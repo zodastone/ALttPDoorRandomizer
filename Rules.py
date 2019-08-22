@@ -259,8 +259,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_Pearl(player) and state.has_sword(player) and state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock (Top)', 'Region', player))  # sword required to cast magic (!)
     set_rule(world.get_location('Mimic Cave', player), lambda state: state.has('Hammer', player))
 
-    set_rule(world.get_entrance('Sewers Door', player), lambda state: state.has_key('Small Key (Escape)', player))
-    set_rule(world.get_entrance('Sewers Back Door', player), lambda state: state.has_key('Small Key (Escape)', player))
+#    set_rule(world.get_entrance('Sewers Door', player), lambda state: state.has_key('Small Key (Escape)', player))
+#    set_rule(world.get_entrance('Sewers Back Door', player), lambda state: state.has_key('Small Key (Escape)', player))
 
     set_rule(world.get_location('Eastern Palace - Big Chest', player), lambda state: state.has('Big Key (Eastern Palace)', player))
     set_rule(world.get_location('Eastern Palace - Boss', player), lambda state: state.can_shoot_arrows(player) and state.has('Big Key (Eastern Palace)', player) and world.get_location('Eastern Palace - Boss', player).parent_region.dungeon.boss.can_defeat(state))
@@ -911,14 +911,15 @@ def no_glitches_rules(world, player):
     add_conditional_lamp('Death Mountain Return Cave Exit (West)', 'Death Mountain Return Cave', 'Entrance')
     add_conditional_lamp('Old Man House Front to Back', 'Old Man House', 'Entrance')
     add_conditional_lamp('Old Man House Back to Front', 'Old Man House', 'Entrance')
-    add_conditional_lamp('Eastern Palace - Big Key Chest', 'Eastern Palace', 'Location')
-    add_conditional_lamp('Eastern Palace - Boss', 'Eastern Palace', 'Location')
-    add_conditional_lamp('Eastern Palace - Prize', 'Eastern Palace', 'Location')
+    # todo: lamp requirements
+#    add_conditional_lamp('Eastern Palace - Big Key Chest', 'Eastern Palace', 'Location')
+#    add_conditional_lamp('Eastern Palace - Boss', 'Eastern Palace', 'Location')
+#    add_conditional_lamp('Eastern Palace - Prize', 'Eastern Palace', 'Location')
 
-    if not world.sewer_light_cone:
-        add_lamp_requirement(world.get_location('Sewers - Dark Cross', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Back Door', player), player)
-        add_lamp_requirement(world.get_entrance('Throne Room', player), player)
+#    if not world.sewer_light_cone:
+#        add_lamp_requirement(world.get_location('Sewers - Dark Cross', player), player)
+#        add_lamp_requirement(world.get_entrance('Sewers Back Door', player), player)
+#        add_lamp_requirement(world.get_entrance('Throne Room', player), player)
 
 
 def open_rules(world, player):
@@ -1474,7 +1475,8 @@ def set_bunny_rules(world, player):
     # regions for the exits of multi-entrace caves/drops that bunny cannot pass
     # Note spiral cave may be technically passible, but it would be too absurd to require since OHKO mode is a thing.
     bunny_impassable_caves = ['Bumper Cave', 'Two Brothers House', 'Hookshot Cave', 'Skull Woods First Section (Right)', 'Skull Woods First Section (Left)', 'Skull Woods First Section (Top)', 'Turtle Rock (Entrance)', 'Turtle Rock (Second Section)', 'Turtle Rock (Big Chest)', 'Skull Woods Second Section (Drop)',
-                              'Turtle Rock (Eye Bridge)', 'Sewers', 'Pyramid', 'Spiral Cave (Top)', 'Desert Palace Main (Inner)', 'Fairy Ascension Cave (Drop)']
+                              'Turtle Rock (Eye Bridge)', 'Pyramid', 'Spiral Cave (Top)', 'Desert Palace Main (Inner)', 'Fairy Ascension Cave (Drop)']
+    # todo: bunny impassable caves - sewers drop may or may not be - maybe just new terminology
 
     bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree', 'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid', 'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins']
 

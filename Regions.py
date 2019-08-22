@@ -99,19 +99,11 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Desert Palace Main (Inner)', 'Desert Palace', None, ['Desert Palace Exit (South)', 'Desert Palace Pots (Inner)']),
         create_dungeon_region(player, 'Desert Palace East', 'Desert Palace', ['Desert Palace - Compass Chest', 'Desert Palace - Big Key Chest']),
         create_dungeon_region(player, 'Desert Palace North', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize'], ['Desert Palace Exit (North)']),
-        create_dungeon_region(player, 'Eastern Palace', 'Eastern Palace', ['Eastern Palace - Compass Chest', 'Eastern Palace - Big Chest', 'Eastern Palace - Cannonball Chest',
-                                                 'Eastern Palace - Big Key Chest', 'Eastern Palace - Map Chest', 'Eastern Palace - Boss', 'Eastern Palace - Prize'], ['Eastern Palace Exit']),
         create_lw_region(player, 'Master Sword Meadow', ['Master Sword Pedestal']),
         create_cave_region(player, 'Lost Woods Gamble', 'a game of chance'),
         create_lw_region(player, 'Hyrule Castle Courtyard', None, ['Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Entrance (South)']),
         create_lw_region(player, 'Hyrule Castle Ledge', None, ['Hyrule Castle Entrance (East)', 'Hyrule Castle Entrance (West)', 'Agahnims Tower', 'Hyrule Castle Ledge Courtyard Drop']),
-        create_dungeon_region(player, 'Hyrule Castle', 'Hyrule Castle', ['Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Map Chest', 'Hyrule Castle - Zelda\'s Chest'],
-                              ['Hyrule Castle Exit (East)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (South)', 'Throne Room']),
         create_dungeon_region(player, 'Sewer Drop', 'a drop\'s exit', None, ['Sewer Drop']),  # This exists only to be referenced for access checks
-        create_dungeon_region(player, 'Sewers (Dark)', 'a drop\'s exit', ['Sewers - Dark Cross'], ['Sewers Door']),
-        create_dungeon_region(player, 'Sewers', 'a drop\'s exit', ['Sewers - Secret Room - Left', 'Sewers - Secret Room - Middle',
-                                         'Sewers - Secret Room - Right'], ['Sanctuary Push Door', 'Sewers Back Door']),
-        create_dungeon_region(player, 'Sanctuary', 'a drop\'s exit', ['Sanctuary'], ['Sanctuary Exit']),
         create_dungeon_region(player, 'Agahnims Tower', 'Castle Tower', ['Castle Tower - Room 03', 'Castle Tower - Dark Maze'], ['Agahnim 1', 'Agahnims Tower Exit']),
         create_dungeon_region(player, 'Agahnim 1', 'Castle Tower', ['Agahnim 1'], None),
         create_cave_region(player, 'Old Man Cave', 'a connector', ['Old Man'], ['Old Man Cave Exit (East)', 'Old Man Cave Exit (West)']),
@@ -290,7 +282,71 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Agahnim 2', 'Ganon\'s Tower', ['Ganons Tower - Validation Chest', 'Agahnim 2'], None),
         create_cave_region(player, 'Pyramid', 'a drop\'s exit', ['Ganon'], ['Ganon Drop']),
         create_cave_region(player, 'Bottom of Pyramid', 'a drop\'s exit', None, ['Pyramid Exit']),
-        create_dw_region(player, 'Pyramid Ledge', None, ['Pyramid Entrance', 'Pyramid Drop'])
+        create_dw_region(player, 'Pyramid Ledge', None, ['Pyramid Entrance', 'Pyramid Drop']),
+
+        create_dungeon_region(player, 'Hyrule Castle Lobby', 'A dungeon', None, ['Hyrule Castle Lobby W', 'Hyrule Castle Lobby E',
+                                                            'Hyrule Castle Lobby WN', 'Hyrule Castle Lobby North Stairs', 'Hyrule Castle Exit (South)']),
+        create_dungeon_region(player, 'Hyrule Castle West Lobby', 'A dungeon', None, ['Hyrule Castle West Lobby E', 'Hyrule Castle West Lobby N',
+                                                                 'Hyrule Castle West Lobby EN', 'Hyrule Castle Exit (West)']),
+        create_dungeon_region(player, 'Hyrule Castle East Lobby', 'A dungeon', None, ['Hyrule Castle East Lobby W', 'Hyrule Castle East Lobby N',
+                                                                 'Hyrule Castle East Lobby NE', 'Hyrule Castle Exit (East)']),
+        create_dungeon_region(player, 'Hyrule Castle East Hall', 'A dungeon', None, ['Hyrule Castle East Hall W', 'Hyrule Castle East Hall S',
+                                                                'Hyrule Castle East Hall SE']),
+        create_dungeon_region(player, 'Hyrule Castle West Hall', 'A dungeon', None, ['Hyrule Castle West Hall E', 'Hyrule Castle West Hall S']),
+        create_dungeon_region(player, 'Hyrule Castle Back Hall', 'A dungeon', None, ['Hyrule Castle Back Hall E', 'Hyrule Castle Back Hall W', 'Hyrule Castle Back Hall Down Stairs']),
+        create_dungeon_region(player, 'Hyrule Castle Throne Room', 'A dungeon', None, ['Hyrule Castle Throne Room N', 'Hyrule Castle Throne Room South Stairs']),
+
+        create_dungeon_region(player, 'Hyrule Dungeon Map Room', 'A dungeon', ['Hyrule Castle - Map Chest'], ['Hyrule Dungeon Key Door S', 'Hyrule Dungeon Map Room Up Stairs']),
+        create_dungeon_region(player, 'Hyrule Dungeon North Abyss', 'A dungeon', None, ['Hyrule Dungeon North Abyss South Edge', 'Hyrule Dungeon Key Door N']),
+        create_dungeon_region(player, 'Hyrule Dungeon North Abyss Catwalk', 'A dungeon', None, ['Hyrule Dungeon North Abyss Catwalk Edge', 'Hyrule Dungeon North Abyss Catwalk Dropdown']),
+        create_dungeon_region(player, 'Hyrule Dungeon South Abyss', 'A dungeon', None, ['Hyrule Dungeon South Abyss North Edge', 'Hyrule Dungeon South Abyss West Edge']),
+        create_dungeon_region(player, 'Hyrule Dungeon South Abyss Catwalk', 'A dungeon', None, ['Hyrule Dungeon South Abyss Catwalk North Edge', 'Hyrule Dungeon South Abyss Catwalk West Edge']),
+        create_dungeon_region(player, 'Hyrule Dungeon Guardroom', 'A dungeon', None, ['Hyrule Dungeon Guardroom Catwalk Edge', 'Hyrule Dungeon Guardroom Abyss Edge', 'Hyrule Dungeon Guardroom N']),
+        create_dungeon_region(player, 'Hyrule Dungeon Armory', 'A dungeon', ['Hyrule Castle - Boomerang Chest'], ['Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory Down Stairs']),
+        create_dungeon_region(player, 'Hyrule Dungeon Staircase', 'A dungeon', None, ['Hyrule Dungeon Staircase Up Stairs', 'Hyrule Dungeon Staircase Down Stairs']),
+        create_dungeon_region(player, 'Hyrule Dungeon Cellblock', 'A dungeon', ['Hyrule Castle - Zelda\'s Chest'], ['Hyrule Dungeon Cellblock Up Stairs']),
+
+
+        create_dungeon_region(player, 'Sewers Behind Tapestry', 'A dungeon', None, ['Sewers Behind Tapestry S', 'Sewers Behind Tapestry Down Stairs']),
+        create_dungeon_region(player, 'Sewers Rope Room', 'A dungeon', None, ['Sewers Rope Room Up Stairs', 'Sewers Rope Room North Stairs']),
+        create_dungeon_region(player, 'Sewers Dark Cross', 'A dungeon', ['Sewers - Dark Cross'], ['Sewers Dark Cross Key Door N', 'Sewers Dark Cross South Stairs']),
+        create_dungeon_region(player, 'Sewers Water', 'A dungeon', None, ['Sewers Dark Cross Key Door S', 'Sewers Water W']),
+        create_dungeon_region(player, 'Sewers Key Rat', 'A dungeon', None, ['Sewers Key Rat E', 'Sewers Key Rat Key Door N']),
+        create_dungeon_region(player, 'Sewers Secret Room', 'A dungeon', ['Sewers - Secret Room - Left', 'Sewers - Secret Room - Middle', 'Sewers - Secret Room - Right'],
+                              ['Sewers Secret Room Key Door S', 'Sewers Secret Room Up Stairs']),
+        create_dungeon_region(player, 'Sewers Pull Switch', 'A dungeon', None, ['Sewers Pull Switch Down Stairs', 'Sewers Pull Switch S']),
+        create_dungeon_region(player, 'Sanctuary', 'A dungeon', ['Sanctuary'], ['Sanctuary Exit', 'Sanctuary N']),
+
+        # Eastern Palace
+        create_dungeon_region(player, 'Eastern Lobby', 'A dungeon', None, ['Eastern Lobby N', 'Eastern Palace Exit']),
+        create_dungeon_region(player, 'Eastern Cannonball', 'A dungeon', ['Eastern Palace - Cannonball Chest'], ['Eastern Cannonball S', 'Eastern Cannonball N']),
+        create_dungeon_region(player, 'Eastern Cannonball Ledge', 'A dungeon', None, ['Eastern Cannonball Ledge WN', 'Eastern Cannonball Ledge Key Door EN']),
+        create_dungeon_region(player, 'Eastern Courtyard Ledge', 'A dungeon', None, ['Eastern Courtyard Ledge S', 'Eastern Courtyard Ledge W', 'Eastern Courtyard Ledge E']),
+        create_dungeon_region(player, 'Eastern Map Area', 'A dungeon', ['Eastern Palace - Map Chest'], ['Eastern Map Area W']),
+        create_dungeon_region(player, 'Eastern Compass Area', 'A dungeon', ['Eastern Palace - Compass Chest'], ['Eastern Compass Area E', 'Eastern Compass Area EN', 'Eastern Compass Area SW']),
+        create_dungeon_region(player, 'Eastern Courtyard', 'A dungeon', ['Eastern Palace - Big Chest'], ['Eastern Courtyard WN', 'Eastern Courtyard EN', 'Eastern Courtyard N', 'Eastern Courtyard Potholes']),
+        create_dungeon_region(player, 'Eastern Fairies', 'A dungeon', None, ['Eastern Fairies\' Warp']),
+        create_dungeon_region(player, 'Eastern Map Valley', 'A dungeon', None, ['Eastern Map Valley WN', 'Eastern Map Valley SW']),
+        create_dungeon_region(player, 'Eastern Dark Square', 'A dungeon', None, ['Eastern Dark Square NW', 'Eastern Dark Square Key Door WN']),
+        create_dungeon_region(player, 'Eastern Big Key', 'A dungeon', ['Eastern Palace - Big Key Chest'], ['Eastern Big Key EN', 'Eastern Big Key NE']),
+        create_dungeon_region(player, 'Eastern Darkness', 'A dungeon', None, ['Eastern Darkness S', 'Eastern Darkness Up Stairs']),
+        create_dungeon_region(player, 'Eastern Attic Start', 'A dungeon', None, ['Eastern Attic Start Down Stairs', 'Eastern Attic Start WS']),
+        create_dungeon_region(player, 'Eastern Attic Switches', 'A dungeon', None, ['Eastern Attic Switches ES', 'Eastern Attic Switches WS']),
+        create_dungeon_region(player, 'Eastern Eyegores', 'A dungeon', None, ['Eastern Eyegores ES', 'Eastern Eyegores NE']),
+        create_dungeon_region(player, 'Eastern Boss', 'A dungeon', ['Eastern Palace - Boss', 'Eastern Palace - Prize'], ['Eastern Boss SE']),
+
+        # pod
+        # tt
+        # swamp
+        # ice
+        # mire
+        # tr
+        # gt
+        # sw
+
+        # desert
+        # hera
+        # AgaTower
     ]
 
     for region_name, (room_id, shopkeeper, replaceable) in shop_table.items():
@@ -344,7 +400,7 @@ def mark_light_world_regions(world):
         current = queue.popleft()
         current.is_light_world = True
         for exit in current.exits:
-            if exit.connected_region.type == RegionType.DarkWorld:
+            if exit.connected_region is None or exit.connected_region.type == RegionType.DarkWorld:  # todo: remove none check
                 # Don't venture into the dark world
                 continue
             if exit.connected_region not in seen:

@@ -80,6 +80,7 @@ class World(object):
         self.dynamic_locations = []
         self.spoiler = Spoiler(self)
         self.lamps_needed_for_dark_rooms = 1
+        self.doors = []
 
     def intialize_regions(self):
         for region in self.regions:
@@ -131,6 +132,24 @@ class World(object):
             if dungeon.name == dungeonname and dungeon.player == player:
                 return dungeon
         raise RuntimeError('No such dungeon %s for player %d' % (dungeonname, player))
+
+    def get_door(self, doorname, player):
+        if isinstance(doorname, Door):
+            return doorname
+
+        for door in self.doors:
+            if door.name == doorname and door.player == player:
+                return door
+        raise RuntimeError('No such door %s' % doorname)
+
+    def check_for_door(self, doorname, player):
+        if isinstance(doorname, Door):
+            return doorname
+
+        for door in self.doors:
+            if door.name == doorname and door.player == player:
+                return door
+        return None
 
     def get_all_state(self, keys=False):
         ret = CollectionState(self)
@@ -318,7 +337,7 @@ class CollectionState(object):
         new_regions = True
         reachable_regions_count = len(rrp)
         while new_regions:
-            possible = [region for region in player_regions if region not in rrp] 
+            possible = [region for region in player_regions if region not in rrp]
             for candidate in possible:
                 if candidate.can_reach_private(self):
                     rrp.add(candidate)
@@ -346,7 +365,7 @@ class CollectionState(object):
             else:
                 # default to Region
                 spot = self.world.get_region(spot, player)
-                
+
         return spot.can_reach(self)
 
     def sweep_for_events(self, key_only=False, locations=None):
@@ -482,14 +501,14 @@ class CollectionState(object):
 
     def can_melt_things(self, player):
         return self.has('Fire Rod', player) or (self.has('Bombos', player) and self.has_sword(player))
-    
+
     def can_avoid_lasers(self, player):
         return self.has('Mirror Shield', player) or self.has('Cane of Byrna', player) or self.has('Cape', player)
 
     def is_not_bunny(self, region, player):
         if self.has_Pearl(player):
-            return True 
-        
+            return True
+
         return region.is_light_world if self.world.mode != 'inverted' else region.is_dark_world
 
     def has_misery_mire_medallion(self, player):
@@ -555,7 +574,7 @@ class CollectionState(object):
         elif event or item.advancement:
             self.prog_items.add((item.name, item.player))
             changed = True
-        
+
         self.stale[item.player] = True
 
         if changed:
@@ -731,6 +750,14 @@ class Dungeon(object):
         self.bosses = dict()
         self.player = player
         self.world = None
+        self.paths = None
+        self.path_completion = dict()
+        self.key_number = len(small_keys)
+        self.big_key_required = True if self.big_key else False
+        self.chunks = list()
+
+        self.unlinked_doors = set([])
+        self.chests = 0
 
     @property
     def boss(self):
@@ -751,6 +778,16 @@ class Dungeon(object):
     def is_dungeon_item(self, item):
         return item.player == self.player and item.name in [dungeon_item.name for dungeon_item in self.all_items]
 
+    def count_dungeon_item(self):
+        return len(self.dungeon_items) + 1 if self.big_key_required else 0 + self.key_number
+
+    def incomplete_paths(self):
+        ret = 0
+        for path in self.paths:
+            if not self.path_completion[path]:
+                ret += 1
+        return ret
+
     def __str__(self):
         return str(self.__unicode__())
 
@@ -759,6 +796,56 @@ class Dungeon(object):
             return self.name
         else:
             return '%s (Player %d)' % (self.name, self.player)
+
+
+@unique
+class DoorType(Enum):
+    Normal = 1
+    SpiralStairs = 2
+    StraightStairs = 3
+    Ladder = 4
+    Open = 5
+    Hole = 6
+    Warp = 7
+
+
+@unique
+class Direction(Enum):
+    North = 1
+    West = 2
+    South = 3
+    East = 4
+
+
+class Door(object):
+    def __init__(self, player, name, type, direction):
+        self.player = player
+        self.name = name
+        self.type = type
+        self.direction = direction
+        self.connected = False
+        self.parentChunk = None
+        # probably need exact location of the 12 base types (6 intraroom doors)
+        # need the z-index
+        # need the room index it is located in most likely
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+    def __unicode__(self):
+        return '%s' % self.name
+
+
+class RegionChunk(object):
+
+    def __init__(self):
+        self.regions = []
+        self.outflow = 0
+        self.paths_needed = []
+        self.chests = 0
+        self.entrance = False
+        self.unlinked_doors = set([])
+
 
 class Boss(object):
     def __init__(self, name, enemizer_name, defeat_rule, player):
