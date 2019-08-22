@@ -4,6 +4,7 @@ import logging
 
 
 from BaseClasses import RegionType, DoorType, Direction, RegionChunk
+from Items import ItemFactory
 
 
 def link_doors(world, player):
@@ -14,7 +15,7 @@ def link_doors(world, player):
     for exitName, regionName in mandatory_connections:
         connect_simple_door(world, exitName, regionName, player)
 
-    # These connection are because they are currently unable to be shuffled
+    # These connection are here because they are currently unable to be shuffled
     for entrance, ext in spiral_staircases:
         connect_two_way(world, entrance, ext, player)
     for entrance, ext in straight_staircases:
@@ -25,6 +26,39 @@ def link_doors(world, player):
         connect_simple_door(world, exitName, regionName, player)
     for exitName, regionName in dungeon_warps:
         connect_simple_door(world, exitName, regionName, player)
+
+    # vanilla - todo: different modes
+    for entrance, ext in default_door_connections:
+        connect_two_way(world, entrance, ext, player)
+    for ent, ext in default_one_way_connections:
+        connect_one_way(world, ent, ext, player)
+
+    # vanilla dungeon items
+    ES = world.get_dungeon('Hyrule Castle', player)
+    ES.small_keys = [ItemFactory('Small Key (Escape)', player)]
+    EP = world.get_dungeon('Eastern Palace', player)
+    EP.big_key = ItemFactory('Big Key (Eastern Palace)', player)
+
+    # traverse dungeons and make sure dungeon property is assigned
+    playerDungeons = [dungeon for dungeon in world.dungeons if dungeon.player == player]
+    for dungeon in playerDungeons:
+        queue = collections.deque(dungeon.regions)
+        while len(queue) > 0:
+            region = world.get_region(queue.popleft(), player)
+            if region.name not in dungeon.regions:
+                dungeon.regions.append(region.name)
+                region.dungeon = dungeon
+            for ext in region.exits:
+                d = world.check_for_door(ext.name, player)
+                connected = ext.connected_region
+                if d is not None and connected is not None:
+                    if d.connected and connected.name not in dungeon.regions and connected.type == RegionType.Dungeon and connected.name not in queue:
+                        queue.append(connected)  # needs to be added
+                elif connected is not None and connected.name not in dungeon.regions and connected.type == RegionType.Dungeon and connected.name not in queue:
+                    queue.append(connected)  # needs to be added
+    return
+
+    #code below is a prototype for cross-dungeon mode
 
     # figure out which dungeons have open doors and which doors still need to be connected
 
@@ -466,6 +500,8 @@ def connect_two_way(world, entrancename, exitname, player):
     # todo - rom indications, access rules for the doors...
     entrance.connect(ext.parent_region)
     ext.connect(entrance.parent_region)
+    if entrance.parent_region.dungeon:
+        ext.parent_region.dungeon = entrance.parent_region.dungeon
     d = world.check_for_door(entrancename, player)
     if d is not None:
         d.connected = True
@@ -473,6 +509,27 @@ def connect_two_way(world, entrancename, exitname, player):
     if d is not None:
         d.connected = True
     #  world.spoiler.set_entrance(entrance.name, exit.name, 'both') # todo: spoiler stuff
+
+def connect_one_way(world, entrancename, exitname, player):
+    entrance = world.get_entrance(entrancename, player)
+    ext = world.get_entrance(exitname, player)
+
+    # if these were already connected somewhere, remove the backreference
+    if entrance.connected_region is not None:
+        entrance.connected_region.entrances.remove(entrance, player)
+    if ext.connected_region is not None:
+        ext.connected_region.entrances.remove(ext)
+
+    entrance.connect(ext.parent_region)
+    d = world.check_for_door(entrancename, player)
+    if entrance.parent_region.dungeon:
+        ext.parent_region.dungeon = entrance.parent_region.dungeon
+    if d is not None:
+        d.connected = True
+    d = world.check_for_door(exitname, player)
+    if d is not None:
+        d.connected = True
+    # spoiler info goes here?
 
 
 mandatory_connections = [('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
@@ -518,5 +575,32 @@ falldown_pits = [('Eastern Courtyard Potholes', 'Eastern Fairies')]
 
 dungeon_warps = [('Eastern Fairies\' Warp', 'Eastern Courtyard')]
 
-#todo : vanilla dungeon connections, I guess to get to rom patching
-default_door_connections = [('', '')]
+default_door_connections = [('Hyrule Castle Lobby W', 'Hyrule Castle West Lobby E'),
+                            ('Hyrule Castle Lobby E', 'Hyrule Castle East Lobby W'),
+                            ('Hyrule Castle Lobby WN', 'Hyrule Castle West Lobby EN'),
+                            ('Hyrule Castle West Lobby N', 'Hyrule Castle West Hall S'),
+                            ('Hyrule Castle East Lobby N', 'Hyrule Castle East Hall S'),
+                            ('Hyrule Castle East Lobby NE', 'Hyrule Castle East Hall SE'),
+                            ('Hyrule Castle East Hall W', 'Hyrule Castle Back Hall E'),
+                            ('Hyrule Castle West Hall E', 'Hyrule Castle Back Hall W'),
+                            ('Hyrule Castle Throne Room N', 'Sewers Behind Tapestry S'),
+                            ('Hyrule Dungeon Guardroom N', 'Hyrule Dungeon Armory S'),
+                            ('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
+                            ('Sewers Water W', 'Sewers Key Rat E'),
+                            ('Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S'),
+                            ('Eastern Lobby N', 'Eastern Cannonball S'),
+                            ('Eastern Cannonball N', 'Eastern Courtyard Ledge S'),
+                            ('Eastern Cannonball Ledge WN', 'Eastern Big Key EN'),
+                            ('Eastern Cannonball Ledge Key Door EN', 'Eastern Dark Square Key Door WN'),
+                            ('Eastern Courtyard Ledge W', 'Eastern Compass Area E'),
+                            ('Eastern Courtyard Ledge E', 'Eastern Map Area W'),
+                            ('Eastern Compass Area EN', 'Eastern Courtyard WN'),
+                            ('Eastern Courtyard EN', 'Eastern Map Valley WN'),
+                            ('Eastern Courtyard N', 'Eastern Darkness S'),
+                            ('Eastern Map Valley SW', 'Eastern Dark Square NW'),
+                            ('Eastern Attic Start WS', 'Eastern Attic Switches ES'),
+                            ('Eastern Attic Switches WS', 'Eastern Eyegores ES'),
+                            ('Eastern Eyegores NE', 'Eastern Boss SE')]
+# ('', ''),
+default_one_way_connections = [('Sewers Pull Switch S', 'Sanctuary N'),
+                               ('Eastern Big Key NE', 'Eastern Compass Area SW')]

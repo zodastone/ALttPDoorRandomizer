@@ -55,11 +55,10 @@ def main(args, seed=None):
             create_doors(world, player)
             create_dungeons(world, player)
 
-    # Uncomment to try to shuffle stuff
-    # logger.info('Shuffling dungeons')
+    logger.info('Shuffling dungeons')
 
-    # for player in range(1, world.players + 1):
-    #    link_doors(world, player)
+    for player in range(1, world.players + 1):
+        link_doors(world, player)
 
     logger.info('Shuffling the World about.')
 
