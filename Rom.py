@@ -7,7 +7,7 @@ import random
 import struct
 import subprocess
 
-from BaseClasses import ShopType, Region, Location, Item
+from BaseClasses import ShopType, Region, Location, Item, DoorType
 from Dungeons import dungeon_music_addresses
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
 from Text import Uncle_texts, Ganon1_texts, TavernMan_texts, Sahasrahla2_texts, Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
@@ -532,7 +532,13 @@ def patch_rom(world, player, rom):
                     rom.write_byte(0xDBB73 + exit.addresses, exit.target)
     if world.mode == 'inverted':
         patch_shuffled_dark_sanc(world, rom, player)
-        
+
+    # patch doors
+    if world.doorShuffle != 'vanilla':
+        for door in world.doors:
+            if door.dest is not None and door.player == player and door.type == DoorType.Normal:
+                rom.write_bytes(door.getAddress(), door.dest.getTarget(door.toggle))
+
     write_custom_shops(rom, world, player)
 
     # patch medallion requirements

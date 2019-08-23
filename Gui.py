@@ -18,7 +18,7 @@ from Utils import is_bundled, local_path, output_path, open_file
 
 def guiMain(args=None):
     mainWindow = Tk()
-    mainWindow.wm_title("Entrance Shuffle %s" % ESVersion)
+    mainWindow.wm_title("Door Shuffle %s" % ESVersion)
 
     set_icon(mainWindow)
 
@@ -203,6 +203,14 @@ def guiMain(args=None):
     shuffleLabel = Label(shuffleFrame, text='Entrance shuffle algorithm')
     shuffleLabel.pack(side=LEFT)
 
+    doorShuffleFrame = Frame(drowDownFrame)
+    doorShuffleVar = StringVar()
+    doorShuffleVar.set('vanilla')
+    doorShuffleOptionMenu = OptionMenu(doorShuffleFrame, doorShuffleVar, 'vanilla', 'basic', 'crosssed', 'experimental')
+    doorShuffleOptionMenu.pack(side=RIGHT)
+    doorShuffleLabel = Label(shuffleFrame, text='Door shuffle algorithm')
+    doorShuffleLabel.pack(side=LEFT)
+
     heartbeepFrame = Frame(drowDownFrame)
     heartbeepVar = StringVar()
     heartbeepVar.set('normal')
@@ -235,6 +243,7 @@ def guiMain(args=None):
     progressiveFrame.pack(expand=True, anchor=E)
     algorithmFrame.pack(expand=True, anchor=E)
     shuffleFrame.pack(expand=True, anchor=E)
+    doorShuffleFrame.pack(expand=True, anchor=E)
     heartbeepFrame.pack(expand=True, anchor=E)
     heartcolorFrame.pack(expand=True, anchor=E)
     fastMenuFrame.pack(expand=True, anchor=E)
@@ -320,6 +329,7 @@ def guiMain(args=None):
         guiargs.progressive = progressiveVar.get()
         guiargs.algorithm = algorithmVar.get()
         guiargs.shuffle = shuffleVar.get()
+        guiargs.door_shuffle = doorShuffleVar.get()
         guiargs.heartbeep = heartbeepVar.get()
         guiargs.heartcolor = heartcolorVar.get()
         guiargs.fastmenu = fastMenuVar.get()
@@ -1080,6 +1090,7 @@ def guiMain(args=None):
         goalVar.set(args.goal)
         algorithmVar.set(args.algorithm)
         shuffleVar.set(args.shuffle)
+        doorShuffleVar.set(args.door_shuffle)
         heartbeepVar.set(args.heartbeep)
         fastMenuVar.set(args.fastmenu)
         logicVar.set(args.logic)

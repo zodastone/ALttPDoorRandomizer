@@ -118,7 +118,7 @@ def start():
     parser.add_argument('--algorithm', default='balanced', const='balanced', nargs='?', choices=['freshness', 'flood', 'vt21', 'vt22', 'vt25', 'vt26', 'balanced'],
                         help='''\
                              Select item filling algorithm. (default: %(default)s
-                             balanced:    vt26 derivitive that aims to strike a balance between
+                             balanced:    vt26 derivative that aims to strike a balance between
                                           the overworld heavy vt25 and the dungeon heavy vt26
                                           algorithm.
                              vt26:        Shuffle items and place them in a random location
@@ -162,6 +162,17 @@ def start():
                              The dungeon variants only mix up dungeons and keep the rest of
                              the overworld vanilla.
                              ''')
+    parser.add_argument('--door_shuffle', default='vanilla', const='vanilla', nargs='?', choices=['vanilla', 'basic', 'crossed', 'experimental'],
+                        help='''\
+                            Select Door Shuffling Algorithm. (default: %(default)s)
+                            Basic:      Doors are mixed within a single dungeon.
+                                        (Not yet implemented)
+                            Crossed:    Doors are mixed between all dungeons.
+                                        (Not yet implemented)
+                            Vanilla:    All doors are connected the same way the were in the
+                                        base game.
+                            Experimental: Experimental mixes live here. Use at your own risk.                        
+                        ''')
     parser.add_argument('--crystals_ganon', default='7', const='7', nargs='?', choices=['random', '0', '1', '2', '3', '4', '5', '6', '7'],
                         help='''\
                              How many crystals are needed to defeat ganon. Any other 

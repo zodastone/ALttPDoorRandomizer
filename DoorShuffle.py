@@ -9,8 +9,6 @@ from Items import ItemFactory
 
 def link_doors(world, player):
 
-    logger = logging.getLogger('')
-
     # Make drop-down connections - if applicable
     for exitName, regionName in mandatory_connections:
         connect_simple_door(world, exitName, regionName, player)
@@ -27,18 +25,34 @@ def link_doors(world, player):
     for exitName, regionName in dungeon_warps:
         connect_simple_door(world, exitName, regionName, player)
 
-    # vanilla - todo: different modes
-    for entrance, ext in default_door_connections:
-        connect_two_way(world, entrance, ext, player)
-    for ent, ext in default_one_way_connections:
-        connect_one_way(world, ent, ext, player)
+    if world.doorShuffle == 'vanilla':
+        for entrance, ext in default_door_connections:
+            connect_two_way(world, entrance, ext, player)
+        for ent, ext in default_one_way_connections:
+            connect_one_way(world, ent, ext, player)
+        normal_dungeon_pool(world, player)
+    elif world.doorShuffle == 'basic':
+        normal_dungeon_pool(world, player)
+        within_dungeon(world, player)
+    elif world.doorShuffle == 'crossed':
+        normal_dungeon_pool(world, player)
+        cross_dungeon(world, player)
+    elif world.doorShuffle == 'experimental':
+        normal_dungeon_pool(world, player)
+        experiment(world, player)
 
+    mark_regions(world, player)
+
+
+def normal_dungeon_pool(world, player):
     # vanilla dungeon items
     ES = world.get_dungeon('Hyrule Castle', player)
     ES.small_keys = [ItemFactory('Small Key (Escape)', player)]
     EP = world.get_dungeon('Eastern Palace', player)
     EP.big_key = ItemFactory('Big Key (Eastern Palace)', player)
 
+
+def mark_regions(world, player):
     # traverse dungeons and make sure dungeon property is assigned
     playerDungeons = [dungeon for dungeon in world.dungeons if dungeon.player == player]
     for dungeon in playerDungeons:
@@ -52,13 +66,84 @@ def link_doors(world, player):
                 d = world.check_for_door(ext.name, player)
                 connected = ext.connected_region
                 if d is not None and connected is not None:
-                    if d.connected and connected.name not in dungeon.regions and connected.type == RegionType.Dungeon and connected.name not in queue:
+                    if d.dest is not None and connected.name not in dungeon.regions and connected.type == RegionType.Dungeon and connected.name not in queue:
                         queue.append(connected)  # needs to be added
                 elif connected is not None and connected.name not in dungeon.regions and connected.type == RegionType.Dungeon and connected.name not in queue:
                     queue.append(connected)  # needs to be added
-    return
 
-    #code below is a prototype for cross-dungeon mode
+
+# some useful functions
+def switch_dir(direction):
+    oppositemap = {
+        Direction.South: Direction.North,
+        Direction.North: Direction.South,
+        Direction.West: Direction.East,
+        Direction.East: Direction.West,
+    }
+    return oppositemap[direction]
+
+
+def connect_simple_door(world, exit_name, region_name, player):
+    region = world.get_region(region_name, player)
+    world.get_entrance(exit_name, player).connect(region)
+    d = world.check_for_door(exit_name, player)
+    if d is not None:
+        d.dest = region
+
+
+def connect_two_way(world, entrancename, exitname, player):
+    entrance = world.get_entrance(entrancename, player)
+    ext = world.get_entrance(exitname, player)
+
+    # if these were already connected somewhere, remove the backreference
+    if entrance.connected_region is not None:
+        entrance.connected_region.entrances.remove(entrance, player)
+    if ext.connected_region is not None:
+        ext.connected_region.entrances.remove(ext)
+
+    # todo - access rules for the doors...
+    entrance.connect(ext.parent_region)
+    ext.connect(entrance.parent_region)
+    if entrance.parent_region.dungeon:
+        ext.parent_region.dungeon = entrance.parent_region.dungeon
+    x = world.check_for_door(entrancename, player)
+    y = world.check_for_door(exitname, player)
+    if x is not None:
+        x.dest = y
+    if y is not None:
+        y.dest = x
+    #  world.spoiler.set_entrance(entrance.name, exit.name, 'both') # todo: spoiler stuff
+
+
+def connect_one_way(world, entrancename, exitname, player):
+    entrance = world.get_entrance(entrancename, player)
+    ext = world.get_entrance(exitname, player)
+
+    # if these were already connected somewhere, remove the backreference
+    if entrance.connected_region is not None:
+        entrance.connected_region.entrances.remove(entrance, player)
+    if ext.connected_region is not None:
+        ext.connected_region.entrances.remove(ext)
+
+    entrance.connect(ext.parent_region)
+    if entrance.parent_region.dungeon:
+        ext.parent_region.dungeon = entrance.parent_region.dungeon
+    x = world.check_for_door(entrancename, player)
+    y = world.check_for_door(exitname, player)
+    if x is not None:
+        x.dest = y
+    if y is not None:
+        y.dest = x
+    # spoiler info goes here?
+
+
+def within_dungeon(world, player):
+    raise NotImplementedError('Haven\'t started this yet')
+
+
+# code below is an early prototype for cross-dungeon mode
+def cross_dungeon(world, player):
+    logger = logging.getLogger('')
 
     # figure out which dungeons have open doors and which doors still need to be connected
 
@@ -79,15 +164,15 @@ def link_doors(world, player):
     available_doors = set(world.doors)
 
     unfinished_dungeons = []
-    # modfiy avail doors and d_regions, produces a list of unlinked doors
+    # modify avail doors and d_regions, produces a list of unlinked doors
     for dungeon in world.dungeons:
         dungeon.paths = dungeon_paths[dungeon.name]
         for path in dungeon.paths:
             dungeon.path_completion[path] = False
         for regionName in list(dungeon.regions):
-            region = world.get_region(regionName)
+            region = world.get_region(regionName, player)
             dungeon.regions.remove(regionName)
-            chunk = create_chunk(world, region, available_dungeon_regions, available_doors)
+            chunk = create_chunk(world, player, region, available_dungeon_regions, available_doors)
             dungeon.chunks.append(chunk)
             # todo: indicate entrance chunks
             dungeon.regions.extend(chunk.regions)
@@ -108,7 +193,7 @@ def link_doors(world, player):
     avail_chunks = []
     while len(available_dungeon_regions) > 0:
         region = available_dungeon_regions.pop()
-        chunk = create_chunk(world, region, available_dungeon_regions)
+        chunk = create_chunk(world, player, region, available_dungeon_regions)
         if chunk.outflow > 0:
             avail_chunks.append(chunk)
 
@@ -126,11 +211,11 @@ def link_doors(world, player):
     for dungeon in unfinished_dungeons:
         logger.info('Starting %s', dungeon.name)
         bailcnt = 0
-        while not is_dungeon_finished(world, dungeon):
+        while not is_dungeon_finished(world, player, dungeon):
             # pick some unfinished criteria to help?
             trgt_pct = len(dungeon.regions) / target_regions
             for path in dungeon.paths:
-                find_path(world, path, dungeon.path_completion)
+                find_path(world, player, path, dungeon.path_completion)
 
             # process - expand to about half size
             # start closing off unlinked doors - self pick vs dead end pick
@@ -187,14 +272,13 @@ def link_doors(world, player):
             else:
                 bailcnt += 1
 
-            if len(dungeon.unlinked_doors) == 0 and not is_dungeon_finished(world, dungeon):
+            if len(dungeon.unlinked_doors) == 0 and not is_dungeon_finished(world, player, dungeon):
                 raise RuntimeError('Made a bad dungeon - more smarts needed')
             if bailcnt > 100:
                 raise RuntimeError('Infinite loop detected - see output')
 
 
-
-def create_chunk(world, newregion, available_dungeon_regions, available_doors=None):
+def create_chunk(world, player, newregion, available_dungeon_regions, available_doors=None):
     # if newregion.name in dungeon.regions:
     # return  # we've been here before
     chunk = RegionChunk()
@@ -206,14 +290,14 @@ def create_chunk(world, newregion, available_dungeon_regions, available_doors=No
             available_dungeon_regions.remove(region)
         chunk.chests += len(region.locations)
         for ext in region.exits:
-            d = world.check_for_door(ext.name)
+            d = world.check_for_door(ext.name, player)
             connected = ext.connected_region
             # todo - check for key restrictions?
             if d is not None:
                 if available_doors is not None:
                     available_doors.remove(d)
                 d.parentChunk = chunk
-                if not d.connected:
+                if d.dest is None:
                     chunk.outflow += 1
                     # direction of door catalog ?
                     chunk.unlinked_doors.add(d)
@@ -438,11 +522,11 @@ def valid_self_pick(src_door, dest_door):
     return False
 
 
-def is_dungeon_finished(world, dungeon):
+def is_dungeon_finished(world, player, dungeon):
     if len(dungeon.unlinked_doors) > 0:  # no unlinked doors
         return False
     for path in dungeon.paths:  # paths through dungeon are possible
-        if not find_path(world, path, dungeon.path_completion):
+        if not find_path(world, player, path, dungeon.path_completion):
             return False
     # if dungeon.chests < dungeon.count_dungeon_item() + 2:  # 2 or more chests reachable in dungeon than number of dungeon items
     #    return False
@@ -451,11 +535,11 @@ def is_dungeon_finished(world, dungeon):
     return True
 
 
-def find_path(world, path, path_completion):
+def find_path(world, player, path, path_completion):
     if path_completion[path]:   # found it earlier -- assuming no disconnects
         return True
     visited_regions = set([])
-    queue = collections.deque([world.get_region(path[0])])
+    queue = collections.deque([world.get_region(path[0], player)])
     while len(queue) > 0:
         region = queue.popleft()
         if region.name == path[1]:
@@ -469,68 +553,18 @@ def find_path(world, path, path_completion):
                 queue.append(connected)
     return False
 
-
-def switch_dir(direction):
-    oppositemap = {
-        Direction.South: Direction.North,
-        Direction.North: Direction.South,
-        Direction.West: Direction.East,
-        Direction.East: Direction.West,
-    }
-    return oppositemap[direction]
-
-
-def connect_simple_door(world, exit_name, region_name, player):
-    world.get_entrance(exit_name, player).connect(world.get_region(region_name, player))
-    d = world.check_for_door(exit_name, player)
-    if d is not None:
-        d.connected = True
+def experiment(world, player):
+    for ent, ext in experimental_connections:
+        if world.get_door(ent, player).blocked:
+            connect_one_way(world, ext, ent, player)
+        elif  world.get_door(ext, player).blocked:
+            connect_one_way(world, ent, ext, player)
+        else:
+            connect_two_way(world, ent, ext, player)
 
 
-def connect_two_way(world, entrancename, exitname, player):
-    entrance = world.get_entrance(entrancename, player)
-    ext = world.get_entrance(exitname, player)
 
-    # if these were already connected somewhere, remove the backreference
-    if entrance.connected_region is not None:
-        entrance.connected_region.entrances.remove(entrance, player)
-    if ext.connected_region is not None:
-        ext.connected_region.entrances.remove(ext)
-
-    # todo - rom indications, access rules for the doors...
-    entrance.connect(ext.parent_region)
-    ext.connect(entrance.parent_region)
-    if entrance.parent_region.dungeon:
-        ext.parent_region.dungeon = entrance.parent_region.dungeon
-    d = world.check_for_door(entrancename, player)
-    if d is not None:
-        d.connected = True
-    d = world.check_for_door(exitname, player)
-    if d is not None:
-        d.connected = True
-    #  world.spoiler.set_entrance(entrance.name, exit.name, 'both') # todo: spoiler stuff
-
-def connect_one_way(world, entrancename, exitname, player):
-    entrance = world.get_entrance(entrancename, player)
-    ext = world.get_entrance(exitname, player)
-
-    # if these were already connected somewhere, remove the backreference
-    if entrance.connected_region is not None:
-        entrance.connected_region.entrances.remove(entrance, player)
-    if ext.connected_region is not None:
-        ext.connected_region.entrances.remove(ext)
-
-    entrance.connect(ext.parent_region)
-    d = world.check_for_door(entrancename, player)
-    if entrance.parent_region.dungeon:
-        ext.parent_region.dungeon = entrance.parent_region.dungeon
-    if d is not None:
-        d.connected = True
-    d = world.check_for_door(exitname, player)
-    if d is not None:
-        d.connected = True
-    # spoiler info goes here?
-
+# DATA GOES DOWN HERE
 
 mandatory_connections = [('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
                          ('Hyrule Dungeon Key Door S', 'Hyrule Dungeon North Abyss'),
@@ -580,7 +614,7 @@ default_door_connections = [('Hyrule Castle Lobby W', 'Hyrule Castle West Lobby 
                             ('Hyrule Castle Lobby WN', 'Hyrule Castle West Lobby EN'),
                             ('Hyrule Castle West Lobby N', 'Hyrule Castle West Hall S'),
                             ('Hyrule Castle East Lobby N', 'Hyrule Castle East Hall S'),
-                            ('Hyrule Castle East Lobby NE', 'Hyrule Castle East Hall SE'),
+                            ('Hyrule Castle East Lobby NW', 'Hyrule Castle East Hall SW'),
                             ('Hyrule Castle East Hall W', 'Hyrule Castle Back Hall E'),
                             ('Hyrule Castle West Hall E', 'Hyrule Castle Back Hall W'),
                             ('Hyrule Castle Throne Room N', 'Sewers Behind Tapestry S'),
@@ -604,3 +638,24 @@ default_door_connections = [('Hyrule Castle Lobby W', 'Hyrule Castle West Lobby 
 # ('', ''),
 default_one_way_connections = [('Sewers Pull Switch S', 'Sanctuary N'),
                                ('Eastern Big Key NE', 'Eastern Compass Area SW')]
+
+
+experimental_connections = [('Eastern Boss SE', 'Eastern Courtyard N'),
+                            ('Eastern Courtyard EN', 'Eastern Attic Switches WS'),
+                            ('Eastern Lobby N', 'Eastern Darkness S'),
+                            ('Eastern Courtyard WN', 'Eastern Compass Area E'),
+                            ('Eastern Attic Switches ES', 'Eastern Cannonball Ledge WN'),
+                            ('Eastern Compass Area EN', 'Hyrule Castle Back Hall W'),
+                            ('Hyrule Castle Back Hall E', 'Eastern Map Area W'),
+                            ('Eastern Attic Start WS', 'Eastern Cannonball Ledge Key Door EN'),
+                            ('Eastern Compass Area SW', 'Hyrule Dungeon Guardroom N'),
+                            ('Hyrule Castle East Lobby NW', 'Hyrule Castle East Hall SW'),
+                            ('Hyrule Castle East Lobby N', 'Eastern Courtyard Ledge S'),
+                            ('Hyrule Castle Lobby E', 'Eastern Courtyard Ledge W'),
+                            ('Hyrule Castle Lobby WN', 'Eastern Courtyard Ledge E'),
+                            ('Hyrule Castle West Lobby EN', 'Hyrule Castle East Lobby W'),
+                            ('Hyrule Castle Throne Room N', 'Hyrule Castle East Hall S'),
+                            ('Hyrule Castle West Lobby E', 'Hyrule Castle East Hall W'),
+                            ('Hyrule Castle West Lobby N', 'Hyrule Dungeon Armory S'),
+                            ('Hyrule Castle Lobby W', 'Hyrule Castle West Hall E'),
+                            ('Hyrule Castle West Hall S', 'Sanctuary N')]

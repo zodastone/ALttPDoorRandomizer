@@ -8,9 +8,10 @@ from Utils import int16_as_bytes
 
 class World(object):
 
-    def __init__(self, players, shuffle, logic, mode, swords, difficulty, difficulty_adjustments, timer, progressive, goal, algorithm, place_dungeon_items, accessibility, shuffle_ganon, quickswap, fastmenu, disable_music, keysanity, retro, custom, customitemarray, boss_shuffle, hints):
+    def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments, timer, progressive, goal, algorithm, place_dungeon_items, accessibility, shuffle_ganon, quickswap, fastmenu, disable_music, keysanity, retro, custom, customitemarray, boss_shuffle, hints):
         self.players = players
         self.shuffle = shuffle
+        self.doorShuffle = doorShuffle
         self.logic = logic
         self.mode = mode
         self.swords = swords
@@ -811,23 +812,41 @@ class DoorType(Enum):
 
 @unique
 class Direction(Enum):
-    North = 1
-    West = 2
-    South = 3
-    East = 4
+    North = 0
+    West = 1
+    South = 2
+    East = 3
 
 
 class Door(object):
-    def __init__(self, player, name, type, direction):
+    def __init__(self, player, name, type, direction, roomIndex, doorIndex, layer, toggle=False):
         self.player = player
         self.name = name
         self.type = type
         self.direction = direction
-        self.connected = False
+
+        # rom properties
+        self.roomIndex = roomIndex
+        self.doorIndex = doorIndex  # 0,1,2 + Direction (N:0, W:3, S:6, E:9)
+        self.layer = layer  # 0 for normal floor, 1 for the inset layer
+        self.toggle = toggle
+
+        # logical properties
+        # self.connected = False  # combine with Dest?
+        self.dest = None
         self.parentChunk = None
-        # probably need exact location of the 12 base types (6 intraroom doors)
-        # need the z-index
-        # need the room index it is located in most likely
+        self.blocked = False  # Indicates if the door is normally blocked off. (Sanc door or always closed)
+        self.smallKey = False  # There's a small key door on this side
+        self.bigKey = False  # There's a big key door on this side
+
+    def getAddress(self):
+        if self.type == DoorType.Normal:
+            return 0x13A000 + self.roomIndex * 24 + (self.doorIndex + self.direction.value * 3) * 2
+
+    def getTarget(self, toggle):
+        layer = 4 * (self.layer ^ 1 if toggle else self.layer)
+        return [self.roomIndex, layer + self.doorIndex]
+
 
     def __str__(self):
         return str(self.__unicode__())
