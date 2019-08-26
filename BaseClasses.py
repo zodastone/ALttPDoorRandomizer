@@ -1013,24 +1013,17 @@ class Spoiler(object):
 
         from Main import __version__ as ERVersion
         self.metadata = {'version': ERVersion,
-                         'seed': self.world.seed,
                          'logic': self.world.logic,
                          'mode': self.world.mode,
-                         'swords': self.world.swords,
+                         'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'shuffle': self.world.shuffle,
-                         'algorithm': self.world.algorithm,
-                         'difficulty': self.world.difficulty,
-                         'difficulty_mode': self.world.difficulty_adjustments,
-                         'timer': self.world.timer,
-                         'progressive': self.world.progressive,
+                         'item_pool': self.world.difficulty,
+                         'item_functionality': self.world.difficulty_adjustments,
                          'accessibility': self.world.accessibility,
-                         'dungeonitems': self.world.place_dungeon_items,
-                         'quickswap': self.world.quickswap,
-                         'fastmenu': self.world.fastmenu,
-                         'disable_music': self.world.disable_music,
+                         'hints': self.world.hints,
                          'keysanity': self.world.keysanity,
-                         'players': self.world.players}
+                         }
 
     def to_json(self):
         self.parse_data()
@@ -1051,20 +1044,20 @@ class Spoiler(object):
     def to_file(self, filename):
         self.parse_data()
         with open(filename, 'w') as outfile:
-            outfile.write('ALttP Entrance Randomizer Version %s  -  Seed: %s\n\n' % (self.metadata['version'], self.metadata['seed']))
+            outfile.write('ALttP Entrance Randomizer Version %s  -  Seed: %s\n\n' % (self.metadata['version'], self.world.seed))
             outfile.write('Logic:                           %s\n' % self.metadata['logic'])
             outfile.write('Mode:                            %s\n' % self.metadata['mode'])
             outfile.write('Goal:                            %s\n' % self.metadata['goal'])
-            outfile.write('Difficulty:                      %s\n' % self.metadata['difficulty'])
-            outfile.write('Item Functionality:              %s\n' % self.metadata['difficulty_mode'])
+            outfile.write('Difficulty:                      %s\n' % self.metadata['item_pool'])
+            outfile.write('Item Functionality:              %s\n' % self.metadata['item_functionality'])
             outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'])
-            outfile.write('Filling Algorithm:               %s\n' % self.metadata['algorithm'])
+            outfile.write('Filling Algorithm:               %s\n' % self.world.algorithm)
             outfile.write('Accessibility:                   %s\n' % self.metadata['accessibility'])
-            outfile.write('Maps and Compasses in Dungeons:  %s\n' % ('Yes' if self.metadata['dungeonitems'] else 'No'))
-            outfile.write('L\\R Quickswap enabled:           %s\n' % ('Yes' if self.metadata['quickswap'] else 'No'))
-            outfile.write('Menu speed:                      %s\n' % self.metadata['fastmenu'])
+            outfile.write('Maps and Compasses in Dungeons:  %s\n' % ('Yes' if self.world.place_dungeon_items else 'No'))
+            outfile.write('L\\R Quickswap enabled:           %s\n' % ('Yes' if self.world.quickswap else 'No'))
+            outfile.write('Menu speed:                      %s\n' % self.world.fastmenu)
             outfile.write('Keysanity enabled:               %s\n' % ('Yes' if self.metadata['keysanity'] else 'No'))
-            outfile.write('Players:                         %d' % self.metadata['players'])
+            outfile.write('Players:                         %d' % self.world.players)
             if self.entrances:
                 outfile.write('\n\nEntrances:\n\n')
                 outfile.write('\n'.join(['%s%s %s %s' % ('Player {0}: '.format(entry['player']) if self.world.players >1 else '', entry['entrance'], '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', entry['exit']) for entry in self.entrances.values()]))
