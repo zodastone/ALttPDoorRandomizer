@@ -97,7 +97,7 @@ def connect_two_way(world, entrancename, exitname, player):
 
     # if these were already connected somewhere, remove the backreference
     if entrance.connected_region is not None:
-        entrance.connected_region.entrances.remove(entrance, player)
+        entrance.connected_region.entrances.remove(entrance)
     if ext.connected_region is not None:
         ext.connected_region.entrances.remove(ext)
 
@@ -640,22 +640,40 @@ default_one_way_connections = [('Sewers Pull Switch S', 'Sanctuary N'),
                                ('Eastern Big Key NE', 'Eastern Compass Area SW')]
 
 
-experimental_connections = [('Eastern Boss SE', 'Eastern Courtyard N'),
-                            ('Eastern Courtyard EN', 'Eastern Attic Switches WS'),
-                            ('Eastern Lobby N', 'Eastern Darkness S'),
-                            ('Eastern Courtyard WN', 'Eastern Compass Area E'),
-                            ('Eastern Attic Switches ES', 'Eastern Cannonball Ledge WN'),
-                            ('Eastern Compass Area EN', 'Hyrule Castle Back Hall W'),
-                            ('Hyrule Castle Back Hall E', 'Eastern Map Area W'),
-                            ('Eastern Attic Start WS', 'Eastern Cannonball Ledge Key Door EN'),
-                            ('Eastern Compass Area SW', 'Hyrule Dungeon Guardroom N'),
-                            ('Hyrule Castle East Lobby NW', 'Hyrule Castle East Hall SW'),
-                            ('Hyrule Castle East Lobby N', 'Eastern Courtyard Ledge S'),
-                            ('Hyrule Castle Lobby E', 'Eastern Courtyard Ledge W'),
-                            ('Hyrule Castle Lobby WN', 'Eastern Courtyard Ledge E'),
-                            ('Hyrule Castle West Lobby EN', 'Hyrule Castle East Lobby W'),
-                            ('Hyrule Castle Throne Room N', 'Hyrule Castle East Hall S'),
-                            ('Hyrule Castle West Lobby E', 'Hyrule Castle East Hall W'),
-                            ('Hyrule Castle West Lobby N', 'Hyrule Dungeon Armory S'),
-                            ('Hyrule Castle Lobby W', 'Hyrule Castle West Hall E'),
-                            ('Hyrule Castle West Hall S', 'Sanctuary N')]
+experimental_connections = [('Eastern Boss SE', 'Eastern Eyegores NE'),
+                            ('Eastern Eyegores ES', 'Eastern Map Valley WN'),
+                            ('Eastern Lobby N', 'Eastern Courtyard Ledge S'),
+                            ('Eastern Big Key EN', 'Eastern Courtyard Ledge W'),
+                            ('Eastern Big Key NE', 'Eastern Compass Area SW'),
+                            ('Eastern Compass Area EN', 'Eastern Courtyard WN'),
+                            ('Eastern Courtyard N', 'Eastern Map Valley SW'),
+                            ('Eastern Courtyard EN', 'Eastern Map Area W'),
+
+
+                            ('Hyrule Castle Lobby W', 'Hyrule Castle Back Hall E'),
+                            ('Hyrule Castle Throne Room N', 'Sewers Behind Tapestry S'),
+                            ('Hyrule Castle Lobby WN', 'Hyrule Castle West Lobby EN'),
+                            ('Hyrule Castle West Lobby N', 'Eastern Cannonball S'),
+
+                            ('Hyrule Castle Lobby E', 'Sewers Water W'),
+                            ('Sewers Dark Cross Key Door S', 'Sanctuary N')]
+
+# experimental_connections = [('Eastern Boss SE', 'Eastern Courtyard N'),
+#                             ('Eastern Courtyard EN', 'Eastern Attic Switches WS'),
+#                             ('Eastern Lobby N', 'Eastern Darkness S'),
+#                             ('Eastern Courtyard WN', 'Eastern Compass Area E'),
+#                             ('Eastern Attic Switches ES', 'Eastern Cannonball Ledge WN'),
+#                             ('Eastern Compass Area EN', 'Hyrule Castle Back Hall W'),
+#                             ('Hyrule Castle Back Hall E', 'Eastern Map Area W'),
+#                             ('Eastern Attic Start WS', 'Eastern Cannonball Ledge Key Door EN'),
+#                             ('Eastern Compass Area SW', 'Hyrule Dungeon Guardroom N'),
+#                             ('Hyrule Castle East Lobby NW', 'Hyrule Castle East Hall SW'),
+#                             ('Hyrule Castle East Lobby N', 'Eastern Courtyard Ledge S'),
+#                             ('Hyrule Castle Lobby E', 'Eastern Courtyard Ledge W'),
+#                             ('Hyrule Castle Lobby WN', 'Eastern Courtyard Ledge E'),
+#                             ('Hyrule Castle West Lobby EN', 'Hyrule Castle East Lobby W'),
+#                             ('Hyrule Castle Throne Room N', 'Hyrule Castle East Hall S'),
+#                             ('Hyrule Castle West Lobby E', 'Hyrule Castle East Hall W'),
+#                             ('Hyrule Castle West Lobby N', 'Hyrule Dungeon Armory S'),
+#                             ('Hyrule Castle Lobby W', 'Hyrule Castle West Hall E'),
+#                             ('Hyrule Castle West Hall S', 'Sanctuary N')]

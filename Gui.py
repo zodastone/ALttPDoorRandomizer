@@ -208,7 +208,7 @@ def guiMain(args=None):
     doorShuffleVar.set('vanilla')
     doorShuffleOptionMenu = OptionMenu(doorShuffleFrame, doorShuffleVar, 'vanilla', 'basic', 'crosssed', 'experimental')
     doorShuffleOptionMenu.pack(side=RIGHT)
-    doorShuffleLabel = Label(shuffleFrame, text='Door shuffle algorithm')
+    doorShuffleLabel = Label(doorShuffleFrame, text='Door shuffle algorithm')
     doorShuffleLabel.pack(side=LEFT)
 
     heartbeepFrame = Frame(drowDownFrame)

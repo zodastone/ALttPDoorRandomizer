@@ -12,6 +12,16 @@ org $02bd80
 jsl AdjustTransition
 nop
 
+; Graphics fix - doesn't work yet
+org $028961
+jsl GfxFixer
+org $00fda4
+Dungeon_InitStarTileCh:
+org $00d6ae ;(PC: 56ae)
+LoadTransAuxGfx:
+org $00df5a ;(PC: 5f5a)
+PrepTransAuxGfx:
+
 ;turn off linking doors -- see .notRoomLinkDoor label in Bank02.asm
 org $02b5a6
 bra NotLinkDoor1
@@ -86,8 +96,8 @@ CalcIndex: ; A->low byte of Link's Coord, X-> Link's quadrant, DoorOffset x 2 ->
 ; A is a door table row offset
 LoadRoomHorz:
 {
+    phb : phk : plb
 	sty $06 : sta $07 : lda $a0 : pha ; Store normal room on stack
-	lda #$27 : pha : plb ; change db register
 	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00
 	lda $01 : and.b #$80 : cmp #$80 : bne .gtg
 	pla : sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
@@ -95,16 +105,17 @@ LoadRoomHorz:
 	.gtg ;Good to Go!
 	pla ; Throw away normal room (don't fill up the stack)
 	lda $a0 : and.b #$0F : asl a : sec : sbc $23 : clc : adc $06 : sta $02
-	ldx #$00 : jsr ShiftVariablesMainDir
-	lda $a0 : and.b #$F0 : lsr #3 : sec : sbc $21 : sta $02 : sta $03
+	ldy #$00 : jsr ShiftVariablesMainDir
+	lda $aa : lsr : sta $07
+	lda $a0 : and.b #$F0 : lsr #3 : clc : adc $07 : sec : sbc $21 : sta $02 : sta $03
 	jsr ShiftLowCoord
 	jsr ShiftQuad
 	jsr ShiftCameraBounds
-	ldx #$01 : jsr ShiftVariablesSubDir ; flip direction
+	ldy #$01 : jsr ShiftVariablesSubDir ; flip direction
 	lda $01 : and.b #$04 : lsr #2
 	sta.b $EE
 	.end
-	lda #$02 : pha : plb ; restore db register
+	plb ; restore db register
 	rts
 }
 
@@ -112,8 +123,8 @@ LoadRoomHorz:
 ; A is a door table row offset (stored a $07)
 LoadRoomVert:
 {
+    phb : phk : plb
 	sty $06 : sta $07 : lda $a0 : pha ; Store normal room on stack
-	lda #$27 : pha : plb ; change db register
 	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00
 	lda $01 : and.b #$80 : cmp #$80 : bne .gtg
 	pla : sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
@@ -121,16 +132,16 @@ LoadRoomVert:
 	.gtg ;Good to Go!
 	pla ; Throw away normal room (don't fill up the stack)
 	lda $a0 : and.b #$F0 : lsr #3 : sec : sbc $21 : clc : adc $06 : sta $02
-	ldx #$01 : jsr ShiftVariablesMainDir ;; Todo consider using y as main index (may simplify things)
-	lda $a0 : and.b #$0F : asl a : sec : sbc $23 : sta $02 : sta $03
+	ldy #$01 : jsr ShiftVariablesMainDir
+	lda $a0 : and.b #$0F : asl a : clc : adc $a9 : sec : sbc $23 : sta $02 : sta $03
 	jsr ShiftLowCoord
 	jsr ShiftQuad
 	jsr ShiftCameraBounds
-	ldx #$00 : jsr ShiftVariablesSubDir ; flip direction
+	ldy #$00 : jsr ShiftVariablesSubDir ; flip direction
 	lda $01 : and.b #$04 : lsr #2
 	sta.b $EE
 	.end
-	lda #$02 : pha : plb ; restore db register
+	plb ; restore db register
 	rts
 }
 
@@ -151,7 +162,7 @@ LookupNewRoom: ; expects data offset to be in A
 ; Sets high bytes of various registers
 ShiftVariablesMainDir:
 {
-	txy : lda CoordIndex,y : tax
+	lda CoordIndex,y : tax
 	lda $21,x : clc : adc $02 : sta $21,x ; coordinate update
 	lda CameraIndex,y : tax
 	lda $e3,x : clc : adc $02 : sta $e3,x ; scroll register high byte
@@ -160,7 +171,7 @@ ShiftVariablesMainDir:
 	lda $0607,x : clc : adc $02 : sta $0607,x
 	lda $0601,x : clc : adc $02 : sta $0601,x
 	lda $0603,x : clc : adc $02 : sta $0603,x
-	tyx : rts
+	rts
 }
 
 ShiftLowCoord:
@@ -168,9 +179,8 @@ ShiftLowCoord:
 	lda $01 : and.b #$03 ; high byte index
 	jsr CalcOpposingShift
 	lda $0127 : and.b #$f0 : cmp.b #$20 : bne .lowDone
-	lda OppCoordIndex,x : phx : tax
+	lda OppCoordIndex,y : tax
 	lda #$80 : clc : adc $20,x : sta $20,x
-	plx
 	.lowDone
 	rts
 }
@@ -184,7 +194,7 @@ CalcOpposingShift:
 {
 	stz $0127 ; set up (can you zero out 127 alone?)
 	cmp.b $04 : beq .noOffset ; (equal, no shifts to do)
-	phx : tay ; reserve these
+	phy : tay ; reserve these
 	lda $04 : tax : tya : sec : sbc $04 : sta $04 : cmp.b #$00 : bpl .shiftPos
 	lda #$40
 	cpx.b #$01 : beq .skipNegQuad
@@ -203,29 +213,28 @@ CalcOpposingShift:
 	lda $0127 : eor #$60
 
 	.setDone  sta $0127
-	.done     plx
+	.done     ply
 	.noOffset rts
 }
 
-; X should be set to either 1 (vertical) or 2 (horizontal) (for a9,aa quadrant a8 is base)
+
 ShiftQuad:
 {
 	lda $0127 : and #$08 : cmp.b #$00 : beq .quadDone
-	phx : lda ShiftQuadIndex,x : tax
+	lda ShiftQuadIndex,y : tax ; X should be set to either 1 (vertical) or 2 (horizontal) (for a9,aa quadrant)
 	lda $0127 : and #$01 : cmp.b #$00 : beq .decQuad
 	inc $02
 	txa : sta $a8, x ; alter a9/aa
-	bra .end
+	bra .quadDone
 	.decQuad
-	lda $02 : inc : sta $03
+	dec $02
 	lda #$00 : sta $a8, x ; alter a9/aa
-	.end plx
 	.quadDone rts
 }
 
 ShiftVariablesSubDir:
 {
-	txy : lda CoordIndex,y : tax
+	lda CoordIndex,y : tax
 	lda $21,x : clc : adc $02 : sta $21,x ; coordinate update
 	lda CameraIndex,y : tax
 	lda $e3,x : clc : adc $03 : sta $e3,x ; scroll register high byte
@@ -234,22 +243,22 @@ ShiftVariablesSubDir:
 	lda $0605,x : clc : adc $02 : sta $0605,x ; high bytes of these guys
 	lda $0603,x : clc : adc $03 : sta $0603,x
 	lda $0607,x : clc : adc $03 : sta $0607,x
-	tyx : rts ; so as to not modify x
+	rts
 }
 
 ShiftCameraBounds:
 {
-	lda CamBoundIndex,x : tay ; should be 0 for horz travel (vert bounds) or 4 for vert travel (horz bounds)
+	lda CamBoundIndex,y : tax ; should be 0 for horz travel (vert bounds) or 4 for vert travel (horz bounds)
 	rep #$30
 	lda $0127 : and #$00f0 : asl #2 : sta $06
 	lda $0127 : and #$0001 : cmp #$0000 : beq .subIt
-	lda $0618, y : clc : adc $06 : sta $0618, y
-	lda $061A, y : clc : adc $06 : sta $061A, y
+	lda $0618, x : clc : adc $06 : sta $0618, x
+	lda $061A, x : clc : adc $06 : sta $061A, x
 	sep #$30
 	rts
 	.subIt
-	lda $0618, y : sec : sbc $06 : sta $0618, y
-	lda $061A, y : sec : sbc $06 : sta $061A, y
+	lda $0618, x : sec : sbc $06 : sta $0618, x
+	lda $061A, x : sec : sbc $06 : sta $061A, x
 	sep #$30
 	rts
 }
@@ -272,6 +281,12 @@ AdjustTransition:
 	rep #$20 : lda $00 : and #$01fc
 	rtl
 }
+
+GfxFixer:
+jsl Dungeon_InitStarTileCh
+jsl LoadTransAuxGfx
+jsl PrepTransAuxGfx
+rtl
 
 org $279000
 OffsetTable:
