@@ -413,12 +413,13 @@ def mark_light_world_regions(world):
         current = queue.popleft()
         current.is_dark_world = True
         for exit in current.exits:
-            if exit.connected_region.type == RegionType.LightWorld:
-                # Don't venture into the light world
-                continue
-            if exit.connected_region not in seen:
-                seen.add(exit.connected_region)
-                queue.append(exit.connected_region)
+            if exit.connected_region is not None:
+                if exit.connected_region.type == RegionType.LightWorld:
+                    # Don't venture into the light world
+                    continue
+                if exit.connected_region not in seen:
+                    seen.add(exit.connected_region)
+                    queue.append(exit.connected_region)
 
 # (room_id, shopkeeper, replaceable)
 shop_table = {

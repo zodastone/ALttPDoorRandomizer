@@ -1027,6 +1027,7 @@ class Spoiler(object):
     def __init__(self, world):
         self.world = world
         self.entrances = OrderedDict()
+        self.doors = OrderedDict()
         self.medallions = {}
         self.playthrough = {}
         self.locations = {}
@@ -1040,6 +1041,12 @@ class Spoiler(object):
             self.entrances[(entrance, direction, player)] = OrderedDict([('entrance', entrance), ('exit', exit), ('direction', direction)])
         else:
             self.entrances[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction)])
+
+    def set_door(self, entrance, exit, direction, player):
+        if self.world.players == 1:
+            self.doors[(entrance, direction, player)] = OrderedDict([('entrance', entrance), ('exit', exit), ('direction', direction)])
+        else:
+            self.doors[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction)])
 
     def parse_data(self):
         self.medallions = OrderedDict()
@@ -1135,6 +1142,7 @@ class Spoiler(object):
         self.parse_data()
         out = OrderedDict()
         out['Entrances'] = list(self.entrances.values())
+        out['Doors'] = list(self.doors.values())
         out.update(self.locations)
         out['Special'] = self.medallions
         if self.shops:
@@ -1164,9 +1172,12 @@ class Spoiler(object):
             outfile.write('Menu speed:                      %s\n' % self.world.fastmenu)
             outfile.write('Keysanity enabled:               %s\n' % ('Yes' if self.metadata['keysanity'] else 'No'))
             outfile.write('Players:                         %d' % self.world.players)
+            if self.doors:
+                outfile.write('\n\nDoors:\n\n')
+                outfile.write('\n'.join(['%s%s %s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', entry['entrance'], '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', entry['exit']) for entry in self.doors.values()]))
             if self.entrances:
                 outfile.write('\n\nEntrances:\n\n')
-                outfile.write('\n'.join(['%s%s %s %s' % ('Player {0}: '.format(entry['player']) if self.world.players >1 else '', entry['entrance'], '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', entry['exit']) for entry in self.entrances.values()]))
+                outfile.write('\n'.join(['%s%s %s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', entry['entrance'], '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', entry['exit']) for entry in self.entrances.values()]))
             outfile.write('\n\nMedallions\n')
             if self.world.players == 1:
                 outfile.write('\nMisery Mire Medallion: %s' % (self.medallions['Misery Mire']))

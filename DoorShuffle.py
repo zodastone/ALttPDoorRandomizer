@@ -15,11 +15,11 @@ def link_doors(world, player):
 
     # These connection are here because they are currently unable to be shuffled
     for entrance, ext in spiral_staircases:
-        connect_two_way(world, entrance, ext, player)
+        connect_two_way(world, entrance, ext, player, True)
     for entrance, ext in straight_staircases:
-        connect_two_way(world, entrance, ext, player)
+        connect_two_way(world, entrance, ext, player, True)
     for entrance, ext in open_edges:
-        connect_two_way(world, entrance, ext, player)
+        connect_two_way(world, entrance, ext, player, True)
     for exitName, regionName in falldown_pits:
         connect_simple_door(world, exitName, regionName, player)
     for exitName, regionName in dungeon_warps:
@@ -27,9 +27,9 @@ def link_doors(world, player):
 
     if world.doorShuffle == 'vanilla':
         for entrance, ext in default_door_connections:
-            connect_two_way(world, entrance, ext, player)
+            connect_two_way(world, entrance, ext, player, True)
         for ent, ext in default_one_way_connections:
-            connect_one_way(world, ent, ext, player)
+            connect_one_way(world, ent, ext, True)
         normal_dungeon_pool(world, player)
     elif world.doorShuffle == 'basic':
         normal_dungeon_pool(world, player)
@@ -91,7 +91,7 @@ def connect_simple_door(world, exit_name, region_name, player):
         d.dest = region
 
 
-def connect_two_way(world, entrancename, exitname, player):
+def connect_two_way(world, entrancename, exitname, player, skipSpoiler=False):
     entrance = world.get_entrance(entrancename, player)
     ext = world.get_entrance(exitname, player)
 
@@ -112,10 +112,11 @@ def connect_two_way(world, entrancename, exitname, player):
         x.dest = y
     if y is not None:
         y.dest = x
-    #  world.spoiler.set_entrance(entrance.name, exit.name, 'both') # todo: spoiler stuff
+    if not skipSpoiler and x is not None and y is not None:
+        world.spoiler.set_door(x.name, y.name, 'both', player)
 
 
-def connect_one_way(world, entrancename, exitname, player):
+def connect_one_way(world, entrancename, exitname, player, skipSpoiler=False):
     entrance = world.get_entrance(entrancename, player)
     ext = world.get_entrance(exitname, player)
 
@@ -134,7 +135,8 @@ def connect_one_way(world, entrancename, exitname, player):
         x.dest = y
     if y is not None:
         y.dest = x
-    # spoiler info goes here?
+    if not skipSpoiler and x is not None and y is not None:
+        world.spoiler.set_door(x.name, y.name, 'entrance', player)
 
 
 def within_dungeon(world, player):
