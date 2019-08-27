@@ -140,8 +140,100 @@ def connect_one_way(world, entrancename, exitname, player, skipSpoiler=False):
 
 
 def within_dungeon(world, player):
-    raise NotImplementedError('Haven\'t started this yet')
+    # TODO: Add dungeon names to Regions so we can just look these lists up
+    dungeon_region_names_es = ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall', 'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Dungeon Map Room', 'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk', 'Hyrule Dungeon South Abyss', 'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory', 'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Secret Room', 'Sewers Pull Switch', 'Sanctuary']
+    dungeon_region_names_ep = ['Eastern Lobby', 'Eastern Cannonball', 'Eastern Cannonball Ledge', 'Eastern Courtyard Ledge', 'Eastern Map Area', 'Eastern Compass Area', 'Eastern Courtyard', 'Eastern Fairies', 'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Big Key', 'Eastern Darkness', 'Eastern Attic Start', 'Eastern Attic Switches', 'Eastern Eyegores',  'Eastern Boss']
+    dungeon_region_lists = [dungeon_region_names_es, dungeon_region_names_ep]
+    for region_list in dungeon_region_lists:
+        shuffle_dungeon(world, player, region_list)
 
+def shuffle_dungeon(world, player, dungeon_region_names):
+    available_regions = []
+    for name in dungeon_region_names:
+        available_regions.append(world.get_region(name, player))
+    random.shuffle(available_regions)
+    
+    # Pick a random region and make its doors the open set
+    # TODO: It would make sense to start with the entrance but I'm not sure it's needed.
+    available_doors = []
+    region = available_regions.pop()
+    print("Starting in " + region.name)
+    available_doors.extend(get_doors(world, region, player))
+    
+    # Loop until all available doors are used
+    while len(available_doors) > 0:
+        # Pick a random available door to connect
+        # TODO: Is there an existing "remove random from list" in this codebase?
+        random.shuffle(available_doors)
+        door = available_doors.pop()
+        print("Linking " + door.name)
+        # Find an available region that has a compatible door
+        connect_region, connect_door = find_compatible_door_in_regions(world, door, available_regions, player)
+        if connect_region is not None:
+            print("Found new region " + connect_region.name + " via " + connect_door.name)
+            # Apply connection and add the new region's doors to the available list
+            maybe_connect_two_way(world, door, connect_door, player)
+            available_doors.extend(get_doors(world, connect_region, player))
+            # We've used this region and door, so don't use them again
+            available_regions.remove(connect_region)
+            available_doors.remove(connect_door)
+        else:
+            # If there's no available region with a door, use an internal connection
+            connect_door = find_compatible_door_in_list(world, door, available_doors, player)
+            print("Adding loop via " + connect_door.name)
+            maybe_connect_two_way(world, door, connect_door, player)
+            available_doors.remove(connect_door)
+    print(available_regions)
+    print(available_doors)
+
+# Connects a and b. Or don't if they're an unsupported connection type.
+# TODO: This is gross, don't do it this way
+def maybe_connect_two_way(world, a, b, player):
+    if a.type == DoorType.Open or a.type == DoorType.StraightStairs or a.type == DoorType.SpiralStairs or a.type == DoorType.Hole or a.type == DoorType.Warp:
+        return
+    connect_two_way(world, a.name, b.name, player)
+
+# Finds a compatible door in regions, returns the region and door
+def find_compatible_door_in_regions(world, door, regions, player):
+    for region in regions:
+        for proposed_door in get_doors(world, region, player):
+            if doors_compatible(door, proposed_door):
+                return region, proposed_door
+    return None, None
+
+def find_compatible_door_in_list(world, door, doors, player):
+    for proposed_door in doors:
+        if doors_compatible(door, proposed_door):
+            return proposed_door
+ 
+def get_doors(world, region, player):
+    res = []
+    for exit in region.exits:
+        door = world.check_for_door(exit.name, player)
+        if door is not None:
+            res.append(door)
+    return res
+
+def doors_compatible(a, b):
+    if a.type != b.type:
+        return False
+    if a.type == DoorType.Open:
+        return doors_fit_mandatory_pair(open_edges, a, b)
+    if a.type == DoorType.StraightStairs:
+        return doors_fit_mandatory_pair(straight_staircases, a, b)
+    if a.type == DoorType.SpiralStairs:
+        return doors_fit_mandatory_pair(spiral_staircases, a, b)
+    if a.type == DoorType.Hole:
+        return doors_fit_mandatory_pair(falldown_pits_as_doors, a, b)
+    if a.type == DoorType.Warp:
+        return doors_fit_mandatory_pair(dungeon_warps_as_doors, a, b)
+    return a.direction == switch_dir(b.direction)
+
+def doors_fit_mandatory_pair(pair_list, a, b):
+  for pair_a, pair_b in pair_list:
+      if (a.name == pair_a and b.name == pair_b) or (a.name == pair_b and b.name == pair_a):
+          return True
+  return False
 
 # code below is an early prototype for cross-dungeon mode
 def cross_dungeon(world, player):
@@ -592,6 +684,11 @@ dungeon_paths = {
     'Ganons Tower': []
 }
 
+open_edges = [('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
+                         ('Hyrule Dungeon Key Door S', 'Hyrule Dungeon North Abyss'),
+                         ('Hyrule Dungeon Key Door N', 'Hyrule Dungeon Map Room')
+                         ]
+
 spiral_staircases = [('Hyrule Castle Back Hall Down Stairs', 'Hyrule Dungeon Map Room Up Stairs'),
                      ('Hyrule Dungeon Armory Down Stairs', 'Hyrule Dungeon Staircase Up Stairs'),
                      ('Hyrule Dungeon Staircase Down Stairs', 'Hyrule Dungeon Cellblock Up Stairs'),
@@ -608,8 +705,10 @@ open_edges = [('Hyrule Dungeon North Abyss South Edge', 'Hyrule Dungeon South Ab
               ('Hyrule Dungeon South Abyss Catwalk West Edge', 'Hyrule Dungeon Guardroom Catwalk Edge')]
 
 falldown_pits = [('Eastern Courtyard Potholes', 'Eastern Fairies')]
+falldown_pits_as_doors = [('Eastern Courtyard Potholes', 'Eastern Fairy Landing')]
 
 dungeon_warps = [('Eastern Fairies\' Warp', 'Eastern Courtyard')]
+dungeon_warps_as_doors = [('Eastern Fairies\' Warp', 'Eastern Courtyard Warp End')]
 
 default_door_connections = [('Hyrule Castle Lobby W', 'Hyrule Castle West Lobby E'),
                             ('Hyrule Castle Lobby E', 'Hyrule Castle East Lobby W'),
