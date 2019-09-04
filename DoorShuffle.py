@@ -14,7 +14,7 @@ def link_doors(world, player):
         connect_simple_door(world, exitName, regionName, player)
 
     # These connection are here because they are currently unable to be shuffled
-    for entrance, ext in spiral_staircases:
+    for entrance, ext in spiral_staircases:  # these can now be shuffled, maybe
         connect_two_way(world, entrance, ext, player, True)
     for entrance, ext in straight_staircases:
         connect_two_way(world, entrance, ext, player, True)
@@ -141,7 +141,7 @@ def connect_one_way(world, entrancename, exitname, player, skipSpoiler=False):
 
 def within_dungeon(world, player):
     # TODO: Add dungeon names to Regions so we can just look these lists up
-    dungeon_region_names_es = ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall', 'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Dungeon Map Room', 'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk', 'Hyrule Dungeon South Abyss', 'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory', 'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Secret Room', 'Sewers Pull Switch', 'Sanctuary']
+    dungeon_region_names_es = ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall', 'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Dungeon Map Room', 'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk', 'Hyrule Dungeon South Abyss', 'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory', 'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Secret Room', 'Sewers Secret Room Blocked Path', 'Sewers Pull Switch', 'Sanctuary']
     dungeon_region_names_ep = ['Eastern Lobby', 'Eastern Cannonball', 'Eastern Cannonball Ledge', 'Eastern Courtyard Ledge', 'Eastern Map Area', 'Eastern Compass Area', 'Eastern Courtyard', 'Eastern Fairies', 'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Big Key', 'Eastern Darkness', 'Eastern Attic Start', 'Eastern Attic Switches', 'Eastern Eyegores',  'Eastern Boss']
     dungeon_region_lists = [dungeon_region_names_es, dungeon_region_names_ep]
     for region_list in dungeon_region_lists:
@@ -662,7 +662,8 @@ def experiment(world, player):
 
 mandatory_connections = [('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
                          ('Hyrule Dungeon Key Door S', 'Hyrule Dungeon North Abyss'),
-                         ('Hyrule Dungeon Key Door N', 'Hyrule Dungeon Map Room')
+                         ('Hyrule Dungeon Key Door N', 'Hyrule Dungeon Map Room'),
+                         ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path')
                          ]
 
 dungeon_paths = {

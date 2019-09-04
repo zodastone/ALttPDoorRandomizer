@@ -5,6 +5,7 @@ import json
 from collections import OrderedDict
 from _vendor.collections_extended import bag
 from Utils import int16_as_bytes
+from Tables import normal_offset_table, spiral_offset_table
 
 class World(object):
 
@@ -816,6 +817,8 @@ class Direction(Enum):
     West = 1
     South = 2
     East = 3
+    Up = 4
+    Down = 5
 
 
 class Door(object):
@@ -827,9 +830,16 @@ class Door(object):
 
         # rom properties
         self.roomIndex = roomIndex
-        self.doorIndex = doorIndex  # 0,1,2 + Direction (N:0, W:3, S:6, E:9)
+        # 0,1,2 + Direction (N:0, W:3, S:6, E:9) for normal
+        # 0-4 for spiral offset thing
+        self.doorIndex = doorIndex
         self.layer = layer  # 0 for normal floor, 1 for the inset layer
         self.toggle = toggle
+        self.quadrant = 2
+        self.shiftX = 78
+        self.shiftY = 78
+        self.zeroHzCam = False
+        self.zeroVtCam = False
 
         # logical properties
         # self.connected = False  # combine with Dest?
@@ -841,11 +851,18 @@ class Door(object):
 
     def getAddress(self):
         if self.type == DoorType.Normal:
-            return 0x13A000 + self.roomIndex * 24 + (self.doorIndex + self.direction.value * 3) * 2
+            return 0x13A000 + normal_offset_table[self.roomIndex] * 24 + (self.doorIndex + self.direction.value * 3) * 2
+        elif self.type == DoorType.SpiralStairs:
+            return 0x13B000 + (spiral_offset_table[self.roomIndex] + self.doorIndex) * 4
 
     def getTarget(self, toggle):
-        layer = 4 * (self.layer ^ 1 if toggle else self.layer)
-        return [self.roomIndex, layer + self.doorIndex]
+        if self.type == DoorType.Normal:
+            layer = 4 * (self.layer ^ 1 if toggle else self.layer)
+            return [self.roomIndex, layer + self.doorIndex]
+        if self.type == DoorType.SpiralStairs:
+            bitmask = 0x10 * int(self.zeroHzCam)
+            bitmask += 0x20 * int(self.zeroVtCam)
+            return [self.roomIndex, bitmask + self.quadrant, self.shiftX, self.shiftY]
 
 
     def __str__(self):

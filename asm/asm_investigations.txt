@@ -1,0 +1,141 @@
+
+Dungeon_InterRoomTrans 7.2 -> (01) -> Dungeon_LoadRoom
+        					    	  Dungeon_InitStarTileCh
+        					    	  **Load and and Prep Here
+        					    	  Dungeon_ResetSprites
+$028908 (PC: 10908) is the jump tample
+
+hook points 7.2.1
+22 32 f4 a0
+$028961 (PC: 10961) 22 a4 fd 00
+22 39 d7 00
+e6 b0
+9c 00 02
+a5 a2
+48
+a5 a0
+
+
+
+
+Modules 04 and 05 skip the PaletteFiltering right above it - moving the pointers slightly might help
+
+60 a5 b0 c9 07 90 ?? ??
+jsl ?? ?? ??
+jsl ?? ?? ??
+jsl 07 ?? ??
+lda b0
+jsl 00 ?? ??
+pointers!!!
+SpiralStaircase
+	(00) 290C6
+	(01) 28B7A
+	(02) 28FA3 -> Fixed Color see 110A1-$110C6 JUMP LOCATION in Bank02 e944 is PaletteFiltering (Fade out!) (.doFiltering)
+	(03) 28BE4 -> Dungeon_LoadRoom, Dungeon_InitStarTileChr, LoadTransAuxGfx, Dungeon_LoadCustomTileAttr
+	(04) 28D11 -> PrepTransAuxGfx
+	(05) 28D1F -> Sets $17 to #$0A
+	(06) 28C12 -> Dungeon_ResetSprites
+	- these guys called each other a ton
+	c9* b5 ca* b5* ca* b1* b5 c6* ca b1* b5 c6* ca 96---------
+	(07) 28FC9 -> 5 jumps in here, sets $a4 floor
+			112B1 -> may be related to straight staircase only
+			13B7B
+			135DC
+			10EC9
+			10AB3 - right before b5
+
+	(08) 289CA -> calls $113F (above .copyTilemap in Bank 00)
+	(09) 289B5 -> calls $11C4 (updates all tiles in a room)
+	(0a) 289CA -> go through the tilemap....
+	(0b) 289B1 -> runs a filter - new color?, then $11C4 (didn't see call to 289B5)
+	(0c) 289C6 -> runs a filter then $113F
+	(0d) 289B1 -> repeat last two steps
+	(0e) 289C6
+	(0f) 28F96 -> Fade in
+
+	(10) 2905D
+	(11) 2909D
+	(12) 290B7
+	(13) 290DF 
+SpiralStaircase -> (03) 10CE2 -> Dungeon_LoadRoom
+								 Dungeon_InitStarTileChr	 
+								 LoadTransAuxGfx
+								 Dungeon_LoadCustomTileAttr
+				   (04)	10E0F -> PrepTransAuxGfx
+				   (06) 10D10 -> Dungeon_ResetSprites
+
+
+; Upward floor transition
+Dungeon -> x06 -> $10C14 -> 10CE2 -> Dungeon_LoadRoom
+									 Dungeon_InitStarTileChr	 
+									 LoadTransAuxGfx
+									 Dungeon_LoadCustomTileAttr
+							10E0F -> PrepTransAuxGfx 
+							10D10 -> Dungeon_ResetSprites  
+
+; Downward floor transition
+Dungeon -> x07 -> $10E27 -> 10CE2 -> Dungeon_LoadRoom
+									 Dungeon_InitStarTileChr	 
+								 	 LoadTransAuxGfx
+								 	 Dungeon_LoadCustomTileAttr
+							10E0F -> PrepTransAuxGfx
+							10D10 -> Dungeon_ResetSprites 
+
+
+StraightStairs_2 -> Dungeon_LoadRoom
+				 -> LoadTransAuxGfx
+StraightStairs_3 -> 10E0F -> PrepTransAuxGfx
+StraightStairs_4 -> Dungeon_ResetSprites
+
+
+Dungeon_Teleport -> 10CE2 -> Dungeon_LoadRoom
+					10CE2 -> LoadTransAuxGfx
+					10D10 -> Dungeon_ResetSprites
+
+
+
+Hook points 
+org $00d6ae (PC: 56ae)
+LoadTransAuxGfx
+8b 4b ab 64 00
+
+org $00df5a (PC: 5f5a)
+PrepTransAuxGfx
+a9 7e 85 02 85 05 c2 31
+
+org $0ffd65 (PC: 07fd65)        
+Dungeon_LoadCustomTileAttr
+8b 4b ab c2 30 ad A2 0A 29 FF 00
+
+Palette_DungBgMain
+c2 21 ae b6 0a bf 1b       
+; This is the palette index for a certain background
+        LDX $0AB6
+        
+        LDA $1BEC4B, X : ADC.w #$D734 : STA $00 : PHA
+        
+        REP #$10
+        
+        LDA.w #$0042    ; Target BP-2 through BP-7 (full)
+        LDX.w #$000E    ; (Length - 1) (in words) of the palettes.
+        LDY.w #$0005  
+
+
+
+Other transition stuff
+
+Overworld_LoadTransGfx -> LoadTransAuxGfx
+Overworld_LoadTransGfx -> PrepTransAuxGfx
+Module_LoadFile -> Dungeon_ResetSprites
+Module_HoleToDungeon -> 10D10 -> Dungeon_ResetSprites
+
+
+
+
+Camera work:
+Places where sta $e2 happens
+02ba5d 13A31 -
+
+028750 Module_Dungeon
+0286ef Module_Dungeon
+

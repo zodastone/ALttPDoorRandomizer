@@ -313,7 +313,8 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Sewers Water', 'A dungeon', None, ['Sewers Dark Cross Key Door S', 'Sewers Water W']),
         create_dungeon_region(player, 'Sewers Key Rat', 'A dungeon', None, ['Sewers Key Rat E', 'Sewers Key Rat Key Door N']),
         create_dungeon_region(player, 'Sewers Secret Room', 'A dungeon', ['Sewers - Secret Room - Left', 'Sewers - Secret Room - Middle', 'Sewers - Secret Room - Right'],
-                              ['Sewers Secret Room Key Door S', 'Sewers Secret Room Up Stairs']),
+                              ['Sewers Secret Room Key Door S', 'Sewers Secret Room Push Block']),
+        create_dungeon_region(player, 'Sewers Secret Room Blocked Path', 'A dungeon', None, ['Sewers Secret Room Up Stairs']),
         create_dungeon_region(player, 'Sewers Pull Switch', 'A dungeon', None, ['Sewers Pull Switch Down Stairs', 'Sewers Pull Switch S']),
         create_dungeon_region(player, 'Sanctuary', 'A dungeon', ['Sanctuary'], ['Sanctuary Exit', 'Sanctuary N']),
 

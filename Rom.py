@@ -18,8 +18,7 @@ from EntranceShuffle import door_addresses
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '10d5e3bb3fad6cb230090678ce5b86c2'
-# RANDOMIZERBASEHASH = 'cb560220b7b1b8202e92381aee19cd36' todo clean this up
+RANDOMIZERBASEHASH = 'fdfff1a9046506a57dbcbe23fb5fd386'
 
 
 class JsonRom(object):
@@ -535,7 +534,7 @@ def patch_rom(world, player, rom):
 
     # patch doors
     for door in world.doors:
-        if door.dest is not None and door.player == player and door.type == DoorType.Normal:
+        if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door.toggle))
 
     write_custom_shops(rom, world, player)
