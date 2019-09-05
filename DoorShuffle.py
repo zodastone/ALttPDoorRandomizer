@@ -79,6 +79,8 @@ def switch_dir(direction):
         Direction.North: Direction.South,
         Direction.West: Direction.East,
         Direction.East: Direction.West,
+        Direction.Up: Direction.Down,
+        Direction.Down: Direction.Up,
     }
     return oppositemap[direction]
 
@@ -189,7 +191,7 @@ def shuffle_dungeon(world, player, dungeon_region_names):
 # Connects a and b. Or don't if they're an unsupported connection type.
 # TODO: This is gross, don't do it this way
 def maybe_connect_two_way(world, a, b, player):
-    if a.type == DoorType.Open or a.type == DoorType.StraightStairs or a.type == DoorType.SpiralStairs or a.type == DoorType.Hole or a.type == DoorType.Warp:
+    if a.type == DoorType.Open or a.type == DoorType.StraightStairs or a.type == DoorType.Hole or a.type == DoorType.Warp:
         return
     connect_two_way(world, a.name, b.name, player)
 
@@ -221,8 +223,6 @@ def doors_compatible(a, b):
         return doors_fit_mandatory_pair(open_edges, a, b)
     if a.type == DoorType.StraightStairs:
         return doors_fit_mandatory_pair(straight_staircases, a, b)
-    if a.type == DoorType.SpiralStairs:
-        return doors_fit_mandatory_pair(spiral_staircases, a, b)
     if a.type == DoorType.Hole:
         return doors_fit_mandatory_pair(falldown_pits_as_doors, a, b)
     if a.type == DoorType.Warp:
