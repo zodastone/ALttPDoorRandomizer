@@ -29,7 +29,7 @@ NotLinkDoor2:
 ; Staircase routine
 ;org $02a1e7 ;(PC: 121e7)
 org $01c3d4 ;(PC: c3d4)
-jsl SpiralWarp : nop
+jsl SpiralWarp : nop #4
 
 
 ; Graphics fix
@@ -333,5 +333,7 @@ ShiftQuadIndex:
 db 2, 1 ; see ShiftQuad func (relates to $a9,$aa)
 CamBoundIndex: ; Horizontal 1st
 db 0, 4 ; Camera Bounds $0618-$61f
+OppCamBoundIndex: ; Horizontal 1st
+db 4, 0 ; Camera Bounds $0618-$61f
 
 incsrc doortables.asm

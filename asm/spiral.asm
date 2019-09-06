@@ -29,20 +29,21 @@ SpiralWarp:
     ldy #$01 : jsr ShiftQuadSimple
 
     .skipYQuad
+    lda $01 : and #$04 : lsr : sta $048a ;fix layer calc 0->0 2->1
     ; shift lower coordinates
     lda $02 : sta $22
     lda $03 : sta $20
 
-    ldy #$00 : jsr SetCamera ; todo: figure out camera jazz
+    ldy #$00 : jsr SetCamera
     ldy #$01 : jsr SetCamera
 
     ply : plx : plb ; pull the stuff we pushed
 
-    .end
+    .end rtl
     ; this is the code we are hijacking
-    ; lda $a0 - we overwrote this behavior
-    lda $063d, x
-    rtl
+    ; lda $a0 - we overwrote all this behavior
+    ; lda $063d, x
+    ; sta $048a
 }
 
 ;Sets the offset in A
@@ -97,8 +98,6 @@ ShiftQuadSimple:
 SetCamera:
 {
     stz $04 : sty $05
-    lda $01 : and #$10 : !add $05 : cmp #$10 : beq .done ; zeroHzCam check (10+0 = 10)
-    lda $01 : and #$20 : !add $05 : cmp #$21 : beq .done ; zeroVtCam check (20+1 = 21)
 
     tyx : lda $a9,x : bne .nonZeroHalf
     lda CamQuadIndex,y : tax : lda $607,x : pha
@@ -106,21 +105,40 @@ SetCamera:
     dec $e3,x
 
     .noQuadAdj
+    lda $01 : and #$10 : !add $05 : cmp #$10 : beq .done ; zeroHzCam check (10+0 = 10)
+    lda $01 : and #$20 : !add $05 : cmp #$21 : beq .done ; zeroVtCam check (20+1 = 21)
     lda CoordIndex,y : tax
-    lda $20,x : cmp #$79 : bcc .adjust
-    !sub #$78 : sta $04 : bra .adjust
+    lda $20,x : cmp #$79 : bcc .done
+    !sub #$78 : sta $04 : bra .done
 
     .nonZeroHalf ;meaning either right half or bottom half
     lda CoordIndex,y : tax
     lda $20,x : cmp #$78 : bcs .setQuad
-    !add #$78 : sta $04 : bra .adjust
+    lda $01 : and #$10 : !add $05 : cmp #$10 : beq .done ; zeroHzCam check (10+0 = 10)
+    lda $01 : and #$20 : !add $05 : cmp #$21 : beq .done ; zeroVtCam check (20+1 = 21)
+    !add #$78 : sta $04 : bra .done
 
     .setQuad
     lda CamQuadIndex,y : tax : lda $0607, x : pha
-    lda CameraIndex,y : tax : pla : sta $e3, x : bra .done
+    lda CameraIndex,y : tax : pla : sta $e3, x
+    bra .done
 
-    .adjust
-    lda CameraIndex,y : tax
-    .done lda $04 : sta $e2,x
+    .done
+    lda CameraIndex,y : tax : lda $e2, x : phx
+    jsr AdjCamBounds
+    plx : lda $e2, x : !sub $04 : sta $e2, x
+    rts
+}
+
+;input : A should be loaded with current camera low byte
+;        $04 should be loaded with what we want the low byte to become (00-ff)
+AdjCamBounds:
+{
+    stz $05 : rep #$30 : and #$00FF ; sanitize input for 16 bit
+    !sub $04 : sta $04
+    lda OppCamBoundIndex,y : tax
+    lda $0618, x : !sub $04 : sta $0618, x
+    lda $061A, x : !sub $04 : sta $061A, x
+    sep #$30
     rts
 }

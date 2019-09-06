@@ -1,9 +1,9 @@
 Notes:
 
+Zero camera out skips quad logic
 
 
-
-The armory guard room and the room above have fake layers. Maybe not???
+The armory guard room and the room above have fake layers. Shutter doors
 
 
 

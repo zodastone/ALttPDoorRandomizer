@@ -860,7 +860,8 @@ class Door(object):
             layer = 4 * (self.layer ^ 1 if toggle else self.layer)
             return [self.roomIndex, layer + self.doorIndex]
         if self.type == DoorType.SpiralStairs:
-            bitmask = 0x10 * int(self.zeroHzCam)
+            bitmask = 0x04 * int(self.layer)
+            bitmask += 0x10 * int(self.zeroHzCam)
             bitmask += 0x20 * int(self.zeroVtCam)
             return [self.roomIndex, bitmask + self.quadrant, self.shiftX, self.shiftY]
 
