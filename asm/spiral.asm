@@ -1,6 +1,4 @@
-SpiralWarp:
-{
-
+SpiralWarp: {
     pha : lda $040c : cmp.b #$ff : beq .abort ; abort if not in dungeon
     cmp #$06 : bcs .abort ; abort if not supported yet -- todo: this needs to be altered/removed as more dungeons are implemented
     lda $0e : cmp #$5e : beq .gtg ; abort if not spiral - intended room is in A!
@@ -34,7 +32,9 @@ SpiralWarp:
     lda $02 : sta $22
     lda $03 : sta $20
 
+    lda $01 : and #$10 : sta $07 ; zeroHzCam check
     ldy #$00 : jsr SetCamera
+    lda $01 : and #$20 : sta $07 ; zeroVtCam check
     ldy #$01 : jsr SetCamera
 
     ply : plx : plb ; pull the stuff we pushed
@@ -47,8 +47,7 @@ SpiralWarp:
 }
 
 ;Sets the offset in A
-LookupSpiralOffset:
-{
+LookupSpiralOffset: {
     ;where link currently is in $a2: quad in a8 & #$03
     ;count doors
     stz $00 : ldx #$00 : stz $01
@@ -85,8 +84,7 @@ LookupSpiralOffset:
     rts
 }
 
-ShiftQuadSimple:
-{
+ShiftQuadSimple: {
 	lda CoordIndex,y : tax
 	lda $21,x : !add $06 : sta $21,x ; coordinate update
 	lda CamQuadIndex,y : tax
@@ -95,8 +93,7 @@ ShiftQuadSimple:
 	rts
 }
 
-SetCamera:
-{
+SetCamera: {
     stz $04 : sty $05
 
     tyx : lda $a9,x : bne .nonZeroHalf
@@ -105,34 +102,51 @@ SetCamera:
     dec $e3,x
 
     .noQuadAdj
-    lda $01 : and #$10 : !add $05 : cmp #$10 : beq .done ; zeroHzCam check (10+0 = 10)
-    lda $01 : and #$20 : !add $05 : cmp #$21 : beq .done ; zeroVtCam check (20+1 = 21)
+    lda $07 : bne .adj0
     lda CoordIndex,y : tax
-    lda $20,x : cmp #$79 : bcc .done
-    !sub #$78 : sta $04 : bra .done
+    lda $20,x : cmp #$79 : bcc .adj0
+    !sub #$78 : sta $04
+    tya : asl : add #$04 : tax : jsr AdjCamBounds : bra .done
+    .adj0
+    tya : asl : tax : jsr AdjCamBounds : bra .done
 
     .nonZeroHalf ;meaning either right half or bottom half
     lda CoordIndex,y : tax
     lda $20,x : cmp #$78 : bcs .setQuad
-    lda $01 : and #$10 : !add $05 : cmp #$10 : beq .done ; zeroHzCam check (10+0 = 10)
-    lda $01 : and #$20 : !add $05 : cmp #$21 : beq .done ; zeroVtCam check (20+1 = 21)
-    !add #$78 : sta $04 : bra .done
+    lda $07 : bne .adj1
+    !add #$78 : sta $04
+    tya : asl : add #$08 : tax : jsr AdjCamBounds : bra .done
 
     .setQuad
     lda CamQuadIndex,y : tax : lda $0607, x : pha
     lda CameraIndex,y : tax : pla : sta $e3, x
-    bra .done
+    .adj1
+    tya : asl : add #$0c : tax : jsr AdjCamBounds : bra .done
 
     .done
     lda CameraIndex,y : tax : lda $e2, x : phx
-    jsr AdjCamBounds
-    plx : lda $e2, x : !sub $04 : sta $e2, x
+    lda $04 : sta $e2, x
     rts
 }
 
+; input, expects X to be an appropriate offset into the CamBoundBaseLine table
+; when $04 is 0 no coordinate are added
+AdjCamBounds: {
+    rep #$20 : lda CamBoundBaseLine, x : sta $05
+    lda $04 : and #$00ff : beq .common
+    lda CoordIndex,y : tax
+    lda $20, x : and #$00ff : !add $05 : sta $05
+    .common
+    lda OppCamBoundIndex,y : tax
+    lda $05 : sta $0618, x
+    inc #2 : sta $061A, x : sep #$20
+    rts
+}
+
+; todo - should I delete this, yet?
 ;input : A should be loaded with current camera low byte
 ;        $04 should be loaded with what we want the low byte to become (00-ff)
-AdjCamBounds:
+AdjCamBoundsOld:
 {
     stz $05 : rep #$30 : and #$00FF ; sanitize input for 16 bit
     !sub $04 : sta $04
