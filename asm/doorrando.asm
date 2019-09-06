@@ -27,9 +27,10 @@ NotLinkDoor2:
 
 
 ; Staircase routine
-;org $02a1e7 ;(PC: 121e7)
 org $01c3d4 ;(PC: c3d4)
-jsl SpiralWarp : nop #4
+jsl RecordStairType : nop
+org $02a1e7 ;(PC: 121e7)
+jsl SpiralWarp
 
 
 ; Graphics fix
