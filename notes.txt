@@ -14,3 +14,13 @@ Notes 2:
 (Fixed) Courtyard N is set to $02D8 - typo
 (Fixed) Sanc N is $0650 but should be $0250 which I think is right. typo again on the wrong layer
 (Fixed) Eastern boss had wrong room
+
+Pairing Notes
+30-34 4f-37 #$18,-24
+30-34 37-1f #$18,-24
+30-34 1f-1f???
+30-35 1f-1f
+30-34 36-1e #$18,-24
+30-34 1e-1f
+
+inconsistencies are caused by $0492 being set wrong

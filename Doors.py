@@ -72,7 +72,7 @@ def create_doors(world, player):
         create_small_key_door(player, 'Sewers Key Rat Key Door N', DoorType.Normal, Direction.North, 0x21, Right, High),
         create_small_key_door(player, 'Sewers Secret Room Key Door S', DoorType.Normal, Direction.South, 0x11, Right, High),
         create_spiral_stairs(player, 'Sewers Secret Room Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x11, 0, High, S, 0x37, 0x78),
-        create_spiral_stairs(player, 'Sewers Pull Switch Down Stairs', DoorType.SpiralStairs, Direction.Down, 0x02, 0, High, S, 0x1f, 0x78),
+        create_spiral_stairs(player, 'Sewers Pull Switch Down Stairs', DoorType.SpiralStairs, Direction.Down, 0x02, 0, Low, S, 0x1f, 0x78),
         create_toggle_door(player, 'Sewers Pull Switch S', DoorType.Normal, Direction.South, 0x02, Mid, Low),
         # logically one way the sanc, but should be linked - also toggle
         create_blocked_door(player, 'Sanctuary N', DoorType.Normal, Direction.North, 0x12, Mid, 0, True),
