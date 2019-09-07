@@ -1,6 +1,7 @@
 RecordStairType: {
+    pha
     lda $0e : sta $045e
-    lda $a0 : lda $063d, x
+    pla : sta $a0 : lda $063d, x
     rtl
 }
 
