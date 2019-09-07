@@ -122,6 +122,26 @@ c2 21 ae b6 0a bf 1b
 
 
 
+Trap doors:
+
+0468 - flag is set when doors are down (1 = down? 0 = up?)
+$690 - 7 for open - 0 for down
+
+IntraRoom: ->
+Dungeon_IntraRoomTransShutDoors (maybe should be Open)
+stz $0468
+#$07 -> $0690
+
+Dungeon_IntraRoomTransOpenDoors (maybe should be Shut)
+
+10D71 -> A
+A -> 0468
+0468++
+0 -> 0690
+
+
+
+
 Other transition stuff
 
 Overworld_LoadTransGfx -> LoadTransAuxGfx

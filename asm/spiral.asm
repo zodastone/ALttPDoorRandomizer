@@ -1,14 +1,19 @@
-SpiralWarp:
-{
+RecordStairType: {
+    pha
+    lda $0e : sta $045e
+    pla : sta $a0 : lda $063d, x
+    rtl
+}
 
-    pha : lda $040c : cmp.b #$ff : beq .abort ; abort if not in dungeon
+SpiralWarp: {
+    lda $040c : cmp.b #$ff : beq .abort ; abort if not in dungeon
     cmp #$06 : bcs .abort ; abort if not supported yet -- todo: this needs to be altered/removed as more dungeons are implemented
-    lda $0e : cmp #$5e : beq .gtg ; abort if not spiral - intended room is in A!
+    lda $045e : cmp #$5e : beq .gtg ; abort if not spiral - intended room is in A!
     cmp #$5f : beq .gtg
-    .abort pla : sta $a0 : bra .end
+    .abort
+    lda $a2 : and #$0f : rtl ; run highjack code and get out
 
     .gtg
-    pla
     phb : phk : plb : phx : phy ; push stuff
     jsr LookupSpiralOffset
     rep #$30 : and #$00FF : asl #2 : tax
@@ -29,25 +34,29 @@ SpiralWarp:
     ldy #$01 : jsr ShiftQuadSimple
 
     .skipYQuad
+    lda $01 : and #$04 : lsr : sta $048a ;fix layer calc 0->0 2->1
+    lda $01 : and #$08 : lsr #2 : sta $0492 ;fix from layer calc 0->0 2->1
     ; shift lower coordinates
-    lda $02 : sta $22
-    lda $03 : sta $20
+    lda $02 : sta $22 : bne .adjY : inc $23
+    .adjY lda $03 : sta $20 : bne .set53 : inc $21
+    .set53 ldx #$08
+    lda $0462 : and #$04 : beq .upStairs
+    ldx #$fd
+    .upStairs
+    txa : !add $22 : sta $53
 
-    ldy #$00 : jsr SetCamera ; todo: figure out camera jazz
+    lda $01 : and #$10 : sta $07 ; zeroHzCam check
+    ldy #$00 : jsr SetCamera
+    lda $01 : and #$20 : sta $07 ; zeroVtCam check
     ldy #$01 : jsr SetCamera
 
     ply : plx : plb ; pull the stuff we pushed
-
-    .end
-    ; this is the code we are hijacking
-    ; lda $a0 - we overwrote this behavior
-    lda $063d, x
+    lda $a2 : and #$0f ; this is the code we are hijacking
     rtl
 }
 
 ;Sets the offset in A
-LookupSpiralOffset:
-{
+LookupSpiralOffset: {
     ;where link currently is in $a2: quad in a8 & #$03
     ;count doors
     stz $00 : ldx #$00 : stz $01
@@ -84,43 +93,65 @@ LookupSpiralOffset:
     rts
 }
 
-ShiftQuadSimple:
-{
+ShiftQuadSimple: {
 	lda CoordIndex,y : tax
+	lda $20,x : beq .skip
 	lda $21,x : !add $06 : sta $21,x ; coordinate update
+	.skip
 	lda CamQuadIndex,y : tax
 	lda $0601,x : !add $06 : sta $0601,x
 	lda $0605,x : !add $06 : sta $0605,x ; high bytes of these guys
 	rts
 }
 
-SetCamera:
-{
-    stz $04 : sty $05
-    lda $01 : and #$10 : !add $05 : cmp #$10 : beq .done ; zeroHzCam check (10+0 = 10)
-    lda $01 : and #$20 : !add $05 : cmp #$21 : beq .done ; zeroVtCam check (20+1 = 21)
-
+SetCamera: {
+    stz $04
     tyx : lda $a9,x : bne .nonZeroHalf
     lda CamQuadIndex,y : tax : lda $607,x : pha
     lda CameraIndex,y : tax : pla : cmp $e3, x : bne .noQuadAdj
     dec $e3,x
 
     .noQuadAdj
+    lda $07 : bne .adj0
     lda CoordIndex,y : tax
-    lda $20,x : cmp #$79 : bcc .adjust
-    !sub #$78 : sta $04 : bra .adjust
+    lda $20,x : beq .oddQuad
+    cmp #$79 : bcc .adj0
+    !sub #$78 : sta $04
+    tya : asl : !add #$04 : tax : jsr AdjCamBounds : bra .done
+    .oddQuad
+    lda #$80 : sta $04 : bra .adj1 ; this is such a weird case - quad cross boundary
+    .adj0
+    tya : asl : tax : jsr AdjCamBounds : bra .done
 
     .nonZeroHalf ;meaning either right half or bottom half
+    lda $07 : bne .setQuad
     lda CoordIndex,y : tax
     lda $20,x : cmp #$78 : bcs .setQuad
-    !add #$78 : sta $04 : bra .adjust
+    !add #$78 : sta $04
+    .adj1
+    tya : asl : !add #$08 : tax : jsr AdjCamBounds : bra .done
 
     .setQuad
     lda CamQuadIndex,y : tax : lda $0607, x : pha
-    lda CameraIndex,y : tax : pla : sta $e3, x : bra .done
+    lda CameraIndex,y : tax : pla : sta $e3, x
+    tya : asl : !add #$0c : tax : jsr AdjCamBounds : bra .done
 
-    .adjust
+    .done
     lda CameraIndex,y : tax
-    .done lda $04 : sta $e2,x
+    lda $04 : sta $e2, x
+    rts
+}
+
+; input, expects X to be an appropriate offset into the CamBoundBaseLine table
+; when $04 is 0 no coordinate are added
+AdjCamBounds: {
+    rep #$20 : lda CamBoundBaseLine, x : sta $05
+    lda $04 : and #$00ff : beq .common
+    lda CoordIndex,y : tax
+    lda $20, x : and #$00ff : !add $05 : sta $05
+    .common
+    lda OppCamBoundIndex,y : tax
+    lda $05 : sta $0618, x
+    inc #2 : sta $061A, x : sep #$20
     rts
 }

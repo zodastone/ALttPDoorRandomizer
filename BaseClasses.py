@@ -284,7 +284,7 @@ class World(object):
 
     def has_beaten_game(self, state, player=None):
         if player:
-            return state.has('Triforce', player) or (self.goal in ['triforcehunt'] and (state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) > self.treasure_hunt_count))
+            return state.has('Triforce', player)
         else:
             return all((self.has_beaten_game(state, p) for p in range(1, self.players + 1)))
 
@@ -862,7 +862,8 @@ class Door(object):
             layer = 4 * (self.layer ^ 1 if toggle else self.layer)
             return [self.roomIndex, layer + self.doorIndex]
         if self.type == DoorType.SpiralStairs:
-            bitmask = 0x10 * int(self.zeroHzCam)
+            bitmask = int(self.layer) << 2
+            bitmask += 0x10 * int(self.zeroHzCam)
             bitmask += 0x20 * int(self.zeroVtCam)
             return [self.roomIndex, bitmask + self.quadrant, self.shiftX, self.shiftY]
 

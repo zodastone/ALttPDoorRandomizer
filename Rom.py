@@ -18,7 +18,7 @@ from EntranceShuffle import door_addresses
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'fdfff1a9046506a57dbcbe23fb5fd386'
+RANDOMIZERBASEHASH = 'efb85e71cf7d9bc0401c6683992d6e2f'
 
 
 class JsonRom(object):
@@ -842,6 +842,7 @@ def patch_rom(world, player, rom):
     # set up goals for treasure hunt
     rom.write_bytes(0x180165, [0x0E, 0x28] if world.treasure_hunt_icon == 'Triforce Piece' else [0x0D, 0x28])
     rom.write_byte(0x180167, world.treasure_hunt_count % 256)
+    rom.write_byte(0x180194, 1) # Must turn in triforced pieces (instant win not enabled)
 
     # TODO: a proper race rom mode should be implemented, that changes the following flag, and rummages the table (or uses the future encryption feature, etc)
     rom.write_bytes(0x180213, [0x00, 0x01]) # Not a Tournament Seed
@@ -1282,17 +1283,18 @@ def write_strings(rom, world, player):
     random.shuffle(silverarrows)
     silverarrow_hint = (' %s?' % hint_text(silverarrows[0]).replace('Ganon\'s', 'my')) if silverarrows else '?\nI think not!'
     tt['ganon_phase_3_no_silvers'] = 'Did you find the silver arrows%s' % silverarrow_hint
+    tt['ganon_phase_3_no_silvers_alt'] = 'Did you find the silver arrows%s' % silverarrow_hint
 
     prog_bow_locs = world.find_items('Progressive Bow', player)
     distinguished_prog_bow_loc = next((location for location in prog_bow_locs if location.item.code == 0x65), None)
     if distinguished_prog_bow_loc:
         prog_bow_locs.remove(distinguished_prog_bow_loc)
         silverarrow_hint = (' %s?' % hint_text(distinguished_prog_bow_loc).replace('Ganon\'s', 'my'))
-        tt['ganon_phase_3_no_silvers'] = 'Did you find the silver arrows%s' % silverarrow_hint
+        tt['ganon_phase_3_no_silvers_alt'] = 'Did you find the silver arrows%s' % silverarrow_hint
 
     if any(prog_bow_locs):
         silverarrow_hint = (' %s?' % hint_text(random.choice(prog_bow_locs)).replace('Ganon\'s', 'my'))
-        tt['ganon_phase_3_no_silvers_alt'] = 'Did you find the silver arrows%s' % silverarrow_hint
+        tt['ganon_phase_3_no_silvers'] = 'Did you find the silver arrows%s' % silverarrow_hint
 
 
     silverarrow_hint = (' %s?' % hint_text(silverarrows[0]).replace('Ganon\'s', 'my')) if silverarrows else '?\nI think not!'
@@ -1323,6 +1325,7 @@ def write_strings(rom, world, player):
         tt['ganon_fall_in_alt'] = 'Why are you even here?\n You can\'t even hurt me! Get the Triforce Pieces.'
         tt['ganon_phase_3_alt'] = 'Seriously? Go Away, I will not Die.'
         tt['sign_ganon'] = 'Go find the Triforce pieces... Ganon is invincible!'
+        tt['murahdahla'] = "Hello @. I\nam Murahdahla, brother of\nSahasrahla and Aginah. Behold the power of\ninvisibility.\n\n\n\n… … …\n\nWait! you can see me? I knew I should have\nhidden in  a hollow tree. If you bring\n%d triforce pieces, I can reassemble it." % world.treasure_hunt_count
     elif world.goal in ['pedestal']:
         tt['ganon_fall_in_alt'] = 'Why are you even here?\n You can\'t even hurt me! Your goal is at the pedestal.'
         tt['ganon_phase_3_alt'] = 'Seriously? Go Away, I will not Die.'
@@ -1406,8 +1409,6 @@ def set_inverted_mode(world, rom):
     rom.write_int16s(snes_to_pc(0x02E849), [0x0043, 0x0056, 0x0058, 0x006C, 0x006F, 0x0070, 0x007B, 0x007F, 0x001B])  # dw flute
     rom.write_int16(snes_to_pc(0x02E8D5), 0x07C8)
     rom.write_int16(snes_to_pc(0x02E8F7), 0x01F8)
-    rom.write_byte(0x7A943, 0xF0)
-    rom.write_byte(0x7A96D, 0xD0)
     rom.write_byte(snes_to_pc(0x08D40C), 0xD0)  # morph proof
     # the following bytes should only be written in vanilla
     # or they'll overwrite the randomizer's shuffles

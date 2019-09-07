@@ -27,9 +27,10 @@ NotLinkDoor2:
 
 
 ; Staircase routine
-;org $02a1e7 ;(PC: 121e7)
 org $01c3d4 ;(PC: c3d4)
-jsl SpiralWarp : nop
+jsl RecordStairType : nop
+org $02a1e7 ;(PC: 121e7)
+jsl SpiralWarp
 
 
 ; Graphics fix
@@ -333,5 +334,12 @@ ShiftQuadIndex:
 db 2, 1 ; see ShiftQuad func (relates to $a9,$aa)
 CamBoundIndex: ; Horizontal 1st
 db 0, 4 ; Camera Bounds $0618-$61f
+OppCamBoundIndex: ; Horizontal 1st
+db 4, 0 ; Camera Bounds $0618-$61f
+CamBoundBaseLine: ; X camera stuff is 1st column todo Y camera is not right yet
+dw $007f, $0077 ; Left/Top camera bounds when at edge or layout frozen
+dw $0007, $000b ; Left/Top camera bounds when not frozen + appropriate low byte $22/$20 (preadj. by #$78/#$6c)
+dw $00ff, $010b ; Right/Bot camera bounds when not frozen + appropriate low byte $20/$22
+dw $017f, $0187 ; Right/Bot camera bound when at edge or layout frozen
 
 incsrc doortables.asm
