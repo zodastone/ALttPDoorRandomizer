@@ -143,24 +143,27 @@ def connect_one_way(world, entrancename, exitname, player, skipSpoiler=False):
 
 def within_dungeon(world, player):
     # TODO: Add dungeon names to Regions so we can just look these lists up
-    dungeon_region_names_es = ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall', 'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Dungeon Map Room', 'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk', 'Hyrule Dungeon South Abyss', 'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory', 'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Secret Room', 'Sewers Secret Room Blocked Path', 'Sewers Pull Switch', 'Sanctuary']
+    # TODO: The "starts" regions need access logic
+    dungeon_region_starts_es = ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Secret Room']
+    dungeon_region_names_es = ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall', 'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Dungeon Map Room', 'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk', 'Hyrule Dungeon South Abyss', 'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory Main', 'Hyrule Dungeon Armory North Branch', 'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Secret Room', 'Sewers Secret Room Blocked Path', 'Sewers Pull Switch', 'Sanctuary']
+    dungeon_region_starts_ep = ['Eastern Lobby']
     dungeon_region_names_ep = ['Eastern Lobby', 'Eastern Cannonball', 'Eastern Cannonball Ledge', 'Eastern Courtyard Ledge', 'Eastern Map Area', 'Eastern Compass Area', 'Eastern Courtyard', 'Eastern Fairies', 'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Big Key', 'Eastern Darkness', 'Eastern Attic Start', 'Eastern Attic Switches', 'Eastern Eyegores',  'Eastern Boss']
-    dungeon_region_lists = [dungeon_region_names_es, dungeon_region_names_ep]
-    for region_list in dungeon_region_lists:
-        shuffle_dungeon(world, player, region_list)
+    dungeon_region_lists = [(dungeon_region_starts_es, dungeon_region_names_es), (dungeon_region_starts_ep, dungeon_region_names_ep)]
+    for start_list, region_list in dungeon_region_lists:
+        shuffle_dungeon(world, player, start_list, region_list)
 
-def shuffle_dungeon(world, player, dungeon_region_names):
+def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
     logger = logging.getLogger('')
+    # Part one - generate a random layout
     available_regions = []
     for name in dungeon_region_names:
         available_regions.append(world.get_region(name, player))
     random.shuffle(available_regions)
     
     # Pick a random region and make its doors the open set
-    # TODO: It would make sense to start with the entrance but I'm not sure it's needed.
     available_doors = []
     region = available_regions.pop()
-    print("Starting in " + region.name)
+    logger.info("Starting in %s", region.name)
     available_doors.extend(get_doors(world, region, player))
     
     # Loop until all available doors are used
@@ -188,16 +191,24 @@ def shuffle_dungeon(world, player, dungeon_region_names):
             available_doors.remove(connect_door)
     # Check that we used everything, and retry if we failed
     if len(available_regions) > 0 or len(available_doors) > 0:
-      logger.info('Failed to add all regions to dungeon, trying again.')
-      shuffle_dungeon(world, player, dungeon_region_names)
+        logger.info('Failed to add all regions to dungeon, trying again.')
+        shuffle_dungeon(world, player, start_region_names, dungeon_region_names)
+        return    
+    
 
 # Connects a and b. Or don't if they're an unsupported connection type.
 # TODO: This is gross, don't do it this way
 def maybe_connect_two_way(world, a, b, player):
-    if a.type == DoorType.Open or a.type == DoorType.StraightStairs or a.type == DoorType.Hole or a.type == DoorType.Warp:
+    # Return on unsupported types.
+    if a.type == DoorType.Open or a.type == DoorType.StraightStairs or a.type == DoorType.Hole or a.type == DoorType.Warp or a.type == DoorType.Interior:
         return
-    connect_two_way(world, a.name, b.name, player)
-
+    # Connect supported types
+    if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs:
+        connect_two_way(world, a.name, b.name, player)
+        return
+    # If we failed to account for a type, panic
+    raise RuntimeError('Unknown door type ' + a.type)
+                
 # Finds a compatible door in regions, returns the region and door
 def find_compatible_door_in_regions(world, door, regions, player):
     for region in regions:
@@ -230,6 +241,8 @@ def doors_compatible(a, b):
         return doors_fit_mandatory_pair(falldown_pits_as_doors, a, b)
     if a.type == DoorType.Warp:
         return doors_fit_mandatory_pair(dungeon_warps_as_doors, a, b)
+    if a.type == DoorType.Interior:
+        return doors_fit_mandatory_pair(interior_doors, a, b)
     return a.direction == switch_dir(b.direction)
 
 def doors_fit_mandatory_pair(pair_list, a, b):
@@ -664,8 +677,6 @@ def experiment(world, player):
 # DATA GOES DOWN HERE
 
 mandatory_connections = [('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
-                         ('Hyrule Dungeon Key Door S', 'Hyrule Dungeon North Abyss'),
-                         ('Hyrule Dungeon Key Door N', 'Hyrule Dungeon Map Room'),
                          ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path')
                          ]
 
@@ -713,6 +724,8 @@ falldown_pits_as_doors = [('Eastern Courtyard Potholes', 'Eastern Fairy Landing'
 
 dungeon_warps = [('Eastern Fairies\' Warp', 'Eastern Courtyard')]
 dungeon_warps_as_doors = [('Eastern Fairies\' Warp', 'Eastern Courtyard Warp End')]
+
+interior_doors = [('Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Armory Interior Key Door N'), ('Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon North Abyss Key Door N')]
 
 default_door_connections = [('Hyrule Castle Lobby W', 'Hyrule Castle West Lobby E'),
                             ('Hyrule Castle Lobby E', 'Hyrule Castle East Lobby W'),
