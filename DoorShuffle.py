@@ -150,6 +150,7 @@ def within_dungeon(world, player):
         shuffle_dungeon(world, player, region_list)
 
 def shuffle_dungeon(world, player, dungeon_region_names):
+    logger = logging.getLogger('')
     available_regions = []
     for name in dungeon_region_names:
         available_regions.append(world.get_region(name, player))
@@ -168,11 +169,11 @@ def shuffle_dungeon(world, player, dungeon_region_names):
         # TODO: Is there an existing "remove random from list" in this codebase?
         random.shuffle(available_doors)
         door = available_doors.pop()
-        print("Linking " + door.name)
+        logger.info('Linking %s', door.name)
         # Find an available region that has a compatible door
         connect_region, connect_door = find_compatible_door_in_regions(world, door, available_regions, player)
         if connect_region is not None:
-            print("Found new region " + connect_region.name + " via " + connect_door.name)
+            logger.info('  Found new region %s via %s', connect_region.name, connect_door.name)
             # Apply connection and add the new region's doors to the available list
             maybe_connect_two_way(world, door, connect_door, player)
             available_doors.extend(get_doors(world, connect_region, player))
@@ -182,11 +183,13 @@ def shuffle_dungeon(world, player, dungeon_region_names):
         else:
             # If there's no available region with a door, use an internal connection
             connect_door = find_compatible_door_in_list(world, door, available_doors, player)
-            print("Adding loop via " + connect_door.name)
+            logger.info('  Adding loop via %s', connect_door.name)
             maybe_connect_two_way(world, door, connect_door, player)
             available_doors.remove(connect_door)
-    print(available_regions)
-    print(available_doors)
+    # Check that we used everything, and retry if we failed
+    if len(available_regions) > 0 or len(available_doors) > 0:
+      logger.info('Failed to add all regions to dungeon, trying again.')
+      shuffle_dungeon(world, player, dungeon_region_names)
 
 # Connects a and b. Or don't if they're an unsupported connection type.
 # TODO: This is gross, don't do it this way
