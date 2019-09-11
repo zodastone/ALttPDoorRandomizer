@@ -139,7 +139,15 @@ A -> 0468
 0468++
 0 -> 0690
 
+InterRoom:
 
+pre
+01b6b5 sta $0468 (01) in this case
+01b7ce stz 468 x2
+post
+028acc inc $0468
+028ad2 stz $0690
+01d391 inc $0690 x 10 during animation
 
 
 Other transition stuff
@@ -158,4 +166,10 @@ Places where sta $e2 happens
 
 028750 Module_Dungeon
 0286ef Module_Dungeon
+
+
+Stuff about big key door south
+ 1e -> Y
+ 1aab1 ldx ce06,y (where y is 1e = ce24) loads 2a80, but should be 2ac8 for the gfx
+ not detected as big key door - need to look into tile attributes
 

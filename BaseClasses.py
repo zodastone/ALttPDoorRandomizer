@@ -835,6 +835,7 @@ class Door(object):
         self.doorIndex = doorIndex
         self.layer = layer  # 0 for normal floor, 1 for the inset layer
         self.toggle = toggle
+        self.trap = 0x0
         self.quadrant = 2
         self.shiftX = 78
         self.shiftY = 78
@@ -857,8 +858,9 @@ class Door(object):
 
     def getTarget(self, toggle):
         if self.type == DoorType.Normal:
-            layer = 4 * (self.layer ^ 1 if toggle else self.layer)
-            return [self.roomIndex, layer + self.doorIndex]
+            bitmask = 4 * (self.layer ^ 1 if toggle else self.layer)
+            bitmask += 0x08 * int(self.trap)
+            return [self.roomIndex, bitmask + self.doorIndex]
         if self.type == DoorType.SpiralStairs:
             bitmask = int(self.layer) << 2
             bitmask += 0x10 * int(self.zeroHzCam)

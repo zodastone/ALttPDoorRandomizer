@@ -11,7 +11,7 @@ Right = 2
 # layer numbers
 High = 0
 Low = 1
-#Quadrants - just been using this in my head - no reason to keep them labeled this way
+# Quadrants - just been using this in my head - no reason to keep them labeled this way
 A = 0
 S = 1
 Z = 2
@@ -21,7 +21,6 @@ HTH = 0  # High to High 00
 HTL = 1  # High to Low  01
 LTH = 2  # Low to High  10
 LTL = 3  # Low to Low   11
-
 
 
 def create_doors(world, player):
@@ -58,15 +57,15 @@ def create_doors(world, player):
         create_dir_door(player, 'Hyrule Dungeon South Abyss Catwalk West Edge', DoorType.Open, Direction.West, 0x82, None, High),
         create_dir_door(player, 'Hyrule Dungeon Guardroom Catwalk Edge', DoorType.Open, Direction.East, 0x81, None, High),
         create_dir_door(player, 'Hyrule Dungeon Guardroom Abyss Edge', DoorType.Open, Direction.West, 0x81, None, High),
-        create_dir_door(player, 'Hyrule Dungeon Guardroom N', DoorType.Normal, Direction.North, 0x81, Left, Low), # todo: is this a toggle door?
-        create_dir_door(player, 'Hyrule Dungeon Armory S', DoorType.Normal, Direction.South, 0x71, Left, Low), # not sure what the layer should be here
+        create_dir_door(player, 'Hyrule Dungeon Guardroom N', DoorType.Normal, Direction.North, 0x81, Left, Low),
+        create_dir_door(player, 'Hyrule Dungeon Armory S', DoorType.Normal, Direction.South, 0x71, Left, Low, 0x1),
         create_spiral_stairs(player, 'Hyrule Dungeon Armory Down Stairs', DoorType.SpiralStairs, Direction.Down, 0x71, 0, HTL, A, 0x11, 0xa8, True),
         create_spiral_stairs(player, 'Hyrule Dungeon Staircase Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x70, 2, LTH, A, 0x32, 0x94, True),
         create_spiral_stairs(player, 'Hyrule Dungeon Staircase Down Stairs', DoorType.SpiralStairs, Direction.Down, 0x70, 1, HTH, A, 0x11, 0x58),
         create_spiral_stairs(player, 'Hyrule Dungeon Cellblock Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x80, 0, HTH, A, 0x1a, 0x44),
 
         # sewers
-        create_blocked_door(player, 'Sewers Behind Tapestry S', DoorType.Normal, Direction.South, 0x41, Mid, High),
+        create_blocked_door(player, 'Sewers Behind Tapestry S', DoorType.Normal, Direction.South, 0x41, Mid, High, False, 0x2),
         create_spiral_stairs(player, 'Sewers Behind Tapestry Down Stairs', DoorType.SpiralStairs, Direction.Down, 0x41, 0, HTH, S, 0x12, 0xb0),
         create_spiral_stairs(player, 'Sewers Rope Room Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x42, 0, HTH, S, 0x1b, 0x9c),
         create_dir_door(player, 'Sewers Rope Room North Stairs', DoorType.StraightStairs, Direction.North, 0x42, Mid, High),
@@ -79,7 +78,7 @@ def create_doors(world, player):
         create_small_key_door(player, 'Sewers Secret Room Key Door S', DoorType.Normal, Direction.South, 0x11, Right, High),
         create_spiral_stairs(player, 'Sewers Secret Room Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x11, 0, LTH, S, 0x33, 0x6c, True),
         create_spiral_stairs(player, 'Sewers Pull Switch Down Stairs', DoorType.SpiralStairs, Direction.Down, 0x02, 0, HTL, S, 0x12, 0x80),
-        create_toggle_door(player, 'Sewers Pull Switch S', DoorType.Normal, Direction.South, 0x02, Mid, Low),
+        create_toggle_door(player, 'Sewers Pull Switch S', DoorType.Normal, Direction.South, 0x02, Mid, Low, 0x2),
         # logically one way the sanc, but should be linked - also toggle
         create_blocked_door(player, 'Sanctuary N', DoorType.Normal, Direction.North, 0x12, Mid, 0, True),
 
@@ -90,12 +89,12 @@ def create_doors(world, player):
         create_dir_door(player, 'Eastern Cannonball Ledge WN', DoorType.Normal, Direction.West, 0xb9, Top, High),
         create_small_key_door(player, 'Eastern Cannonball Ledge Key Door EN', DoorType.Normal, Direction.East, 0xb9, Top, High),
         create_dir_door(player, 'Eastern Courtyard Ledge S', DoorType.Normal, Direction.South, 0xa9, Mid, High),
-        create_dir_door(player, 'Eastern Courtyard Ledge W', DoorType.Normal, Direction.West, 0xa9, Mid, High),
-        create_dir_door(player, 'Eastern Courtyard Ledge E', DoorType.Normal, Direction.East, 0xa9, Mid, High),
+        create_dir_door(player, 'Eastern Courtyard Ledge W', DoorType.Normal, Direction.West, 0xa9, Mid, High, 0x2),
+        create_dir_door(player, 'Eastern Courtyard Ledge E', DoorType.Normal, Direction.East, 0xa9, Mid, High, 0x1),
         create_dir_door(player, 'Eastern Map Area W', DoorType.Normal, Direction.West, 0xaa, Mid, High),
         create_dir_door(player, 'Eastern Compass Area E', DoorType.Normal, Direction.East, 0xa8, Mid, High),
         create_dir_door(player, 'Eastern Compass Area EN', DoorType.Normal, Direction.East, 0xa8, Top, Low),
-        create_blocked_door(player, 'Eastern Compass Area SW', DoorType.Normal, Direction.South, 0xa8, Right, High),
+        create_blocked_door(player, 'Eastern Compass Area SW', DoorType.Normal, Direction.South, 0xa8, Right, High, False),
         create_dir_door(player, 'Eastern Courtyard WN', DoorType.Normal, Direction.West, 0xa9, Top, Low),
         create_dir_door(player, 'Eastern Courtyard EN', DoorType.Normal, Direction.East, 0xa9, Top, Low),
         create_big_key_door(player, 'Eastern Courtyard N', DoorType.Normal, Direction.North, 0xa9, Mid, High),
@@ -137,24 +136,31 @@ def create_big_key_door(player, name, type, direction, room, doorIndex, layer):
     return d
 
 
-def create_blocked_door(player, name, type, direction, room, doorIndex, layer, toggle=False):
+def create_blocked_door(player, name, type, direction, room, doorIndex, layer, toggle=False, trap=0x0):
     d = Door(player, name, type, direction, room, doorIndex, layer, toggle)
     d.blocked = True
+    d.trap = trap
     return d
 
 
-def create_dir_door(player, name, type, direction, room, doorIndex, layer):
-    return Door(player, name, type, direction, room, doorIndex, layer)
-
-
-def create_toggle_door(player, name, type, direction, room, doorIndex, layer):
-    return Door(player, name, type, direction, room, doorIndex, layer, True)
-
-def create_spiral_stairs(player, name, type, direction, room, doorIndex, layer, quadrant, shiftY, shiftX, zeroHzCam = False, zeroVtCam = False):
+def create_dir_door(player, name, type, direction, room, doorIndex, layer, trap=0x0):
     d = Door(player, name, type, direction, room, doorIndex, layer)
+    d.trap = trap
+    return d
+
+
+def create_toggle_door(player, name, type, direction, room, doorIndex, layer, trap=0x0):
+    d = Door(player, name, type, direction, room, doorIndex, layer, True)
+    d.trap = trap
+    return d
+
+
+def create_spiral_stairs(player, name, type, direction, room,
+                         door_index, layer, quadrant, shift_y, shift_x, zero_hz_cam=False, zero_vt_cam=False):
+    d = Door(player, name, type, direction, room, door_index, layer)
     d.quadrant = quadrant
-    d.shiftY = shiftY
-    d.shiftX = shiftX
-    d.zeroHzCam = zeroHzCam
-    d.zeroVtCam = zeroVtCam
+    d.shiftY = shift_y
+    d.shiftX = shift_x
+    d.zeroHzCam = zero_hz_cam
+    d.zeroVtCam = zero_vt_cam
     return d

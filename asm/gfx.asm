@@ -1,24 +1,21 @@
 GfxFixer:
 {
     lda $b1 : bne .stage2
+    jsl Dungeon_LoadRoom_RANDO ; let's only call this guy once - may fix star tiles and slower loads
     jsl Dungeon_InitStarTileCh
     jsl LoadTransAuxGfx
     ;jsl Dungeon_LoadCustomTileAttr
     jsl PrepTransAuxGfx
     lda #$09 : sta $17 : sta $0710
-    inc $b1
-    rtl
-    .stage2
-    cmp #$01 : bne .stage3
-    lda #$0a : sta $17 : sta $0710
-    inc $b1
-    rtl
-    .stage3
     jsl Palette_SpriteAux3
     jsl Palette_SpriteAux2
     jsl Palette_SpriteAux1
     jsl Palette_DungBgMain
     jsr CgramAuxToMain
+    inc $b1
+    rtl
+    .stage2
+    lda #$0a : sta $17 : sta $0710
     stz $b1 : inc $b0
     rtl
 }
