@@ -94,11 +94,6 @@ def create_regions(world, player):
         create_lw_region(player, 'Desert Palace Stairs', None, ['Desert Palace Entrance (South)']),
         create_lw_region(player, 'Desert Palace Lone Stairs', None, ['Desert Palace Stairs Drop', 'Desert Palace Entrance (East)']),
         create_lw_region(player, 'Desert Palace Entrance (North) Spot', None, ['Desert Palace Entrance (North)', 'Desert Ledge Return Rocks']),
-        create_dungeon_region(player, 'Desert Palace Main (Outer)', 'Desert Palace', ['Desert Palace - Big Chest', 'Desert Palace - Torch', 'Desert Palace - Map Chest'],
-                              ['Desert Palace Pots (Outer)', 'Desert Palace Exit (West)', 'Desert Palace Exit (East)', 'Desert Palace East Wing']),
-        create_dungeon_region(player, 'Desert Palace Main (Inner)', 'Desert Palace', None, ['Desert Palace Exit (South)', 'Desert Palace Pots (Inner)']),
-        create_dungeon_region(player, 'Desert Palace East', 'Desert Palace', ['Desert Palace - Compass Chest', 'Desert Palace - Big Key Chest']),
-        create_dungeon_region(player, 'Desert Palace North', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize'], ['Desert Palace Exit (North)']),
         create_lw_region(player, 'Master Sword Meadow', ['Master Sword Pedestal']),
         create_cave_region(player, 'Lost Woods Gamble', 'a game of chance'),
         create_lw_region(player, 'Hyrule Castle Courtyard', None, ['Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Entrance (South)']),
@@ -312,29 +307,58 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Sewers Dark Cross', 'A dungeon', ['Sewers - Dark Cross'], ['Sewers Dark Cross Key Door N', 'Sewers Dark Cross South Stairs']),
         create_dungeon_region(player, 'Sewers Water', 'A dungeon', None, ['Sewers Dark Cross Key Door S', 'Sewers Water W']),
         create_dungeon_region(player, 'Sewers Key Rat', 'A dungeon', None, ['Sewers Key Rat E', 'Sewers Key Rat Key Door N']),
+        create_dungeon_region(player, 'Sewers Secret Room Blocked Path', 'A dungeon', None, ['Sewers Secret Room Up Stairs']),
         create_dungeon_region(player, 'Sewers Secret Room', 'A dungeon', ['Sewers - Secret Room - Left', 'Sewers - Secret Room - Middle', 'Sewers - Secret Room - Right'],
                               ['Sewers Secret Room Key Door S', 'Sewers Secret Room Push Block']),
-        create_dungeon_region(player, 'Sewers Secret Room Blocked Path', 'A dungeon', None, ['Sewers Secret Room Up Stairs']),
         create_dungeon_region(player, 'Sewers Pull Switch', 'A dungeon', None, ['Sewers Pull Switch Down Stairs', 'Sewers Pull Switch S']),
         create_dungeon_region(player, 'Sanctuary', 'A dungeon', ['Sanctuary'], ['Sanctuary Exit', 'Sanctuary N']),
 
         # Eastern Palace
-        create_dungeon_region(player, 'Eastern Lobby', 'A dungeon', None, ['Eastern Lobby N', 'Eastern Palace Exit']),
-        create_dungeon_region(player, 'Eastern Cannonball', 'A dungeon', ['Eastern Palace - Cannonball Chest'], ['Eastern Cannonball S', 'Eastern Cannonball N']),
-        create_dungeon_region(player, 'Eastern Cannonball Ledge', 'A dungeon', None, ['Eastern Cannonball Ledge WN', 'Eastern Cannonball Ledge Key Door EN']),
-        create_dungeon_region(player, 'Eastern Courtyard Ledge', 'A dungeon', None, ['Eastern Courtyard Ledge S', 'Eastern Courtyard Ledge W', 'Eastern Courtyard Ledge E']),
-        create_dungeon_region(player, 'Eastern Map Area', 'A dungeon', ['Eastern Palace - Map Chest'], ['Eastern Map Area W']),
-        create_dungeon_region(player, 'Eastern Compass Area', 'A dungeon', ['Eastern Palace - Compass Chest'], ['Eastern Compass Area E', 'Eastern Compass Area EN', 'Eastern Compass Area SW']),
-        create_dungeon_region(player, 'Eastern Courtyard', 'A dungeon', ['Eastern Palace - Big Chest'], ['Eastern Courtyard WN', 'Eastern Courtyard EN', 'Eastern Courtyard N', 'Eastern Courtyard Potholes', 'Eastern Courtyard Warp End']),
-        create_dungeon_region(player, 'Eastern Fairies', 'A dungeon', None, ['Eastern Fairies\' Warp', 'Eastern Fairy Landing']),
-        create_dungeon_region(player, 'Eastern Map Valley', 'A dungeon', None, ['Eastern Map Valley WN', 'Eastern Map Valley SW']),
-        create_dungeon_region(player, 'Eastern Dark Square', 'A dungeon', None, ['Eastern Dark Square NW', 'Eastern Dark Square Key Door WN']),
-        create_dungeon_region(player, 'Eastern Big Key', 'A dungeon', ['Eastern Palace - Big Key Chest'], ['Eastern Big Key EN', 'Eastern Big Key NE']),
-        create_dungeon_region(player, 'Eastern Darkness', 'A dungeon', None, ['Eastern Darkness S', 'Eastern Darkness Up Stairs']),
-        create_dungeon_region(player, 'Eastern Attic Start', 'A dungeon', None, ['Eastern Attic Start Down Stairs', 'Eastern Attic Start WS']),
-        create_dungeon_region(player, 'Eastern Attic Switches', 'A dungeon', None, ['Eastern Attic Switches ES', 'Eastern Attic Switches WS']),
-        create_dungeon_region(player, 'Eastern Eyegores', 'A dungeon', None, ['Eastern Eyegores ES', 'Eastern Eyegores NE']),
-        create_dungeon_region(player, 'Eastern Boss', 'A dungeon', ['Eastern Palace - Boss', 'Eastern Palace - Prize'], ['Eastern Boss SE']),
+        create_dungeon_region(player, 'Eastern Lobby', 'Eastern Palace', None, ['Eastern Lobby N', 'Eastern Palace Exit']),
+        create_dungeon_region(player, 'Eastern Cannonball', 'Eastern Palace', ['Eastern Palace - Cannonball Chest'], ['Eastern Cannonball S', 'Eastern Cannonball N']),
+        create_dungeon_region(player, 'Eastern Cannonball Ledge', 'Eastern Palace', None, ['Eastern Cannonball Ledge WN', 'Eastern Cannonball Ledge Key Door EN']),
+        create_dungeon_region(player, 'Eastern Courtyard Ledge', 'Eastern Palace', None, ['Eastern Courtyard Ledge S', 'Eastern Courtyard Ledge W', 'Eastern Courtyard Ledge E']),
+        create_dungeon_region(player, 'Eastern Map Area', 'Eastern Palace', ['Eastern Palace - Map Chest'], ['Eastern Map Area W']),
+        create_dungeon_region(player, 'Eastern Compass Area', 'Eastern Palace', ['Eastern Palace - Compass Chest'], ['Eastern Compass Area E', 'Eastern Compass Area EN']),
+        create_dungeon_region(player, 'Eastern Hint Tile Blocked Path', 'Eastern Palace', None, ['Eastern Compass Area SW', 'Eastern Hint Tile Push Block']),
+        create_dungeon_region(player, 'Eastern Courtyard', 'Eastern Palace', ['Eastern Palace - Big Chest'], ['Eastern Courtyard WN', 'Eastern Courtyard EN', 'Eastern Courtyard N', 'Eastern Courtyard Potholes', 'Eastern Courtyard Warp End']),
+        create_dungeon_region(player, 'Eastern Fairies', 'Eastern Palace', None, ['Eastern Fairies\' Warp', 'Eastern Fairy Landing']),
+        create_dungeon_region(player, 'Eastern Map Valley', 'Eastern Palace', None, ['Eastern Map Valley WN', 'Eastern Map Valley SW']),
+        create_dungeon_region(player, 'Eastern Dark Square', 'Eastern Palace', None, ['Eastern Dark Square NW', 'Eastern Dark Square Key Door WN']),
+        create_dungeon_region(player, 'Eastern Big Key', 'Eastern Palace', ['Eastern Palace - Big Key Chest'], ['Eastern Big Key EN', 'Eastern Big Key NE']),
+        create_dungeon_region(player, 'Eastern Darkness', 'Eastern Palace', None, ['Eastern Darkness S', 'Eastern Darkness Up Stairs']),
+        create_dungeon_region(player, 'Eastern Attic Start', 'Eastern Palace', None, ['Eastern Attic Start Down Stairs', 'Eastern Attic Start WS']),
+        create_dungeon_region(player, 'Eastern Attic Switches', 'Eastern Palace', None, ['Eastern Attic Switches ES', 'Eastern Attic Switches WS']),
+        create_dungeon_region(player, 'Eastern Eyegores', 'Eastern Palace', None, ['Eastern Eyegores ES', 'Eastern Eyegores NE']),
+        create_dungeon_region(player, 'Eastern Boss', 'Eastern Palace', ['Eastern Palace - Boss', 'Eastern Palace - Prize'], ['Eastern Boss SE']),
+
+        # Desert Palace
+        # note for later: pots in desert keep out the bunny - logically (though not practically b/c of dungeon bunny revival)
+        create_dungeon_region(player, 'Desert Main Lobby', 'Desert Palace', None, ['Desert Palace Exit (South)','Desert Main Lobby NW Edge', 'Desert Main Lobby N Edge', 'Desert Main Lobby NE Edge', 'Desert Main Lobby E Edge']),
+        create_dungeon_region(player, 'Desert Dead End', 'Desert Palace', None, ['Desert Dead End Edge']),
+        create_dungeon_region(player, 'Desert East Lobby', 'Desert Palace', None, ['Desert East Lobby WS', 'Desert Palace Exit (East)']),
+        create_dungeon_region(player, 'Desert East Wing', 'Desert Palace', None, ['Desert East Wing ES', 'Desert East Wing Key Door EN', 'Desert East Wing W Edge', 'Desert East Wing N Edge']),
+        create_dungeon_region(player, 'Desert Compass Room', 'Desert Palace', ['Desert Palace - Compass Chest'], ['Desert Compass Key Door WN', 'Desert Compass NW']),
+        create_dungeon_region(player, 'Desert Cannonball', 'Desert Palace', ['Desert Palace - Big Key Chest'], ['Desert Cannonball S']),
+        create_dungeon_region(player, 'Desert Arrow Pot Corner', 'Desert Palace', None, ['Desert Arrow Pot Corner S Edge', 'Desert Arrow Pot Corner W Edge']),
+        # skip the trap room for now
+        create_dungeon_region(player, 'Desert North Hall', 'Desert Palace', None, ['Desert North Hall SE Edge', 'Desert North Hall SW Edge', 'Desert North Hall W Edge', 'Desert North Hall E Edge', 'Desert North Hall NW', 'Desert North Hall NE']),
+        create_dungeon_region(player, 'Desert Map Room', 'Desert Palace', ['Desert Palace - Map Chest'], ['Desert Map SW', 'Desert Map SE']),
+        create_dungeon_region(player, 'Desert Sandworm Corner', 'Desert Palace', None, ['Desert Sandworm Corner S Edge', 'Desert Sandworm Corner E Edge', 'Desert Sandworm Corner NE', 'Desert Sandworm Corner WS']),
+        create_dungeon_region(player, 'Desert Bonk Torch', 'Desert Palace', ['Desert Palace - Torch'], ['Desert Bonk Torch SE']),
+        create_dungeon_region(player, 'Desert Circle of Pots', 'Desert Palace', None, ['Desert Circle of Pots ES', 'Desert Circle of Pots NW']),
+        create_dungeon_region(player, 'Desert Big Chest Room', 'Desert Palace', ['Desert Palace - Big Chest'], ['Desert Big Chest SW']),
+        create_dungeon_region(player, 'Desert West Wing', 'Desert Palace', None, ['Desert West Wing N Edge', 'Desert West Wing WS']),
+        create_dungeon_region(player, 'Desert West Lobby', 'Desert Palace', None, ['Desert West Lobby ES', 'Desert Palace Exit (West)']),
+        # skipping the fairy room for now
+        create_dungeon_region(player, 'Desert Back Lobby', 'Desert Palace', None, ['Desert Palace Exit (North)', 'Desert Back Lobby NW']),
+        create_dungeon_region(player, 'Desert Tiles 1', 'Desert Palace', None, ['Desert Tiles 1 SW', 'Desert Tiles 1 Up Stairs']),
+        create_dungeon_region(player, 'Desert Bridge', 'Desert Palace', None, ['Desert Bridge Down Stairs', 'Desert Bridge SW']),
+        create_dungeon_region(player, 'Desert Four Statues', 'Desert Palace', None, ['Desert Four Statues NW', 'Desert Four Statues ES']),
+        create_dungeon_region(player, 'Desert Beamos Hall', 'Desert Palace', None, ['Desert Beamos Hall WS', 'Desert Beamos Hall NE']),
+        create_dungeon_region(player, 'Desert Tiles 2', 'Desert Palace', None, ['Desert Tiles 2 SE', 'Desert Tiles 2 NE']),
+        create_dungeon_region(player, 'Desert Wall Slide', 'Desert Palace', None, ['Desert Wall Slide SE', 'Desert Wall Slide NW']),
+        create_dungeon_region(player, 'Desert Boss', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize'], ['Desert Boss SW']),
 
         # pod
         # tt
@@ -345,7 +369,6 @@ def create_regions(world, player):
         # gt
         # sw
 
-        # desert
         # hera
         # AgaTower
     ]

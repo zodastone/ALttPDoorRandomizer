@@ -2,24 +2,26 @@ import random
 import collections
 import logging
 
-
-from BaseClasses import RegionType, DoorType, Direction, RegionChunk
-from Items import ItemFactory
-
+from BaseClasses import RegionType, DoorType, Direction, RegionChunk, Sector
+from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions
 
 def link_doors(world, player):
 
-    # Make drop-down connections - if applicable
+    # Drop-down connections & push blocks
     for exitName, regionName in mandatory_connections:
         connect_simple_door(world, exitName, regionName, player)
+    # These should all be connected for now as normal connections
+    for edge_a, edge_b in intratile_doors:
+        connect_intertile_door(world, edge_a, edge_b, player)
 
     # These connection are here because they are currently unable to be shuffled
-    for entrance, ext in spiral_staircases:  # these can now be shuffled, maybe
-        connect_two_way(world, entrance, ext, player, True)
+    if world.doorShuffle not in ['basic', 'experimental']:  # these modes supports spirals
+        for entrance, ext in spiral_staircases:
+            connect_two_way(world, entrance, ext, player)
     for entrance, ext in straight_staircases:
-        connect_two_way(world, entrance, ext, player, True)
+        connect_two_way(world, entrance, ext, player)
     for entrance, ext in open_edges:
-        connect_two_way(world, entrance, ext, player, True)
+        connect_two_way(world, entrance, ext, player)
     for exitName, regionName in falldown_pits:
         connect_simple_door(world, exitName, regionName, player)
     for exitName, regionName in dungeon_warps:
@@ -27,29 +29,19 @@ def link_doors(world, player):
 
     if world.doorShuffle == 'vanilla':
         for entrance, ext in default_door_connections:
-            connect_two_way(world, entrance, ext, player, True)
+            connect_two_way(world, entrance, ext, player)
         for ent, ext in default_one_way_connections:
-            connect_one_way(world, ent, ext, True)
-        normal_dungeon_pool(world, player)
+            connect_one_way(world, ent, ext, player)
     elif world.doorShuffle == 'basic':
-        normal_dungeon_pool(world, player)
         within_dungeon(world, player)
     elif world.doorShuffle == 'crossed':
-        normal_dungeon_pool(world, player)
         cross_dungeon(world, player)
     elif world.doorShuffle == 'experimental':
-        normal_dungeon_pool(world, player)
         experiment(world, player)
 
     mark_regions(world, player)
-
-
-def normal_dungeon_pool(world, player):
-    # vanilla dungeon items
-    ES = world.get_dungeon('Hyrule Castle', player)
-    ES.small_keys = [ItemFactory('Small Key (Escape)', player)]
-    EP = world.get_dungeon('Eastern Palace', player)
-    EP.big_key = ItemFactory('Big Key (Eastern Palace)', player)
+    if world.doorShuffle != 'vanilla':
+        create_door_spoiler(world, player)
 
 
 def mark_regions(world, player):
@@ -70,6 +62,31 @@ def mark_regions(world, player):
                         queue.append(connected)  # needs to be added
                 elif connected is not None and connected.name not in dungeon.regions and connected.type == RegionType.Dungeon and connected.name not in queue:
                     queue.append(connected)  # needs to be added
+
+
+def create_door_spoiler(world, player):
+    logger = logging.getLogger('')
+    queue = collections.deque(world.doors)
+    while len(queue) > 0:
+        door_a = queue.popleft()
+        if door_a.type in [DoorType.Normal, DoorType.SpiralStairs]:
+            door_b = door_a.dest
+            if door_b is not None:
+                logger.info('spoiler: %s connected to %s', door_a.name, door_b.name)
+                if not door_a.blocked and not door_b.blocked:
+                    world.spoiler.set_door(door_a.name, door_b.name, 'both', player)
+                elif door_a.blocked:
+                    world.spoiler.set_door(door_b.name, door_a.name, 'entrance', player)
+                elif door_b.blocked:
+                    world.spoiler.set_door(door_a.name, door_b.name, 'entrance', player)
+                else:
+                    logger.warning('This is a bug')
+                if door_b in queue:
+                    queue.remove(door_b)
+                else:
+                    logger.info('Door not found in queue: %s connected to %s', door_b.name, door_a.name)
+            else:
+                logger.info('Door not connected: %s', door_a.name)
 
 
 # some useful functions
@@ -93,7 +110,21 @@ def connect_simple_door(world, exit_name, region_name, player):
         d.dest = region
 
 
-def connect_two_way(world, entrancename, exitname, player, skipSpoiler=False):
+def connect_intertile_door(world, edge_1, edge_2, player):
+    ent_a = world.get_entrance(edge_1, player)
+    ent_b = world.get_entrance(edge_2, player)
+
+    # if these were already connected somewhere, remove the backreference
+    if ent_a.connected_region is not None:
+        ent_a.connected_region.entrances.remove(ent_a)
+    if ent_b.connected_region is not None:
+        ent_b.connected_region.entrances.remove(ent_b)
+
+    ent_a.connect(ent_b.parent_region)
+    ent_b.connect(ent_a.parent_region)
+
+
+def connect_two_way(world, entrancename, exitname, player):
     entrance = world.get_entrance(entrancename, player)
     ext = world.get_entrance(exitname, player)
 
@@ -114,11 +145,9 @@ def connect_two_way(world, entrancename, exitname, player, skipSpoiler=False):
         x.dest = y
     if y is not None:
         y.dest = x
-    if not skipSpoiler and x is not None and y is not None:
-        world.spoiler.set_door(x.name, y.name, 'both', player)
 
 
-def connect_one_way(world, entrancename, exitname, player, skipSpoiler=False):
+def connect_one_way(world, entrancename, exitname, player):
     entrance = world.get_entrance(entrancename, player)
     ext = world.get_entrance(exitname, player)
 
@@ -137,17 +166,13 @@ def connect_one_way(world, entrancename, exitname, player, skipSpoiler=False):
         x.dest = y
     if y is not None:
         y.dest = x
-    if not skipSpoiler and x is not None and y is not None:
-        world.spoiler.set_door(x.name, y.name, 'entrance', player)
 
 
 def within_dungeon(world, player):
-    # TODO: Add dungeon names to Regions so we can just look these lists up
-    dungeon_region_names_es = ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall', 'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Dungeon Map Room', 'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk', 'Hyrule Dungeon South Abyss', 'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory', 'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Secret Room', 'Sewers Secret Room Blocked Path', 'Sewers Pull Switch', 'Sanctuary']
-    dungeon_region_names_ep = ['Eastern Lobby', 'Eastern Cannonball', 'Eastern Cannonball Ledge', 'Eastern Courtyard Ledge', 'Eastern Map Area', 'Eastern Compass Area', 'Eastern Courtyard', 'Eastern Fairies', 'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Big Key', 'Eastern Darkness', 'Eastern Attic Start', 'Eastern Attic Switches', 'Eastern Eyegores',  'Eastern Boss']
-    dungeon_region_lists = [dungeon_region_names_es, dungeon_region_names_ep]
+    dungeon_region_lists = [hyrule_castle_regions, eastern_regions, desert_regions]
     for region_list in dungeon_region_lists:
         shuffle_dungeon(world, player, region_list)
+
 
 def shuffle_dungeon(world, player, dungeon_region_names):
     logger = logging.getLogger('')
@@ -183,9 +208,10 @@ def shuffle_dungeon(world, player, dungeon_region_names):
         else:
             # If there's no available region with a door, use an internal connection
             connect_door = find_compatible_door_in_list(world, door, available_doors, player)
-            logger.info('  Adding loop via %s', connect_door.name)
-            maybe_connect_two_way(world, door, connect_door, player)
-            available_doors.remove(connect_door)
+            if connect_door is not None:
+                logger.info('  Adding loop via %s', connect_door.name)
+                maybe_connect_two_way(world, door, connect_door, player)
+                available_doors.remove(connect_door)
     # Check that we used everything, and retry if we failed
     if len(available_regions) > 0 or len(available_doors) > 0:
       logger.info('Failed to add all regions to dungeon, trying again.')
@@ -194,7 +220,7 @@ def shuffle_dungeon(world, player, dungeon_region_names):
 # Connects a and b. Or don't if they're an unsupported connection type.
 # TODO: This is gross, don't do it this way
 def maybe_connect_two_way(world, a, b, player):
-    if a.type == DoorType.Open or a.type == DoorType.StraightStairs or a.type == DoorType.Hole or a.type == DoorType.Warp:
+    if a.type in [DoorType.Open, DoorType.StraightStairs, DoorType.Hole, DoorType.Warp]:
         return
     connect_two_way(world, a.name, b.name, player)
 
@@ -206,11 +232,13 @@ def find_compatible_door_in_regions(world, door, regions, player):
                 return region, proposed_door
     return None, None
 
+
 def find_compatible_door_in_list(world, door, doors, player):
     for proposed_door in doors:
         if doors_compatible(door, proposed_door):
             return proposed_door
- 
+
+
 def get_doors(world, region, player):
     res = []
     for exit in region.exits:
@@ -218,6 +246,7 @@ def get_doors(world, region, player):
         if door is not None:
             res.append(door)
     return res
+
 
 def doors_compatible(a, b):
     if a.type != b.type:
@@ -232,11 +261,13 @@ def doors_compatible(a, b):
         return doors_fit_mandatory_pair(dungeon_warps_as_doors, a, b)
     return a.direction == switch_dir(b.direction)
 
+
 def doors_fit_mandatory_pair(pair_list, a, b):
   for pair_a, pair_b in pair_list:
       if (a.name == pair_a and b.name == pair_b) or (a.name == pair_b and b.name == pair_a):
           return True
   return False
+
 
 # code below is an early prototype for cross-dungeon mode
 def cross_dungeon(world, player):
@@ -650,32 +681,217 @@ def find_path(world, player, path, path_completion):
                 queue.append(connected)
     return False
 
+
 def experiment(world, player):
-    for ent, ext in experimental_connections:
-        if world.get_door(ent, player).blocked:
-            connect_one_way(world, ext, ent, player)
-        elif  world.get_door(ext, player).blocked:
-            connect_one_way(world, ent, ext, player)
-        else:
-            connect_two_way(world, ent, ext, player)
+    hc = convert_to_sectors(hyrule_castle_regions, world, player)
+    ep = convert_to_sectors(eastern_regions, world, player)
+    dp = convert_to_sectors(desert_regions, world, player)
+    dungeon_sectors = [hc, ep, dp]
+    for sector_list in dungeon_sectors:
+        for sector in sector_list:
+            for region in sector.regions:
+                print(region.name)
+            for door in sector.oustandings_doors:
+                print(door.name)
+            print()
+            print()
+
+    dungeon_region_lists = [hyrule_castle_regions, eastern_regions, desert_regions]
+    for region_list in dungeon_region_lists:
+        shuffle_dungeon_no_repeats(world, player, region_list)
+    # for ent, ext in experimental_connections:
+    #     if world.get_door(ent, player).blocked:
+    #         connect_one_way(world, ext, ent, player)
+    #     elif  world.get_door(ext, player).blocked:
+    #         connect_one_way(world, ent, ext, player)
+    #     else:
+    #         connect_two_way(world, ent, ext, player)
+
+    # Create list of regions
+
+
+def convert_regions(region_names, world, player):
+    region_list = []
+    for name in region_names:
+        region_list.append(world.get_region(name, player))
+    return region_list
+
+
+def convert_to_sectors(region_names, world, player):
+    region_list = convert_regions(region_names, world, player)
+    sectors = []
+    while len(region_list) > 0:
+        region = region_list.pop()
+        region_chunk = [region]
+        exits = []
+        exits.extend(region.exits)
+        outstanding_doors = []
+        while len(exits) > 0:
+            ext = exits.pop()
+            if ext.connected_region is not None:
+                connect_region = ext.connected_region
+                if connect_region not in region_chunk and connect_region in region_list:
+                    region_list.remove(connect_region)
+                    region_chunk.append(connect_region)
+                    exits.extend(connect_region.exits)
+            else:
+                door = world.check_for_door(ext.name, player)
+                if door is not None:
+                    outstanding_doors.append(door)
+        sector = Sector()
+        sector.regions.extend(region_chunk)
+        sector.oustandings_doors.extend(outstanding_doors)
+        sectors.append(sector)
+    return sectors
+
+
+def split_up_sectors(sector_list, entrance_sets):
+    new_sector_grid = []
+    for entrance_set in entrance_sets:
+        new_sector_list = []
+        for sector in sector_list:
+            s_regions = list(map(lambda r: r.name, sector.regions))
+            for entrance in entrance_set:
+                if entrance in s_regions:
+                    new_sector_list.append(sector)
+                    break
+        new_sector_grid.append(new_sector_list)
+    # appalling I know - how to split up other things
+    return new_sector_grid
+
+
+
+# code below is for an algorithm without restarts
+
+# "simple" thing that would probably reduce the number of restarts:
+# When you pick a region check for all existing connections to other regions
+# first via region.exits (which is a list of non-door exits from the current region)
+# then for each Entrance in that list it may have a connected_region (or not)
+# but make sure the connected_region is a Dungeon type so the search doesn't venture out into the overworld.
+# Then, once you have this region chunk, add all the doors and do the normal loop.
+# Nuts, normal loop
+
+
+def shuffle_dungeon_no_repeats(world, player, dungeon_region_names):
+    logger = logging.getLogger('')
+    available_regions = []
+    for name in dungeon_region_names:
+        available_regions.append(world.get_region(name, player))
+    random.shuffle(available_regions)
+
+    available_doors = []
+    # this is interesting but I want to ensure connectedness
+    # Except for Desert1/2 and Skull 1/2/3 - treat them as separate dungeons?
+    while len(available_regions) > 0:
+        # Pick a random region and make its doors the open set
+        region = available_regions.pop()
+        logger.info("Starting in %s", region.name)
+        regions = find_connected_regions(region, available_regions, logger)
+        for region in regions:
+            available_doors.extend(get_doors_ex(world, region, player))
+
+        # Loop until all available doors are used
+        while len(available_doors) > 0:
+            # Pick a random available door to connect
+            random.shuffle(available_doors)
+            door = available_doors.pop()
+            logger.info('Linking %s', door.name)
+            # Find an available region that has a compatible door
+            connect_region, connect_door = find_compatible_door_in_regions_ex(world, door, available_regions, player)
+            if connect_region is not None:
+                logger.info('  Found new region %s via %s', connect_region.name, connect_door.name)
+                # Apply connection and add the new region's doors to the available list
+                maybe_connect_two_way(world, door, connect_door, player)
+                c_regions = find_connected_regions(connect_region, available_regions, logger)
+                for region in c_regions:
+                    available_doors.extend(get_doors_ex(world, region, player))
+                # We've used this region and door, so don't use them again
+                available_doors.remove(connect_door)
+                available_regions.remove(connect_region)
+            else:
+                # If there's no available region with a door, use an internal connection
+                connect_door = find_compatible_door_in_list(world, door, available_doors, player)
+                if connect_door is not None:
+                    logger.info('  Adding loop via %s', connect_door.name)
+                    maybe_connect_two_way(world, door, connect_door, player)
+                    available_doors.remove(connect_door)
+    # Check that we used everything, we failed otherwise
+    if len(available_regions) > 0 or len(available_doors) > 0:
+        logger.warning('Failed to add all regions/doors to dungeon, generation will likely fail.')
+
+
+def find_connected_regions(region, available_regions, logger):
+    region_chunk = [region]
+    exits = []
+    exits.extend(region.exits)
+    while len(exits) > 0:
+        ext = exits.pop()
+        if ext.connected_region is not None:
+            connect_region = ext.connected_region
+            if connect_region not in region_chunk and connect_region in available_regions:
+                # door = world.check_for_door(ext.name, player)
+                # if door is None or door.type not in [DoorType.Normal, DoorType.SpiralStairs]:
+                logger.info('  Found new region %s via %s', connect_region.name, ext.name)
+                available_regions.remove(connect_region)
+                region_chunk.append(connect_region)
+                exits.extend(connect_region.exits)
+    return region_chunk
+
+
+def find_compatible_door_in_regions_ex(world, door, regions, player):
+    for region in regions:
+        for proposed_door in get_doors_ex(world, region, player):
+            if doors_compatible(door, proposed_door):
+                return region, proposed_door
+    return None, None
+
+def get_doors_ex(world, region, player):
+    res = []
+    for exit in region.exits:
+        door = world.check_for_door(exit.name, player)
+        if door is not None and door.type in [DoorType.Normal, DoorType.SpiralStairs]:
+            res.append(door)
+    return res
 
 
 
 # DATA GOES DOWN HERE
 
-mandatory_connections = [('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
-                         ('Hyrule Dungeon Key Door S', 'Hyrule Dungeon North Abyss'),
-                         ('Hyrule Dungeon Key Door N', 'Hyrule Dungeon Map Room'),
-                         ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path')
-                         ]
+mandatory_connections = [
+    ('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
+    # ('Hyrule Dungeon Key Door S', 'Hyrule Dungeon North Abyss'),
+    # ('Hyrule Dungeon Key Door N', 'Hyrule Dungeon Map Room'),
+    ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path'),
+    ('Eastern Hint Tile Push Block', 'Eastern Compass Area')
+]
 
+intratile_doors = [
+    ('Hyrule Dungeon Key Door S', 'Hyrule Dungeon Key Door N'),
+    ('Desert East Lobby WS', 'Desert East Wing ES'),
+    ('Desert East Wing Key Door EN', 'Desert Compass Key Door WN'),
+    ('Desert North Hall NW', 'Desert Map SW'),
+    ('Desert North Hall NE', 'Desert Map SE'),
+    ('Desert Sandworm Corner NE', 'Desert Bonk Torch SE'),
+    ('Desert Sandworm Corner WS', 'Desert Circle of Pots ES'),
+    ('Desert Circle of Pots NW', 'Desert Big Chest SW'),
+    ('Desert West Wing WS', 'Desert West Lobby ES',),
+    ('Desert Back Lobby NW', 'Desert Tiles 1 SW'),
+    ('Desert Bridge SW', 'Desert Four Statues NW'),
+    ('Desert Four Statues ES', 'Desert Beamos Hall WS',),
+    ('Desert Tiles 2 NE', 'Desert Wall Slide SE'),
+]
+
+# todo: these path rules are more complicated I think...
+#  there may be a better way to do them if we randomize dungeon entrances
 dungeon_paths = {
     'Hyrule Castle': [('Hyrule Castle Lobby', 'Hyrule Castle West Lobby'),
                       ('Hyrule Castle Lobby', 'Hyrule Castle East Lobby'),
-                      ('Hyrule Castle Lobby', 'Hyrule Dungeon Cellblock'),
-                      ('Hyrule Dungeon Cellblock', 'Sanctuary')],
+                      ('Hyrule Castle Lobby', 'Hyrule Dungeon Cellblock'),  # just for standard mode?
+                      ('Hyrule Dungeon Cellblock', 'Sanctuary')],  # again, standard mode?
     'Eastern Palace': [('Eastern Lobby', 'Eastern Boss')],
-    'Desert Palace': [],
+    'Desert Palace': [('Desert Main Lobby', 'Desert West Lobby'),
+                      ('Desert Main Lobby', 'Desert East Lobby'),
+                      ('Desert Back Lobby', 'Desert Boss')],  # or Desert Main Lobby to Desert Boss would be fine I guess
     'Tower of Hera': [],
     'Agahnims Tower': [],
     'Palace of Darkness': [],
@@ -688,25 +904,31 @@ dungeon_paths = {
     'Ganons Tower': []
 }
 
-open_edges = [('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
-                         ('Hyrule Dungeon Key Door S', 'Hyrule Dungeon North Abyss'),
-                         ('Hyrule Dungeon Key Door N', 'Hyrule Dungeon Map Room')
-                         ]
-
 spiral_staircases = [('Hyrule Castle Back Hall Down Stairs', 'Hyrule Dungeon Map Room Up Stairs'),
                      ('Hyrule Dungeon Armory Down Stairs', 'Hyrule Dungeon Staircase Up Stairs'),
                      ('Hyrule Dungeon Staircase Down Stairs', 'Hyrule Dungeon Cellblock Up Stairs'),
                      ('Sewers Behind Tapestry Down Stairs', 'Sewers Rope Room Up Stairs'),
                      ('Sewers Secret Room Up Stairs', 'Sewers Pull Switch Down Stairs'),
-                     ('Eastern Darkness Up Stairs', 'Eastern Attic Start Down Stairs')]
+                     ('Eastern Darkness Up Stairs', 'Eastern Attic Start Down Stairs'),
+                     ('Desert Tiles 1 Up Stairs', 'Desert Bridge Down Stairs')]
 
 straight_staircases = [('Hyrule Castle Lobby North Stairs', 'Hyrule Castle Throne Room South Stairs'),
                        ('Sewers Rope Room North Stairs', 'Sewers Dark Cross South Stairs')]
 
-open_edges = [('Hyrule Dungeon North Abyss South Edge', 'Hyrule Dungeon South Abyss North Edge'),
-              ('Hyrule Dungeon North Abyss Catwalk Edge', 'Hyrule Dungeon South Abyss Catwalk North Edge'),
-              ('Hyrule Dungeon South Abyss West Edge', 'Hyrule Dungeon Guardroom Abyss Edge'),
-              ('Hyrule Dungeon South Abyss Catwalk West Edge', 'Hyrule Dungeon Guardroom Catwalk Edge')]
+open_edges = [
+    ('Hyrule Dungeon North Abyss South Edge', 'Hyrule Dungeon South Abyss North Edge'),
+    ('Hyrule Dungeon North Abyss Catwalk Edge', 'Hyrule Dungeon South Abyss Catwalk North Edge'),
+    ('Hyrule Dungeon South Abyss West Edge', 'Hyrule Dungeon Guardroom Abyss Edge'),
+    ('Hyrule Dungeon South Abyss Catwalk West Edge', 'Hyrule Dungeon Guardroom Catwalk Edge'),
+    ('Desert Main Lobby NW Edge', 'Desert North Hall SW Edge'),
+    ('Desert Main Lobby N Edge', 'Desert Dead End Edge'),
+    ('Desert Main Lobby NE Edge', 'Desert North Hall SE Edge'),
+    ('Desert Main Lobby E Edge', 'Desert East Wing W Edge'),
+    ('Desert East Wing N Edge', 'Desert Arrow Pot Corner S Edge'),
+    ('Desert Arrow Pot Corner W Edge', 'Desert North Hall E Edge'),
+    ('Desert North Hall W Edge', 'Desert Sandworm Corner S Edge'),
+    ('Desert Sandworm Corner E Edge', 'Desert West Wing N Edge')
+]
 
 falldown_pits = [('Eastern Courtyard Potholes', 'Eastern Fairies')]
 falldown_pits_as_doors = [('Eastern Courtyard Potholes', 'Eastern Fairy Landing')]
@@ -714,36 +936,42 @@ falldown_pits_as_doors = [('Eastern Courtyard Potholes', 'Eastern Fairy Landing'
 dungeon_warps = [('Eastern Fairies\' Warp', 'Eastern Courtyard')]
 dungeon_warps_as_doors = [('Eastern Fairies\' Warp', 'Eastern Courtyard Warp End')]
 
-default_door_connections = [('Hyrule Castle Lobby W', 'Hyrule Castle West Lobby E'),
-                            ('Hyrule Castle Lobby E', 'Hyrule Castle East Lobby W'),
-                            ('Hyrule Castle Lobby WN', 'Hyrule Castle West Lobby EN'),
-                            ('Hyrule Castle West Lobby N', 'Hyrule Castle West Hall S'),
-                            ('Hyrule Castle East Lobby N', 'Hyrule Castle East Hall S'),
-                            ('Hyrule Castle East Lobby NW', 'Hyrule Castle East Hall SW'),
-                            ('Hyrule Castle East Hall W', 'Hyrule Castle Back Hall E'),
-                            ('Hyrule Castle West Hall E', 'Hyrule Castle Back Hall W'),
-                            ('Hyrule Castle Throne Room N', 'Sewers Behind Tapestry S'),
-                            ('Hyrule Dungeon Guardroom N', 'Hyrule Dungeon Armory S'),
-                            ('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
-                            ('Sewers Water W', 'Sewers Key Rat E'),
-                            ('Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S'),
-                            ('Eastern Lobby N', 'Eastern Cannonball S'),
-                            ('Eastern Cannonball N', 'Eastern Courtyard Ledge S'),
-                            ('Eastern Cannonball Ledge WN', 'Eastern Big Key EN'),
-                            ('Eastern Cannonball Ledge Key Door EN', 'Eastern Dark Square Key Door WN'),
-                            ('Eastern Courtyard Ledge W', 'Eastern Compass Area E'),
-                            ('Eastern Courtyard Ledge E', 'Eastern Map Area W'),
-                            ('Eastern Compass Area EN', 'Eastern Courtyard WN'),
-                            ('Eastern Courtyard EN', 'Eastern Map Valley WN'),
-                            ('Eastern Courtyard N', 'Eastern Darkness S'),
-                            ('Eastern Map Valley SW', 'Eastern Dark Square NW'),
-                            ('Eastern Attic Start WS', 'Eastern Attic Switches ES'),
-                            ('Eastern Attic Switches WS', 'Eastern Eyegores ES'),
-                            ('Eastern Eyegores NE', 'Eastern Boss SE')]
-# ('', ''),
-default_one_way_connections = [('Sewers Pull Switch S', 'Sanctuary N'),
-                               ('Eastern Big Key NE', 'Eastern Compass Area SW')]
+default_door_connections = [
+    ('Hyrule Castle Lobby W', 'Hyrule Castle West Lobby E'),
+    ('Hyrule Castle Lobby E', 'Hyrule Castle East Lobby W'),
+    ('Hyrule Castle Lobby WN', 'Hyrule Castle West Lobby EN'),
+    ('Hyrule Castle West Lobby N', 'Hyrule Castle West Hall S'),
+    ('Hyrule Castle East Lobby N', 'Hyrule Castle East Hall S'),
+    ('Hyrule Castle East Lobby NW', 'Hyrule Castle East Hall SW'),
+    ('Hyrule Castle East Hall W', 'Hyrule Castle Back Hall E'),
+    ('Hyrule Castle West Hall E', 'Hyrule Castle Back Hall W'),
+    ('Hyrule Castle Throne Room N', 'Sewers Behind Tapestry S'),
+    ('Hyrule Dungeon Guardroom N', 'Hyrule Dungeon Armory S'),
+    ('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
+    ('Sewers Water W', 'Sewers Key Rat E'),
+    ('Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S'),
+    ('Eastern Lobby N', 'Eastern Cannonball S'),
+    ('Eastern Cannonball N', 'Eastern Courtyard Ledge S'),
+    ('Eastern Cannonball Ledge WN', 'Eastern Big Key EN'),
+    ('Eastern Cannonball Ledge Key Door EN', 'Eastern Dark Square Key Door WN'),
+    ('Eastern Courtyard Ledge W', 'Eastern Compass Area E'),
+    ('Eastern Courtyard Ledge E', 'Eastern Map Area W'),
+    ('Eastern Compass Area EN', 'Eastern Courtyard WN'),
+    ('Eastern Courtyard EN', 'Eastern Map Valley WN'),
+    ('Eastern Courtyard N', 'Eastern Darkness S'),
+    ('Eastern Map Valley SW', 'Eastern Dark Square NW'),
+    ('Eastern Attic Start WS', 'Eastern Attic Switches ES'),
+    ('Eastern Attic Switches WS', 'Eastern Eyegores ES'),
+    ('Desert Compass NW', 'Desert Cannonball S'),
+    ('Desert Beamos Hall NE', 'Desert Tiles 2 SE')
+]
 
+# ('', ''),
+default_one_way_connections = [
+    ('Sewers Pull Switch S', 'Sanctuary N'),
+    ('Eastern Eyegores NE', 'Eastern Boss SE'),
+    ('Desert Wall Slide NW', 'Desert Boss SW')
+]
 
 experimental_connections = [('Eastern Boss SE', 'Eastern Eyegores NE'),
                             ('Eastern Eyegores ES', 'Eastern Map Valley WN'),
@@ -782,3 +1010,9 @@ experimental_connections = [('Eastern Boss SE', 'Eastern Eyegores NE'),
 #                             ('Hyrule Castle West Lobby N', 'Hyrule Dungeon Armory S'),
 #                             ('Hyrule Castle Lobby W', 'Hyrule Castle West Hall E'),
 #                             ('Hyrule Castle West Hall S', 'Sanctuary N')]
+
+
+desert_default_entrance_sets = [
+    ['Desert Back Lobby'],
+    ['Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
+]

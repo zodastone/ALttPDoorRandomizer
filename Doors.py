@@ -22,7 +22,7 @@ HTL = 1  # High to Low  01
 LTH = 2  # Low to High  10
 LTL = 3  # Low to Low   11
 
-
+# Only documenting non intratile transitions right now - could add intratile at some point
 def create_doors(world, player):
     world.doors += [
         # hyrule castle
@@ -94,7 +94,7 @@ def create_doors(world, player):
         create_dir_door(player, 'Eastern Map Area W', DoorType.Normal, Direction.West, 0xaa, Mid, High),
         create_dir_door(player, 'Eastern Compass Area E', DoorType.Normal, Direction.East, 0xa8, Mid, High),
         create_dir_door(player, 'Eastern Compass Area EN', DoorType.Normal, Direction.East, 0xa8, Top, Low),
-        create_blocked_door(player, 'Eastern Compass Area SW', DoorType.Normal, Direction.South, 0xa8, Right, High, False),
+        create_blocked_door(player, 'Eastern Compass Area SW', DoorType.Normal, Direction.South, 0xa8, Right, High),
         create_dir_door(player, 'Eastern Courtyard WN', DoorType.Normal, Direction.West, 0xa9, Top, Low),
         create_dir_door(player, 'Eastern Courtyard EN', DoorType.Normal, Direction.East, 0xa9, Top, Low),
         create_big_key_door(player, 'Eastern Courtyard N', DoorType.Normal, Direction.North, 0xa9, Mid, High),
@@ -116,7 +116,33 @@ def create_doors(world, player):
         create_dir_door(player, 'Eastern Attic Switches WS', DoorType.Normal, Direction.West, 0xd9, Bot, High),
         create_dir_door(player, 'Eastern Eyegores ES', DoorType.Normal, Direction.East, 0xd8, Bot, High),
         create_dir_door(player, 'Eastern Eyegores NE', DoorType.Normal, Direction.North, 0xd8, Right, High),
-        create_dir_door(player, 'Eastern Boss SE', DoorType.Normal, Direction.South, 0xc8, Right, High),
+        create_blocked_door(player, 'Eastern Boss SE', DoorType.Normal, Direction.South, 0xc8, Right, High, False, 0x2),
+
+        # Desert Palace
+        create_dir_door(player, 'Desert Main Lobby NW Edge', DoorType.Open, Direction.North, 0x84, None, High),
+        create_dir_door(player, 'Desert Main Lobby N Edge', DoorType.Open, Direction.North, 0x84, None, High),
+        create_dir_door(player, 'Desert Main Lobby NE Edge', DoorType.Open, Direction.North, 0x84, None, High),
+        create_dir_door(player, 'Desert Main Lobby E Edge', DoorType.Open, Direction.East, 0x84, None, High),
+        create_dir_door(player, 'Desert Dead End Edge', DoorType.Open, Direction.South, 0x74, None, High),
+        create_dir_door(player, 'Desert East Wing W Edge', DoorType.Open, Direction.West, 0x85, None, High),
+        create_dir_door(player, 'Desert East Wing N Edge', DoorType.Open, Direction.North, 0x85, None, High),
+        create_dir_door(player, 'Desert Compass NW', DoorType.Normal, Direction.North, 0x85, Left, High, 0x2),
+        create_dir_door(player, 'Desert Cannonball S', DoorType.Normal, Direction.South, 0x75, Left, High),
+        create_dir_door(player, 'Desert Arrow Pot Corner S Edge', DoorType.Open, Direction.South, 0x75, None, High),
+        create_dir_door(player, 'Desert Arrow Pot Corner W Edge', DoorType.Open, Direction.West, 0x75, None, High),
+        create_dir_door(player, 'Desert North Hall SE Edge', DoorType.Open, Direction.South, 0x74, None, High),
+        create_dir_door(player, 'Desert North Hall SW Edge', DoorType.Open, Direction.South, 0x74, None, High),
+        create_dir_door(player, 'Desert North Hall W Edge', DoorType.Open, Direction.West, 0x74, None, High),
+        create_dir_door(player, 'Desert North Hall E Edge', DoorType.Open, Direction.East, 0x74, None, High),
+        create_dir_door(player, 'Desert Sandworm Corner S Edge', DoorType.Open, Direction.South, 0x73, None, High),
+        create_dir_door(player, 'Desert Sandworm Corner E Edge', DoorType.Open, Direction.East, 0x73, None, High),
+        create_dir_door(player, 'Desert West Wing N Edge', DoorType.Open, Direction.North, 0x83, None, High),
+        create_spiral_stairs(player, 'Desert Tiles 1 Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x63, 0, HTH, A, 0x1b, 0x6c, True),
+        create_spiral_stairs(player, 'Desert Bridge Down Stairs', DoorType.SpiralStairs, Direction.Down, 0x53, 0, HTH, A, 0x0f, 0x80, True),
+        create_dir_door(player, 'Desert Beamos Hall NE', DoorType.Normal, Direction.North, 0x53, Right, High),
+        create_dir_door(player, 'Desert Tiles 2 SE', DoorType.Normal, Direction.South, 0x43, Right, High),
+        create_big_key_door(player, 'Desert Wall Slide NW', DoorType.Normal, Direction.North, 0x43, Left, High),
+        create_blocked_door(player, 'Desert Boss SW', DoorType.Normal, Direction.South, 0x33, Left, High, False, 0x2),
     ]
 
 

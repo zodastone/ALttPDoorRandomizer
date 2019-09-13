@@ -886,6 +886,13 @@ class RegionChunk(object):
         self.unlinked_doors = set([])
 
 
+class Sector(object):
+
+    def __init__(self):
+        self.regions = []
+        self.oustandings_doors = []
+
+
 class Boss(object):
     def __init__(self, name, enemizer_name, defeat_rule, player):
         self.name = name

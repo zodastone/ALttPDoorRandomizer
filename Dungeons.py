@@ -15,11 +15,11 @@ def create_dungeons(world, player):
             dungeon.world = world
         return dungeon
 
-    ES = make_dungeon('Hyrule Castle', None, ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sanctuary', 'Hyrule Dungeon Cellblock'], None, [], [ItemFactory('Map (Escape)', player)])
-    EP = make_dungeon('Eastern Palace', 'Armos Knights', ['Eastern Lobby', 'Eastern Boss'], None, [], ItemFactory(['Map (Eastern Palace)', 'Compass (Eastern Palace)'], player))
+    ES = make_dungeon('Hyrule Castle', None, hyrule_castle_regions, None, [ItemFactory('Small Key (Escape)', player)], [ItemFactory('Map (Escape)', player)])
+    EP = make_dungeon('Eastern Palace', 'Armos Knights', eastern_regions, ItemFactory('Big Key (Eastern Palace)', player), [], ItemFactory(['Map (Eastern Palace)', 'Compass (Eastern Palace)'], player))
+    DP = make_dungeon('Desert Palace', 'Lanmolas', desert_regions, ItemFactory('Big Key (Desert Palace)', player), [ItemFactory('Small Key (Desert Palace)', player)], ItemFactory(['Map (Desert Palace)', 'Compass (Desert Palace)'], player))
 
     #still standard dungeons
-    DP = make_dungeon('Desert Palace', 'Lanmolas', ['Desert Palace North', 'Desert Palace Main (Inner)', 'Desert Palace Main (Outer)', 'Desert Palace East'], ItemFactory('Big Key (Desert Palace)', player), [ItemFactory('Small Key (Desert Palace)', player)], ItemFactory(['Map (Desert Palace)', 'Compass (Desert Palace)'], player))
     ToH = make_dungeon('Tower of Hera', 'Moldorm', ['Tower of Hera (Bottom)', 'Tower of Hera (Basement)', 'Tower of Hera (Top)'], ItemFactory('Big Key (Tower of Hera)', player), [ItemFactory('Small Key (Tower of Hera)', player)], ItemFactory(['Map (Tower of Hera)', 'Compass (Tower of Hera)'], player))
     PoD = make_dungeon('Palace of Darkness', 'Helmasaur King', ['Palace of Darkness (Entrance)', 'Palace of Darkness (Center)', 'Palace of Darkness (Big Key Chest)', 'Palace of Darkness (Bonk Section)', 'Palace of Darkness (North)', 'Palace of Darkness (Maze)', 'Palace of Darkness (Harmless Hellway)', 'Palace of Darkness (Final Section)'], ItemFactory('Big Key (Palace of Darkness)', player), ItemFactory(['Small Key (Palace of Darkness)'] * 6, player), ItemFactory(['Map (Palace of Darkness)', 'Compass (Palace of Darkness)'], player))
     TT = make_dungeon('Thieves Town', 'Blind', ['Thieves Town (Entrance)', 'Thieves Town (Deep)', 'Blind Fight'], ItemFactory('Big Key (Thieves Town)', player), [ItemFactory('Small Key (Thieves Town)', player)], ItemFactory(['Map (Thieves Town)', 'Compass (Thieves Town)'], player))
@@ -166,3 +166,28 @@ dungeon_music_addresses = {'Eastern Palace - Prize': [0x1559A],
                            'Ice Palace - Prize': [0x155BF],
                            'Misery Mire - Prize': [0x155B9],
                            'Turtle Rock - Prize': [0x155C7, 0x155A7, 0x155AA, 0x155AB]}
+
+hyrule_castle_regions = [
+    'Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall',
+    'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Dungeon Map Room',
+    'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk', 'Hyrule Dungeon South Abyss',
+    'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory',
+    'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room',
+    'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Secret Room', 'Sewers Secret Room Blocked Path',
+    'Sewers Pull Switch', 'Sanctuary'
+]
+
+eastern_regions = [
+    'Eastern Lobby', 'Eastern Cannonball', 'Eastern Cannonball Ledge', 'Eastern Courtyard Ledge', 'Eastern Map Area',
+    'Eastern Compass Area', 'Eastern Hint Tile Blocked Path', 'Eastern Courtyard', 'Eastern Fairies',
+    'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Big Key', 'Eastern Darkness', 'Eastern Attic Start',
+    'Eastern Attic Switches', 'Eastern Eyegores', 'Eastern Boss'
+]
+
+desert_regions = [
+    'Desert Main Lobby', 'Desert Dead End', 'Desert East Lobby', 'Desert East Wing', 'Desert Compass Room',
+    'Desert Cannonball', 'Desert Arrow Pot Corner', 'Desert North Hall', 'Desert Map Room', 'Desert Sandworm Corner',
+    'Desert Bonk Torch', 'Desert Circle of Pots', 'Desert Big Chest Room', 'Desert West Wing',
+    'Desert West Lobby', 'Desert Back Lobby', 'Desert Tiles 1',
+    'Desert Bridge', 'Desert Four Statues', 'Desert Beamos Hall', 'Desert Tiles 2', 'Desert Wall Slide', 'Desert Boss',
+]
