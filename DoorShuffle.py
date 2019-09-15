@@ -693,8 +693,11 @@ def experiment(world, player):
                 print(region.name)
             for door in sector.oustandings_doors:
                 print(door.name)
+            print('pol: ' + str(sector.polarity()))
+            print('mag: ' + str(sector.magnitude()))
             print()
             print()
+    split_up_sectors(dp, desert_default_entrance_sets)
 
     dungeon_region_lists = [hyrule_castle_regions, eastern_regions, desert_regions]
     for region_list in dungeon_region_lists:
@@ -747,6 +750,8 @@ def convert_to_sectors(region_names, world, player):
 
 def split_up_sectors(sector_list, entrance_sets):
     new_sector_grid = []
+    leftover_sectors = []
+    leftover_sectors.extend(sector_list)
     for entrance_set in entrance_sets:
         new_sector_list = []
         for sector in sector_list:
@@ -754,11 +759,83 @@ def split_up_sectors(sector_list, entrance_sets):
             for entrance in entrance_set:
                 if entrance in s_regions:
                     new_sector_list.append(sector)
+                    leftover_sectors.remove(sector)
                     break
         new_sector_grid.append(new_sector_list)
     # appalling I know - how to split up other things
+    for s_list in new_sector_grid:
+        print('pol:'+str(sum_vector(s_list, lambda s: s.polarity())))
+        print('mag:'+str(sum_vector(s_list, lambda s: s.magnitude())))
+    print('pol:'+str(sum_vector(leftover_sectors, lambda s: s.polarity())))
+    print('mag:'+str(sum_vector(leftover_sectors, lambda s: s.magnitude())))
+
+
     return new_sector_grid
 
+
+def sum_vector(sector_list, func):
+    sum = [0, 0, 0]
+    for sector in sector_list:
+        vector = func(sector)
+        for i in range(len(sum)):
+            sum[i] = sum[i] + vector[i]
+    return sum
+
+
+# def add_vectors(vector_one, vector_two):
+#     result = [0]*len(vector_one)
+#     for i in range(len(result)):
+#         result[i] = vector_one[i] + vector_two[i]
+#     return result
+
+
+def is_polarity_neutral(polarity):
+    neutral = 0
+    for value in polarity:
+        neutral = neutral + value
+    return neutral == 0
+
+
+def is_proposal_valid(proposal, buckets, candidates):
+    # check that proposal is complete
+    for i in range(len(proposal)):
+        if proposal[i] is -1:
+            return False  # indicates an incomplete proposal
+    test_bucket = [[]]*len(buckets)
+    for bucket_idx in range(len(buckets)):
+        test_bucket[bucket_idx].extend(buckets[bucket_idx])
+    for i in range(len(proposal)):
+        test_bucket[proposal[i]].append(candidates[i])
+    for test in test_bucket:
+        valid = is_polarity_neutral(sum_vector(test, lambda s: s.polarity()))
+        if not valid:
+            return False
+    return True
+
+
+def assignment(buckets, candidates):
+    random.shuffle(buckets)
+    random.shuffle(candidates)
+    proposal = [-1]*len(candidates)
+
+    solution = next_proposal(proposal, buckets, candidates)
+    if solution is None:
+        raise Exception('Unable to find a proposal')
+    # todo: use solution to assign to buckets and candidates
+    # buckets =
+
+
+def next_proposal(proposal, buckets, candidates):
+    if is_proposal_valid(proposal, buckets, candidates):
+        return proposal
+
+    next_candidate_idx = proposal.index(-1)
+    for i in range(len(buckets)): # todo: this produces a weighted solution unfortunately, good for a mode called OneBigHappyDungeon in crossed, not good for a balanced, or random approach
+        proposal[next_candidate_idx] = i
+        found_proposal = next_proposal(proposal, buckets, candidates)
+        if found_proposal is not None:
+            return found_proposal
+    return None  # there was no valid assignment
 
 
 # code below is for an algorithm without restarts

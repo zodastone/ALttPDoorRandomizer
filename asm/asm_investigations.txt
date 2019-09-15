@@ -18,7 +18,8 @@ a5 a0
 
 
 
-Modules 04 and 05 skip the PaletteFiltering right above it - moving the pointers slightly might help
+Modules 04 and 05 skip the PaletteFiltering right above it - moving the pointers slightly might help - didn't help
+mostly for the black fade out
 
 60 a5 b0 c9 07 90 ?? ??
 jsl ?? ?? ??

@@ -821,6 +821,20 @@ class Direction(Enum):
     Down = 5
 
 
+pol_idx = {
+    Direction.North: (0, 'Pos'),
+    Direction.South: (0, 'Neg'),
+    Direction.East: (1, 'Pos'),
+    Direction.West: (1, 'Neg'),
+    Direction.Up: (2, 'Pos'),
+    Direction.Down: (2, 'Neg')
+}
+pol_inc = {
+    'Pos': lambda x: x + 1,
+    'Neg': lambda x: x - 1,
+}
+
+
 class Door(object):
     def __init__(self, player, name, type, direction, roomIndex, doorIndex, layer, toggle=False):
         self.player = player
@@ -847,6 +861,7 @@ class Door(object):
         self.dest = None
         self.parentChunk = None
         self.blocked = False  # Indicates if the door is normally blocked off. (Sanc door or always closed)
+        self.landing = False  # Indicates a door only for matching Holes/Warp # Todo: add to those
         self.smallKey = False  # There's a small key door on this side
         self.bigKey = False  # There's a big key door on this side
 
@@ -891,6 +906,20 @@ class Sector(object):
     def __init__(self):
         self.regions = []
         self.oustandings_doors = []
+
+    def polarity(self):
+        polarity = [0, 0, 0]
+        for door in self.oustandings_doors:
+            idx, inc = pol_idx[door.direction]
+            polarity[idx] = pol_inc[inc](polarity[idx])
+        return polarity
+
+    def magnitude(self):
+        magnitude = [0, 0, 0]
+        for door in self.oustandings_doors:
+            idx, inc = pol_idx[door.direction]
+            magnitude[idx] = magnitude[idx] + 1
+        return magnitude
 
 
 class Boss(object):
