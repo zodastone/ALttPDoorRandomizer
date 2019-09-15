@@ -124,7 +124,7 @@ def connect_one_way(world, entrancename, exitname, player, skipSpoiler=False):
 
     # if these were already connected somewhere, remove the backreference
     if entrance.connected_region is not None:
-        entrance.connected_region.entrances.remove(entrance, player)
+        entrance.connected_region.entrances.remove(entrance)
     if ext.connected_region is not None:
         ext.connected_region.entrances.remove(ext)
 
@@ -205,7 +205,12 @@ def maybe_connect_two_way(world, a, b, player):
         return
     # Connect supported types
     if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs:
-        connect_two_way(world, a.name, b.name, player)
+        if a.blocked:
+            connect_one_way(world, b.name, a.name, player)
+        elif b.blocked:
+            connect_one_way(world, a.name, b.name, player)
+        else:
+            connect_two_way(world, a.name, b.name, player)
         return
     # If we failed to account for a type, panic
     raise RuntimeError('Unknown door type ' + a.type.name)
