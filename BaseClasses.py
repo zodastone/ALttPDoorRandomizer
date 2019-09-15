@@ -655,10 +655,9 @@ class RegionType(Enum):
 
 class Region(object):
 
-    def __init__(self, name, type, forced_keys, hint, player):
+    def __init__(self, name, type, hint, player):
         self.name = name
         self.type = type
-        self.forced_keys = forced_keys
         self.entrances = []
         self.exits = []
         self.locations = []

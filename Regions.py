@@ -296,13 +296,13 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Hyrule Castle Back Hall', 'A dungeon', None, ['Hyrule Castle Back Hall E', 'Hyrule Castle Back Hall W', 'Hyrule Castle Back Hall Down Stairs']),
         create_dungeon_region(player, 'Hyrule Castle Throne Room', 'A dungeon', None, ['Hyrule Castle Throne Room N', 'Hyrule Castle Throne Room South Stairs']),
 
-        create_forced_key_region(player, 'Hyrule Dungeon Map Room', 'A dungeon', 1, ['Hyrule Castle - Map Chest'], ['Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon Map Room Up Stairs']),
+        create_dungeon_region(player, 'Hyrule Dungeon Map Room', 'A dungeon', ['Hyrule Castle - Map Chest'], ['Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon Map Room Up Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon North Abyss', 'A dungeon', None, ['Hyrule Dungeon North Abyss South Edge', 'Hyrule Dungeon North Abyss Key Door N']),
         create_dungeon_region(player, 'Hyrule Dungeon North Abyss Catwalk', 'A dungeon', None, ['Hyrule Dungeon North Abyss Catwalk Edge', 'Hyrule Dungeon North Abyss Catwalk Dropdown']),
         create_dungeon_region(player, 'Hyrule Dungeon South Abyss', 'A dungeon', None, ['Hyrule Dungeon South Abyss North Edge', 'Hyrule Dungeon South Abyss West Edge']),
         create_dungeon_region(player, 'Hyrule Dungeon South Abyss Catwalk', 'A dungeon', None, ['Hyrule Dungeon South Abyss Catwalk North Edge', 'Hyrule Dungeon South Abyss Catwalk West Edge']),
         create_dungeon_region(player, 'Hyrule Dungeon Guardroom', 'A dungeon', None, ['Hyrule Dungeon Guardroom Catwalk Edge', 'Hyrule Dungeon Guardroom Abyss Edge', 'Hyrule Dungeon Guardroom N']),
-        create_forced_key_region(player, 'Hyrule Dungeon Armory Main', 'A dungeon', 1, ['Hyrule Castle - Boomerang Chest'], ['Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory Interior Key Door N']),
+        create_dungeon_region(player, 'Hyrule Dungeon Armory Main', 'A dungeon', ['Hyrule Castle - Boomerang Chest'], ['Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory Interior Key Door N']),
         create_dungeon_region(player, 'Hyrule Dungeon Armory North Branch', 'A dungeon', None, ['Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Armory Down Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon Staircase', 'A dungeon', None, ['Hyrule Dungeon Staircase Up Stairs', 'Hyrule Dungeon Staircase Down Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon Cellblock', 'A dungeon', ['Hyrule Castle - Zelda\'s Chest'], ['Hyrule Dungeon Cellblock Up Stairs']),
@@ -368,22 +368,19 @@ def create_regions(world, player):
     world.intialize_regions()
 
 def create_lw_region(player, name, locations=None, exits=None):
-    return _create_region(player, name, RegionType.LightWorld, 'Light World', 0, locations, exits)
+    return _create_region(player, name, RegionType.LightWorld, 'Light World', locations, exits)
 
 def create_dw_region(player, name, locations=None, exits=None):
-    return _create_region(player, name, RegionType.DarkWorld, 'Dark World', 0, locations, exits)
+    return _create_region(player, name, RegionType.DarkWorld, 'Dark World', locations, exits)
 
 def create_cave_region(player, name, hint='Hyrule', locations=None, exits=None):
-    return _create_region(player, name, RegionType.Cave, hint, 0, locations, exits)
+    return _create_region(player, name, RegionType.Cave, hint, locations, exits)
 
 def create_dungeon_region(player, name, hint='Hyrule', locations=None, exits=None):
-    return _create_region(player, name, RegionType.Dungeon, hint, 0, locations, exits)
-
-def create_forced_key_region(player, name, hint='Hyrule', keys=0, locations=None, exits=None):
-    return _create_region(player, name, RegionType.Dungeon, hint, keys, locations, exits)
+    return _create_region(player, name, RegionType.Dungeon, hint, locations, exits)
     
-def _create_region(player, name, type, hint='Hyrule', keys=0, locations=None, exits=None):
-    ret = Region(name, type, keys, hint, player)
+def _create_region(player, name, type, hint='Hyrule', locations=None, exits=None):
+    ret = Region(name, type, hint, player)
     if locations is None:
         locations = []
     if exits is None:
