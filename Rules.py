@@ -258,6 +258,25 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_Pearl(player) and state.has_sword(player) and state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock (Top)', 'Region', player))  # sword required to cast magic (!)
     set_rule(world.get_location('Mimic Cave', player), lambda state: state.has('Hammer', player))
 
+    # Start of door rando rules
+    # TODO: Do these need to flag off when door rando is off?
+    # TODO: Can these replace other rules?
+
+    # Sewers: All sorts of things need lamps
+    # TODO: Need to play nice with other complicated lamp rules
+    set_rule(world.get_entrance('Sewers Behind Tapestry S', player), lambda state: state.has('Lamp', player))
+    set_rule(world.get_entrance('Sewers Behind Tapestry Down Stairs', player), lambda state: state.has('Lamp', player))
+    set_rule(world.get_entrance('Sewers Rope Room Up Stairs', player), lambda state: state.has('Lamp', player))
+    set_rule(world.get_entrance('Sewers Rope Room North Stairs', player), lambda state: state.has('Lamp', player))
+    set_rule(world.get_entrance('Sewers Dark Cross South Stairs', player), lambda state: state.has('Lamp', player))
+    set_rule(world.get_entrance('Sewers Dark Cross Key Door N', player), lambda state: state.has('Lamp', player))
+    set_rule(world.get_entrance('Sewers Dark Cross Key Door S', player), lambda state: state.has('Lamp', player))
+    set_rule(world.get_entrance('Sewers Water W', player), lambda state: state.has('Lamp', player))
+    set_rule(world.get_entrance('Sewers Key Rat E', player), lambda state: state.has('Lamp', player))
+    set_rule(world.get_entrance('Sewers Key Rat Key Door N', player), lambda state: state.has('Lamp', player))
+    
+    # End of door rando rules.
+    
 #    set_rule(world.get_entrance('Sewers Door', player), lambda state: state.has_key('Small Key (Escape)', player))
 #    set_rule(world.get_entrance('Sewers Back Door', player), lambda state: state.has_key('Small Key (Escape)', player))
 
