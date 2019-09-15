@@ -296,13 +296,13 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Hyrule Castle Back Hall', 'A dungeon', None, ['Hyrule Castle Back Hall E', 'Hyrule Castle Back Hall W', 'Hyrule Castle Back Hall Down Stairs']),
         create_dungeon_region(player, 'Hyrule Castle Throne Room', 'A dungeon', None, ['Hyrule Castle Throne Room N', 'Hyrule Castle Throne Room South Stairs']),
 
-        create_dungeon_region(player, 'Hyrule Dungeon Map Room', 'A dungeon', ['Hyrule Castle - Map Chest'], ['Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon Map Room Up Stairs']),
+        create_dungeon_region(player, 'Hyrule Dungeon Map Room', 'A dungeon', ['Hyrule Castle - Map Chest', 'Hyrule Castle - Map Guard Key Drop'], ['Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon Map Room Up Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon North Abyss', 'A dungeon', None, ['Hyrule Dungeon North Abyss South Edge', 'Hyrule Dungeon North Abyss Key Door N']),
         create_dungeon_region(player, 'Hyrule Dungeon North Abyss Catwalk', 'A dungeon', None, ['Hyrule Dungeon North Abyss Catwalk Edge', 'Hyrule Dungeon North Abyss Catwalk Dropdown']),
         create_dungeon_region(player, 'Hyrule Dungeon South Abyss', 'A dungeon', None, ['Hyrule Dungeon South Abyss North Edge', 'Hyrule Dungeon South Abyss West Edge']),
         create_dungeon_region(player, 'Hyrule Dungeon South Abyss Catwalk', 'A dungeon', None, ['Hyrule Dungeon South Abyss Catwalk North Edge', 'Hyrule Dungeon South Abyss Catwalk West Edge']),
         create_dungeon_region(player, 'Hyrule Dungeon Guardroom', 'A dungeon', None, ['Hyrule Dungeon Guardroom Catwalk Edge', 'Hyrule Dungeon Guardroom Abyss Edge', 'Hyrule Dungeon Guardroom N']),
-        create_dungeon_region(player, 'Hyrule Dungeon Armory Main', 'A dungeon', ['Hyrule Castle - Boomerang Chest'], ['Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory Interior Key Door N']),
+        create_dungeon_region(player, 'Hyrule Dungeon Armory Main', 'A dungeon', ['Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Boomerang Guard Key Drop'], ['Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory Interior Key Door N']),
         create_dungeon_region(player, 'Hyrule Dungeon Armory North Branch', 'A dungeon', None, ['Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Armory Down Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon Staircase', 'A dungeon', None, ['Hyrule Dungeon Staircase Up Stairs', 'Hyrule Dungeon Staircase Down Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon Cellblock', 'A dungeon', ['Hyrule Castle - Zelda\'s Chest'], ['Hyrule Dungeon Cellblock Up Stairs']),
@@ -389,8 +389,11 @@ def _create_region(player, name, type, hint='Hyrule', locations=None, exits=None
     for exit in exits:
         ret.exits.append(Entrance(player, exit, ret))
     for location in locations:
-        address, crystal, hint_text = location_table[location]
-        ret.locations.append(Location(player, location, address, crystal, hint_text, ret))
+        if location in key_only_locations:
+          ret.locations.append(Location(player, location, None, False, None, ret, key_only_locations[location]))
+        else: 
+          address, crystal, hint_text = location_table[location]
+          ret.locations.append(Location(player, location, address, crystal, hint_text, ret))
     return ret
 
 def mark_light_world_regions(world):
@@ -454,6 +457,11 @@ default_shop_contents = {
     'Kakariko Shop': _basic_shop_defaults,
     'Cave Shop (Lake Hylia)': _basic_shop_defaults,
     'Potion Shop': [('Red Potion', 120), ('Green Potion', 60), ('Blue Potion', 160)],
+}
+
+key_only_locations = {
+  'Hyrule Castle - Map Guard Key Drop': 'Small Key (Escape)',
+  'Hyrule Castle - Boomerang Guard Key Drop': 'Small Key (Escape)'
 }
 
 location_table = {'Mushroom': (0x180013, False, 'in the woods'),
