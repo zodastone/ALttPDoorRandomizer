@@ -739,6 +739,7 @@ interior_doors = [('Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon 
 key_doors = [('Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S'),
              ('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
              ('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
+             ('Eastern Darkness Up Stairs', 'Eastern Attic Start Down Stairs'),
              ('Eastern Big Key NE', 'Eastern Compass Area SW'),
              ('Eastern Darkness S', 'Eastern Courtyard N')]
 

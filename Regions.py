@@ -329,9 +329,9 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Eastern Courtyard', 'A dungeon', ['Eastern Palace - Big Chest'], ['Eastern Courtyard WN', 'Eastern Courtyard EN', 'Eastern Courtyard N', 'Eastern Courtyard Potholes', 'Eastern Courtyard Warp End']),
         create_dungeon_region(player, 'Eastern Fairies', 'A dungeon', None, ['Eastern Fairies\' Warp', 'Eastern Fairy Landing']),
         create_dungeon_region(player, 'Eastern Map Valley', 'A dungeon', None, ['Eastern Map Valley WN', 'Eastern Map Valley SW']),
-        create_dungeon_region(player, 'Eastern Dark Square', 'A dungeon', None, ['Eastern Dark Square NW', 'Eastern Dark Square Key Door WN']),
+        create_dungeon_region(player, 'Eastern Dark Square', 'A dungeon', ['Eastern Palace - Dark Square Pot Key'], ['Eastern Dark Square NW', 'Eastern Dark Square Key Door WN']),
         create_dungeon_region(player, 'Eastern Big Key', 'A dungeon', ['Eastern Palace - Big Key Chest'], ['Eastern Big Key EN', 'Eastern Big Key NE']),
-        create_dungeon_region(player, 'Eastern Darkness', 'A dungeon', None, ['Eastern Darkness S', 'Eastern Darkness Up Stairs']),
+        create_dungeon_region(player, 'Eastern Darkness', 'A dungeon', ['Eastern Palace - Dark Eyegore Key Drop'], ['Eastern Darkness S', 'Eastern Darkness Up Stairs']),
         create_dungeon_region(player, 'Eastern Attic Start', 'A dungeon', None, ['Eastern Attic Start Down Stairs', 'Eastern Attic Start WS']),
         create_dungeon_region(player, 'Eastern Attic Switches', 'A dungeon', None, ['Eastern Attic Switches ES', 'Eastern Attic Switches WS']),
         create_dungeon_region(player, 'Eastern Eyegores', 'A dungeon', None, ['Eastern Eyegores ES', 'Eastern Eyegores NE']),
@@ -461,7 +461,9 @@ default_shop_contents = {
 
 key_only_locations = {
   'Hyrule Castle - Map Guard Key Drop': 'Small Key (Escape)',
-  'Hyrule Castle - Boomerang Guard Key Drop': 'Small Key (Escape)'
+  'Hyrule Castle - Boomerang Guard Key Drop': 'Small Key (Escape)',
+  'Eastern Palace - Dark Square Pot Key': 'Small Key (Eastern Palace)',
+  'Eastern Palace - Dark Eyegore Key Drop': 'Small Key (Eastern Palace)',
 }
 
 location_table = {'Mushroom': (0x180013, False, 'in the woods'),

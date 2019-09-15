@@ -282,20 +282,38 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Sewers Dark Cross South Stairs', player), lambda state: state.has('Lamp', player))
     set_rule(world.get_entrance('Sewers Dark Cross Key Door N', player), lambda state: state.has('Lamp', player))
     set_rule(world.get_entrance('Sewers Dark Cross Key Door S', player), lambda state: state.has('Lamp', player))
+    set_rule(world.get_location('Sewers - Dark Cross', player), lambda state: state.has('Lamp', player))
     set_rule(world.get_entrance('Sewers Water W', player), lambda state: state.has('Lamp', player))
     set_rule(world.get_entrance('Sewers Key Rat E', player), lambda state: state.has('Lamp', player))
     set_rule(world.get_entrance('Sewers Key Rat Key Door N', player), lambda state: state.has('Lamp', player))
     
-    # End of door rando rules.
+    # Eastern Palace
+    # The stalfos room and eyegore with a key can be killed with pots.
+    # Eastern Palace has dark rooms.
+    for location in ['Eastern Palace - Dark Square Pot Key', 'Eastern Palace - Dark Eyegore Key Drop']:
+        add_rule(world.get_location(location, player), lambda state: state.has('Lamp', player))
+    for door in ['Eastern Darkness S', 'Eastern Darkness Up Stairs', 'Eastern Dark Square NW', 'Eastern Dark Square Key Door WN']:
+        add_rule(world.get_entrance(door, player), lambda state: state.has('Lamp', player))
+    # Eyegore room needs a bow
+    set_rule(world.get_entrance('Eastern Eyegores NE', player), lambda state: state.can_shoot_arrows(player))
+    # Big key rules
+    set_rule(world.get_location('Eastern Palace - Big Chest', player), lambda state: state.has('Big Key (Eastern Palace)', player))
+    set_rule(world.get_entrance('Eastern Big Key NE', player), lambda state: state.has('Big Key (Eastern Palace)', player))
+    set_rule(world.get_entrance('Eastern Courtyard N', player), lambda state: state.has('Big Key (Eastern Palace)', player))
+    # There are two keys and we don't know how we shuffled, so careful with key doors.
+    # TODO: Generate key rules in the shuffler. (But make sure this way works first.)
+    for door in ['Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN', 'Eastern Darkness Up Stairs', 'Eastern Attic Start Down Stairs']:
+        set_rule(world.get_entrance(door, player), lambda state: state.has_key('Small Key (Eastern Palace)', player, 2))
+
+        # End of door rando rules.
     
 #    set_rule(world.get_entrance('Sewers Door', player), lambda state: state.has_key('Small Key (Escape)', player))
 #    set_rule(world.get_entrance('Sewers Back Door', player), lambda state: state.has_key('Small Key (Escape)', player))
 
-    set_rule(world.get_location('Eastern Palace - Big Chest', player), lambda state: state.has('Big Key (Eastern Palace)', player))
     set_rule(world.get_location('Eastern Palace - Boss', player), lambda state: state.can_shoot_arrows(player) and state.has('Big Key (Eastern Palace)', player) and world.get_location('Eastern Palace - Boss', player).parent_region.dungeon.boss.can_defeat(state))
     set_rule(world.get_location('Eastern Palace - Prize', player), lambda state: state.can_shoot_arrows(player) and state.has('Big Key (Eastern Palace)', player) and world.get_location('Eastern Palace - Prize', player).parent_region.dungeon.boss.can_defeat(state))
-    for location in ['Eastern Palace - Boss', 'Eastern Palace - Big Chest']:
-        forbid_item(world.get_location(location, player), 'Big Key (Eastern Palace)', player)
+#    for location in ['Eastern Palace - Boss', 'Eastern Palace - Big Chest']:
+#        forbid_item(world.get_location(location, player), 'Big Key (Eastern Palace)', player)
 
     set_rule(world.get_location('Desert Palace - Big Chest', player), lambda state: state.has('Big Key (Desert Palace)', player))
     set_rule(world.get_location('Desert Palace - Torch', player), lambda state: state.has_Boots(player))
