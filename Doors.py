@@ -99,7 +99,7 @@ def create_doors(world, player):
         create_dir_door(player, 'Eastern Map Area W', DoorType.Normal, Direction.West, 0xaa, Mid, High),
         create_dir_door(player, 'Eastern Compass Area E', DoorType.Normal, Direction.East, 0xa8, Mid, High),
         create_dir_door(player, 'Eastern Compass Area EN', DoorType.Normal, Direction.East, 0xa8, Top, Low),
-        create_blocked_door(player, 'Eastern Compass Area SW', DoorType.Normal, Direction.South, 0xa8, Right, High),
+        create_blocked_key_door(player, 'Eastern Compass Area SW', DoorType.Normal, Direction.South, 0xa8, Right, High),
         create_dir_door(player, 'Eastern Courtyard WN', DoorType.Normal, Direction.West, 0xa9, Top, Low),
         create_dir_door(player, 'Eastern Courtyard EN', DoorType.Normal, Direction.East, 0xa9, Top, Low),
         create_big_key_door(player, 'Eastern Courtyard N', DoorType.Normal, Direction.North, 0xa9, Mid, High),
@@ -109,10 +109,10 @@ def create_doors(world, player):
         create_door(player, 'Eastern Courtyard Warp End', DoorType.Warp),
         create_dir_door(player, 'Eastern Map Valley WN', DoorType.Normal, Direction.West, 0xaa, Top, Low),
         create_dir_door(player, 'Eastern Map Valley SW', DoorType.Normal, Direction.South, 0xaa, Left, High),
-        create_small_key_door(player, 'Eastern Dark Square NW', DoorType.Normal, Direction.North, 0xba, Left, High),
+        create_dir_door(player, 'Eastern Dark Square NW', DoorType.Normal, Direction.North, 0xba, Left, High),
         create_small_key_door(player, 'Eastern Dark Square Key Door WN', DoorType.Normal, Direction.West, 0xba, Top, High),
-        create_small_key_door(player, 'Eastern Big Key EN', DoorType.Normal, Direction.East, 0xb8, Top, High),
-        create_dir_door(player, 'Eastern Big Key NE', DoorType.Normal, Direction.North, 0xb8, Right, High),
+        create_dir_door(player, 'Eastern Big Key EN', DoorType.Normal, Direction.East, 0xb8, Top, High),
+        create_big_key_door(player, 'Eastern Big Key NE', DoorType.Normal, Direction.North, 0xb8, Right, High),
         create_small_key_door(player, 'Eastern Darkness S', DoorType.Normal, Direction.South, 0x99, Mid, High),
         create_spiral_stairs(player, 'Eastern Darkness Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x99, 0, HTH, Z, 0x1a, 0x6c, False, True),
         create_spiral_stairs(player, 'Eastern Attic Start Down Stairs', DoorType.SpiralStairs, Direction.Down, 0xda, 0, HTH, Z, 0x11, 0x80, False, True),
@@ -146,6 +146,11 @@ def create_blocked_door(player, name, type, direction, room, doorIndex, layer, t
     d.blocked = True
     return d
 
+def create_blocked_key_door(player, name, type, direction, room, doorIndex, layer, toggle=False):
+    d = Door(player, name, type, direction, room, doorIndex, layer, toggle)
+    d.blocked = True
+    d.smallKey = True
+    return d
 
 def create_dir_door(player, name, type, direction, room, doorIndex, layer):
     return Door(player, name, type, direction, room, doorIndex, layer)
