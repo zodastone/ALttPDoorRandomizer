@@ -193,7 +193,8 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
     if len(available_regions) > 0 or len(available_doors) > 0:
         logger.info('Failed to add all regions to dungeon, trying again.')
         shuffle_dungeon(world, player, start_region_names, dungeon_region_names)
-        return    
+        return
+    
     
 
 # Connects a and b. Or don't if they're an unsupported connection type.
@@ -207,7 +208,7 @@ def maybe_connect_two_way(world, a, b, player):
         connect_two_way(world, a.name, b.name, player)
         return
     # If we failed to account for a type, panic
-    raise RuntimeError('Unknown door type ' + a.type)
+    raise RuntimeError('Unknown door type ' + a.type.name)
                 
 # Finds a compatible door in regions, returns the region and door
 def find_compatible_door_in_regions(world, door, regions, player):
@@ -243,6 +244,8 @@ def doors_compatible(a, b):
         return doors_fit_mandatory_pair(dungeon_warps_as_doors, a, b)
     if a.type == DoorType.Interior:
         return doors_fit_mandatory_pair(interior_doors, a, b)
+    if a.type == DoorType.Normal and (a.smallKey or b.smallKey or a.bigKey or b.bigKey):
+        return doors_fit_mandatory_pair(key_doors, a, b)
     return a.direction == switch_dir(b.direction)
 
 def doors_fit_mandatory_pair(pair_list, a, b):
@@ -725,7 +728,13 @@ falldown_pits_as_doors = [('Eastern Courtyard Potholes', 'Eastern Fairy Landing'
 dungeon_warps = [('Eastern Fairies\' Warp', 'Eastern Courtyard')]
 dungeon_warps_as_doors = [('Eastern Fairies\' Warp', 'Eastern Courtyard Warp End')]
 
-interior_doors = [('Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Armory Interior Key Door N'), ('Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon North Abyss Key Door N')]
+interior_doors = [('Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Armory Interior Key Door N'),
+        ('Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon North Abyss Key Door N')]
+
+key_doors = [('Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S'),
+             ('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
+             ('Eastern Big Key NE', 'Eastern Compass Area SW'),
+             ('Eastern Darkness S', 'Eastern Courtyard N')]
 
 default_door_connections = [('Hyrule Castle Lobby W', 'Hyrule Castle West Lobby E'),
                             ('Hyrule Castle Lobby E', 'Hyrule Castle East Lobby W'),
