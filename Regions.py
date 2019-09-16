@@ -353,11 +353,11 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Desert West Lobby', 'Desert Palace', None, ['Desert West Lobby ES', 'Desert Palace Exit (West)']),
         # skipping the fairy room for now
         create_dungeon_region(player, 'Desert Back Lobby', 'Desert Palace', None, ['Desert Palace Exit (North)', 'Desert Back Lobby NW']),
-        create_dungeon_region(player, 'Desert Tiles 1', 'Desert Palace', None, ['Desert Tiles 1 SW', 'Desert Tiles 1 Up Stairs']),
+        create_dungeon_region(player, 'Desert Tiles 1', 'Desert Palace', ['Desert Palace - Desert Tiles 1 Pot Key'], ['Desert Tiles 1 SW', 'Desert Tiles 1 Up Stairs']),
         create_dungeon_region(player, 'Desert Bridge', 'Desert Palace', None, ['Desert Bridge Down Stairs', 'Desert Bridge SW']),
         create_dungeon_region(player, 'Desert Four Statues', 'Desert Palace', None, ['Desert Four Statues NW', 'Desert Four Statues ES']),
-        create_dungeon_region(player, 'Desert Beamos Hall', 'Desert Palace', None, ['Desert Beamos Hall WS', 'Desert Beamos Hall NE']),
-        create_dungeon_region(player, 'Desert Tiles 2', 'Desert Palace', None, ['Desert Tiles 2 SE', 'Desert Tiles 2 NE']),
+        create_dungeon_region(player, 'Desert Beamos Hall', 'Desert Palace', ['Desert Palace - Beamos Hall Pot Key'], ['Desert Beamos Hall WS', 'Desert Beamos Hall NE']),
+        create_dungeon_region(player, 'Desert Tiles 2', 'Desert Palace', ['Desert Palace - Desert Tiles 2 Pot Key'], ['Desert Tiles 2 SE', 'Desert Tiles 2 NE']),
         create_dungeon_region(player, 'Desert Wall Slide', 'Desert Palace', None, ['Desert Wall Slide SE', 'Desert Wall Slide NW']),
         create_dungeon_region(player, 'Desert Boss', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize'], ['Desert Boss SW']),
 
@@ -485,8 +485,12 @@ default_shop_contents = {
 key_only_locations = {
   'Hyrule Castle - Map Guard Key Drop': 'Small Key (Escape)',
   'Hyrule Castle - Boomerang Guard Key Drop': 'Small Key (Escape)',
+  # todo: escape big key?
   'Eastern Palace - Dark Square Pot Key': 'Small Key (Eastern Palace)',
   'Eastern Palace - Dark Eyegore Key Drop': 'Small Key (Eastern Palace)',
+  'Desert Palace - Desert Tiles 1 Pot Key': 'Small Key (Desert Palace)',
+  'Desert Palace - Beamos Hall Pot Key': 'Small Key (Desert Palace)',
+  'Desert Palace - Desert Tiles 2 Pot Key': 'Small Key (Desert Palace)',
 }
 
 location_table = {'Mushroom': (0x180013, False, 'in the woods'),

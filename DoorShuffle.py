@@ -1071,7 +1071,12 @@ key_doors = [
     ('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
     ('Eastern Darkness Up Stairs', 'Eastern Attic Start Down Stairs'),
     ('Eastern Big Key NE', 'Eastern Compass Area SW'),
-    ('Eastern Darkness S', 'Eastern Courtyard N')
+    ('Eastern Darkness S', 'Eastern Courtyard N'),
+    ('Desert East Wing Key Door EN', 'Desert Compass Key Door WN'),
+    ('Desert Tiles 1 Up Stairs', 'Desert Bridge Down Stairs'),
+    ('Desert Beamos Hall NE', 'Desert Tiles 2 SE'),
+    ('Desert Tiles 2 NE', 'Desert Wall Slide SE'),
+    ('Desert Wall Slide NW', 'Desert Boss SW')
 ]
 
 default_door_connections = [
