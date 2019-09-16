@@ -305,13 +305,17 @@ def global_rules(world, player):
     for door in ['Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN', 'Eastern Darkness Up Stairs', 'Eastern Attic Start Down Stairs']:
         set_rule(world.get_entrance(door, player), lambda state: state.has_key('Small Key (Eastern Palace)', player, 2))
 
-        # End of door rando rules.
+    # Boss rules. Same as below but no BK or arrow requirement.
+    set_rule(world.get_location('Eastern Palace - Boss', player), lambda state: world.get_location('Eastern Palace - Boss', player).parent_region.dungeon.boss.can_defeat(state))
+    set_rule(world.get_location('Eastern Palace - Prize', player), lambda state: world.get_location('Eastern Palace - Prize', player).parent_region.dungeon.boss.can_defeat(state))
+
+    # End of door rando rules.
     
 #    set_rule(world.get_entrance('Sewers Door', player), lambda state: state.has_key('Small Key (Escape)', player))
 #    set_rule(world.get_entrance('Sewers Back Door', player), lambda state: state.has_key('Small Key (Escape)', player))
 
-    set_rule(world.get_location('Eastern Palace - Boss', player), lambda state: state.can_shoot_arrows(player) and state.has('Big Key (Eastern Palace)', player) and world.get_location('Eastern Palace - Boss', player).parent_region.dungeon.boss.can_defeat(state))
-    set_rule(world.get_location('Eastern Palace - Prize', player), lambda state: state.can_shoot_arrows(player) and state.has('Big Key (Eastern Palace)', player) and world.get_location('Eastern Palace - Prize', player).parent_region.dungeon.boss.can_defeat(state))
+#    set_rule(world.get_location('Eastern Palace - Boss', player), lambda state: state.can_shoot_arrows(player) and state.has('Big Key (Eastern Palace)', player) and world.get_location('Eastern Palace - Boss', player).parent_region.dungeon.boss.can_defeat(state))
+#    set_rule(world.get_location('Eastern Palace - Prize', player), lambda state: state.can_shoot_arrows(player) and state.has('Big Key (Eastern Palace)', player) and world.get_location('Eastern Palace - Prize', player).parent_region.dungeon.boss.can_defeat(state))
 #    for location in ['Eastern Palace - Boss', 'Eastern Palace - Big Chest']:
 #        forbid_item(world.get_location(location, player), 'Big Key (Eastern Palace)', player)
 
