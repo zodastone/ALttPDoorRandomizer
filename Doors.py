@@ -49,6 +49,8 @@ def create_doors(world, player):
 
         # hyrule dungeon level
         create_spiral_stairs(player, 'Hyrule Dungeon Map Room Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x72, 0, LTH, A, 0x4b, 0xec),
+        create_small_key_door(player, 'Hyrule Dungeon Map Room Key Door S', DoorType.Interior, Direction.South, 0x71, Right, High),
+        create_small_key_door(player, 'Hyrule Dungeon North Abyss Key Door N', DoorType.Interior, Direction.North, 0x71, Right, High),
         create_dir_door(player, 'Hyrule Dungeon North Abyss South Edge', DoorType.Open, Direction.South, 0x72, None, Low),
         create_dir_door(player, 'Hyrule Dungeon North Abyss Catwalk Edge', DoorType.Open, Direction.South, 0x72, None, High),
         create_dir_door(player, 'Hyrule Dungeon South Abyss North Edge', DoorType.Open, Direction.North, 0x82, None, Low),
@@ -58,20 +60,22 @@ def create_doors(world, player):
         create_dir_door(player, 'Hyrule Dungeon Guardroom Catwalk Edge', DoorType.Open, Direction.East, 0x81, None, High),
         create_dir_door(player, 'Hyrule Dungeon Guardroom Abyss Edge', DoorType.Open, Direction.West, 0x81, None, High),
         create_dir_door(player, 'Hyrule Dungeon Guardroom N', DoorType.Normal, Direction.North, 0x81, Left, Low),
-        create_dir_door(player, 'Hyrule Dungeon Armory S', DoorType.Normal, Direction.South, 0x71, Left, Low, 0x1),
+        create_dir_door(player, 'Hyrule Dungeon Armory S', DoorType.Normal, Direction.South, 0x71, Left, Low),
+        create_small_key_door(player, 'Hyrule Dungeon Armory Interior Key Door N', DoorType.Interior, Direction.North, 0x71, Left, High),
+        create_small_key_door(player, 'Hyrule Dungeon Armory Interior Key Door S', DoorType.Interior, Direction.South, 0x71, Left, High),
         create_spiral_stairs(player, 'Hyrule Dungeon Armory Down Stairs', DoorType.SpiralStairs, Direction.Down, 0x71, 0, HTL, A, 0x11, 0xa8, True),
         create_spiral_stairs(player, 'Hyrule Dungeon Staircase Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x70, 2, LTH, A, 0x32, 0x94, True),
         create_spiral_stairs(player, 'Hyrule Dungeon Staircase Down Stairs', DoorType.SpiralStairs, Direction.Down, 0x70, 1, HTH, A, 0x11, 0x58),
         create_spiral_stairs(player, 'Hyrule Dungeon Cellblock Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x80, 0, HTH, A, 0x1a, 0x44),
 
         # sewers
-        create_blocked_door(player, 'Sewers Behind Tapestry S', DoorType.Normal, Direction.South, 0x41, Mid, High, False, 0x2),
+        create_blocked_door(player, 'Sewers Behind Tapestry S', DoorType.Normal, Direction.South, 0x41, Mid, High, False, False, 0x2),
         create_spiral_stairs(player, 'Sewers Behind Tapestry Down Stairs', DoorType.SpiralStairs, Direction.Down, 0x41, 0, HTH, S, 0x12, 0xb0),
         create_spiral_stairs(player, 'Sewers Rope Room Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x42, 0, HTH, S, 0x1b, 0x9c),
         create_dir_door(player, 'Sewers Rope Room North Stairs', DoorType.StraightStairs, Direction.North, 0x42, Mid, High),
         create_dir_door(player, 'Sewers Dark Cross South Stairs', DoorType.StraightStairs, Direction.South, 0x32, Mid, High),
-        create_dir_door(player, 'Sewers Dark Cross Key Door N', DoorType.Normal, Direction.North, 0x32, Mid, High),
-        create_dir_door(player, 'Sewers Dark Cross Key Door S', DoorType.Normal, Direction.South, 0x22, Mid, High),
+        create_small_key_door(player, 'Sewers Dark Cross Key Door N', DoorType.Normal, Direction.North, 0x32, Mid, High),
+        create_small_key_door(player, 'Sewers Dark Cross Key Door S', DoorType.Normal, Direction.South, 0x22, Mid, High),
         create_dir_door(player, 'Sewers Water W', DoorType.Normal, Direction.West, 0x22, Bot, High),
         create_dir_door(player, 'Sewers Key Rat E', DoorType.Normal, Direction.East, 0x21, Bot, High),
         create_small_key_door(player, 'Sewers Key Rat Key Door N', DoorType.Normal, Direction.North, 0x21, Right, High),
@@ -94,7 +98,7 @@ def create_doors(world, player):
         create_dir_door(player, 'Eastern Map Area W', DoorType.Normal, Direction.West, 0xaa, Mid, High),
         create_dir_door(player, 'Eastern Compass Area E', DoorType.Normal, Direction.East, 0xa8, Mid, High),
         create_dir_door(player, 'Eastern Compass Area EN', DoorType.Normal, Direction.East, 0xa8, Top, Low),
-        create_blocked_door(player, 'Eastern Compass Area SW', DoorType.Normal, Direction.South, 0xa8, Right, High),
+        ugly_door(create_small_key_door(player, 'Eastern Compass Area SW', DoorType.Normal, Direction.South, 0xa8, Right, High, False, True)),
         create_dir_door(player, 'Eastern Courtyard WN', DoorType.Normal, Direction.West, 0xa9, Top, Low),
         create_dir_door(player, 'Eastern Courtyard EN', DoorType.Normal, Direction.East, 0xa9, Top, Low),
         create_big_key_door(player, 'Eastern Courtyard N', DoorType.Normal, Direction.North, 0xa9, Mid, High),
@@ -104,13 +108,15 @@ def create_doors(world, player):
         create_door(player, 'Eastern Courtyard Warp End', DoorType.Warp),
         create_dir_door(player, 'Eastern Map Valley WN', DoorType.Normal, Direction.West, 0xaa, Top, Low),
         create_dir_door(player, 'Eastern Map Valley SW', DoorType.Normal, Direction.South, 0xaa, Left, High),
-        create_small_key_door(player, 'Eastern Dark Square NW', DoorType.Normal, Direction.North, 0xba, Left, High),
+        create_dir_door(player, 'Eastern Dark Square NW', DoorType.Normal, Direction.North, 0xba, Left, High),
         create_small_key_door(player, 'Eastern Dark Square Key Door WN', DoorType.Normal, Direction.West, 0xba, Top, High),
-        create_small_key_door(player, 'Eastern Big Key EN', DoorType.Normal, Direction.East, 0xb8, Top, High),
-        create_dir_door(player, 'Eastern Big Key NE', DoorType.Normal, Direction.North, 0xb8, Right, High),
-        create_small_key_door(player, 'Eastern Darkness S', DoorType.Normal, Direction.South, 0x99, Mid, High),
+        create_dir_door(player, 'Eastern Big Key EN', DoorType.Normal, Direction.East, 0xb8, Top, High),
+        create_big_key_door(player, 'Eastern Big Key NE', DoorType.Normal, Direction.North, 0xb8, Right, High),
+        ugly_door(create_small_key_door(player, 'Eastern Darkness S', DoorType.Normal, Direction.South, 0x99, Mid, High)),
+        # Up is a keydoor and down is not. Only the up stairs should be considered a key door for now.
+        # Todo: add key door?
         create_spiral_stairs(player, 'Eastern Darkness Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x99, 0, HTH, Z, 0x1a, 0x6c, False, True),
-        create_spiral_stairs(player, 'Eastern Attic Start Down Stairs', DoorType.SpiralStairs, Direction.Down, 0xda, 0, HTH, Z, 0x11, 0x80, False, True),
+        ugly_door(create_spiral_stairs(player, 'Eastern Attic Start Down Stairs', DoorType.SpiralStairs, Direction.Down, 0xda, 0, HTH, Z, 0x11, 0x80, False, True)),
         create_dir_door(player, 'Eastern Attic Start WS', DoorType.Normal, Direction.West, 0xda, Bot, High),
         create_dir_door(player, 'Eastern Attic Switches ES', DoorType.Normal, Direction.East, 0xd9, Bot, High),
         create_dir_door(player, 'Eastern Attic Switches WS', DoorType.Normal, Direction.West, 0xd9, Bot, High),
@@ -162,12 +168,12 @@ def create_big_key_door(player, name, type, direction, room, doorIndex, layer):
     return d
 
 
-def create_blocked_door(player, name, type, direction, room, doorIndex, layer, toggle=False, trap=0x0):
+def create_blocked_door(player, name, type, direction, room, doorIndex, layer, toggle=False, key=False, trap=0x0):
     d = Door(player, name, type, direction, room, doorIndex, layer, toggle)
     d.blocked = True
+    d.smallKey = key
     d.trap = trap
     return d
-
 
 def create_dir_door(player, name, type, direction, room, doorIndex, layer, trap=0x0):
     d = Door(player, name, type, direction, room, doorIndex, layer)
@@ -190,3 +196,7 @@ def create_spiral_stairs(player, name, type, direction, room,
     d.zeroHzCam = zero_hz_cam
     d.zeroVtCam = zero_vt_cam
     return d
+
+def ugly_door(door):
+  door.ugly = True
+  return door

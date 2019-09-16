@@ -809,6 +809,8 @@ class DoorType(Enum):
     Open = 5
     Hole = 6
     Warp = 7
+    Interior = 8
+    Logical = 9
 
 
 @unique
@@ -864,6 +866,7 @@ class Door(object):
         self.landing = False  # Indicates a door only for matching Holes/Warp # Todo: add to those
         self.smallKey = False  # There's a small key door on this side
         self.bigKey = False  # There's a big key door on this side
+        self.ugly = False  # Indicates that it can't be seen from the front (e.g. back of a big key door)
 
     def getAddress(self):
         if self.type == DoorType.Normal:
@@ -933,17 +936,24 @@ class Boss(object):
         return self.defeat_rule(state, self.player)
 
 class Location(object):
-    def __init__(self, player, name='', address=None, crystal=False, hint_text=None, parent=None):
+    def __init__(self, player, name='', address=None, crystal=False, hint_text=None, parent=None, forced_item=None):
         self.name = name
         self.parent_region = parent
-        self.item = None
+        if forced_item is not None:
+          from Items import ItemFactory
+          self.forced_item = ItemFactory([forced_item], player)[0]
+          self.item = self.forced_item
+          self.event = True
+        else:
+          self.forced_item = None
+          self.item = None
+          self.event = False
         self.crystal = crystal
         self.address = address
         self.spot_type = 'Location'
         self.hint_text = hint_text if hint_text is not None else 'Hyrule'
         self.recursion_count = 0
         self.staleness_count = 0
-        self.event = False
         self.locked = True
         self.always_allow = lambda item, state: False
         self.access_rule = lambda state: True
