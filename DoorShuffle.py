@@ -159,12 +159,20 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
     for name in [r for r in dungeon_region_names if r not in start_region_names]:
         available_regions.append(world.get_region(name, player))
     random.shuffle(available_regions)
+
+    # "Ugly" doors are doors that we don't want to see from the front, because of some
+    # sort of unsupported key door. To handle them, make a map of "ugly regions" and
+    # never link across them.
+    ugly_regions = {}
+    next_ugly_region = 1
     
     # Add all start regions to the open set.
     available_doors = []
     for name in start_region_names:
         logger.info("Starting in %s", name)
-        available_doors.extend(get_doors(world, world.get_region(name, player), player))
+        for door in get_doors(world, world.get_region(name, player), player):
+            ugly_regions[door.name] = 0
+            available_doors.append(door)
     
     # Loop until all available doors are used
     while len(available_doors) > 0:
@@ -173,7 +181,7 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
         # into the dungeon), or puts them late in the dungeon (so they probably are part
         # of a loop). Panic if neither of these happens.
         random.shuffle(available_doors)
-        available_doors.sort(key=lambda door: 1 if door.blocked else 0)
+        available_doors.sort(key=lambda door: 1 if door.blocked else 2 if door.ugly else 0)
         door = available_doors.pop()
         logger.info('Linking %s', door.name)
         # Find an available region that has a compatible door
@@ -184,13 +192,27 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
             logger.info('  Found new region %s via %s', connect_region.name, connect_door.name)
             # Apply connection and add the new region's doors to the available list
             maybe_connect_two_way(world, door, connect_door, player)
-            available_doors.extend(get_doors(world, connect_region, player))
+            # Figure out the new room's ugliness region
+            new_room_ugly_region = ugly_regions[door.name]
+            if connect_door.ugly:
+                next_ugly_region += 1
+                new_room_ugly_region = next_ugly_region
+            # Add the doors
+            for door in get_doors(world, connect_region, player):
+                ugly_regions[door.name] = new_room_ugly_region
+                available_doors.append(door)
+                # If an ugly door is anything but the connect door, panic and die
+                if door != connect_door and door.ugly:
+                    logger.info('Failed because of ugly door, trying again.')
+                    shuffle_dungeon(world, player, start_region_names, dungeon_region_names)
+                    return
+                    
             # We've used this region and door, so don't use them again
             available_regions.remove(connect_region)
             available_doors.remove(connect_door)
         else:
             # If there's no available region with a door, use an internal connection
-            connect_door = find_compatible_door_in_list(world, door, available_doors, player)
+            connect_door = find_compatible_door_in_list(ugly_regions, world, door, available_doors, player)
             # If we don't have a door at this point, it's time to panic and retry.
             if connect_door is None:
                 logger.info('Failed because of blocked door, trying again.')
@@ -233,8 +255,10 @@ def find_compatible_door_in_regions(world, door, regions, player):
                 return region, proposed_door
     return None, None
 
-def find_compatible_door_in_list(world, door, doors, player):
+def find_compatible_door_in_list(ugly_regions, world, door, doors, player):
     for proposed_door in doors:
+        if ugly_regions[door.name] != ugly_regions[proposed_door.name]:
+            continue
         if doors_compatible(door, proposed_door):
             return proposed_door
  

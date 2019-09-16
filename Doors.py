@@ -112,10 +112,10 @@ def create_doors(world, player):
         create_small_key_door(player, 'Eastern Dark Square Key Door WN', DoorType.Normal, Direction.West, 0xba, Top, High),
         create_dir_door(player, 'Eastern Big Key EN', DoorType.Normal, Direction.East, 0xb8, Top, High),
         create_big_key_door(player, 'Eastern Big Key NE', DoorType.Normal, Direction.North, 0xb8, Right, High),
-        create_small_key_door(player, 'Eastern Darkness S', DoorType.Normal, Direction.South, 0x99, Mid, High),
+        ugly_door(create_small_key_door(player, 'Eastern Darkness S', DoorType.Normal, Direction.South, 0x99, Mid, High)),
         # TODO: Up is a keydoor and down is not. Are they both spiralkeys or what?
         create_spiral_stairs(player, 'Eastern Darkness Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x99, 0, HTH, Z, 0x1a, 0x6c, False, True),
-        create_spiral_stairs(player, 'Eastern Attic Start Down Stairs', DoorType.SpiralStairs, Direction.Down, 0xda, 0, HTH, Z, 0x11, 0x80, False, True),
+        ugly_door(create_spiral_stairs(player, 'Eastern Attic Start Down Stairs', DoorType.SpiralStairs, Direction.Down, 0xda, 0, HTH, Z, 0x11, 0x80, False, True)),
         create_dir_door(player, 'Eastern Attic Start WS', DoorType.Normal, Direction.West, 0xda, Bot, High),
         create_dir_door(player, 'Eastern Attic Switches ES', DoorType.Normal, Direction.East, 0xd9, Bot, High),
         create_dir_door(player, 'Eastern Attic Switches WS', DoorType.Normal, Direction.West, 0xd9, Bot, High),
@@ -169,3 +169,7 @@ def create_spiral_stairs(player, name, type, direction, room,
     d.zeroHzCam = zero_hz_cam
     d.zeroVtCam = zero_vt_cam
     return d
+
+def ugly_door(door):
+  door.ugly = True
+  return door

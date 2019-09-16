@@ -850,6 +850,7 @@ class Door(object):
         self.blocked = False  # Indicates if the door is normally blocked off. (Sanc door or always closed)
         self.smallKey = False  # There's a small key door on this side
         self.bigKey = False  # There's a big key door on this side
+        self.ugly = False  # Indicates that it can't be seen from the front (e.g. back of a big key door)
 
     def getAddress(self):
         if self.type == DoorType.Normal:
