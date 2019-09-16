@@ -156,26 +156,31 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
     logger = logging.getLogger('')
     # Part one - generate a random layout
     available_regions = []
-    for name in dungeon_region_names:
+    for name in [r for r in dungeon_region_names if r not in start_region_names]:
         available_regions.append(world.get_region(name, player))
     random.shuffle(available_regions)
     
-    # Pick a random region and make its doors the open set
+    # Add all start regions to the open set.
     available_doors = []
-    region = available_regions.pop()
-    logger.info("Starting in %s", region.name)
-    available_doors.extend(get_doors(world, region, player))
+    for name in start_region_names:
+        logger.info("Starting in %s", name)
+        available_doors.extend(get_doors(world, world.get_region(name, player), player))
     
     # Loop until all available doors are used
     while len(available_doors) > 0:
-        # Pick a random available door to connect
-        # TODO: Is there an existing "remove random from list" in this codebase?
+        # Pick a random available door to connect, prioritizing ones that aren't blocked.
+        # This makes them either get picked up through another door (so they head deeper
+        # into the dungeon), or puts them late in the dungeon (so they probably are part
+        # of a loop). Panic if neither of these happens.
         random.shuffle(available_doors)
+        available_doors.sort(key=lambda door: 1 if door.blocked else 0)
         door = available_doors.pop()
         logger.info('Linking %s', door.name)
         # Find an available region that has a compatible door
         connect_region, connect_door = find_compatible_door_in_regions(world, door, available_regions, player)
-        if connect_region is not None:
+        # Also ignore compatible doors if they're blocked; these should only be used to
+        # create loops.
+        if connect_region is not None and not door.blocked:
             logger.info('  Found new region %s via %s', connect_region.name, connect_door.name)
             # Apply connection and add the new region's doors to the available list
             maybe_connect_two_way(world, door, connect_door, player)
@@ -186,6 +191,11 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
         else:
             # If there's no available region with a door, use an internal connection
             connect_door = find_compatible_door_in_list(world, door, available_doors, player)
+            # If we don't have a door at this point, it's time to panic and retry.
+            if connect_door is None:
+                logger.info('Failed because of blocked door, trying again.')
+                shuffle_dungeon(world, player, start_region_names, dungeon_region_names)
+                return                
             logger.info('  Adding loop via %s', connect_door.name)
             maybe_connect_two_way(world, door, connect_door, player)
             available_doors.remove(connect_door)
