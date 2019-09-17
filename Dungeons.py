@@ -174,7 +174,7 @@ hyrule_castle_regions = [
     'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory Main',
     'Hyrule Dungeon Armory North Branch', 'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock',
     'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat',
-    'Sewers Secret Room', 'Sewers Secret Room Blocked Path', 'Sewers Pull Switch', 'Sanctuary'
+    'Sewers Secret Room Blocked Path', 'Sewers Secret Room', 'Sewers Pull Switch', 'Sanctuary'
 ]
 
 eastern_regions = [

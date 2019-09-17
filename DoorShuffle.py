@@ -900,60 +900,55 @@ def shuffle_dungeon_no_repeats(world, player, available_sectors):
     logger = logging.getLogger('')
 
     random.shuffle(available_sectors)
+    for sector in available_sectors:
+        random.shuffle(sector.outstanding_doors)
 
-    available_doors = []
-    # this is interesting but I want to ensure connectedness
-    # Except for Desert1/2 and Skull 1/2/3 - treat them as separate dungeons?
     while len(available_sectors) > 0:
         # Pick a random region and make its doors the open set
         sector = available_sectors.pop()
         current_sector = sector
-        available_doors.extend(sector.outstanding_doors)
 
         # Loop until all available doors are used
-        while len(available_doors) > 0:
+        while len(current_sector.outstanding_doors) > 0:
             # Pick a random available door to connect
-            random.shuffle(available_doors)
-            door = available_doors.pop()
+            random.shuffle(current_sector.outstanding_doors)
+            door = current_sector.outstanding_doors.pop()
             logger.info('Linking %s', door.name)
             # Find an available region that has a compatible door
             connect_sector, connect_door = find_compatible_door_in_sectors_ex(world, door, available_sectors, player)
             if connect_sector is not None:
                 logger.info('  Found new sector via %s', connect_door.name)
-                if door not in current_sector.outstanding_doors:
-                    raise Exception('Door %s was not in sector', door.name)
                 # Check if valid
                 if not is_valid(door, connect_door, current_sector, connect_sector, len(available_sectors) == 1):
                     logger.info(' Not Linking %s to %s', door.name, connect_door.name)
-                    available_doors.insert(0, door)
+                    current_sector.outstanding_doors.insert(0, door)
+                    if len(current_sector.outstanding_doors) <= 1:
+                        raise Exception('Rejected last option due to dead end... infinite loop ensues')
                     continue
                 # Apply connection and add the new region's doors to the available list
                 maybe_connect_two_way(world, door, connect_door, player)
-                current_sector.outstanding_doors.remove(door)
                 connect_sector.outstanding_doors.remove(connect_door)
-                available_doors.extend(connect_sector.outstanding_doors)
                 available_sectors.remove(connect_sector)
                 current_sector.outstanding_doors.extend(connect_sector.outstanding_doors)
                 current_sector.regions.extend(connect_sector.regions)
             else:
                 # If there's no available region with a door, use an internal connection
-                connect_door = find_compatible_door_in_list_old(world, door, available_doors, player)
+                connect_door = find_compatible_door_in_list_old(world, door, current_sector.outstanding_doors, player)
                 if connect_door is not None:
                     logger.info('  Adding loop via %s', connect_door.name)
-                    if door not in current_sector.outstanding_doors:
-                        raise Exception('Door %s was not in sector', door.name)
                     # Check if valid
-                    if not is_loop_valid(door, connect_door, current_sector):
+                    if not is_loop_valid(door, connect_door, current_sector, len(available_sectors) == 0):
                         logger.info(' Not Linking %s to %s', door.name, connect_door.name)
-                        available_doors.insert(0, door)
+                        current_sector.outstanding_doors.insert(0, door)
+                        if len(current_sector.outstanding_doors) <= 1:
+                            raise Exception('Rejected last option due to dead end...')
                         continue
                     maybe_connect_two_way(world, door, connect_door, player)
-                    current_sector.outstanding_doors.remove(door)
                     current_sector.outstanding_doors.remove(connect_door)
                 else:
-                    raise Exception ('Something has gone terribly wrong')
+                    raise Exception('Something has gone terribly wrong')
     # Check that we used everything, we failed otherwise
-    if len(available_sectors) > 0 or len(available_doors) > 0:
+    if len(available_sectors) > 0 or len(current_sector.outstanding_doors) > 0:
         logger.warning('Failed to add all regions/doors to dungeon, generation will likely fail.')
 
 
@@ -984,8 +979,14 @@ def is_valid(door_a, door_b, sector_a, sector_b, last_sector):
     return False  # not sure how we got here, but it's a bad idea
 
 
-def is_loop_valid(door_a, door_b, sector):
-    return True  # todo: is this always true?
+def is_loop_valid(door_a, door_b, sector, no_more_sectors):
+    if no_more_sectors:
+        return True
+    elif not door_a.blocked and not door_b.blocked:
+        return sector.outflow() - 2 > 0
+    elif door_a.blocked or door_b.blocked:
+        return sector.outflow() - 1 > 0
+    return True  # todo: is this always true? both blocked but we're connecting loops now, so dead end?
 
 
 # DATA GOES DOWN HERE
