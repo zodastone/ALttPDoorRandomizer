@@ -423,7 +423,7 @@ def is_proposal_valid(proposal, buckets, candidates):
     global search_iterations
     search_iterations = search_iterations + 1
     if search_iterations % 100 == 0:
-        logger.info('Iteration ', search_iterations)
+        logger.info('Iteration %s', search_iterations)
     # check that proposal is complete
     for i in range(len(proposal)):
         if proposal[i] is -1:
