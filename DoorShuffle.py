@@ -2,7 +2,7 @@ import random
 import collections
 import logging
 
-from BaseClasses import RegionType, DoorType, Direction, RegionChunk, Sector
+from BaseClasses import RegionType, DoorType, Direction, RegionChunk, Sector, pol_idx
 from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions
 
 def link_doors(world, player):
@@ -15,9 +15,6 @@ def link_doors(world, player):
         connect_two_way(world, edge_a, edge_b, player)
 
     # These connection are here because they are currently unable to be shuffled
-    if world.doorShuffle not in ['basic', 'experimental']:  # these modes supports spirals
-        for entrance, ext in spiral_staircases:
-            connect_two_way(world, entrance, ext, player)
     for entrance, ext in straight_staircases:
         connect_two_way(world, entrance, ext, player)
     for entrance, ext in open_edges:
@@ -28,6 +25,8 @@ def link_doors(world, player):
         connect_simple_door(world, exitName, regionName, player)
 
     if world.doorShuffle == 'vanilla':
+        for entrance, ext in spiral_staircases:
+            connect_two_way(world, entrance, ext, player)
         for entrance, ext in default_door_connections:
             connect_two_way(world, entrance, ext, player)
         for ent, ext in default_one_way_connections:
@@ -158,7 +157,12 @@ def within_dungeon(world, player):
     # Aerinon's note: I think this is handled already by ER Rules
     dungeon_region_starts_es = ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Secret Room']
     dungeon_region_starts_ep = ['Eastern Lobby']
-    dungeon_region_lists = [(dungeon_region_starts_es, hyrule_castle_regions), (dungeon_region_starts_ep, eastern_regions)]
+    dungeon_region_starts_dp = ['Desert Back Lobby', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
+    dungeon_region_lists = [
+        (dungeon_region_starts_es, hyrule_castle_regions),
+        (dungeon_region_starts_ep, eastern_regions),
+        (dungeon_region_starts_dp, desert_regions)
+    ]
     for start_list, region_list in dungeon_region_lists:
         shuffle_dungeon(world, player, start_list, region_list)
 
@@ -234,7 +238,6 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
         return
 
 
-
 # Connects a and b. Or don't if they're an unsupported connection type.
 # TODO: This is gross, don't do it this way
 def maybe_connect_two_way(world, a, b, player):
@@ -252,6 +255,7 @@ def maybe_connect_two_way(world, a, b, player):
         return
     # If we failed to account for a type, panic
     raise RuntimeError('Unknown door type ' + a.type.name)
+
 
 # Finds a compatible door in regions, returns the region and door
 def find_compatible_door_in_regions(world, door, regions, player):
@@ -302,418 +306,26 @@ def doors_fit_mandatory_pair(pair_list, a, b):
           return True
   return False
 
+# goals:
+# 1. have enough chests to be interesting (2 more than dungeon items)
+# 2. have a balanced amount of regions added (check)
+# 3. prevent soft locks due to key usage
+# 4. rules in place to affect item placement (lamp, keys, etc.)
+# 5. to be complete -- all doors linked (check, somewhat)
+# 6. avoid deadlocks/dead end dungeon (check)
+# 7. certain paths through dungeon must be possible - be able to reach goals (check)
 
-# code below is an early prototype for cross-dungeon mode
+
 def cross_dungeon(world, player):
-    logger = logging.getLogger('')
-
-    # figure out which dungeons have open doors and which doors still need to be connected
-
-    # goals:
-    # 1. have enough chests to be interesting (2 more than dungeon items)
-    # 2. have a balanced amount of regions added
-    # 3. prevent soft locks due to key usage
-    # 4. rules in place to affect item placement (lamp, keys, etc.)
-    # 5. to be complete -- all doors linked
-    # 6. avoid deadlocks/dead end dungeon
-    # 7. certain paths through dungeon must be possible - be able to reach goals
-
-    available_dungeon_regions = set([])
-    for region in world.regions:
-        if region.type == RegionType.Dungeon:
-            available_dungeon_regions.add(region)
-
-    available_doors = set(world.doors)
-
-    unfinished_dungeons = []
-    # modify avail doors and d_regions, produces a list of unlinked doors
-    for dungeon in world.dungeons:
-        dungeon.paths = dungeon_paths[dungeon.name]
-        for path in dungeon.paths:
-            dungeon.path_completion[path] = False
-        for regionName in list(dungeon.regions):
-            region = world.get_region(regionName, player)
-            dungeon.regions.remove(regionName)
-            chunk = create_chunk(world, player, region, available_dungeon_regions, available_doors)
-            dungeon.chunks.append(chunk)
-            # todo: indicate entrance chunks
-            dungeon.regions.extend(chunk.regions)
-            dungeon.unlinked_doors.update(chunk.unlinked_doors)
-            dungeon.chests += chunk.chests
-            for path in dungeon.paths:
-                if path[0] in chunk.regions or path[1] in chunk.regions:
-                    chunk.paths_needed.append(path)
-        if len(dungeon.unlinked_doors) > 0:
-            unfinished_dungeons.append(dungeon)
-
-    ttl_regions = len(available_dungeon_regions)
-    for dungeon in unfinished_dungeons:
-        ttl_regions += len(dungeon.regions)
-    target_regions = ttl_regions // len(unfinished_dungeons)
-
-    # chunk up the rest of the avail dungeon regions
-    avail_chunks = []
-    while len(available_dungeon_regions) > 0:
-        region = available_dungeon_regions.pop()
-        chunk = create_chunk(world, player, region, available_dungeon_regions)
-        if chunk.outflow > 0:
-            avail_chunks.append(chunk)
-
-    normal_door_map = {Direction.South: [], Direction.North: [], Direction.East: [], Direction.West: []}
-    for d in available_doors:
-        if d.type == DoorType.Normal:
-            normal_door_map[d.direction].append(d)
-    random.shuffle(normal_door_map[Direction.South])
-    random.shuffle(normal_door_map[Direction.North])
-    random.shuffle(normal_door_map[Direction.East])
-    random.shuffle(normal_door_map[Direction.West])
-
-    # unfinished dungeons should be generated
-    random.shuffle(unfinished_dungeons)
-    for dungeon in unfinished_dungeons:
-        logger.info('Starting %s', dungeon.name)
-        bailcnt = 0
-        while not is_dungeon_finished(world, player, dungeon):
-            # pick some unfinished criteria to help?
-            trgt_pct = len(dungeon.regions) / target_regions
-            for path in dungeon.paths:
-                find_path(world, player, path, dungeon.path_completion)
-
-            # process - expand to about half size
-            # start closing off unlinked doors - self pick vs dead end pick
-            # ensure pick does not cutoff path (Zelda Cell direct to Sanc)
-            # potential problems:
-            # not enough outflow from path "source" to different locations
-            # one-way doors
-            # number of chests
-            # key spheres
-
-            if trgt_pct < .5:  # nothing to worry about yet
-                pick = expand_pick(dungeon, normal_door_map)
-                if pick is None:  # very possibly, some dungeon (looking at you HC) took forever to solve and the rest will have to be small
-                    pick = self_pick(dungeon)
-                # other bad situations for last dungeon: unused chests in avail_chunks
-            else:
-                if len(dungeon.unlinked_doors) // 2 > dungeon.incomplete_paths():
-                    if len(dungeon.unlinked_doors) % 2 == 1:
-                        logger.info('dead end')
-                        pick = dead_end_pick(dungeon, avail_chunks)
-                    else:
-                        logger.info('self connection')
-                        pick = self_pick(dungeon)
-                elif len(dungeon.unlinked_doors) // 2 >= dungeon.incomplete_paths() and trgt_pct >= .8:
-                    if len(dungeon.unlinked_doors) % 2 == 1:
-                        logger.info('dead end')
-                        pick = dead_end_pick(dungeon, avail_chunks)
-                    else:  # we should ensure paths get done at this point
-                        logger.info('path connection')
-                        pick = path_pick(dungeon)
-                # todo - branch here for chests?
-                else:
-                    pick = expand_pick(dungeon, normal_door_map)
-                if pick is None:
-                    # todo: efficiency note: if dead was selected, outflow helps more
-                    # todo: if path or self was selected then direction helps more
-                    logger.info('change request')
-                    pick = change_outflow_or_dir_pick(dungeon, avail_chunks)
-
-            # other cases: finding more chests for key spheres or chest count.
-            # last dungeon should use all the remaining chests / doors
-
-            if pick is not None:
-                (srcdoor, destdoor) = pick
-                logger.info('connecting %s to %s', srcdoor.name, destdoor.name)
-                connect_two_way(world, srcdoor.name, destdoor.name, player)
-                if destdoor.parentChunk in avail_chunks:
-                    avail_chunks.remove(destdoor.parentChunk)
-                for d in destdoor.parentChunk.unlinked_doors:
-                    if d in normal_door_map[d.direction]:
-                        normal_door_map[d.direction].remove(d)  # from the available door pool
-
-                merge_chunks(dungeon, srcdoor.parentChunk, destdoor.parentChunk, srcdoor, destdoor)
-            else:
-                bailcnt += 1
-
-            if len(dungeon.unlinked_doors) == 0 and not is_dungeon_finished(world, player, dungeon):
-                raise RuntimeError('Made a bad dungeon - more smarts needed')
-            if bailcnt > 100:
-                raise RuntimeError('Infinite loop detected - see output')
-
-
-def create_chunk(world, player, newregion, available_dungeon_regions, available_doors=None):
-    # if newregion.name in dungeon.regions:
-    # return  # we've been here before
-    chunk = RegionChunk()
-    queue = collections.deque([newregion])
-    while len(queue) > 0:
-        region = queue.popleft()
-        chunk.regions.append(region.name)
-        if region in available_dungeon_regions:
-            available_dungeon_regions.remove(region)
-        chunk.chests += len(region.locations)
-        for ext in region.exits:
-            d = world.check_for_door(ext.name, player)
-            connected = ext.connected_region
-            # todo - check for key restrictions?
-            if d is not None:
-                if available_doors is not None:
-                    available_doors.remove(d)
-                d.parentChunk = chunk
-                if d.dest is None:
-                    chunk.outflow += 1
-                    # direction of door catalog ?
-                    chunk.unlinked_doors.add(d)
-                elif connected.name not in chunk.regions and connected.type == RegionType.Dungeon and connected not in queue:
-                    queue.append(connected)  # needs to be added
-            elif connected is not None and connected.name not in chunk.regions and connected.type == RegionType.Dungeon and connected not in queue:
-                queue.append(connected)  # needs to be added
-    return chunk
-
-
-def merge_chunks(dungeon, old_chunk, new_chunk, old_door, new_door):
-    old_chunk.unlinked_doors.remove(old_door)
-    if old_door in dungeon.unlinked_doors:
-        dungeon.unlinked_doors.remove(old_door)
-    new_chunk.unlinked_doors.remove(new_door)
-    if new_door in dungeon.unlinked_doors:
-        dungeon.unlinked_doors.remove(new_door)
-
-    if old_chunk is new_chunk:  # i think no merging necessary
-        old_chunk.outflow -= 2  # loses some outflow # todo - keysphere or pathing re-eval?
-        return
-
-    # merge new chunk with old
-    old_chunk.regions.extend(new_chunk.regions)
-    old_chunk.unlinked_doors.update(new_chunk.unlinked_doors)
-    for d in new_chunk.unlinked_doors:
-        d.parentChunk = old_chunk
-    new_door.parentChunk = old_chunk
-    old_chunk.outflow += new_chunk.outflow - 2  # todo - one-way doors most likely
-    paths_needed = []
-    for path in old_chunk.paths_needed:
-        if not ((path[0] in old_chunk.regions and path[1] in new_chunk.regions)
-                or (path[1] in old_chunk.regions and path[0] in new_chunk.regions)):
-            paths_needed.append(path)
-    for path in new_chunk.paths_needed:
-        if not ((path[0] in old_chunk.regions and path[1] in new_chunk.regions)
-                or (path[1] in old_chunk.regions and path[0] in new_chunk.regions)):
-            paths_needed.append(path)
-
-    old_chunk.paths_needed = paths_needed
-    old_chunk.chests += new_chunk.chests
-    old_chunk.entrance = old_chunk.entrance or new_chunk.entrance
-    # key spheres?
-
-    if new_chunk in dungeon.chunks:
-        dungeon.chunks.remove(new_chunk)
-    dungeon.regions.extend(new_chunk.regions)
-    dungeon.unlinked_doors.update(new_chunk.unlinked_doors)
-    dungeon.chests += new_chunk.chests
-
-
-def expand_pick(dungeon, normal_door_map):
-    pairs = []
-    for src in dungeon.unlinked_doors:
-        for dest in normal_door_map[switch_dir(src.direction)]:
-            pairs.append((src, dest))
-
-    if len(pairs) == 0:
-        return None
-    random.shuffle(pairs)
-    valid, pick = False, None
-    while not valid and len(pairs) > 0:
-        pick = pairs.pop()
-        valid = valid_extend_pick(pick[0], pick[1])
-    if valid:
-        return pick
-    else:
-        return None
-
-
-def dead_end_pick(dungeon, avail_chunks):
-    door_map = {Direction.South: [], Direction.North: [], Direction.East: [], Direction.West: []}
-    for d in dungeon.unlinked_doors:
-        door_map[d.direction].append(d)
-
-    chunky_doors = []
-    for chunk in avail_chunks:
-        if chunk.outflow == 1:  # dead end definition
-            chunky_doors.extend(chunk.unlinked_doors)  # one-way door warning? todo
-
-    pairs = []
-    for dest in chunky_doors:
-        for src in door_map[switch_dir(dest.direction)]:
-            pairs.append((src, dest))
-
-    if len(pairs) == 0:
-        return None
-    random.shuffle(pairs)
-    valid, pick = False, None
-    while not valid and len(pairs) > 0:
-        pick = pairs.pop()
-        valid = valid_extend_pick(pick[0], pick[1])
-    if valid:
-        return pick
-    else:
-        return None
-
-def change_outflow_or_dir_pick(dungeon, avail_chunks):
-    door_map = {Direction.South: [], Direction.North: [], Direction.East: [], Direction.West: []}
-    for d in dungeon.unlinked_doors:
-        door_map[d.direction].append(d)
-
-    chunky_doors = []
-    for chunk in avail_chunks:
-        if chunk.outflow >= 2:  # no dead ends considered
-            chunky_doors.extend(chunk.unlinked_doors)
-
-    pairs = []
-    for dest in chunky_doors:
-        for src in door_map[switch_dir(dest.direction)]:
-            if dest.parentChunk.outflow > 2:  # increases outflow
-                pairs.append((src, dest))
-            else:
-                dest_doors = set(dest.parentChunk.unlinked_doors)
-                dest_doors.remove(dest)
-                if dest_doors.pop().direction != src.direction:  # the other door is not the same direction (or type?)
-                    pairs.append((src, dest))
-
-    if len(pairs) == 0:
-        return None
-    random.shuffle(pairs)
-    valid, pick = False, None
-    while not valid and len(pairs) > 0:
-        pick = pairs.pop()
-        valid = valid_extend_pick(pick[0], pick[1])
-    if valid:
-        return pick
-    else:
-        return None
-
-
-# there shouldn't be any path in the destination
-def valid_extend_pick(src_door, dest_door):
-    src_chunk = src_door.parentChunk
-    dest_chunk = dest_door.parentChunk
-    unfulfilled_paths = 0
-    for path in src_chunk.paths_needed:
-        if not ((path[0] in src_chunk.regions and path[1] in dest_chunk.regions)
-                or (path[1] in src_chunk.regions and path[0] in dest_chunk.regions)):
-            unfulfilled_paths += 1
-    if unfulfilled_paths == 0 or dest_chunk.outflow + src_chunk.outflow - 2 > 0:
-        return True
-    return False
-
-
-def self_pick(dungeon):
-    door_map = {Direction.South: [], Direction.North: [], Direction.East: [], Direction.West: []}
-    for d in dungeon.unlinked_doors:
-        door_map[d.direction].append(d)
-
-    pairs = []
-    for dest in dungeon.unlinked_doors:
-        for src in door_map[switch_dir(dest.direction)]:
-            pairs.append((src, dest))
-
-    if len(pairs) == 0:
-        return None
-    random.shuffle(pairs)
-    valid, pick = False, None
-    while not valid and len(pairs) > 0:
-        pick = pairs.pop()
-        valid = valid_self_pick(pick[0], pick[1])
-    if valid:
-        return pick
-    else:
-        return None
-
-# this currently checks
-# 1. that all paths are fulfilled by this connection or the outflow is greater than 0.
-def path_pick(dungeon) -> object:
-    paths = []
-    for path in dungeon.paths:
-        if not dungeon.path_completion[path]:
-            paths.append(path)
-    random.shuffle(paths)
-    pick = None
-    while pick is None and len(paths) > 0:
-        path = paths.pop()
-        src_chunk = dest_chunk = None
-        for chunk in dungeon.chunks:
-            if path[0] in chunk.regions:
-                src_chunk = chunk
-            if path[1] in chunk.regions:
-                dest_chunk = chunk
-
-        door_map = {Direction.South: [], Direction.North: [], Direction.East: [], Direction.West: []}
-        for d in src_chunk.unlinked_doors:
-            door_map[d.direction].append(d)
-
-        pairs = []
-        for dest in dest_chunk.unlinked_doors:
-            for src in door_map[switch_dir(dest.direction)]:
-                pairs.append((src, dest))
-
-        if len(pairs) == 0:
-            continue
-        random.shuffle(pairs)
-        valid, pair = False, None
-        while not valid and len(pairs) > 0:
-            pair = pairs.pop()
-            valid = valid_self_pick(pair[0], pair[1])
-        if valid:
-            pick = pair
-    return pick
-
-
-def valid_self_pick(src_door, dest_door):
-    src_chunk, dest_chunk = src_door.parentChunk, dest_door.parentChunk
-    if src_chunk == dest_chunk:
-        return src_chunk.outflow - 2 > 0 or len(src_chunk.paths_needed) == 0
-    unfulfilled_paths = 0
-    for path in src_chunk.paths_needed:
-        if not ((path[0] in src_chunk.regions and path[1] in dest_chunk.regions)
-                or (path[1] in src_chunk.regions and path[0] in dest_chunk.regions)):
-            unfulfilled_paths += 1
-    for path in dest_chunk.paths_needed:
-        if not ((path[0] in src_chunk.regions and path[1] in dest_chunk.regions)
-                or (path[1] in src_chunk.regions and path[0] in dest_chunk.regions)):
-            unfulfilled_paths += 1
-    if unfulfilled_paths == 0 or dest_chunk.outflow + src_chunk.outflow - 2 > 0:
-        return True
-    return False
-
-
-def is_dungeon_finished(world, player, dungeon):
-    if len(dungeon.unlinked_doors) > 0:  # no unlinked doors
-        return False
-    for path in dungeon.paths:  # paths through dungeon are possible
-        if not find_path(world, player, path, dungeon.path_completion):
-            return False
-    # if dungeon.chests < dungeon.count_dungeon_item() + 2:  # 2 or more chests reachable in dungeon than number of dungeon items
-    #    return False
-    # size of dungeon is acceptable
-    # enough chests+keys within each key sphere to open key doors
-    return True
-
-
-def find_path(world, player, path, path_completion):
-    if path_completion[path]:   # found it earlier -- assuming no disconnects
-        return True
-    visited_regions = set([])
-    queue = collections.deque([world.get_region(path[0], player)])
-    while len(queue) > 0:
-        region = queue.popleft()
-        if region.name == path[1]:
-            path_completion[path] = True
-            # would be nice if we could mark off the path needed in the chunks here
-            return True
-        visited_regions.add(region)
-        for ext in region.exits:
-            connected = ext.connected_region
-            if connected is not None and connected not in visited_regions and connected.type == RegionType.Dungeon and connected not in queue:
-                queue.append(connected)
-    return False
+    hc = convert_to_sectors(hyrule_castle_regions, world, player)
+    ep = convert_to_sectors(eastern_regions, world, player)
+    dp = convert_to_sectors(desert_regions, world, player)
+    world_split = split_up_sectors(hc + ep + dp, default_dungeon_sets)
+    dp_split = split_up_sectors(world_split.pop(2), desert_default_entrance_sets)
+    world_split.extend(dp_split)
+    # todo - adjust dungeon item pools
+    for sector_list in world_split:
+        shuffle_dungeon_no_repeats(world, player, sector_list)
 
 
 def experiment(world, player):
@@ -723,29 +335,8 @@ def experiment(world, player):
     dungeon_sectors = [hc, ep]
     dp_split = split_up_sectors(dp, desert_default_entrance_sets)
     dungeon_sectors.extend(dp_split)
-
-    for sector_list in dungeon_sectors:
-        for sector in sector_list:
-            for region in sector.regions:
-                print(region.name)
-            for door in sector.outstanding_doors:
-                print(door.name)
-            print('pol: ' + str(sector.polarity()))
-            print('mag: ' + str(sector.magnitude()))
-            print()
-            print()
-
     for sector_list in dungeon_sectors:
         shuffle_dungeon_no_repeats(world, player, sector_list)
-    # for ent, ext in experimental_connections:
-    #     if world.get_door(ent, player).blocked:
-    #         connect_one_way(world, ext, ent, player)
-    #     elif  world.get_door(ext, player).blocked:
-    #         connect_one_way(world, ent, ext, player)
-    #     else:
-    #         connect_two_way(world, ent, ext, player)
-
-    # Create list of regions
 
 
 def convert_regions(region_names, world, player):
@@ -774,7 +365,7 @@ def convert_to_sectors(region_names, world, player):
                     exits.extend(connect_region.exits)
             else:
                 door = world.check_for_door(ext.name, player)
-                if door is not None:
+                if door is not None and not door.landing:
                     outstanding_doors.append(door)
         sector = Sector()
         sector.regions.extend(region_chunk)
@@ -797,13 +388,7 @@ def split_up_sectors(sector_list, entrance_sets):
                     leftover_sectors.remove(sector)
                     break
         new_sector_grid.append(new_sector_list)
-    # appalling I know - how to split up other things
-    for s_list in new_sector_grid:
-        print('pol:'+str(sum_vector(s_list, lambda s: s.polarity())))
-        print('mag:'+str(sum_vector(s_list, lambda s: s.magnitude())))
-    print('pol:'+str(sum_vector(leftover_sectors, lambda s: s.polarity())))
-    print('mag:'+str(sum_vector(leftover_sectors, lambda s: s.magnitude())))
-    assignment(new_sector_grid, leftover_sectors)
+    shuffle_sectors(new_sector_grid, leftover_sectors)
     return new_sector_grid
 
 
@@ -816,11 +401,11 @@ def sum_vector(sector_list, func):
     return result
 
 
-# def add_vectors(vector_one, vector_two):
-#     result = [0]*len(vector_one)
-#     for i in range(len(result)):
-#         result[i] = vector_one[i] + vector_two[i]
-#     return result
+def add_vectors(vector_one, vector_two):
+    result = [0]*len(vector_one)
+    for i in range(len(result)):
+        result[i] = vector_one[i] + vector_two[i]
+    return result
 
 
 def is_polarity_neutral(polarity):
@@ -830,7 +415,15 @@ def is_polarity_neutral(polarity):
     return True
 
 
+search_iterations = 0
+
+
 def is_proposal_valid(proposal, buckets, candidates):
+    logger = logging.getLogger('')
+    global search_iterations
+    search_iterations = search_iterations + 1
+    if search_iterations % 100 == 0:
+        logger.info('Iteration ', search_iterations)
     # check that proposal is complete
     for i in range(len(proposal)):
         if proposal[i] is -1:
@@ -847,20 +440,43 @@ def is_proposal_valid(proposal, buckets, candidates):
     return True
 
 
-def assignment(buckets, candidates):
+def shuffle_sectors(buckets, candidates):
     # for a faster search - instead of random - put the most likely culprits to cause problems at the end, least likely at the front
     # unless we start checking for failures earlier in the algo
     random.shuffle(candidates)
     proposal = [-1]*len(candidates)
 
-    solution = find_proposal(proposal, buckets, candidates)
+    solution = find_proposal_monte_carlo(proposal, buckets, candidates)
     if solution is None:
         raise Exception('Unable to find a proposal')
     for i in range(len(solution)):
         buckets[solution[i]].append(candidates[i])
 
 
-# this is a DFS search
+# monte carlo proposal generation
+def find_proposal_monte_carlo(proposal, buckets, candidates):
+    n = len(candidates)
+    k = len(buckets)
+    hashes = set()
+    collisions = 0
+
+    while collisions < 10000:
+        for i in range(n):
+            proposal[i] = random.randrange(k)
+        hash = ''
+        for value in proposal:
+            hash = hash + str(value)
+        if hash not in hashes:
+            collisions = 0
+            if is_proposal_valid(proposal, buckets, candidates):
+                return proposal
+            hashes.add(hash)
+        else:
+            collisions = collisions + 1
+    raise Exception('Too many collisions in a row, solutions space is sparse')
+
+
+# this is a DFS search - fairly slow
 def find_proposal(proposal, buckets, candidates):
     size = len(candidates)
     combination_grid = []
@@ -915,36 +531,39 @@ def shuffle_dungeon_no_repeats(world, player, available_sectors):
             door = current_sector.outstanding_doors.pop()
             logger.info('Linking %s', door.name)
             # Find an available region that has a compatible door
-            connect_sector, connect_door = find_compatible_door_in_sectors_ex(world, door, available_sectors, player)
-            if connect_sector is not None:
-                logger.info('  Found new sector via %s', connect_door.name)
+            compatibles = find_all_compatible_door_in_sectors_ex(door, available_sectors)
+            while len(compatibles) > 0:
+                connect_sector, connect_door = compatibles.pop()
+                logger.info('  Found possible new sector via %s', connect_door.name)
                 # Check if valid
-                if not is_valid(door, connect_door, current_sector, connect_sector, len(available_sectors) == 1):
-                    logger.info(' Not Linking %s to %s', door.name, connect_door.name)
+                if is_valid(door, connect_door, current_sector, connect_sector, available_sectors):
+                    # Apply connection and add the new region's doors to the available list
+                    maybe_connect_two_way(world, door, connect_door, player)
+                    connect_sector.outstanding_doors.remove(connect_door)
+                    available_sectors.remove(connect_sector)
+                    current_sector.outstanding_doors.extend(connect_sector.outstanding_doors)
+                    current_sector.regions.extend(connect_sector.regions)
+                    break
+                logger.info(' Not Linking %s to %s', door.name, connect_door.name)
+                if len(compatibles) == 0:  # time to try again
                     current_sector.outstanding_doors.insert(0, door)
                     if len(current_sector.outstanding_doors) <= 1:
                         raise Exception('Rejected last option due to dead end... infinite loop ensues')
-                    continue
-                # Apply connection and add the new region's doors to the available list
-                maybe_connect_two_way(world, door, connect_door, player)
-                connect_sector.outstanding_doors.remove(connect_door)
-                available_sectors.remove(connect_sector)
-                current_sector.outstanding_doors.extend(connect_sector.outstanding_doors)
-                current_sector.regions.extend(connect_sector.regions)
             else:
                 # If there's no available region with a door, use an internal connection
+                # todo: find all possibles for this door first
                 connect_door = find_compatible_door_in_list_old(world, door, current_sector.outstanding_doors, player)
                 if connect_door is not None:
                     logger.info('  Adding loop via %s', connect_door.name)
                     # Check if valid
-                    if not is_loop_valid(door, connect_door, current_sector, len(available_sectors) == 0):
+                    if is_loop_valid(door, connect_door, current_sector, len(available_sectors) == 0):
+                        maybe_connect_two_way(world, door, connect_door, player)
+                        current_sector.outstanding_doors.remove(connect_door)
+                    else:
                         logger.info(' Not Linking %s to %s', door.name, connect_door.name)
                         current_sector.outstanding_doors.insert(0, door)
-                        if len(current_sector.outstanding_doors) <= 1:
-                            raise Exception('Rejected last option due to dead end...')
-                        continue
-                    maybe_connect_two_way(world, door, connect_door, player)
-                    current_sector.outstanding_doors.remove(connect_door)
+                        if len(current_sector.outstanding_doors) <= 2:
+                            raise Exception('Rejected last option due to likely improper loops...')
                 else:
                     raise Exception('Something has gone terribly wrong')
     # Check that we used everything, we failed otherwise
@@ -952,30 +571,43 @@ def shuffle_dungeon_no_repeats(world, player, available_sectors):
         logger.warning('Failed to add all regions/doors to dungeon, generation will likely fail.')
 
 
-def find_compatible_door_in_sectors_ex(world, door, sectors, player):
+def find_all_compatible_door_in_sectors_ex(door, sectors):
+    result = []
     for sector in sectors:
         for proposed_door in sector.outstanding_doors:
-            if doors_compatible(door, proposed_door):
-                return sector, proposed_door
-    return None, None
+            if doors_compatible_ignore_keys(door, proposed_door):
+                result.append((sector, proposed_door))
+    return result
 
 
 def find_compatible_door_in_list_old(world, door, doors, player):
     for proposed_door in doors:
-        if doors_compatible(door, proposed_door):
+        if doors_compatible_ignore_keys(door, proposed_door):
             return proposed_door
 
 
+# this method also assumes that sectors have been build appropriately
+def doors_compatible_ignore_keys(a, b):
+    if a.type != b.type:
+        return False
+    # todo: test spirals linking to each other
+    # if a.type == DoorType.SpiralStairs:
+    #     return True
+    return a.direction == switch_dir(b.direction)
+
+
 # todo: path checking needed?
-def is_valid(door_a, door_b, sector_a, sector_b, last_sector):
-    if last_sector:
+def is_valid(door_a, door_b, sector_a, sector_b, available_sectors):
+    if len(available_sectors) == 1:
         return True
-    elif door_a.blocked and door_b.blocked:  # todo, I can't see this going well unless we are in loop generation...
+    elif not are_there_outstanding_doors_of_type(door_a, door_b, sector_a, sector_b, available_sectors):
+        return False
+    elif door_a.blocked and door_b.blocked:  # I can't see this going well unless we are in loop generation...
         return False
     elif not door_a.blocked and not door_b.blocked:
-        return sector_a.outflow() + sector_b.outflow() - 2 > 0
+        return sector_a.outflow() + sector_b.outflow() - 1 > 0  # door_a has been removed already, so a.outflow is reduced by one
     elif door_a.blocked or door_b.blocked:
-        return sector_a.outflow() + sector_b.outflow() - 1 > 0
+        return sector_a.outflow() + sector_b.outflow() > 0
     return False  # not sure how we got here, but it's a bad idea
 
 
@@ -983,10 +615,37 @@ def is_loop_valid(door_a, door_b, sector, no_more_sectors):
     if no_more_sectors:
         return True
     elif not door_a.blocked and not door_b.blocked:
-        return sector.outflow() - 2 > 0
-    elif door_a.blocked or door_b.blocked:
         return sector.outflow() - 1 > 0
-    return True  # todo: is this always true? both blocked but we're connecting loops now, so dead end?
+    elif door_a.blocked or door_b.blocked:
+        return sector.outflow() > 0
+    return True  #  I think this is always true. Both blocked but we're connecting loops now, so dead end?
+
+
+def are_there_outstanding_doors_of_type(door_a, door_b, sector_a, sector_b, available_sectors):
+    idx = pol_idx[door_a.direction][0]
+    diff = sum_vector(available_sectors, lambda x: x.magnitude())[idx]-sector_b.magnitude()[idx]
+    if diff == 0:
+        return True  # this case will cover all the doors of that DirectionPair
+    only_neutral_left = True
+    for sector in available_sectors:
+        if sector != sector_b and sector.polarity()[idx] != 0:
+            only_neutral_left = False
+            break
+
+    if only_neutral_left:
+        hooks_left = False
+        for door in sector_a.outstanding_doors:
+            if door != door_a and pol_idx[door.direction][0] == idx:
+                hooks_left = True
+                break
+        if not hooks_left:
+            for door in sector_b.outstanding_doors:
+                if door != door_b and pol_idx[door.direction][0] == idx:
+                    hooks_left = True
+                    break
+        return hooks_left
+    return True
+
 
 
 # DATA GOES DOWN HERE
@@ -1161,6 +820,15 @@ experimental_connections = [('Eastern Boss SE', 'Eastern Eyegores NE'),
 #                             ('Hyrule Castle West Lobby N', 'Hyrule Dungeon Armory S'),
 #                             ('Hyrule Castle Lobby W', 'Hyrule Castle West Hall E'),
 #                             ('Hyrule Castle West Hall S', 'Sanctuary N')]
+
+
+# For crossed
+default_dungeon_sets = [
+    ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Secret Room', 'Sanctuary',
+     'Hyrule Dungeon Cellblock'],
+    ['Eastern Lobby', 'Eastern Boss'],
+    ['Desert Back Lobby', 'Desert Boss', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
+]
 
 
 desert_default_entrance_sets = [
