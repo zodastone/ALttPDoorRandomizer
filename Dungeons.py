@@ -171,10 +171,10 @@ hyrule_castle_regions = [
     'Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall',
     'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Dungeon Map Room',
     'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk', 'Hyrule Dungeon South Abyss',
-    'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory',
-    'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room',
-    'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Secret Room', 'Sewers Secret Room Blocked Path',
-    'Sewers Pull Switch', 'Sanctuary'
+    'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory Main',
+    'Hyrule Dungeon Armory North Branch', 'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock',
+    'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat',
+    'Sewers Secret Room', 'Sewers Secret Room Blocked Path', 'Sewers Pull Switch', 'Sanctuary'
 ]
 
 eastern_regions = [

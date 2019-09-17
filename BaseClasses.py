@@ -867,6 +867,7 @@ class Door(object):
         self.smallKey = False  # There's a small key door on this side
         self.bigKey = False  # There's a big key door on this side
         self.ugly = False  # Indicates that it can't be seen from the front (e.g. back of a big key door)
+        self.landing = False
 
     def getAddress(self):
         if self.type == DoorType.Normal:
@@ -908,21 +909,31 @@ class Sector(object):
 
     def __init__(self):
         self.regions = []
-        self.oustandings_doors = []
+        self.outstanding_doors = []
+        # todo: make these lazy init? - when do you invalidate them
 
     def polarity(self):
         polarity = [0, 0, 0]
-        for door in self.oustandings_doors:
-            idx, inc = pol_idx[door.direction]
-            polarity[idx] = pol_inc[inc](polarity[idx])
+        for door in self.outstanding_doors:
+            if not door.landing:
+                idx, inc = pol_idx[door.direction]
+                polarity[idx] = pol_inc[inc](polarity[idx])
         return polarity
 
     def magnitude(self):
         magnitude = [0, 0, 0]
-        for door in self.oustandings_doors:
-            idx, inc = pol_idx[door.direction]
-            magnitude[idx] = magnitude[idx] + 1
+        for door in self.outstanding_doors:
+            if not door.landing:
+                idx, inc = pol_idx[door.direction]
+                magnitude[idx] = magnitude[idx] + 1
         return magnitude
+
+    def outflow(self):
+        outflow = 0
+        for door in self.outstanding_doors:
+            if not door.blocked:
+                outflow = outflow + 1
+        return outflow
 
 
 class Boss(object):

@@ -11,8 +11,8 @@ def link_doors(world, player):
     for exitName, regionName in mandatory_connections:
         connect_simple_door(world, exitName, regionName, player)
     # These should all be connected for now as normal connections
-    for edge_a, edge_b in intratile_doors:
-        connect_intertile_door(world, edge_a, edge_b, player)
+    for edge_a, edge_b in interior_doors:
+        connect_two_way(world, edge_a, edge_b, player)
 
     # These connection are here because they are currently unable to be shuffled
     if world.doorShuffle not in ['basic', 'experimental']:  # these modes supports spirals
@@ -110,20 +110,6 @@ def connect_simple_door(world, exit_name, region_name, player):
         d.dest = region
 
 
-def connect_intertile_door(world, edge_1, edge_2, player):
-    ent_a = world.get_entrance(edge_1, player)
-    ent_b = world.get_entrance(edge_2, player)
-
-    # if these were already connected somewhere, remove the backreference
-    if ent_a.connected_region is not None:
-        ent_a.connected_region.entrances.remove(ent_a)
-    if ent_b.connected_region is not None:
-        ent_b.connected_region.entrances.remove(ent_b)
-
-    ent_a.connect(ent_b.parent_region)
-    ent_b.connect(ent_a.parent_region)
-
-
 def connect_two_way(world, entrancename, exitname, player):
     entrance = world.get_entrance(entrancename, player)
     ext = world.get_entrance(exitname, player)
@@ -134,7 +120,6 @@ def connect_two_way(world, entrancename, exitname, player):
     if ext.connected_region is not None:
         ext.connected_region.entrances.remove(ext)
 
-    # todo - access rules for the doors...
     entrance.connect(ext.parent_region)
     ext.connect(entrance.parent_region)
     if entrance.parent_region.dungeon:
@@ -237,7 +222,7 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
             available_doors.remove(connect_door)
         else:
             # If there's no available region with a door, use an internal connection
-            connect_door = find_compatible_door_in_list(world, door, available_doors, player)
+            connect_door = find_compatible_door_in_list(ugly_regions, world, door, available_doors, player)
             if connect_door is not None:
                 logger.info('  Adding loop via %s', connect_door.name)
                 maybe_connect_two_way(world, door, connect_door, player)
@@ -735,22 +720,23 @@ def experiment(world, player):
     hc = convert_to_sectors(hyrule_castle_regions, world, player)
     ep = convert_to_sectors(eastern_regions, world, player)
     dp = convert_to_sectors(desert_regions, world, player)
-    dungeon_sectors = [hc, ep, dp]
+    dungeon_sectors = [hc, ep]
+    dp_split = split_up_sectors(dp, desert_default_entrance_sets)
+    dungeon_sectors.extend(dp_split)
+
     for sector_list in dungeon_sectors:
         for sector in sector_list:
             for region in sector.regions:
                 print(region.name)
-            for door in sector.oustandings_doors:
+            for door in sector.outstanding_doors:
                 print(door.name)
             print('pol: ' + str(sector.polarity()))
             print('mag: ' + str(sector.magnitude()))
             print()
             print()
-    split_up_sectors(dp, desert_default_entrance_sets)
 
-    dungeon_region_lists = [hyrule_castle_regions, eastern_regions, desert_regions]
-    for region_list in dungeon_region_lists:
-        shuffle_dungeon_no_repeats(world, player, region_list)
+    for sector_list in dungeon_sectors:
+        shuffle_dungeon_no_repeats(world, player, sector_list)
     # for ent, ext in experimental_connections:
     #     if world.get_door(ent, player).blocked:
     #         connect_one_way(world, ext, ent, player)
@@ -792,7 +778,7 @@ def convert_to_sectors(region_names, world, player):
                     outstanding_doors.append(door)
         sector = Sector()
         sector.regions.extend(region_chunk)
-        sector.oustandings_doors.extend(outstanding_doors)
+        sector.outstanding_doors.extend(outstanding_doors)
         sectors.append(sector)
     return sectors
 
@@ -817,18 +803,17 @@ def split_up_sectors(sector_list, entrance_sets):
         print('mag:'+str(sum_vector(s_list, lambda s: s.magnitude())))
     print('pol:'+str(sum_vector(leftover_sectors, lambda s: s.polarity())))
     print('mag:'+str(sum_vector(leftover_sectors, lambda s: s.magnitude())))
-
-
+    assignment(new_sector_grid, leftover_sectors)
     return new_sector_grid
 
 
 def sum_vector(sector_list, func):
-    sum = [0, 0, 0]
+    result = [0, 0, 0]
     for sector in sector_list:
         vector = func(sector)
-        for i in range(len(sum)):
-            sum[i] = sum[i] + vector[i]
-    return sum
+        for i in range(len(result)):
+            result[i] = result[i] + vector[i]
+    return result
 
 
 # def add_vectors(vector_one, vector_two):
@@ -839,10 +824,10 @@ def sum_vector(sector_list, func):
 
 
 def is_polarity_neutral(polarity):
-    neutral = 0
     for value in polarity:
-        neutral = neutral + value
-    return neutral == 0
+        if value != 0:
+            return False
+    return True
 
 
 def is_proposal_valid(proposal, buckets, candidates):
@@ -850,9 +835,9 @@ def is_proposal_valid(proposal, buckets, candidates):
     for i in range(len(proposal)):
         if proposal[i] is -1:
             return False  # indicates an incomplete proposal
-    test_bucket = [[]]*len(buckets)
+    test_bucket = []
     for bucket_idx in range(len(buckets)):
-        test_bucket[bucket_idx].extend(buckets[bucket_idx])
+        test_bucket.append(list(buckets[bucket_idx]))
     for i in range(len(proposal)):
         test_bucket[proposal[i]].append(candidates[i])
     for test in test_bucket:
@@ -863,28 +848,41 @@ def is_proposal_valid(proposal, buckets, candidates):
 
 
 def assignment(buckets, candidates):
-    random.shuffle(buckets)
+    # for a faster search - instead of random - put the most likely culprits to cause problems at the end, least likely at the front
+    # unless we start checking for failures earlier in the algo
     random.shuffle(candidates)
     proposal = [-1]*len(candidates)
 
-    solution = next_proposal(proposal, buckets, candidates)
+    solution = find_proposal(proposal, buckets, candidates)
     if solution is None:
         raise Exception('Unable to find a proposal')
-    # todo: use solution to assign to buckets and candidates
-    # buckets =
+    for i in range(len(solution)):
+        buckets[solution[i]].append(candidates[i])
 
 
-def next_proposal(proposal, buckets, candidates):
-    if is_proposal_valid(proposal, buckets, candidates):
-        return proposal
+# this is a DFS search
+def find_proposal(proposal, buckets, candidates):
+    size = len(candidates)
+    combination_grid = []
+    for i in range(size):
+        combination_grid.append(list(range(len(buckets))))
+    # randomize which bucket
+    for possible_buckets in combination_grid:
+        random.shuffle(possible_buckets)
 
-    next_candidate_idx = proposal.index(-1)
-    for i in range(len(buckets)): # todo: this produces a weighted solution unfortunately, good for a mode called OneBigHappyDungeon in crossed, not good for a balanced, or random approach
-        proposal[next_candidate_idx] = i
-        found_proposal = next_proposal(proposal, buckets, candidates)
-        if found_proposal is not None:
-            return found_proposal
-    return None  # there was no valid assignment
+    idx = 0
+    while idx != size or not is_proposal_valid(proposal, buckets, candidates):
+        if idx == size:
+            idx = idx - 1
+            while len(combination_grid[idx]) == 0:
+                if idx == -1:  # this is the failure case - we shouldn't hit it
+                    return None
+                combination_grid[idx] = list(range(len(buckets)))
+                idx = idx - 1
+        proposal[idx] = combination_grid[idx].pop()
+        # can we detect a bad choice at this stage
+        idx = idx + 1
+    return proposal
 
 
 # code below is for an algorithm without restarts
@@ -898,23 +896,19 @@ def next_proposal(proposal, buckets, candidates):
 # Nuts, normal loop
 
 
-def shuffle_dungeon_no_repeats(world, player, dungeon_region_names):
+def shuffle_dungeon_no_repeats(world, player, available_sectors):
     logger = logging.getLogger('')
-    available_regions = []
-    for name in dungeon_region_names:
-        available_regions.append(world.get_region(name, player))
-    random.shuffle(available_regions)
+
+    random.shuffle(available_sectors)
 
     available_doors = []
     # this is interesting but I want to ensure connectedness
     # Except for Desert1/2 and Skull 1/2/3 - treat them as separate dungeons?
-    while len(available_regions) > 0:
+    while len(available_sectors) > 0:
         # Pick a random region and make its doors the open set
-        region = available_regions.pop()
-        logger.info("Starting in %s", region.name)
-        regions = find_connected_regions(region, available_regions, logger)
-        for region in regions:
-            available_doors.extend(get_doors_ex(world, region, player))
+        sector = available_sectors.pop()
+        current_sector = sector
+        available_doors.extend(sector.outstanding_doors)
 
         # Loop until all available doors are used
         while len(available_doors) > 0:
@@ -923,62 +917,75 @@ def shuffle_dungeon_no_repeats(world, player, dungeon_region_names):
             door = available_doors.pop()
             logger.info('Linking %s', door.name)
             # Find an available region that has a compatible door
-            connect_region, connect_door = find_compatible_door_in_regions_ex(world, door, available_regions, player)
-            if connect_region is not None:
-                logger.info('  Found new region %s via %s', connect_region.name, connect_door.name)
+            connect_sector, connect_door = find_compatible_door_in_sectors_ex(world, door, available_sectors, player)
+            if connect_sector is not None:
+                logger.info('  Found new sector via %s', connect_door.name)
+                if door not in current_sector.outstanding_doors:
+                    raise Exception('Door %s was not in sector', door.name)
+                # Check if valid
+                if not is_valid(door, connect_door, current_sector, connect_sector, len(available_sectors) == 1):
+                    logger.info(' Not Linking %s to %s', door.name, connect_door.name)
+                    available_doors.insert(0, door)
+                    continue
                 # Apply connection and add the new region's doors to the available list
                 maybe_connect_two_way(world, door, connect_door, player)
-                c_regions = find_connected_regions(connect_region, available_regions, logger)
-                for region in c_regions:
-                    available_doors.extend(get_doors_ex(world, region, player))
-                # We've used this region and door, so don't use them again
-                available_doors.remove(connect_door)
-                available_regions.remove(connect_region)
+                current_sector.outstanding_doors.remove(door)
+                connect_sector.outstanding_doors.remove(connect_door)
+                available_doors.extend(connect_sector.outstanding_doors)
+                available_sectors.remove(connect_sector)
+                current_sector.outstanding_doors.extend(connect_sector.outstanding_doors)
+                current_sector.regions.extend(connect_sector.regions)
             else:
                 # If there's no available region with a door, use an internal connection
-                connect_door = find_compatible_door_in_list(world, door, available_doors, player)
+                connect_door = find_compatible_door_in_list_old(world, door, available_doors, player)
                 if connect_door is not None:
                     logger.info('  Adding loop via %s', connect_door.name)
+                    if door not in current_sector.outstanding_doors:
+                        raise Exception('Door %s was not in sector', door.name)
+                    # Check if valid
+                    if not is_loop_valid(door, connect_door, current_sector):
+                        logger.info(' Not Linking %s to %s', door.name, connect_door.name)
+                        available_doors.insert(0, door)
+                        continue
                     maybe_connect_two_way(world, door, connect_door, player)
-                    available_doors.remove(connect_door)
+                    current_sector.outstanding_doors.remove(door)
+                    current_sector.outstanding_doors.remove(connect_door)
+                else:
+                    raise Exception ('Something has gone terribly wrong')
     # Check that we used everything, we failed otherwise
-    if len(available_regions) > 0 or len(available_doors) > 0:
+    if len(available_sectors) > 0 or len(available_doors) > 0:
         logger.warning('Failed to add all regions/doors to dungeon, generation will likely fail.')
 
 
-def find_connected_regions(region, available_regions, logger):
-    region_chunk = [region]
-    exits = []
-    exits.extend(region.exits)
-    while len(exits) > 0:
-        ext = exits.pop()
-        if ext.connected_region is not None:
-            connect_region = ext.connected_region
-            if connect_region not in region_chunk and connect_region in available_regions:
-                # door = world.check_for_door(ext.name, player)
-                # if door is None or door.type not in [DoorType.Normal, DoorType.SpiralStairs]:
-                logger.info('  Found new region %s via %s', connect_region.name, ext.name)
-                available_regions.remove(connect_region)
-                region_chunk.append(connect_region)
-                exits.extend(connect_region.exits)
-    return region_chunk
-
-
-def find_compatible_door_in_regions_ex(world, door, regions, player):
-    for region in regions:
-        for proposed_door in get_doors_ex(world, region, player):
+def find_compatible_door_in_sectors_ex(world, door, sectors, player):
+    for sector in sectors:
+        for proposed_door in sector.outstanding_doors:
             if doors_compatible(door, proposed_door):
-                return region, proposed_door
+                return sector, proposed_door
     return None, None
 
-def get_doors_ex(world, region, player):
-    res = []
-    for exit in region.exits:
-        door = world.check_for_door(exit.name, player)
-        if door is not None and door.type in [DoorType.Normal, DoorType.SpiralStairs]:
-            res.append(door)
-    return res
 
+def find_compatible_door_in_list_old(world, door, doors, player):
+    for proposed_door in doors:
+        if doors_compatible(door, proposed_door):
+            return proposed_door
+
+
+# todo: path checking needed?
+def is_valid(door_a, door_b, sector_a, sector_b, last_sector):
+    if last_sector:
+        return True
+    elif door_a.blocked and door_b.blocked:  # todo, I can't see this going well unless we are in loop generation...
+        return False
+    elif not door_a.blocked and not door_b.blocked:
+        return sector_a.outflow() + sector_b.outflow() - 2 > 0
+    elif door_a.blocked or door_b.blocked:
+        return sector_a.outflow() + sector_b.outflow() - 1 > 0
+    return False  # not sure how we got here, but it's a bad idea
+
+
+def is_loop_valid(door_a, door_b, sector):
+    return True  # todo: is this always true?
 
 
 # DATA GOES DOWN HERE

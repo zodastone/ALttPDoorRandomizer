@@ -103,9 +103,9 @@ def create_doors(world, player):
         create_dir_door(player, 'Eastern Courtyard EN', DoorType.Normal, Direction.East, 0xa9, Top, Low),
         big_key(create_dir_door(player, 'Eastern Courtyard N', DoorType.Normal, Direction.North, 0xa9, Mid, High)),
         create_door(player, 'Eastern Courtyard Potholes', DoorType.Hole),
-        create_door(player, 'Eastern Fairy Landing', DoorType.Hole),
+        landing(create_door(player, 'Eastern Fairy Landing', DoorType.Hole)),
         create_door(player, 'Eastern Fairies\' Warp', DoorType.Warp),
-        create_door(player, 'Eastern Courtyard Warp End', DoorType.Warp),
+        landing(create_door(player, 'Eastern Courtyard Warp End', DoorType.Warp)),
         create_dir_door(player, 'Eastern Map Valley WN', DoorType.Normal, Direction.West, 0xaa, Top, Low),
         create_dir_door(player, 'Eastern Map Valley SW', DoorType.Normal, Direction.South, 0xaa, Left, High),
         create_dir_door(player, 'Eastern Dark Square NW', DoorType.Normal, Direction.North, 0xba, Left, High),
@@ -225,4 +225,9 @@ def toggle(door):
 
 def blocked(door):
     door.blocked = True
+    return door
+
+
+def landing(door):
+    door.landing = True
     return door
