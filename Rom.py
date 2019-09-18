@@ -18,7 +18,7 @@ from EntranceShuffle import door_addresses
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '05390999d13b1c365bafcc17d2870fec'
+RANDOMIZERBASEHASH = '685febf25ec0aeef6df39e645f195521'
 
 
 class JsonRom(object):
@@ -1029,7 +1029,7 @@ def patch_rom(world, player, rom):
     # set rom name
     # 21 bytes
     from Main import __version__
-    rom.name = bytearray('ER_{0}_{1:09}\0'.format(__version__[0:7],world.seed), 'utf8')
+    rom.name = bytearray('DR_{0}_{1:09}\0'.format(__version__[0:7],world.seed), 'utf8')
     assert len(rom.name) <= 21
     rom.write_bytes(0x7FC0, rom.name)
 

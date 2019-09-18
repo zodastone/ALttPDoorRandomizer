@@ -23,8 +23,10 @@ SpiralWarp: {
     lda $00 : sta $a0
     ; shift quadrant if necessary
     lda $01 : and #$01 : !sub $a9
-    beq .skipXQuad
-    sta $06 : !add $a9 : sta $a9
+    bne .xQuad
+    lda $22 : bne .skipXQuad ; this is an edge case
+    dec $23 : bra .skipXQuad ; need to -1 if $22 is 0
+    .xQuad sta $06 : !add $a9 : sta $a9
     ldy #$00 : jsr ShiftQuadSimple
 
     .skipXQuad

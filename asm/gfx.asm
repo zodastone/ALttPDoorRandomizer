@@ -1,7 +1,7 @@
 GfxFixer:
 {
     lda $b1 : bne .stage2
-    jsl Dungeon_LoadRoom_RANDO ; let's only call this guy once - may fix star tiles and slower loads
+    jsl LoadRoomHook ; this is the rando version - let's only call this guy once - may fix star tiles and slower loads
     jsl Dungeon_InitStarTileCh
     jsl LoadTransAuxGfx
     ;jsl Dungeon_LoadCustomTileAttr

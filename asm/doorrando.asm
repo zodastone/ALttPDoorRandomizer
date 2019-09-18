@@ -60,8 +60,8 @@ PrepTransAuxGfx:
 ;Dungeon_LoadCustomTileAttr:
 ;org $01fec1
 ;Dungeon_ApproachFixedColor_variable:
-org $a0f432 ; Rando version -- needs to be after hooks and loadroom.asm I think?
-Dungeon_LoadRoom_RANDO:
+;org $a0f972 ; Rando version
+;LoadRoomHook:
 org $1bee74 ;(PC: 0dee74)
 Palette_DungBgMain:
 org $1bec77
