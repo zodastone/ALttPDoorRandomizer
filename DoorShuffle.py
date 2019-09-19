@@ -215,10 +215,12 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
             if connect_door.ugly:
                 next_ugly_region += 1
                 new_room_ugly_region = next_ugly_region
+            is_new_region = connect_region in available_regions
             # Add the doors
             for door in get_doors(world, connect_region, player):
                 ugly_regions[door.name] = new_room_ugly_region
-                available_doors.append(door)
+                if is_new_region:
+                    available_doors.append(door)
                 # If an ugly door is anything but the connect door, panic and die
                 if door != connect_door and door.ugly:
                     logger.info('Failed because of ugly door, trying again.')
@@ -226,15 +228,18 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
                     return
 
             # We've used this region and door, so don't use them again
-            available_regions.remove(connect_region)
-            available_doors.remove(connect_door)
+            if is_new_region:
+                available_regions.remove(connect_region)
+            if connect_door in available_doors:
+                available_doors.remove(connect_door)
         else:
             # If there's no available region with a door, use an internal connection
             connect_door = find_compatible_door_in_list(ugly_regions, world, door, available_doors, player)
             if connect_door is not None:
                 logger.info('  Adding loop via %s', connect_door.name)
                 maybe_connect_two_way(world, door, connect_door, player)
-                available_doors.remove(connect_door)
+                if connect_door in available_doors:
+                    available_doors.remove(connect_door)
     # Check that we used everything, and retry if we failed
     if len(available_regions) > 0 or len(available_doors) > 0:
         logger.info('Failed to add all regions to dungeon, trying again.')
@@ -263,6 +268,8 @@ def maybe_connect_two_way(world, a, b, player):
 
 # Finds a compatible door in regions, returns the region and door
 def find_compatible_door_in_regions(world, door, regions, player):
+    if door.type in [DoorType.Hole, DoorType.Warp, DoorType.Logical]:
+        return door.dest, door
     for region in regions:
         for proposed_door in get_doors(world, region, player):
             if doors_compatible(door, proposed_door):
@@ -270,6 +277,8 @@ def find_compatible_door_in_regions(world, door, regions, player):
     return None, None
 
 def find_compatible_door_in_list(ugly_regions, world, door, doors, player):
+    if door.type in [DoorType.Hole, DoorType.Warp, DoorType.Logical]:
+        return door
     for proposed_door in doors:
         if ugly_regions[door.name] != ugly_regions[proposed_door.name]:
             continue
@@ -293,14 +302,12 @@ def doors_compatible(a, b):
         return doors_fit_mandatory_pair(open_edges, a, b)
     if a.type == DoorType.StraightStairs:
         return doors_fit_mandatory_pair(straight_staircases, a, b)
-    if a.type == DoorType.Hole:
-        return doors_fit_mandatory_pair(falldown_pits_as_doors, a, b)
-    if a.type == DoorType.Warp:
-        return doors_fit_mandatory_pair(dungeon_warps_as_doors, a, b)
     if a.type == DoorType.Interior:
         return doors_fit_mandatory_pair(interior_doors, a, b)
     if a.type == DoorType.Normal and (a.smallKey or b.smallKey or a.bigKey or b.bigKey):
         return doors_fit_mandatory_pair(key_doors, a, b)
+    if a.type in [DoorType.Hole, DoorType.Warp, DoorType.Logical]:
+        return False  # these aren't compatible with anything
     return a.direction == switch_dir(b.direction)
 
 
@@ -712,14 +719,10 @@ falldown_pits = [
     ('Hera Boss Inner Hole', 'Hera 4F'),
 ]
 
-falldown_pits_as_doors = [('Eastern Courtyard Potholes', 'Eastern Fairy Landing')]
-
 dungeon_warps = [
     ('Eastern Fairies\' Warp', 'Eastern Courtyard'),
     ('Hera Fairies\' Warp', 'Hera 5F')
 ]
-
-dungeon_warps_as_doors = [('Eastern Fairies\' Warp', 'Eastern Courtyard Warp End')]
 
 interior_doors = [
     ('Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Armory Interior Key Door N'),
