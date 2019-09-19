@@ -40,11 +40,18 @@ SpiralWarp: {
     lda $01 : and #$08 : lsr #2 : sta $0492 ;fix from layer calc 0->0 2->1
     ; shift lower coordinates
     lda $02 : sta $22 : bne .adjY : inc $23
-    .adjY lda $03 : sta $20 : bne .set53 : inc $21
-    .set53 ldx #$08
+    .adjY lda $03 : sta $20 : bne .upDownAdj : inc $21
+    .upDownAdj ldx #$08
     lda $0462 : and #$04 : beq .upStairs
     ldx #$fd
+    lda $01 : and #$80 : bne .set53
+    ; if target is also down adjust by (6,-15)
+    lda #$06 : !add $20 : sta $20 : lda #$eb : !add $22 : sta $22 : bra .set53
     .upStairs
+    lda $01 : and #$80 : beq .set53
+    ; if target is also up adjust by (-6, 14)
+    lda #$fa : !add $20 : sta $20 : lda #$14 : !add $22 : sta $22
+    .set53
     txa : !add $22 : sta $53
 
     lda $01 : and #$10 : sta $07 ; zeroHzCam check

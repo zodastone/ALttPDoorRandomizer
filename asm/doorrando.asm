@@ -71,6 +71,7 @@ Palette_SpriteAux2:
 org $1bece4
 Palette_SpriteAux1:
 
+incsrc keydoors.asm
 ;Kill big key (1e) check for south doors - not that easy unfortunately
 ;org $1aa90
 ;nop #5

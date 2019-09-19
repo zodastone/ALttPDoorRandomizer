@@ -883,6 +883,7 @@ class Door(object):
             bitmask = int(self.layer) << 2
             bitmask += 0x10 * int(self.zeroHzCam)
             bitmask += 0x20 * int(self.zeroVtCam)
+            bitmask += 0x80 if self.direction == Direction.Up else 0
             return [self.roomIndex, bitmask + self.quadrant, self.shiftX, self.shiftY]
 
 
