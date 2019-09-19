@@ -894,17 +894,6 @@ class Door(object):
         return '%s' % self.name
 
 
-class RegionChunk(object):
-
-    def __init__(self):
-        self.regions = []
-        self.outflow = 0
-        self.paths_needed = []
-        self.chests = 0
-        self.entrance = False
-        self.unlinked_doors = set([])
-
-
 class Sector(object):
 
     def __init__(self):

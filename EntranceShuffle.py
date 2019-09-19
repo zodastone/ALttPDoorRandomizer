@@ -2867,8 +2867,6 @@ mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia Central 
                          ('Death Mountain (Top)', 'Death Mountain (Top)'),
                          ('Death Mountain Drop', 'Death Mountain'),
                          ('Spectacle Rock Drop', 'Death Mountain (Top)'),
-                         ('Tower of Hera Small Key Door', 'Tower of Hera (Basement)'),
-                         ('Tower of Hera Big Key Door', 'Tower of Hera (Top)'),
 
                          ('Top of Pyramid', 'East Dark World'),
                          ('Dark Lake Hylia Drop (East)', 'Dark Lake Hylia'),
@@ -3034,8 +3032,6 @@ inverted_mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia
                                   ('East Death Mountain (Top)', 'East Death Mountain (Top)'),
                                   ('Death Mountain (Top)', 'Death Mountain (Top)'),
                                   ('Death Mountain Drop', 'Death Mountain'),
-                                  ('Tower of Hera Small Key Door', 'Tower of Hera (Basement)'),
-                                  ('Tower of Hera Big Key Door', 'Tower of Hera (Top)'),
                                   ('Dark Lake Hylia Drop (East)', 'Dark Lake Hylia'),
                                   ('Dark Lake Hylia Drop (South)', 'Dark Lake Hylia'),
                                   ('Dark Lake Hylia Teleporter', 'Dark Lake Hylia'),
@@ -3522,7 +3518,7 @@ default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert Main L
 
                                ('Eastern Palace', 'Eastern Lobby'),
                                ('Eastern Palace Exit', 'Light World'),
-                               ('Tower of Hera', 'Tower of Hera (Bottom)'),
+                               ('Tower of Hera', 'Hera Lobby'),
                                ('Tower of Hera Exit', 'Death Mountain (Top)'),
 
                                ('Hyrule Castle Entrance (South)', 'Hyrule Castle Lobby'),

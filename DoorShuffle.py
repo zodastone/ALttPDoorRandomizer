@@ -2,13 +2,13 @@ import random
 import collections
 import logging
 
-from BaseClasses import RegionType, DoorType, Direction, RegionChunk, Sector, pol_idx
-from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions
+from BaseClasses import RegionType, DoorType, Direction, Sector, pol_idx
+from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions
 
 def link_doors(world, player):
 
     # Drop-down connections & push blocks
-    for exitName, regionName in mandatory_connections:
+    for exitName, regionName in logical_connections:
         connect_simple_door(world, exitName, regionName, player)
     # These should all be connected for now as normal connections
     for edge_a, edge_b in interior_doors:
@@ -71,7 +71,7 @@ def create_door_spoiler(world, player):
         if door_a.type in [DoorType.Normal, DoorType.SpiralStairs]:
             door_b = door_a.dest
             if door_b is not None:
-                logger.info('spoiler: %s connected to %s', door_a.name, door_b.name)
+                logger.debug('spoiler: %s connected to %s', door_a.name, door_b.name)
                 if not door_a.blocked and not door_b.blocked:
                     world.spoiler.set_door(door_a.name, door_b.name, 'both', player)
                 elif door_a.blocked:
@@ -83,21 +83,23 @@ def create_door_spoiler(world, player):
                 if door_b in queue:
                     queue.remove(door_b)
                 else:
-                    logger.info('Door not found in queue: %s connected to %s', door_b.name, door_a.name)
+                    logger.debug('Door not found in queue: %s connected to %s', door_b.name, door_a.name)
             else:
-                logger.info('Door not connected: %s', door_a.name)
+                logger.warning('Door not connected: %s', door_a.name)
 
 
 # some useful functions
+oppositemap = {
+    Direction.South: Direction.North,
+    Direction.North: Direction.South,
+    Direction.West: Direction.East,
+    Direction.East: Direction.West,
+    Direction.Up: Direction.Down,
+    Direction.Down: Direction.Up,
+}
+
+
 def switch_dir(direction):
-    oppositemap = {
-        Direction.South: Direction.North,
-        Direction.North: Direction.South,
-        Direction.West: Direction.East,
-        Direction.East: Direction.West,
-        Direction.Up: Direction.Down,
-        Direction.Down: Direction.Up,
-    }
     return oppositemap[direction]
 
 
@@ -154,14 +156,16 @@ def connect_one_way(world, entrancename, exitname, player):
 
 def within_dungeon(world, player):
     # TODO: The "starts" regions need access logic
-    # Aerinon's note: I think this is handled already by ER Rules
+    # Aerinon's note: I think this is handled already by ER Rules - may need to check correct requirements
     dungeon_region_starts_es = ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Secret Room']
     dungeon_region_starts_ep = ['Eastern Lobby']
     dungeon_region_starts_dp = ['Desert Back Lobby', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
+    dungeon_region_starts_th = ['Hera Lobby']
     dungeon_region_lists = [
         (dungeon_region_starts_es, hyrule_castle_regions),
         (dungeon_region_starts_ep, eastern_regions),
-        (dungeon_region_starts_dp, desert_regions)
+        (dungeon_region_starts_dp, desert_regions),
+        (dungeon_region_starts_th, hera_regions)
     ]
     for start_list, region_list in dungeon_region_lists:
         shuffle_dungeon(world, player, start_list, region_list)
@@ -320,7 +324,8 @@ def cross_dungeon(world, player):
     hc = convert_to_sectors(hyrule_castle_regions, world, player)
     ep = convert_to_sectors(eastern_regions, world, player)
     dp = convert_to_sectors(desert_regions, world, player)
-    world_split = split_up_sectors(hc + ep + dp, default_dungeon_sets)
+    th = convert_to_sectors(hera_regions, world, player)
+    world_split = split_up_sectors(hc + ep + dp + th, default_dungeon_sets)
     dp_split = split_up_sectors(world_split.pop(2), desert_default_entrance_sets)
     world_split.extend(dp_split)
     # todo - adjust dungeon item pools
@@ -332,7 +337,8 @@ def experiment(world, player):
     hc = convert_to_sectors(hyrule_castle_regions, world, player)
     ep = convert_to_sectors(eastern_regions, world, player)
     dp = convert_to_sectors(desert_regions, world, player)
-    dungeon_sectors = [hc, ep]
+    th = convert_to_sectors(hera_regions, world, player)
+    dungeon_sectors = [hc, ep, th]
     dp_split = split_up_sectors(dp, desert_default_entrance_sets)
     dungeon_sectors.extend(dp_split)
     for sector_list in dungeon_sectors:
@@ -461,11 +467,10 @@ def find_proposal_monte_carlo(proposal, buckets, candidates):
     collisions = 0
 
     while collisions < 10000:
+        hash = ''
         for i in range(n):
             proposal[i] = random.randrange(k)
-        hash = ''
-        for value in proposal:
-            hash = hash + str(value)
+            hash = hash + str(proposal[i])
         if hash not in hashes:
             collisions = 0
             if is_proposal_valid(proposal, buckets, candidates):
@@ -650,34 +655,12 @@ def are_there_outstanding_doors_of_type(door_a, door_b, sector_a, sector_b, avai
 
 # DATA GOES DOWN HERE
 
-mandatory_connections = [
+logical_connections = [
     ('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
     ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path'),
-    ('Eastern Hint Tile Push Block', 'Eastern Compass Area')
+    ('Eastern Hint Tile Push Block', 'Eastern Compass Area'),
+    ('Hera Big Chest Landing Exit', 'Hera 4F')
 ]
-
-# todo: these path rules are more complicated I think...
-#  there may be a better way to do them if we randomize dungeon entrances
-dungeon_paths = {
-    'Hyrule Castle': [('Hyrule Castle Lobby', 'Hyrule Castle West Lobby'),
-                      ('Hyrule Castle Lobby', 'Hyrule Castle East Lobby'),
-                      ('Hyrule Castle Lobby', 'Hyrule Dungeon Cellblock'),  # just for standard mode?
-                      ('Hyrule Dungeon Cellblock', 'Sanctuary')],  # again, standard mode?
-    'Eastern Palace': [('Eastern Lobby', 'Eastern Boss')],
-    'Desert Palace': [('Desert Main Lobby', 'Desert West Lobby'),
-                      ('Desert Main Lobby', 'Desert East Lobby'),
-                      ('Desert Back Lobby', 'Desert Boss')],  # or Desert Main Lobby to Desert Boss would be fine I guess
-    'Tower of Hera': [],
-    'Agahnims Tower': [],
-    'Palace of Darkness': [],
-    'Thieves Town': [],
-    'Skull Woods': [],
-    'Swamp Palace': [],
-    'Ice Palace': [],
-    'Misery Mire': [],
-    'Turtle Rock': [],
-    'Ganons Tower': []
-}
 
 spiral_staircases = [
     ('Hyrule Castle Back Hall Down Stairs', 'Hyrule Dungeon Map Room Up Stairs'),
@@ -686,7 +669,13 @@ spiral_staircases = [
     ('Sewers Behind Tapestry Down Stairs', 'Sewers Rope Room Up Stairs'),
     ('Sewers Secret Room Up Stairs', 'Sewers Pull Switch Down Stairs'),
     ('Eastern Darkness Up Stairs', 'Eastern Attic Start Down Stairs'),
-    ('Desert Tiles 1 Up Stairs', 'Desert Bridge Down Stairs')
+    ('Desert Tiles 1 Up Stairs', 'Desert Bridge Down Stairs'),
+    ('Hera Lobby Down Stairs', 'Hera Basement Cage Up Stairs'),
+    ('Hera Lobby Key Stairs', 'Hera Tile Room Up Stairs'),
+    ('Hera Lobby Up Stairs', 'Hera Beetles Down Stairs'),
+    ('Hera Startile Wide Up Stairs', 'Hera 4F Down Stairs'),
+    ('Hera 4F Up Stairs', 'Hera 5F Down Stairs'),
+    ('Hera 5F Up Stairs', 'Hera Boss Down Stairs'),
 ]
 
 straight_staircases = [
@@ -709,10 +698,27 @@ open_edges = [
     ('Desert Sandworm Corner E Edge', 'Desert West Wing N Edge')
 ]
 
-falldown_pits = [('Eastern Courtyard Potholes', 'Eastern Fairies')]
+falldown_pits = [
+    ('Eastern Courtyard Potholes', 'Eastern Fairies'),
+    ('Hera Beetles Holes', 'Hera Lobby'),
+    ('Hera Startile Corner Holes', 'Hera Lobby'),
+    ('Hera Startile Wide Holes', 'Hera Lobby'),
+    ('Hera 4F Holes', 'Hera Lobby'),  # failed bomb jump
+    ('Hera Big Chest Landing Holes', 'Hera Startile Wide'),  # the other holes near big chest
+    ('Hera 5F Star Hole', 'Hera Big Chest Landing'),
+    ('Hera 5F Pothole Chain', 'Hera Fairies'),
+    ('Hera 5F Normal Holes', 'Hera 4F'),
+    ('Hera Boss Outer Hole', 'Hera 5F'),
+    ('Hera Boss Inner Hole', 'Hera 4F'),
+]
+
 falldown_pits_as_doors = [('Eastern Courtyard Potholes', 'Eastern Fairy Landing')]
 
-dungeon_warps = [('Eastern Fairies\' Warp', 'Eastern Courtyard')]
+dungeon_warps = [
+    ('Eastern Fairies\' Warp', 'Eastern Courtyard'),
+    ('Hera Fairies\' Warp', 'Hera 5F')
+]
+
 dungeon_warps_as_doors = [('Eastern Fairies\' Warp', 'Eastern Courtyard Warp End')]
 
 interior_doors = [
@@ -730,6 +736,10 @@ interior_doors = [
     ('Desert Bridge SW', 'Desert Four Statues NW'),
     ('Desert Four Statues ES', 'Desert Beamos Hall WS',),
     ('Desert Tiles 2 NE', 'Desert Wall Slide SE'),
+    ('Hera Tile Room EN', 'Hera Tridorm WN'),
+    ('Hera Tridorm SE', 'Hera Torches NE'),
+    ('Hera Beetles WS', 'Hera Startile Corner ES'),
+    ('Hera Startile Corner NW', 'Hera Startile Wide SW'),
 ]
 
 key_doors = [
@@ -743,7 +753,9 @@ key_doors = [
     ('Desert Tiles 1 Up Stairs', 'Desert Bridge Down Stairs'),
     ('Desert Beamos Hall NE', 'Desert Tiles 2 SE'),
     ('Desert Tiles 2 NE', 'Desert Wall Slide SE'),
-    ('Desert Wall Slide NW', 'Desert Boss SW')
+    ('Desert Wall Slide NW', 'Desert Boss SW'),
+    ('Hera Lobby Key Stairs', 'Hera Tile Room Up Stairs'),
+    ('Hera Startile Corner NW', 'Hera Startile Wide SW'),
 ]
 
 default_door_connections = [
@@ -783,51 +795,36 @@ default_one_way_connections = [
     ('Desert Wall Slide NW', 'Desert Boss SW')
 ]
 
-experimental_connections = [('Eastern Boss SE', 'Eastern Eyegores NE'),
-                            ('Eastern Eyegores ES', 'Eastern Map Valley WN'),
-                            ('Eastern Lobby N', 'Eastern Courtyard Ledge S'),
-                            ('Eastern Big Key EN', 'Eastern Courtyard Ledge W'),
-                            ('Eastern Big Key NE', 'Eastern Compass Area SW'),
-                            ('Eastern Compass Area EN', 'Eastern Courtyard WN'),
-                            ('Eastern Courtyard N', 'Eastern Map Valley SW'),
-                            ('Eastern Courtyard EN', 'Eastern Map Area W'),
-
-
-                            ('Hyrule Castle Lobby W', 'Hyrule Castle Back Hall E'),
-                            ('Hyrule Castle Throne Room N', 'Sewers Behind Tapestry S'),
-                            ('Hyrule Castle Lobby WN', 'Hyrule Castle West Lobby EN'),
-                            ('Hyrule Castle West Lobby N', 'Eastern Cannonball S'),
-
-                            ('Hyrule Castle Lobby E', 'Sewers Water W'),
-                            ('Sewers Dark Cross Key Door S', 'Sanctuary N')]
-
-# experimental_connections = [('Eastern Boss SE', 'Eastern Courtyard N'),
-#                             ('Eastern Courtyard EN', 'Eastern Attic Switches WS'),
-#                             ('Eastern Lobby N', 'Eastern Darkness S'),
-#                             ('Eastern Courtyard WN', 'Eastern Compass Area E'),
-#                             ('Eastern Attic Switches ES', 'Eastern Cannonball Ledge WN'),
-#                             ('Eastern Compass Area EN', 'Hyrule Castle Back Hall W'),
-#                             ('Hyrule Castle Back Hall E', 'Eastern Map Area W'),
-#                             ('Eastern Attic Start WS', 'Eastern Cannonball Ledge Key Door EN'),
-#                             ('Eastern Compass Area SW', 'Hyrule Dungeon Guardroom N'),
-#                             ('Hyrule Castle East Lobby NW', 'Hyrule Castle East Hall SW'),
-#                             ('Hyrule Castle East Lobby N', 'Eastern Courtyard Ledge S'),
-#                             ('Hyrule Castle Lobby E', 'Eastern Courtyard Ledge W'),
-#                             ('Hyrule Castle Lobby WN', 'Eastern Courtyard Ledge E'),
-#                             ('Hyrule Castle West Lobby EN', 'Hyrule Castle East Lobby W'),
-#                             ('Hyrule Castle Throne Room N', 'Hyrule Castle East Hall S'),
-#                             ('Hyrule Castle West Lobby E', 'Hyrule Castle East Hall W'),
-#                             ('Hyrule Castle West Lobby N', 'Hyrule Dungeon Armory S'),
-#                             ('Hyrule Castle Lobby W', 'Hyrule Castle West Hall E'),
-#                             ('Hyrule Castle West Hall S', 'Sanctuary N')]
-
+# todo: these path rules are more complicated I think...
+#  there may be a better way to do them if we randomize dungeon entrances
+dungeon_paths = {
+    'Hyrule Castle': [('Hyrule Castle Lobby', 'Hyrule Castle West Lobby'),
+                      ('Hyrule Castle Lobby', 'Hyrule Castle East Lobby'),
+                      ('Hyrule Castle Lobby', 'Hyrule Dungeon Cellblock'),  # just for standard mode?
+                      ('Hyrule Dungeon Cellblock', 'Sanctuary')],  # again, standard mode?
+    'Eastern Palace': [('Eastern Lobby', 'Eastern Boss')],
+    'Desert Palace': [('Desert Main Lobby', 'Desert West Lobby'),
+                      ('Desert Main Lobby', 'Desert East Lobby'),
+                      ('Desert Back Lobby', 'Desert Boss')],  # or Desert Main Lobby to Desert Boss would be fine I guess
+    'Tower of Hera': [],
+    'Agahnims Tower': [],
+    'Palace of Darkness': [],
+    'Thieves Town': [],
+    'Skull Woods': [],
+    'Swamp Palace': [],
+    'Ice Palace': [],
+    'Misery Mire': [],
+    'Turtle Rock': [],
+    'Ganons Tower': []
+}
 
 # For crossed
 default_dungeon_sets = [
     ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Secret Room', 'Sanctuary',
      'Hyrule Dungeon Cellblock'],
     ['Eastern Lobby', 'Eastern Boss'],
-    ['Desert Back Lobby', 'Desert Boss', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
+    ['Desert Back Lobby', 'Desert Boss', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby'],
+    ['Hera Lobby', 'Hera Boss']
 ]
 
 

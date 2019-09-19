@@ -134,9 +134,6 @@ def create_regions(world, player):
         create_lw_region(player, 'Fairy Ascension Ledge', None, ['Fairy Ascension Ledge Drop', 'Fairy Ascension Cave (Top)']),
         create_lw_region(player, 'Death Mountain (Top)', ['Ether Tablet'], ['East Death Mountain (Top)', 'Tower of Hera', 'Death Mountain Drop']),
         create_lw_region(player, 'Spectacle Rock', ['Spectacle Rock'], ['Spectacle Rock Drop']),
-        create_dungeon_region(player, 'Tower of Hera (Bottom)', 'Tower of Hera', ['Tower of Hera - Basement Cage', 'Tower of Hera - Map Chest'], ['Tower of Hera Small Key Door', 'Tower of Hera Big Key Door', 'Tower of Hera Exit']),
-        create_dungeon_region(player, 'Tower of Hera (Basement)', 'Tower of Hera', ['Tower of Hera - Big Key Chest']),
-        create_dungeon_region(player, 'Tower of Hera (Top)', 'Tower of Hera', ['Tower of Hera - Compass Chest', 'Tower of Hera - Big Chest', 'Tower of Hera - Boss', 'Tower of Hera - Prize']),
 
         create_dw_region(player, 'East Dark World', ['Pyramid'], ['Pyramid Fairy', 'South Dark World Bridge', 'Palace of Darkness', 'Dark Lake Hylia Drop (East)', 'Dark Lake Hylia Teleporter',
                                                            'Hyrule Castle Ledge Mirror Spot', 'Dark Lake Hylia Fairy', 'Palace of Darkness Hint', 'East Dark World Hint', 'Pyramid Hole', 'Northeast Dark World Broken Bridge Pass']),
@@ -361,6 +358,23 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Desert Wall Slide', 'Desert Palace', None, ['Desert Wall Slide SE', 'Desert Wall Slide NW']),
         create_dungeon_region(player, 'Desert Boss', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize'], ['Desert Boss SW']),
 
+        # Hera
+        create_dungeon_region(player, 'Hera Lobby', 'Tower of Hera', ['Tower of Hera - Map Chest'], ['Hera Lobby Down Stairs', 'Hera Lobby Key Stairs', 'Hera Lobby Up Stairs', 'Tower of Hera Exit']),
+        create_dungeon_region(player, 'Hera Basement Cage', 'Tower of Hera', ['Tower of Hera - Basement Cage'], ['Hera Basement Cage Up Stairs']),
+        create_dungeon_region(player, 'Hera Tile Room', 'Tower of Hera', None, ['Hera Tile Room Up Stairs', 'Hera Tile Room EN']),
+        create_dungeon_region(player, 'Hera Tridorm', 'Tower of Hera', None, ['Hera Tridorm WN', 'Hera Tridorm SE']),
+        create_dungeon_region(player, 'Hera Torches', 'Tower of Hera', ['Tower of Hera - Big Key Chest'], ['Hera Torches NE']),
+        create_dungeon_region(player, 'Hera Beetles', 'Tower of Hera', None, ['Hera Beetles Down Stairs', 'Hera Beetles WS', 'Hera Beetles Holes']),
+        create_dungeon_region(player, 'Hera Startile Corner', 'Tower of Hera', None, ['Hera Startile Corner ES', 'Hera Startile Corner NW', 'Hera Startile Corner Holes']),
+        create_dungeon_region(player, 'Hera Startile Wide', 'Tower of Hera', None, ['Hera Startile Wide SW', 'Hera Startile Wide Up Stairs', 'Hera Startile Wide Holes']),
+        create_dungeon_region(player, 'Hera 4F', 'Tower of Hera', ['Tower of Hera - Compass Chest'], ['Hera 4F Down Stairs', 'Hera 4F Up Stairs', 'Hera 4F Holes']),
+        create_dungeon_region(player, 'Hera Big Chest Landing', 'Tower of Hera', ['Tower of Hera - Big Chest'], ['Hera Big Chest Landing Exit', 'Hera Big Chest Landing Holes']),
+        create_dungeon_region(player, 'Hera 5F', 'Tower of Hera', None, ['Hera 5F Down Stairs', 'Hera 5F Up Stairs', 'Hera 5F Star Hole', 'Hera 5F Pothole Chain', 'Hera 5F Normal Holes']),
+        create_dungeon_region(player, 'Hera Fairies', 'Tower of Hera', None, ['Hera Fairies\' Warp']),
+        create_dungeon_region(player, 'Hera Boss', 'Tower of Hera', ['Tower of Hera - Boss', 'Tower of Hera - Prize'], ['Hera Boss Down Stairs', 'Hera Boss Outer Hole', 'Hera Boss Inner Hole']),
+
+        # AgaTower
+
         # pod
         # tt
         # swamp
@@ -370,8 +384,7 @@ def create_regions(world, player):
         # gt
         # sw
 
-        # hera
-        # AgaTower
+
     ]
 
     for region_name, (room_id, shopkeeper, replaceable) in shop_table.items():
