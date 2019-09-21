@@ -30,7 +30,7 @@ def create_dungeons(world, player):
     TR = make_dungeon('Turtle Rock', 'Trinexx', ['Turtle Rock (Entrance)', 'Turtle Rock (First Section)', 'Turtle Rock (Chain Chomp Room)', 'Turtle Rock (Second Section)', 'Turtle Rock (Big Chest)', 'Turtle Rock (Crystaroller Room)', 'Turtle Rock (Dark Room)', 'Turtle Rock (Eye Bridge)', 'Turtle Rock (Trinexx)'], ItemFactory('Big Key (Turtle Rock)', player), ItemFactory(['Small Key (Turtle Rock)'] * 4, player), ItemFactory(['Map (Turtle Rock)', 'Compass (Turtle Rock)'], player))
 
     if world.mode != 'inverted':
-        AT = make_dungeon('Agahnims Tower', 'Agahnim', ['Agahnims Tower', 'Agahnim 1'], None, ItemFactory(['Small Key (Agahnims Tower)'] * 2, player), [])
+        AT = make_dungeon('Agahnims Tower', 'Agahnim', tower_regions, None, ItemFactory(['Small Key (Agahnims Tower)'] * 2, player), [])
         GT = make_dungeon('Ganons Tower', 'Agahnim2', ['Ganons Tower (Entrance)', 'Ganons Tower (Tile Room)', 'Ganons Tower (Compass Room)', 'Ganons Tower (Hookshot Room)', 'Ganons Tower (Map Room)', 'Ganons Tower (Firesnake Room)', 'Ganons Tower (Teleport Room)', 'Ganons Tower (Bottom)', 'Ganons Tower (Top)', 'Ganons Tower (Before Moldorm)', 'Ganons Tower (Moldorm)', 'Agahnim 2'], ItemFactory('Big Key (Ganons Tower)', player), ItemFactory(['Small Key (Ganons Tower)'] * 4, player), ItemFactory(['Map (Ganons Tower)', 'Compass (Ganons Tower)'], player))
     else:
         AT = make_dungeon('Inverted Agahnims Tower', 'Agahnim', ['Inverted Agahnims Tower', 'Agahnim 1'], None, ItemFactory(['Small Key (Agahnims Tower)'] * 2, player), [])
@@ -197,3 +197,26 @@ hera_regions = [
     'Hera Startile Corner', 'Hera Startile Wide', 'Hera 4F', 'Hera Big Chest Landing', 'Hera 5F',
     'Hera Fairies', 'Hera Boss'
 ]
+
+tower_regions = [
+    'Tower Lobby', 'Tower Gold Knights', 'Tower Room 03', 'Tower Lone Statue', 'Tower Dark Maze', 'Tower Dark Chargers',
+    'Tower Dual Statues', 'Tower Dark Pits', 'Tower Dark Archers', 'Tower Red Spears', 'Tower Red Guards',
+    'Tower Circle of Pots', 'Tower Pacifist Run', 'Tower Push Statue', 'Tower Catwalk', 'Tower Antechamber',
+    'Tower Altar', 'Tower Agahnim 1'
+]
+
+dungeon_regions = {
+    'Hyrule Castle': hyrule_castle_regions,
+    'Eastern': eastern_regions,
+    'Desert': desert_regions,
+    'Hera': hera_regions,
+    'Tower': tower_regions,
+    # 'PoD':
+    # 'Swamp':
+    # 'Skull':
+    # 'TT':
+    # 'Ice':
+    # 'Mire':
+    # 'TR':
+    # 'GT':
+}

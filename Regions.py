@@ -99,8 +99,7 @@ def create_regions(world, player):
         create_lw_region(player, 'Hyrule Castle Courtyard', None, ['Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Entrance (South)']),
         create_lw_region(player, 'Hyrule Castle Ledge', None, ['Hyrule Castle Entrance (East)', 'Hyrule Castle Entrance (West)', 'Agahnims Tower', 'Hyrule Castle Ledge Courtyard Drop']),
         create_dungeon_region(player, 'Sewer Drop', 'a drop\'s exit', None, ['Sewer Drop']),  # This exists only to be referenced for access checks
-        create_dungeon_region(player, 'Agahnims Tower', 'Castle Tower', ['Castle Tower - Room 03', 'Castle Tower - Dark Maze'], ['Agahnim 1', 'Agahnims Tower Exit']),
-        create_dungeon_region(player, 'Agahnim 1', 'Castle Tower', ['Agahnim 1'], None),
+
         create_cave_region(player, 'Old Man Cave', 'a connector', ['Old Man'], ['Old Man Cave Exit (East)', 'Old Man Cave Exit (West)']),
         create_cave_region(player, 'Old Man House', 'a connector', None, ['Old Man House Exit (Bottom)', 'Old Man House Front to Back']),
         create_cave_region(player, 'Old Man House Back', 'a connector', None, ['Old Man House Exit (Top)', 'Old Man House Back to Front']),
@@ -374,6 +373,24 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Hera Boss', 'Tower of Hera', ['Tower of Hera - Boss', 'Tower of Hera - Prize'], ['Hera Boss Down Stairs', 'Hera Boss Outer Hole', 'Hera Boss Inner Hole']),
 
         # AgaTower
+        create_dungeon_region(player, 'Tower Lobby', 'Castle Tower', None, ['Tower Lobby NW', 'Agahnims Tower Exit']),
+        create_dungeon_region(player, 'Tower Gold Knights', 'Castle Tower', None, ['Tower Gold Knights SW', 'Tower Gold Knights EN']),
+        create_dungeon_region(player, 'Tower Room 03', 'Castle Tower', ['Castle Tower - Room 03'], ['Tower Room 03 WN', 'Tower Room 03 Up Stairs']),
+        create_dungeon_region(player, 'Tower Lone Statue', 'Castle Tower', None, ['Tower Lone Statue Down Stairs', 'Tower Lone Statue WN']),
+        create_dungeon_region(player, 'Tower Dark Maze', 'Castle Tower', ['Castle Tower - Dark Maze'], ['Tower Dark Maze EN', 'Tower Dark Maze ES']),
+        create_dungeon_region(player, 'Tower Dark Chargers', 'Castle Tower', None, ['Tower Dark Chargers WS', 'Tower Dark Chargers Up Stairs']),
+        create_dungeon_region(player, 'Tower Dual Statues', 'Castle Tower', None, ['Tower Dual Statues Down Stairs', 'Tower Dual Statues WS']),
+        create_dungeon_region(player, 'Tower Dark Pits', 'Castle Tower', None, ['Tower Dark Pits ES', 'Tower Dark Pits EN']),
+        create_dungeon_region(player, 'Tower Dark Archers', 'Castle Tower', ['Castle Tower - Dark Archer Key Drop'], ['Tower Dark Archers WS', 'Tower Dark Archers Up Stairs']),
+        create_dungeon_region(player, 'Tower Red Spears', 'Castle Tower', None, ['Tower Red Spears Down Stairs', 'Tower Red Spears WN']),
+        create_dungeon_region(player, 'Tower Red Guards', 'Castle Tower', None, ['Tower Red Guards EN', 'Tower Red Guards SW']),
+        create_dungeon_region(player, 'Tower Circle of Pots', 'Castle Tower', ['Castle Tower - Circle of Pots Key Drop'], ['Tower Circle of Pots NW', 'Tower Circle of Pots WS']),
+        create_dungeon_region(player, 'Tower Pacifist Run', 'Castle Tower', None, ['Tower Pacifist Run ES', 'Tower Pacifist Run Up Stairs']),
+        create_dungeon_region(player, 'Tower Push Statue', 'Castle Tower', None, ['Tower Push Statue Down Stairs', 'Tower Push Statue WS']),
+        create_dungeon_region(player, 'Tower Catwalk', 'Castle Tower', None, ['Tower Catwalk ES', 'Tower Catwalk North Stairs']),
+        create_dungeon_region(player, 'Tower Antechamber', 'Castle Tower', None, ['Tower Antechamber South Stairs', 'Tower Antechamber NW']),
+        create_dungeon_region(player, 'Tower Altar', 'Castle Tower', None, ['Tower Altar SW', 'Tower Altar NW']),
+        create_dungeon_region(player, 'Tower Agahnim 1', 'Castle Tower', ['Agahnim 1'], ['Tower Agahnim 1 SW']),
 
         # pod
         # tt
@@ -383,8 +400,6 @@ def create_regions(world, player):
         # tr
         # gt
         # sw
-
-
     ]
 
     for region_name, (room_id, shopkeeper, replaceable) in shop_table.items():
@@ -504,6 +519,8 @@ key_only_locations = {
   'Desert Palace - Desert Tiles 1 Pot Key': 'Small Key (Desert Palace)',
   'Desert Palace - Beamos Hall Pot Key': 'Small Key (Desert Palace)',
   'Desert Palace - Desert Tiles 2 Pot Key': 'Small Key (Desert Palace)',
+  'Castle Tower - Dark Archer Key Drop': 'Small Key (Agahnims Tower)',
+  'Castle Tower - Circle of Pots Key Drop': 'Small Key (Agahnims Tower)',
 }
 
 location_table = {'Mushroom': (0x180013, False, 'in the woods'),

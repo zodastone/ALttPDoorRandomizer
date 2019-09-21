@@ -2848,7 +2848,6 @@ mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia Central 
                          ('Hyrule Castle Ledge Courtyard Drop', 'Hyrule Castle Courtyard'),
                          ('Hyrule Castle Main Gate', 'Hyrule Castle Courtyard'),
                          ('Sewer Drop', 'Sewers Secret Room'),
-                         ('Agahnim 1', 'Agahnim 1'),
                          ('Flute Spot 1', 'Death Mountain'),
                          ('Death Mountain Entrance Rock', 'Death Mountain Entrance'),
                          ('Death Mountain Entrance Drop', 'Light World'),
@@ -3527,7 +3526,7 @@ default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert Main L
                                ('Hyrule Castle Exit (South)', 'Light World'),
                                ('Hyrule Castle Exit (West)', 'Hyrule Castle Ledge'),
                                ('Hyrule Castle Exit (East)', 'Hyrule Castle Ledge'),
-                               ('Agahnims Tower', 'Agahnims Tower'),
+                               ('Agahnims Tower', 'Tower Lobby'),
                                ('Agahnims Tower Exit', 'Hyrule Castle Ledge'),
 
                                ('Thieves Town', 'Thieves Town (Entrance)'),

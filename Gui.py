@@ -155,6 +155,14 @@ def guiMain(args=None):
     logicLabel = Label(logicFrame, text='Game logic')
     logicLabel.pack(side=LEFT)
 
+    swordsFrame = Frame(drowDownFrame)
+    swordsVar = StringVar()
+    swordsVar.set('random')
+    swordsOptionMenu = OptionMenu(swordsFrame, swordsVar, 'random', 'assured', 'swordless', 'vanilla')
+    swordsOptionMenu.pack(side=RIGHT)
+    swordsLabel = Label(swordsFrame, text='Swords')
+    swordsLabel.pack(side=LEFT)
+
     goalFrame = Frame(drowDownFrame)
     goalVar = StringVar()
     goalVar.set('ganon')
@@ -323,6 +331,7 @@ def guiMain(args=None):
         guiargs.count = int(countVar.get()) if countVar.get() != '1' else None
         guiargs.mode = modeVar.get()
         guiargs.logic = logicVar.get()
+        guiargs.swords = swordsVar.get()
         guiargs.goal = goalVar.get()
         guiargs.difficulty = difficultyVar.get()
         guiargs.timer = timerVar.get()

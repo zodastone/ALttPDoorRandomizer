@@ -171,7 +171,7 @@ def global_rules(world, player):
     set_rule(world.get_location('Master Sword Pedestal', player), lambda state: state.has('Red Pendant', player) and state.has('Blue Pendant', player) and state.has('Green Pendant', player))
     set_rule(world.get_location('Sahasrahla', player), lambda state: state.has('Green Pendant', player))
     set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has_beam_sword(player) or state.has('Beat Agahnim 1', player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
-    set_rule(world.get_entrance('Agahnim 1', player), lambda state: state.has_sword(player) and state.has_key('Small Key (Agahnims Tower)', player, 2))
+    # set_rule(world.get_entrance('Agahnim 1', player), lambda state: state.has_sword(player) and state.has_key('Small Key (Agahnims Tower)', player, 2))
     set_defeat_dungeon_boss_rule(world.get_location('Agahnim 1', player))
     set_rule(world.get_location('Castle Tower - Dark Maze', player), lambda state: state.has_key('Small Key (Agahnims Tower)', player))
     set_rule(world.get_entrance('Top of Pyramid', player), lambda state: state.has('Beat Agahnim 1', player))
@@ -308,6 +308,8 @@ def global_rules(world, player):
     # Boss rules. Same as below but no BK or arrow requirement.
     set_rule(world.get_location('Eastern Palace - Boss', player), lambda state: world.get_location('Eastern Palace - Boss', player).parent_region.dungeon.boss.can_defeat(state))
     set_rule(world.get_location('Eastern Palace - Prize', player), lambda state: world.get_location('Eastern Palace - Prize', player).parent_region.dungeon.boss.can_defeat(state))
+
+    set_rule(world.get_entrance('Tower Altar NW', player), lambda state: state.has_sword(player))
 
     # End of door rando rules.
     
@@ -950,10 +952,11 @@ def no_glitches_rules(world, player):
     add_conditional_lamp('Palace of Darkness Maze Door', 'Palace of Darkness (Entrance)', 'Entrance')
     add_conditional_lamp('Palace of Darkness - Dark Basement - Left', 'Palace of Darkness (Entrance)', 'Location')
     add_conditional_lamp('Palace of Darkness - Dark Basement - Right', 'Palace of Darkness (Entrance)', 'Location')
-    if world.mode != 'inverted':
-        add_conditional_lamp('Agahnim 1', 'Agahnims Tower', 'Entrance')
-        add_conditional_lamp('Castle Tower - Dark Maze', 'Agahnims Tower', 'Location')
-    else:
+   # todo: more lamp
+    # if :
+        # add_conditional_lamp('Agahnim 1', 'Agahnims Tower', 'Entrance')
+        # add_conditional_lamp('Castle Tower - Dark Maze', 'Agahnims Tower', 'Location')
+    if world.mode == 'inverted':
         add_conditional_lamp('Agahnim 1', 'Inverted Agahnims Tower', 'Entrance')
         add_conditional_lamp('Castle Tower - Dark Maze', 'Inverted Agahnims Tower', 'Location')
     add_conditional_lamp('Old Man', 'Old Man Cave', 'Location')

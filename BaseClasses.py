@@ -752,14 +752,8 @@ class Dungeon(object):
         self.bosses = dict()
         self.player = player
         self.world = None
-        self.paths = None
-        self.path_completion = dict()
-        self.key_number = len(small_keys)
-        self.big_key_required = True if self.big_key else False
-        self.chunks = list()
 
-        self.unlinked_doors = set([])
-        self.chests = 0
+        self.entrance_regions = []
 
     @property
     def boss(self):
@@ -861,12 +855,10 @@ class Door(object):
         # logical properties
         # self.connected = False  # combine with Dest?
         self.dest = None
-        self.parentChunk = None
         self.blocked = False  # Indicates if the door is normally blocked off. (Sanc door or always closed)
         self.smallKey = False  # There's a small key door on this side
         self.bigKey = False  # There's a big key door on this side
         self.ugly = False  # Indicates that it can't be seen from the front (e.g. back of a big key door)
-        self.landing = False
 
     def getAddress(self):
         if self.type == DoorType.Normal:
@@ -904,17 +896,15 @@ class Sector(object):
     def polarity(self):
         polarity = [0, 0, 0]
         for door in self.outstanding_doors:
-            if not door.landing:
-                idx, inc = pol_idx[door.direction]
-                polarity[idx] = pol_inc[inc](polarity[idx])
+            idx, inc = pol_idx[door.direction]
+            polarity[idx] = pol_inc[inc](polarity[idx])
         return polarity
 
     def magnitude(self):
         magnitude = [0, 0, 0]
         for door in self.outstanding_doors:
-            if not door.landing:
-                idx, inc = pol_idx[door.direction]
-                magnitude[idx] = magnitude[idx] + 1
+            idx, inc = pol_idx[door.direction]
+            magnitude[idx] = magnitude[idx] + 1
         return magnitude
 
     def outflow(self):

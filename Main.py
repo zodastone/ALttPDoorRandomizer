@@ -20,7 +20,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes
 from Utils import output_path
 
-__version__ = '0.6.3-pre'
+__version__ = '0.0.1-pre'
 
 def main(args, seed=None):
     start = time.clock()
@@ -40,7 +40,7 @@ def main(args, seed=None):
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
-    logger.info('ALttP Entrance Randomizer Version %s  -  Seed: %s\n\n', __version__, world.seed)
+    logger.info('ALttP Door Randomizer Version %s  -  Seed: %s\n\n', __version__, world.seed)
 
     world.difficulty_requirements = difficulties[world.difficulty]
 
@@ -82,6 +82,13 @@ def main(args, seed=None):
 
     for player in range(1, world.players + 1):
         set_rules(world, player)
+
+    # todo: remove this later. this is for debugging
+    for player in range(1, world.players + 1):
+        all_state = world.get_all_state(keys=True)
+        for bossregion in ['Eastern Boss', 'Desert Boss', 'Hera Boss', 'Tower Agahnim 1']:
+            if world.get_region(bossregion, player) not in all_state.reachable_regions[player]:
+                raise Exception(bossregion + ' missing from generation')
 
     logger.info('Placing Dungeon Prizes.')
 
