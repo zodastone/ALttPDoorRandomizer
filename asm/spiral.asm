@@ -32,7 +32,7 @@ SpiralWarp: {
     ldy #$00 : jsr ShiftQuadSimple
 
     .skipXQuad
-    lda $01 : and #$02 : lsr : sta $06 : lda $aa : lsr : !sub $06
+    lda $aa : lsr : sta $06 : lda $01 : and #$02 : lsr : !sub $06
     beq .skipYQuad
     sta $06 : asl : !add $aa : sta $aa
     ldy #$01 : jsr ShiftQuadSimple
@@ -82,7 +82,7 @@ LookupSpiralOffset: {
     cmp #$01 : beq .done
 
     ; look up the quad
-    lda $a8 : and #$03 : beq .quad0
+    lda $a9 : ora $aa : and #$03 : beq .quad0
     cmp #$01 : beq .quad1
     cmp #$02 : beq .quad2
     cmp #$03 : beq .quad3
@@ -90,7 +90,7 @@ LookupSpiralOffset: {
     inc $01 : lda $22 : cmp #$98 : bcc .done ;gt ent and hc stairwell
     inc $01 : bra .done
     .quad1
-    lda $22 : cmp #$78 : bcc .done ;swamp/pod dual stairs
+    lda $22 : cmp #$98 : bcc .done ;swamp/pod dual stairs
     inc $01 : bra .done
     .quad2    ;ice room
     lda #$03 : sta $01
@@ -139,6 +139,8 @@ SetCamera: {
     lda CoordIndex,y : tax
     lda $20,x : cmp #$78 : bcs .setQuad
     !add #$78 : sta $04
+    lda CamQuadIndex,y : tax : lda $0603, x : pha
+    lda CameraIndex,y : tax : pla : sta $e3, x
     .adj1
     tya : asl : !add #$08 : tax : jsr AdjCamBounds : bra .done
 

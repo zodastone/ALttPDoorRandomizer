@@ -171,6 +171,9 @@ Places where sta $e2 happens
 
 Stuff about big key door south
  1e -> Y
+ this is at 00ce24 or pc 004e24
+ org 00ce24
+ dw 2ac8
  1aab1 ldx ce06,y (where y is 1e = ce24) loads 2a80, but should be 2ac8 for the gfx
  not detected as big key door - need to look into tile attributes
 
