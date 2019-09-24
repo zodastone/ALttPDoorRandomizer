@@ -13,7 +13,7 @@ SpiralWarp: {
     lda $045e : cmp #$5e : beq .gtg ; abort if not spiral - intended room is in A!
     cmp #$5f : beq .gtg
     .abort
-    lda $a2 : and #$0f : rtl ; run highjack code and get out
+    stz $045e :lda $a2 : and #$0f : rtl ; clear,run highjack code and get out
 
     .gtg
     phb : phk : plb : phx : phy ; push stuff
@@ -61,6 +61,7 @@ SpiralWarp: {
     lda $01 : and #$20 : sta $07 ; zeroVtCam check
     ldy #$01 : jsr SetCamera
 
+    stz $045e
     ply : plx : plb ; pull the stuff we pushed
     lda $a2 : and #$0f ; this is the code we are hijacking
     rtl
@@ -90,9 +91,11 @@ LookupSpiralOffset: {
     inc $01 : lda $22 : cmp #$98 : bcc .done ;gt ent and hc stairwell
     inc $01 : bra .done
     .quad1
-    lda $22 : cmp #$98 : bcc .done ;swamp/pod dual stairs
+    lda $040c : cmp $0a : beq .q1diff : cmp $0c : bne .done
+    .q1diff lda $22 : cmp #$98 : bcc .done ;swamp/pod dual stairs
     inc $01 : bra .done
     .quad2    ;ice room
+    lda $040c : cmp $12 : bne .done
     lda #$03 : sta $01
     lda $22 : cmp #$78 : bcc .done
     inc $01 : bra .done
