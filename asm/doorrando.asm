@@ -8,6 +8,7 @@
 ; Gfx uses $b1 to for sub-sub-sub-module thing
 
 ; Hooks into various routines
+incsrc drhooks.asm
 
 org $02b5c4 ; -- moving right routine 135c4
 jsl WarpRight
@@ -20,8 +21,6 @@ jsl WarpUp
 org $02bd80
 jsl AdjustTransition
 nop
-org $01b714
-jsl TrapDoorFixer
 
 ;turn off linking doors -- see .notRoomLinkDoor label in Bank02.asm
 org $02b5a6

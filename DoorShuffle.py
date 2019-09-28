@@ -576,9 +576,9 @@ def shuffle_dungeon_no_repeats(world, player, available_sectors, entrance_region
                     raise Exception('Rejected last option due to dead end... infinite loop ensues')
         else:
             # If there's no available region with a door, use an internal connection
-            # todo: find all possibles for this door first
-            connect_door = find_compatible_door_in_list_old(world, door, reachable_doors, player)
-            if connect_door is not None:
+            compatibles = find_all_compatible_door_in_list(door, reachable_doors)
+            while len(compatibles) > 0:
+                connect_door = compatibles.pop()
                 logger.info('  Adding loop via %s', connect_door.name)
                 # Check if valid
                 if is_loop_valid(door, connect_door, sector, len(available_sectors) == 1):
@@ -591,13 +591,14 @@ def shuffle_dungeon_no_repeats(world, player, available_sectors, entrance_region
                         available_sectors.remove(connect_sector)
                         sector.outstanding_doors.extend(connect_sector.outstanding_doors)
                         sector.regions.extend(connect_sector.regions)
+                    break  # skips else block with exception
                 else:
                     logger.info(' Not Linking %s to %s', door.name, connect_door.name)
                     sector.outstanding_doors.insert(0, door)
                     if len(reachable_doors) <= 2:
                         raise Exception('Rejected last option due to likely improper loops...')
             else:
-                raise Exception('Something has gone terribly wrong')
+                raise Exception('Nothing is apparently compatible with %s', door.name)
     # Check that we used everything, we failed otherwise
     if len(available_sectors) != 1:
         logger.warning('Failed to add all regions/doors to dungeon, generation will likely fail.')
@@ -638,18 +639,19 @@ def find_all_compatible_door_in_sectors_ex(door, sectors, reachable_doors):
     return result
 
 
-def find_compatible_door_in_list_old(world, door, doors, player):
+def find_all_compatible_door_in_list(door, doors):
+    result = []
     for proposed_door in doors:
-        if doors_compatible_ignore_keys(door, proposed_door):
-            return proposed_door
+        if proposed_door != door and doors_compatible_ignore_keys(door, proposed_door):
+            result.append(proposed_door)
+    return result
 
 
 # this method also assumes that sectors have been build appropriately
 def doors_compatible_ignore_keys(a, b):
     if a.type != b.type:
         return False
-    # todo: test spirals linking to each other
-    if a.type == DoorType.SpiralStairs:
+    if a.type == DoorType.SpiralStairs and a != b:
         return True
     return a.direction == switch_dir(b.direction)
 
@@ -664,10 +666,14 @@ def is_valid(door_a, door_b, sector_a, sector_b, available_sectors):
         return False
     elif door_a.blocked and door_b.blocked:  # I can't see this going well unless we are in loop generation...
         return False
-    elif not door_a.blocked and not door_b.blocked:
+    elif not door_a.blocked and not door_b.blocked and sector_a != sector_b:
         return sector_a.outflow() + sector_b.outflow() - 1 > 0  # door_a has been removed already, so a.outflow is reduced by one
-    elif door_a.blocked or door_b.blocked:
+    elif door_a.blocked or door_b.blocked and sector_a != sector_b:
         return sector_a.outflow() + sector_b.outflow() > 0
+    elif sector_a == sector_b and not door_a.blocked and not door_b.blocked:
+        return sector_a.outflow() - 1 > 0
+    elif sector_a == sector_b and door_a.blocked or door_b.blocked:
+        return sector_a.outflow() > 0
     return False  # not sure how we got here, but it's a bad idea
 
 

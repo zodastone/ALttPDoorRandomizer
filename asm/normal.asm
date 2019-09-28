@@ -44,8 +44,7 @@ TrapDoorFixer:
     stz $0468 : lda $068c : ora $00 : sta $068c
     .end
     stz $ab ; clear our ab here because we don't need it anymore
-    lda $a0 : dec : tax
-    rtl
+    rts
 
 Cleanup:
 	inc $11

@@ -83,6 +83,7 @@ class World(object):
         self.spoiler = Spoiler(self)
         self.lamps_needed_for_dark_rooms = 1
         self.doors = []
+        self.rooms = []
 
     def intialize_regions(self):
         for region in self.regions:
@@ -878,6 +879,25 @@ class Door(object):
             bitmask += 0x80 if self.direction == Direction.Up else 0
             return [self.roomIndex, bitmask + self.quadrant, self.shiftX, self.shiftY]
 
+    def small_key(self):
+        self.smallKey = True
+        return self
+
+    def big_key(self):
+        self.bigKey = True
+        return self
+
+    def toggle(self):
+        self.toggle = True
+        return self
+
+    def blocked(self):
+        self.blocked = True
+        return self
+
+    def trap(self, trapFlag):
+        self.trap = trapFlag
+        return self
 
     def __str__(self):
         return str(self.__unicode__())
