@@ -126,7 +126,7 @@ difficulties = {
 
 def generate_itempool(world, player):
     if (world.difficulty not in ['normal', 'hard', 'expert'] or world.goal not in ['ganon', 'pedestal', 'dungeons', 'triforcehunt', 'crystals']
-            or world.mode not in ['open', 'standard', 'swordless', 'inverted'] or world.timer not in ['none', 'display', 'timed', 'timed-ohko', 'ohko', 'timed-countdown'] or world.progressive not in ['on', 'off', 'random']):
+            or world.mode not in ['open', 'standard', 'inverted'] or world.timer not in ['none', 'display', 'timed', 'timed-ohko', 'ohko', 'timed-countdown'] or world.progressive not in ['on', 'off', 'random']):
         raise NotImplementedError('Not supported yet')
 
     if world.timer in ['ohko', 'timed-ohko']:
@@ -233,6 +233,9 @@ take_any_locations = [
     'Dark Lake Hylia Ledge Spike Cave', 'Fortune Teller (Dark)', 'Dark Sanctuary Hint', 'Dark Desert Hint']
 
 def set_up_take_anys(world, player):
+    if world.mode == 'inverted' and 'Dark Sanctuary Hint' in take_any_locations:
+        take_any_locations.remove('Dark Sanctuary Hint')
+    
     regions = random.sample(take_any_locations, 5)
 
     old_man_take_any = Region("Old Man Sword Cave", RegionType.Cave, 'the sword cave', player)
