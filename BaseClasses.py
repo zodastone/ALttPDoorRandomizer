@@ -6,6 +6,7 @@ from collections import OrderedDict
 from _vendor.collections_extended import bag
 from Utils import int16_as_bytes
 from Tables import normal_offset_table, spiral_offset_table
+from RoomData import Room
 
 class World(object):
 
@@ -83,6 +84,7 @@ class World(object):
         self.spoiler = Spoiler(self)
         self.lamps_needed_for_dark_rooms = 1
         self.doors = []
+        self.paired_doors = {}
         self.rooms = []
 
     def intialize_regions(self):
@@ -153,6 +155,15 @@ class World(object):
             if door.name == doorname and door.player == player:
                 return door
         return None
+
+    def get_room(self, room_idx, player):
+        if isinstance(room_idx, Room):
+            return room_idx
+
+        for room in self.rooms:
+            if room.index == room_idx and room.player == player:
+                return room
+        raise RuntimeError('No such room %s' % room_idx)
 
     def get_all_state(self, keys=False):
         ret = CollectionState(self)
@@ -846,12 +857,13 @@ class Door(object):
         self.doorIndex = doorIndex
         self.layer = layer  # 0 for normal floor, 1 for the inset layer
         self.toggle = toggle
-        self.trap = 0x0
+        self.trapFlag = 0x0
         self.quadrant = 2
         self.shiftX = 78
         self.shiftY = 78
         self.zeroHzCam = False
         self.zeroVtCam = False
+        self.doorListPos = -1
 
         # logical properties
         # self.connected = False  # combine with Dest?
@@ -870,7 +882,7 @@ class Door(object):
     def getTarget(self, toggle):
         if self.type == DoorType.Normal:
             bitmask = 4 * (self.layer ^ 1 if toggle else self.layer)
-            bitmask += 0x08 * int(self.trap)
+            bitmask += 0x08 * int(self.trapFlag)
             return [self.roomIndex, bitmask + self.doorIndex]
         if self.type == DoorType.SpiralStairs:
             bitmask = int(self.layer) << 2
@@ -887,16 +899,20 @@ class Door(object):
         self.bigKey = True
         return self
 
-    def toggle(self):
+    def toggler(self):
         self.toggle = True
         return self
 
-    def blocked(self):
+    def no_exit(self):
         self.blocked = True
         return self
 
     def trap(self, trapFlag):
-        self.trap = trapFlag
+        self.trapFlag = trapFlag
+        return self
+
+    def pos(self, pos):
+        self.doorListPos = pos
         return self
 
     def __str__(self):

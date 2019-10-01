@@ -5,6 +5,7 @@ import logging
 from BaseClasses import RegionType, DoorType, Direction, Sector, pol_idx
 from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions
 from Dungeons import dungeon_regions
+from RoomData import DoorKind, PairedDoor
 
 def link_doors(world, player):
 
@@ -153,6 +154,47 @@ def connect_one_way(world, entrancename, exitname, player):
         x.dest = y
     if y is not None:
         y.dest = x
+
+
+def fix_big_key_doors_with_ugly_smalls(world, player):
+    remove_ugly_small_key_doors(world, player)
+    unpair_big_key_doors(world, player)
+
+
+def remove_ugly_small_key_doors(world, player):
+    for d in ['Eastern Compass Area SW', 'Eastern Darkness S']:
+        door = world.get_door(d, player)
+        room = world.get_room(door.roomIndex, player)
+        room.change(door.doorListPos, DoorKind.Normal)
+        door.smallKey = False
+        door.ugly = False
+
+
+def unpair_big_key_doors(world, player):
+    problematic_bk_doors = ['Eastern Courtyard N', 'Eastern Big Key NE']
+    for paired_door in world.paired_doors[player]:
+        if paired_door.door_a in problematic_bk_doors or paired_door.door_b in problematic_bk_doors:
+            paired_door.pair = False
+
+
+def pair_existing_key_doors(world, player, door_a, door_b):
+    already_paired = False
+    door_names = [door_a.name, door_b.name]
+    for pd in world.paired_doors[player]:
+        if pd.door_a in door_names and pd.door_b in door_names:
+            already_paired = True
+            break
+    if already_paired:
+        return
+    for paired_door in world.paired_doors[player]:
+        if paired_door.door_a in door_names or paired_door.door_b in door_names:
+            paired_door.pair = False
+    world.paired_doors[player].append(PairedDoor(door_a, door_b))
+
+
+# def unpair_all_doors(world, player):
+#     for paired_door in world.paired_doors[player]:
+#         paired_door.pair = False
 
 
 def within_dungeon(world, player):
@@ -350,6 +392,7 @@ def cross_dungeon(world, player):
 
 
 def experiment(world, player):
+    fix_big_key_doors_with_ugly_smalls(world, player)
     hc = convert_to_sectors(dungeon_regions['Hyrule Castle'], world, player)
     ep = convert_to_sectors(dungeon_regions['Eastern'], world, player)
     dp = convert_to_sectors(dungeon_regions['Desert'], world, player)

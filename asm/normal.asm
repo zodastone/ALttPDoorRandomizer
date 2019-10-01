@@ -39,8 +39,8 @@ WarpDown:
 	rtl
 
 TrapDoorFixer:
-    lda $ab : and #$0018 : beq .end
-    xba : asl #3 : sta $00
+    lda $ab : and #$0038 : beq .end
+    xba : asl #2 : sta $00
     stz $0468 : lda $068c : ora $00 : sta $068c
     .end
     stz $ab ; clear our ab here because we don't need it anymore

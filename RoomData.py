@@ -1,14 +1,15 @@
 from enum import Enum, unique
+from Tables import door_pair_offset_table
 
 
 def create_rooms(world, player):
     world.rooms = [
         Room(player, 0x01, 0x51168).door(Position.WestN2, DoorKind.Warp).door(Position.EastN2, DoorKind.Warp),
-        Room(player, 0x02, 0x50b97).door(Position.South2, DoorKind.TrapTriggerableLow).door(Position.InteriorV2, DoorKind.NormalLow2).door(Position.South2, DoorKind.TrapLow),
+        Room(player, 0x02, 0x50b97).door(Position.South2, DoorKind.TrapTriggerableLow).door(Position.InteriorV2, DoorKind.NormalLow2).door(Position.South2, DoorKind.ToggleFlag),
         # Room(player, 0x03, 0x509cf).door(Position.SouthW, DoorKind.CaveEntrance),
         Room(player, 0x04, 0xfe25c).door(Position.NorthW, DoorKind.StairKey2).door(Position.InteriorW, DoorKind.Dashable).door(Position.InteriorS, DoorKind.Dashable).door(Position.InteriorE, DoorKind.TrapTriggerable).door(Position.SouthW, DoorKind.Normal),
         Room(player, 0x06, 0xfa192).door(Position.SouthW, DoorKind.Trap),
-        # Room(player, 0x08, 0x5064f).door(Position.InteriorS2, DoorKind.CaveEntranceLow08).door(Position.SouthE, DoorKind.CaveEntrance).door(Position.SouthW2, DoorKind.NormalLow2).door(Position.SouthW2, DoorKind.TrapLow),
+        # Room(player, 0x08, 0x5064f).door(Position.InteriorS2, DoorKind.CaveEntranceLow08).door(Position.SouthE, DoorKind.CaveEntrance).door(Position.SouthW2, DoorKind.NormalLow2).door(Position.SouthW2, DoorKind.ToggleFlag),
         Room(player, 0x0a, 0xfa734).door(Position.North, DoorKind.StairKey),
         Room(player, 0x0b, 0xfabf0).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.InteriorS, DoorKind.Trap2).door(Position.InteriorN, DoorKind.SmallKey),
         Room(player, 0x0c, 0xfef53).door(Position.South, DoorKind.DungeonEntrance),
@@ -17,12 +18,12 @@ def create_rooms(world, player):
 
         # Room(player, 0x10, 0x50596).door(Position.SouthW, DoorKind.DungeonEntrance).door(Position.InteriorS, DoorKind.Normal),
         Room(player, 0x11, 0x50c52).door(Position.InteriorN, DoorKind.Dashable).door(Position.InteriorS, DoorKind.Dashable).door(Position.SouthE, DoorKind.SmallKey),
-        Room(player, 0x12, 0x50a9b).door(Position.North2, DoorKind.NormalLow).door(Position.North2, DoorKind.TrapLow).door(Position.South2, DoorKind.NormalLow).door(Position.South2, DoorKind.IncognitoEntrance),
+        Room(player, 0x12, 0x50a9b).door(Position.North2, DoorKind.NormalLow).door(Position.North2, DoorKind.ToggleFlag).door(Position.South2, DoorKind.NormalLow).door(Position.South2, DoorKind.IncognitoEntrance),
         Room(player, 0x13, 0xfe29d).door(Position.EastS, DoorKind.SmallKey).door(Position.EastN, DoorKind.Normal),
         Room(player, 0x14, 0xfe464).door(Position.SouthE, DoorKind.SmallKey).door(Position.WestS, DoorKind.SmallKey).door(Position.NorthW, DoorKind.Normal).door(Position.WestN, DoorKind.Normal).door(Position.SouthW, DoorKind.Normal).door(Position.EastN, DoorKind.Normal).door(Position.EastS, DoorKind.Normal),
         Room(player, 0x15, 0xfe63e).door(Position.WestS, DoorKind.Trap).door(Position.WestN, DoorKind.Normal),
         Room(player, 0x16, 0xfa150).door(Position.InteriorV, DoorKind.Bombable).door(Position.InteriorW, DoorKind.SmallKey).door(Position.InteriorE, DoorKind.Normal).door(Position.NorthW, DoorKind.Normal),
-        # Room(player, 0x18, 0x506e5).door(Position.NorthW2, DoorKind.NormalLow).door(Position.NorthW2, DoorKind.TrapLow),
+        # Room(player, 0x18, 0x506e5).door(Position.NorthW2, DoorKind.NormalLow).door(Position.NorthW2, DoorKind.ToggleFlag),
         Room(player, 0x19, 0xfacc6).door(Position.East, DoorKind.Bombable).door(Position.EastN, DoorKind.SmallKey),
         Room(player, 0x1a, 0xfa670).door(Position.InteriorE, DoorKind.SmallKey).door(Position.WestN, DoorKind.SmallKey).door(Position.West, DoorKind.Bombable).door(Position.SouthW, DoorKind.SmallKey).door(Position.InteriorN, DoorKind.Normal).door(Position.SouthE, DoorKind.Normal),
         Room(player, 0x1b, 0xfab31).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.SouthW, DoorKind.Normal),
@@ -93,13 +94,13 @@ def create_rooms(world, player):
         Room(player, 0x5e, 0xfc6b8).door(Position.EastS, DoorKind.SmallKey).door(Position.InteriorE, DoorKind.Trap2).door(Position.SouthE, DoorKind.Normal).door(Position.InteriorS, DoorKind.Normal),
         Room(player, 0x5f, 0xfc6fa).door(Position.WestS, DoorKind.SmallKey),
 
-        Room(player, 0x60, 0x51309).door(Position.NorthE2, DoorKind.NormalLow2).door(Position.East2, DoorKind.NormalLow2).door(Position.East2, DoorKind.TrapLow).door(Position.EastN, DoorKind.Normal).door(Position.SouthE, DoorKind.Normal).door(Position.SouthE, DoorKind.IncognitoEntrance),
-        Room(player, 0x61, 0x51454).door(Position.West2, DoorKind.NormalLow).door(Position.West2, DoorKind.TrapLow).door(Position.East2, DoorKind.NormalLow).door(Position.East2, DoorKind.TrapLow).door(Position.South2, DoorKind.NormalLow).door(Position.South2, DoorKind.IncognitoEntrance).door(Position.WestN, DoorKind.Normal),
-        Room(player, 0x62, 0x51577).door(Position.West2, DoorKind.NormalLow2).door(Position.West2, DoorKind.TrapLow).door(Position.NorthW2, DoorKind.NormalLow2).door(Position.North, DoorKind.Normal).door(Position.SouthW, DoorKind.Normal).door(Position.SouthW, DoorKind.IncognitoEntrance),
+        Room(player, 0x60, 0x51309).door(Position.NorthE2, DoorKind.NormalLow2).door(Position.East2, DoorKind.NormalLow2).door(Position.East2, DoorKind.ToggleFlag).door(Position.EastN, DoorKind.Normal).door(Position.SouthE, DoorKind.Normal).door(Position.SouthE, DoorKind.IncognitoEntrance),
+        Room(player, 0x61, 0x51454).door(Position.West2, DoorKind.NormalLow).door(Position.West2, DoorKind.ToggleFlag).door(Position.East2, DoorKind.NormalLow).door(Position.East2, DoorKind.ToggleFlag).door(Position.South2, DoorKind.NormalLow).door(Position.South2, DoorKind.IncognitoEntrance).door(Position.WestN, DoorKind.Normal),
+        Room(player, 0x62, 0x51577).door(Position.West2, DoorKind.NormalLow2).door(Position.West2, DoorKind.ToggleFlag).door(Position.NorthW2, DoorKind.NormalLow2).door(Position.North, DoorKind.Normal).door(Position.SouthW, DoorKind.Normal).door(Position.SouthW, DoorKind.IncognitoEntrance),
         Room(player, 0x63, 0xf88ed).door(Position.NorthE, DoorKind.StairKey).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.SouthW, DoorKind.DungeonEntrance),  # todo: looks like a huge typo - I had to guess on StairKey
         Room(player, 0x64, 0xfda53).door(Position.InteriorS, DoorKind.Trap2),
         Room(player, 0x65, 0xfdac5).door(Position.InteriorS, DoorKind.Normal),
-        Room(player, 0x66, 0xfa01b).door(Position.InteriorE2, DoorKind.Waterfall).door(Position.SouthW2, DoorKind.NormalLow2).door(Position.SouthW2, DoorKind.TrapLow).door(Position.InteriorW2, DoorKind.NormalLow2),
+        Room(player, 0x66, 0xfa01b).door(Position.InteriorE2, DoorKind.Waterfall).door(Position.SouthW2, DoorKind.NormalLow2).door(Position.SouthW2, DoorKind.ToggleFlag).door(Position.InteriorW2, DoorKind.NormalLow2),
         Room(player, 0x67, 0xfbe17).door(Position.NorthE, DoorKind.Normal).door(Position.InteriorS, DoorKind.Normal).door(Position.EastS, DoorKind.Normal),
         Room(player, 0x68, 0xfbf02).door(Position.WestS, DoorKind.Trap).door(Position.NorthE, DoorKind.SmallKey),
         Room(player, 0x6a, 0xfa7c7).door(Position.NorthE, DoorKind.BigKey),
@@ -113,7 +114,7 @@ def create_rooms(world, player):
         Room(player, 0x73, 0xf8972).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.InteriorS, DoorKind.Trap2).door(Position.InteriorE, DoorKind.Normal),
         Room(player, 0x74, 0xf8a66).door(Position.InteriorE, DoorKind.Normal).door(Position.InteriorW, DoorKind.Normal),
         Room(player, 0x75, 0xf8ab9).door(Position.InteriorW, DoorKind.Trap2).door(Position.SouthE, DoorKind.Normal),
-        Room(player, 0x76, 0xf9e35).door(Position.InteriorN2, DoorKind.NormalLow).door(Position.InteriorS2, DoorKind.NormalLow).door(Position.NorthW2, DoorKind.NormalLow).door(Position.NorthW2, DoorKind.TrapLow),
+        Room(player, 0x76, 0xf9e35).door(Position.InteriorN2, DoorKind.NormalLow).door(Position.InteriorS2, DoorKind.NormalLow).door(Position.NorthW2, DoorKind.NormalLow).door(Position.NorthW2, DoorKind.ToggleFlag),
         Room(player, 0x77, 0xfd0e6).door(Position.NorthW2, DoorKind.StairKeyLow).door(Position.South2, DoorKind.DungeonEntranceLow),
         Room(player, 0x7b, 0xff02b).door(Position.SouthW, DoorKind.Trap).door(Position.EastN, DoorKind.SmallKey).door(Position.EastS, DoorKind.Normal),
         Room(player, 0x7c, 0xff0ef).door(Position.NorthE, DoorKind.BlastWall).door(Position.EastS, DoorKind.Bombable).door(Position.WestN, DoorKind.SmallKey).door(Position.WestS, DoorKind.Normal),
@@ -239,10 +240,16 @@ class Room(object):
         self.index = index
         self.doorListAddress = address
         self.doorList = []
+        self.modified = False
 
     def door(self, pos, kind):
         self.doorList.append((pos, kind))
         return self
+
+    def change(self, list_idx, kind):
+        prev = self.doorList[list_idx]
+        self.doorList[list_idx] = (prev[0], kind)
+        self.modified = True
 
     def address(self):
         return self.doorListAddress
@@ -261,6 +268,39 @@ class Room(object):
         return '%s' % self.index
 
 
+class PairedDoor(object):
+    def __init__(self, door_a, door_b):
+        self.door_a = door_a
+        self.door_b = door_b
+        self.pair = True
+
+    def address_a(self, world, player):
+        d = world.check_for_door(self.door_a, player)
+        return 0x13C000 + door_pair_offset_table[d.roomIndex]*2
+
+    def address_b(self, world, player):
+        d = world.check_for_door(self.door_b, player)
+        return 0x13C000 + door_pair_offset_table[d.roomIndex]*2
+
+    def rom_data_a(self, world, player):
+        if not self.pair:
+            return [0x00, 0x00]
+        d = world.check_for_door(self.door_b, player)
+        return [d.roomIndex, pos_map[d.doorListPos]]
+
+    def rom_data_b(self, world, player):
+        if not self.pair:
+            return [0x00, 0x00]
+        d = world.check_for_door(self.door_a, player)
+        return [d.roomIndex, pos_map[d.doorListPos]]
+
+
+pos_map = {
+    0: 0x80, 1: 0x40, 2: 0x20, 3: 0x10
+    # indices 4-7 not supported yet
+}
+
+
 @unique
 class DoorKind(Enum):
     Normal = 0x00
@@ -273,7 +313,7 @@ class DoorKind(Enum):
     CaveEntranceLow = 0x10
     IncognitoEntrance = 0x12
     DungeonChanger = 0x14
-    TrapLow = 0x16
+    ToggleFlag = 0x16
     Trap = 0x18
     UnknownD7 = 0x1A
     SmallKey = 0x1C
@@ -292,7 +332,7 @@ class DoorKind(Enum):
     TrapTriggerableLow = 0x44
     Warp = 0x46
     CaveEntranceLow08 = 0x48
-    TrapLowE3 = 0x4A
+    TrapLowE3 = 0x4A  # Maybe this is a toggle flag too?
 
 
 @unique

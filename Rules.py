@@ -302,7 +302,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Eastern Courtyard N', player), lambda state: state.has('Big Key (Eastern Palace)', player))
     # There are two keys and we don't know how we shuffled, so careful with key doors.
     # TODO: Generate key rules in the shuffler. (But make sure this way works first.)
-    for door in ['Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN', 'Eastern Darkness Up Stairs', 'Eastern Attic Start Down Stairs']:
+    for door in ['Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN', 'Eastern Darkness Up Stairs']:
         set_rule(world.get_entrance(door, player), lambda state: state.has_key('Small Key (Eastern Palace)', player, 2))
 
     # Boss rules. Same as below but no BK or arrow requirement.

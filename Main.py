@@ -14,6 +14,7 @@ from EntranceShuffle import link_entrances, link_inverted_entrances
 from Doors import create_doors
 from DoorShuffle import link_doors
 from Rom import patch_rom, get_enemizer_patch, apply_rom_settings, Sprite, LocalRom, JsonRom
+from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, balance_multiworld_progression
@@ -48,11 +49,13 @@ def main(args, seed=None):
         for player in range(1, world.players + 1):
             create_regions(world, player)
             create_doors(world, player)
+            create_rooms(world, player)
             create_dungeons(world, player)
     else:
         for player in range(1, world.players + 1):
             create_inverted_regions(world, player)  # todo: port all the dungeon region work
             create_doors(world, player)
+            create_rooms(world, player)
             create_dungeons(world, player)
 
     logger.info('Shuffling dungeons')

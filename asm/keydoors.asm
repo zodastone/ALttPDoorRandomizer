@@ -1,20 +1,3 @@
-; This is the reverse side of various key doors
-
-org $1ff8cc ;(PC: 0ff8cc) GT 0x5b (Spikes & Switch)
-dw $0081
-
-org $0a972a ;(PC: 05172a) Eastern Darkness 0x99
-dw $2060, $1e71
-
-org $1fb759 ;(PC: 0fb759) Mire Bridges 0xa2
-dw $0071
-
-org $0a9887 ;(PC: 051887) Eastern Compass Area 0xa8
-dw $3882, $3660, $1e81
-
-org $1fd974 ;(PC: 0fd974) TT Bossway 0xbc
-dw $1c82, $0081
-
 ; code to un-pair or re-pair doors
 
 ; doorlist is loaded into 19A0 but no terminator
@@ -29,19 +12,20 @@ dw $1c82, $0081
 CheckIfDoorsOpen: {
     jsr TrapDoorFixer ; see normal.asm
     ; note we are 16bit mode right now
-    lda $040c : cmp #$00ff ;: bne .gtg
+    lda $040c : cmp #$00ff : bne .gtg
     lda $a0 : dec : tax : and #$000f ; hijacked code
     sec : rtl ; set carry to indicate normal behavior
 
     .gtg
     phb : phk : plb
-    stx $00 : ldy #$00 : stz $03
+    stx $00 : ldy #$0000
     .nextDoor
     lda $a0 : asl : tax
     lda KeyDoorOffset, x : beq .skipDoor
     asl : sty $05 : !add $05 : tax
     lda PairedDoorTable, x : beq .skipDoor
     sta $02 : and #$00ff : asl a : tax
+    lda $02 : and #$ff00 : sta $03
     lda $7ef000, x : and #$f000 : and $03 : beq .skipDoor
     tyx : lda $068c : ora $0098c0,x  : sta $068c
     .skipDoor
@@ -53,5 +37,5 @@ CheckIfDoorsOpen: {
 ; how to indicate opening for other (non-first four doors?)
 ; Bank01 Door Register stores the 4 bits in 068c to 400 (depending on type)
 ; Key collision and others depend on F0-F3 attribute not sure if extendable to other numbers
-; Dungeon_ProcessTorchAndDoorInteractives.isOpenableDoor is the likely culprit fo collision problems
+; Dungeon_ProcessTorchAndDoorInteractives.isOpenableDoor is the likely culprit for collision problems
 ; Saving open status to other unused rooms is tricky -- Bank 2 13947 (line 8888)
