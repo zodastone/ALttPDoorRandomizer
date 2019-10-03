@@ -3,9 +3,10 @@ import collections
 import logging
 
 from BaseClasses import RegionType, DoorType, Direction, Sector, pol_idx
-from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions
+from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions, pod_regions
 from Dungeons import dungeon_regions
 from RoomData import DoorKind, PairedDoor
+
 
 def link_doors(world, player):
 
@@ -25,6 +26,8 @@ def link_doors(world, player):
         connect_simple_door(world, exitName, regionName, player)
     for exitName, regionName in dungeon_warps:
         connect_simple_door(world, exitName, regionName, player)
+    for ent, ext in ladders:
+        connect_two_way(world, ent, ext, player)
 
     if world.doorShuffle == 'vanilla':
         for entrance, ext in spiral_staircases:
@@ -205,12 +208,14 @@ def within_dungeon(world, player):
     dungeon_region_starts_dp = ['Desert Back Lobby', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
     dungeon_region_starts_th = ['Hera Lobby']
     dungeon_region_starts_at = ['Tower Lobby']
+    dungeon_region_starts_pd = ['PoD Lobby']
     dungeon_region_lists = [
         (dungeon_region_starts_es, hyrule_castle_regions),
         (dungeon_region_starts_ep, eastern_regions),
         (dungeon_region_starts_dp, desert_regions),
         (dungeon_region_starts_th, hera_regions),
         (dungeon_region_starts_at, tower_regions),
+        (dungeon_region_starts_pd, pod_regions),
     ]
     for start_list, region_list in dungeon_region_lists:
         shuffle_dungeon(world, player, start_list, region_list)
@@ -349,6 +354,8 @@ def doors_compatible(a, b):
         return doors_fit_mandatory_pair(straight_staircases, a, b)
     if a.type == DoorType.Interior:
         return doors_fit_mandatory_pair(interior_doors, a, b)
+    if a.type == DoorType.Ladder:
+        return doors_fit_mandatory_pair(ladders, a, b)
     if a.type == DoorType.Normal and (a.smallKey or b.smallKey or a.bigKey or b.bigKey):
         return doors_fit_mandatory_pair(key_doors, a, b)
     if a.type in [DoorType.Hole, DoorType.Warp, DoorType.Logical]:
@@ -378,7 +385,8 @@ def cross_dungeon(world, player):
     dp = convert_to_sectors(dungeon_regions['Desert'], world, player)
     th = convert_to_sectors(dungeon_regions['Hera'], world, player)
     at = convert_to_sectors(dungeon_regions['Tower'], world, player)
-    dungeon_split = split_up_sectors(hc + ep + dp + th + at, default_dungeon_sets)
+    pd = convert_to_sectors(dungeon_regions['PoD'], world, player)
+    dungeon_split = split_up_sectors(hc + ep + dp + th + at + pd, default_dungeon_sets)
     dp_split = split_up_sectors(dungeon_split.pop(2), desert_default_entrance_sets)
     dungeon_sectors = []
     # todo - adjust dungeon item pools
@@ -398,8 +406,9 @@ def experiment(world, player):
     dp = convert_to_sectors(dungeon_regions['Desert'], world, player)
     th = convert_to_sectors(dungeon_regions['Hera'], world, player)
     at = convert_to_sectors(dungeon_regions['Tower'], world, player)
+    pd = convert_to_sectors(dungeon_regions['PoD'], world, player)
     dungeon_sectors = []
-    for idx, sector_list in enumerate([hc, ep, th, at]):
+    for idx, sector_list in enumerate([hc, ep, th, at, pd]):
         dungeon_sectors.append((sector_list, entrance_sets[idx]))
     dp_split = split_up_sectors(dp, desert_default_entrance_sets)
     for idx, sector_list in enumerate(dp_split):
@@ -421,6 +430,8 @@ def convert_to_sectors(region_names, world, player):
     sectors = []
     while len(region_list) > 0:
         region = region_list.pop()
+        sector = None
+        new_sector = True
         region_chunk = [region]
         exits = []
         exits.extend(region.exits)
@@ -433,14 +444,21 @@ def convert_to_sectors(region_names, world, player):
                     region_list.remove(connect_region)
                     region_chunk.append(connect_region)
                     exits.extend(connect_region.exits)
+                if connect_region not in region_chunk:
+                    for existing in sectors:
+                        if connect_region in existing.regions:
+                            sector = existing
+                            new_sector = False
             else:
                 door = world.check_for_door(ext.name, player)
                 if door is not None:
                     outstanding_doors.append(door)
-        sector = Sector()
+        if new_sector:
+            sector = Sector()
         sector.regions.extend(region_chunk)
         sector.outstanding_doors.extend(outstanding_doors)
-        sectors.append(sector)
+        if new_sector:
+            sectors.append(sector)
     return sectors
 
 
@@ -645,6 +663,7 @@ def shuffle_dungeon_no_repeats(world, player, available_sectors, entrance_region
     # Check that we used everything, we failed otherwise
     if len(available_sectors) != 1:
         logger.warning('Failed to add all regions/doors to dungeon, generation will likely fail.')
+    return available_sectors[0]
 
 
 def extend_reachable(search_regions, visited_regions, world, player):
@@ -690,7 +709,7 @@ def find_all_compatible_door_in_list(door, doors):
     return result
 
 
-# this method also assumes that sectors have been build appropriately
+# this method also assumes that sectors have been built appropriately - so only randomizable doors get here
 def doors_compatible_ignore_keys(a, b):
     if a.type != b.type:
         return False
@@ -763,7 +782,12 @@ logical_connections = [
     ('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
     ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path'),
     ('Eastern Hint Tile Push Block', 'Eastern Compass Area'),
-    ('Hera Big Chest Landing Exit', 'Hera 4F')
+    ('Hera Big Chest Landing Exit', 'Hera 4F'),
+    ('PoD Arena Main Crystal Path', 'PoD Arena Crystal'),
+    ('PoD Arena Crystal Path', 'PoD Arena Main'),
+    ('PoD Arena Bridge Drop Down', 'PoD Arena Main'),
+    ('PoD Map Balcony Drop Down', 'PoD Sexy Statue'),
+    ('PoD Basement Ledge Drop Down', 'PoD Stalfos Basement'),
 ]
 
 spiral_staircases = [
@@ -783,13 +807,20 @@ spiral_staircases = [
     ('Tower Room 03 Up Stairs', 'Tower Lone Statue Down Stairs'),
     ('Tower Dark Chargers Up Stairs', 'Tower Dual Statues Down Stairs'),
     ('Tower Dark Archers Up Stairs', 'Tower Red Spears Down Stairs'),
-    ('Tower Pacifist Run Up Stairs','Tower Push Statue Down Stairs'),
+    ('Tower Pacifist Run Up Stairs', 'Tower Push Statue Down Stairs'),
+    ('PoD Left Cage Down Stairs', 'PoD Shooter Room Up Stairs'),
+    ('PoD Middle Cage Down Stairs', 'PoD Warp Room Up Stairs'),
+    ('PoD Basement Ledge Up Stairs', 'PoD Big Key Landing Down Stairs'),
+    ('PoD Compass Room W Down Stairs', 'PoD Dark Basement W Up Stairs'),
+    ('PoD Compass Room E Down Stairs', 'PoD Dark Basement E Up Stairs'),
+    # ('', ''),
 ]
 
 straight_staircases = [
     ('Hyrule Castle Lobby North Stairs', 'Hyrule Castle Throne Room South Stairs'),
     ('Sewers Rope Room North Stairs', 'Sewers Dark Cross South Stairs'),
-    ('Tower Catwalk North Stairs', 'Tower Antechamber South Stairs')
+    ('Tower Catwalk North Stairs', 'Tower Antechamber South Stairs'),
+    ('PoD Conveyor North Stairs', 'PoD Map Balcony South Stairs'),
 ]
 
 open_edges = [
@@ -819,11 +850,24 @@ falldown_pits = [
     ('Hera 5F Normal Holes', 'Hera 4F'),
     ('Hera Boss Outer Hole', 'Hera 5F'),
     ('Hera Boss Inner Hole', 'Hera 4F'),
+    ('PoD Pit Room Freefall', 'PoD Stalfos Basement'),
+    ('PoD Pit Room Bomb Hole', 'PoD Basement Ledge'),
+    ('PoD Big Key Landing Hole', 'PoD Stalfos Basement'),
+    # ('', ''),
 ]
 
 dungeon_warps = [
     ('Eastern Fairies\' Warp', 'Eastern Courtyard'),
-    ('Hera Fairies\' Warp', 'Hera 5F')
+    ('Hera Fairies\' Warp', 'Hera 5F'),
+    ('PoD Warp Hint Warp', 'PoD Warp Room'),
+    ('PoD Warp Room Warp', 'PoD Warp Hint'),
+    ('PoD Stalfos Basement Warp', 'PoD Warp Room'),
+    ('PoD Callback Warp', 'PoD Dark Alley'),
+    # ('', ''),
+]
+
+ladders = [
+    ('PoD Bow Statue Down Ladder', 'PoD Dark Pegs Up Ladder')
 ]
 
 interior_doors = [
@@ -856,6 +900,18 @@ interior_doors = [
     ('Tower Circle of Pots WS', 'Tower Pacifist Run ES'),
     ('Tower Push Statue WS', 'Tower Catwalk ES'),
     ('Tower Antechamber NW', 'Tower Altar SW'),
+    ('PoD Lobby N', 'PoD Middle Cage S'),
+    ('PoD Lobby NW', 'PoD Left Cage SW'),
+    ('PoD Lobby NE', 'PoD Middle Cage SE'),
+    ('PoD Warp Hint SE', 'PoD Jelly Hall NE'),
+    ('PoD Jelly Hall NW', 'PoD Mimics 1 SW'),
+    ('PoD Falling Bridge EN', 'PoD Compass Room WN'),
+    ('PoD Compass Room SE', 'PoD Harmless Hellway NE'),
+    ('PoD Mimics 2 NW', 'PoD Bow Statue SW'),
+    ('PoD Dark Pegs WN', 'PoD Lonely Turtle EN'),
+    ('PoD Lonely Turtle SW', 'PoD Turtle Party NW'),
+    ('PoD Turtle Party ES', 'PoD Callback WS'),
+    # ('', ''),
 ]
 
 key_doors = [
@@ -872,6 +928,9 @@ key_doors = [
     ('Desert Wall Slide NW', 'Desert Boss SW'),
     ('Hera Lobby Key Stairs', 'Hera Tile Room Up Stairs'),
     ('Hera Startile Corner NW', 'Hera Startile Wide SW'),
+    ('PoD Middle Cage N', 'PoD Pit Room S'),
+    ('PoD Arena Main NW', 'PoD Falling Bridge SW'),
+    ('PoD Falling Bridge WN', 'PoD Dark Maze EN'),
 ]
 
 default_door_connections = [
@@ -901,15 +960,28 @@ default_door_connections = [
     ('Eastern Attic Start WS', 'Eastern Attic Switches ES'),
     ('Eastern Attic Switches WS', 'Eastern Eyegores ES'),
     ('Desert Compass NW', 'Desert Cannonball S'),
-    ('Desert Beamos Hall NE', 'Desert Tiles 2 SE')
+    ('Desert Beamos Hall NE', 'Desert Tiles 2 SE'),
+    ('PoD Middle Cage N', 'PoD Pit Room S'),
+    ('PoD Pit Room NW', 'PoD Arena Main SW'),
+    ('PoD Pit Room NE', 'PoD Arena Bridge SE'),
+    ('PoD Arena Main NW', 'PoD Falling Bridge SW'),
+    ('PoD Arena Crystals E', 'PoD Sexy Statue W'),
+    ('PoD Mimics 1 NW', 'PoD Conveyor SW'),
+    ('PoD Map Balcony WS', 'PoD Arena Ledge ES'),
+    ('PoD Falling Bridge WN', 'PoD Dark Maze EN'),
+    ('PoD Dark Maze E', 'PoD Big Chest Balcony W'),
+    ('PoD Sexy Statue NW', 'PoD Mimics 2 SW'),
 ]
+
 
 # ('', ''),
 default_one_way_connections = [
     ('Sewers Pull Switch S', 'Sanctuary N'),
     ('Eastern Eyegores NE', 'Eastern Boss SE'),
     ('Desert Wall Slide NW', 'Desert Boss SW'),
-    ('Tower Altar NW', 'Tower Agahnim 1 SW')
+    ('Tower Altar NW', 'Tower Agahnim 1 SW'),
+    ('PoD Harmless Hellway SE', 'PoD Arena Main NE'),
+    ('PoD Dark Alley NE', 'PoD Boss SE'),
 ]
 
 # todo: these path rules are more complicated I think...
@@ -942,7 +1014,8 @@ default_dungeon_sets = [
     ['Eastern Lobby', 'Eastern Boss'],
     ['Desert Back Lobby', 'Desert Boss', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby'],
     ['Hera Lobby', 'Hera Boss'],
-    ['Tower Lobby', 'Tower Agahnim 1']
+    ['Tower Lobby', 'Tower Agahnim 1'],
+    ['PoD Lobby', 'PoD Boss']
 ]
 
 
@@ -958,7 +1031,7 @@ entrance_sets = [
     ['Eastern Lobby'],
     ['Hera Lobby'],
     ['Tower Lobby'],
-    # ['PoD Lobby'],
+    ['PoD Lobby'],
     # ['Swamp Lobby'],
     # ['TT Lobby'],
     # ['Ice Lobby'],

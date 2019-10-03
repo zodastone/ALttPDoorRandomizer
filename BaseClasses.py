@@ -901,6 +901,21 @@ class Door(object):
             bitmask += 0x80 if self.direction == Direction.Up else 0
             return [self.roomIndex, bitmask + self.quadrant, self.shiftX, self.shiftY]
 
+    def dir(self, direction, room, doorIndex, layer):
+        self.direction = direction
+        self.roomIndex = room
+        self.doorIndex = doorIndex
+        self.layer = layer
+        return self
+
+    def ss(self, quadrant, shift_y, shift_x, zero_hz_cam=False, zero_vt_cam=False):
+        self.quadrant = quadrant
+        self.shiftY = shift_y
+        self.shiftX = shift_x
+        self.zeroHzCam = zero_hz_cam
+        self.zeroVtCam = zero_vt_cam
+        return self
+
     def small_key(self):
         self.smallKey = True
         return self

@@ -240,16 +240,6 @@ def create_regions(world, player):
                                                                           'Turtle Rock - Eye Bridge - Top Left', 'Turtle Rock - Eye Bridge - Top Right'],
                               ['Turtle Rock Dark Room (South)', 'Turtle Rock (Trinexx)', 'Turtle Rock Isolated Ledge Exit']),
         create_dungeon_region(player, 'Turtle Rock (Trinexx)', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize']),
-        create_dungeon_region(player, 'Palace of Darkness (Entrance)', 'Palace of Darkness', ['Palace of Darkness - Shooter Room'], ['Palace of Darkness Bridge Room', 'Palace of Darkness Bonk Wall', 'Palace of Darkness Exit']),
-        create_dungeon_region(player, 'Palace of Darkness (Center)', 'Palace of Darkness', ['Palace of Darkness - The Arena - Bridge', 'Palace of Darkness - Stalfos Basement'],
-                              ['Palace of Darkness Big Key Chest Staircase', 'Palace of Darkness (North)', 'Palace of Darkness Big Key Door']),
-        create_dungeon_region(player, 'Palace of Darkness (Big Key Chest)', 'Palace of Darkness', ['Palace of Darkness - Big Key Chest']),
-        create_dungeon_region(player, 'Palace of Darkness (Bonk Section)', 'Palace of Darkness', ['Palace of Darkness - The Arena - Ledge', 'Palace of Darkness - Map Chest'], ['Palace of Darkness Hammer Peg Drop']),
-        create_dungeon_region(player, 'Palace of Darkness (North)', 'Palace of Darkness', ['Palace of Darkness - Compass Chest', 'Palace of Darkness - Dark Basement - Left', 'Palace of Darkness - Dark Basement - Right'],
-                              ['Palace of Darkness Spike Statue Room Door', 'Palace of Darkness Maze Door']),
-        create_dungeon_region(player, 'Palace of Darkness (Maze)', 'Palace of Darkness', ['Palace of Darkness - Dark Maze - Top', 'Palace of Darkness - Dark Maze - Bottom', 'Palace of Darkness - Big Chest']),
-        create_dungeon_region(player, 'Palace of Darkness (Harmless Hellway)', 'Palace of Darkness', ['Palace of Darkness - Harmless Hellway']),
-        create_dungeon_region(player, 'Palace of Darkness (Final Section)', 'Palace of Darkness', ['Palace of Darkness - Boss', 'Palace of Darkness - Prize']),
         create_dungeon_region(player, 'Ganons Tower (Entrance)', 'Ganon\'s Tower', ['Ganons Tower - Bob\'s Torch', 'Ganons Tower - Hope Room - Left', 'Ganons Tower - Hope Room - Right'],
                               ['Ganons Tower (Tile Room)', 'Ganons Tower (Hookshot Room)', 'Ganons Tower Big Key Door', 'Ganons Tower Exit']),
         create_dungeon_region(player, 'Ganons Tower (Tile Room)', 'Ganon\'s Tower', ['Ganons Tower - Tile Room'], ['Ganons Tower (Tile Room) Key Door']),
@@ -393,13 +383,47 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Tower Agahnim 1', 'Castle Tower', ['Agahnim 1'], ['Tower Agahnim 1 SW']),
 
         # pod
-        # tt
+        create_dungeon_region(player, 'PoD Lobby', 'Palace of Darkness', None, ['PoD Lobby N', 'PoD Lobby NW', 'PoD Lobby NE', 'Palace of Darkness Exit']),
+        create_dungeon_region(player, 'PoD Left Cage', 'Palace of Darkness', None, ['PoD Left Cage SW', 'PoD Left Cage Down Stairs']),
+        create_dungeon_region(player, 'PoD Middle Cage', 'Palace of Darkness', None, ['PoD Middle Cage S', 'PoD Middle Cage SE', 'PoD Middle Cage N', 'PoD Middle Cage Down Stairs']),
+        create_dungeon_region(player, 'PoD Shooter Room', 'Palace of Darkness', ['Palace of Darkness - Shooter Room'], ['PoD Shooter Room Up Stairs']),
+        create_dungeon_region(player, 'PoD Pit Room', 'Palace of Darkness', None, ['PoD Pit Room S', 'PoD Pit Room NW', 'PoD Pit Room NE', 'PoD Pit Room Freefall', 'PoD Pit Room Bomb Hole']),
+        create_dungeon_region(player, 'PoD Arena Main', 'Palace of Darkness', None, ['PoD Arena Main SW', 'PoD Arena Main NW', 'PoD Arena Main NE', 'PoD Arena Main Crystal Path']),
+        create_dungeon_region(player, 'PoD Arena Crystal', 'Palace of Darkness', None, ['PoD Arena Crystals E', 'PoD Arena Crystal Path']),
+        create_dungeon_region(player, 'PoD Arena Bridge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Bridge'], ['PoD Arena Bridge SE', 'PoD Arena Bridge Drop Down']),
+        create_dungeon_region(player, 'PoD Arena Ledge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Ledge'], ['PoD Arena Ledge ES']),
+        create_dungeon_region(player, 'PoD Sexy Statue', 'Palace of Darkness', None, ['PoD Sexy Statue W', 'PoD Sexy Statue NW']),
+        create_dungeon_region(player, 'PoD Map Balcony', 'Palace of Darkness', ['Palace of Darkness - Map Chest'], ['PoD Map Balcony WS', 'PoD Map Balcony South Stairs', 'PoD Map Balcony Drop Down']),
+        create_dungeon_region(player, 'PoD Conveyor', 'Palace of Darkness', None, ['PoD Conveyor North Stairs', 'PoD Conveyor SW']),
+        create_dungeon_region(player, 'PoD Mimics 1', 'Palace of Darkness', None, ['PoD Mimics 1 NW', 'PoD Mimics 1 SW']),
+        create_dungeon_region(player, 'PoD Jelly Hall', 'Palace of Darkness', None, ['PoD Jelly Hall NW', 'PoD Jelly Hall NE']),
+        create_dungeon_region(player, 'PoD Warp Hint', 'Palace of Darkness', None, ['PoD Warp Hint SE', 'PoD Warp Hint Warp']),
+        create_dungeon_region(player, 'PoD Warp Room', 'Palace of Darkness', None, ['PoD Warp Room Up Stairs', 'PoD Warp Room Warp']),
+        create_dungeon_region(player, 'PoD Stalfos Basement', 'Palace of Darkness', ['Palace of Darkness - Stalfos Basement'], ['PoD Stalfos Basement Warp']),
+        create_dungeon_region(player, 'PoD Basement Ledge', 'Palace of Darkness', None, ['PoD Basement Ledge Drop Down', 'PoD Basement Ledge Up Stairs']),
+        create_dungeon_region(player, 'PoD Big Key Landing', 'Palace of Darkness', ['Palace of Darkness - Big Key Chest'], ['PoD Big Key Landing Down Stairs', 'PoD Big Key Landing Hole']),
+        create_dungeon_region(player, 'PoD Falling Bridge', 'Palace of Darkness', None, ['PoD Falling Bridge SW', 'PoD Falling Bridge WN', 'PoD Falling Bridge EN']),
+        create_dungeon_region(player, 'PoD Dark Maze', 'Palace of Darkness', ['Palace of Darkness - Dark Maze - Top', 'Palace of Darkness - Dark Maze - Bottom'], ['PoD Dark Maze EN', 'PoD Dark Maze E']),
+        create_dungeon_region(player, 'PoD Big Chest Balcony', 'Palace of Darkness', ['Palace of Darkness - Big Chest'], ['PoD Big Chest Balcony W']),
+        create_dungeon_region(player, 'PoD Compass Room', 'Palace of Darkness', ['Palace of Darkness - Compass Chest'], ['PoD Compass Room SE', 'PoD Compass Room WN', 'PoD Compass Room W Down Stairs', 'PoD Compass Room E Down Stairs']),
+        create_dungeon_region(player, 'PoD Dark Basement', 'Palace of Darkness', ['Palace of Darkness - Dark Basement - Left', 'Palace of Darkness - Dark Basement - Right'], ['PoD Dark Basement W Up Stairs', 'PoD Dark Basement E Up Stairs']),
+        create_dungeon_region(player, 'PoD Harmless Hellway', 'Palace of Darkness', ['Palace of Darkness - Harmless Hellway'], ['PoD Harmless Hellway NE', 'PoD Harmless Hellway SE']),
+        create_dungeon_region(player, 'PoD Mimics 2', 'Palace of Darkness', None, ['PoD Mimics 2 SW', 'PoD Mimics 2 NW']),
+        create_dungeon_region(player, 'PoD Bow Statue', 'Palace of Darkness', None, ['PoD Bow Statue SW', 'PoD Bow Statue Down Ladder']),
+        create_dungeon_region(player, 'PoD Dark Pegs', 'Palace of Darkness', None, ['PoD Dark Pegs Up Ladder', 'PoD Dark Pegs WN']),
+        create_dungeon_region(player, 'PoD Lonely Turtle', 'Palace of Darkness', None, ['PoD Lonely Turtle SW', 'PoD Lonely Turtle EN']),
+        create_dungeon_region(player, 'PoD Turtle Party', 'Palace of Darkness', None, ['PoD Turtle Party ES', 'PoD Turtle Party NW']),
+        create_dungeon_region(player, 'PoD Dark Alley', 'Palace of Darkness', None, ['PoD Dark Alley NE']),
+        create_dungeon_region(player, 'PoD Callback', 'Palace of Darkness', None, ['PoD Callback WS', 'PoD Callback Warp']),
+        create_dungeon_region(player, 'PoD Boss', 'Palace of Darkness', ['Palace of Darkness - Boss', 'Palace of Darkness - Prize'], ['PoD Boss SE']),
+
         # swamp
+        # sw
+        # tt
         # ice
         # mire
         # tr
         # gt
-        # sw
     ]
 
     for region_name, (room_id, shopkeeper, replaceable) in shop_table.items():
