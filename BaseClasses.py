@@ -84,8 +84,10 @@ class World(object):
         self.spoiler = Spoiler(self)
         self.lamps_needed_for_dark_rooms = 1
         self.doors = []
+        self._door_cache = {}
         self.paired_doors = {}
         self.rooms = []
+        self._room_cache = {}
 
     def intialize_regions(self):
         for region in self.regions:
@@ -141,29 +143,38 @@ class World(object):
     def get_door(self, doorname, player):
         if isinstance(doorname, Door):
             return doorname
-
-        for door in self.doors:
-            if door.name == doorname and door.player == player:
-                return door
-        raise RuntimeError('No such door %s' % doorname)
+        try:
+            return self._door_cache[(doorname, player)]
+        except KeyError:
+            for door in self.doors:
+                if door.name == doorname and door.player == player:
+                    self._door_cache[(doorname, player)] = door
+                    return door
+            raise RuntimeError('No such door %s for player %d' % (doorname, player))
 
     def check_for_door(self, doorname, player):
         if isinstance(doorname, Door):
             return doorname
-
-        for door in self.doors:
-            if door.name == doorname and door.player == player:
-                return door
-        return None
+        try:
+            return self._door_cache[(doorname, player)]
+        except KeyError:
+            for door in self.doors:
+                if door.name == doorname and door.player == player:
+                    self._door_cache[(doorname, player)] = door
+                    return door
+            return None
 
     def get_room(self, room_idx, player):
         if isinstance(room_idx, Room):
             return room_idx
-
-        for room in self.rooms:
-            if room.index == room_idx and room.player == player:
-                return room
-        raise RuntimeError('No such room %s' % room_idx)
+        try:
+            return self._room_cache[(room_idx, player)]
+        except KeyError:
+            for room in self.rooms:
+                if room.index == room_idx and room.player == player:
+                    self._room_cache[(room_idx, player)] = room
+                    return room
+            raise RuntimeError('No such room %s for player %d' % (room_idx, player))
 
     def get_all_state(self, keys=False):
         ret = CollectionState(self)

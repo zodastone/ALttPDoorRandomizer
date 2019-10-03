@@ -954,7 +954,7 @@ def no_glitches_rules(world, player):
         add_conditional_lamp('Tower Dual Statues WS', 'Tower Dual Statues', 'Entrance')
         add_conditional_lamp('Tower Dark Pits ES', 'Tower Dark Pits', 'Entrance')
         add_conditional_lamp('Tower Dark Pits EN', 'Tower Dark Pits', 'Entrance')
-        add_conditional_lamp('Tower Dark Archers WS', 'Tower Dark Archers', 'Entrance')
+        add_conditional_lamp('Tower Dark Archers WN', 'Tower Dark Archers', 'Entrance')
         add_conditional_lamp('Tower Dark Archers Up Stairs', 'Tower Dark Archers', 'Entrance')
         add_conditional_lamp('Castle Tower - Dark Maze', 'Tower Dark Maze', 'Location')
         add_conditional_lamp('Castle Tower - Dark Archer Key Drop', 'Tower Dark Archers', 'Location')

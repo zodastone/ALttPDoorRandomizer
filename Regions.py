@@ -371,7 +371,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Tower Dark Chargers', 'Castle Tower', None, ['Tower Dark Chargers WS', 'Tower Dark Chargers Up Stairs']),
         create_dungeon_region(player, 'Tower Dual Statues', 'Castle Tower', None, ['Tower Dual Statues Down Stairs', 'Tower Dual Statues WS']),
         create_dungeon_region(player, 'Tower Dark Pits', 'Castle Tower', None, ['Tower Dark Pits ES', 'Tower Dark Pits EN']),
-        create_dungeon_region(player, 'Tower Dark Archers', 'Castle Tower', ['Castle Tower - Dark Archer Key Drop'], ['Tower Dark Archers WS', 'Tower Dark Archers Up Stairs']),
+        create_dungeon_region(player, 'Tower Dark Archers', 'Castle Tower', ['Castle Tower - Dark Archer Key Drop'], ['Tower Dark Archers WN', 'Tower Dark Archers Up Stairs']),
         create_dungeon_region(player, 'Tower Red Spears', 'Castle Tower', None, ['Tower Red Spears Down Stairs', 'Tower Red Spears WN']),
         create_dungeon_region(player, 'Tower Red Guards', 'Castle Tower', None, ['Tower Red Guards EN', 'Tower Red Guards SW']),
         create_dungeon_region(player, 'Tower Circle of Pots', 'Castle Tower', ['Castle Tower - Circle of Pots Key Drop'], ['Tower Circle of Pots NW', 'Tower Circle of Pots WS']),
