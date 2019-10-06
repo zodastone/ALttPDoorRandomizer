@@ -276,11 +276,11 @@ class PairedDoor(object):
 
     def address_a(self, world, player):
         d = world.check_for_door(self.door_a, player)
-        return 0x13C000 + door_pair_offset_table[d.roomIndex]*2
+        return 0x13C000 + (door_pair_offset_table[d.roomIndex]+d.doorListPos)*2
 
     def address_b(self, world, player):
         d = world.check_for_door(self.door_b, player)
-        return 0x13C000 + door_pair_offset_table[d.roomIndex]*2
+        return 0x13C000 + (door_pair_offset_table[d.roomIndex]+d.doorListPos)*2
 
     def rom_data_a(self, world, player):
         if not self.pair:

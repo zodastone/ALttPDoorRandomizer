@@ -54,6 +54,7 @@ SpiralWarp: {
     lda $01 : and #$80 : beq .set53
     ; if target is also up adjust by (-6, 14)
     lda #$fa : !add $20 : sta $20 : lda #$14 : !add $22 : sta $22
+    bne .set53 : inc $23
     .set53
     txa : !add $22 : sta $53
 
@@ -96,8 +97,8 @@ LookupSpiralOffset: {
     .q1diff lda $22 : cmp #$98 : bcc .done ;swamp/pod dual stairs
     inc $01 : bra .done
     .quad2    ;ice room
-    lda $040c : cmp $12 : bne .done
     lda #$03 : sta $01
+    lda $040c : cmp $12 : bne .done
     lda $22 : cmp #$78 : bcc .done
     inc $01 : bra .done
     .quad3 lda #$02 : sta $01 ; always 2

@@ -1009,7 +1009,7 @@ def reassign_key_doors(current_doors, proposal, world, player):
     while len(queue) > 0:
         d = queue.pop()
         if d.type is DoorType.SpiralStairs and d not in proposal:
-            world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)
+            world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.IncognitoEntrance)
             d.smallKey = False
         elif d.type is DoorType.Interior and d not in flat_proposal and d.dest not in flat_proposal:
             world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)

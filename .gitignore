@@ -3,6 +3,8 @@
 *_Spoiler.txt
 *.pyc
 *.sfc
+*.srm
+*.bst
 *.wixobj
 build
 bundle/components.wxs
@@ -13,3 +15,5 @@ README.html
 *multisave
 EnemizerCLI/
 .mypy_cache/
+venv
+test
