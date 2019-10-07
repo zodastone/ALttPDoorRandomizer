@@ -256,12 +256,7 @@ def global_rules(world, player):
 
     # Start of door rando rules
     # TODO: Do these need to flag off when door rando is off?
-    # TODO: Can these replace other rules?
-
-    # Hyrule Castle: Can't get keys from guards unless you can kill said guards.
-    # Aerinon's note: You can use bombs? - That's usually assumed. In Standard, you get uncle weapon
-    # add_rule(world.get_location('Hyrule Castle - Map Guard Key Drop', player), lambda state: state.can_kill_most_things(player))
-    # add_rule(world.get_location('Hyrule Castle - Boomerang Guard Key Drop', player), lambda state: state.can_kill_most_things(player))
+    # If these generate fine rules with vanilla shuffle - then no.
 
     # Hyrule Castle: There are three keys and we don't know how we shuffled, so we
     # need three keys to be accessible before you use any of these doors.
@@ -285,10 +280,7 @@ def global_rules(world, player):
         forbid_item(world.get_location('Eastern Palace - Big Chest', player), 'Big Key (Eastern Palace)', player)
     set_rule(world.get_entrance('Eastern Big Key NE', player), lambda state: state.has('Big Key (Eastern Palace)', player))
     set_rule(world.get_entrance('Eastern Courtyard N', player), lambda state: state.has('Big Key (Eastern Palace)', player))
-    # There are two keys and we don't know how we shuffled, so careful with key doors.
-    # TODO: Generate key rules in the shuffler. (But make sure this way works first.)
-    for door in ['Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN', 'Eastern Darkness Up Stairs']:
-        set_rule(world.get_entrance(door, player), lambda state: state.has_key('Small Key (Eastern Palace)', player, 2))
+    # TODO: Key logic for eastern
 
     # Boss rules. Same as below but no BK or arrow requirement.
     set_defeat_dungeon_boss_rule(world.get_location('Eastern Palace - Prize', player))

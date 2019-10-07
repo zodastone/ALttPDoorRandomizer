@@ -311,7 +311,8 @@ def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
 # TODO: This is gross, don't do it this way
 def maybe_connect_two_way(world, a, b, player):
     # Return on unsupported types.
-    if a.type in [DoorType.Open, DoorType.StraightStairs, DoorType.Hole, DoorType.Warp, DoorType.Interior, DoorType.Logical]:
+    if a.type in [DoorType.Open, DoorType.StraightStairs, DoorType.Hole, DoorType.Warp, DoorType.Ladder,
+                  DoorType.Interior, DoorType.Logical]:
         return
     # Connect supported types
     if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs:
@@ -847,7 +848,7 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
     # find valid combination of candidates
     paired_candidates = build_pair_list(flat_candidates)
     if len(paired_candidates) < num_key_doors:
-        raise Exception('Not enough candidates')
+        num_key_doors = len(paired_candidates)  # reduce number of key doors
     random.shuffle(paired_candidates)
     combinations = ncr(len(paired_candidates), num_key_doors)
     itr = 0
@@ -901,8 +902,7 @@ def find_key_door_candidates(region, checked, world, player):
                     position, kind = room.doorList[d.doorListPos]
 
                     if d.type == DoorType.Interior:
-                        valid = kind in [DoorKind.Normal, DoorKind.NormalLow, DoorKind.SmallKey, DoorKind.Bombable,
-                                         DoorKind.Dashable, DoorKind.NormalLow2]
+                        valid = kind in [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable, DoorKind.Dashable]
                     elif d.type == DoorType.SpiralStairs:
                         valid = kind in [DoorKind.StairKey, DoorKind.StairKey2, DoorKind.StairKeyLow]
                     elif d.type == DoorType.Normal:
@@ -910,8 +910,8 @@ def find_key_door_candidates(region, checked, world, player):
                         if d2 not in candidates:
                             room_b = world.get_room(d2.roomIndex, player)
                             pos_b, kind_b = room_b.doorList[d2.doorListPos]
-                            okay_normals = [DoorKind.Normal, DoorKind.NormalLow, DoorKind.SmallKey, DoorKind.Bombable,
-                                            DoorKind.Dashable, DoorKind.NormalLow2, DoorKind.Warp, DoorKind.DungeonChanger]
+                            okay_normals = [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable,
+                                            DoorKind.Dashable, DoorKind.Warp, DoorKind.DungeonChanger]
                             valid = kind in okay_normals and kind_b in okay_normals
                         else:
                             valid = True
@@ -1009,7 +1009,7 @@ def reassign_key_doors(current_doors, proposal, world, player):
     while len(queue) > 0:
         d = queue.pop()
         if d.type is DoorType.SpiralStairs and d not in proposal:
-            world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.IncognitoEntrance)
+            world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Waterfall)
             d.smallKey = False
         elif d.type is DoorType.Interior and d not in flat_proposal and d.dest not in flat_proposal:
             world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)
@@ -1035,6 +1035,10 @@ def reassign_key_doors(current_doors, proposal, world, player):
                     if dp.door_a in names and dp.door_b in names:
                         dp.pair = True
                         found = True
+                    elif dp.door_a in names:
+                        dp.pair = False
+                    elif dp.door_b in names:
+                        dp.pair = False
                 if not found:
                     world.paired_doors[player].append(PairedDoor(d1.name, d2.name))
                     change_door_to_small_key(d1, world, player)

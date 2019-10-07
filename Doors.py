@@ -116,10 +116,9 @@ def create_doors(world, player):
         big_key(create_dir_door(player, 'Eastern Big Key NE', DoorType.Normal, Direction.North, 0xb8, Right, High)).pos(0),
         ugly_door(small_key(create_dir_door(player, 'Eastern Darkness S', DoorType.Normal, Direction.South, 0x99, Mid, High))).pos(1),
         # Up is a keydoor and down is not. Only the up stairs should be considered a key door for now.
-        # Todo: add key door?
-        small_key(create_spiral_stairs(player, 'Eastern Darkness Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x99, 0, HTH, Z, 0x1a, 0x6c, False, True)),
+        small_key(create_spiral_stairs(player, 'Eastern Darkness Up Stairs', DoorType.SpiralStairs, Direction.Up, 0x99, 0, HTH, Z, 0x1a, 0x6c, False, True)).pos(0),
         ugly_door(create_spiral_stairs(player, 'Eastern Attic Start Down Stairs', DoorType.SpiralStairs, Direction.Down, 0xda, 0, HTH, Z, 0x11, 0x80, True, True)),
-        create_dir_door(player, 'Eastern Attic Start WS', DoorType.Normal, Direction.West, 0xda, Bot, High).pos(0),
+        create_dir_door(player, 'Eastern Attic Start WS', DoorType.Normal, Direction.West, 0xda, Bot, High).trap(0x4).pos(0),
         create_dir_door(player, 'Eastern Attic Switches ES', DoorType.Normal, Direction.East, 0xd9, Bot, High).trap(0x1).pos(2),
         create_dir_door(player, 'Eastern Attic Switches WS', DoorType.Normal, Direction.West, 0xd9, Bot, High).trap(0x4).pos(0),
         create_dir_door(player, 'Eastern Eyegores ES', DoorType.Normal, Direction.East, 0xd8, Bot, High).pos(2),

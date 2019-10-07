@@ -320,6 +320,7 @@ class DoorKind(Enum):
     BigKey = 0x1E
     StairKey = 0x20
     StairKey2 = 0x22
+    HauntedStairKey = 0x24  # not a real door, can see it in dark rooms when facing left
     StairKeyLow = 0x26
     Dashable = 0x28
     BombableEntrance = 0x2A

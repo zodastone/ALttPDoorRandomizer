@@ -1,24 +1,11 @@
 Notes:
 
-(Fixed?) HD Staircase up to HC Main Map Room was wrong location
-(Fixed?) Key door between Hyrule Castle East Hall S <=> Sewers Key Rat Key Door N not paired
+AgaTower usually doesn't have enough Key Door candidates
 (Testing) Camera spots in Aga Tower: Push Statue, Lone Statue maybe?
-(Fixed?) Spiral stairs without keys look funny - change to Incognito instead of Normal
+(Testing Waterfall Now) Spiral stairs without keys look funny - change to Incognito instead of Normal
 
-Key door on Layer 1 not working (Aga Tower)
-Key door in HC Lobby E door not passable - look into it?
-
-Zero camera out skips quad logic
-
-The armory guard room and the room above have fake layers. Trap doors
-
-Notes 2:
-(Fixed)  this is 0060 but looks like should be 0460 layer again
-(Fixed) Wrong layer for Compass room WN?
-(Fixed partially )Guardroom N Door is set to $8000, I think it was supposed to be Eastern Compass Area SW $02a8 that how this get teleported back to HC. Wrong room index. Still might be a toggle door
-(Fixed) Courtyard N is set to $02D8 - typo
-(Fixed) Sanc N is $0650 but should be $0250 which I think is right. typo again on the wrong layer
-(Fixed) Eastern boss had wrong room
+(Can't Fix yet) Key door on Layer 1 not working (Aga Tower)
+(Can't Fix yet) Key door in HC Lobby E door not passable - look into it?
 
 Pairing Notes
 30-34 4f-37 #$18,-24
