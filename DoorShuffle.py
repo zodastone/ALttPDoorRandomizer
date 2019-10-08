@@ -6,7 +6,8 @@ import operator as op
 from functools import reduce
 from BaseClasses import RegionType, DoorType, Direction, Sector, pol_idx
 from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions, pod_regions
-from Dungeons import dungeon_regions
+from Dungeons import dungeon_regions, region_starts, split_region_starts
+from Regions import key_only_locations
 from RoomData import DoorKind, PairedDoor
 
 
@@ -391,58 +392,51 @@ def doors_fit_mandatory_pair(pair_list, a, b):
 
 
 def cross_dungeon(world, player):
-    hc = convert_to_sectors(dungeon_regions['Hyrule Castle'], world, player)
-    ep = convert_to_sectors(dungeon_regions['Eastern'], world, player)
-    dp = convert_to_sectors(dungeon_regions['Desert'], world, player)
-    th = convert_to_sectors(dungeon_regions['Hera'], world, player)
-    at = convert_to_sectors(dungeon_regions['Tower'], world, player)
-    pd = convert_to_sectors(dungeon_regions['PoD'], world, player)
-    dungeon_split = split_up_sectors(hc + ep + dp + th + at + pd, default_dungeon_sets)
-    dp_split = split_up_sectors(dungeon_split.pop(2), desert_default_entrance_sets)
+    all_sectors = []
+    for key in dungeon_regions.keys():
+        all_sectors.extend(convert_to_sectors(dungeon_regions[key], world, player))
+    dungeon_split = split_up_sectors(all_sectors, default_dungeon_sets)
     dungeon_sectors = []
-    # todo - adjust dungeon item pools
     for idx, sector_list in enumerate(dungeon_split):
-        dungeon_sectors.append((sector_list, entrance_sets[idx]))
-    for idx, sector_list in enumerate(dp_split):
-        dungeon_sectors.append((sector_list, desert_default_entrance_sets[idx]))
+        name = dungeon_x_idx_to_name[idx]
+        if name in split_region_starts.keys():
+            split = split_up_sectors(sector_list, split_region_starts[name])
+            for sub_idx, sub_sector_list in enumerate(split):
+                dungeon_sectors.append((name, sub_sector_list, split_region_starts[name][sub_idx]))
+        else:
+            dungeon_sectors.append((name, sector_list, region_starts[name]))
+    # todo - adjust dungeon item pools -- ?
+    dungeon_layouts = []
+    for key, sector_list, entrance_list in dungeon_sectors:
+        ds = shuffle_dungeon_no_repeats(world, player, sector_list, entrance_list)
+        ds.name = key
+        dungeon_layouts.append((ds, entrance_list))
 
-    for sector_list, entrance_list in dungeon_sectors:
-        shuffle_dungeon_no_repeats(world, player, sector_list, entrance_list)
+    combine_layouts(dungeon_layouts)
+
+    for layout in dungeon_layouts:
+        shuffle_key_doors(layout[1], layout[2], world, player)
 
 
 def experiment(world, player):
     fix_big_key_doors_with_ugly_smalls(world, player)
-    hc = convert_to_sectors(dungeon_regions['Hyrule Castle'], world, player)
-    ep = convert_to_sectors(dungeon_regions['Eastern'], world, player)
-    dp = convert_to_sectors(dungeon_regions['Desert'], world, player)
-    th = convert_to_sectors(dungeon_regions['Hera'], world, player)
-    at = convert_to_sectors(dungeon_regions['Tower'], world, player)
-    pd = convert_to_sectors(dungeon_regions['PoD'], world, player)
     dungeon_sectors = []
-    for idx, sector_list in enumerate([hc, ep, th, at, pd]):
-        dungeon_sectors.append((sector_list, entrance_sets[idx]))
-    dp_split = split_up_sectors(dp, desert_default_entrance_sets)
-    for idx, sector_list in enumerate(dp_split):
-        dungeon_sectors.append((sector_list, desert_default_entrance_sets[idx]))
+    for key in dungeon_regions.keys():
+        sector_list = convert_to_sectors(dungeon_regions[key], world, player)
+        if key in split_region_starts.keys():
+            split_sectors = split_up_sectors(sector_list, split_region_starts[key])
+            for idx, sub_sector_list in enumerate(split_sectors):
+                dungeon_sectors.append((key, sub_sector_list, split_region_starts[key][idx]))
+        else:
+            dungeon_sectors.append((key, sector_list, region_starts[key]))
 
     dungeon_layouts = []
-    for sector_list, entrance_list in dungeon_sectors:
+    for key, sector_list, entrance_list in dungeon_sectors:
         ds = shuffle_dungeon_no_repeats(world, player, sector_list, entrance_list)
+        ds.name = key
         dungeon_layouts.append((ds, entrance_list))
 
-    desert_combined = None
-    desert_entrances = []
-    queue = collections.deque(dungeon_layouts)
-    while len(queue) > 0:
-        sector, entrance_list = queue.pop()
-        if entrance_list in desert_default_entrance_sets:
-            dungeon_layouts.remove((sector, entrance_list))
-            desert_entrances.extend(entrance_list)
-            if desert_combined is None:
-                desert_combined = sector
-            else:
-                desert_combined.regions.extend(sector.regions)
-    dungeon_layouts.append((desert_combined, desert_entrances))
+    combine_layouts(dungeon_layouts)
 
     # shuffle_key_doors for dungeons
     for layout in dungeon_layouts:
@@ -491,6 +485,23 @@ def convert_to_sectors(region_names, world, player):
         if new_sector:
             sectors.append(sector)
     return sectors
+
+
+# those with split region starts like Desert/Skull combine for key layouts
+def combine_layouts(dungeon_layouts):
+    combined = {}
+    queue = collections.deque(dungeon_layouts)
+    while len(queue) > 0:
+        sector, entrance_list = queue.pop()
+        if sector.name in split_region_starts:
+            dungeon_layouts.remove((sector, entrance_list))
+            # desert_entrances.extend(entrance_list)
+            if sector.name not in combined:
+                combined[sector.name] = sector
+            else:
+                combined[sector.name].regions.extend(sector.regions)
+    for key in combined.keys():
+        dungeon_layouts.append((combined[key], region_starts[key]))
 
 
 def split_up_sectors(sector_list, entrance_sets):
@@ -810,7 +821,7 @@ def are_there_outstanding_doors_of_type(door_a, door_b, sector_a, sector_b, avai
 
 def shuffle_key_doors(dungeon_sector, entrances, world, player):
     start_regions = convert_regions(entrances, world, player)
-    # count number of key doors
+    # count number of key doors - this could be a table?
     num_key_doors = 0
     current_doors = []
     skips = []
@@ -849,16 +860,19 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
     paired_candidates = build_pair_list(flat_candidates)
     if len(paired_candidates) < num_key_doors:
         num_key_doors = len(paired_candidates)  # reduce number of key doors
+        logging.getLogger('').debug('Lowering key door count because not enough candidates: %s', dungeon_sector.name)
     random.shuffle(paired_candidates)
     combinations = ncr(len(paired_candidates), num_key_doors)
     itr = 0
     proposal = kth_combination(itr, paired_candidates, num_key_doors)
-    while not validate_key_layout(start_regions, proposal, world, player):
+    while not validate_key_layout(dungeon_sector, start_regions, proposal, world, player):
         itr += 1
+        if itr >= combinations:
+            logging.getLogger('').debug('Lowering key door count because no valid layouts: %s', dungeon_sector.name)
+            num_key_doors -= 1
+            combinations = ncr(len(paired_candidates), num_key_doors)
+            itr = 0
         proposal = kth_combination(itr, paired_candidates, num_key_doors)
-        if itr > combinations:
-            raise Exception('No valid key layouts!')
-
     # make changes
     reassign_key_doors(current_doors, proposal, world, player)
 
@@ -937,70 +951,130 @@ def kth_combination(k, l, r):
 
 
 def ncr(n, r):
+    if r == 0:
+        return 1
     r = min(r, n-r)
     numerator = reduce(op.mul, range(n, n-r, -1), 1)
     denominator = reduce(op.mul, range(1, r+1), 1)
     return numerator / denominator
 
 
-def validate_key_layout(start_regions, key_door_proposal, world, player):
+class KeyDoorState(object):
+
+    def __init__(self):
+        self.avail_doors = []
+        self.small_doors = []
+        self.big_doors = []
+        self.opened_doors = []
+        self.big_key_opened = False
+        self.big_key_special = False
+
+        self.visited_regions = set()
+        self.ttl_locations = 0
+        self.used_locations = 0
+        self.key_locations = 0
+        self.used_smalls = 0
+
+    def copy(self):
+        ret = KeyDoorState()
+        ret.avail_doors = list(self.avail_doors)
+        ret.small_doors = list(self.small_doors)
+        ret.big_doors = list(self.big_doors)
+        ret.opened_doors = list(self.opened_doors)
+        ret.big_key_opened = self.big_key_opened
+        ret.big_key_special = self.big_key_special
+        ret.visited_regions = set(self.visited_regions)
+        ret.ttl_locations = self.ttl_locations
+        ret.key_locations = self.key_locations
+        ret.used_locations = self.used_locations
+        ret.used_smalls = self.used_smalls
+
+        return ret
+
+
+def validate_key_layout(sector, start_regions, key_door_proposal, world, player):
     flat_proposal = flatten_pair_list(key_door_proposal)
-    available_doors = []  # Doors to explore
-    big_key_doors = []
-    small_key_doors = []
-    big_key_opened = False
-    visited_regions = set()  # Regions we've been to and don't need to expand
-    ttl_locations = 0
-    used_locations = 0
+    state = KeyDoorState()
+    state.key_locations = len(world.get_dungeon(sector.name, player).small_keys)
+    state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in sector.regions
     # Everything in a start region is in key region 0.
     for region in start_regions:
-        visited_regions.add(region)
-        ttl_locations += len(region.locations)
-        add_doors_to_lists(region, flat_proposal, available_doors, small_key_doors,
-                           big_key_doors, big_key_opened, world, player)
-    while len(available_doors) > 0:
-        door = available_doors.pop()
+        state.visited_regions.add(region)
+        state.ttl_locations += len(region.locations)
+        for location in region.locations:
+            if location.name in key_only_locations:
+                state.key_locations += 1
+        add_doors_to_lists(region, flat_proposal, state, world, player)
+    return validate_key_layout_r(state, flat_proposal, world, player)
+
+
+def validate_key_layout_r(state, flat_proposal, world, player):
+    while len(state.avail_doors) > 0:
+        door = state.avail_doors.pop()
         connect_region = world.get_entrance(door.name, player).connected_region
-        if not door.blocked and connect_region not in visited_regions:
-            visited_regions.add(connect_region)
-            ttl_locations += len(connect_region.locations)
-            add_doors_to_lists(connect_region, flat_proposal, available_doors, small_key_doors,
-                               big_key_doors, big_key_opened, world, player)
-        if len(available_doors) == 0:
+        if not door.blocked and connect_region not in state.visited_regions:
+            state.visited_regions.add(connect_region)
+            state.ttl_locations += len([x for x in connect_region.locations if '- Prize' not in x.name])
+            for location in connect_region.locations:
+                if location.name in key_only_locations:
+                    state.key_locations += 1
+            if connect_region.name == 'Hyrule Dungeon Cellblock':
+                state.big_key_opened = True
+                state.avail_doors.extend(state.big_doors)
+                state.big_doors.clear()
+            add_doors_to_lists(connect_region, flat_proposal, state, world, player)
+        if len(state.avail_doors) == 0:
             num_smalls = 0
-            for small in small_key_doors:
-                if small.dest in small_key_doors:
+            for small in state.small_doors:
+                if small.dest in state.small_doors:
                     num_smalls += 0.5  # half now, half with the dest
                 else:
                     num_smalls += 1
-            num_bigs = 1 if len(big_key_doors) > 0 else 0  # all or nothing
+            num_bigs = 1 if len(state.big_doors) > 0 else 0  # all or nothing
             if num_smalls == 0 and num_bigs == 0:
                 return True   # I think that's the end
-            available_locations = ttl_locations - used_locations
-            if available_locations >= num_smalls > 0:  # todo: this not lenient at all - need a recursive function maybe
-                available_doors.extend(small_key_doors)
-                small_key_doors.clear()
-                used_locations += num_smalls
-            elif not big_key_opened and available_locations >= num_bigs > 0:
-                big_key_opened = True
-                used_locations += 1  # todo: this does not handle hc big key in crossed modes
-                available_doors.extend(big_key_doors)
-                big_key_doors.clear()
-            else:
+            available_small_locations = min(state.ttl_locations - state.used_locations, state.key_locations - state.used_smalls)
+            available_big_locations = state.ttl_locations - state.used_locations if not state.big_key_special else 0
+            valid = True
+            if (num_smalls == 0 or available_small_locations == 0) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
                 return False
-    return len(small_key_doors) == 0 and len(big_key_doors) == 0
+            else:
+                if num_smalls > 0 and available_small_locations > 0:
+                    for d in state.small_doors:
+                        state_copy = state.copy()
+                        state_copy.opened_doors.append(d)
+                        state_copy.avail_doors.append(d)
+                        state_copy.small_doors.remove(d)
+                        if d.dest in flat_proposal:
+                            state_copy.opened_doors.append(d.dest)
+                            if d.dest in state_copy.small_doors:
+                                state_copy.small_doors.remove(d.dest)
+                                state_copy.avail_doors.append(d.dest)
+                        state_copy.used_locations += 1
+                        state_copy.used_smalls += 1
+                        valid = validate_key_layout_r(state_copy, flat_proposal, world, player)
+                        if not valid:
+                            return valid
+                if not state.big_key_opened and available_big_locations >= num_bigs > 0:
+                    state_copy = state.copy()
+                    state_copy.big_key_opened = True
+                    state_copy.used_locations += 1
+                    state_copy.avail_doors.extend(state.big_doors)
+                    state_copy.big_doors.clear()
+                    valid = validate_key_layout_r(state_copy, flat_proposal, world, player)
+            return valid
+    return len(state.small_doors) == 0 and len(state.big_doors) == 0
 
 
-def add_doors_to_lists(region, key_door_proposal, available_doors, small_key_doors,
-                       big_key_doors, big_key_opened, world, player):
+def add_doors_to_lists(region, key_door_proposal, kd_state, world, player):
     for door in get_doors(world, region, player):
         if not door.blocked:
-            if door in key_door_proposal and door not in small_key_doors:
-                small_key_doors.append(door)
-            elif door.bigKey and not big_key_opened and door not in big_key_doors:
-                big_key_doors.append(door)
-            elif door not in available_doors:
-                available_doors.append(door)
+            if door in key_door_proposal and door not in kd_state.small_doors and door not in kd_state.opened_doors:
+                kd_state.small_doors.append(door)
+            elif door.bigKey and not kd_state.big_key_opened and door not in kd_state.big_doors:
+                kd_state.big_doors.append(door)
+            elif door not in kd_state.avail_doors:
+                kd_state.avail_doors.append(door)
 
 
 def reassign_key_doors(current_doors, proposal, world, player):
@@ -1302,24 +1376,12 @@ default_dungeon_sets = [
     ['PoD Lobby', 'PoD Boss']
 ]
 
-
-desert_default_entrance_sets = [
-    ['Desert Back Lobby'],
-    ['Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
-]
-
-# 'Skull': ['Skull 1 Lobby', 'Skull 2 Mummy Lobby', 'Skull 2 Key Lobby', 'Skull 3 Lobby'],
-
-entrance_sets = [
-    ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Secret Room', 'Sanctuary'],
-    ['Eastern Lobby'],
-    ['Hera Lobby'],
-    ['Tower Lobby'],
-    ['PoD Lobby'],
-    # ['Swamp Lobby'],
-    # ['TT Lobby'],
-    # ['Ice Lobby'],
-    # ['Mire Lobby'],
-    # ['TR Main Lobby', 'TR Eye Trap', 'TR Big Chest', 'TR Laser Bridge'],
-    # ['GT Lobby']
-]
+dungeon_x_idx_to_name = {
+    0: 'Hyrule Castle',
+    1: 'Eastern Palace',
+    2: 'Desert Palace',
+    3: 'Tower of Hera',
+    4: 'Agahnims Tower',
+    5: 'Palace of Darkness',
+#     etc
+}

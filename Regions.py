@@ -293,7 +293,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Sewers Rope Room', 'A dungeon', None, ['Sewers Rope Room Up Stairs', 'Sewers Rope Room North Stairs']),
         create_dungeon_region(player, 'Sewers Dark Cross', 'A dungeon', ['Sewers - Dark Cross'], ['Sewers Dark Cross Key Door N', 'Sewers Dark Cross South Stairs']),
         create_dungeon_region(player, 'Sewers Water', 'A dungeon', None, ['Sewers Dark Cross Key Door S', 'Sewers Water W']),
-        create_dungeon_region(player, 'Sewers Key Rat', 'A dungeon', None, ['Sewers Key Rat E', 'Sewers Key Rat Key Door N']),
+        create_dungeon_region(player, 'Sewers Key Rat', 'A dungeon', ['Hyrule Castle - Key Rat Key Drop'], ['Sewers Key Rat E', 'Sewers Key Rat Key Door N']),
         create_dungeon_region(player, 'Sewers Secret Room Blocked Path', 'A dungeon', None, ['Sewers Secret Room Up Stairs']),
         create_dungeon_region(player, 'Sewers Secret Room', 'A dungeon', ['Sewers - Secret Room - Left', 'Sewers - Secret Room - Middle', 'Sewers - Secret Room - Right'],
                               ['Sewers Secret Room Key Door S', 'Sewers Secret Room Push Block']),
@@ -537,7 +537,7 @@ default_shop_contents = {
 key_only_locations = {
   'Hyrule Castle - Map Guard Key Drop': 'Small Key (Escape)',
   'Hyrule Castle - Boomerang Guard Key Drop': 'Small Key (Escape)',
-  # todo: escape big key?
+  'Hyrule Castle - Key Rat Key Drop': 'Small Key (Escape)',
   'Eastern Palace - Dark Square Pot Key': 'Small Key (Eastern Palace)',
   'Eastern Palace - Dark Eyegore Key Drop': 'Small Key (Eastern Palace)',
   'Desert Palace - Desert Tiles 1 Pot Key': 'Small Key (Desert Palace)',
@@ -546,6 +546,8 @@ key_only_locations = {
   'Castle Tower - Dark Archer Key Drop': 'Small Key (Agahnims Tower)',
   'Castle Tower - Circle of Pots Key Drop': 'Small Key (Agahnims Tower)',
 }
+
+# todo: escape big key? - should be separate from above for dungeon key layout validation
 
 location_table = {'Mushroom': (0x180013, False, 'in the woods'),
                   'Bottle Merchant': (0x2eb18, False, 'with a merchant'),

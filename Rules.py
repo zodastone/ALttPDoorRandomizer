@@ -1,6 +1,8 @@
 import collections
+from collections import defaultdict
 import logging
 from BaseClasses import CollectionState
+from Dungeons import region_starts
 
 
 def set_rules(world, player):
@@ -258,20 +260,10 @@ def global_rules(world, player):
     # TODO: Do these need to flag off when door rando is off?
     # If these generate fine rules with vanilla shuffle - then no.
 
-    # Hyrule Castle: There are three keys and we don't know how we shuffled, so we
-    # need three keys to be accessible before you use any of these doors.
-    # TODO: Generate key rules in the shuffler. (But make sure this way works first.)
-    for door in ['Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S',
-             'Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S', 'Hyrule Dungeon Armory Interior Key Door N', 'Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon North Abyss Key Door N']:
-        set_rule(world.get_entrance(door, player), lambda state: state.has_key('Small Key (Escape)', player, 3))
-    
+    # Escape/ Hyrule Castle
+    generate_key_logic(region_starts['Hyrule Castle'], 'Small Key (Escape)', world, player)
+
     # Eastern Palace
-    # The stalfos room and eyegore with a key can be killed with pots.
-    # Eastern Palace has dark rooms.
-    for location in ['Eastern Palace - Dark Square Pot Key', 'Eastern Palace - Dark Eyegore Key Drop']:
-        add_rule(world.get_location(location, player), lambda state: state.has('Lamp', player))
-    for door in ['Eastern Darkness S', 'Eastern Darkness Up Stairs', 'Eastern Dark Square NW', 'Eastern Dark Square Key Door WN']:
-        add_rule(world.get_entrance(door, player), lambda state: state.has('Lamp', player))
     # Eyegore room needs a bow
     set_rule(world.get_entrance('Eastern Eyegores NE', player), lambda state: state.can_shoot_arrows(player))
     # Big key rules
@@ -280,7 +272,7 @@ def global_rules(world, player):
         forbid_item(world.get_location('Eastern Palace - Big Chest', player), 'Big Key (Eastern Palace)', player)
     set_rule(world.get_entrance('Eastern Big Key NE', player), lambda state: state.has('Big Key (Eastern Palace)', player))
     set_rule(world.get_entrance('Eastern Courtyard N', player), lambda state: state.has('Big Key (Eastern Palace)', player))
-    # TODO: Key logic for eastern
+    generate_key_logic(region_starts['Eastern Palace'], 'Small Key (Eastern Palace)', world, player)
 
     # Boss rules. Same as below but no BK or arrow requirement.
     set_defeat_dungeon_boss_rule(world.get_location('Eastern Palace - Prize', player))
@@ -294,7 +286,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Desert Wall Slide NW', player), lambda state: state.has_fire_source(player))
     set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Prize', player))
     set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Boss', player))
-    # TODO: Key logic for desert
+    generate_key_logic(region_starts['Desert Palace'], 'Small Key (Desert Palace)', world, player)
 
     # Tower of Hera
     set_rule(world.get_location('Tower of Hera - Big Chest', player), lambda state: state.has('Big Key (Tower of Hera)', player))
@@ -304,9 +296,10 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Hera Startile Corner NW', player), lambda state: state.has('Big Key (Tower of Hera)', player))
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Prize', player))
-    # TODO: Key logic for hera
+    generate_key_logic(region_starts['Tower of Hera'], 'Small Key (Tower of Hera)', world, player)
 
     set_rule(world.get_entrance('Tower Altar NW', player), lambda state: state.has_sword(player))
+    generate_key_logic(region_starts['Agahnims Tower'], 'Small Key (Agahnims Tower)', world, player)
 
     set_rule(world.get_entrance('PoD Mimics 1 NW', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Mimics 2 NW', player), lambda state: state.can_shoot_arrows(player))
@@ -320,7 +313,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('PoD Dark Pegs Up Ladder', player), lambda state: state.has('Hammer', player))
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Prize', player))
-    # TODO: Key logic for pod
+    generate_key_logic(region_starts['Palace of Darkness'], 'Small Key (Palace of Darkness)', world, player)
 
     # End of door rando rules.
 
@@ -1674,3 +1667,94 @@ def set_inverted_bunny_rules(world, player):
             add_rule(location, get_rule_to_add(location.parent_region))
 
 
+def generate_key_logic(start_region_names, small_key_name, world, player):
+    logger = logging.getLogger('')
+    # Now that the dungeon layout is done, we need to search again to generate key logic.
+    # TODO: This assumes all start doors are accessible, which isn't always true.
+    # TODO: This can generate solvable-but-really-annoying layouts due to one ways.
+    available_doors = []  # Doors to explore
+    visited_regions = set()  # Regions we've been to and don't need to expand
+    current_kr = 0  # Key regions are numbered, starting at 0
+    door_krs = {}  # Map of key door name to KR it lives in
+    kr_parents = {}  # Key region to parent map
+    kr_location_counts = defaultdict(int)  # Number of locations in each key region
+    # Everything in a start region is in key region 0.
+    for name in start_region_names:
+        region = world.get_region(name, player)
+        visited_regions.add(name)
+        kr_location_counts[current_kr] += len(region.locations)
+        for door in get_doors(world, region, player):
+            if not door.blocked:
+                available_doors.append(door)
+                door_krs[door.name] = current_kr
+    # Search into the dungeon
+    logger.debug('Begin key region search. %s', small_key_name)
+    while len(available_doors) > 0:
+        # Open as many non-key doors as possible before opening a key door.
+        # This guarantees that we're only exploring one key region at a time.
+        available_doors.sort(key=lambda door: 0 if door.smallKey else 1)
+        door = available_doors.pop()
+        # Bail early if we've been here before or the door is blocked
+        local_kr = door_krs[door.name]
+        logger.debug('  kr %s: Door %s', local_kr, door.name)
+        exit = world.get_entrance(door.name, player).connected_region
+        if door.blocked or exit.name in visited_regions:
+            continue
+        # Once we open a key door, we need a new region.
+        if door.smallKey:
+            current_kr += 1
+            kr_parents[current_kr] = local_kr
+            local_kr = current_kr
+            logger.debug('    New KR %s', current_kr)
+        # Account for the new region
+        visited_regions.add(exit.name)
+        kr_location_counts[local_kr] += len(exit.locations)
+        for new_door in get_doors(world, exit, player):
+            available_doors.append(new_door)
+            door_krs[new_door.name] = local_kr
+    # Now that we have doors divided up into key regions, we can analyze the map
+    # Invert the door -> kr map into one that lists doors by region.
+    kr_doors = defaultdict(list)
+    region_krs = {}
+    for door_name in door_krs:
+        kr = door_krs[door_name]
+        exit = world.get_entrance(door_name, player);
+        door = world.check_for_door(door_name, player)
+        region_krs[exit.parent_region.name] = kr
+        if door.smallKey and not door.blocked:
+            kr_doors[kr].append(exit)
+    kr_keys = defaultdict(int)  # Number of keys each region needs
+    for kr in range(0, current_kr + 1):
+        logic_doors = []
+        keys = 0
+        for door in kr_doors[kr]:
+            dest_kr = region_krs[door.connected_region.name]
+            if dest_kr > kr:
+                # This door heads deeper into the dungeon. It needs a full key, and logic
+                keys += 1
+                logic_doors.append(door)
+            elif dest_kr == kr:
+                # This door doesn't get us any deeper, but it's possible to waste a key.
+                # We're going to see its sibling in this search, so add half a key
+                keys += 0.5
+        # Add key count from parent region
+        if kr in kr_parents:
+            keys += kr_keys[kr_parents[kr]]
+        kr_keys[kr] = keys
+        # Generate logic
+        for door in logic_doors:
+            logger.info('  %s in kr %s needs %s keys', door.name, kr, keys)
+            add_rule(world.get_entrance(door.name, player), create_key_rule(small_key_name, player, keys))
+
+
+def create_key_rule(small_key_name, player, keys):
+    return lambda state: state.has_key(small_key_name, player, keys)
+
+
+def get_doors(world, region, player):
+    res = []
+    for exit in region.exits:
+        door = world.check_for_door(exit.name, player)
+        if door is not None:
+            res.append(door)
+    return res

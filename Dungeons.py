@@ -217,11 +217,11 @@ pod_regions = [
 
 dungeon_regions = {
     'Hyrule Castle': hyrule_castle_regions,
-    'Eastern': eastern_regions,
-    'Desert': desert_regions,
-    'Hera': hera_regions,
-    'Tower': tower_regions,
-    'PoD': pod_regions,
+    'Eastern Palace': eastern_regions,
+    'Desert Palace': desert_regions,
+    'Tower of Hera': hera_regions,
+    'Agahnims Tower': tower_regions,
+    'Palace of Darkness': pod_regions,
     # 'Swamp':
     # 'Skull':
     # 'TT':
@@ -230,3 +230,28 @@ dungeon_regions = {
     # 'TR':
     # 'GT':
 }
+
+region_starts = {
+    'Hyrule Castle': ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Secret Room', 'Sanctuary'],
+    'Eastern Palace': ['Eastern Lobby'],
+    'Desert Palace': ['Desert Back Lobby', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby'],
+    'Tower of Hera': ['Hera Lobby'],
+    'Agahnims Tower': ['Tower Lobby'],
+    'Palace of Darkness': ['PoD Lobby'],
+    # ['Swamp Lobby'],
+    # ['TT Lobby'],
+    # ['Ice Lobby'],
+    # ['Mire Lobby'],
+    # ['TR Main Lobby', 'TR Eye Trap', 'TR Big Chest', 'TR Laser Bridge'],
+    # ['GT Lobby']
+}
+
+split_region_starts = {
+    'Desert Palace': [
+        ['Desert Back Lobby'],
+        ['Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
+    ]
+    # 'Skull': ['Skull 1 Lobby', 'Skull 2 Mummy Lobby', 'Skull 2 Key Lobby', 'Skull 3 Lobby'],
+}
+
+
