@@ -232,6 +232,10 @@ def create_rooms(world, player):
         # Room(player, 0xfe, 0x52ff1).door(Position.SouthE2, DoorKind.CaveEntranceLow),
         # Room(player, 0xff, 0x52c9a).door(Position.InteriorW, DoorKind.Bombable).door(Position.InteriorE, DoorKind.Bombable).door(Position.SouthE, DoorKind.CaveEntrance),
     ]
+    # fix some wonky things
+    world.get_room(0x60, player).swap(2, 4)  # puts the exit at pos 2 - enables pos 3
+    world.get_room(0x61, player).swap(1, 6)  # puts the WN door at pos 1 - enables it
+    world.get_room(0x62, player).swap(1, 4)  # puts the exit at pos 1 - enables pos 3
 
 
 class Room(object):
@@ -249,6 +253,13 @@ class Room(object):
     def change(self, list_idx, kind):
         prev = self.doorList[list_idx]
         self.doorList[list_idx] = (prev[0], kind)
+        self.modified = True
+
+    def swap(self, idx1, idx2):
+        item1 = self.doorList[idx1]
+        item2 = self.doorList[idx2]
+        self.doorList[idx1] = item2
+        self.doorList[idx2] = item1
         self.modified = True
 
     def address(self):

@@ -1157,6 +1157,7 @@ class Spoiler(object):
         self.world = world
         self.entrances = OrderedDict()
         self.doors = OrderedDict()
+        self.doorTypes = OrderedDict()
         self.medallions = {}
         self.playthrough = {}
         self.locations = {}
@@ -1176,6 +1177,12 @@ class Spoiler(object):
             self.doors[(entrance, direction, player)] = OrderedDict([('entrance', entrance), ('exit', exit), ('direction', direction)])
         else:
             self.doors[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction)])
+
+    def set_door_type(self, doorNames, type, player):
+        if self.world.players == 1:
+            self.doorTypes[(doorNames, player)] = OrderedDict([('doorNames', doorNames), ('type', type)])
+        else:
+            self.doorTypes[(doorNames, player)] = OrderedDict([('player', player), ('doorNames', doorNames), ('type', type)])
 
     def parse_data(self):
         self.medallions = OrderedDict()
@@ -1272,6 +1279,7 @@ class Spoiler(object):
         out = OrderedDict()
         out['Entrances'] = list(self.entrances.values())
         out['Doors'] = list(self.doors.values())
+        out['DoorTypes'] = list(self.doorTypes.values())
         out.update(self.locations)
         out['Special'] = self.medallions
         if self.shops:
@@ -1304,6 +1312,9 @@ class Spoiler(object):
             if self.doors:
                 outfile.write('\n\nDoors:\n\n')
                 outfile.write('\n'.join(['%s%s %s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', entry['entrance'], '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', entry['exit']) for entry in self.doors.values()]))
+            if self.doorTypes:
+                outfile.write('\n\nDoor Types:\n\n')
+                outfile.write('\n'.join(['%s%s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', entry['doorNames'], entry['type']) for entry in self.doorTypes.values()]))
             if self.entrances:
                 outfile.write('\n\nEntrances:\n\n')
                 outfile.write('\n'.join(['%s%s %s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', entry['entrance'], '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', entry['exit']) for entry in self.entrances.values()]))

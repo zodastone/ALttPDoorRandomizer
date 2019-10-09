@@ -94,9 +94,6 @@ def create_door_spoiler(world, player):
                     logger.debug('Door not found in queue: %s connected to %s', door_b.name, door_a.name)
             else:
                 logger.warning('Door not connected: %s', door_a.name)
-    for room in world.rooms:
-        if room.modified:
-            logger.debug('Room %s changed (p%d)', room.index, player)
     for dp in world.paired_doors[player]:
         if dp.pair:
             logger.debug('Paired Doors: %s with %s (p%d)', dp.door_a, dp.door_b, player)
@@ -925,7 +922,7 @@ def find_key_door_candidates(region, checked, world, player):
                             room_b = world.get_room(d2.roomIndex, player)
                             pos_b, kind_b = room_b.doorList[d2.doorListPos]
                             okay_normals = [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable,
-                                            DoorKind.Dashable, DoorKind.Warp, DoorKind.DungeonChanger]
+                                            DoorKind.Dashable, DoorKind.DungeonChanger]
                             valid = kind in okay_normals and kind_b in okay_normals
                         else:
                             valid = True
@@ -1009,6 +1006,8 @@ def validate_key_layout(sector, start_regions, key_door_proposal, world, player)
 
 
 def validate_key_layout_r(state, flat_proposal, world, player):
+    # improvements: remove recursion to make this iterative
+    # store a cache of various states of opened door to increase speed of checks - many are repetitive
     while len(state.avail_doors) > 0:
         door = state.avail_doors.pop()
         connect_region = world.get_entrance(door.name, player).connected_region
@@ -1117,6 +1116,7 @@ def reassign_key_doors(current_doors, proposal, world, player):
                     world.paired_doors[player].append(PairedDoor(d1.name, d2.name))
                     change_door_to_small_key(d1, world, player)
                     change_door_to_small_key(d2, world, player)
+            world.spoiler.set_door_type(d1.name+' <-> '+d2.name, 'Key Door', player)
         else:
             d = obj
             if d.type is DoorType.Interior:
@@ -1125,6 +1125,7 @@ def reassign_key_doors(current_doors, proposal, world, player):
                 pass  # we don't have spiral stairs candidates yet that aren't already key doors
             elif d.type is DoorType.Normal:
                 change_door_to_small_key(d, world, player)
+            world.spoiler.set_door_type(d.name, 'Key Door', player)
 
 
 def change_door_to_small_key(d, world, player):
