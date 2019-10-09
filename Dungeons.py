@@ -24,7 +24,7 @@ def create_dungeons(world, player):
     #still standard dungeons
     TT = make_dungeon('Thieves Town', 'Blind', ['Thieves Town (Entrance)', 'Thieves Town (Deep)', 'Blind Fight'], ItemFactory('Big Key (Thieves Town)', player), [ItemFactory('Small Key (Thieves Town)', player)], ItemFactory(['Map (Thieves Town)', 'Compass (Thieves Town)'], player))
     SW = make_dungeon('Skull Woods', 'Mothula', ['Skull Woods Final Section (Entrance)', 'Skull Woods First Section', 'Skull Woods Second Section', 'Skull Woods Second Section (Drop)', 'Skull Woods Final Section (Mothula)', 'Skull Woods First Section (Right)', 'Skull Woods First Section (Left)', 'Skull Woods First Section (Top)'], ItemFactory('Big Key (Skull Woods)', player), ItemFactory(['Small Key (Skull Woods)'] * 2, player), ItemFactory(['Map (Skull Woods)', 'Compass (Skull Woods)'], player))
-    SP = make_dungeon('Swamp Palace', 'Arrghus', ['Swamp Palace (Entrance)', 'Swamp Palace (First Room)', 'Swamp Palace (Starting Area)', 'Swamp Palace (Center)', 'Swamp Palace (North)'], ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
+    SP = make_dungeon('Swamp Palace', 'Arrghus', swamp_regions, ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
     IP = make_dungeon('Ice Palace', 'Kholdstare', ['Ice Palace (Entrance)', 'Ice Palace (Main)', 'Ice Palace (East)', 'Ice Palace (East Top)', 'Ice Palace (Kholdstare)'], ItemFactory('Big Key (Ice Palace)', player), ItemFactory(['Small Key (Ice Palace)'] * 2, player), ItemFactory(['Map (Ice Palace)', 'Compass (Ice Palace)'], player))
     MM = make_dungeon('Misery Mire', 'Vitreous', ['Misery Mire (Entrance)', 'Misery Mire (Main)', 'Misery Mire (West)', 'Misery Mire (Final Area)', 'Misery Mire (Vitreous)'], ItemFactory('Big Key (Misery Mire)', player), ItemFactory(['Small Key (Misery Mire)'] * 3, player), ItemFactory(['Map (Misery Mire)', 'Compass (Misery Mire)'], player))
     TR = make_dungeon('Turtle Rock', 'Trinexx', ['Turtle Rock (Entrance)', 'Turtle Rock (First Section)', 'Turtle Rock (Chain Chomp Room)', 'Turtle Rock (Second Section)', 'Turtle Rock (Big Chest)', 'Turtle Rock (Crystaroller Room)', 'Turtle Rock (Dark Room)', 'Turtle Rock (Eye Bridge)', 'Turtle Rock (Trinexx)'], ItemFactory('Big Key (Turtle Rock)', player), ItemFactory(['Small Key (Turtle Rock)'] * 4, player), ItemFactory(['Map (Turtle Rock)', 'Compass (Turtle Rock)'], player))
@@ -214,6 +214,17 @@ pod_regions = [
     'PoD Turtle Party', 'PoD Dark Alley', 'PoD Callback', 'PoD Boss'
 ]
 
+swamp_regions = [
+    'Swamp Lobby', 'Swamp Entrance', 'Swamp Pot Row', 'Swamp Map Ledge', 'Swamp Trench 1 Approach',
+    'Swamp Trench 1 Nexus', 'Swamp Trench 1 Alcove', 'Swamp Trench 1 Key Ledge', 'Swamp Trench 1 Departure'
+    'Swamp Hammer Switch', 'Swamp Hub', 'Swamp Hub Dead Ledge', 'Swamp Hub North Ledge', 'Swamp Donut Top'
+    'Swamp Donut Bottom', 'Swamp Compass Donut', 'Swamp Crystal Switch', 'Swamp Shortcut', 'Swamp Trench 2 Pots'
+    'Swamp Trench 2 Blocks', 'Swamp Trench 2 Alcove', 'Swamp Trench 2 Departure', 'Swamp Big Key Ledge'
+    'Swamp West Shallows', 'Swamp West Block Path', 'Swamp West Ledge', 'Swamp Barrier Ledge', 'Swamp Barrier'
+    'Swamp Attic', 'Swamp Push Statue', 'Swamp Shooters', 'Swamp Left Elbow', 'Swamp Right Elbow', 'Swamp Drain Left'
+    'Swamp Drain Right', 'Swamp Flooded Room', 'Swamp Basement Shallows', 'Swamp Waterfall Room', 'Swamp Refill 1'
+    'Swamp Behind Waterfall', 'Swamp C', 'Swamp Waterway', 'Swamp I', 'Swamp T', 'Swamp Boss'
+]
 
 dungeon_regions = {
     'Hyrule Castle': hyrule_castle_regions,
@@ -222,7 +233,7 @@ dungeon_regions = {
     'Tower of Hera': hera_regions,
     'Agahnims Tower': tower_regions,
     'Palace of Darkness': pod_regions,
-    # 'Swamp':
+    'Swamp Palace': swamp_regions,
     # 'Skull':
     # 'TT':
     # 'Ice':
@@ -238,7 +249,7 @@ region_starts = {
     'Tower of Hera': ['Hera Lobby'],
     'Agahnims Tower': ['Tower Lobby'],
     'Palace of Darkness': ['PoD Lobby'],
-    # ['Swamp Lobby'],
+    'Swamp Palace': ['Swamp Lobby'],
     # ['TT Lobby'],
     # ['Ice Lobby'],
     # ['Mire Lobby'],

@@ -1147,6 +1147,40 @@ logical_connections = [
     ('PoD Arena Bridge Drop Down', 'PoD Arena Main'),
     ('PoD Map Balcony Drop Down', 'PoD Sexy Statue'),
     ('PoD Basement Ledge Drop Down', 'PoD Stalfos Basement'),
+    ('Swamp Lobby Moat', 'Swamp Entrance'),
+    ('Swamp Entrance Moat', 'Swamp Lobby'),
+    ('Swamp Trench 1 Approach Dry', 'Swamp Trench 1 Nexus'),
+    ('Swamp Trench 1 Approach Key', 'Swamp Trench 1 Key Ledge'),
+    ('Swamp Trench 1 Approach Swim Depart', 'Swamp Trench 1 Departure'),
+    ('Swamp Trench 1 Nexus Approach', 'Swamp Trench 1 Approach'),
+    ('Swamp Trench 1 Nexus Key', 'Swamp Trench 1 Key Ledge'),
+    ('Swamp Trench 1 Key Ledge Dry', 'Swamp Trench 1 Nexus'),
+    ('Swamp Trench 1 Key Approach', 'Swamp Trench 1 Approach'),
+    ('Swamp Trench 1 Key Ledge Depart', 'Swamp Trench 1 Departure'),
+    ('Swamp Trench 1 Departure Dry', 'Swamp Trench 1 Nexus'),
+    ('Swamp Trench 1 Departure Approach', 'Swamp Trench 1 Approach'),
+    ('Swamp Trench 1 Departure Key', 'Swamp Trench 1 Key Ledge'),
+    ('Swamp Hub Hook Path', 'Swamp Hub North Ledge'),
+    ('Swamp Hub North Ledge Drop Down', 'Swamp Hub'),
+    ('Swamp Compass Donut Push Block', 'Swamp Donut Top'),
+    ('Swamp Shortcut Blue Barrier', 'Swamp Trench 2 Pots'),
+    ('Swamp Trench 2 Pots Blue Barrier', 'Swamp Shortcut'),
+    ('Swamp Trench 2 Pots Dry', 'Swamp Trench 2 Blocks'),
+    ('Swamp Trench 2 Pots Wet', 'Swamp Trench 2 Departure'),
+    ('Swamp Trench 2 Blocks Pots', 'Swamp Trench 2 Pots'),
+    ('Swamp Trench 2 Departure Wet', 'Swamp Trench 2 Pots'),
+    ('Swamp West Shallows Push Blocks', 'Swamp West Block Path'),
+    ('Swamp West Ledge Drop Down', 'Swamp West Shallows'),
+    ('Swamp West Ledge Hook Path', 'Swamp Barrier Ledge'),
+    ('Swamp Barrier Ledge Drop Down', 'Swamp West Shallows'),
+    ('Swamp Barrier Ledge - Orange', 'Swamp Barrier'),
+    ('Swamp Barrier - Orange', 'Swamp Barrier Ledge'),
+    ('Swamp Barrier Ledge Hook Path', 'Swamp West Ledge'),
+    ('Swamp Drain Left Switch', 'Swamp Drain Right'),
+    ('Swamp Drain Right Switch', 'Swamp Drain Left'),
+    # ('', ''),
+    # ('', ''),
+    # ('', ''),
 ]
 
 spiral_staircases = [
@@ -1172,6 +1206,14 @@ spiral_staircases = [
     ('PoD Basement Ledge Up Stairs', 'PoD Big Key Landing Down Stairs'),
     ('PoD Compass Room W Down Stairs', 'PoD Dark Basement W Up Stairs'),
     ('PoD Compass Room E Down Stairs', 'PoD Dark Basement E Up Stairs'),
+    ('Swamp Entrance Down Stairs', 'Swamp Pot Row Up Stairs'),
+    ('Swamp West Block Path Up Stairs', 'Swamp Attic Down Stairs'),
+    ('Swamp Push Statue Down Stairs', 'Swamp Flooded Room Up Stairs'),
+    ('Swamp Left Elbow Down Stairs', 'Swamp Drain Left Up Stairs'),
+    ('Swamp Right Elbow Down Stairs', 'Swamp Drain Right Up Stairs'),
+    ('Swamp Behind Waterfall Up Stairs', 'Swamp C Down Stairs'),
+    # ('', ''),
+    # ('', ''),
     # ('', ''),
 ]
 
@@ -1212,6 +1254,9 @@ falldown_pits = [
     ('PoD Pit Room Freefall', 'PoD Stalfos Basement'),
     ('PoD Pit Room Bomb Hole', 'PoD Basement Ledge'),
     ('PoD Big Key Landing Hole', 'PoD Stalfos Basement'),
+    ('Swamp Attic Right Pit', 'Swamp Barrier Ledge'),
+    ('Swamp Attic Left Pit', 'Swamp West Ledge'),
+    # ('', ''),
     # ('', ''),
 ]
 
@@ -1270,6 +1315,22 @@ interior_doors = [
     ('PoD Dark Pegs WN', 'PoD Lonely Turtle EN'),
     ('PoD Lonely Turtle SW', 'PoD Turtle Party NW'),
     ('PoD Turtle Party ES', 'PoD Callback WS'),
+    ('Swamp Trench 1 Nexus N', 'Swamp Trench 1 Alcove S'),
+    ('Swamp Trench 1 Key Ledge NW', 'Swamp Hammer Switch SW'),
+    ('Swamp Donut Top SE', 'Swamp Donut Bottom NE'),
+    ('Swamp Donut Bottom NW', 'Swamp Compass Donut SW'),
+    ('Swamp Crystal Switch SE', 'Swamp Shortcut NE'),
+    ('Swamp Trench 2 Blocks N', 'Swamp Trench 2 Alcove S'),
+    ('Swamp Push Statue NW', 'Swamp Shooters SW'),
+    ('Swamp Push Statue NE', 'Swamp Right Elbow SE'),
+    ('Swamp Shooters EN', 'Swamp Left Elbow WN'),
+    ('Swamp Drain WN', 'Swamp Basement Shallows EN'),
+    ('Swamp Flooded Room WS', 'Swamp Basement Shallows ES'),
+    ('Swamp Waterfall Room NW', 'Swamp Refill 1 SW'),
+    ('Swamp Waterfall Room NE', 'Swamp Behind Waterfall SE'),
+    ('Swamp C SE', 'Swamp Waterway NE'),
+    ('Swamp Waterway N', 'Swamp I S'),
+    ('Swamp Waterway NW', 'Swamp T SW'),
     # ('', ''),
 ]
 
@@ -1330,8 +1391,22 @@ default_door_connections = [
     ('PoD Falling Bridge WN', 'PoD Dark Maze EN'),
     ('PoD Dark Maze E', 'PoD Big Chest Balcony W'),
     ('PoD Sexy Statue NW', 'PoD Mimics 2 SW'),
+    ('Swamp Pot Row WN', 'Swamp Map Ledge EN'),
+    ('Swamp Pot Row WS', 'Swamp Trench 1 Approach ES'),
+    ('Swamp Trench 1 Departure WS', 'Swamp Hub ES'),
+    ('Swamp Hammer Switch WN', 'Swamp Hub Dead Ledge EN'),
+    ('Swamp Hub S', 'Swamp Donut Top N'),
+    ('Swamp Hub WS', 'Swamp Trench 2 Pots ES'),
+    ('Swamp Hub WN', 'Swamp Crystal Switch EN'),
+    ('Swamp Hub North Ledge N', 'Swamp Push Statue S'),
+    ('Swamp Trench 2 Departure WS', 'Swamp West Shallows ES'),
+    ('Swamp Big Key Ledge WN', 'Swamp Barrier EN'),
+    ('Swamp Basement Shallows NW', 'Swamp Waterfall Room SW'),
+    # ('', ''),
+    # ('', ''),
+    # ('', ''),
+    # ('', ''),
 ]
-
 
 # ('', ''),
 default_one_way_connections = [
@@ -1341,6 +1416,7 @@ default_one_way_connections = [
     ('Tower Altar NW', 'Tower Agahnim 1 SW'),
     ('PoD Harmless Hellway SE', 'PoD Arena Main NE'),
     ('PoD Dark Alley NE', 'PoD Boss SE'),
+    ('Swamp T NW', 'Swamp Boss SW'),
 ]
 
 # todo: these path rules are more complicated I think...
@@ -1374,7 +1450,8 @@ default_dungeon_sets = [
     ['Desert Back Lobby', 'Desert Boss', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby'],
     ['Hera Lobby', 'Hera Boss'],
     ['Tower Lobby', 'Tower Agahnim 1'],
-    ['PoD Lobby', 'PoD Boss']
+    ['PoD Lobby', 'PoD Boss'],
+    ['Swamp Lobby', 'Swamp Boss']
 ]
 
 dungeon_x_idx_to_name = {
@@ -1384,5 +1461,6 @@ dungeon_x_idx_to_name = {
     3: 'Tower of Hera',
     4: 'Agahnims Tower',
     5: 'Palace of Darkness',
+    6: 'Swamp Palace',
 #     etc
 }
