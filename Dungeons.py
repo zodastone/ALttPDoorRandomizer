@@ -216,14 +216,14 @@ pod_regions = [
 
 swamp_regions = [
     'Swamp Lobby', 'Swamp Entrance', 'Swamp Pot Row', 'Swamp Map Ledge', 'Swamp Trench 1 Approach',
-    'Swamp Trench 1 Nexus', 'Swamp Trench 1 Alcove', 'Swamp Trench 1 Key Ledge', 'Swamp Trench 1 Departure'
-    'Swamp Hammer Switch', 'Swamp Hub', 'Swamp Hub Dead Ledge', 'Swamp Hub North Ledge', 'Swamp Donut Top'
-    'Swamp Donut Bottom', 'Swamp Compass Donut', 'Swamp Crystal Switch', 'Swamp Shortcut', 'Swamp Trench 2 Pots'
-    'Swamp Trench 2 Blocks', 'Swamp Trench 2 Alcove', 'Swamp Trench 2 Departure', 'Swamp Big Key Ledge'
-    'Swamp West Shallows', 'Swamp West Block Path', 'Swamp West Ledge', 'Swamp Barrier Ledge', 'Swamp Barrier'
-    'Swamp Attic', 'Swamp Push Statue', 'Swamp Shooters', 'Swamp Left Elbow', 'Swamp Right Elbow', 'Swamp Drain Left'
-    'Swamp Drain Right', 'Swamp Flooded Room', 'Swamp Basement Shallows', 'Swamp Waterfall Room', 'Swamp Refill 1'
-    'Swamp Behind Waterfall', 'Swamp C', 'Swamp Waterway', 'Swamp I', 'Swamp T', 'Swamp Boss'
+    'Swamp Trench 1 Nexus', 'Swamp Trench 1 Alcove', 'Swamp Trench 1 Key Ledge', 'Swamp Trench 1 Departure',
+    'Swamp Hammer Switch', 'Swamp Hub', 'Swamp Hub Dead Ledge', 'Swamp Hub North Ledge', 'Swamp Donut Top',
+    'Swamp Donut Bottom', 'Swamp Compass Donut', 'Swamp Crystal Switch', 'Swamp Shortcut', 'Swamp Trench 2 Pots',
+    'Swamp Trench 2 Blocks', 'Swamp Trench 2 Alcove', 'Swamp Trench 2 Departure', 'Swamp Big Key Ledge',
+    'Swamp West Shallows', 'Swamp West Block Path', 'Swamp West Ledge', 'Swamp Barrier Ledge', 'Swamp Barrier',
+    'Swamp Attic', 'Swamp Push Statue', 'Swamp Shooters', 'Swamp Left Elbow', 'Swamp Right Elbow', 'Swamp Drain Left',
+    'Swamp Drain Right', 'Swamp Flooded Room', 'Swamp Flooded Spot', 'Swamp Basement Shallows', 'Swamp Waterfall Room',
+    'Swamp Refill', 'Swamp Behind Waterfall', 'Swamp C', 'Swamp Waterway', 'Swamp I', 'Swamp T', 'Swamp Boss'
 ]
 
 dungeon_regions = {

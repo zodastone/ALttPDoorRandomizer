@@ -174,6 +174,15 @@ def generate_itempool(world, player):
     world.push_item(world.get_location('Floodgate', player), ItemFactory('Open Floodgate', player), False)
     world.get_location('Floodgate', player).event = True
     world.get_location('Floodgate', player).locked = True
+    world.push_item(world.get_location('Trench 1 Switch', player), ItemFactory('Trench 1 Filled', player), False)
+    world.get_location('Trench 1 Switch', player).event = True
+    world.get_location('Trench 1 Switch', player).locked = True
+    world.push_item(world.get_location('Trench 2 Switch', player), ItemFactory('Trench 2 Filled', player), False)
+    world.get_location('Trench 2 Switch', player).event = True
+    world.get_location('Trench 2 Switch', player).locked = True
+    world.push_item(world.get_location('Swamp Drain', player), ItemFactory('Drained Swamp', player), False)
+    world.get_location('Swamp Drain', player).event = True
+    world.get_location('Swamp Drain', player).locked = True
 
     # set up item pool
     if world.custom:

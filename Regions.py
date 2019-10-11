@@ -420,14 +420,14 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Swamp Trench 1 Alcove', 'Swamp Palace', ['Swamp Palace - Trench 1 Pot Key'], ['Swamp Trench 1 Alcove S']),
         create_dungeon_region(player, 'Swamp Trench 1 Key Ledge', 'Swamp Palace', None, ['Swamp Trench 1 Key Ledge Dry', 'Swamp Trench 1 Key Approach', 'Swamp Trench 1 Key Ledge Depart', 'Swamp Trench 1 Key Ledge NW']),
         create_dungeon_region(player, 'Swamp Trench 1 Departure', 'Swamp Palace', None, ['Swamp Trench 1 Departure Dry', 'Swamp Trench 1 Departure Approach', 'Swamp Trench 1 Departure Key', 'Swamp Trench 1 Departure WS']),
-        create_dungeon_region(player, 'Swamp Hammer Switch', 'Swamp Palace', None, ['Swamp Hammer Switch SW', 'Swamp Hammer Switch WN']),
+        create_dungeon_region(player, 'Swamp Hammer Switch', 'Swamp Palace', ['Trench 1 Switch'], ['Swamp Hammer Switch SW', 'Swamp Hammer Switch WN']),
         create_dungeon_region(player, 'Swamp Hub', 'Swamp Palace', ['Swamp Palace - Big Chest', 'Swamp Palace - Hookshot Pot Key'], ['Swamp Hub ES', 'Swamp Hub S', 'Swamp Hub WS', 'Swamp Hub WN', 'Swamp Hub Hook Path']),
         create_dungeon_region(player, 'Swamp Hub Dead Ledge', 'Swamp Palace', None, ['Swamp Hub Dead Ledge EN']),
         create_dungeon_region(player, 'Swamp Hub North Ledge', 'Swamp Palace', None, ['Swamp Hub North Ledge N', 'Swamp Hub North Ledge Drop Down']),
         create_dungeon_region(player, 'Swamp Donut Top', 'Swamp Palace', None, ['Swamp Donut Top N', 'Swamp Donut Top SE']),
         create_dungeon_region(player, 'Swamp Donut Bottom', 'Swamp Palace', None, ['Swamp Donut Bottom NE', 'Swamp Donut Bottom NW']),
         create_dungeon_region(player, 'Swamp Compass Donut', 'Swamp Palace', ['Swamp Palace - Compass Chest'], ['Swamp Compass Donut SW', 'Swamp Compass Donut Push Block']),
-        create_dungeon_region(player, 'Swamp Crystal Switch', 'Swamp Palace', None, ['Swamp Crystal Switch EN', 'Swamp Crystal Switch SE']),
+        create_dungeon_region(player, 'Swamp Crystal Switch', 'Swamp Palace', ['Trench 2 Switch'], ['Swamp Crystal Switch EN', 'Swamp Crystal Switch SE']),
         create_dungeon_region(player, 'Swamp Shortcut', 'Swamp Palace', None, ['Swamp Shortcut NE', 'Swamp Shortcut Blue Barrier']),
         create_dungeon_region(player, 'Swamp Trench 2 Pots', 'Swamp Palace', None, ['Swamp Trench 2 Pots ES', 'Swamp Trench 2 Pots Blue Barrier', 'Swamp Trench 2 Pots Dry', 'Swamp Trench 2 Pots Wet']),
         create_dungeon_region(player, 'Swamp Trench 2 Blocks', 'Swamp Palace', None, ['Swamp Trench 2 Blocks Pots', 'Swamp Trench 2 Blocks N']),
@@ -445,11 +445,13 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Swamp Left Elbow', 'Swamp Palace', None, ['Swamp Left Elbow WN', 'Swamp Left Elbow Down Stairs']),
         create_dungeon_region(player, 'Swamp Right Elbow', 'Swamp Palace', None, ['Swamp Right Elbow SE', 'Swamp Right Elbow Down Stairs']),
         create_dungeon_region(player, 'Swamp Drain Left', 'Swamp Palace', None, ['Swamp Drain Left Up Stairs', 'Swamp Drain WN', 'Swamp Drain Left Switch']),
-        create_dungeon_region(player, 'Swamp Drain Right', 'Swamp Palace', None, ['Swamp Drain Right Switch', 'Swamp Drain Right Up Stairs']),
-        create_dungeon_region(player, 'Swamp Flooded Room', 'Swamp Palace', ['Swamp Palace - Flooded Room - Left', 'Swamp Palace - Flooded Room - Right'], ['Swamp Flooded Room Up Stairs', 'Swamp Flooded Room WS']),
+        create_dungeon_region(player, 'Swamp Drain Right', 'Swamp Palace', ['Swamp Drain'], ['Swamp Drain Right Switch', 'Swamp Drain Right Up Stairs']),
+        # This is intentionally odd so I don't have to treat the WS door in the Flooded Room oddly (because of how it works when going backward)
+        create_dungeon_region(player, 'Swamp Flooded Room', 'Swamp Palace', None, ['Swamp Flooded Room Up Stairs', 'Swamp Flooded Room Ladder', 'Swamp Flooded Room WS']),
+        create_dungeon_region(player, 'Swamp Flooded Spot', 'Swamp Palace', ['Swamp Palace - Flooded Room - Left', 'Swamp Palace - Flooded Room - Right'], ['Swamp Flooded Spot Ladder']),
         create_dungeon_region(player, 'Swamp Basement Shallows', 'Swamp Palace', None, ['Swamp Basement Shallows NW', 'Swamp Basement Shallows EN', 'Swamp Basement Shallows ES']),
         create_dungeon_region(player, 'Swamp Waterfall Room', 'Swamp Palace', ['Swamp Palace - Waterfall Room'], ['Swamp Waterfall Room SW', 'Swamp Waterfall Room NW', 'Swamp Waterfall Room NE']),
-        create_dungeon_region(player, 'Swamp Refill 1', 'Swamp Palace', None, ['Swamp Refill 1 SW']),
+        create_dungeon_region(player, 'Swamp Refill', 'Swamp Palace', None, ['Swamp Refill SW']),
         create_dungeon_region(player, 'Swamp Behind Waterfall', 'Swamp Palace', None, ['Swamp Behind Waterfall SE', 'Swamp Behind Waterfall Up Stairs']),
         create_dungeon_region(player, 'Swamp C', 'Swamp Palace', None, ['Swamp C Down Stairs', 'Swamp C SE']),
         create_dungeon_region(player, 'Swamp Waterway', 'Swamp Palace', ['Swamp Palace - Waterway Pot Key'], ['Swamp Waterway NE', 'Swamp Waterway N', 'Swamp Waterway NW']),
@@ -590,6 +592,12 @@ key_only_locations = {
   'Swamp Palace - Trench 2 Pot Key': 'Small Key (Swamp Palace)',
   'Swamp Palace - Waterway Pot Key': 'Small Key (Swamp Palace)'
 }
+
+dungeon_events = [
+    'Trench 1 Switch',
+    'Trench 2 Switch',
+    'Swamp Drain'
+]
 
 # todo: escape big key? - should be separate from above for dungeon key layout validation
 
@@ -816,6 +824,9 @@ location_table = {'Mushroom': (0x180013, False, 'in the woods'),
                   'Frog': (None, False, None),
                   'Missing Smith': (None, False, None),
                   'Dark Blacksmith Ruins': (None, False, None),
+                  'Trench 1 Switch': (None, False, None),
+                  'Trench 2 Switch': (None, False, None),
+                  'Swamp Drain': (None, False, None),
                   'Eastern Palace - Prize': ([0x1209D, 0x53EF8, 0x53EF9, 0x180052, 0x18007C, 0xC6FE], True, 'Eastern Palace'),
                   'Desert Palace - Prize': ([0x1209E, 0x53F1C, 0x53F1D, 0x180053, 0x180078, 0xC6FF], True, 'Desert Palace'),
                   'Tower of Hera - Prize': ([0x120A5, 0x53F0A, 0x53F0B, 0x18005A, 0x18007A, 0xC706], True, 'Tower of Hera'),

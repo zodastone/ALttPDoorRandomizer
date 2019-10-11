@@ -8,13 +8,12 @@ RecordStairType: {
 SpiralWarp: {
     lda $040c : cmp.b #$ff : beq .abort ; abort if not in dungeon
     cmp #$14 : beq .check ; hera is okay
-    cmp #$0c : beq .check ; pod is okay
-    cmp #$0A : bcs .abort ; abort if not supported yet -- todo: this needs to be altered/removed as more dungeons are implemented
+    cmp #$0e : bcs .abort ; abort if not supported yet -- todo: this needs to be altered/removed as more dungeons are implemented
     .check
     lda $045e : cmp #$5e : beq .gtg ; abort if not spiral - intended room is in A!
     cmp #$5f : beq .gtg
     .abort
-    stz $045e : lda $a2 : and #$0f : rtl ; clear,run highjack code and get out
+    stz $045e : lda $a2 : and #$0f : rtl ; clear,run hijacked code and get out
 
     .gtg
     phb : phk : plb : phx : phy ; push stuff
@@ -90,15 +89,22 @@ LookupSpiralOffset: {
     cmp #$02 : beq .quad2
     cmp #$03 : beq .quad3
     .quad0
-    inc $01 : lda $22 : cmp #$98 : bcc .done ;gt ent and hc stairwell
+    inc $01 : lda $a2
+    cmp #$0c : beq .q0diff ;gt ent
+    cmp #$70 : bne .done   ;hc stairwell
+    .q0diff lda $22 : cmp #$98 : bcc .done ;gt ent and hc stairwell
     inc $01 : bra .done
     .quad1
-    lda $040c : cmp $0a : beq .q1diff : cmp $0c : bne .done
-    .q1diff lda $22 : cmp #$98 : bcc .done ;swamp/pod dual stairs
+    lda $a2
+    cmp #$1a : beq .q1diff ;pod compass
+    cmp #$26 : beq .q1diff ;swamp elbows
+    cmp #$6a : beq .q1diff ;pod dark basement
+    cmp #$76 : bne .done   ;swamp drain
+    .q1diff lda $22 : cmp #$98 : bcc .done
     inc $01 : bra .done
-    .quad2    ;ice room
-    lda #$03 : sta $01
-    lda $040c : cmp $12 : bne .done
+    .quad2
+    lda #$03 : sta $01 : lda $a2
+    cmp #$5f : bne .done ;ice u room
     lda $22 : cmp #$78 : bcc .done
     inc $01 : bra .done
     .quad3 lda #$02 : sta $01 ; always 2

@@ -2947,10 +2947,6 @@ mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia Central 
                          ('Cave 45 Mirror Spot', 'Cave 45 Ledge'),
                          ('Graveyard Ledge Mirror Spot', 'Graveyard Ledge'),
 
-                         ('Swamp Palace Moat', 'Swamp Palace (First Room)'),
-                         ('Swamp Palace Small Key Door', 'Swamp Palace (Starting Area)'),
-                         ('Swamp Palace (Center)', 'Swamp Palace (Center)'),
-                         ('Swamp Palace (North)', 'Swamp Palace (North)'),
                          ('Thieves Town Big Key Door', 'Thieves Town (Deep)'),
                          ('Skull Woods Torch Room', 'Skull Woods Final Section (Mothula)'),
                          ('Skull Woods First Section Bomb Jump', 'Skull Woods First Section (Top)'),  # represents bomb jumping to big chest
@@ -3543,7 +3539,7 @@ default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert Main L
                                ('Misery Mire Exit', 'Dark Desert'),
                                ('Palace of Darkness', 'PoD Lobby'),
                                ('Palace of Darkness Exit', 'East Dark World'),
-                               ('Swamp Palace', 'Swamp Palace (Entrance)'),  # requires additional patch for flooding moat if moved
+                               ('Swamp Palace', 'Swamp Lobby'),  # requires additional patch for flooding moat if moved
                                ('Swamp Palace Exit', 'South Dark World'),
 
                                ('Turtle Rock', 'Turtle Rock (Entrance)'),

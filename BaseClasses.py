@@ -863,21 +863,28 @@ pol_inc = {
     'Neg': lambda x: x - 1,
 }
 
+@unique
+class CrystalBarrier(Enum):
+    Null = 1  # no special requirement
+    Blue = 2  # blue must be down and explore state set to Blue
+    Orange = 3  # orange must be down and explore state set to Orange
+    Either = 4  # you choose to leave this room in Either state
+
 
 class Door(object):
-    def __init__(self, player, name, type, direction, roomIndex, doorIndex, layer, toggle=False):
+    def __init__(self, player, name, type):
         self.player = player
         self.name = name
         self.type = type
-        self.direction = direction
+        self.direction = None
 
         # rom properties
-        self.roomIndex = roomIndex
+        self.roomIndex = -1
         # 0,1,2 + Direction (N:0, W:3, S:6, E:9) for normal
         # 0-4 for spiral offset thing
-        self.doorIndex = doorIndex
-        self.layer = layer  # 0 for normal floor, 1 for the inset layer
-        self.toggle = toggle
+        self.doorIndex = -1
+        self.layer = -1  # 0 for normal floor, 1 for the inset layer
+        self.toggle = False
         self.trapFlag = 0x0
         self.quadrant = 2
         self.shiftX = 78
@@ -893,6 +900,8 @@ class Door(object):
         self.smallKey = False  # There's a small key door on this side
         self.bigKey = False  # There's a big key door on this side
         self.ugly = False  # Indicates that it can't be seen from the front (e.g. back of a big key door)
+        self.crystal = CrystalBarrier.Null  # How your crystal state changes if you use this door
+        self.req_event = None  # if a dungeon event is required for this door - swamp palace mostly
 
     def getAddress(self):
         if self.type == DoorType.Normal:
@@ -949,6 +958,18 @@ class Door(object):
 
     def pos(self, pos):
         self.doorListPos = pos
+        return self
+
+    def event(self, event):
+        self.req_event = event
+        return self
+
+    def barrier(self, crystal):
+        self.crystal = crystal
+        return self
+
+    def c_switch(self):
+        self.crystal = CrystalBarrier.Either
         return self
 
     def __str__(self):
