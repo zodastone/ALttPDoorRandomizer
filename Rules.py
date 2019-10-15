@@ -1,8 +1,9 @@
 import collections
 from collections import defaultdict
 import logging
-from BaseClasses import CollectionState
+from BaseClasses import CollectionState, DoorType
 from Dungeons import region_starts
+from DoorShuffle import ExplorationState
 
 
 def set_rules(world, player):
@@ -1695,72 +1696,79 @@ def generate_key_logic(start_region_names, small_key_name, world, player):
     logger = logging.getLogger('')
     # Now that the dungeon layout is done, we need to search again to generate key logic.
     # TODO: This assumes all start doors are accessible, which isn't always true.
-    # TODO: This can generate solvable-but-really-annoying layouts due to one ways.
-    available_doors = []  # Doors to explore
-    visited_regions = set()  # Regions we've been to and don't need to expand
+    state = ExplorationState()
+    # available_doors = []  # Doors to explore
+    # visited_regions = set()  # Regions we've been to and don't need to expand
     current_kr = 0  # Key regions are numbered, starting at 0
-    door_krs = {}  # Map of key door name to KR it lives in
+    # door_krs = {}  # Map of key door name to KR it lives in
     kr_parents = {}  # Key region to parent map
-    kr_location_counts = defaultdict(int)  # Number of locations in each key region
+    # kr_location_counts = defaultdict(int)  # Number of locations in each key region
     # Everything in a start region is in key region 0.
     for name in start_region_names:
         region = world.get_region(name, player)
-        visited_regions.add(name)
-        kr_location_counts[current_kr] += len(region.locations)
-        for door in get_doors(world, region, player):
-            if not door.blocked:
-                available_doors.append(door)
-                door_krs[door.name] = current_kr
+        state.visit_region(region, current_kr)
+        state.add_all_doors_check_key_region(region, current_kr, world, player)
     # Search into the dungeon
     logger.debug('Begin key region search. %s', small_key_name)
-    while len(available_doors) > 0:
+    while len(state.avail_doors) > 0:
         # Open as many non-key doors as possible before opening a key door.
         # This guarantees that we're only exploring one key region at a time.
-        available_doors.sort(key=lambda door: 0 if door.smallKey else 1)
-        door = available_doors.pop()
-        # Bail early if we've been here before or the door is blocked
-        local_kr = door_krs[door.name]
+        state.avail_doors.sort(key=state.key_door_sort)
+        explorable_door = state.next_avail_door()
+        door = explorable_door.door
+        local_kr = state.door_krs[door.name]
         logger.debug('  kr %s: Door %s', local_kr, door.name)
-        exit = world.get_entrance(door.name, player).connected_region
-        if door.blocked or exit.name in visited_regions:
+        connect_region = world.get_entrance(door.name, player).connected_region
+        # Bail early if we've been here before or the door is blocked
+        if not state.can_traverse(door) or state.visited(connect_region):
             continue
         # Once we open a key door, we need a new region.
-        if door.smallKey:
+        if door.smallKey and door not in state.opened_doors:  # we tend to open doors in a DFS manner
             current_kr += 1
             kr_parents[current_kr] = local_kr
             local_kr = current_kr
+            state.opened_doors.append(door)
+            if door.dest.smallKey:
+                state.opened_doors.append(door.dest)
             logger.debug('    New KR %s', current_kr)
         # Account for the new region
-        visited_regions.add(exit.name)
-        kr_location_counts[local_kr] += len(exit.locations)
-        for new_door in get_doors(world, exit, player):
-            available_doors.append(new_door)
-            door_krs[new_door.name] = local_kr
+        state.visit_region(connect_region, local_kr)
+        state.add_all_doors_check_key_region(connect_region, local_kr, world, player)
+        # kr_location_counts[local_kr] += len(exit.locations)
     # Now that we have doors divided up into key regions, we can analyze the map
     # Invert the door -> kr map into one that lists doors by region.
     kr_doors = defaultdict(list)
     region_krs = {}
-    for door_name in door_krs:
-        kr = door_krs[door_name]
-        exit = world.get_entrance(door_name, player);
+    for door_name in state.door_krs:
+        kr = state.door_krs[door_name]
+        entrance = world.get_entrance(door_name, player)
         door = world.check_for_door(door_name, player)
-        region_krs[exit.parent_region.name] = kr
+        ent_name = entrance.parent_region.name
+        if ent_name in region_krs.keys():
+            region_krs[entrance.parent_region.name] = min(region_krs[entrance.parent_region.name], kr)
+        else:
+            region_krs[entrance.parent_region.name] = kr
         if door.smallKey and not door.blocked:
-            kr_doors[kr].append(exit)
+            kr_doors[kr].append(entrance)
     kr_keys = defaultdict(int)  # Number of keys each region needs
     for kr in range(0, current_kr + 1):
         logic_doors = []
         keys = 0
         for door in kr_doors[kr]:
             dest_kr = region_krs[door.connected_region.name]
-            if dest_kr > kr:
+            if dest_kr > kr:  # may be the case if dest_kr != parent_kr of kr
                 # This door heads deeper into the dungeon. It needs a full key, and logic
                 keys += 1
                 logic_doors.append(door)
             elif dest_kr == kr:
                 # This door doesn't get us any deeper, but it's possible to waste a key.
-                # We're going to see its sibling in this search, so add half a key
-                keys += 0.5
+                # If we're going to see its sibling in this search, add half a key
+                actual_door = world.get_door(door.name, player)
+                if actual_door.type == DoorType.SpiralStairs:
+                    keys += 1
+                else:
+                    keys += 0.5
+                logic_doors.append(door)  # this may still need logic
         # Add key count from parent region
         if kr in kr_parents:
             keys += kr_keys[kr_parents[kr]]

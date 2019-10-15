@@ -1027,6 +1027,7 @@ class Location(object):
           from Items import ItemFactory
           self.forced_item = ItemFactory([forced_item], player)[0]
           self.item = self.forced_item
+          self.item.location = self
           self.event = True
         else:
           self.forced_item = None
