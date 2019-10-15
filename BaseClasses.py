@@ -401,12 +401,24 @@ class CollectionState(object):
             if locations is None:
                 locations = self.world.get_filled_locations()
             reachable_events = [location for location in locations if location.event and (not key_only or location.item.key) and location.can_reach(self)]
+            reachable_events = self._do_not_flood_the_keys(reachable_events)
             for event in reachable_events:
                 if (event.name, event.player) not in self.events:
                     self.events.append((event.name, event.player))
                     self.collect(event.item, True, event)
             new_locations = len(reachable_events) > checked_locations
             checked_locations = len(reachable_events)
+
+    def _do_not_flood_the_keys(self, reachable_events):
+        adjusted_checks = list(reachable_events)
+        for event in reachable_events:
+            if event.name == 'Trench 2 Switch' and self.world.get_location('Swamp Palace - Trench 2 Pot Key', event.player) not in reachable_events:
+                adjusted_checks.remove(event)
+            if event.name == 'Trench 1 Switch' and self.world.get_location('Swamp Palace - Trench 1 Pot Key', event.player) not in reachable_events:
+                adjusted_checks.remove(event)
+        if len(adjusted_checks) < len(reachable_events):
+            return adjusted_checks
+        return reachable_events
 
     def has(self, item, player, count=1):
         if count == 1:

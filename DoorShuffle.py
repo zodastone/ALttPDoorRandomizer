@@ -672,6 +672,7 @@ class ExplorationState(object):
 
     def copy(self):
         ret = ExplorationState()
+        ret.unattached_doors = list(self.unattached_doors)
         ret.avail_doors = list(self.avail_doors)
         ret.event_doors = list(self.event_doors)
         ret.visited_orange = list(self.visited_orange)
@@ -734,7 +735,7 @@ class ExplorationState(object):
     def add_all_doors_check_unattached(self, region, world, player):
         for door in get_doors(world, region, player):
             if self.can_traverse(door):
-                if door.dest is None and door not in self.unattached_doors:
+                if door.dest is None and not self.in_door_list_ic(door, self.unattached_doors):
                     self.append_door_to_list(door, self.unattached_doors)
                 elif door.req_event is not None and door.req_event not in self.events and not self.in_door_list(door, self.event_doors):
                     self.append_door_to_list(door, self.event_doors)
@@ -751,16 +752,18 @@ class ExplorationState(object):
                     if door.name not in self.door_krs.keys():
                         self.door_krs[door.name] = key_region
 
-
     def add_all_doors_check_keys(self, region, key_door_proposal, world, player):
         for door in get_doors(world, region, player):
             if self.can_traverse(door):
-                if door in key_door_proposal and not self.in_door_list(door, self.small_doors) and door not in self.opened_doors:
-                    self.append_door_to_list(door, self.small_doors)
-                elif door.bigKey and not self.big_key_opened and not self.in_door_list(door, self.big_doors):
-                    self.append_door_to_list(door, self.big_doors)
-                elif door.req_event is not None and door.req_event not in self.events and not self.in_door_list(door, self.event_doors):
-                    self.append_door_to_list(door, self.event_doors)
+                if door in key_door_proposal and door not in self.opened_doors:
+                    if not self.in_door_list(door, self.small_doors):
+                        self.append_door_to_list(door, self.small_doors)
+                elif door.bigKey and not self.big_key_opened:
+                    if not self.in_door_list(door, self.big_doors):
+                        self.append_door_to_list(door, self.big_doors)
+                elif door.req_event is not None and door.req_event not in self.events:
+                    if not self.in_door_list(door, self.event_doors):
+                        self.append_door_to_list(door, self.event_doors)
                 elif not self.in_door_list(door, self.avail_doors):
                     self.append_door_to_list(door, self.avail_doors)
 
@@ -824,6 +827,8 @@ def extend_reachable_state(search_regions, state, world, player):
     return local_state
 
 
+# todo: this sometimes generates two independent parts - that could be valid if the entrances are accessible
+# todo: prevent crystal barrier dead ends
 def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_region_names):
     logger = logging.getLogger('')
     random.shuffle(available_sectors)
@@ -836,18 +841,17 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
         entrance_regions.append(world.get_region(region_name, player))
 
     state = extend_reachable_state(entrance_regions, ExplorationState(), world, player)
-    reachable_doors_new = state.unattached_doors
     # Loop until all available doors are used
-    while len(reachable_doors_new) > 0:
+    while len(state.unattached_doors) > 0:
         # Pick a random available door to connect
-        explorable_door = random.choice(reachable_doors_new)
+        explorable_door = random.choice(state.unattached_doors)
         door = explorable_door.door
         sector = find_sector_for_door(door, available_sectors)
         sector.outstanding_doors.remove(door)
         # door_connected = False
         logger.info('Linking %s', door.name)
         # Find an available region that has a compatible door
-        reachable_doors = [d.door for d in reachable_doors_new]
+        reachable_doors = [d.door for d in state.unattached_doors]
         compatibles = find_all_compatible_door_in_sectors_ex(door, available_sectors, reachable_doors)
         while len(compatibles) > 0:
             connect_sector, connect_door = compatibles.pop()
@@ -856,7 +860,7 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
             if is_valid(door, connect_door, sector, connect_sector, available_sectors):
                 # Apply connection and add the new region's doors to the available list
                 maybe_connect_two_way(world, door, connect_door, player)
-                reachable_doors_new.remove(explorable_door)  # todo: does this remove it from the state list?
+                state.unattached_doors.remove(explorable_door)
                 connect_sector.outstanding_doors.remove(connect_door)
                 if sector != connect_sector:  # combine if not the same
                     available_sectors.remove(connect_sector)
@@ -864,12 +868,12 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
                     sector.regions.extend(connect_sector.regions)
                 if not door.blocked:
                     connect_region = world.get_entrance(door.dest.name, player).parent_region
-                    state = extend_reachable([connect_region], state, world, player)
+                    state = extend_reachable_state([connect_region], state, world, player)
                 break  # skips else block below
             logger.info(' Not Linking %s to %s', door.name, connect_door.name)
             if len(compatibles) == 0:  # time to try again
                 sector.outstanding_doors.insert(0, door)
-                if len(reachable_doors_new) <= 1:
+                if len(state.unattached_doors) <= 1:
                     raise Exception('Rejected last option due to dead end... infinite loop ensues')
         else:
             # If there's no available region with a door, use an internal connection
@@ -877,11 +881,12 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
             while len(compatibles) > 0:
                 connect_door = compatibles.pop()
                 logger.info('  Adding loop via %s', connect_door.name)
+                connect_sector = find_sector_for_door(connect_door, available_sectors)
                 # Check if valid
-                if is_loop_valid(door, connect_door, sector, available_sectors):
+                if is_loop_valid(door, connect_door, sector, connect_sector, available_sectors):
                     maybe_connect_two_way(world, door, connect_door, player)
-                    reachable_doors_new.remove(explorable_door)
-                    reachable_doors_new[:] = [ed for ed in reachable_doors_new if ed.door != connect_door]
+                    state.unattached_doors.remove(explorable_door)
+                    state.unattached_doors[:] = [ed for ed in state.unattached_doors if ed.door != connect_door]
                     connect_sector = find_sector_for_door(connect_door, available_sectors)
                     connect_sector.outstanding_doors.remove(connect_door)
                     if sector != connect_sector:  # combine if not the same
@@ -892,7 +897,7 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
                 else:
                     logger.info(' Not Linking %s to %s', door.name, connect_door.name)
                     sector.outstanding_doors.insert(0, door)
-                    if len(reachable_doors_new) <= 2:
+                    if len(state.unattached_doors) <= 2:
                         raise Exception('Rejected last option due to likely improper loops...')
             else:
                 raise Exception('Nothing is apparently compatible with %s', door.name)
@@ -953,8 +958,9 @@ def shuffle_dungeon_no_repeats(world, player, available_sectors, entrance_region
             while len(compatibles) > 0:
                 connect_door = compatibles.pop()
                 logger.info('  Adding loop via %s', connect_door.name)
+                connect_sector = find_sector_for_door(connect_door, available_sectors)
                 # Check if valid
-                if is_loop_valid(door, connect_door, sector, available_sectors):
+                if is_loop_valid(door, connect_door, sector, connect_sector, available_sectors):
                     maybe_connect_two_way(world, door, connect_door, player)
                     reachable_doors.remove(door)
                     reachable_doors.remove(connect_door)
@@ -1051,16 +1057,20 @@ def is_valid(door_a, door_b, sector_a, sector_b, available_sectors):
     return False  # not sure how we got here, but it's a bad idea
 
 
-def is_loop_valid(door_a, door_b, sector, available_sectors):
+def is_loop_valid(door_a, door_b, sector_a, sector_b, available_sectors):
     if len(available_sectors) == 1:
         return True
-    if len(available_sectors) == 2 and door_b not in sector.outstanding_doors:
+    if len(available_sectors) == 2 and door_b not in sector_a.outstanding_doors:
         return True
-    elif not door_a.blocked and not door_b.blocked:
-        return sector.outflow() - 1 > 0
-    elif door_a.blocked or door_b.blocked:
-        return sector.outflow() > 0
-    return True  #  I think this is always true. Both blocked but we're connecting loops now, so dead end?
+    elif not door_a.blocked and not door_b.blocked and sector_a != sector_b:
+        return sector_a.outflow() + sector_b.outflow() - 1 > 0  # door_a has been removed already, so a.outflow is reduced by one
+    elif door_a.blocked or door_b.blocked and sector_a != sector_b:
+        return sector_a.outflow() + sector_b.outflow() > 0
+    elif sector_a == sector_b and not door_a.blocked and not door_b.blocked:
+        return sector_a.outflow() - 1 > 0
+    elif sector_a == sector_b and door_a.blocked or door_b.blocked:
+        return sector_a.outflow() > 0
+    return True  # I think this is always true. Both blocked but we're connecting loops now, so dead end?
 
 
 def are_there_outstanding_doors_of_type(door_a, door_b, sector_a, sector_b, available_sectors):
