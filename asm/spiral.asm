@@ -24,8 +24,10 @@ SpiralWarp: {
     sep #$30
     lda $00 : sta $a0
     ; shift quadrant if necessary
+    stz $07
     lda $01 : and #$01 : !sub $a9
     bne .xQuad
+    inc $07
     lda $22 : bne .skipXQuad ; this is an edge case
     dec $23 : bra .skipXQuad ; need to -1 if $22 is 0
     .xQuad sta $06 : !add $a9 : sta $a9
@@ -41,7 +43,7 @@ SpiralWarp: {
     lda $01 : and #$04 : lsr : sta $048a ;fix layer calc 0->0 2->1
     lda $01 : and #$08 : lsr #2 : sta $0492 ;fix from layer calc 0->0 2->1
     ; shift lower coordinates
-    lda $02 : sta $22 : bne .adjY : inc $23
+    lda $02 : sta $22 : bne .adjY : lda $23 : !add $07 : sta $23
     .adjY lda $03 : sta $20 : bne .upDownAdj : inc $21
     .upDownAdj ldx #$08
     lda $0462 : and #$04 : beq .upStairs
