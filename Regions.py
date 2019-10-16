@@ -444,7 +444,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Swamp Shooters', 'Swamp Palace', None, ['Swamp Shooters SW', 'Swamp Shooters EN']),
         create_dungeon_region(player, 'Swamp Left Elbow', 'Swamp Palace', None, ['Swamp Left Elbow WN', 'Swamp Left Elbow Down Stairs']),
         create_dungeon_region(player, 'Swamp Right Elbow', 'Swamp Palace', None, ['Swamp Right Elbow SE', 'Swamp Right Elbow Down Stairs']),
-        create_dungeon_region(player, 'Swamp Drain Left', 'Swamp Palace', None, ['Swamp Drain Left Up Stairs', 'Swamp Drain WN', 'Swamp Drain Left Switch']),
+        create_dungeon_region(player, 'Swamp Drain Left', 'Swamp Palace', None, ['Swamp Drain Left Up Stairs', 'Swamp Drain WN']),
         create_dungeon_region(player, 'Swamp Drain Right', 'Swamp Palace', ['Swamp Drain'], ['Swamp Drain Right Switch', 'Swamp Drain Right Up Stairs']),
         # This is intentionally odd so I don't have to treat the WS door in the Flooded Room oddly (because of how it works when going backward)
         create_dungeon_region(player, 'Swamp Flooded Room', 'Swamp Palace', None, ['Swamp Flooded Room Up Stairs', 'Swamp Flooded Room Ladder', 'Swamp Flooded Room WS']),

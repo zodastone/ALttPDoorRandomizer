@@ -397,7 +397,7 @@ def create_doors(world, player):
         create_door(player, 'Swamp Barrier EN', Nrml).dir(Direction.East, 0x34, Top, High).pos(0),
         create_door(player, 'Swamp Barrier - Orange', Lgcl),
         create_door(player, 'Swamp Barrier Ledge Hook Path', Lgcl),
-        create_door(player, 'Swamp Attic Down Stairs', Sprl).dir(Direction.Down, 0x54, 0, HTH).ss(Z, 0x12, 0x80),
+        create_door(player, 'Swamp Attic Down Stairs', Sprl).dir(Direction.Down, 0x54, 0, HTH).ss(Z, 0x12, 0x80, False, True),
         create_door(player, 'Swamp Attic Left Pit', Hole),
         create_door(player, 'Swamp Attic Right Pit', Hole),
         create_door(player, 'Swamp Push Statue S', Nrml).dir(Direction.South, 0x26, Mid, High).small_key().pos(0),
@@ -412,16 +412,15 @@ def create_doors(world, player):
         create_door(player, 'Swamp Right Elbow Down Stairs', Sprl).dir(Direction.Down, 0x26, 1, HTH).ss(S, 0x12, 0xb0, True, True),
         create_door(player, 'Swamp Drain Left Up Stairs', Sprl).dir(Direction.Up, 0x76, 0, HTH).ss(S, 0x1b, 0x2c, True, True),
         create_door(player, 'Swamp Drain WN', Intr).dir(Direction.West, 0x76, Top, Low).pos(0),
-        create_door(player, 'Swamp Drain Left Switch', Lgcl),
         create_door(player, 'Swamp Drain Right Switch', Lgcl),
         create_door(player, 'Swamp Drain Right Up Stairs', Sprl).dir(Direction.Up, 0x76, 1, HTH).ss(S, 0x1b, 0x9c, True, True),
         create_door(player, 'Swamp Flooded Room Up Stairs', Sprl).dir(Direction.Up, 0x76, 2, HTH).ss(X, 0x1a, 0xac, True, True),
         create_door(player, 'Swamp Flooded Room WS', Intr).dir(Direction.West, 0x76, Bot, Low).pos(1),
         create_door(player, 'Swamp Flooded Spot Ladder', Lgcl),
         create_door(player, 'Swamp Flooded Room Ladder', Lgcl),
-        create_door(player, 'Swamp Basement Shallows NW', Nrml).dir(Direction.North, 0x76, Left, Low).toggler().pos(2),
-        create_door(player, 'Swamp Basement Shallows EN', Intr).dir(Direction.West, 0x76, Top, Low).pos(0),
-        create_door(player, 'Swamp Basement Shallows ES', Intr).dir(Direction.East, 0x76, Bot, Low).pos(1),
+        create_door(player, 'Swamp Basement Shallows NW', Nrml).dir(Direction.North, 0x76, Left, High).toggler().pos(2),
+        create_door(player, 'Swamp Basement Shallows EN', Intr).dir(Direction.West, 0x76, Top, High).pos(0),
+        create_door(player, 'Swamp Basement Shallows ES', Intr).dir(Direction.East, 0x76, Bot, High).pos(1),
         create_door(player, 'Swamp Waterfall Room SW', Nrml).dir(Direction.South, 0x66, Left, Low).toggler().pos(1),
         create_door(player, 'Swamp Waterfall Room NW', Intr).dir(Direction.North, 0x66, Left, Low).pos(3),
         create_door(player, 'Swamp Waterfall Room NE', Intr).dir(Direction.North, 0x66, Right, Low).pos(0),
@@ -451,7 +450,6 @@ def create_doors(world, player):
     world.get_door('Swamp Trench 2 Departure Wet', player).event('Trench 2 Switch')
     world.get_door('Swamp Drain WN', player).event('Swamp Drain')
     world.get_door('Swamp Flooded Room WS', player).event('Swamp Drain')
-    world.get_door('Swamp Drain Left Switch', player).event('Swamp Drain')
     world.get_door('Swamp Drain Right Switch', player).event('Swamp Drain')
     world.get_door('Swamp Flooded Room Ladder', player).event('Swamp Drain')
 

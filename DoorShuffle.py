@@ -1421,7 +1421,6 @@ logical_connections = [
     ('Swamp Barrier Ledge - Orange', 'Swamp Barrier'),
     ('Swamp Barrier - Orange', 'Swamp Barrier Ledge'),
     ('Swamp Barrier Ledge Hook Path', 'Swamp West Ledge'),
-    ('Swamp Drain Left Switch', 'Swamp Drain Right'),
     ('Swamp Drain Right Switch', 'Swamp Drain Left'),
     ('Swamp Flooded Spot Ladder', 'Swamp Flooded Room'),
     ('Swamp Flooded Room Ladder', 'Swamp Flooded Spot'),
