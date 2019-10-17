@@ -88,6 +88,8 @@ class World(object):
         self.paired_doors = {}
         self.rooms = []
         self._room_cache = {}
+        self.dungeon_layouts = {}
+        self.inaccessible_regions = []
 
     def intialize_regions(self):
         for region in self.regions:
@@ -862,17 +864,52 @@ class Direction(Enum):
     Down = 5
 
 
+class Polarity:
+    def __init__(self, vector):
+        self.vector = vector
+
+    def __add__(self, other):
+        result = Polarity([0]*len(self.vector))
+        for i in range(len(self.vector)):
+            result.vector[i] = pol_add[pol_idx_2[i]](self.vector[i], other.vector[i])
+        return result
+
+    def __iadd__(self, other):
+        for i in range(len(self.vector)):
+            self.vector[i] = pol_add[pol_idx_2[i]](self.vector[i], other.vector[i])
+        return self
+
+    def __getitem__(self, item):
+        return self.vector[item]
+
+    def is_neutral(self):
+        for i in range(len(self.vector)):
+            if self.vector[i] != 0:
+                return False
+        return True
+
+
 pol_idx = {
     Direction.North: (0, 'Pos'),
     Direction.South: (0, 'Neg'),
     Direction.East: (1, 'Pos'),
     Direction.West: (1, 'Neg'),
-    Direction.Up: (2, 'Pos'),
-    Direction.Down: (2, 'Neg')
+    Direction.Up: (2, 'Mod'),
+    Direction.Down: (2, 'Mod')
+}
+pol_idx_2 = {
+    0: 'Add',
+    1: 'Add',
+    2: 'Mod'
 }
 pol_inc = {
     'Pos': lambda x: x + 1,
     'Neg': lambda x: x - 1,
+    'Mod': lambda x: (x + 1) % 2
+}
+pol_add = {
+    'Add': lambda x, y: x + y,
+    'Mod': lambda x, y: (x + y) % 2
 }
 
 @unique
@@ -1000,11 +1037,11 @@ class Sector(object):
         # todo: make these lazy init? - when do you invalidate them
 
     def polarity(self):
-        polarity = [0, 0, 0]
+        pol = Polarity([0, 0, 0])
         for door in self.outstanding_doors:
             idx, inc = pol_idx[door.direction]
-            polarity[idx] = pol_inc[inc](polarity[idx])
-        return polarity
+            pol.vector[idx] = pol_inc[inc](pol.vector[idx])
+        return pol
 
     def magnitude(self):
         magnitude = [0, 0, 0]

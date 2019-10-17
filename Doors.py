@@ -323,6 +323,8 @@ def create_doors(world, player):
         create_door(player, 'PoD Mimics 2 SW', Nrml).dir(Direction.South, 0x1b, Left, High).pos(1),
         create_door(player, 'PoD Mimics 2 NW', Intr).dir(Direction.North, 0x1b, Left, High).pos(0),
         create_door(player, 'PoD Bow Statue SW', Intr).dir(Direction.South, 0x1b, Left, High).pos(0),
+        # todo: we need a new flag for a door that has a wall on it - you have to traverse it one particular way first
+        # the above is not a problem until we get to crossed mode
         create_door(player, 'PoD Bow Statue Down Ladder', Lddr),
         create_door(player, 'PoD Dark Pegs Up Ladder', Lddr),
         create_door(player, 'PoD Dark Pegs WN', Intr).dir(Direction.West, 0x0b, Mid, High).small_key().pos(2),
@@ -390,6 +392,7 @@ def create_doors(world, player):
         create_door(player, 'Swamp West Shallows ES', Nrml).dir(Direction.East, 0x34, Bot, High).pos(1),
         create_door(player, 'Swamp West Shallows Push Blocks', Lgcl),
         create_door(player, 'Swamp West Block Path Up Stairs', Sprl).dir(Direction.Up, 0x34, 0, HTH).ss(Z, 0x1b, 0x6c, False, True),
+        create_door(player, 'Swamp West Block Path Drop Down', Lgcl),
         create_door(player, 'Swamp West Ledge Drop Down', Lgcl),
         create_door(player, 'Swamp West Ledge Hook Path', Lgcl),
         create_door(player, 'Swamp Barrier Ledge Drop Down', Lgcl),
@@ -436,6 +439,51 @@ def create_doors(world, player):
         create_door(player, 'Swamp T SW', Intr).dir(Direction.South, 0x16, Left, High).small_key().pos(1),
         create_door(player, 'Swamp T NW', Nrml).dir(Direction.North, 0x16, Left, High).pos(3),
         create_door(player, 'Swamp Boss SW', Nrml).dir(Direction.South, 0x06, Left, High).trap(0x4).pos(0),
+
+        create_door(player, 'Skull 1 Lobby WS', Nrml).dir(Direction.West, 0x58, Bot, High).small_key().pos(1),
+        create_door(player, 'Skull 1 Lobby ES', Intr).dir(Direction.East, 0x58, Bot, High).pos(5),
+        create_door(player, 'Skull Map Room WS', Intr).dir(Direction.West, 0x58, Bot, High).pos(5),
+        create_door(player, 'Skull Map Room SE', Nrml).dir(Direction.South, 0x58, Right, High).small_key().pos(2),
+        create_door(player, 'Skull Pot Circle WN', Intr).dir(Direction.West, 0x58, Top, High).pos(3),
+        create_door(player, 'Skull Pull Switch EN', Intr).dir(Direction.East, 0x58, Top, High).pos(3),
+        create_door(player, 'Skull Pot Circle Star Path', Lgcl),
+        create_door(player, 'Skull Pull Switch S', Intr).dir(Direction.South, 0x58, Left, High).pos(0),
+        create_door(player, 'Skull Big Chest N', Intr).dir(Direction.North, 0x58, Left, High).no_exit().pos(0),
+        create_door(player, 'Skull Big Chest Hookpath', Lgcl),
+        create_door(player, 'Skull Pinball NE', Nrml).dir(Direction.North, 0x68, Right, High).small_key().pos(1),
+        create_door(player, 'Skull Pinball WS', Nrml).dir(Direction.West, 0x68, Bot, High).no_exit().trap(0x4).pos(0),
+        create_door(player, 'Skull Compass Room NE', Nrml).dir(Direction.North, 0x67, Right, High).pos(0),
+        create_door(player, 'Skull Compass Room ES', Nrml).dir(Direction.East, 0x67, Bot, High).pos(2),
+        create_door(player, 'Skull Left Drop ES', Intr).dir(Direction.East, 0x67, Bot, High).pos(1),
+        create_door(player, 'Skull Compass Room WS', Intr).dir(Direction.West, 0x67, Bot, High).pos(1),
+        create_door(player, 'Skull Pot Prison ES', Nrml).dir(Direction.East, 0x57, Bot, High).small_key().pos(2),
+        create_door(player, 'Skull Pot Prison SE', Nrml).dir(Direction.South, 0x57, Right, High).pos(5),
+        create_door(player, 'Skull 2 East Lobby WS', Nrml).dir(Direction.West, 0x57, Bot, High).pos(4),
+        create_door(player, 'Skull 2 East Lobby NW', Intr).dir(Direction.North, 0x57, Left, High).pos(1),
+        create_door(player, 'Skull Big Key SW', Intr).dir(Direction.South, 0x57, Left, High).pos(1),
+        create_door(player, 'Skull Big Key WN', Intr).dir(Direction.West, 0x57, Top, High).pos(0),
+        create_door(player, 'Skull Lone Pot EN', Intr).dir(Direction.East, 0x57, Top, High).pos(0),
+        create_door(player, 'Skull Small Hall ES', Nrml).dir(Direction.East, 0x56, Bot, High).pos(3),
+        create_door(player, 'Skull Small Hall WS', Intr).dir(Direction.West, 0x56, Bot, High).pos(2),
+        create_door(player, 'Skull 2 West Lobby ES', Intr).dir(Direction.East, 0x56, Bot, High).pos(2),
+        create_door(player, 'Skull 2 West Lobby NW', Intr).dir(Direction.North, 0x56, Left, High).small_key().pos(0),
+        create_door(player, 'Skull X Room SW', Intr).dir(Direction.South, 0x56, Left, High).small_key().pos(0),
+        create_door(player, 'Skull Back Drop Star Path', Lgcl),
+        create_door(player, 'Skull 3 Lobby NW', Nrml).dir(Direction.North, 0x59, Left, High).small_key().pos(0),
+        create_door(player, 'Skull 3 Lobby WN', Intr).dir(Direction.West, 0x59, Top, High).pos(2),
+        create_door(player, 'Skull East Bridge EN', Intr).dir(Direction.East, 0x59, Top, High).pos(2),
+        create_door(player, 'Skull East Bridge ES', Intr).dir(Direction.East, 0x59, Bot, High).pos(3),
+        create_door(player, 'Skull West Bridge Nook WS', Intr).dir(Direction.West, 0x59, Bot, High).pos(3),
+        create_door(player, 'Skull Star Pits SW', Nrml).dir(Direction.South, 0x49, Left, High).small_key().pos(2),
+        create_door(player, 'Skull Star Pits WS', Intr).dir(Direction.West, 0x49, Bot, High).pos(3),
+        create_door(player, 'Skull Torch Room ES', Intr).dir(Direction.East, 0x49, Bot, High).pos(3),
+        create_door(player, 'Skull Torch Room EN', Intr).dir(Direction.East, 0x49, Top, High).pos(1),
+        create_door(player, 'Skull Vines WN', Intr).dir(Direction.West, 0x49, Top, High).pos(1),
+        create_door(player, 'Skull Vines NW', Nrml).dir(Direction.North, 0x49, Left, High).pos(0),
+        create_door(player, 'Skull Spike Corner SW', Nrml).dir(Direction.South, 0x39, Left, High).no_exit().trap(0x4).pos(0),
+        create_door(player, 'Skull Spike Corner WS', Intr).dir(Direction.West, 0x39, Bot, High).small_key().pos(1),
+        create_door(player, 'Skull Final Drop ES', Intr).dir(Direction.East, 0x39, Bot, High).small_key().pos(1),
+        create_door(player, 'Skull Final Drop Hole', Hole),
     ]
     create_paired_doors(world, player)
 
@@ -511,9 +559,9 @@ def create_paired_doors(world, player):
         # PairedDoor('', ''),  # GT moldorm key door
         # PairedDoor('', ''),  # Ice BJ key door
         PairedDoor('Desert Tiles 2 SE', 'Desert Beamos Hall NE'),
-        # PairedDoor('', ''),  # Skull 3 key door
-        # PairedDoor('', ''),  # Skull 1 key door - pot prison to big chest
-        # PairedDoor('', ''),  # Skull 1 - pinball key door
+        PairedDoor('Skull 3 Lobby NW', 'Skull Star Pits SW'),  # Skull 3 key door
+        PairedDoor('Skull 1 Lobby WS', 'Skull Pot Prison ES'),  # Skull 1 key door - pot prison to big chest
+        PairedDoor('Skull Map Room SE', 'Skull Pinball NE'),  # Skull 1 - pinball key door
         # PairedDoor('', ''),  # gt main big key door
         # PairedDoor('', ''),  # ice door to spike chest
         # PairedDoor('', ''),  # gt right side key door to cape bridge

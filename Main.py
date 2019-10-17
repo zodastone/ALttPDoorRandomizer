@@ -58,11 +58,6 @@ def main(args, seed=None):
             create_rooms(world, player)
             create_dungeons(world, player)
 
-    logger.info('Shuffling dungeons')
-
-    for player in range(1, world.players + 1):
-        link_doors(world, player)
-
     logger.info('Shuffling the World about.')
 
     if world.mode != 'inverted':
@@ -75,6 +70,13 @@ def main(args, seed=None):
             link_inverted_entrances(world, player)
 
         mark_dark_world_regions(world)
+
+    logger.info('Shuffling dungeons')
+
+    for player in range(1, world.players + 1):
+        link_doors(world, player)
+
+    # todo: mark regions after linking doors - for bunny logic?
 
     logger.info('Generating Item Pool.')
 
@@ -89,7 +91,7 @@ def main(args, seed=None):
     # todo: remove this later. this is for debugging
     for player in range(1, world.players + 1):
         all_state = world.get_all_state(keys=True)
-        for bossregion in ['Eastern Boss', 'Desert Boss', 'Hera Boss', 'Tower Agahnim 1', 'PoD Boss', 'Swamp Boss']:
+        for bossregion in ['Eastern Boss', 'Desert Boss', 'Hera Boss', 'Tower Agahnim 1', 'PoD Boss', 'Swamp Boss', 'Skull Boss']:
             if world.get_region(bossregion, player) not in all_state.reachable_regions[player]:
                 raise Exception(bossregion + ' missing from generation')
 
@@ -273,6 +275,12 @@ def copy_world(world):
     ret.state.prog_items = world.state.prog_items.copy()
     ret.precollected_items = world.precollected_items.copy()
     ret.state.stale = {player: True for player in range(1, world.players + 1)}
+
+    ret.doors = world.doors
+    ret.paired_doors = world.paired_doors
+    ret.rooms = world.rooms
+    ret.inaccessible_regions = world.inaccessible_regions
+    ret.dungeon_layouts = world.dungeon_layouts
 
     for player in range(1, world.players + 1):
         set_rules(ret, player)

@@ -201,14 +201,7 @@ def create_regions(world, player):
                                                                         'Thieves\' Town - Big Chest',
                                                                         'Thieves\' Town - Blind\'s Cell'], ['Blind Fight']),
         create_dungeon_region(player, 'Blind Fight', 'Thieves\' Town', ['Thieves\' Town - Boss', 'Thieves\' Town - Prize']),
-        create_dungeon_region(player, 'Skull Woods First Section', 'Skull Woods', ['Skull Woods - Map Chest'], ['Skull Woods First Section Exit', 'Skull Woods First Section Bomb Jump', 'Skull Woods First Section South Door', 'Skull Woods First Section West Door']),
-        create_dungeon_region(player, 'Skull Woods First Section (Right)', 'Skull Woods', ['Skull Woods - Pinball Room'], ['Skull Woods First Section (Right) North Door']),
-        create_dungeon_region(player, 'Skull Woods First Section (Left)', 'Skull Woods', ['Skull Woods - Compass Chest', 'Skull Woods - Pot Prison'], ['Skull Woods First Section (Left) Door to Exit', 'Skull Woods First Section (Left) Door to Right']),
-        create_dungeon_region(player, 'Skull Woods First Section (Top)', 'Skull Woods', ['Skull Woods - Big Chest'], ['Skull Woods First Section (Top) One-Way Path']),
-        create_dungeon_region(player, 'Skull Woods Second Section (Drop)', 'Skull Woods', None, ['Skull Woods Second Section (Drop)']),
-        create_dungeon_region(player, 'Skull Woods Second Section', 'Skull Woods', ['Skull Woods - Big Key Chest'], ['Skull Woods Second Section Exit (East)', 'Skull Woods Second Section Exit (West)']),
-        create_dungeon_region(player, 'Skull Woods Final Section (Entrance)', 'Skull Woods', ['Skull Woods - Bridge Room'], ['Skull Woods Torch Room', 'Skull Woods Final Section Exit']),
-        create_dungeon_region(player, 'Skull Woods Final Section (Mothula)', 'Skull Woods', ['Skull Woods - Boss', 'Skull Woods - Prize']),
+
         create_dungeon_region(player, 'Ice Palace (Entrance)', 'Ice Palace', None, ['Ice Palace Entrance Room', 'Ice Palace Exit']),
         create_dungeon_region(player, 'Ice Palace (Main)', 'Ice Palace', ['Ice Palace - Compass Chest', 'Ice Palace - Freezor Chest',
                                                                   'Ice Palace - Big Chest', 'Ice Palace - Iced T Room'], ['Ice Palace (East)', 'Ice Palace (Kholdstare)']),
@@ -435,7 +428,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Swamp Trench 2 Departure', 'Swamp Palace', None, ['Swamp Trench 2 Departure Wet', 'Swamp Trench 2 Departure WS']),
         create_dungeon_region(player, 'Swamp Big Key Ledge', 'Swamp Palace', ['Swamp Palace - Big Key Chest'], ['Swamp Big Key Ledge WN']),
         create_dungeon_region(player, 'Swamp West Shallows', 'Swamp Palace', None, ['Swamp West Shallows ES', 'Swamp West Shallows Push Blocks']),
-        create_dungeon_region(player, 'Swamp West Block Path', 'Swamp Palace', None, ['Swamp West Block Path Up Stairs']),
+        create_dungeon_region(player, 'Swamp West Block Path', 'Swamp Palace', None, ['Swamp West Block Path Up Stairs', 'Swamp West Block Path Drop Down']),
         create_dungeon_region(player, 'Swamp West Ledge', 'Swamp Palace', ['Swamp Palace - West Chest'], ['Swamp West Ledge Drop Down', 'Swamp West Ledge Hook Path']),
         create_dungeon_region(player, 'Swamp Barrier Ledge', 'Swamp Palace', None, ['Swamp Barrier Ledge Drop Down', 'Swamp Barrier Ledge - Orange', 'Swamp Barrier Ledge Hook Path']),
         create_dungeon_region(player, 'Swamp Barrier', 'Swamp Palace', None, ['Swamp Barrier EN', 'Swamp Barrier - Orange']),
@@ -460,6 +453,32 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Swamp Boss', 'Swamp Palace', ['Swamp Palace - Boss', 'Swamp Palace - Prize'], ['Swamp Boss SW']),
 
         # sw
+        create_dungeon_region(player, 'Skull 1 Lobby', 'Skull Woods', None, ['Skull Woods First Section Exit', 'Skull 1 Lobby WS', 'Skull 1 Lobby ES']),
+        create_dungeon_region(player, 'Skull Map Room', 'Skull Woods', ['Skull Woods - Map Chest'], ['Skull Map Room WS', 'Skull Map Room SE']),
+        create_dungeon_region(player, 'Skull Pot Circle', 'Skull Woods', None, ['Skull Pot Circle WN', 'Skull Pot Circle Star Path']),
+        create_dungeon_region(player, 'Skull Pull Switch', 'Skull Woods', None, ['Skull Pull Switch EN', 'Skull Pull Switch S']),
+        create_dungeon_region(player, 'Skull Big Chest', 'Skull Woods', ['Skull Woods - Big Chest'], ['Skull Big Chest N', 'Skull Big Chest Hookpath']),
+        create_dungeon_region(player, 'Skull Pinball', 'Skull Woods', ['Skull Woods - Pinball Room'], ['Skull Pinball NE', 'Skull Pinball WS']),
+        create_dungeon_region(player, 'Skull Pot Prison', 'Skull Woods', ['Skull Woods - Pot Prison'], ['Skull Pot Prison ES', 'Skull Pot Prison SE']),
+        create_dungeon_region(player, 'Skull Compass Room', 'Skull Woods', ['Skull Woods - Compass Chest'], ['Skull Compass Room NE', 'Skull Compass Room ES', 'Skull Compass Room WS']),
+        create_dungeon_region(player, 'Skull Left Drop', 'Skull Woods', None, ['Skull Left Drop ES']),
+        create_dungeon_region(player, 'Skull 2 East Lobby', 'Skull Woods', None, ['Skull 2 East Lobby NW', 'Skull 2 East Lobby WS', 'Skull Woods Second Section Exit (East)']),
+        create_dungeon_region(player, 'Skull Big Key', 'Skull Woods', ['Skull Woods - Big Key Chest'], ['Skull Big Key SW', 'Skull Big Key WN']),
+        create_dungeon_region(player, 'Skull Lone Pot', 'Skull Woods', None, ['Skull Lone Pot EN']),
+        create_dungeon_region(player, 'Skull Small Hall', 'Skull Woods', None, ['Skull Small Hall ES', 'Skull Small Hall WS']),
+        create_dungeon_region(player, 'Skull Back Drop', 'Skull Woods', None, ['Skull Back Drop Star Path', ]),
+        create_dungeon_region(player, 'Skull 2 West Lobby', 'Skull Woods', ['Skull Woods - West Lobby Pot Key'], ['Skull 2 West Lobby ES', 'Skull 2 West Lobby NW', 'Skull Woods Second Section Exit (West)']),
+        create_dungeon_region(player, 'Skull X Room', 'Skull Woods', None, ['Skull X Room SW']),
+        create_dungeon_region(player, 'Skull 3 Lobby', 'Skull Woods', None, ['Skull 3 Lobby NW', 'Skull 3 Lobby WN', 'Skull Woods Final Section Exit']),
+        create_dungeon_region(player, 'Skull East Bridge', 'Skull Woods', None, ['Skull East Bridge EN', 'Skull East Bridge ES']),
+        create_dungeon_region(player, 'Skull West Bridge Nook', 'Skull Woods', ['Skull Woods - Bridge Room'], ['Skull West Bridge Nook WS']),
+        create_dungeon_region(player, 'Skull Star Pits', 'Skull Woods', None, ['Skull Star Pits SW', 'Skull Star Pits WS']),
+        create_dungeon_region(player, 'Skull Torch Room', 'Skull Woods', None, ['Skull Torch Room ES', 'Skull Torch Room EN']),
+        create_dungeon_region(player, 'Skull Vines', 'Skull Woods', None, ['Skull Vines WN', 'Skull Vines NW']),
+        create_dungeon_region(player, 'Skull Spike Corner', 'Skull Woods', ['Skull Woods - Spike Corner Key Drop'], ['Skull Spike Corner SW', 'Skull Spike Corner WS']),
+        create_dungeon_region(player, 'Skull Final Drop', 'Skull Woods', None, ['Skull Final Drop ES', 'Skull Final Drop Hole']),
+        create_dungeon_region(player, 'Skull Boss', 'Skull Woods', ['Skull Woods - Boss', 'Skull Woods - Prize']),
+
         # tt
         # ice
         # mire
@@ -590,7 +609,9 @@ key_only_locations = {
   'Swamp Palace - Trench 1 Pot Key': 'Small Key (Swamp Palace)',
   'Swamp Palace - Hookshot Pot Key': 'Small Key (Swamp Palace)',
   'Swamp Palace - Trench 2 Pot Key': 'Small Key (Swamp Palace)',
-  'Swamp Palace - Waterway Pot Key': 'Small Key (Swamp Palace)'
+  'Swamp Palace - Waterway Pot Key': 'Small Key (Swamp Palace)',
+  'Skull Woods - West Lobby Pot Key': 'Small Key (Skull Woods)',
+  'Skull Woods - Spike Corner Key Drop': 'Small Key (Skull Woods)'
 }
 
 dungeon_events = [

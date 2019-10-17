@@ -2,7 +2,6 @@ import collections
 from collections import defaultdict
 import logging
 from BaseClasses import CollectionState, DoorType
-from Dungeons import region_starts
 from DoorShuffle import ExplorationState
 
 
@@ -262,7 +261,7 @@ def global_rules(world, player):
     # If these generate fine rules with vanilla shuffle - then no.
 
     # Escape/ Hyrule Castle
-    generate_key_logic(region_starts['Hyrule Castle'], 'Small Key (Escape)', world, player)
+    generate_key_logic('Hyrule Castle', 'Small Key (Escape)', world, player)
 
     # Eastern Palace
     # Eyegore room needs a bow
@@ -273,7 +272,7 @@ def global_rules(world, player):
         forbid_item(world.get_location('Eastern Palace - Big Chest', player), 'Big Key (Eastern Palace)', player)
     set_rule(world.get_entrance('Eastern Big Key NE', player), lambda state: state.has('Big Key (Eastern Palace)', player))
     set_rule(world.get_entrance('Eastern Courtyard N', player), lambda state: state.has('Big Key (Eastern Palace)', player))
-    generate_key_logic(region_starts['Eastern Palace'], 'Small Key (Eastern Palace)', world, player)
+    generate_key_logic('Eastern Palace', 'Small Key (Eastern Palace)', world, player)
 
     # Boss rules. Same as below but no BK or arrow requirement.
     set_defeat_dungeon_boss_rule(world.get_location('Eastern Palace - Prize', player))
@@ -287,7 +286,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Desert Wall Slide NW', player), lambda state: state.has_fire_source(player))
     set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Prize', player))
     set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Boss', player))
-    generate_key_logic(region_starts['Desert Palace'], 'Small Key (Desert Palace)', world, player)
+    generate_key_logic('Desert Palace', 'Small Key (Desert Palace)', world, player)
 
     # Tower of Hera
     set_rule(world.get_location('Tower of Hera - Big Chest', player), lambda state: state.has('Big Key (Tower of Hera)', player))
@@ -297,10 +296,10 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Hera Startile Corner NW', player), lambda state: state.has('Big Key (Tower of Hera)', player))
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Prize', player))
-    generate_key_logic(region_starts['Tower of Hera'], 'Small Key (Tower of Hera)', world, player)
+    generate_key_logic('Tower of Hera', 'Small Key (Tower of Hera)', world, player)
 
     set_rule(world.get_entrance('Tower Altar NW', player), lambda state: state.has_sword(player))
-    generate_key_logic(region_starts['Agahnims Tower'], 'Small Key (Agahnims Tower)', world, player)
+    generate_key_logic('Agahnims Tower', 'Small Key (Agahnims Tower)', world, player)
 
     set_rule(world.get_entrance('PoD Mimics 1 NW', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Mimics 2 NW', player), lambda state: state.can_shoot_arrows(player))
@@ -314,7 +313,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('PoD Dark Pegs Up Ladder', player), lambda state: state.has('Hammer', player))
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Prize', player))
-    generate_key_logic(region_starts['Palace of Darkness'], 'Small Key (Palace of Darkness)', world, player)
+    generate_key_logic('Palace of Darkness', 'Small Key (Palace of Darkness)', world, player)
 
     set_rule(world.get_entrance('Swamp Lobby Moat', player), lambda state: state.has('Flippers', player) and state.has('Open Floodgate', player))
     set_rule(world.get_entrance('Swamp Trench 1 Approach Dry', player), lambda state: not state.has('Trench 1 Filled', player))
@@ -349,7 +348,17 @@ def global_rules(world, player):
         forbid_item(world.get_location('Swamp Palace - Big Chest', player), 'Big Key (Swamp Palace)', player)
     set_defeat_dungeon_boss_rule(world.get_location('Swamp Palace - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Swamp Palace - Prize', player))
-    generate_key_logic(region_starts['Swamp Palace'], 'Small Key (Swamp Palace)', world, player)
+    generate_key_logic('Swamp Palace', 'Small Key (Swamp Palace)', world, player)
+
+    set_rule(world.get_entrance('Skull Big Chest Hookpath', player), lambda state: state.has('Hookshot', player))
+    set_rule(world.get_location('Skull Woods - Big Chest', player), lambda state: state.has('Big Key (Skull Woods)', player))
+    if world.accessibility == 'locations':
+        forbid_item(world.get_location('Skull Woods - Big Chest', player), 'Big Key (Skull Woods)', player)
+    set_rule(world.get_entrance('Skull Torch Room EN', player), lambda state: state.has('Fire Rod', player))
+    set_rule(world.get_entrance('Skull Vines NW', player), lambda state: state.has_sword(player))
+    set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Boss', player))
+    set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Prize', player))
+    generate_key_logic('Skull Woods', 'Small Key (Skull Woods)', world, player)
 
     # End of door rando rules.
 
@@ -367,19 +376,6 @@ def global_rules(world, player):
         forbid_item(world.get_location(location, player), 'Big Key (Thieves Town)', player)
     for location in ['Thieves\' Town - Attic', 'Thieves\' Town - Boss']:
         forbid_item(world.get_location(location, player), 'Small Key (Thieves Town)', player)
-
-    set_rule(world.get_entrance('Skull Woods First Section South Door', player), lambda state: state.has_key('Small Key (Skull Woods)', player))
-    set_rule(world.get_entrance('Skull Woods First Section (Right) North Door', player), lambda state: state.has_key('Small Key (Skull Woods)', player))
-    set_rule(world.get_entrance('Skull Woods First Section West Door', player), lambda state: state.has_key('Small Key (Skull Woods)', player, 2))  # ideally would only be one key, but we may have spent thst key already on escaping the right section
-    set_rule(world.get_entrance('Skull Woods First Section (Left) Door to Exit', player), lambda state: state.has_key('Small Key (Skull Woods)', player, 2))
-    set_rule(world.get_location('Skull Woods - Big Chest', player), lambda state: state.has('Big Key (Skull Woods)', player) or item_name(state, 'Skull Woods - Big Chest', player) == ('Big Key (Skull Woods)', player))
-    if world.accessibility != 'locations':
-        set_always_allow(world.get_location('Skull Woods - Big Chest', player), lambda state, item: item.name == 'Big Key (Skull Woods)' and item.player == player)
-    set_rule(world.get_entrance('Skull Woods Torch Room', player), lambda state: state.has_key('Small Key (Skull Woods)', player, 3) and state.has('Fire Rod', player) and state.has_sword(player))  # sword required for curtain
-    set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Prize', player))
-    for location in ['Skull Woods - Boss']:
-        forbid_item(world.get_location(location, player), 'Small Key (Skull Woods)', player)
 
     set_rule(world.get_entrance('Ice Palace Entrance Room', player), lambda state: state.can_melt_things(player))
     set_rule(world.get_location('Ice Palace - Big Chest', player), lambda state: state.has('Big Key (Ice Palace)', player))
@@ -904,7 +900,6 @@ def no_glitches_rules(world, player):
         add_rule(world.get_location(location, player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: False)  # no glitches does not require block override
     set_rule(world.get_entrance('Paradox Cave Bomb Jump', player), lambda state: False)
-    set_rule(world.get_entrance('Skull Woods First Section Bomb Jump', player), lambda state: False)
 
     # Light cones in standard depend on which world we actually are in, not which one the location would normally be
     # We add Lamp requirements only to those locations which lie in the dark world (or everything if open
@@ -1549,11 +1544,12 @@ def set_bunny_rules(world, player):
 
     # regions for the exits of multi-entrace caves/drops that bunny cannot pass
     # Note spiral cave may be technically passible, but it would be too absurd to require since OHKO mode is a thing.
-    bunny_impassable_caves = ['Bumper Cave', 'Two Brothers House', 'Hookshot Cave', 'Skull Woods First Section (Right)', 'Skull Woods First Section (Left)', 'Skull Woods First Section (Top)', 'Turtle Rock (Entrance)', 'Turtle Rock (Second Section)', 'Turtle Rock (Big Chest)', 'Skull Woods Second Section (Drop)',
+    bunny_impassable_caves = ['Bumper Cave', 'Two Brothers House', 'Hookshot Cave', 'Turtle Rock (Entrance)', 'Turtle Rock (Second Section)', 'Turtle Rock (Big Chest)',
                               'Turtle Rock (Eye Bridge)', 'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)']
     # todo: bunny impassable caves
     #  sewers drop may or may not be - maybe just new terminology
     #  desert pots are impassible by bunny - need rules for those transitions
+    #  skull woods drops tend to soft lock bunny
 
     bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree', 'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid', 'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins']
 
@@ -1691,7 +1687,8 @@ def set_inverted_bunny_rules(world, player):
             add_rule(location, get_rule_to_add(location.parent_region))
 
 
-def generate_key_logic(start_region_names, small_key_name, world, player):
+def generate_key_logic(dungeon_name, small_key_name, world, player):
+    sector, start_region_names = world.dungeon_layouts[player][dungeon_name]
     logger = logging.getLogger('')
     # Now that the dungeon layout is done, we need to search again to generate key logic.
     # TODO: This assumes all start doors are accessible, which isn't always true.
@@ -1716,10 +1713,10 @@ def generate_key_logic(start_region_names, small_key_name, world, player):
         explorable_door = state.next_avail_door()
         door = explorable_door.door
         local_kr = state.door_krs[door.name]
-        logger.debug('  kr %s: Door %s', local_kr, door.name)
+        # logger.debug('  kr %s: Door %s', local_kr, door.name)
         connect_region = world.get_entrance(door.name, player).connected_region
         # Bail early if we've been here before or the door is blocked
-        if not state.can_traverse(door) or state.visited(connect_region):
+        if not state.validate(door, connect_region, world):
             continue
         # Once we open a key door, we need a new region.
         if door.smallKey and door not in state.opened_doors:  # we tend to open doors in a DFS manner
@@ -1729,7 +1726,7 @@ def generate_key_logic(start_region_names, small_key_name, world, player):
             state.opened_doors.append(door)
             if door.dest.smallKey:
                 state.opened_doors.append(door.dest)
-            logger.debug('    New KR %s', current_kr)
+            logger.debug('%s:    New KR %s', door.name, current_kr)
         # Account for the new region
         state.visit_region(connect_region, local_kr)
         state.add_all_doors_check_key_region(connect_region, local_kr, world, player)

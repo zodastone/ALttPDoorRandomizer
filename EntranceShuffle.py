@@ -1995,7 +1995,7 @@ def connect_doors(world, doors, targets, player):
 
 def skull_woods_shuffle(world, player):
     connect_random(world, ['Skull Woods First Section Hole (East)', 'Skull Woods First Section Hole (West)', 'Skull Woods First Section Hole (North)', 'Skull Woods Second Section Hole'],
-                   ['Skull Woods First Section (Left)', 'Skull Woods First Section (Right)', 'Skull Woods First Section (Top)', 'Skull Woods Second Section (Drop)'], player)
+                   ['Skull Left Drop', 'Skull Pinball', 'Skull Pot Circle', 'Skull Back Drop'], player)
     connect_random(world, ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)', 'Skull Woods Second Section Door (West)'],
                    ['Skull Woods First Section Exit', 'Skull Woods Second Section Exit (East)', 'Skull Woods Second Section Exit (West)'], player, True)
 
@@ -2948,15 +2948,6 @@ mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia Central 
                          ('Graveyard Ledge Mirror Spot', 'Graveyard Ledge'),
 
                          ('Thieves Town Big Key Door', 'Thieves Town (Deep)'),
-                         ('Skull Woods Torch Room', 'Skull Woods Final Section (Mothula)'),
-                         ('Skull Woods First Section Bomb Jump', 'Skull Woods First Section (Top)'),  # represents bomb jumping to big chest
-                         ('Skull Woods First Section South Door', 'Skull Woods First Section (Right)'),
-                         ('Skull Woods First Section West Door', 'Skull Woods First Section (Left)'),
-                         ('Skull Woods First Section (Right) North Door', 'Skull Woods First Section'),
-                         ('Skull Woods First Section (Left) Door to Right', 'Skull Woods First Section (Right)'),
-                         ('Skull Woods First Section (Left) Door to Exit', 'Skull Woods First Section'),
-                         ('Skull Woods First Section (Top) One-Way Path', 'Skull Woods First Section'),
-                         ('Skull Woods Second Section (Drop)', 'Skull Woods Second Section'),
                          ('Blind Fight', 'Blind Fight'),
                          ('Ice Palace Entrance Room', 'Ice Palace (Main)'),
                          ('Ice Palace (East)', 'Ice Palace (East)'),
@@ -3073,7 +3064,6 @@ inverted_mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia
                                   ('Swamp Palace (North)', 'Swamp Palace (North)'),
                                   ('Thieves Town Big Key Door', 'Thieves Town (Deep)'),
                                   ('Skull Woods Torch Room', 'Skull Woods Final Section (Mothula)'),
-                                  ('Skull Woods First Section Bomb Jump', 'Skull Woods First Section (Top)'),
                                   ('Skull Woods First Section South Door', 'Skull Woods First Section (Right)'),
                                   ('Skull Woods First Section West Door', 'Skull Woods First Section (Left)'),
                                   ('Skull Woods First Section (Right) North Door', 'Skull Woods First Section'),
@@ -3521,17 +3511,17 @@ default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert Main L
 
                                ('Thieves Town', 'Thieves Town (Entrance)'),
                                ('Thieves Town Exit', 'West Dark World'),
-                               ('Skull Woods First Section Hole (East)', 'Skull Woods First Section (Right)'),
-                               ('Skull Woods First Section Hole (West)', 'Skull Woods First Section (Left)'),
-                               ('Skull Woods First Section Hole (North)', 'Skull Woods First Section (Top)'),
-                               ('Skull Woods First Section Door', 'Skull Woods First Section'),
+                               ('Skull Woods First Section Hole (East)', 'Skull Pinball'),
+                               ('Skull Woods First Section Hole (West)', 'Skull Left Drop'),
+                               ('Skull Woods First Section Hole (North)', 'Skull Pot Circle'),
+                               ('Skull Woods First Section Door', 'Skull 1 Lobby'),
                                ('Skull Woods First Section Exit', 'Skull Woods Forest'),
-                               ('Skull Woods Second Section Hole', 'Skull Woods Second Section (Drop)'),
-                               ('Skull Woods Second Section Door (East)', 'Skull Woods Second Section'),
-                               ('Skull Woods Second Section Door (West)', 'Skull Woods Second Section'),
+                               ('Skull Woods Second Section Hole', 'Skull Back Drop'),
+                               ('Skull Woods Second Section Door (East)', 'Skull 2 East Lobby'),
+                               ('Skull Woods Second Section Door (West)', 'Skull 2 West Lobby'),
                                ('Skull Woods Second Section Exit (East)', 'Skull Woods Forest'),
                                ('Skull Woods Second Section Exit (West)', 'Skull Woods Forest (West)'),
-                               ('Skull Woods Final Section', 'Skull Woods Final Section (Entrance)'),
+                               ('Skull Woods Final Section', 'Skull 3 Lobby'),
                                ('Skull Woods Final Section Exit', 'Skull Woods Forest (West)'),
                                ('Ice Palace', 'Ice Palace (Entrance)'),
                                ('Ice Palace Exit', 'Dark Lake Hylia Central Island'),
