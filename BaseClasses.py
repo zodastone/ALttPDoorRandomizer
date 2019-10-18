@@ -865,11 +865,14 @@ class Direction(Enum):
 
 
 class Polarity:
-    def __init__(self, vector):
-        self.vector = vector
+    def __init__(self):
+        self.vector = [0, 0, 0]
+
+    def __len__(self):
+        return len(self.vector)
 
     def __add__(self, other):
-        result = Polarity([0]*len(self.vector))
+        result = Polarity()
         for i in range(len(self.vector)):
             result.vector[i] = pol_add[pol_idx_2[i]](self.vector[i], other.vector[i])
         return result
@@ -1037,7 +1040,7 @@ class Sector(object):
         # todo: make these lazy init? - when do you invalidate them
 
     def polarity(self):
-        pol = Polarity([0, 0, 0])
+        pol = Polarity()
         for door in self.outstanding_doors:
             idx, inc = pol_idx[door.direction]
             pol.vector[idx] = pol_inc[inc](pol.vector[idx])

@@ -4,7 +4,7 @@ import logging
 import operator as op
 
 from functools import reduce
-from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier, Polarity, pol_idx
+from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier, Polarity, pol_idx, pol_inc
 from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions, pod_regions
 from Dungeons import dungeon_regions, region_starts, split_region_starts
 from Regions import key_only_locations, dungeon_events
@@ -430,7 +430,7 @@ def experiment(world, player):
 
     dungeon_layouts = []
     for key, sector_list, entrance_list in dungeon_sectors:
-        ds = shuffle_dungeon_no_repeats(world, player, sector_list, entrance_list)
+        ds = shuffle_dungeon_no_repeats_new(world, player, sector_list, entrance_list)
         ds.name = key
         dungeon_layouts.append((ds, entrance_list))
 
@@ -537,7 +537,7 @@ def sum_vector(sector_list, func):
 
 
 def is_polarity_neutral(sector_list):
-    pol = Polarity([0, 0, 0])
+    pol = Polarity()
     for sector in sector_list:
         pol += sector.polarity()
     return pol.is_neutral()
@@ -909,7 +909,7 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
                     if len(state.unattached_doors) <= 2:
                         raise Exception('Rejected last option due to likely improper loops...')
             else:
-                raise Exception('Nothing is apparently compatible with %s', door.name)
+                raise Exception('Nothing is apparently compatible with %s' % door.name)
     # Check that we used everything, we failed otherwise
     if len(available_sectors) != 1:
         logger.warning('Failed to add all regions/doors to dungeon, generation will likely fail.')
@@ -1060,6 +1060,8 @@ def is_valid(door_a, door_b, sector_a, sector_b, available_sectors):
         return True
     elif not are_there_outstanding_doors_of_type(door_a, door_b, sector_a, sector_b, available_sectors):
         return False
+    elif early_loop_dies(door_a, sector_a, sector_b, available_sectors):
+        return False
     elif door_a.blocked and door_b.blocked:  # I can't see this going well unless we are in loop generation...
         return False
     elif not door_a.blocked and not door_b.blocked and sector_a != sector_b:
@@ -1113,6 +1115,29 @@ def are_there_outstanding_doors_of_type(door_a, door_b, sector_a, sector_b, avai
                     break
         return hooks_left
     return True
+
+
+def early_loop_dies(door_a, sector_a, sector_b, available_sectors):
+    other_sectors = list(available_sectors)
+    other_sectors.remove(sector_a)
+    if sector_a != sector_b:
+        other_sectors.remove(sector_b)
+        current_pol = sector_a.polarity() + sector_b.polarity()
+        current_mag = sum_vector([sector_a, sector_b], lambda x: x.magnitude())
+    else:
+        current_pol = sector_a.polarity()
+        current_mag = sector_a.magnitude()
+    idx, inc = pol_idx[door_a.direction]
+    current_pol.vector[idx] = pol_inc[inc](current_pol[idx])
+    current_mag[idx] -= 1
+    other_mag = sum_vector(other_sectors, lambda x: x.magnitude())
+    # other_polarity = reduce(lambda x, y: x+y, map(lambda x: x.polarity(), other_sectors))
+    ttl_magnitude = 0
+    for i in range(len(current_mag)):
+        ttl_magnitude += 0 if current_pol[i] == 0 and other_mag[i] == 0 else current_mag[i]
+    if ttl_magnitude == 0:
+            return True
+    return False
 
 
 def shuffle_key_doors(dungeon_sector, entrances, world, player):
@@ -1494,7 +1519,7 @@ def check_required_paths(paths, world, player):
                     explore_state(state, world, player)
                     valid, bad_region = check_if_regions_visited(state, check_paths)
             if not valid:
-                raise Exception('% cannot reach %', dungeon_name, bad_region.name)
+                raise Exception('%s cannot reach %s' % (dungeon_name, bad_region.name))
 
 
 def explore_state(state, world, player):
