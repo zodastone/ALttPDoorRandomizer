@@ -7,7 +7,7 @@ from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier, Polarity, pol_idx, pol_inc
 from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions, pod_regions
 from Dungeons import dungeon_regions, region_starts, split_region_starts
-from Regions import key_only_locations, dungeon_events , flooded_keys, flooded_keys_reverse
+from Regions import key_only_locations, dungeon_events, flooded_keys, flooded_keys_reverse
 from RoomData import DoorKind, PairedDoor
 
 
@@ -111,6 +111,23 @@ oppositemap = {
     Direction.Down: Direction.Up,
 }
 
+similar_directions = {
+    Direction.South: [Direction.South],
+    Direction.North: [Direction.North],
+    Direction.West: [Direction.West],
+    Direction.East: [Direction.East],
+    Direction.Up: [Direction.Down, Direction.Up],
+    Direction.Down: [Direction.Down, Direction.Up],
+}
+
+paired_directions = {
+    Direction.South: [Direction.North],
+    Direction.North: [Direction.South],
+    Direction.West: [Direction.East],
+    Direction.East: [Direction.West],
+    Direction.Up: [Direction.Down, Direction.Up],
+    Direction.Down: [Direction.Down, Direction.Up],
+}
 
 def switch_dir(direction):
     return oppositemap[direction]
@@ -348,6 +365,15 @@ def find_compatible_door_in_list(ugly_regions, world, door, doors, player):
 def get_doors(world, region, player):
     res = []
     for exit in region.exits:
+        door = world.check_for_door(exit.name, player)
+        if door is not None:
+            res.append(door)
+    return res
+
+
+def get_entrance_doors(world, region, player):
+    res = []
+    for exit in region.entrances:
         door = world.check_for_door(exit.name, player)
         if door is not None:
             res.append(door)
@@ -671,6 +697,8 @@ class ExplorationState(object):
         self.key_locations = 0
         self.used_smalls = 0
 
+        self.non_door_entrances = []
+
     def copy(self):
         ret = ExplorationState()
         ret.unattached_doors = list(self.unattached_doors)
@@ -692,6 +720,8 @@ class ExplorationState(object):
         ret.used_locations = self.used_locations
         ret.used_smalls = self.used_smalls
         ret.found_locations = list(self.found_locations)
+
+        ret.non_door_entrances = list(self.non_door_entrances)
         return ret
 
     def next_avail_door(self):
@@ -715,11 +745,12 @@ class ExplorationState(object):
                     self.key_locations += 1
                 if location.name not in dungeon_events and '- Prize' not in location.name:
                     self.ttl_locations += 1
-            self.found_locations.append(location)
+            if location not in self.found_locations:
+                self.found_locations.append(location)
             if location.name in dungeon_events and location.name not in self.events:
                 if self.flooded_key_check(location):
                     self.perform_event(location.name, key_region)
-            if location.name in flooded_keys_reverse.keys() and flooded_keys_reverse[location.name] in self.found_locations:
+            if location.name in flooded_keys_reverse.keys() and self.location_found(flooded_keys_reverse[location.name]):
                 self.perform_event(flooded_keys_reverse[location.name], key_region)
         if key_checks and region.name == 'Hyrule Dungeon Cellblock' and not self.big_key_opened:
             self.big_key_opened = True
@@ -731,13 +762,14 @@ class ExplorationState(object):
             return True
         return flooded_keys[location.name] in self.found_locations
 
-    def perform_event(self, location_name, key_region):
-        location = None
+    def location_found(self, location_name):
         for l in self.found_locations:
             if l.name == location_name:
-                location = l
-                break
-        self.events.add(location)
+                return True
+        return False
+
+    def perform_event(self, location_name, key_region):
+        self.events.add(location_name)
         queue = collections.deque(self.event_doors)
         while len(queue) > 0:
             exp_door = queue.pop()
@@ -748,6 +780,22 @@ class ExplorationState(object):
                     d_name = exp_door.door.name
                     if d_name not in self.door_krs.keys():
                         self.door_krs[d_name] = key_region
+
+    def add_all_entrance_doors_check_unattached(self, region, world, player):
+        door_list = [x for x in get_doors(world, region, player) if x.type in [DoorType.Normal, DoorType.SpiralStairs]]
+        door_list.extend(get_entrance_doors(world, region, player))
+        for door in door_list:
+            if self.can_traverse(door):
+                if door.dest is None and not self.in_door_list_ic(door, self.unattached_doors):
+                    self.append_door_to_list(door, self.unattached_doors)
+                elif door.req_event is not None and door.req_event not in self.events and not self.in_door_list(door, self.event_doors):
+                    self.append_door_to_list(door, self.event_doors)
+                elif not self.in_door_list(door, self.avail_doors):
+                    self.append_door_to_list(door, self.avail_doors)
+        for entrance in region.entrances:
+            door = world.check_for_door(entrance.name, player)
+            if door is None:
+                self.non_door_entrances.append(entrance)
 
     def add_all_doors_check_unattached(self, region, world, player):
         for door in get_doors(world, region, player):
@@ -850,6 +898,22 @@ def extend_reachable_state(search_regions, state, world, player):
             if valid_region_to_explore(connect_region, world) and not local_state.visited(connect_region):
                 local_state.visit_region(connect_region)
                 local_state.add_all_doors_check_unattached(connect_region, world, player)
+    return local_state
+
+
+def extend_state_backward(search_regions, state, world, player):
+    local_state = state.copy()
+    for region in search_regions:
+        local_state.visit_region(region)
+        local_state.add_all_entrance_doors_check_unattached(region, world, player)
+    while len(local_state.avail_doors) > 0:
+        explorable_door = local_state.next_avail_door()
+        entrance = world.get_entrance(explorable_door.door.name, player)
+        connect_region = entrance.parent_region
+        if connect_region is not None:
+            if valid_region_to_explore(connect_region, world) and not local_state.visited(connect_region):
+                local_state.visit_region(connect_region)
+                local_state.add_all_entrance_doors_check_unattached(connect_region, world, player)
     return local_state
 
 
@@ -1071,29 +1135,70 @@ def logical_dead_end(door_a, door_b, state, world, player, available_sectors, re
     if len(new_state.unattached_doors) == 0:
         return True
     d_type = door_a.type
-    directions = [door_a.direction, switch_dir(door_a.direction)]
+    directions = paired_directions[door_a.direction]
+    hook_directions = similar_directions[door_a.direction]
     number_of_hooks = 0
+    opposing_hooks = 0
     for door in new_state.unattached_doors:
-        if door.door.type == d_type and door.door.direction in directions:
+        if door.door.type == d_type and door.door.direction in hook_directions:
             number_of_hooks += 1
-    only_dead_ends = True
+        if door.door.type == d_type and door.door.direction in directions:
+            opposing_hooks += 1
+    hooks_needed = 0
+    visited_regions = set()
     outstanding_doors_of_type = 0
-    if number_of_hooks == 0:
-        for sector in available_sectors:
-            for door in sector.outstanding_doors:
-                if door != door_b and door.type == d_type and door.direction in directions:
+    outstanding_hooks = 0
+    only_dead_ends = True
+    for sector in available_sectors:
+        for door in sector.outstanding_doors:
+            if door_of_interest(door, door_b, d_type, directions, hook_directions, new_state):
+                needed = True
+                if door.direction in directions:
                     outstanding_doors_of_type += 1
-                    region = world.get_entrance(door.name, player).parent_region
-                    local_state = extend_reachable_state([region], ExplorationState(), world, player)
+                region = world.get_entrance(door.name, player).parent_region
+                local_state = extend_state_backward([region], ExplorationState(), world, player)
+                if len(local_state.non_door_entrances) > 0 and not door.blocked:
+                    needed = False
+                else:
                     for exp_d in local_state.unattached_doors:
-                        if exp_d.door.type != d_type or exp_d.door.direction not in directions and exp_d.door not in reachable_doors:
-                            only_dead_ends = False
+                        if different_direction(exp_d.door, d_type, directions, hook_directions, reachable_doors):
+                            needed = False
                             break
-            if not only_dead_ends:
-                break
-        if outstanding_doors_of_type > 0 and only_dead_ends:
-            return True
+                region_set = set(local_state.visited_orange+local_state.visited_blue)
+                if needed and len(visited_regions.intersection(region_set)) == 0 and door.direction in directions:
+                    hooks_needed += 1
+                elif door.direction in hook_directions:
+                    outstanding_hooks += 1
+                    if opposing_hooks > 0 and more_than_one_hook(local_state, hook_directions):
+                        needed = False
+                visited_regions.update(region_set)
+                if not needed:
+                    only_dead_ends = False
+    if outstanding_doors_of_type > 0 and ((number_of_hooks == 0 and only_dead_ends) or hooks_needed > number_of_hooks + outstanding_hooks):
+        return True
     return False
+
+
+def door_of_interest(door, door_b, d_type, directions, hook_directions, state):
+    if door == door_b or door.type != d_type:
+        return False
+    if door.direction not in directions and door.direction not in hook_directions:
+        return False
+    return not state.in_door_list_ic(door, state.unattached_doors)
+
+
+def different_direction(door, d_type, directions, hook_directions, reachable_doors):
+    if door in reachable_doors:
+        return False
+    return door.type != d_type or (door.direction not in directions and door.direction not in hook_directions)
+
+
+def more_than_one_hook(state, hook_directions):
+    cnt = 0
+    for exp_d in state.unattached_doors:
+        if exp_d.door.direction in hook_directions:
+            cnt += 1
+    return cnt > 1
 
 
 def pinball_exception(door_a, door_b, sector_a):
