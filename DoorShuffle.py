@@ -7,7 +7,7 @@ from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier, Polarity, pol_idx, pol_inc
 from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions, pod_regions
 from Dungeons import dungeon_regions, region_starts, split_region_starts
-from Regions import key_only_locations, dungeon_events
+from Regions import key_only_locations, dungeon_events , flooded_keys, flooded_keys_reverse
 from RoomData import DoorKind, PairedDoor
 
 
@@ -405,7 +405,7 @@ def cross_dungeon(world, player):
     # todo - adjust dungeon item pools -- ?
     dungeon_layouts = []
     for key, sector_list, entrance_list in dungeon_sectors:
-        ds = shuffle_dungeon_no_repeats(world, player, sector_list, entrance_list)
+        ds = shuffle_dungeon_no_repeats_new(world, player, sector_list, entrance_list)
         ds.name = key
         dungeon_layouts.append((ds, entrance_list))
 
@@ -710,28 +710,44 @@ class ExplorationState(object):
         elif self.crystal == CrystalBarrier.Blue:
             self.visited_blue.append(region)
         for location in region.locations:
-            if location.name in dungeon_events and location.name not in self.events:
-                self.events.add(location.name)
-                queue = collections.deque(self.event_doors)
-                while len(queue) > 0:
-                    exp_door = queue.pop()
-                    if exp_door.door.req_event == location.name:
-                        self.avail_doors.append(exp_door)
-                        self.event_doors.remove(exp_door)
-                        if key_region is not None:
-                            d_name = exp_door.door.name
-                            if d_name not in self.door_krs.keys():
-                                self.door_krs[d_name] = key_region
             if key_checks and location not in self.found_locations:
                 if location.name in key_only_locations:
                     self.key_locations += 1
                 if location.name not in dungeon_events and '- Prize' not in location.name:
                     self.ttl_locations += 1
-                self.found_locations.append(location)
+            self.found_locations.append(location)
+            if location.name in dungeon_events and location.name not in self.events:
+                if self.flooded_key_check(location):
+                    self.perform_event(location.name, key_region)
+            if location.name in flooded_keys_reverse.keys() and flooded_keys_reverse[location.name] in self.found_locations:
+                self.perform_event(flooded_keys_reverse[location.name], key_region)
         if key_checks and region.name == 'Hyrule Dungeon Cellblock' and not self.big_key_opened:
             self.big_key_opened = True
             self.avail_doors.extend(self.big_doors)
             self.big_doors.clear()
+
+    def flooded_key_check(self, location):
+        if location.name not in flooded_keys.keys():
+            return True
+        return flooded_keys[location.name] in self.found_locations
+
+    def perform_event(self, location_name, key_region):
+        location = None
+        for l in self.found_locations:
+            if l.name == location_name:
+                location = l
+                break
+        self.events.add(location)
+        queue = collections.deque(self.event_doors)
+        while len(queue) > 0:
+            exp_door = queue.pop()
+            if exp_door.door.req_event == location_name:
+                self.avail_doors.append(exp_door)
+                self.event_doors.remove(exp_door)
+                if key_region is not None:
+                    d_name = exp_door.door.name
+                    if d_name not in self.door_krs.keys():
+                        self.door_krs[d_name] = key_region
 
     def add_all_doors_check_unattached(self, region, world, player):
         for door in get_doors(world, region, player):
@@ -745,13 +761,16 @@ class ExplorationState(object):
 
     def add_all_doors_check_key_region(self, region, key_region, world, player):
         for door in get_doors(world, region, player):
-            if door.name not in self.door_krs.keys():
-                self.door_krs[door.name] = key_region
             if self.can_traverse(door):
                 if door.req_event is not None and door.req_event not in self.events and not self.in_door_list(door, self.event_doors):
                     self.append_door_to_list(door, self.event_doors)
                 elif not self.in_door_list(door, self.avail_doors):
                     self.append_door_to_list(door, self.avail_doors)
+                    if door.name not in self.door_krs.keys():
+                        self.door_krs[door.name] = key_region
+            else:
+                if door.name not in self.door_krs.keys():
+                    self.door_krs[door.name] = key_region
 
     def add_all_doors_check_keys(self, region, key_door_proposal, world, player):
         for door in get_doors(world, region, player):
@@ -867,7 +886,7 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
             connect_sector, connect_door = compatibles.pop()
             logger.info('  Found possible new sector via %s', connect_door.name)
             # Check if valid
-            if is_valid(door, connect_door, sector, connect_sector, available_sectors):
+            if is_valid(door, connect_door, sector, connect_sector, available_sectors, reachable_doors, state, world, player):
                 # Apply connection and add the new region's doors to the available list
                 maybe_connect_two_way(world, door, connect_door, player)
                 state.unattached_doors.remove(explorable_door)
@@ -916,105 +935,6 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
     return available_sectors[0]
 
 
-def shuffle_dungeon_no_repeats(world, player, available_sectors, entrance_region_names):
-    logger = logging.getLogger('')
-    random.shuffle(available_sectors)
-    for sector in available_sectors:
-        random.shuffle(sector.outstanding_doors)
-
-    entrance_regions = []
-    # current_sector = None
-    for region_name in entrance_region_names:
-        entrance_regions.append(world.get_region(region_name, player))
-
-    reachable_doors, visited_regions = extend_reachable(entrance_regions, [], world, player)
-    # Loop until all available doors are used
-    while len(reachable_doors) > 0:
-        # Pick a random available door to connect
-        door = random.choice(reachable_doors)
-        sector = find_sector_for_door(door, available_sectors)
-        if sector is None:
-            reachable_doors.remove(door)
-            continue
-        sector.outstanding_doors.remove(door)
-        # door_connected = False
-        logger.info('Linking %s', door.name)
-        # Find an available region that has a compatible door
-        compatibles = find_all_compatible_door_in_sectors_ex(door, available_sectors, reachable_doors)
-        while len(compatibles) > 0:
-            connect_sector, connect_door = compatibles.pop()
-            logger.info('  Found possible new sector via %s', connect_door.name)
-            # Check if valid
-            if is_valid(door, connect_door, sector, connect_sector, available_sectors):
-                # Apply connection and add the new region's doors to the available list
-                maybe_connect_two_way(world, door, connect_door, player)
-                reachable_doors.remove(door)
-                connect_sector.outstanding_doors.remove(connect_door)
-                if sector != connect_sector:  # combine if not the same
-                    available_sectors.remove(connect_sector)
-                    sector.outstanding_doors.extend(connect_sector.outstanding_doors)
-                    sector.regions.extend(connect_sector.regions)
-                if not door.blocked:
-                    connect_region = world.get_entrance(door.dest.name, player).parent_region
-                    potential_new_doors, visited_regions = extend_reachable([connect_region], visited_regions, world, player)
-                    reachable_doors.extend(potential_new_doors)
-                break  # skips else block below
-            logger.info(' Not Linking %s to %s', door.name, connect_door.name)
-            if len(compatibles) == 0:  # time to try again
-                if len(reachable_doors) <= 1:
-                    raise Exception('Rejected last option due to dead end... infinite loop ensues')
-        else:
-            # If there's no available region with a door, use an internal connection
-            compatibles = find_all_compatible_door_in_list(door, reachable_doors)
-            while len(compatibles) > 0:
-                connect_door = compatibles.pop()
-                logger.info('  Adding loop via %s', connect_door.name)
-                connect_sector = find_sector_for_door(connect_door, available_sectors)
-                # Check if valid
-                if is_loop_valid(door, connect_door, sector, connect_sector, available_sectors):
-                    maybe_connect_two_way(world, door, connect_door, player)
-                    reachable_doors.remove(door)
-                    reachable_doors.remove(connect_door)
-                    connect_sector = find_sector_for_door(connect_door, available_sectors)
-                    connect_sector.outstanding_doors.remove(connect_door)
-                    if sector != connect_sector:  # combine if not the same
-                        available_sectors.remove(connect_sector)
-                        sector.outstanding_doors.extend(connect_sector.outstanding_doors)
-                        sector.regions.extend(connect_sector.regions)
-                    break  # skips else block with exception
-                else:
-                    logger.info(' Not Linking %s to %s', door.name, connect_door.name)
-                    sector.outstanding_doors.insert(0, door)
-                    if len(reachable_doors) <= 2:
-                        raise Exception('Rejected last option due to likely improper loops...')
-            else:
-                raise Exception('Nothing is apparently compatible with %s', door.name)
-    # Check that we used everything, we failed otherwise
-    if len(available_sectors) != 1:
-        logger.warning('Failed to add all regions/doors to dungeon, generation will likely fail.')
-        return available_sectors
-    return available_sectors[0]
-
-
-def extend_reachable(search_regions, visited_regions, world, player):
-    region_list = list(search_regions)
-    visited_regions = visited_regions
-    reachable_doors = []
-    while len(region_list) > 0:
-        region = region_list.pop()
-        visited_regions.append(region)
-        for ext in region.exits:
-            if ext.connected_region is not None:
-                connect_region = ext.connected_region
-                if valid_region_to_explore(connect_region, world) and connect_region not in visited_regions and connect_region not in region_list:
-                    region_list.append(connect_region)
-            else:
-                door = world.check_for_door(ext.name, player)
-                if door is not None and door.dest is None:  # make sure it isn't a weird blocked door
-                    reachable_doors.append(door)
-    return reachable_doors, visited_regions
-
-
 def valid_region_to_explore(region, world):
     return region.type == RegionType.Dungeon or region.name in world.inaccessible_regions
 
@@ -1053,7 +973,7 @@ def doors_compatible_ignore_keys(a, b):
 
 
 # todo: path checking needed?
-def is_valid(door_a, door_b, sector_a, sector_b, available_sectors):
+def is_valid(door_a, door_b, sector_a, sector_b, available_sectors, reachable_doors, state, world, player):
     if len(available_sectors) == 1:
         return True
     if len(available_sectors) <= 2 and sector_a != sector_b:
@@ -1062,8 +982,12 @@ def is_valid(door_a, door_b, sector_a, sector_b, available_sectors):
         return False
     elif early_loop_dies(door_a, sector_a, sector_b, available_sectors):
         return False
+    elif logical_dead_end(door_a, door_b, state, world, player, available_sectors, reachable_doors):
+        return False
     elif door_a.blocked and door_b.blocked:  # I can't see this going well unless we are in loop generation...
         return False
+    elif pinball_exception(door_a, door_b, sector_a):
+        return True
     elif not door_a.blocked and not door_b.blocked and sector_a != sector_b:
         return sector_a.outflow() + sector_b.outflow() - 1 > 0  # door_a has been removed already, so a.outflow is reduced by one
     elif door_a.blocked or door_b.blocked and sector_a != sector_b:
@@ -1140,6 +1064,46 @@ def early_loop_dies(door_a, sector_a, sector_b, available_sectors):
     return False
 
 
+def logical_dead_end(door_a, door_b, state, world, player, available_sectors, reachable_doors):
+    region = world.get_entrance(door_b.name, player).parent_region
+    new_state = extend_reachable_state([region], state, world, player)
+    new_state.unattached_doors[:] = [x for x in new_state.unattached_doors if x.door not in [door_a, door_b]]
+    if len(new_state.unattached_doors) == 0:
+        return True
+    d_type = door_a.type
+    directions = [door_a.direction, switch_dir(door_a.direction)]
+    number_of_hooks = 0
+    for door in new_state.unattached_doors:
+        if door.door.type == d_type and door.door.direction in directions:
+            number_of_hooks += 1
+    only_dead_ends = True
+    outstanding_doors_of_type = 0
+    if number_of_hooks == 0:
+        for sector in available_sectors:
+            for door in sector.outstanding_doors:
+                if door != door_b and door.type == d_type and door.direction in directions:
+                    outstanding_doors_of_type += 1
+                    region = world.get_entrance(door.name, player).parent_region
+                    local_state = extend_reachable_state([region], ExplorationState(), world, player)
+                    for exp_d in local_state.unattached_doors:
+                        if exp_d.door.type != d_type or exp_d.door.direction not in directions and exp_d.door not in reachable_doors:
+                            only_dead_ends = False
+                            break
+            if not only_dead_ends:
+                break
+        if outstanding_doors_of_type > 0 and only_dead_ends:
+            return True
+    return False
+
+
+def pinball_exception(door_a, door_b, sector_a):
+    if door_a.name == 'Skull Pot Prison SE' and door_b.name == 'Skull Pinball NE':
+        for r in sector_a.regions:
+            if r.name == 'Skull 2 East Lobby':
+                return True
+    return False
+
+
 def shuffle_key_doors(dungeon_sector, entrances, world, player):
     start_regions = convert_regions(entrances, world, player)
     # count number of key doors - this could be a table?
@@ -1181,7 +1145,7 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
     paired_candidates = build_pair_list(flat_candidates)
     if len(paired_candidates) < num_key_doors:
         num_key_doors = len(paired_candidates)  # reduce number of key doors
-        logging.getLogger('').debug('Lowering key door count because not enough candidates: %s', dungeon_sector.name)
+        logging.getLogger('').info('Lowering key door count because not enough candidates: %s', dungeon_sector.name)
     random.shuffle(paired_candidates)
     combinations = ncr(len(paired_candidates), num_key_doors)
     itr = 0
@@ -1189,7 +1153,7 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
     while not validate_key_layout(dungeon_sector, start_regions, proposal, world, player):
         itr += 1
         if itr >= combinations:
-            logging.getLogger('').debug('Lowering key door count because no valid layouts: %s', dungeon_sector.name)
+            logging.getLogger('').info('Lowering key door count because no valid layouts: %s', dungeon_sector.name)
             num_key_doors -= 1
             combinations = ncr(len(paired_candidates), num_key_doors)
             itr = 0
@@ -1400,7 +1364,7 @@ def reassign_key_doors(current_doors, proposal, world, player):
                     change_door_to_small_key(d1, world, player)
                     change_door_to_small_key(d2, world, player)
             world.spoiler.set_door_type(d1.name+' <-> '+d2.name, 'Key Door', player)
-            logger.debug('Key Door: %s', d1.name+' <-> '+d2.name)
+            logger.info('Key Door: %s', d1.name+' <-> '+d2.name)
         else:
             d = obj
             if d.type is DoorType.Interior:
@@ -1411,7 +1375,7 @@ def reassign_key_doors(current_doors, proposal, world, player):
             elif d.type is DoorType.Normal:
                 change_door_to_small_key(d, world, player)
             world.spoiler.set_door_type(d.name, 'Key Door', player)
-            logger.debug('Key Door: %s', d.name)
+            logger.info('Key Door: %s', d.name)
 
 
 def change_door_to_small_key(d, world, player):

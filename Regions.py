@@ -620,6 +620,16 @@ dungeon_events = [
     'Swamp Drain'
 ]
 
+flooded_keys = {
+    'Trench 1 Switch': 'Swamp Palace - Trench 1 Pot Key',
+    'Trench 2 Switch': 'Swamp Palace - Trench 2 Pot Key'
+}
+
+flooded_keys_reverse = {
+    'Swamp Palace - Trench 1 Pot Key': 'Trench 1 Switch',
+    'Swamp Palace - Trench 2 Pot Key': 'Trench 2 Switch'
+}
+
 # todo: escape big key? - should be separate from above for dungeon key layout validation
 
 location_table = {'Mushroom': (0x180013, False, 'in the woods'),
