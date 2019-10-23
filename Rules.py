@@ -266,6 +266,7 @@ def global_rules(world, player):
     # Eastern Palace
     # Eyegore room needs a bow
     set_rule(world.get_entrance('Eastern Eyegores NE', player), lambda state: state.can_shoot_arrows(player))
+    set_rule(world.get_entrance('Eastern Map Balcony Hook Path', player), lambda state: state.has('Hookshot', player))
     # Big key rules
     set_rule(world.get_location('Eastern Palace - Big Chest', player), lambda state: state.has('Big Key (Eastern Palace)', player))
     if world.accessibility == 'locations':
