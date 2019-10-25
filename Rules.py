@@ -1709,7 +1709,7 @@ def generate_key_logic(dungeon_name, small_key_name, world, player):
         state.visit_region(region, current_kr)
         state.add_all_doors_check_key_region(region, current_kr, world, player)
     # Search into the dungeon
-    logger.debug('Begin key region search. %s', small_key_name)
+    # logger.debug('Begin key region search. %s', small_key_name)
     while len(state.avail_doors) > 0:
         # Open as many non-key doors as possible before opening a key door.
         # This guarantees that we're only exploring one key region at a time.
@@ -1730,7 +1730,7 @@ def generate_key_logic(dungeon_name, small_key_name, world, player):
             state.opened_doors.append(door)
             if door.dest.smallKey:
                 state.opened_doors.append(door.dest)
-            logger.debug('%s:    New KR %s', door.name, current_kr)
+            # logger.debug('%s:    New KR %s', door.name, current_kr)
         # Account for the new region
         state.visit_region(connect_region, local_kr)
         state.add_all_doors_check_key_region(connect_region, local_kr, world, player)
@@ -1775,7 +1775,7 @@ def generate_key_logic(dungeon_name, small_key_name, world, player):
         kr_keys[kr] = keys
         # Generate logic
         for door in logic_doors:
-            logger.info('  %s in kr %s needs %s keys', door.name, kr, keys)
+            logger.debug('  %s in kr %s needs %s keys', door.name, kr, keys)
             add_rule(world.get_entrance(door.name, player), create_key_rule(small_key_name, player, keys))
 
 

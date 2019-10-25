@@ -577,7 +577,7 @@ def is_proposal_valid(proposal, buckets, candidates):
     global search_iterations
     search_iterations = search_iterations + 1
     if search_iterations % 100 == 0:
-        logger.info('Iteration %s', search_iterations)
+        logger.debug('Iteration %s', search_iterations)
     # check that proposal is complete
     for i in range(len(proposal)):
         if proposal[i] is -1:
@@ -591,6 +591,14 @@ def is_proposal_valid(proposal, buckets, candidates):
         valid = is_polarity_neutral(test)
         if not valid:
             return False
+        for sector in test:
+            other_sectors = list(test)
+            other_sectors.remove(sector)
+            sector_mag = sector.magnitude()
+            other_mag = sum_vector(other_sectors, lambda x: x.magnitude())
+            for i in range(len(sector_mag)):
+                if sector_mag[i] > 0 and other_mag[i] == 0:
+                    return False
     return True
 
 
@@ -942,13 +950,13 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
             continue
         sector.outstanding_doors.remove(door)
         # door_connected = False
-        logger.info('Linking %s', door.name)
+        logger.debug('Linking %s', door.name)
         # Find an available region that has a compatible door
         reachable_doors = [d.door for d in state.unattached_doors]
         compatibles = find_all_compatible_door_in_sectors_ex(door, available_sectors, reachable_doors)
         while len(compatibles) > 0:
             connect_sector, connect_door = compatibles.pop()
-            logger.info('  Found possible new sector via %s', connect_door.name)
+            logger.debug('  Found possible new sector via %s', connect_door.name)
             # Check if valid
             if is_valid(door, connect_door, sector, connect_sector, available_sectors, reachable_doors, state, world, player):
                 # Apply connection and add the new region's doors to the available list
@@ -963,7 +971,7 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
                     connect_region = world.get_entrance(door.dest.name, player).parent_region
                     state = extend_reachable_state([connect_region], state, world, player)
                 break  # skips else block below
-            logger.info(' Not Linking %s to %s', door.name, connect_door.name)
+            logger.debug(' Not Linking %s to %s', door.name, connect_door.name)
             if len(compatibles) == 0:  # time to try again
                 if len(state.unattached_doors) <= 1:
                     raise Exception('Rejected last option due to dead end... infinite loop ensues')
@@ -972,7 +980,7 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
             compatibles = find_all_compatible_door_in_list(door, reachable_doors)
             while len(compatibles) > 0:
                 connect_door = compatibles.pop()
-                logger.info('  Adding loop via %s', connect_door.name)
+                logger.debug('  Adding loop via %s', connect_door.name)
                 connect_sector = find_sector_for_door(connect_door, available_sectors)
                 # Check if valid
                 if is_loop_valid(door, connect_door, sector, connect_sector, available_sectors):
@@ -987,7 +995,7 @@ def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_re
                         sector.regions.extend(connect_sector.regions)
                     break  # skips else block with exception
                 else:
-                    logger.info(' Not Linking %s to %s', door.name, connect_door.name)
+                    logger.debug(' Not Linking %s to %s', door.name, connect_door.name)
                     sector.outstanding_doors.insert(0, door)
                     if len(state.unattached_doors) <= 2:
                         raise Exception('Rejected last option due to likely improper loops...')
@@ -1469,7 +1477,7 @@ def reassign_key_doors(current_doors, proposal, world, player):
                     change_door_to_small_key(d1, world, player)
                     change_door_to_small_key(d2, world, player)
             world.spoiler.set_door_type(d1.name+' <-> '+d2.name, 'Key Door', player)
-            logger.info('Key Door: %s', d1.name+' <-> '+d2.name)
+            logger.debug('Key Door: %s', d1.name+' <-> '+d2.name)
         else:
             d = obj
             if d.type is DoorType.Interior:
@@ -1480,7 +1488,7 @@ def reassign_key_doors(current_doors, proposal, world, player):
             elif d.type is DoorType.Normal:
                 change_door_to_small_key(d, world, player)
             world.spoiler.set_door_type(d.name, 'Key Door', player)
-            logger.info('Key Door: %s', d.name)
+            logger.debug('Key Door: %s', d.name)
 
 
 def change_door_to_small_key(d, world, player):
