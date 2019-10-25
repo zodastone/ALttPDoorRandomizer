@@ -181,8 +181,9 @@ eastern_regions = [
     'Eastern Cannonball', 'Eastern Cannonball Ledge', 'Eastern Courtyard Ledge', 'Eastern East Wing',
     'Eastern Pot Switch', 'Eastern Map Balcony', 'Eastern Map Room', 'Eastern West Wing', 'Eastern Stalfos Spawn',
     'Eastern Compass Room', 'Eastern Hint Tile', 'Eastern Hint Tile Blocked Path', 'Eastern Courtyard',
-    'Eastern Fairies', 'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Big Key', 'Eastern Darkness',
-    'Eastern Attic Start', 'Eastern Attic Switches', 'Eastern Eyegores', 'Eastern Boss'
+    'Eastern Fairies', 'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Dark Pots', 'Eastern Big Key',
+    'Eastern Darkness', 'Eastern Rupees', 'Eastern Attic Start', 'Eastern False Switches', 'Eastern Cannonball Hell',
+    'Eastern Single Eyegore', 'Eastern Duo Eyegores', 'Eastern Boss'
 ]
 
 desert_regions = [

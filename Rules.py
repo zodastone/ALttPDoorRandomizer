@@ -265,7 +265,8 @@ def global_rules(world, player):
 
     # Eastern Palace
     # Eyegore room needs a bow
-    set_rule(world.get_entrance('Eastern Eyegores NE', player), lambda state: state.can_shoot_arrows(player))
+    set_rule(world.get_entrance('Eastern Duo Eyegores NE', player), lambda state: state.can_shoot_arrows(player))
+    set_rule(world.get_entrance('Eastern Single Eyegore NE', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('Eastern Map Balcony Hook Path', player), lambda state: state.has('Hookshot', player))
     # Big key rules
     set_rule(world.get_location('Eastern Palace - Big Chest', player), lambda state: state.has('Big Key (Eastern Palace)', player))
@@ -944,8 +945,12 @@ def no_glitches_rules(world, player):
     add_conditional_lamp('Palace of Darkness - Dark Maze - Bottom', 'PoD Dark Maze', 'Location')
     add_conditional_lamp('Eastern Dark Square NW', 'Eastern Dark Square', 'Entrance')
     add_conditional_lamp('Eastern Dark Square Key Door WN', 'Eastern Dark Square', 'Entrance')
+    add_conditional_lamp('Eastern Dark Square EN', 'Eastern Dark Square', 'Entrance')
+    add_conditional_lamp('Eastern Dark Pots WN', 'Eastern Dark Pots', 'Entrance')
     add_conditional_lamp('Eastern Darkness S', 'Eastern Darkness', 'Entrance')
     add_conditional_lamp('Eastern Darkness Up Stairs', 'Eastern Darkness', 'Entrance')
+    add_conditional_lamp('Eastern Darkness NE', 'Eastern Darkness', 'Entrance')
+    add_conditional_lamp('Eastern Rupees SE', 'Eastern Rupees', 'Entrance')
     add_conditional_lamp('Eastern Palace - Dark Square Pot Key', 'Eastern Dark Square', 'Location')
     add_conditional_lamp('Eastern Palace - Dark Eyegore Key Drop', 'Eastern Darkness', 'Location')
     if world.mode != 'inverted':

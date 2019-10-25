@@ -310,16 +310,16 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Eastern Courtyard', 'Eastern Palace', ['Eastern Palace - Big Chest'], ['Eastern Courtyard WN', 'Eastern Courtyard EN', 'Eastern Courtyard N', 'Eastern Courtyard Potholes']),
         create_dungeon_region(player, 'Eastern Fairies', 'Eastern Palace', None, ['Eastern Fairies\' Warp']),
         create_dungeon_region(player, 'Eastern Map Valley', 'Eastern Palace', None, ['Eastern Map Valley WN', 'Eastern Map Valley SW']),
-        create_dungeon_region(player, 'Eastern Dark Square', 'Eastern Palace', ['Eastern Palace - Dark Square Pot Key'], ['Eastern Dark Square NW', 'Eastern Dark Square Key Door WN']),
-        # todo: dark pots
+        create_dungeon_region(player, 'Eastern Dark Square', 'Eastern Palace', None, ['Eastern Dark Square NW', 'Eastern Dark Square Key Door WN', 'Eastern Dark Square EN']),
+        create_dungeon_region(player, 'Eastern Dark Pots', 'Eastern Palace', ['Eastern Palace - Dark Square Pot Key'], ['Eastern Dark Pots WN']),
         create_dungeon_region(player, 'Eastern Big Key', 'Eastern Palace', ['Eastern Palace - Big Key Chest'], ['Eastern Big Key EN', 'Eastern Big Key NE']),
-        create_dungeon_region(player, 'Eastern Darkness', 'Eastern Palace', ['Eastern Palace - Dark Eyegore Key Drop'], ['Eastern Darkness S', 'Eastern Darkness Up Stairs']),
-        # todo: rupees
+        create_dungeon_region(player, 'Eastern Darkness', 'Eastern Palace', ['Eastern Palace - Dark Eyegore Key Drop'], ['Eastern Darkness S', 'Eastern Darkness Up Stairs', 'Eastern Darkness NE']),
+        create_dungeon_region(player, 'Eastern Rupees', 'Eastern Palace', None, ['Eastern Rupees SE']),
         create_dungeon_region(player, 'Eastern Attic Start', 'Eastern Palace', None, ['Eastern Attic Start Down Stairs', 'Eastern Attic Start WS']),
-        create_dungeon_region(player, 'Eastern Attic Switches', 'Eastern Palace', None, ['Eastern Attic Switches ES', 'Eastern Attic Switches WS']),
-        # todo: cannonball
-        create_dungeon_region(player, 'Eastern Eyegores', 'Eastern Palace', None, ['Eastern Eyegores ES', 'Eastern Eyegores NE']),
-        # todo: eyegores 2
+        create_dungeon_region(player, 'Eastern False Switches', 'Eastern Palace', None, ['Eastern False Switches ES', 'Eastern False Switches WS']),
+        create_dungeon_region(player, 'Eastern Cannonball Hell', 'Eastern Palace', None, ['Eastern Cannonball Hell ES', 'Eastern Cannonball Hell WS']),
+        create_dungeon_region(player, 'Eastern Single Eyegore', 'Eastern Palace', None, ['Eastern Single Eyegore ES', 'Eastern Single Eyegore NE']),
+        create_dungeon_region(player, 'Eastern Duo Eyegores', 'Eastern Palace', None, ['Eastern Duo Eyegores SE', 'Eastern Duo Eyegores NE']),
         create_dungeon_region(player, 'Eastern Boss', 'Eastern Palace', ['Eastern Palace - Boss', 'Eastern Palace - Prize'], ['Eastern Boss SE']),
 
         # Desert Palace
