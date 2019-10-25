@@ -360,22 +360,26 @@ def global_rules(world, player):
     set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Prize', player))
     generate_key_logic('Skull Woods', 'Small Key (Skull Woods)', world, player)
 
+    set_rule(world.get_entrance('Thieves BK Corner NE', player), lambda state: state.has('Big Key (Thieves Town)', player))
+    # blind can't have the small key? - not necessarily true anymore - but likely still
+    set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: (state.has('Big Key (Thieves Town)') and state.has('Hammer', player)))
+    if world.accessibility == 'locations':
+        forbid_item(world.get_location('Thieves\' Town - Big Chest', player), 'Big Key (Thieves Town)', player)
+    for entrance in ['Thieves Basement Block Path', 'Thieves Blocked Entry Path', 'Thieves Conveyor Block Path', 'Thieves Conveyor Bridge Block Path']:
+        set_rule(world.get_entrance(entrance, player), lambda state: state.can_lift_rocks(player))
+    for location in ['Thieves\' Town - Blind\'s Cell', 'Thieves\' Town - Boss']:
+        forbid_item(world.get_location(location, player), 'Big Key (Thieves Town)', player)
+    forbid_item(world.get_location('Thieves\' Town - Blind\'s Cell', player), 'Big Key (Thieves Town)', player)
+    for location in ['Suspicious Maiden', 'Thieves\' Town - Blind\'s Cell']:
+        set_rule(world.get_location(location, player), lambda state: state.has('Big Key (Thieves Town)', player))
+    set_rule(world.get_location('Revealing Light', player), lambda state: state.has('Shining Light', player) and state.has('Maiden Rescued', player))
+    set_rule(world.get_location('Thieves\' Town - Boss', player), lambda state: state.has('Maiden Unmasked', player) and world.get_location('Thieves\' Town - Boss', player).parent_region.dungeon.boss.can_defeat(state))
+    set_rule(world.get_location('Thieves\' Town - Prize', player), lambda state: state.has('Maiden Unmasked', player) and world.get_location('Thieves\' Town - Prize', player).parent_region.dungeon.boss.can_defeat(state))
+    generate_key_logic('Thieves Town', 'Small Key (Thieves Town)', world, player)
+
     # End of door rando rules.
 
     add_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
-
-    set_rule(world.get_entrance('Thieves Town Big Key Door', player), lambda state: state.has('Big Key (Thieves Town)', player))
-    set_rule(world.get_entrance('Blind Fight', player), lambda state: state.has_key('Small Key (Thieves Town)', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Thieves\' Town - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Thieves\' Town - Prize', player))
-    set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: (state.has_key('Small Key (Thieves Town)', player) or item_name(state, 'Thieves\' Town - Big Chest', player) == ('Small Key (Thieves Town)', player)) and state.has('Hammer', player))
-    if world.accessibility != 'locations':
-        set_always_allow(world.get_location('Thieves\' Town - Big Chest', player), lambda state, item: item.name == 'Small Key (Thieves Town)' and item.player == player and state.has('Hammer', player))
-    set_rule(world.get_location('Thieves\' Town - Attic', player), lambda state: state.has_key('Small Key (Thieves Town)', player))
-    for location in ['Thieves\' Town - Attic', 'Thieves\' Town - Big Chest', 'Thieves\' Town - Blind\'s Cell', 'Thieves\' Town - Boss']:
-        forbid_item(world.get_location(location, player), 'Big Key (Thieves Town)', player)
-    for location in ['Thieves\' Town - Attic', 'Thieves\' Town - Boss']:
-        forbid_item(world.get_location(location, player), 'Small Key (Thieves Town)', player)
 
     set_rule(world.get_entrance('Ice Palace Entrance Room', player), lambda state: state.can_melt_things(player))
     set_rule(world.get_location('Ice Palace - Big Chest', player), lambda state: state.has('Big Key (Ice Palace)', player))

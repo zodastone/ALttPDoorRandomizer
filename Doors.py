@@ -484,6 +484,88 @@ def create_doors(world, player):
         create_door(player, 'Skull Spike Corner WS', Intr).dir(Direction.West, 0x39, Bot, High).small_key().pos(1),
         create_door(player, 'Skull Final Drop ES', Intr).dir(Direction.East, 0x39, Bot, High).small_key().pos(1),
         create_door(player, 'Skull Final Drop Hole', Hole),
+
+        create_door(player, 'Thieves Lobby N Edge', Open).dir(Direction.North, 0xdb, None, Low),
+        create_door(player, 'Thieves Lobby NE Edge', Open).dir(Direction.North, 0xdb, None, Low),
+        create_door(player, 'Thieves Lobby E', Nrml).dir(Direction.East, 0xdb, Mid, High).no_exit().trap(0x4).pos(0),
+        create_door(player, 'Thieves Big Chest Nook WS Edge', Open).dir(Direction.West, 0xdb, None, Low),
+        create_door(player, 'Thieves Ambush S Edge', Open).dir(Direction.South, 0xcb, None, Low),
+        create_door(player, 'Thieves Ambush SE Edge', Open).dir(Direction.South, 0xcb, None, Low),
+        create_door(player, 'Thieves Ambush ES Edge', Open).dir(Direction.East, 0xcb, None, Low),
+        create_door(player, 'Thieves Ambush EN Edge', Open).dir(Direction.East, 0xcb, None, Low),
+        create_door(player, 'Thieves Ambush E', Nrml).dir(Direction.East, 0xcb, Mid, High).pos(0),
+        create_door(player, 'Thieves BK Corner WN Edge', Open).dir(Direction.West, 0xcc, None, Low),
+        create_door(player, 'Thieves BK Corner WS Edge', Open).dir(Direction.West, 0xcc, None, Low),
+        create_door(player, 'Thieves BK Corner S Edge', Open).dir(Direction.South, 0xcc, None, Low),
+        create_door(player, 'Thieves BK Corner SW Edge', Open).dir(Direction.South, 0xcc, None, Low),
+        create_door(player, 'Thieves BK Corner W', Nrml).dir(Direction.West, 0xcc, Mid, High).pos(2),
+        create_door(player, 'Thieves BK Corner NW', Nrml).dir(Direction.North, 0xcc, Left, High).pos(1),
+        create_door(player, 'Thieves BK Corner NE', Nrml).dir(Direction.North, 0xcc, Right, High).big_key().pos(0),
+        create_door(player, 'Thieves Compass Room NW Edge', Open).dir(Direction.North, 0xdc, None, Low),
+        create_door(player, 'Thieves Compass Room N Edge', Open).dir(Direction.North, 0xdc, None, Low),
+        create_door(player, 'Thieves Compass Room WS Edge', Open).dir(Direction.West, 0xdc, None, Low),
+        create_door(player, 'Thieves Compass Room W', Nrml).dir(Direction.West, 0xdc, Mid, High).pos(0),
+        create_door(player, 'Thieves Hallway SE', Nrml).dir(Direction.South, 0xbc, Right, High).small_key().pos(1),
+        create_door(player, 'Thieves Hallway NE', Nrml).dir(Direction.North, 0xbc, Right, High).pos(7),
+        create_door(player, 'Thieves Pot Alcove Mid WS', Nrml).dir(Direction.West, 0xbc, Bot, High).pos(5),
+        create_door(player, 'Thieves Pot Alcove Bottom SW', Nrml).dir(Direction.South, 0xbc, Left, High).pos(3),
+        create_door(player, 'Thieves Conveyor Maze WN', Nrml).dir(Direction.West, 0xbc, Top, High).pos(4),
+        create_door(player, 'Thieves Hallway WS', Intr).dir(Direction.West, 0xbc, Bot, High).small_key().pos(0),
+        create_door(player, 'Thieves Pot Alcove Mid ES', Intr).dir(Direction.East, 0xbc, Bot, High).small_key().pos(0),
+        create_door(player, 'Thieves Conveyor Maze SW', Intr).dir(Direction.South, 0xbc, Left, High).pos(6),
+        create_door(player, 'Thieves Pot Alcove Top NW', Intr).dir(Direction.North, 0xbc, Left, High).pos(6),
+        create_door(player, 'Thieves Conveyor Maze EN', Intr).dir(Direction.East, 0xbc, Top, High).pos(2),
+        create_door(player, 'Thieves Hallway WN', Intr).dir(Direction.West, 0xbc, Top, High).no_exit().pos(2),
+        create_door(player, 'Thieves Conveyor Maze Down Stairs', Sprl).dir(Direction.Down, 0xbc, 0, HTH).ss(A, 0x11, 0x80, True, True),
+        create_door(player, 'Thieves Boss SE', Nrml).dir(Direction.South, 0xac, Right, High).no_exit().trap(0x4).pos(0),
+        create_door(player, 'Thieves Spike Track ES', Nrml).dir(Direction.East, 0xbb, Bot, High).pos(5),
+        create_door(player, 'Thieves Hellway NW', Nrml).dir(Direction.North, 0xbb, Left, High).pos(0),
+        create_door(player, 'Thieves Triple Bypass EN', Nrml).dir(Direction.East, 0xbb, Top, High).pos(4),
+        create_door(player, 'Thieves Hellway Orange Barrier', Lgcl),
+        create_door(player, 'Thieves Hellway Crystal Orange Barrier', Lgcl),
+        create_door(player, 'Thieves Hellway Blue Barrier', Lgcl),
+        create_door(player, 'Thieves Hellway Crystal Blue Barrier', Lgcl),
+        create_door(player, 'Thieves Spike Track WS', Intr).dir(Direction.West, 0xbb, Bot, High).pos(2),
+        create_door(player, 'Thieves Hellway Crystal ES', Intr).dir(Direction.East, 0xbb, Bot, High).pos(2),
+        create_door(player, 'Thieves Spike Track NE', Intr).dir(Direction.North, 0xbb, Right, High).pos(3),
+        create_door(player, 'Thieves Triple Bypass SE', Intr).dir(Direction.South, 0xbb, Right, High).pos(3),
+        create_door(player, 'Thieves Hellway Crystal EN', Intr).dir(Direction.East, 0xbb, Top, High).pos(1),
+        create_door(player, 'Thieves Triple Bypass WN', Intr).dir(Direction.West, 0xbb, Top, High).pos(1),
+        create_door(player, 'Thieves Spike Switch SW', Nrml).dir(Direction.South, 0xab, Left, High).pos(1),
+        create_door(player, 'Thieves Spike Switch Up Stairs', Sprl).dir(Direction.Up, 0xab, 0, HTH).ss(Z, 0x1a, 0x6c, True, True).small_key().pos(0),
+        create_door(player, 'Thieves Attic Down Stairs', Sprl).dir(Direction.Down, 0x64, 0, HTH).ss(Z, 0x11, 0x80, True, True),
+        create_door(player, 'Thieves Attic ES', Intr).dir(Direction.East, 0x64, Bot, High).pos(0),
+        create_door(player, 'Thieves Cricket Hall Left WS', Intr).dir(Direction.West, 0x64, Bot, High).pos(0),
+        create_door(player, 'Thieves Cricket Hall Left Edge', Open).dir(Direction.East, 0x64, None, High),
+        create_door(player, 'Thieves Cricket Hall Right Edge', Open).dir(Direction.West, 0x65, None, High),
+        create_door(player, 'Thieves Cricket Hall Right ES', Intr).dir(Direction.East, 0x65, Bot, High).pos(0),
+        create_door(player, 'Thieves Attic Window WS', Intr).dir(Direction.West, 0x65, Bot, High).pos(0),
+        create_door(player, 'Thieves Basement Block Up Stairs', Sprl).dir(Direction.Up, 0x45, 0, HTH).ss(A, 0x1a, 0x6c, True, True),
+        create_door(player, 'Thieves Basement Block WN', Nrml).dir(Direction.West, 0x45, Top, High).trap(0x4).pos(0),
+        create_door(player, 'Thieves Basement Block Path', Lgcl),
+        create_door(player, 'Thieves Blocked Entry Path', Lgcl),
+        create_door(player, 'Thieves Lonely Zazak WS', Nrml).dir(Direction.West, 0x45, Bot, High).pos(2),
+        create_door(player, 'Thieves Blocked Entry SW', Intr).dir(Direction.South, 0x45, Left, High).pos(1),
+        create_door(player, 'Thieves Lonely Zazak NW', Intr).dir(Direction.North, 0x45, Left, High).pos(1),
+        create_door(player, 'Thieves Lonely Zazak ES', Intr).dir(Direction.East, 0x45, Right, High).pos(3),
+        create_door(player, 'Thieves Blind\'s Cell WS', Intr).dir(Direction.West, 0x45, Right, High).pos(3),
+        create_door(player, 'Thieves Conveyor Bridge EN', Nrml).dir(Direction.East, 0x44, Top, High).pos(2),
+        create_door(player, 'Thieves Conveyor Bridge ES', Nrml).dir(Direction.East, 0x44, Bot, High).pos(3),
+        create_door(player, 'Thieves Conveyor Bridge Block Path', Lgcl),
+        create_door(player, 'Thieves Conveyor Block Path', Lgcl),
+        create_door(player, 'Thieves Conveyor Bridge WS', Intr).dir(Direction.West, 0x44, Bot, High).small_key().pos(1),
+        create_door(player, 'Thieves Big Chest Room ES', Intr).dir(Direction.East, 0x44, Bot, High).small_key().pos(1),
+        create_door(player, 'Thieves Conveyor Block WN', Intr).dir(Direction.West, 0x44, Top, High).pos(0),
+        create_door(player, 'Thieves Trap EN', Intr).dir(Direction.East, 0x44, Left, Top).pos(0),
+
+        # Door Templates
+        # create_door(player, '', Nrml).dir(Direction.North, 0x00, Mid, High).pos(),
+        # create_door(player, '', Intr).dir(Direction.North, 0x00, Left, High).pos(),
+        # create_door(player, '', Sprl).dir(Direction.North, 0x00, 0, High).ss(),
+        # create_door(player, '', Open).dir(Direction.North, 0x00, None, High),
+        # create_door(player, '', Lgcl),
+        # create_door(player, '', Hole),
+        # create_door(player, '', Warp),
     ]
     create_paired_doors(world, player)
 
@@ -539,6 +621,17 @@ def create_doors(world, player):
     world.get_door('Swamp Barrier Ledge - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('Swamp Barrier - Orange', player).barrier(CrystalBarrier.Orange)
 
+    world.get_door('Thieves Spike Switch Up Stairs', player).c_switch()
+    world.get_door('Thieves Spike Switch SW', player).c_switch()
+    world.get_door('Thieves Attic ES', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Thieves Hellway Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Thieves Hellway Crystal Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Thieves Triple Bypass SE', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Thieves Triple Bypass WN', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Thieves Triple Bypass EN', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Thieves Hellway Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Thieves Hellway Crystal Orange Barrier', player).barrier(CrystalBarrier.Orange)
+
 
 def create_paired_doors(world, player):
     world.paired_doors[player] = [
@@ -573,13 +666,13 @@ def create_paired_doors(world, player):
         PairedDoor('Eastern Big Key NE', 'Eastern Compass Area SW'),
         # PairedDoor('', ''),  # TR somaria hub to pokey
         PairedDoor('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
-        # PairedDoor('', ''),  # TT random bomb to pots
-        # PairedDoor('', ''),  # TT big key door
+        PairedDoor('Thieves BK Corner NW', 'Thieves Pot Alcove Bottom SW'),  # TT random bomb to pots
+        PairedDoor('Thieves BK Corner NW', 'Thieves Hallway SE'),  # TT big key door
         # PairedDoor('', ''),  # Ice last key door to crystal switch
         # PairedDoor('', ''),  # mire hub key door to attic
         # PairedDoor('', ''),  # mire hub key door to map
         # PairedDoor('', ''),  # tr last key door to switch maze
-        # PairedDoor('', '')  # TT dashable above
+        PairedDoor('Thieves Ambush E', 'Thieves BK Corner W')  # TT dashable above
     ]
 
 

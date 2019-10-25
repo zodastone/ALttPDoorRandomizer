@@ -190,7 +190,7 @@ def fix_big_key_doors_with_ugly_smalls(world, player):
 
 
 def remove_ugly_small_key_doors(world, player):
-    for d in ['Eastern Compass Area SW', 'Eastern Darkness S']:
+    for d in ['Eastern Compass Area SW', 'Eastern Darkness S', 'Thieves Hallway SE']:
         door = world.get_door(d, player)
         room = world.get_room(door.roomIndex, player)
         room.change(door.doorListPos, DoorKind.Normal)
@@ -199,7 +199,7 @@ def remove_ugly_small_key_doors(world, player):
 
 
 def unpair_big_key_doors(world, player):
-    problematic_bk_doors = ['Eastern Courtyard N', 'Eastern Big Key NE']
+    problematic_bk_doors = ['Eastern Courtyard N', 'Eastern Big Key NE', 'Thieves BK Corner NE']
     for paired_door in world.paired_doors[player]:
         if paired_door.door_a in problematic_bk_doors or paired_door.door_b in problematic_bk_doors:
             paired_door.pair = False
@@ -1517,7 +1517,7 @@ def determine_required_paths(world):
         'Palace of Darkness': ['PoD Boss'],
         'Swamp Palace': ['Swamp Boss'],
         'Skull Woods': ['Skull Boss'],
-        # 'Thieves Town': [],
+        'Thieves Town': ['Thieves Boss', ('Thieves Blind\'s Cell', 'Thieves Boss')],
         }
     if world.shuffle == 'vanilla':
         # paths['Skull Woods'].remove('Skull Boss')  # is this necessary?
@@ -1526,6 +1526,8 @@ def determine_required_paths(world):
         if world.mode == 'standard':
             paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
             paths['Hyrule Castle'].append('Sanctuary')
+    if world.doorShuffle in ['basic', 'experimental']:
+        paths['Thieves Town'].append('Thieves Attic Window')
     return paths
 
 
@@ -1575,20 +1577,27 @@ def check_required_paths(paths, world, player):
     for dungeon_name in paths.keys():
         sector, entrances = world.dungeon_layouts[player][dungeon_name]
         if len(paths[dungeon_name]) > 0:
-            check_paths = convert_regions(paths[dungeon_name], world, player)
-            start_regions = convert_regions(entrances, world, player)
-            state = ExplorationState()
-            for region in start_regions:
-                state.visit_region(region)
-                state.add_all_doors_check_unattached(region, world, player)
-            explore_state(state, world, player)
-            valid, bad_region = check_if_regions_visited(state, check_paths)
-            if not valid:
-                if check_for_pinball_fix(state, bad_region, world, player):
-                    explore_state(state, world, player)
-                    valid, bad_region = check_if_regions_visited(state, check_paths)
-            if not valid:
-                raise Exception('%s cannot reach %s' % (dungeon_name, bad_region.name))
+            states_to_explore = defaultdict(list)
+            for path in paths[dungeon_name]:
+                if type(path) is tuple:
+                    states_to_explore[tuple([path[0]])].append(path[1])
+                else:
+                    states_to_explore[tuple(entrances)].append(path)
+            for start_regs, dest_regs in states_to_explore.items():
+                check_paths = convert_regions(dest_regs, world, player)
+                start_regions = convert_regions(start_regs, world, player)
+                state = ExplorationState()
+                for region in start_regions:
+                    state.visit_region(region)
+                    state.add_all_doors_check_unattached(region, world, player)
+                explore_state(state, world, player)
+                valid, bad_region = check_if_regions_visited(state, check_paths)
+                if not valid:
+                    if check_for_pinball_fix(state, bad_region, world, player):
+                        explore_state(state, world, player)
+                        valid, bad_region = check_if_regions_visited(state, check_paths)
+                if not valid:
+                    raise Exception('%s cannot reach %s' % (dungeon_name, bad_region.name))
 
 
 def explore_state(state, world, player):
@@ -1674,6 +1683,14 @@ logical_connections = [
     ('Skull Pot Circle Star Path', 'Skull Map Room'),
     ('Skull Big Chest Hookpath', 'Skull 1 Lobby'),
     ('Skull Back Drop Star Path', 'Skull Small Hall'),
+    ('Thieves Hellway Orange Barrier', 'Thieves Hellway S Crystal'),
+    ('Thieves Hellway Crystal Orange Barrier', 'Thieves Hellway'),
+    ('Thieves Hellway Blue Barrier', 'Thieves Hellway N Crystal'),
+    ('Thieves Hellway Crystal Blue Barrier', 'Thieves Hellway'),
+    ('Thieves Basement Block Path', 'Thieves Blocked Entry'),
+    ('Thieves Blocked Entry Path', 'Thieves Basement Block'),
+    ('Thieves Conveyor Bridge Block Path', 'Thieves Conveyor Block'),
+    ('Thieves Conveyor Block Path', 'Thieves Conveyor Bridge'),
     # ('', ''),
 ]
 
@@ -1706,8 +1723,8 @@ spiral_staircases = [
     ('Swamp Left Elbow Down Stairs', 'Swamp Drain Left Up Stairs'),
     ('Swamp Right Elbow Down Stairs', 'Swamp Drain Right Up Stairs'),
     ('Swamp Behind Waterfall Up Stairs', 'Swamp C Down Stairs'),
-    # ('', ''),
-    # ('', ''),
+    ('Thieves Spike Switch Up Stairs', 'Thieves Attic Down Stairs'),
+    ('Thieves Conveyor Maze Down Stairs', 'Thieves Basement Block Up Stairs'),
     # ('', ''),
 ]
 
@@ -1730,7 +1747,15 @@ open_edges = [
     ('Desert East Wing N Edge', 'Desert Arrow Pot Corner S Edge'),
     ('Desert Arrow Pot Corner W Edge', 'Desert North Hall E Edge'),
     ('Desert North Hall W Edge', 'Desert Sandworm Corner S Edge'),
-    ('Desert Sandworm Corner E Edge', 'Desert West Wing N Edge')
+    ('Desert Sandworm Corner E Edge', 'Desert West Wing N Edge'),
+    ('Thieves Lobby N Edge', 'Thieves Ambush S Edge'),
+    ('Thieves Lobby NE Edge', 'Thieves Ambush SE Edge'),
+    ('Thieves Ambush ES Edge', 'Thieves BK Corner WS Edge'),
+    ('Thieves Ambush EN Edge', 'Thieves BK Corner WN Edge'),
+    ('Thieves BK Corner S Edge', 'Thieves Compass Room N Edge'),
+    ('Thieves BK Corner SW Edge', 'Thieves Compass Room NW Edge'),
+    ('Thieves Compass Room WS Edge', 'Thieves Big Chest Nook WS Edge'),
+    ('Thieves Cricket Hall Left Edge', 'Thieves Cricket Hall Right Edge')
 ]
 
 falldown_pits = [
@@ -1838,6 +1863,18 @@ interior_doors = [
     ('Skull Star Pits WS', 'Skull Torch Room ES'),
     ('Skull Torch Room EN', 'Skull Vines WN'),
     ('Skull Spike Corner WS', 'Skull Final Drop ES'),
+    ('Thieves Hallway WS', 'Thieves Pot Alcove Mid ES'),
+    ('Thieves Conveyor Maze SW', 'Thieves Pot Alcove Top NW'),
+    ('Thieves Conveyor Maze EN', 'Thieves Hallway WN'),
+    ('Thieves Spike Track NE', 'Thieves Triple Bypass SE'),
+    ('Thieves Spike Track WS', 'Thieves Hellway Crystal ES'),
+    ('Thieves Hellway Crystal EN', 'Thieves Triple Bypass WN'),
+    ('Thieves Attic ES', 'Thieves Cricket Hall Left WS'),
+    ('Thieves Cricket Hall Right ES', 'Thieves Attic Window WS'),
+    ('Thieves Blocked Entry SW', 'Thieves Lonely Zazak NW'),
+    ('Thieves Lonely Zazak ES', 'Thieves Blind\'s Cell WS'),
+    ('Thieves Conveyor Bridge WS', 'Thieves Big Chest Room ES'),
+    ('Thieves Conveyor Block WN', 'Thieves Trap EN'),
     # ('', ''),
 ]
 
@@ -1916,6 +1953,17 @@ default_door_connections = [
     ('Skull 2 East Lobby WS', 'Skull Small Hall ES'),
     ('Skull 3 Lobby NW', 'Skull Star Pits SW'),
     ('Skull Vines NW', 'Skull Spike Corner SW'),
+    ('Thieves Lobby E', 'Thieves Compass Room W'),
+    ('Thieves Ambush E', 'Thieves BK Corner W'),
+    ('Thieves BK Corner NW', 'Thieves Pot Alcove Bottom SW'),
+    ('Thieves BK Corner NE', 'Thieves Hallway SE'),
+    ('Thieves Pot Alcove Mid WS', 'Thieves Spike Track ES'),
+    ('Thieves Hellway NW', 'Thieves Spike Switch SW'),
+    ('Thieves Triple Bypass EN', 'Thieves Conveyor Maze WN'),
+    ('Thieves Basement Block WN', 'Thieves Conveyor Bridge EN'),
+    ('Thieves Lonely Zazak WS', 'Thieves Conveyor Bridge ES'),
+    # ('', ''),
+    # ('', ''),
     # ('', ''),
 ]
 
@@ -1928,6 +1976,8 @@ default_one_way_connections = [
     ('PoD Harmless Hellway SE', 'PoD Arena Main NE'),
     ('PoD Dark Alley NE', 'PoD Boss SE'),
     ('Swamp T NW', 'Swamp Boss SW'),
+    ('Thieves Hallway NE', 'Thieves Boss SE'),
+    # ('', ''),
 ]
 
 # todo: these path rules are more complicated I think...

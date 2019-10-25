@@ -8,6 +8,7 @@ RecordStairType: {
 SpiralWarp: {
     lda $040c : cmp.b #$ff : beq .abort ; abort if not in dungeon
     cmp #$14 : beq .check ; hera is okay
+    cmp #$16 : beq .check ; thieves is okay
     cmp #$0e : bcs .abort ; abort if not supported yet -- todo: this needs to be altered/removed as more dungeons are implemented
     .check
     lda $045e : cmp #$5e : beq .gtg ; abort if not spiral - intended room is in A!

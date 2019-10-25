@@ -20,7 +20,7 @@ def create_dungeons(world, player):
     DP = make_dungeon('Desert Palace', 'Lanmolas', desert_regions, ItemFactory('Big Key (Desert Palace)', player), [ItemFactory('Small Key (Desert Palace)', player)], ItemFactory(['Map (Desert Palace)', 'Compass (Desert Palace)'], player))
     ToH = make_dungeon('Tower of Hera', 'Moldorm', hera_regions, ItemFactory('Big Key (Tower of Hera)', player), [ItemFactory('Small Key (Tower of Hera)', player)], ItemFactory(['Map (Tower of Hera)', 'Compass (Tower of Hera)'], player))
     PoD = make_dungeon('Palace of Darkness', 'Helmasaur King', pod_regions, ItemFactory('Big Key (Palace of Darkness)', player), ItemFactory(['Small Key (Palace of Darkness)'] * 6, player), ItemFactory(['Map (Palace of Darkness)', 'Compass (Palace of Darkness)'], player))
-    TT = make_dungeon('Thieves Town', 'Blind', ['Thieves Town (Entrance)', 'Thieves Town (Deep)', 'Blind Fight'], ItemFactory('Big Key (Thieves Town)', player), [ItemFactory('Small Key (Thieves Town)', player)], ItemFactory(['Map (Thieves Town)', 'Compass (Thieves Town)'], player))
+    TT = make_dungeon('Thieves Town', 'Blind', thieves_regions, ItemFactory('Big Key (Thieves Town)', player), [ItemFactory('Small Key (Thieves Town)', player)], ItemFactory(['Map (Thieves Town)', 'Compass (Thieves Town)'], player))
     SW = make_dungeon('Skull Woods', 'Mothula', skull_regions, ItemFactory('Big Key (Skull Woods)', player), ItemFactory(['Small Key (Skull Woods)'] * 2, player), ItemFactory(['Map (Skull Woods)', 'Compass (Skull Woods)'], player))
     SP = make_dungeon('Swamp Palace', 'Arrghus', swamp_regions, ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
     IP = make_dungeon('Ice Palace', 'Kholdstare', ['Ice Palace (Entrance)', 'Ice Palace (Main)', 'Ice Palace (East)', 'Ice Palace (East Top)', 'Ice Palace (Kholdstare)'], ItemFactory('Big Key (Ice Palace)', player), ItemFactory(['Small Key (Ice Palace)'] * 2, player), ItemFactory(['Map (Ice Palace)', 'Compass (Ice Palace)'], player))
@@ -153,7 +153,6 @@ def fill_dungeons_restrictive(world, shuffled_locations):
     fill_restrictive(world, all_state_base, shuffled_locations, dungeon_items)
 
 
-
 dungeon_music_addresses = {'Eastern Palace - Prize': [0x1559A],
                            'Desert Palace - Prize': [0x1559B, 0x1559C, 0x1559D, 0x1559E],
                            'Tower of Hera - Prize': [0x155C5, 0x1107A, 0x10B8C],
@@ -232,6 +231,17 @@ skull_regions = [
     'Skull Spike Corner', 'Skull Final Drop', 'Skull Boss'
 ]
 
+thieves_regions = [
+    'Thieves Lobby', 'Thieves Ambush', 'Thieves BK Corner', 'Thieves Compass Room', 'Thieves Big Chest Nook',
+    'Thieves Hallway', 'Thieves Boss', 'Thieves Pot Alcove Mid', 'Thieves Pot Alcove Bottom', 'Thieves Pot Alcove Top',
+    'Thieves Conveyor Maze', 'Thieves Spike Track', 'Thieves Hellway', 'Thieves Hellway N Crystal',
+    'Thieves Hellway S Crystal', 'Thieves Triple Bypass', 'Thieves Spike Switch', 'Thieves Attic',
+    'Thieves Cricket Hall Left', 'Thieves Cricket Hall Right', 'Thieves Attic Window', 'Thieves Basement Block',
+    'Thieves Blocked Entry', 'Thieves Lonely Zazak', 'Thieves Blind\'s Cell', 'Thieves Conveyor Bridge',
+    'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap'
+]
+
+
 dungeon_regions = {
     'Hyrule Castle': hyrule_castle_regions,
     'Eastern Palace': eastern_regions,
@@ -241,7 +251,7 @@ dungeon_regions = {
     'Palace of Darkness': pod_regions,
     'Swamp Palace': swamp_regions,
     'Skull Woods': skull_regions,
-    # 'TT':
+    'Thieves Town': thieves_regions,
     # 'Ice':
     # 'Mire':
     # 'TR':
@@ -258,7 +268,7 @@ region_starts = {
     'Swamp Palace': ['Swamp Lobby'],
     'Skull Woods': ['Skull 1 Lobby', 'Skull 2 East Lobby', 'Skull 2 West Lobby', 'Skull 3 Lobby', 'Skull Pot Circle',
                     'Skull Pinball', 'Skull Left Drop', 'Skull Back Drop'],
-    # ['TT Lobby'],
+    'Thieves Town': ['Thieves Lobby'],
     # ['Ice Lobby'],
     # ['Mire Lobby'],
     # ['TR Main Lobby', 'TR Eye Trap', 'TR Big Chest', 'TR Laser Bridge'],

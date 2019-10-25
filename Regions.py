@@ -193,15 +193,6 @@ def create_regions(world, player):
         create_lw_region(player, 'Mimic Cave Ledge', None, ['Mimic Cave']),
         create_cave_region(player, 'Mimic Cave', 'Mimic Cave', ['Mimic Cave']),
 
-        create_dungeon_region(player, 'Thieves Town (Entrance)', 'Thieves\' Town', ['Thieves\' Town - Big Key Chest',
-                                                                            'Thieves\' Town - Map Chest',
-                                                                            'Thieves\' Town - Compass Chest',
-                                                                            'Thieves\' Town - Ambush Chest'], ['Thieves Town Big Key Door', 'Thieves Town Exit']),
-        create_dungeon_region(player, 'Thieves Town (Deep)', 'Thieves\' Town', ['Thieves\' Town - Attic',
-                                                                        'Thieves\' Town - Big Chest',
-                                                                        'Thieves\' Town - Blind\'s Cell'], ['Blind Fight']),
-        create_dungeon_region(player, 'Blind Fight', 'Thieves\' Town', ['Thieves\' Town - Boss', 'Thieves\' Town - Prize']),
-
         create_dungeon_region(player, 'Ice Palace (Entrance)', 'Ice Palace', None, ['Ice Palace Entrance Room', 'Ice Palace Exit']),
         create_dungeon_region(player, 'Ice Palace (Main)', 'Ice Palace', ['Ice Palace - Compass Chest', 'Ice Palace - Freezor Chest',
                                                                   'Ice Palace - Big Chest', 'Ice Palace - Iced T Room'], ['Ice Palace (East)', 'Ice Palace (Kholdstare)']),
@@ -480,6 +471,37 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Skull Boss', 'Skull Woods', ['Skull Woods - Boss', 'Skull Woods - Prize']),
 
         # tt
+        create_dungeon_region(player, 'Thieves Lobby', 'Thieves\' Town', ['Thieves\' Town - Map Chest'], ['Thieves Town Exit', 'Thieves Lobby N Edge', 'Thieves Lobby NE Edge', 'Thieves Lobby E']),
+        create_dungeon_region(player, 'Thieves Ambush', 'Thieves\' Town', ['Thieves\' Town - Ambush Chest'], ['Thieves Ambush S Edge', 'Thieves Ambush SE Edge', 'Thieves Ambush ES Edge', 'Thieves Ambush EN Edge', 'Thieves Ambush E']),
+        create_dungeon_region(player, 'Thieves BK Corner', 'Thieves\' Town', None, ['Thieves BK Corner WN Edge', 'Thieves BK Corner WS Edge', 'Thieves BK Corner S Edge', 'Thieves BK Corner SW Edge',
+                                                                                    'Thieves BK Corner W', 'Thieves BK Corner NW', 'Thieves BK Corner NE']),
+        create_dungeon_region(player, 'Thieves Compass Room', 'Thieves\' Town', ['Thieves\' Town - Compass Chest'], ['Thieves Compass Room NW Edge', 'Thieves Compass Room N Edge', 'Thieves Compass Room WS Edge', 'Thieves Compass Room W']),
+        create_dungeon_region(player, 'Thieves Big Chest Nook', 'Thieves\' Town', ['Thieves\' Town - Big Key Chest'], ['Thieves Big Chest Nook WS Edge']),
+        create_dungeon_region(player, 'Thieves Hallway', 'Thieves\' Town', ['Thieves\' Town - Hallway Pot Key'], ['Thieves Hallway SE', 'Thieves Hallway NE', 'Thieves Hallway WN', 'Thieves Hallway WS']),
+        create_dungeon_region(player, 'Thieves Boss', 'Thieves\' Town', ['Revealing Light', 'Thieves\' Town - Boss', 'Thieves\' Town - Prize'], ['Thieves Boss SE']),
+        create_dungeon_region(player, 'Thieves Pot Alcove Mid', 'Thieves\' Town', None, ['Thieves Pot Alcove Mid ES', 'Thieves Pot Alcove Mid WS']),
+        create_dungeon_region(player, 'Thieves Pot Alcove Bottom', 'Thieves\' Town', None, ['Thieves Pot Alcove Bottom SW']),
+        create_dungeon_region(player, 'Thieves Pot Alcove Top', 'Thieves\' Town', None, ['Thieves Pot Alcove Top NW']),
+        create_dungeon_region(player, 'Thieves Conveyor Maze', 'Thieves\' Town', None, ['Thieves Conveyor Maze SW', 'Thieves Conveyor Maze EN', 'Thieves Conveyor Maze WN', 'Thieves Conveyor Maze Down Stairs']),
+        create_dungeon_region(player, 'Thieves Spike Track', 'Thieves\' Town', None, ['Thieves Spike Track WS', 'Thieves Spike Track ES', 'Thieves Spike Track NE']),
+        create_dungeon_region(player, 'Thieves Hellway', 'Thieves\' Town', None, ['Thieves Hellway Orange Barrier', 'Thieves Hellway NW', 'Thieves Hellway Blue Barrier']),
+        create_dungeon_region(player, 'Thieves Hellway N Crystal', 'Thieves\' Town', None, ['Thieves Hellway Crystal Blue Barrier', 'Thieves Hellway Crystal EN']),
+        create_dungeon_region(player, 'Thieves Hellway S Crystal', 'Thieves\' Town', None, ['Thieves Hellway Crystal Orange Barrier', 'Thieves Hellway Crystal ES']),
+        create_dungeon_region(player, 'Thieves Triple Bypass', 'Thieves\' Town', None, ['Thieves Triple Bypass WN', 'Thieves Triple Bypass EN', 'Thieves Triple Bypass SE']),
+        create_dungeon_region(player, 'Thieves Spike Switch', 'Thieves\' Town', ['Thieves\' Town - Spike Switch Pot Key'], ['Thieves Spike Switch SW', 'Thieves Spike Switch Up Stairs']),
+        create_dungeon_region(player, 'Thieves Attic', 'Thieves\' Town', None, ['Thieves Attic Down Stairs', 'Thieves Attic ES']),
+        create_dungeon_region(player, 'Thieves Cricket Hall Left', 'Thieves\' Town', None, ['Thieves Cricket Hall Left WS', 'Thieves Cricket Hall Left Edge']),
+        create_dungeon_region(player, 'Thieves Cricket Hall Right', 'Thieves\' Town', None, ['Thieves Cricket Hall Right Edge', 'Thieves Cricket Hall Right ES']),
+        create_dungeon_region(player, 'Thieves Attic Window', 'Thieves\' Town', ['Thieves\' Town - Attic', 'Attic Cracked Floor'], ['Thieves Attic Window WS']),
+        create_dungeon_region(player, 'Thieves Basement Block', 'Thieves\' Town', None, ['Thieves Basement Block Up Stairs', 'Thieves Basement Block WN', 'Thieves Basement Block Path']),
+        create_dungeon_region(player, 'Thieves Blocked Entry', 'Thieves\' Town', None, ['Thieves Blocked Entry Path', 'Thieves Blocked Entry SW']),
+        create_dungeon_region(player, 'Thieves Lonely Zazak', 'Thieves\' Town', None, ['Thieves Lonely Zazak WS', 'Thieves Lonely Zazak ES', 'Thieves Lonely Zazak NW']),
+        create_dungeon_region(player, 'Thieves Blind\'s Cell', 'Thieves\' Town', ['Thieves\' Town - Blind\'s Cell', 'Suspicious Maiden'], ['Thieves Blind\'s Cell WS']),
+        create_dungeon_region(player, 'Thieves Conveyor Bridge', 'Thieves\' Town', None, ['Thieves Conveyor Bridge EN', 'Thieves Conveyor Bridge ES', 'Thieves Conveyor Bridge WS', 'Thieves Conveyor Bridge Block Path']),
+        create_dungeon_region(player, 'Thieves Conveyor Block', 'Thieves\' Town', None, ['Thieves Conveyor Block Path', 'Thieves Conveyor Block WN']),
+        create_dungeon_region(player, 'Thieves Big Chest Room', 'Thieves\' Town', ['Thieves\' Town - Big Chest'], ['Thieves Big Chest Room ES']),
+        create_dungeon_region(player, 'Thieves Trap', 'Thieves\' Town', None, ['Thieves Trap EN']),
+
         # ice
         # mire
         # tr
@@ -611,13 +633,18 @@ key_only_locations = {
   'Swamp Palace - Trench 2 Pot Key': 'Small Key (Swamp Palace)',
   'Swamp Palace - Waterway Pot Key': 'Small Key (Swamp Palace)',
   'Skull Woods - West Lobby Pot Key': 'Small Key (Skull Woods)',
-  'Skull Woods - Spike Corner Key Drop': 'Small Key (Skull Woods)'
+  'Skull Woods - Spike Corner Key Drop': 'Small Key (Skull Woods)',
+  'Thieves\' Town - Hallway Pot Key': 'Small Key (Thieves Town)',
+  'Thieves\' Town - Spike Switch Pot Key': 'Small Key (Thieves Town)'
 }
 
 dungeon_events = [
     'Trench 1 Switch',
     'Trench 2 Switch',
-    'Swamp Drain'
+    'Swamp Drain',
+    'Attic Cracked Floor',
+    'Suspicious Maiden',
+    'Revealing Light'
 ]
 
 flooded_keys = {
@@ -858,6 +885,9 @@ location_table = {'Mushroom': (0x180013, False, 'in the woods'),
                   'Trench 1 Switch': (None, False, None),
                   'Trench 2 Switch': (None, False, None),
                   'Swamp Drain': (None, False, None),
+                  'Attic Cracked Floor': (None, False, None),
+                  'Suspicious Maiden': (None, False, None),
+                  'Revealing Light': (None, False, None),
                   'Eastern Palace - Prize': ([0x1209D, 0x53EF8, 0x53EF9, 0x180052, 0x18007C, 0xC6FE], True, 'Eastern Palace'),
                   'Desert Palace - Prize': ([0x1209E, 0x53F1C, 0x53F1D, 0x180053, 0x180078, 0xC6FF], True, 'Desert Palace'),
                   'Tower of Hera - Prize': ([0x120A5, 0x53F0A, 0x53F0B, 0x18005A, 0x18007A, 0xC706], True, 'Tower of Hera'),
