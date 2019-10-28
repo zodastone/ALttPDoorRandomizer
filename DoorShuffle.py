@@ -245,6 +245,10 @@ def within_dungeon(world, player):
     for start_list, region_list in dungeon_region_lists:
         shuffle_dungeon(world, player, start_list, region_list)
 
+    world.dungeon_layouts[player] = {}
+    for key in dungeon_regions.keys():
+        world.dungeon_layouts[player][key] = (key, region_starts[key])
+
 def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
     logger = logging.getLogger('')
     # Part one - generate a random layout
