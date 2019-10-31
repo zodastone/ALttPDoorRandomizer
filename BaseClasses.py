@@ -88,6 +88,9 @@ class World(object):
         self.paired_doors = {}
         self.rooms = []
         self._room_cache = {}
+        self.dungeon_layouts = {}
+        self.inaccessible_regions = []
+        self.key_logic = {}
 
     def intialize_regions(self):
         for region in self.regions:
@@ -326,7 +329,7 @@ class World(object):
             sphere = []
             # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
             for location in prog_locations:
-                if location.can_reach(state):
+                if location.can_reach(state) and state.not_flooding_a_key(state.world, location):
                     sphere.append(location)
 
             if not sphere:
@@ -401,12 +404,27 @@ class CollectionState(object):
             if locations is None:
                 locations = self.world.get_filled_locations()
             reachable_events = [location for location in locations if location.event and (not key_only or location.item.key) and location.can_reach(self)]
+            reachable_events = self._do_not_flood_the_keys(reachable_events)
             for event in reachable_events:
                 if (event.name, event.player) not in self.events:
                     self.events.append((event.name, event.player))
                     self.collect(event.item, True, event)
             new_locations = len(reachable_events) > checked_locations
             checked_locations = len(reachable_events)
+
+    def _do_not_flood_the_keys(self, reachable_events):
+        adjusted_checks = list(reachable_events)
+        for event in reachable_events:
+            if event.name in flooded_keys.keys() and self.world.get_location(flooded_keys[event.name], event.player) not in reachable_events:
+                adjusted_checks.remove(event)
+        if len(adjusted_checks) < len(reachable_events):
+            return adjusted_checks
+        return reachable_events
+
+    def not_flooding_a_key(self, world, location):
+        if location.name in flooded_keys.keys():
+            return world.get_location(flooded_keys[location.name], location.player) in self.locations_checked
+        return True
 
     def has(self, item, player, count=1):
         if count == 1:
@@ -850,34 +868,79 @@ class Direction(Enum):
     Down = 5
 
 
+class Polarity:
+    def __init__(self):
+        self.vector = [0, 0, 0]
+
+    def __len__(self):
+        return len(self.vector)
+
+    def __add__(self, other):
+        result = Polarity()
+        for i in range(len(self.vector)):
+            result.vector[i] = pol_add[pol_idx_2[i]](self.vector[i], other.vector[i])
+        return result
+
+    def __iadd__(self, other):
+        for i in range(len(self.vector)):
+            self.vector[i] = pol_add[pol_idx_2[i]](self.vector[i], other.vector[i])
+        return self
+
+    def __getitem__(self, item):
+        return self.vector[item]
+
+    def is_neutral(self):
+        for i in range(len(self.vector)):
+            if self.vector[i] != 0:
+                return False
+        return True
+
+
 pol_idx = {
     Direction.North: (0, 'Pos'),
     Direction.South: (0, 'Neg'),
     Direction.East: (1, 'Pos'),
     Direction.West: (1, 'Neg'),
-    Direction.Up: (2, 'Pos'),
-    Direction.Down: (2, 'Neg')
+    Direction.Up: (2, 'Mod'),
+    Direction.Down: (2, 'Mod')
+}
+pol_idx_2 = {
+    0: 'Add',
+    1: 'Add',
+    2: 'Mod'
 }
 pol_inc = {
     'Pos': lambda x: x + 1,
     'Neg': lambda x: x - 1,
+    'Mod': lambda x: (x + 1) % 2
 }
+pol_add = {
+    'Add': lambda x, y: x + y,
+    'Mod': lambda x, y: (x + y) % 2
+}
+
+@unique
+class CrystalBarrier(Enum):
+    Null = 1  # no special requirement
+    Blue = 2  # blue must be down and explore state set to Blue
+    Orange = 3  # orange must be down and explore state set to Orange
+    Either = 4  # you choose to leave this room in Either state
 
 
 class Door(object):
-    def __init__(self, player, name, type, direction, roomIndex, doorIndex, layer, toggle=False):
+    def __init__(self, player, name, type):
         self.player = player
         self.name = name
         self.type = type
-        self.direction = direction
+        self.direction = None
 
         # rom properties
-        self.roomIndex = roomIndex
+        self.roomIndex = -1
         # 0,1,2 + Direction (N:0, W:3, S:6, E:9) for normal
         # 0-4 for spiral offset thing
-        self.doorIndex = doorIndex
-        self.layer = layer  # 0 for normal floor, 1 for the inset layer
-        self.toggle = toggle
+        self.doorIndex = -1
+        self.layer = -1  # 0 for normal floor, 1 for the inset layer
+        self.toggle = False
         self.trapFlag = 0x0
         self.quadrant = 2
         self.shiftX = 78
@@ -889,10 +952,13 @@ class Door(object):
         # logical properties
         # self.connected = False  # combine with Dest?
         self.dest = None
-        self.blocked = False  # Indicates if the door is normally blocked off. (Sanc door or always closed)
+        self.blocked = False  # Indicates if the door is normally blocked off as an exit. (Sanc door or always closed)
+        self.stonewall = False  # Indicate that the door cannot be enter until exited (Desert Torches, PoD Eye Statue)
         self.smallKey = False  # There's a small key door on this side
         self.bigKey = False  # There's a big key door on this side
         self.ugly = False  # Indicates that it can't be seen from the front (e.g. back of a big key door)
+        self.crystal = CrystalBarrier.Null  # How your crystal state changes if you use this door
+        self.req_event = None  # if a dungeon event is required for this door - swamp palace mostly
 
     def getAddress(self):
         if self.type == DoorType.Normal:
@@ -943,6 +1009,10 @@ class Door(object):
         self.blocked = True
         return self
 
+    def no_entrance(self):
+        self.stonewall = True
+        return self
+
     def trap(self, trapFlag):
         self.trapFlag = trapFlag
         return self
@@ -950,6 +1020,24 @@ class Door(object):
     def pos(self, pos):
         self.doorListPos = pos
         return self
+
+    def event(self, event):
+        self.req_event = event
+        return self
+
+    def barrier(self, crystal):
+        self.crystal = crystal
+        return self
+
+    def c_switch(self):
+        self.crystal = CrystalBarrier.Either
+        return self
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.name == other.name
+
+    def __hash__(self):
+        return hash(self.name)
 
     def __str__(self):
         return str(self.__unicode__())
@@ -967,11 +1055,11 @@ class Sector(object):
         # todo: make these lazy init? - when do you invalidate them
 
     def polarity(self):
-        polarity = [0, 0, 0]
+        pol = Polarity()
         for door in self.outstanding_doors:
             idx, inc = pol_idx[door.direction]
-            polarity[idx] = pol_inc[inc](polarity[idx])
-        return polarity
+            pol.vector[idx] = pol_inc[inc](pol.vector[idx])
+        return pol
 
     def magnitude(self):
         magnitude = [0, 0, 0]
@@ -1006,6 +1094,7 @@ class Location(object):
           from Items import ItemFactory
           self.forced_item = ItemFactory([forced_item], player)[0]
           self.item = self.forced_item
+          self.item.location = self
           self.event = True
         else:
           self.forced_item = None
@@ -1345,3 +1434,9 @@ class Spoiler(object):
                 path_listings.append("{}\n        {}".format(location, "\n   =>   ".join(path_lines)))
 
             outfile.write('\n'.join(path_listings))
+
+
+flooded_keys = {
+    'Trench 1 Switch': 'Swamp Palace - Trench 1 Pot Key',
+    'Trench 2 Switch': 'Swamp Palace - Trench 2 Pot Key'
+}

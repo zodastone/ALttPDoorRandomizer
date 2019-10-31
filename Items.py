@@ -172,4 +172,10 @@ item_table = {'Bow': (True, False, None, 0x0B, 'You have\nchosen the\narcher cla
               'Return Smith': (True, False, 'Event', None, None, None, None, None, None, None, None),
               'Pick Up Purple Chest': (True, False, 'Event', None, None, None, None, None, None, None, None),
               'Open Floodgate': (True, False, 'Event', None, None, None, None, None, None, None, None),
+              'Trench 1 Filled': (True, False, 'Event', None, None, None, None, None, None, None, None),
+              'Trench 2 Filled': (True, False, 'Event', None, None, None, None, None, None, None, None),
+              'Drained Swamp': (True, False, 'Event', None, None, None, None, None, None, None, None),
+              'Shining Light': (True, False, 'Event', None, None, None, None, None, None, None, None),
+              'Maiden Rescued': (True, False, 'Event', None, None, None, None, None, None, None, None),
+              'Maiden Unmasked': (True, False, 'Event', None, None, None, None, None, None, None, None),
              }

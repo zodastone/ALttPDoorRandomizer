@@ -1,14 +1,15 @@
 import random
 import collections
+from collections import defaultdict
 import logging
 import operator as op
 
 from functools import reduce
-from BaseClasses import RegionType, DoorType, Direction, Sector, pol_idx
+from BaseClasses import RegionType, Door, DoorType, Direction, Sector, Polarity, pol_idx, pol_inc
 from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions, pod_regions
-from Dungeons import dungeon_regions, region_starts, split_region_starts
-from Regions import key_only_locations
+from Dungeons import dungeon_regions, region_starts, split_region_starts, dungeon_keys, dungeon_bigs
 from RoomData import DoorKind, PairedDoor
+from DungeonGenerator import ExplorationState, extend_reachable_state, convert_regions, generate_dungeon
 
 
 def link_doors(world, player):
@@ -94,11 +95,11 @@ def create_door_spoiler(world, player):
                     logger.debug('Door not found in queue: %s connected to %s', door_b.name, door_a.name)
             else:
                 logger.warning('Door not connected: %s', door_a.name)
-    for dp in world.paired_doors[player]:
-        if dp.pair:
-            logger.debug('Paired Doors: %s with %s (p%d)', dp.door_a, dp.door_b, player)
-        else:
-            logger.debug('Unpaired Doors: %s not paired with %s (p%d)', dp.door_a, dp.door_b, player)
+    # for dp in world.paired_doors[player]:
+    #     if dp.pair:
+    #         logger.debug('Paired Doors: %s with %s (p%d)', dp.door_a, dp.door_b, player)
+    #     else:
+    #         logger.debug('Unpaired Doors: %s not paired with %s (p%d)', dp.door_a, dp.door_b, player)
 
 
 # some useful functions
@@ -111,6 +112,33 @@ oppositemap = {
     Direction.Down: Direction.Up,
 }
 
+similar_directions = {
+    Direction.South: [Direction.South],
+    Direction.North: [Direction.North],
+    Direction.West: [Direction.West],
+    Direction.East: [Direction.East],
+    Direction.Up: [Direction.Down, Direction.Up],
+    Direction.Down: [Direction.Down, Direction.Up],
+}
+
+paired_directions = {
+    Direction.South: [Direction.North],
+    Direction.North: [Direction.South],
+    Direction.West: [Direction.East],
+    Direction.East: [Direction.West],
+    Direction.Up: [Direction.Down, Direction.Up],
+    Direction.Down: [Direction.Down, Direction.Up],
+}
+
+allied_directions = {
+    Direction.South: [Direction.North, Direction.South],
+    Direction.North: [Direction.North, Direction.South],
+    Direction.West: [Direction.East, Direction.West],
+    Direction.East: [Direction.East, Direction.West],
+    Direction.Up: [Direction.Down, Direction.Up],
+    Direction.Down: [Direction.Down, Direction.Up],
+
+}
 
 def switch_dir(direction):
     return oppositemap[direction]
@@ -173,7 +201,7 @@ def fix_big_key_doors_with_ugly_smalls(world, player):
 
 
 def remove_ugly_small_key_doors(world, player):
-    for d in ['Eastern Compass Area SW', 'Eastern Darkness S']:
+    for d in ['Eastern Compass Area SW', 'Eastern Darkness S', 'Thieves Hallway SE']:
         door = world.get_door(d, player)
         room = world.get_room(door.roomIndex, player)
         room.change(door.doorListPos, DoorKind.Normal)
@@ -182,7 +210,7 @@ def remove_ugly_small_key_doors(world, player):
 
 
 def unpair_big_key_doors(world, player):
-    problematic_bk_doors = ['Eastern Courtyard N', 'Eastern Big Key NE']
+    problematic_bk_doors = ['Eastern Courtyard N', 'Eastern Big Key NE', 'Thieves BK Corner NE']
     for paired_door in world.paired_doors[player]:
         if paired_door.door_a in problematic_bk_doors or paired_door.door_b in problematic_bk_doors:
             paired_door.pair = False
@@ -227,6 +255,10 @@ def within_dungeon(world, player):
     ]
     for start_list, region_list in dungeon_region_lists:
         shuffle_dungeon(world, player, start_list, region_list)
+
+    world.dungeon_layouts[player] = {}
+    for key in dungeon_regions.keys():
+        world.dungeon_layouts[player][key] = (key, region_starts[key])
 
 def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
     logger = logging.getLogger('')
@@ -354,6 +386,15 @@ def get_doors(world, region, player):
     return res
 
 
+def get_entrance_doors(world, region, player):
+    res = []
+    for exit in region.entrances:
+        door = world.check_for_door(exit.name, player)
+        if door is not None:
+            res.append(door)
+    return res
+
+
 def doors_compatible(a, b):
     if a.type != b.type:
         return False
@@ -405,18 +446,19 @@ def cross_dungeon(world, player):
     # todo - adjust dungeon item pools -- ?
     dungeon_layouts = []
     for key, sector_list, entrance_list in dungeon_sectors:
-        ds = shuffle_dungeon_no_repeats(world, player, sector_list, entrance_list)
+        ds = shuffle_dungeon_no_repeats_new(world, player, sector_list, entrance_list)
         ds.name = key
         dungeon_layouts.append((ds, entrance_list))
 
     combine_layouts(dungeon_layouts)
 
     for layout in dungeon_layouts:
-        shuffle_key_doors(layout[1], layout[2], world, player)
+        shuffle_key_doors(layout[0], layout[1], world, player)
 
 
 def experiment(world, player):
     fix_big_key_doors_with_ugly_smalls(world, player)
+    overworld_prep(world, player)
     dungeon_sectors = []
     for key in dungeon_regions.keys():
         sector_list = convert_to_sectors(dungeon_regions[key], world, player)
@@ -424,20 +466,28 @@ def experiment(world, player):
             split_sectors = split_up_sectors(sector_list, split_region_starts[key])
             for idx, sub_sector_list in enumerate(split_sectors):
                 dungeon_sectors.append((key, sub_sector_list, split_region_starts[key][idx]))
+                # todo: shuffable entrances like pinball, left pit need to be added to entrance list
         else:
             dungeon_sectors.append((key, sector_list, region_starts[key]))
 
     dungeon_layouts = []
     for key, sector_list, entrance_list in dungeon_sectors:
-        ds = shuffle_dungeon_no_repeats(world, player, sector_list, entrance_list)
+        ds = generate_dungeon(sector_list, entrance_list, world, player)
         ds.name = key
         dungeon_layouts.append((ds, entrance_list))
 
     combine_layouts(dungeon_layouts)
+    world.dungeon_layouts[player] = {}
+    for sector, entrances in dungeon_layouts:
+        world.dungeon_layouts[player][sector.name] = (sector, entrances)
+
+    remove_inaccessible_entrances(world, player)
+    paths = determine_required_paths(world)
+    check_required_paths(paths, world, player)
 
     # shuffle_key_doors for dungeons
-    for layout in dungeon_layouts:
-        shuffle_key_doors(layout[0], layout[1], world, player)
+    for sector, entrances in world.dungeon_layouts[player].values():
+        shuffle_key_doors(sector, entrances, world, player)
 
 
 def convert_regions(region_names, world, player):
@@ -528,18 +578,11 @@ def sum_vector(sector_list, func):
     return result
 
 
-def add_vectors(vector_one, vector_two):
-    result = [0]*len(vector_one)
-    for i in range(len(result)):
-        result[i] = vector_one[i] + vector_two[i]
-    return result
-
-
-def is_polarity_neutral(polarity):
-    for value in polarity:
-        if value != 0:
-            return False
-    return True
+def is_polarity_neutral(sector_list):
+    pol = Polarity()
+    for sector in sector_list:
+        pol += sector.polarity()
+    return pol.is_neutral()
 
 
 search_iterations = 0
@@ -550,7 +593,7 @@ def is_proposal_valid(proposal, buckets, candidates):
     global search_iterations
     search_iterations = search_iterations + 1
     if search_iterations % 100 == 0:
-        logger.info('Iteration %s', search_iterations)
+        logger.debug('Iteration %s', search_iterations)
     # check that proposal is complete
     for i in range(len(proposal)):
         if proposal[i] is -1:
@@ -561,9 +604,17 @@ def is_proposal_valid(proposal, buckets, candidates):
     for i in range(len(proposal)):
         test_bucket[proposal[i]].append(candidates[i])
     for test in test_bucket:
-        valid = is_polarity_neutral(sum_vector(test, lambda s: s.polarity()))
+        valid = is_polarity_neutral(test)
         if not valid:
             return False
+        for sector in test:
+            other_sectors = list(test)
+            other_sectors.remove(sector)
+            sector_mag = sector.magnitude()
+            other_mag = sum_vector(other_sectors, lambda x: x.magnitude())
+            for i in range(len(sector_mag)):
+                if sector_mag[i] > 0 and other_mag[i] == 0:
+                    return False
     return True
 
 
@@ -578,6 +629,14 @@ def shuffle_sectors(buckets, candidates):
         raise Exception('Unable to find a proposal')
     for i in range(len(solution)):
         buckets[solution[i]].append(candidates[i])
+
+
+# def find_proposal_greedy_backtrack(bucket, candidates):
+#     choices = []
+#
+#     # todo: stick things on the queue in interesting order
+#     queue = collections.deque(candidates):
+#
 
 
 # monte carlo proposal generation
@@ -627,38 +686,57 @@ def find_proposal(proposal, buckets, candidates):
     return proposal
 
 
-# code below is for an algorithm without restarts
+def extend_state_backward(search_regions, state, world, player):
+    local_state = state.copy()
+    for region in search_regions:
+        local_state.visit_region(region)
+        local_state.add_all_entrance_doors_check_unattached(region, world, player)
+    while len(local_state.avail_doors) > 0:
+        explorable_door = local_state.next_avail_door()
+        entrance = world.get_entrance(explorable_door.door.name, player)
+        connect_region = entrance.parent_region
+        if connect_region is not None:
+            if valid_region_to_explore(connect_region, world) and not local_state.visited(connect_region):
+                local_state.visit_region(connect_region)
+                local_state.add_all_entrance_doors_check_unattached(connect_region, world, player)
+    return local_state
 
-def shuffle_dungeon_no_repeats(world, player, available_sectors, entrance_region_names):
+
+# code below is for an algorithm without restarts
+# todo: this sometimes generates two independent parts - that could be valid if the entrances are accessible
+# todo: prevent crystal barrier dead ends
+def shuffle_dungeon_no_repeats_new(world, player, available_sectors, entrance_region_names):
     logger = logging.getLogger('')
     random.shuffle(available_sectors)
     for sector in available_sectors:
         random.shuffle(sector.outstanding_doors)
 
-    entrance_regions = []
-    # current_sector = None
-    for region_name in entrance_region_names:
-        entrance_regions.append(world.get_region(region_name, player))
+    entrance_regions = convert_regions(entrance_region_names, world, player)
 
-    reachable_doors, visited_regions = extend_reachable(entrance_regions, [], world, player)
+    state = extend_reachable_state(entrance_regions, ExplorationState(), world, player)
     # Loop until all available doors are used
-    while len(reachable_doors) > 0:
+    while len(state.unattached_doors) > 0:
         # Pick a random available door to connect
-        door = random.choice(reachable_doors)
+        explorable_door = random.choice(state.unattached_doors)
+        door = explorable_door.door
         sector = find_sector_for_door(door, available_sectors)
+        if sector is None:
+            state.unattached_doors.remove(explorable_door)
+            continue
         sector.outstanding_doors.remove(door)
         # door_connected = False
-        logger.info('Linking %s', door.name)
+        logger.debug('Linking %s', door.name)
         # Find an available region that has a compatible door
+        reachable_doors = [d.door for d in state.unattached_doors]
         compatibles = find_all_compatible_door_in_sectors_ex(door, available_sectors, reachable_doors)
         while len(compatibles) > 0:
             connect_sector, connect_door = compatibles.pop()
-            logger.info('  Found possible new sector via %s', connect_door.name)
+            logger.debug('  Found possible new sector via %s', connect_door.name)
             # Check if valid
-            if is_valid(door, connect_door, sector, connect_sector, available_sectors):
+            if is_valid(door, connect_door, sector, connect_sector, available_sectors, reachable_doors, state, world, player):
                 # Apply connection and add the new region's doors to the available list
                 maybe_connect_two_way(world, door, connect_door, player)
-                reachable_doors.remove(door)
+                state.unattached_doors.remove(explorable_door)
                 connect_sector.outstanding_doors.remove(connect_door)
                 if sector != connect_sector:  # combine if not the same
                     available_sectors.remove(connect_sector)
@@ -666,25 +744,24 @@ def shuffle_dungeon_no_repeats(world, player, available_sectors, entrance_region
                     sector.regions.extend(connect_sector.regions)
                 if not door.blocked:
                     connect_region = world.get_entrance(door.dest.name, player).parent_region
-                    potential_new_doors, visited_regions = extend_reachable([connect_region], visited_regions, world, player)
-                    reachable_doors.extend(potential_new_doors)
+                    state = extend_reachable_state([connect_region], state, world, player)
                 break  # skips else block below
-            logger.info(' Not Linking %s to %s', door.name, connect_door.name)
+            logger.debug(' Not Linking %s to %s', door.name, connect_door.name)
             if len(compatibles) == 0:  # time to try again
-                sector.outstanding_doors.insert(0, door)
-                if len(reachable_doors) <= 1:
+                if len(state.unattached_doors) <= 1:
                     raise Exception('Rejected last option due to dead end... infinite loop ensues')
         else:
             # If there's no available region with a door, use an internal connection
             compatibles = find_all_compatible_door_in_list(door, reachable_doors)
             while len(compatibles) > 0:
                 connect_door = compatibles.pop()
-                logger.info('  Adding loop via %s', connect_door.name)
+                logger.debug('  Adding loop via %s', connect_door.name)
+                connect_sector = find_sector_for_door(connect_door, available_sectors)
                 # Check if valid
-                if is_loop_valid(door, connect_door, sector, available_sectors):
+                if is_loop_valid(door, connect_door, sector, connect_sector, available_sectors):
                     maybe_connect_two_way(world, door, connect_door, player)
-                    reachable_doors.remove(door)
-                    reachable_doors.remove(connect_door)
+                    state.unattached_doors.remove(explorable_door)
+                    state.unattached_doors[:] = [ed for ed in state.unattached_doors if ed.door != connect_door]
                     connect_sector = find_sector_for_door(connect_door, available_sectors)
                     connect_sector.outstanding_doors.remove(connect_door)
                     if sector != connect_sector:  # combine if not the same
@@ -693,35 +770,20 @@ def shuffle_dungeon_no_repeats(world, player, available_sectors, entrance_region
                         sector.regions.extend(connect_sector.regions)
                     break  # skips else block with exception
                 else:
-                    logger.info(' Not Linking %s to %s', door.name, connect_door.name)
+                    logger.debug(' Not Linking %s to %s', door.name, connect_door.name)
                     sector.outstanding_doors.insert(0, door)
-                    if len(reachable_doors) <= 2:
+                    if len(state.unattached_doors) <= 2:
                         raise Exception('Rejected last option due to likely improper loops...')
             else:
-                raise Exception('Nothing is apparently compatible with %s', door.name)
+                raise Exception('Nothing is apparently compatible with %s' % door.name)
     # Check that we used everything, we failed otherwise
     if len(available_sectors) != 1:
         logger.warning('Failed to add all regions/doors to dungeon, generation will likely fail.')
     return available_sectors[0]
 
 
-def extend_reachable(search_regions, visited_regions, world, player):
-    region_list = list(search_regions)
-    visited_regions = visited_regions
-    reachable_doors = []
-    while len(region_list) > 0:
-        region = region_list.pop()
-        visited_regions.append(region)
-        for ext in region.exits:
-            if ext.connected_region is not None:
-                connect_region = ext.connected_region
-                if connect_region not in visited_regions and connect_region not in region_list:
-                    region_list.append(connect_region)
-            else:
-                door = world.check_for_door(ext.name, player)
-                if door is not None and door.dest is None:  # make sure it isn't a weird blocked door
-                    reachable_doors.append(door)
-    return reachable_doors, visited_regions
+def valid_region_to_explore(region, world):
+    return region.type == RegionType.Dungeon or region.name in world.inaccessible_regions
 
 
 def find_sector_for_door(door, sectors):
@@ -758,15 +820,21 @@ def doors_compatible_ignore_keys(a, b):
 
 
 # todo: path checking needed?
-def is_valid(door_a, door_b, sector_a, sector_b, available_sectors):
+def is_valid(door_a, door_b, sector_a, sector_b, available_sectors, reachable_doors, state, world, player):
     if len(available_sectors) == 1:
         return True
     if len(available_sectors) <= 2 and sector_a != sector_b:
         return True
     elif not are_there_outstanding_doors_of_type(door_a, door_b, sector_a, sector_b, available_sectors):
         return False
+    elif early_loop_dies(door_a, sector_a, sector_b, available_sectors):
+        return False
+    elif logical_dead_end_3(door_a, door_b, state, world, player, available_sectors, reachable_doors):
+        return False
     elif door_a.blocked and door_b.blocked:  # I can't see this going well unless we are in loop generation...
         return False
+    elif pinball_exception(door_a, door_b, sector_a):
+        return True
     elif not door_a.blocked and not door_b.blocked and sector_a != sector_b:
         return sector_a.outflow() + sector_b.outflow() - 1 > 0  # door_a has been removed already, so a.outflow is reduced by one
     elif door_a.blocked or door_b.blocked and sector_a != sector_b:
@@ -778,16 +846,20 @@ def is_valid(door_a, door_b, sector_a, sector_b, available_sectors):
     return False  # not sure how we got here, but it's a bad idea
 
 
-def is_loop_valid(door_a, door_b, sector, available_sectors):
+def is_loop_valid(door_a, door_b, sector_a, sector_b, available_sectors):
     if len(available_sectors) == 1:
         return True
-    if len(available_sectors) == 2 and door_b not in sector.outstanding_doors:
+    if len(available_sectors) == 2 and door_b not in sector_a.outstanding_doors:
         return True
-    elif not door_a.blocked and not door_b.blocked:
-        return sector.outflow() - 1 > 0
-    elif door_a.blocked or door_b.blocked:
-        return sector.outflow() > 0
-    return True  #  I think this is always true. Both blocked but we're connecting loops now, so dead end?
+    elif not door_a.blocked and not door_b.blocked and sector_a != sector_b:
+        return sector_a.outflow() + sector_b.outflow() - 1 > 0  # door_a has been removed already, so a.outflow is reduced by one
+    elif door_a.blocked or door_b.blocked and sector_a != sector_b:
+        return sector_a.outflow() + sector_b.outflow() > 0
+    elif sector_a == sector_b and not door_a.blocked and not door_b.blocked:
+        return sector_a.outflow() - 1 > 0
+    elif sector_a == sector_b and door_a.blocked or door_b.blocked:
+        return sector_a.outflow() > 0
+    return True  # I think this is always true. Both blocked but we're connecting loops now, so dead end?
 
 
 def are_there_outstanding_doors_of_type(door_a, door_b, sector_a, sector_b, available_sectors):
@@ -814,6 +886,293 @@ def are_there_outstanding_doors_of_type(door_a, door_b, sector_a, sector_b, avai
                     break
         return hooks_left
     return True
+
+
+def early_loop_dies(door_a, sector_a, sector_b, available_sectors):
+    other_sectors = list(available_sectors)
+    other_sectors.remove(sector_a)
+    if sector_a != sector_b:
+        other_sectors.remove(sector_b)
+        current_pol = sector_a.polarity() + sector_b.polarity()
+        current_mag = sum_vector([sector_a, sector_b], lambda x: x.magnitude())
+    else:
+        current_pol = sector_a.polarity()
+        current_mag = sector_a.magnitude()
+    idx, inc = pol_idx[door_a.direction]
+    current_pol.vector[idx] = pol_inc[inc](current_pol[idx])
+    current_mag[idx] -= 1
+    other_mag = sum_vector(other_sectors, lambda x: x.magnitude())
+    # other_polarity = reduce(lambda x, y: x+y, map(lambda x: x.polarity(), other_sectors))
+    ttl_magnitude = 0
+    for i in range(len(current_mag)):
+        ttl_magnitude += 0 if current_pol[i] == 0 and other_mag[i] == 0 else current_mag[i]
+    if ttl_magnitude == 0:
+            return True
+    return False
+
+
+def logical_dead_end(door_a, door_b, state, world, player, available_sectors, reachable_doors):
+    region = world.get_entrance(door_b.name, player).parent_region
+    new_state = extend_reachable_state([region], state, world, player)
+    new_state.unattached_doors[:] = [x for x in new_state.unattached_doors if x.door not in [door_a, door_b]]
+    if len(new_state.unattached_doors) == 0:
+        return True
+    d_type = door_a.type
+    directions = paired_directions[door_a.direction]
+    hook_directions = similar_directions[door_a.direction]
+    number_of_hooks = 0
+    opposing_hooks = 0
+    for door in new_state.unattached_doors:
+        if door.door.type == d_type and door.door.direction in hook_directions:
+            number_of_hooks += 1
+        if door.door.type == d_type and door.door.direction in directions:
+            opposing_hooks += 1
+    hooks_needed = 0
+    visited_regions = set()
+    outstanding_doors_of_type = 0
+    outstanding_hooks = 0
+    only_dead_ends = True
+    for sector in available_sectors:
+        for door in sector.outstanding_doors:
+            if door_of_interest(door, door_b, d_type, directions, hook_directions, new_state):
+                needed = True
+                if door.direction in directions:
+                    outstanding_doors_of_type += 1
+                region = world.get_entrance(door.name, player).parent_region
+                local_state = extend_state_backward([region], ExplorationState(), world, player)
+                if len(local_state.non_door_entrances) > 0 and not door.blocked:
+                    needed = False
+                else:
+                    for exp_d in local_state.unattached_doors:
+                        if different_direction(exp_d.door, d_type, directions, hook_directions, reachable_doors):
+                            needed = False
+                            break
+                region_set = set(local_state.visited_orange+local_state.visited_blue)
+                if needed and len(visited_regions.intersection(region_set)) == 0 and door.direction in directions:
+                    hooks_needed += 1
+                    visited_regions.update(region_set)
+                elif door.direction in hook_directions and not door.blocked:
+                    if opposing_hooks > 0 and more_than_one_hook(local_state, hook_directions):
+                        needed = False
+                    if not needed:
+                        outstanding_hooks += 1
+                        visited_regions.update(region_set)
+                if not needed:
+                    only_dead_ends = False
+    if outstanding_doors_of_type > 0 and ((number_of_hooks == 0 and only_dead_ends) or hooks_needed > number_of_hooks + outstanding_hooks):
+        return True
+    return False
+
+
+def logical_dead_end_3(door_a, door_b, state, world, player, available_sectors, reachable_doors):
+    region = world.get_entrance(door_b.name, player).parent_region
+    new_state = extend_reachable_state([region], state, world, player)
+    new_state.unattached_doors[:] = [x for x in new_state.unattached_doors if x.door not in [door_a, door_b]]
+    if len(new_state.unattached_doors) == 0:
+        return True
+    current_hooks = defaultdict(lambda: 0)
+    hooks_needed = defaultdict(set)
+    outstanding_hooks = defaultdict(lambda: 0)
+    outstanding_total = defaultdict(lambda: 0)
+    potential_hooks = []
+    only_dead_ends_vector = [True, True, True]
+    avail_dirs = set()
+    for exp_d in new_state.unattached_doors:
+        hook_key = hook_id(exp_d.door)
+        current_hooks[hook_key] += 1
+        avail_dirs.update(allied_directions[exp_d.door.direction])
+    for sector in available_sectors:
+        for door in sector.outstanding_doors:
+            if door != door_b and not state.in_door_list_ic(door, new_state.unattached_doors):
+                opp_hook_key = opp_hook_id(door)
+                outstanding_total[opp_hook_key] += 1
+                if door.blocked:
+                    hooks_needed[opp_hook_key].add(door)
+                else:
+                    dead_end, cross_interaction = True, False
+                    region = world.get_entrance(door.name, player).parent_region
+                    local_state = extend_state_backward([region], ExplorationState(), world, player)
+                    if len(local_state.non_door_entrances) > 0:
+                        dead_end = False  # not a dead end
+                        cross_interaction = True
+                    elif len(local_state.unattached_doors) > 1:
+                        dead_end = False
+                    for exp_d in local_state.unattached_doors:
+                        if cross_door_interaction(exp_d.door, door, reachable_doors, avail_dirs):
+                            cross_interaction = True
+                            break
+                    if dead_end:
+                        hooks_needed[opp_hook_key].add(door)
+                    else:
+                        door_set = set([x.door for x in local_state.unattached_doors if x.door != door])
+                        potential_hooks.append((door, door_set))
+                    if cross_interaction:
+                        only_dead_ends_vector[pol_idx[door.direction][0]] = False
+    logically_valid = False
+    satisfying_hooks = []
+    while not logically_valid:
+        check_good = True
+        for key in [Direction.North, Direction.South, Direction.East, Direction.West, DoorType.SpiralStairs]:
+            dir = key if isinstance(key, Direction) else Direction.Up
+            vector_idx = pol_idx[dir][0]
+            ttl_hooks = current_hooks[key] + current_hooks[switch_dir(dir) if isinstance(key, Direction) else DoorType.SpiralStairs]
+            if outstanding_total[key] > 0 and ttl_hooks == 0 and only_dead_ends_vector[vector_idx]:
+                return True  # no way to get to part of the dungeon
+            hooks_wanted = hooks_needed[key]
+            if outstanding_total[key] > 0 and len(hooks_wanted) > current_hooks[key] + outstanding_hooks[key]:
+                check_good = False
+                fixer = find_fixer(potential_hooks, key, hooks_wanted, [])
+                if fixer is None:
+                    return True  # couldn't find a fix
+                else:
+                    apply_fix(fixer, potential_hooks, outstanding_hooks, hooks_needed, satisfying_hooks, key)
+        if check_good and len(satisfying_hooks) > 0:
+            check_good = False
+            votes = defaultdict(lambda: 0)  # I really don't like this as other votes could lead to a valid configuration
+            door_dict = {}
+            for hook_set in satisfying_hooks:
+                if len(hook_set) == 0:
+                    return True  # unsatisfiable condition
+                for hookable in hook_set:
+                    votes[hookable.name] += 1
+                    door_dict[hookable.name] = hookable
+            winner = None
+            for door_name in votes.keys():
+                if winner is None or votes[door_name] > votes[winner]:
+                    winner = door_name
+            winning_hook = door_dict[winner]
+            key = opp_hook_id(winning_hook)
+            hooks_needed[key].add(winning_hook)
+            satisfying_hooks[:] = [x for x in satisfying_hooks if winning_hook not in x]
+        logically_valid = check_good
+    return False  # no logical dead ends!
+
+    #             potential_fixers = []
+    #             skip = False
+    #             for hookable in hook_set:
+    #                 key = opp_hook_id(hookable)
+    #                 if len(hooks_needed[key]) < current_hooks[key] + outstanding_hooks[key]:
+    #                     hooks_needed[key].add(hookable)
+    #                     hooks_to_remove.append(hook_set)
+    #                     hooks_to_remove.extend([x for x in satisfying_hooks if hookable in x])
+    #                     skip = True
+    #                     break
+    #                 fixer = find_fixer(potential_hooks, key, hooks_needed[key], hook_set)
+    #                 if fixer is not None:
+    #                     potential_fixers.append(fixer)
+    #             if skip:
+    #                 break
+    #             if len(potential_fixers) == 0:
+    #                 return True  # can't find fixers for this set
+    #             elif len(potential_fixers) >= 1:
+    #                 check_good = False
+    #                 fixer = potential_fixers[0]  # just pick the first for now
+    #                 apply_fix(fixer, potential_hooks, outstanding_hooks, hooks_needed, satisfying_hooks, hook_id(fixer[0]))
+    #                 hooks_to_remove.append(hook_set)
+    #         # what's left - multiple set with multiple available fixes
+    #         if len(hooks_to_remove) == 0:
+    #             return True  # can't seem to make progress yet
+    #         satisfying_hooks[:] = [x for x in satisfying_hooks if x not in hooks_to_remove]
+    #     logically_valid = check_good
+    # return False  # no logical dead ends!
+
+
+def hook_id(door):
+    if door.type == DoorType.Normal:
+        return door.direction
+    if door.type == DoorType.SpiralStairs:
+        return door.type
+    return 'Some new door type'
+
+
+def opp_hook_id(door):
+    if door.type == DoorType.Normal:
+        return switch_dir(door.direction)
+    if door.type == DoorType.SpiralStairs:
+        return door.type
+    return 'Some new door type'
+
+
+def find_fixer(potential_hooks, key, hooks_wanted, invalid_options):
+    fixer = None
+    for door, door_set in potential_hooks:
+        if match_hook_key(door, key) and (len(hooks_wanted) > 1 or len(hooks_wanted.union(door_set)) > 1) and door not in invalid_options:
+            if fixer is None or len(door_set) > len(fixer[1]):  # choose the one with most options
+                fixer = (door, door_set)
+    return fixer
+
+
+def apply_fix(fixer, potential_hooks, outstanding_hooks, hooks_needed, satisfying_hooks, key):
+    outstanding_hooks[key] += 1
+    potential_hooks.remove(fixer)
+    winnow_potential_hooks(potential_hooks, fixer[0])  #
+    winnow_satisfying_hooks(satisfying_hooks, fixer[0])
+    if len(fixer[1]) == 1:
+        new_need = fixer[1].pop()
+        hooks_needed[opp_hook_id(new_need)].add(new_need)
+        # removes any hooks that are now fulfilled
+        satisfying_hooks[:] = [x for x in satisfying_hooks if new_need not in x]
+    else:
+        satisfying_hooks.append(fixer[1])
+
+
+def match_hook_key(door, key):
+    if isinstance(key, DoorType):
+        return door.type == key
+    if isinstance(key, Direction):
+        return door.direction == key
+    return False
+
+
+def winnow_potential_hooks(hooks, door_removal):
+    for door, door_set in hooks:
+        if door_removal in door_set:
+            door_set.remove(door_removal)
+    hooks[:] = [x for x in hooks if len(x[1]) > 0]
+
+
+def winnow_satisfying_hooks(satisfying, door_removal):
+    for hook_set in satisfying:
+        if door_removal in hook_set:
+            hook_set.remove(door_removal)
+
+
+def door_of_interest(door, door_b, d_type, directions, hook_directions, state):
+    if door == door_b or door.type != d_type:
+        return False
+    if door.direction not in directions and door.direction not in hook_directions:
+        return False
+    return not state.in_door_list_ic(door, state.unattached_doors)
+
+
+def different_direction(door, d_type, directions, hook_directions, reachable_doors):
+    if door in reachable_doors:
+        return False
+    return door.type != d_type or (door.direction not in directions and door.direction not in hook_directions)
+
+
+def cross_door_interaction(door, original_door, reachable_doors, avail_dir):
+    if door in reachable_doors or door == original_door:
+        return False
+    if door.type == original_door.type and door.direction in allied_directions[original_door.direction]:  # revisit if cross-type linking ever happens
+        return False
+    return door.direction in avail_dir
+
+
+def more_than_one_hook(state, hook_directions):
+    cnt = 0
+    for exp_d in state.unattached_doors:
+        if exp_d.door.direction in hook_directions:
+            cnt += 1
+    return cnt > 1
+
+
+def pinball_exception(door_a, door_b, sector_a):
+    if door_a.name == 'Skull Pot Prison SE' and door_b.name == 'Skull Pinball NE':
+        for r in sector_a.regions:
+            if r.name == 'Skull 2 East Lobby':
+                return True
+    return False
 
 
 def shuffle_key_doors(dungeon_sector, entrances, world, player):
@@ -857,21 +1216,35 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
     paired_candidates = build_pair_list(flat_candidates)
     if len(paired_candidates) < num_key_doors:
         num_key_doors = len(paired_candidates)  # reduce number of key doors
-        logging.getLogger('').debug('Lowering key door count because not enough candidates: %s', dungeon_sector.name)
+        logging.getLogger('').info('Lowering key door count because not enough candidates: %s', dungeon_sector.name)
     random.shuffle(paired_candidates)
     combinations = ncr(len(paired_candidates), num_key_doors)
     itr = 0
     proposal = kth_combination(itr, paired_candidates, num_key_doors)
-    while not validate_key_layout(dungeon_sector, start_regions, proposal, world, player):
+    key_logic = KeyLogic(dungeon_sector.name)
+    while not validate_key_layout(dungeon_sector, start_regions, proposal, key_logic, world, player):
         itr += 1
         if itr >= combinations:
-            logging.getLogger('').debug('Lowering key door count because no valid layouts: %s', dungeon_sector.name)
+            logging.getLogger('').info('Lowering key door count because no valid layouts: %s', dungeon_sector.name)
             num_key_doors -= 1
             combinations = ncr(len(paired_candidates), num_key_doors)
             itr = 0
         proposal = kth_combination(itr, paired_candidates, num_key_doors)
+        key_logic = KeyLogic(dungeon_sector.name)
     # make changes
+    if player not in world.key_logic.keys():
+        world.key_logic[player] = {}
+    world.key_logic[player][dungeon_sector.name] = key_logic
     reassign_key_doors(current_doors, proposal, world, player)
+    
+
+class KeyLogic(object):
+    
+    def __init__(self, dungeon_name):
+        self.door_rules = {}
+        self.bk_restricted = []
+        self.small_key_name = dungeon_keys[dungeon_name]
+        self.bk_name = dungeon_bigs[dungeon_name]
 
 
 def build_pair_list(flat_list):
@@ -956,127 +1329,108 @@ def ncr(n, r):
     return numerator / denominator
 
 
-class KeyDoorState(object):
-
-    def __init__(self):
-        self.avail_doors = []
-        self.small_doors = []
-        self.big_doors = []
-        self.opened_doors = []
-        self.big_key_opened = False
-        self.big_key_special = False
-
-        self.visited_regions = set()
-        self.ttl_locations = 0
-        self.used_locations = 0
-        self.key_locations = 0
-        self.used_smalls = 0
-
-    def copy(self):
-        ret = KeyDoorState()
-        ret.avail_doors = list(self.avail_doors)
-        ret.small_doors = list(self.small_doors)
-        ret.big_doors = list(self.big_doors)
-        ret.opened_doors = list(self.opened_doors)
-        ret.big_key_opened = self.big_key_opened
-        ret.big_key_special = self.big_key_special
-        ret.visited_regions = set(self.visited_regions)
-        ret.ttl_locations = self.ttl_locations
-        ret.key_locations = self.key_locations
-        ret.used_locations = self.used_locations
-        ret.used_smalls = self.used_smalls
-
-        return ret
-
-
-def validate_key_layout(sector, start_regions, key_door_proposal, world, player):
+def validate_key_layout(sector, start_regions, key_door_proposal, key_logic, world, player):
     flat_proposal = flatten_pair_list(key_door_proposal)
-    state = KeyDoorState()
+    state = ExplorationState()
     state.key_locations = len(world.get_dungeon(sector.name, player).small_keys)
     state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in sector.regions
     # Everything in a start region is in key region 0.
     for region in start_regions:
-        state.visited_regions.add(region)
-        state.ttl_locations += len(region.locations)
-        for location in region.locations:
-            if location.name in key_only_locations:
-                state.key_locations += 1
-        add_doors_to_lists(region, flat_proposal, state, world, player)
-    return validate_key_layout_r(state, flat_proposal, world, player)
+        state.visit_region(region, key_checks=True)
+        state.add_all_doors_check_keys(region, flat_proposal, world, player)
+    checked_states = set()
+    return validate_key_layout_r(state, flat_proposal, checked_states, key_logic, world, player)
 
 
-def validate_key_layout_r(state, flat_proposal, world, player):
+def validate_key_layout_r(state, flat_proposal, checked_states, key_logic, world, player):
+
     # improvements: remove recursion to make this iterative
     # store a cache of various states of opened door to increase speed of checks - many are repetitive
     while len(state.avail_doors) > 0:
-        door = state.avail_doors.pop()
+        exp_door = state.next_avail_door()
+        door = exp_door.door
         connect_region = world.get_entrance(door.name, player).connected_region
-        if not door.blocked and connect_region not in state.visited_regions:
-            state.visited_regions.add(connect_region)
-            state.ttl_locations += len([x for x in connect_region.locations if '- Prize' not in x.name])
-            for location in connect_region.locations:
-                if location.name in key_only_locations:
-                    state.key_locations += 1
-            if connect_region.name == 'Hyrule Dungeon Cellblock':
-                state.big_key_opened = True
-                state.avail_doors.extend(state.big_doors)
-                state.big_doors.clear()
-            add_doors_to_lists(connect_region, flat_proposal, state, world, player)
-        if len(state.avail_doors) == 0:
-            num_smalls = 0
-            for small in state.small_doors:
-                if small.dest in state.small_doors:
-                    num_smalls += 0.5  # half now, half with the dest
-                else:
-                    num_smalls += 1
-            num_bigs = 1 if len(state.big_doors) > 0 else 0  # all or nothing
-            if num_smalls == 0 and num_bigs == 0:
-                return True   # I think that's the end
-            available_small_locations = min(state.ttl_locations - state.used_locations, state.key_locations - state.used_smalls)
-            available_big_locations = state.ttl_locations - state.used_locations if not state.big_key_special else 0
-            valid = True
-            if (num_smalls == 0 or available_small_locations == 0) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
-                return False
-            else:
-                if num_smalls > 0 and available_small_locations > 0:
-                    for d in state.small_doors:
-                        state_copy = state.copy()
-                        state_copy.opened_doors.append(d)
-                        state_copy.avail_doors.append(d)
-                        state_copy.small_doors.remove(d)
-                        if d.dest in flat_proposal:
-                            state_copy.opened_doors.append(d.dest)
-                            if d.dest in state_copy.small_doors:
-                                state_copy.small_doors.remove(d.dest)
-                                state_copy.avail_doors.append(d.dest)
-                        state_copy.used_locations += 1
-                        state_copy.used_smalls += 1
-                        valid = validate_key_layout_r(state_copy, flat_proposal, world, player)
-                        if not valid:
-                            return valid
-                if not state.big_key_opened and available_big_locations >= num_bigs > 0:
-                    state_copy = state.copy()
-                    state_copy.big_key_opened = True
-                    state_copy.used_locations += 1
-                    state_copy.avail_doors.extend(state.big_doors)
-                    state_copy.big_doors.clear()
-                    valid = validate_key_layout_r(state_copy, flat_proposal, world, player)
-            return valid
-    return len(state.small_doors) == 0 and len(state.big_doors) == 0
+        if state.validate(door, connect_region, world):
+            state.visit_region(connect_region, key_checks=True)
+            state.add_all_doors_check_keys(connect_region, flat_proposal, world, player)
+    smalls_avail = len(state.small_doors) > 0
+    num_bigs = 1 if len(state.big_doors) > 0 else 0  # all or nothing
+    if not smalls_avail and num_bigs == 0:
+        return True   # I think that's the end
+    available_small_locations = min(state.ttl_locations - state.used_locations, state.key_locations - state.used_smalls)
+    available_big_locations = state.ttl_locations - state.used_locations if not state.big_key_special else 0
+    valid = True
+    if (not smalls_avail or available_small_locations == 0) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
+        return False
+    else:
+        if not state.big_key_opened and available_big_locations >= num_bigs > 0:  # bk first for better key rules
+            state_copy = state.copy()
+            state_copy.big_key_opened = True
+            state_copy.used_locations += 1
+            state_copy.avail_doors.extend(state.big_doors)
+            state_copy.big_doors.clear()
+            code = state_id(state_copy, flat_proposal)
+            if code not in checked_states:
+                valid = validate_key_layout_r(state_copy, flat_proposal, checked_states, key_logic, world, player)
+                if valid:
+                    checked_states.add(code)
+        elif smalls_avail and available_small_locations > 0:
+            key_rule_num = min(state.key_locations, count_unique_doors(state.small_doors) + state.used_smalls)
+            if key_rule_num == len(state.found_locations):
+                key_logic.bk_restricted.extend([x for x in state.found_locations if x not in key_logic.bk_restricted])
+            for exp_door in state.small_doors:
+                state_copy = state.copy()
+                state_copy.opened_doors.append(exp_door.door)
+                state_copy.avail_doors.append(exp_door)
+                state_copy.small_doors.remove(exp_door)
+                dest_door = exp_door.door.dest
+                if dest_door in flat_proposal:
+                    state_copy.opened_doors.append(dest_door)
+                    if state_copy.in_door_list_ic(dest_door, state_copy.small_doors):
+                        now_available = [x for x in state_copy.small_doors if x.door == dest_door]
+                        state_copy.small_doors[:] = [x for x in state_copy.small_doors if x.door != dest_door]
+                        state_copy.avail_doors.extend(now_available)
+                        set_key_rules(key_logic, dest_door, key_rule_num)
+                set_key_rules(key_logic, exp_door.door, key_rule_num)
+                state_copy.used_locations += 1
+                state_copy.used_smalls += 1
+                code = state_id(state_copy, flat_proposal)
+                if code not in checked_states:
+                    valid = validate_key_layout_r(state_copy, flat_proposal, checked_states, key_logic, world, player)
+                    if valid:
+                        checked_states.add(code)
+                if not valid:
+                    return valid
+    return valid
 
 
-def add_doors_to_lists(region, key_door_proposal, kd_state, world, player):
-    for door in get_doors(world, region, player):
-        if not door.blocked:
-            if door in key_door_proposal and door not in kd_state.small_doors and door not in kd_state.opened_doors:
-                kd_state.small_doors.append(door)
-            elif door.bigKey and not kd_state.big_key_opened and door not in kd_state.big_doors:
-                kd_state.big_doors.append(door)
-            elif door not in kd_state.avail_doors:
-                kd_state.avail_doors.append(door)
+def count_unique_doors(doors_to_count):
+    cnt = 0
+    counted = set()
+    for d in doors_to_count:
+        if d.door not in counted:
+            cnt += 1
+            counted.add(d.door)
+            counted.add(d.door.dest)
+    return cnt
+
+
+def set_key_rules(key_logic, door, number):
+    if door.name not in key_logic.door_rules.keys():
+        key_logic.door_rules[door.name] = number
+    else:
+        key_logic.door_rules[door.name] = min(number, key_logic.door_rules[door.name])
+
+
+def state_id(state, flat_proposal):
+    s_id = '1' if state.big_key_opened else '0'
+    for d in flat_proposal:
+        s_id += '1' if d in state.opened_doors else '0'
+    return s_id
 
 
 def reassign_key_doors(current_doors, proposal, world, player):
+    logger = logging.getLogger('')
     flat_proposal = flatten_pair_list(proposal)
     queue = collections.deque(current_doors)
     while len(queue) > 0:
@@ -1101,6 +1455,7 @@ def reassign_key_doors(current_doors, proposal, world, player):
             d2 = obj[1]
             if d1.type is DoorType.Interior:
                 change_door_to_small_key(d1, world, player)
+                d2.smallKey = True  # ensure flag is set
             else:
                 names = [d1.name, d2.name]
                 found = False
@@ -1117,15 +1472,18 @@ def reassign_key_doors(current_doors, proposal, world, player):
                     change_door_to_small_key(d1, world, player)
                     change_door_to_small_key(d2, world, player)
             world.spoiler.set_door_type(d1.name+' <-> '+d2.name, 'Key Door', player)
+            logger.debug('Key Door: %s', d1.name+' <-> '+d2.name)
         else:
             d = obj
             if d.type is DoorType.Interior:
                 change_door_to_small_key(d, world, player)
+                d.dest.smallKey = True  # ensure flag is set
             elif d.type is DoorType.SpiralStairs:
                 pass  # we don't have spiral stairs candidates yet that aren't already key doors
             elif d.type is DoorType.Normal:
                 change_door_to_small_key(d, world, player)
             world.spoiler.set_door_type(d.name, 'Key Door', player)
+            logger.debug('Key Door: %s', d.name)
 
 
 def change_door_to_small_key(d, world, player):
@@ -1133,6 +1491,151 @@ def change_door_to_small_key(d, world, player):
     room = world.get_room(d.roomIndex, player)
     if room.doorList[d.doorListPos][1] != DoorKind.SmallKey:
         room.change(d.doorListPos, DoorKind.SmallKey)
+
+
+def remove_inaccessible_entrances(world, player):
+    if world.shuffle == 'vanilla':
+        for dungeon_name in world.dungeon_layouts[player].keys():
+            sector, entrances = world.dungeon_layouts[player][dungeon_name]
+            if dungeon_name == 'Skull Woods':
+                entrances.remove('Skull 2 West Lobby')
+                entrances.remove('Skull 3 Lobby')
+                entrances.remove('Skull Back Drop')
+            if world.mode == 'standard' and dungeon_name == 'Hyrule Castle':
+                entrances.remove('Hyrule Castle West Lobby')
+                entrances.remove('Hyrule Castle East Lobby')
+                entrances.remove('Sewers Secret Room')
+                entrances.remove('Sanctuary')
+    # todo - not sure about what to do in entrance shuffle - tbh
+    # simple and restricted have interesting effects
+
+
+def determine_required_paths(world):
+    paths = {
+        'Hyrule Castle': [],
+        'Eastern Palace': ['Eastern Boss'],
+        'Desert Palace': ['Desert Boss'],
+        'Tower of Hera': ['Hera Boss'],
+        'Agahnims Tower': ['Tower Agahnim 1'],
+        'Palace of Darkness': ['PoD Boss'],
+        'Swamp Palace': ['Swamp Boss'],
+        'Skull Woods': ['Skull Boss'],
+        'Thieves Town': ['Thieves Boss', ('Thieves Blind\'s Cell', 'Thieves Boss')],
+        }
+    if world.shuffle == 'vanilla':
+        # paths['Skull Woods'].remove('Skull Boss')  # is this necessary?
+        paths['Skull Woods'].insert(0, 'Skull 2 West Lobby')
+        # todo - TR jazz
+        if world.mode == 'standard':
+            paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
+            paths['Hyrule Castle'].append('Sanctuary')
+    if world.doorShuffle in ['basic', 'experimental']:
+        paths['Thieves Town'].append('Thieves Attic Window')
+    return paths
+
+
+def overworld_prep(world, player):
+    if world.mode != 'inverted':
+        if world.mode == 'standard':
+            world.inaccessible_regions.append('Hyrule Castle Ledge')  # maybe only with er off
+        world.inaccessible_regions.append('Skull Woods Forest (West)')
+        world.inaccessible_regions.append('Dark Death Mountain Ledge')
+        world.inaccessible_regions.append('Dark Death Mountain Isolated Ledge')
+        world.inaccessible_regions.append('Desert Palace Lone Stairs')
+        world.inaccessible_regions.append('Bumper Cave Ledge')
+        world.inaccessible_regions.append('Death Mountain Floating Island (Dark World)')
+    else:
+        world.inaccessible_regions.append('Desert Ledge')
+        # world.inaccessible_regions.append('Hyrule Castle Ledge')  # accessible via aga 1?
+        world.inaccessible_regions.append('Desert Palace Lone Stairs')
+        world.inaccessible_regions.append('Death Mountain Return Ledge')
+        world.inaccessible_regions.append('Maze Race Ledge')
+    if world.shuffle == 'vanilla':
+        skull_doors = [
+            Door(player, 'Skull Woods Second Section Exit (West)', DoorType.Logical),
+            Door(player, 'Skull Woods Second Section Door (West)', DoorType.Logical),
+            Door(player, 'Skull Woods Second Section Hole', DoorType.Logical),
+            Door(player, 'Skull Woods Final Section', DoorType.Logical)
+        ]
+        world.doors += skull_doors
+        connect_simple_door(world, skull_doors[0].name, 'Skull Woods Forest (West)', player)
+        connect_simple_door(world, skull_doors[1].name, 'Skull 2 West Lobby', player)
+        connect_simple_door(world, skull_doors[2].name, 'Skull Back Drop', player)
+        connect_simple_door(world, skull_doors[3].name, 'Skull 3 Lobby', player)
+        if world.mode == 'standard':
+            castle_doors = [
+                Door(player, 'Hyrule Castle Exit (West)', DoorType.Logical),
+                Door(player, 'Hyrule Castle Exit (East)', DoorType.Logical),
+                Door(player, 'Hyrule Castle Entrance (East)', DoorType.Logical),
+                Door(player, 'Hyrule Castle Entrance (West)', DoorType.Logical)
+            ]
+            world.doors += castle_doors
+            connect_simple_door(world, castle_doors[0].name, 'Hyrule Castle Ledge', player)
+            connect_simple_door(world, castle_doors[1].name, 'Hyrule Castle Ledge', player)
+            connect_simple_door(world, castle_doors[2].name, 'Hyrule Castle East Lobby', player)
+            connect_simple_door(world, castle_doors[3].name, 'Hyrule Castle West Lobby', player)
+
+
+def check_required_paths(paths, world, player):
+    for dungeon_name in paths.keys():
+        sector, entrances = world.dungeon_layouts[player][dungeon_name]
+        if len(paths[dungeon_name]) > 0:
+            states_to_explore = defaultdict(list)
+            for path in paths[dungeon_name]:
+                if type(path) is tuple:
+                    states_to_explore[tuple([path[0]])].append(path[1])
+                else:
+                    states_to_explore[tuple(entrances)].append(path)
+            for start_regs, dest_regs in states_to_explore.items():
+                check_paths = convert_regions(dest_regs, world, player)
+                start_regions = convert_regions(start_regs, world, player)
+                state = ExplorationState()
+                for region in start_regions:
+                    state.visit_region(region)
+                    state.add_all_doors_check_unattached(region, world, player)
+                explore_state(state, world, player)
+                valid, bad_region = check_if_regions_visited(state, check_paths)
+                if not valid:
+                    if check_for_pinball_fix(state, bad_region, world, player):
+                        explore_state(state, world, player)
+                        valid, bad_region = check_if_regions_visited(state, check_paths)
+                if not valid:
+                    raise Exception('%s cannot reach %s' % (dungeon_name, bad_region.name))
+
+
+def explore_state(state, world, player):
+    while len(state.avail_doors) > 0:
+        door = state.next_avail_door().door
+        connect_region = world.get_entrance(door.name, player).connected_region
+        if state.can_traverse(door) and not state.visited(connect_region) and valid_region_to_explore(connect_region, world):
+            state.visit_region(connect_region)
+            state.add_all_doors_check_unattached(connect_region, world, player)
+
+
+def check_if_regions_visited(state, check_paths):
+    valid = True
+    breaking_region = None
+    for region_target in check_paths:
+        if not state.visited_at_all(region_target):
+            valid = False
+            breaking_region = region_target
+            break
+    return valid, breaking_region
+
+
+def check_for_pinball_fix(state, bad_region, world, player):
+    pinball_region = world.get_region('Skull Pinball', player)
+    if bad_region.name == 'Skull 2 West Lobby' and state.visited_at_all(pinball_region):
+        door = world.get_door('Skull Pinball WS', player)
+        room = world.get_room(door.roomIndex, player)
+        if room.doorList[door.doorListPos][1] == DoorKind.Trap:
+            room.change(door.doorListPos, DoorKind.Normal)
+            door.trapFlag = 0x0
+            door.blocked = False
+            connect_two_way(world, door.name, door.dest.name, player)
+            state.add_all_doors_check_unattached(pinball_region, world, player)
+            return True
+    return False
 
 
 # DATA GOES DOWN HERE
@@ -1147,6 +1650,51 @@ logical_connections = [
     ('PoD Arena Bridge Drop Down', 'PoD Arena Main'),
     ('PoD Map Balcony Drop Down', 'PoD Sexy Statue'),
     ('PoD Basement Ledge Drop Down', 'PoD Stalfos Basement'),
+    ('Swamp Lobby Moat', 'Swamp Entrance'),
+    ('Swamp Entrance Moat', 'Swamp Lobby'),
+    ('Swamp Trench 1 Approach Dry', 'Swamp Trench 1 Nexus'),
+    ('Swamp Trench 1 Approach Key', 'Swamp Trench 1 Key Ledge'),
+    ('Swamp Trench 1 Approach Swim Depart', 'Swamp Trench 1 Departure'),
+    ('Swamp Trench 1 Nexus Approach', 'Swamp Trench 1 Approach'),
+    ('Swamp Trench 1 Nexus Key', 'Swamp Trench 1 Key Ledge'),
+    ('Swamp Trench 1 Key Ledge Dry', 'Swamp Trench 1 Nexus'),
+    ('Swamp Trench 1 Key Approach', 'Swamp Trench 1 Approach'),
+    ('Swamp Trench 1 Key Ledge Depart', 'Swamp Trench 1 Departure'),
+    ('Swamp Trench 1 Departure Dry', 'Swamp Trench 1 Nexus'),
+    ('Swamp Trench 1 Departure Approach', 'Swamp Trench 1 Approach'),
+    ('Swamp Trench 1 Departure Key', 'Swamp Trench 1 Key Ledge'),
+    ('Swamp Hub Hook Path', 'Swamp Hub North Ledge'),
+    ('Swamp Hub North Ledge Drop Down', 'Swamp Hub'),
+    ('Swamp Compass Donut Push Block', 'Swamp Donut Top'),
+    ('Swamp Shortcut Blue Barrier', 'Swamp Trench 2 Pots'),
+    ('Swamp Trench 2 Pots Blue Barrier', 'Swamp Shortcut'),
+    ('Swamp Trench 2 Pots Dry', 'Swamp Trench 2 Blocks'),
+    ('Swamp Trench 2 Pots Wet', 'Swamp Trench 2 Departure'),
+    ('Swamp Trench 2 Blocks Pots', 'Swamp Trench 2 Pots'),
+    ('Swamp Trench 2 Departure Wet', 'Swamp Trench 2 Pots'),
+    ('Swamp West Shallows Push Blocks', 'Swamp West Block Path'),
+    ('Swamp West Block Path Drop Down', 'Swamp West Shallows'),
+    ('Swamp West Ledge Drop Down', 'Swamp West Shallows'),
+    ('Swamp West Ledge Hook Path', 'Swamp Barrier Ledge'),
+    ('Swamp Barrier Ledge Drop Down', 'Swamp West Shallows'),
+    ('Swamp Barrier Ledge - Orange', 'Swamp Barrier'),
+    ('Swamp Barrier - Orange', 'Swamp Barrier Ledge'),
+    ('Swamp Barrier Ledge Hook Path', 'Swamp West Ledge'),
+    ('Swamp Drain Right Switch', 'Swamp Drain Left'),
+    ('Swamp Flooded Spot Ladder', 'Swamp Flooded Room'),
+    ('Swamp Flooded Room Ladder', 'Swamp Flooded Spot'),
+    ('Skull Pot Circle Star Path', 'Skull Map Room'),
+    ('Skull Big Chest Hookpath', 'Skull 1 Lobby'),
+    ('Skull Back Drop Star Path', 'Skull Small Hall'),
+    ('Thieves Hellway Orange Barrier', 'Thieves Hellway S Crystal'),
+    ('Thieves Hellway Crystal Orange Barrier', 'Thieves Hellway'),
+    ('Thieves Hellway Blue Barrier', 'Thieves Hellway N Crystal'),
+    ('Thieves Hellway Crystal Blue Barrier', 'Thieves Hellway'),
+    ('Thieves Basement Block Path', 'Thieves Blocked Entry'),
+    ('Thieves Blocked Entry Path', 'Thieves Basement Block'),
+    ('Thieves Conveyor Bridge Block Path', 'Thieves Conveyor Block'),
+    ('Thieves Conveyor Block Path', 'Thieves Conveyor Bridge'),
+    # ('', ''),
 ]
 
 spiral_staircases = [
@@ -1172,6 +1720,14 @@ spiral_staircases = [
     ('PoD Basement Ledge Up Stairs', 'PoD Big Key Landing Down Stairs'),
     ('PoD Compass Room W Down Stairs', 'PoD Dark Basement W Up Stairs'),
     ('PoD Compass Room E Down Stairs', 'PoD Dark Basement E Up Stairs'),
+    ('Swamp Entrance Down Stairs', 'Swamp Pot Row Up Stairs'),
+    ('Swamp West Block Path Up Stairs', 'Swamp Attic Down Stairs'),
+    ('Swamp Push Statue Down Stairs', 'Swamp Flooded Room Up Stairs'),
+    ('Swamp Left Elbow Down Stairs', 'Swamp Drain Left Up Stairs'),
+    ('Swamp Right Elbow Down Stairs', 'Swamp Drain Right Up Stairs'),
+    ('Swamp Behind Waterfall Up Stairs', 'Swamp C Down Stairs'),
+    ('Thieves Spike Switch Up Stairs', 'Thieves Attic Down Stairs'),
+    ('Thieves Conveyor Maze Down Stairs', 'Thieves Basement Block Up Stairs'),
     # ('', ''),
 ]
 
@@ -1194,7 +1750,15 @@ open_edges = [
     ('Desert East Wing N Edge', 'Desert Arrow Pot Corner S Edge'),
     ('Desert Arrow Pot Corner W Edge', 'Desert North Hall E Edge'),
     ('Desert North Hall W Edge', 'Desert Sandworm Corner S Edge'),
-    ('Desert Sandworm Corner E Edge', 'Desert West Wing N Edge')
+    ('Desert Sandworm Corner E Edge', 'Desert West Wing N Edge'),
+    ('Thieves Lobby N Edge', 'Thieves Ambush S Edge'),
+    ('Thieves Lobby NE Edge', 'Thieves Ambush SE Edge'),
+    ('Thieves Ambush ES Edge', 'Thieves BK Corner WS Edge'),
+    ('Thieves Ambush EN Edge', 'Thieves BK Corner WN Edge'),
+    ('Thieves BK Corner S Edge', 'Thieves Compass Room N Edge'),
+    ('Thieves BK Corner SW Edge', 'Thieves Compass Room NW Edge'),
+    ('Thieves Compass Room WS Edge', 'Thieves Big Chest Nook WS Edge'),
+    ('Thieves Cricket Hall Left Edge', 'Thieves Cricket Hall Right Edge')
 ]
 
 falldown_pits = [
@@ -1212,6 +1776,9 @@ falldown_pits = [
     ('PoD Pit Room Freefall', 'PoD Stalfos Basement'),
     ('PoD Pit Room Bomb Hole', 'PoD Basement Ledge'),
     ('PoD Big Key Landing Hole', 'PoD Stalfos Basement'),
+    ('Swamp Attic Right Pit', 'Swamp Barrier Ledge'),
+    ('Swamp Attic Left Pit', 'Swamp West Ledge'),
+    ('Skull Final Drop Hole', 'Skull Boss'),
     # ('', ''),
 ]
 
@@ -1270,6 +1837,47 @@ interior_doors = [
     ('PoD Dark Pegs WN', 'PoD Lonely Turtle EN'),
     ('PoD Lonely Turtle SW', 'PoD Turtle Party NW'),
     ('PoD Turtle Party ES', 'PoD Callback WS'),
+    ('Swamp Trench 1 Nexus N', 'Swamp Trench 1 Alcove S'),
+    ('Swamp Trench 1 Key Ledge NW', 'Swamp Hammer Switch SW'),
+    ('Swamp Donut Top SE', 'Swamp Donut Bottom NE'),
+    ('Swamp Donut Bottom NW', 'Swamp Compass Donut SW'),
+    ('Swamp Crystal Switch SE', 'Swamp Shortcut NE'),
+    ('Swamp Trench 2 Blocks N', 'Swamp Trench 2 Alcove S'),
+    ('Swamp Push Statue NW', 'Swamp Shooters SW'),
+    ('Swamp Push Statue NE', 'Swamp Right Elbow SE'),
+    ('Swamp Shooters EN', 'Swamp Left Elbow WN'),
+    ('Swamp Drain WN', 'Swamp Basement Shallows EN'),
+    ('Swamp Flooded Room WS', 'Swamp Basement Shallows ES'),
+    ('Swamp Waterfall Room NW', 'Swamp Refill SW'),
+    ('Swamp Waterfall Room NE', 'Swamp Behind Waterfall SE'),
+    ('Swamp C SE', 'Swamp Waterway NE'),
+    ('Swamp Waterway N', 'Swamp I S'),
+    ('Swamp Waterway NW', 'Swamp T SW'),
+    ('Skull 1 Lobby ES', 'Skull Map Room WS'),
+    ('Skull Pot Circle WN', 'Skull Pull Switch EN'),
+    ('Skull Pull Switch S', 'Skull Big Chest N'),
+    ('Skull Left Drop ES', 'Skull Compass Room WS'),
+    ('Skull 2 East Lobby NW', 'Skull Big Key SW'),
+    ('Skull Big Key WN', 'Skull Lone Pot EN'),
+    ('Skull Small Hall WS', 'Skull 2 West Lobby ES'),
+    ('Skull 2 West Lobby NW', 'Skull X Room SW'),
+    ('Skull 3 Lobby WN', 'Skull East Bridge EN'),
+    ('Skull East Bridge ES', 'Skull West Bridge Nook WS'),
+    ('Skull Star Pits WS', 'Skull Torch Room ES'),
+    ('Skull Torch Room EN', 'Skull Vines WN'),
+    ('Skull Spike Corner WS', 'Skull Final Drop ES'),
+    ('Thieves Hallway WS', 'Thieves Pot Alcove Mid ES'),
+    ('Thieves Conveyor Maze SW', 'Thieves Pot Alcove Top NW'),
+    ('Thieves Conveyor Maze EN', 'Thieves Hallway WN'),
+    ('Thieves Spike Track NE', 'Thieves Triple Bypass SE'),
+    ('Thieves Spike Track WS', 'Thieves Hellway Crystal ES'),
+    ('Thieves Hellway Crystal EN', 'Thieves Triple Bypass WN'),
+    ('Thieves Attic ES', 'Thieves Cricket Hall Left WS'),
+    ('Thieves Cricket Hall Right ES', 'Thieves Attic Window WS'),
+    ('Thieves Blocked Entry SW', 'Thieves Lonely Zazak NW'),
+    ('Thieves Lonely Zazak ES', 'Thieves Blind\'s Cell WS'),
+    ('Thieves Conveyor Bridge WS', 'Thieves Big Chest Room ES'),
+    ('Thieves Conveyor Block WN', 'Thieves Trap EN'),
     # ('', ''),
 ]
 
@@ -1330,8 +1938,37 @@ default_door_connections = [
     ('PoD Falling Bridge WN', 'PoD Dark Maze EN'),
     ('PoD Dark Maze E', 'PoD Big Chest Balcony W'),
     ('PoD Sexy Statue NW', 'PoD Mimics 2 SW'),
+    ('Swamp Pot Row WN', 'Swamp Map Ledge EN'),
+    ('Swamp Pot Row WS', 'Swamp Trench 1 Approach ES'),
+    ('Swamp Trench 1 Departure WS', 'Swamp Hub ES'),
+    ('Swamp Hammer Switch WN', 'Swamp Hub Dead Ledge EN'),
+    ('Swamp Hub S', 'Swamp Donut Top N'),
+    ('Swamp Hub WS', 'Swamp Trench 2 Pots ES'),
+    ('Swamp Hub WN', 'Swamp Crystal Switch EN'),
+    ('Swamp Hub North Ledge N', 'Swamp Push Statue S'),
+    ('Swamp Trench 2 Departure WS', 'Swamp West Shallows ES'),
+    ('Swamp Big Key Ledge WN', 'Swamp Barrier EN'),
+    ('Swamp Basement Shallows NW', 'Swamp Waterfall Room SW'),
+    ('Skull 1 Lobby WS', 'Skull Pot Prison ES'),
+    ('Skull Map Room SE', 'Skull Pinball NE'),
+    ('Skull Pinball WS', 'Skull Compass Room ES'),
+    ('Skull Compass Room NE', 'Skull Pot Prison SE'),
+    ('Skull 2 East Lobby WS', 'Skull Small Hall ES'),
+    ('Skull 3 Lobby NW', 'Skull Star Pits SW'),
+    ('Skull Vines NW', 'Skull Spike Corner SW'),
+    ('Thieves Lobby E', 'Thieves Compass Room W'),
+    ('Thieves Ambush E', 'Thieves BK Corner W'),
+    ('Thieves BK Corner NW', 'Thieves Pot Alcove Bottom SW'),
+    ('Thieves BK Corner NE', 'Thieves Hallway SE'),
+    ('Thieves Pot Alcove Mid WS', 'Thieves Spike Track ES'),
+    ('Thieves Hellway NW', 'Thieves Spike Switch SW'),
+    ('Thieves Triple Bypass EN', 'Thieves Conveyor Maze WN'),
+    ('Thieves Basement Block WN', 'Thieves Conveyor Bridge EN'),
+    ('Thieves Lonely Zazak WS', 'Thieves Conveyor Bridge ES'),
+    # ('', ''),
+    # ('', ''),
+    # ('', ''),
 ]
-
 
 # ('', ''),
 default_one_way_connections = [
@@ -1341,6 +1978,9 @@ default_one_way_connections = [
     ('Tower Altar NW', 'Tower Agahnim 1 SW'),
     ('PoD Harmless Hellway SE', 'PoD Arena Main NE'),
     ('PoD Dark Alley NE', 'PoD Boss SE'),
+    ('Swamp T NW', 'Swamp Boss SW'),
+    ('Thieves Hallway NE', 'Thieves Boss SE'),
+    # ('', ''),
 ]
 
 # todo: these path rules are more complicated I think...
@@ -1374,7 +2014,8 @@ default_dungeon_sets = [
     ['Desert Back Lobby', 'Desert Boss', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby'],
     ['Hera Lobby', 'Hera Boss'],
     ['Tower Lobby', 'Tower Agahnim 1'],
-    ['PoD Lobby', 'PoD Boss']
+    ['PoD Lobby', 'PoD Boss'],
+    ['Swamp Lobby', 'Swamp Boss']
 ]
 
 dungeon_x_idx_to_name = {
@@ -1384,5 +2025,6 @@ dungeon_x_idx_to_name = {
     3: 'Tower of Hera',
     4: 'Agahnims Tower',
     5: 'Palace of Darkness',
+    6: 'Swamp Palace',
 #     etc
 }

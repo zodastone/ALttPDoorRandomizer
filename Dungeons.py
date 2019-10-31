@@ -20,11 +20,9 @@ def create_dungeons(world, player):
     DP = make_dungeon('Desert Palace', 'Lanmolas', desert_regions, ItemFactory('Big Key (Desert Palace)', player), [ItemFactory('Small Key (Desert Palace)', player)], ItemFactory(['Map (Desert Palace)', 'Compass (Desert Palace)'], player))
     ToH = make_dungeon('Tower of Hera', 'Moldorm', hera_regions, ItemFactory('Big Key (Tower of Hera)', player), [ItemFactory('Small Key (Tower of Hera)', player)], ItemFactory(['Map (Tower of Hera)', 'Compass (Tower of Hera)'], player))
     PoD = make_dungeon('Palace of Darkness', 'Helmasaur King', pod_regions, ItemFactory('Big Key (Palace of Darkness)', player), ItemFactory(['Small Key (Palace of Darkness)'] * 6, player), ItemFactory(['Map (Palace of Darkness)', 'Compass (Palace of Darkness)'], player))
-
-    #still standard dungeons
-    TT = make_dungeon('Thieves Town', 'Blind', ['Thieves Town (Entrance)', 'Thieves Town (Deep)', 'Blind Fight'], ItemFactory('Big Key (Thieves Town)', player), [ItemFactory('Small Key (Thieves Town)', player)], ItemFactory(['Map (Thieves Town)', 'Compass (Thieves Town)'], player))
-    SW = make_dungeon('Skull Woods', 'Mothula', ['Skull Woods Final Section (Entrance)', 'Skull Woods First Section', 'Skull Woods Second Section', 'Skull Woods Second Section (Drop)', 'Skull Woods Final Section (Mothula)', 'Skull Woods First Section (Right)', 'Skull Woods First Section (Left)', 'Skull Woods First Section (Top)'], ItemFactory('Big Key (Skull Woods)', player), ItemFactory(['Small Key (Skull Woods)'] * 2, player), ItemFactory(['Map (Skull Woods)', 'Compass (Skull Woods)'], player))
-    SP = make_dungeon('Swamp Palace', 'Arrghus', ['Swamp Palace (Entrance)', 'Swamp Palace (First Room)', 'Swamp Palace (Starting Area)', 'Swamp Palace (Center)', 'Swamp Palace (North)'], ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
+    TT = make_dungeon('Thieves Town', 'Blind', thieves_regions, ItemFactory('Big Key (Thieves Town)', player), [ItemFactory('Small Key (Thieves Town)', player)], ItemFactory(['Map (Thieves Town)', 'Compass (Thieves Town)'], player))
+    SW = make_dungeon('Skull Woods', 'Mothula', skull_regions, ItemFactory('Big Key (Skull Woods)', player), ItemFactory(['Small Key (Skull Woods)'] * 2, player), ItemFactory(['Map (Skull Woods)', 'Compass (Skull Woods)'], player))
+    SP = make_dungeon('Swamp Palace', 'Arrghus', swamp_regions, ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
     IP = make_dungeon('Ice Palace', 'Kholdstare', ['Ice Palace (Entrance)', 'Ice Palace (Main)', 'Ice Palace (East)', 'Ice Palace (East Top)', 'Ice Palace (Kholdstare)'], ItemFactory('Big Key (Ice Palace)', player), ItemFactory(['Small Key (Ice Palace)'] * 2, player), ItemFactory(['Map (Ice Palace)', 'Compass (Ice Palace)'], player))
     MM = make_dungeon('Misery Mire', 'Vitreous', ['Misery Mire (Entrance)', 'Misery Mire (Main)', 'Misery Mire (West)', 'Misery Mire (Final Area)', 'Misery Mire (Vitreous)'], ItemFactory('Big Key (Misery Mire)', player), ItemFactory(['Small Key (Misery Mire)'] * 3, player), ItemFactory(['Map (Misery Mire)', 'Compass (Misery Mire)'], player))
     TR = make_dungeon('Turtle Rock', 'Trinexx', ['Turtle Rock (Entrance)', 'Turtle Rock (First Section)', 'Turtle Rock (Chain Chomp Room)', 'Turtle Rock (Second Section)', 'Turtle Rock (Big Chest)', 'Turtle Rock (Crystaroller Room)', 'Turtle Rock (Dark Room)', 'Turtle Rock (Eye Bridge)', 'Turtle Rock (Trinexx)'], ItemFactory('Big Key (Turtle Rock)', player), ItemFactory(['Small Key (Turtle Rock)'] * 4, player), ItemFactory(['Map (Turtle Rock)', 'Compass (Turtle Rock)'], player))
@@ -155,7 +153,6 @@ def fill_dungeons_restrictive(world, shuffled_locations):
     fill_restrictive(world, all_state_base, shuffled_locations, dungeon_items)
 
 
-
 dungeon_music_addresses = {'Eastern Palace - Prize': [0x1559A],
                            'Desert Palace - Prize': [0x1559B, 0x1559C, 0x1559D, 0x1559E],
                            'Tower of Hera - Prize': [0x155C5, 0x1107A, 0x10B8C],
@@ -214,6 +211,36 @@ pod_regions = [
     'PoD Turtle Party', 'PoD Dark Alley', 'PoD Callback', 'PoD Boss'
 ]
 
+swamp_regions = [
+    'Swamp Lobby', 'Swamp Entrance', 'Swamp Pot Row', 'Swamp Map Ledge', 'Swamp Trench 1 Approach',
+    'Swamp Trench 1 Nexus', 'Swamp Trench 1 Alcove', 'Swamp Trench 1 Key Ledge', 'Swamp Trench 1 Departure',
+    'Swamp Hammer Switch', 'Swamp Hub', 'Swamp Hub Dead Ledge', 'Swamp Hub North Ledge', 'Swamp Donut Top',
+    'Swamp Donut Bottom', 'Swamp Compass Donut', 'Swamp Crystal Switch', 'Swamp Shortcut', 'Swamp Trench 2 Pots',
+    'Swamp Trench 2 Blocks', 'Swamp Trench 2 Alcove', 'Swamp Trench 2 Departure', 'Swamp Big Key Ledge',
+    'Swamp West Shallows', 'Swamp West Block Path', 'Swamp West Ledge', 'Swamp Barrier Ledge', 'Swamp Barrier',
+    'Swamp Attic', 'Swamp Push Statue', 'Swamp Shooters', 'Swamp Left Elbow', 'Swamp Right Elbow', 'Swamp Drain Left',
+    'Swamp Drain Right', 'Swamp Flooded Room', 'Swamp Flooded Spot', 'Swamp Basement Shallows', 'Swamp Waterfall Room',
+    'Swamp Refill', 'Swamp Behind Waterfall', 'Swamp C', 'Swamp Waterway', 'Swamp I', 'Swamp T', 'Swamp Boss'
+]
+
+skull_regions = [
+    'Skull 1 Lobby', 'Skull Map Room', 'Skull Pot Circle', 'Skull Pull Switch', 'Skull Big Chest', 'Skull Pinball',
+    'Skull Pot Prison', 'Skull Compass Room', 'Skull Left Drop', 'Skull 2 East Lobby', 'Skull Big Key',
+    'Skull Lone Pot', 'Skull Small Hall', 'Skull Back Drop', 'Skull 2 West Lobby', 'Skull X Room', 'Skull 3 Lobby',
+    'Skull East Bridge', 'Skull West Bridge Nook', 'Skull Star Pits', 'Skull Torch Room', 'Skull Vines',
+    'Skull Spike Corner', 'Skull Final Drop', 'Skull Boss'
+]
+
+thieves_regions = [
+    'Thieves Lobby', 'Thieves Ambush', 'Thieves BK Corner', 'Thieves Compass Room', 'Thieves Big Chest Nook',
+    'Thieves Hallway', 'Thieves Boss', 'Thieves Pot Alcove Mid', 'Thieves Pot Alcove Bottom', 'Thieves Pot Alcove Top',
+    'Thieves Conveyor Maze', 'Thieves Spike Track', 'Thieves Hellway', 'Thieves Hellway N Crystal',
+    'Thieves Hellway S Crystal', 'Thieves Triple Bypass', 'Thieves Spike Switch', 'Thieves Attic',
+    'Thieves Cricket Hall Left', 'Thieves Cricket Hall Right', 'Thieves Attic Window', 'Thieves Basement Block',
+    'Thieves Blocked Entry', 'Thieves Lonely Zazak', 'Thieves Blind\'s Cell', 'Thieves Conveyor Bridge',
+    'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap'
+]
+
 
 dungeon_regions = {
     'Hyrule Castle': hyrule_castle_regions,
@@ -222,9 +249,9 @@ dungeon_regions = {
     'Tower of Hera': hera_regions,
     'Agahnims Tower': tower_regions,
     'Palace of Darkness': pod_regions,
-    # 'Swamp':
-    # 'Skull':
-    # 'TT':
+    'Swamp Palace': swamp_regions,
+    'Skull Woods': skull_regions,
+    'Thieves Town': thieves_regions,
     # 'Ice':
     # 'Mire':
     # 'TR':
@@ -238,8 +265,10 @@ region_starts = {
     'Tower of Hera': ['Hera Lobby'],
     'Agahnims Tower': ['Tower Lobby'],
     'Palace of Darkness': ['PoD Lobby'],
-    # ['Swamp Lobby'],
-    # ['TT Lobby'],
+    'Swamp Palace': ['Swamp Lobby'],
+    'Skull Woods': ['Skull 1 Lobby', 'Skull 2 East Lobby', 'Skull 2 West Lobby', 'Skull 3 Lobby', 'Skull Pot Circle',
+                    'Skull Pinball', 'Skull Left Drop', 'Skull Back Drop'],
+    'Thieves Town': ['Thieves Lobby'],
     # ['Ice Lobby'],
     # ['Mire Lobby'],
     # ['TR Main Lobby', 'TR Eye Trap', 'TR Big Chest', 'TR Laser Bridge'],
@@ -250,8 +279,35 @@ split_region_starts = {
     'Desert Palace': [
         ['Desert Back Lobby'],
         ['Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
+    ],
+    'Skull Woods': [
+        ['Skull 1 Lobby', 'Skull Pot Circle'],
+        ['Skull 2 West Lobby', 'Skull 2 East Lobby', 'Skull Back Drop'],
+        ['Skull 3 Lobby']
     ]
-    # 'Skull': ['Skull 1 Lobby', 'Skull 2 Mummy Lobby', 'Skull 2 Key Lobby', 'Skull 3 Lobby'],
 }
 
+dungeon_keys = {
+    'Hyrule Castle': 'Small Key (Escape)',
+    'Eastern Palace': 'Small Key (Eastern Palace)',
+    'Desert Palace': 'Small Key (Desert Palace)',
+    'Tower of Hera': 'Small Key (Tower of Hera)',
+    'Agahnims Tower': 'Small Key (Agahnims Tower)',
+    'Palace of Darkness': 'Small Key (Palace of Darkness)',
+    'Swamp Palace': 'Small Key (Swamp Palace)',
+    'Skull Woods': 'Small Key (Skull Woods)',
+    'Thieves Town': 'Small Key (Thieves Town)'
+}
+
+dungeon_bigs = {
+    'Hyrule Castle': 'Big Key (Escape)',
+    'Eastern Palace': 'Big Key (Eastern Palace)',
+    'Desert Palace': 'Big Key (Desert Palace)',
+    'Tower of Hera': 'Big Key (Tower of Hera)',
+    'Agahnims Tower': 'Big Key (Agahnims Tower)',
+    'Palace of Darkness': 'Big Key (Palace of Darkness)',
+    'Swamp Palace': 'Big Key (Swamp Palace)',
+    'Skull Woods': 'Big Key (Skull Woods)',
+    'Thieves Town': 'Big Key (Thieves Town)'
+}
 
