@@ -90,6 +90,7 @@ class World(object):
         self._room_cache = {}
         self.dungeon_layouts = {}
         self.inaccessible_regions = []
+        self.key_logic = {}
 
     def intialize_regions(self):
         for region in self.regions:
@@ -328,7 +329,7 @@ class World(object):
             sphere = []
             # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
             for location in prog_locations:
-                if location.can_reach(state):
+                if location.can_reach(state) and state.not_flooding_a_key(state.world, location):
                     sphere.append(location)
 
             if not sphere:
@@ -414,13 +415,16 @@ class CollectionState(object):
     def _do_not_flood_the_keys(self, reachable_events):
         adjusted_checks = list(reachable_events)
         for event in reachable_events:
-            if event.name == 'Trench 2 Switch' and self.world.get_location('Swamp Palace - Trench 2 Pot Key', event.player) not in reachable_events:
-                adjusted_checks.remove(event)
-            if event.name == 'Trench 1 Switch' and self.world.get_location('Swamp Palace - Trench 1 Pot Key', event.player) not in reachable_events:
+            if event.name in flooded_keys.keys() and self.world.get_location(flooded_keys[event.name], event.player) not in reachable_events:
                 adjusted_checks.remove(event)
         if len(adjusted_checks) < len(reachable_events):
             return adjusted_checks
         return reachable_events
+
+    def not_flooding_a_key(self, world, location):
+        if location.name in flooded_keys.keys():
+            return world.get_location(flooded_keys[location.name], location.player) in self.locations_checked
+        return True
 
     def has(self, item, player, count=1):
         if count == 1:
@@ -948,7 +952,8 @@ class Door(object):
         # logical properties
         # self.connected = False  # combine with Dest?
         self.dest = None
-        self.blocked = False  # Indicates if the door is normally blocked off. (Sanc door or always closed)
+        self.blocked = False  # Indicates if the door is normally blocked off as an exit. (Sanc door or always closed)
+        self.stonewall = False  # Indicate that the door cannot be enter until exited (Desert Torches, PoD Eye Statue)
         self.smallKey = False  # There's a small key door on this side
         self.bigKey = False  # There's a big key door on this side
         self.ugly = False  # Indicates that it can't be seen from the front (e.g. back of a big key door)
@@ -1004,6 +1009,10 @@ class Door(object):
         self.blocked = True
         return self
 
+    def no_entrance(self):
+        self.stonewall = True
+        return self
+
     def trap(self, trapFlag):
         self.trapFlag = trapFlag
         return self
@@ -1023,6 +1032,12 @@ class Door(object):
     def c_switch(self):
         self.crystal = CrystalBarrier.Either
         return self
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.name == other.name
+
+    def __hash__(self):
+        return hash(self.name)
 
     def __str__(self):
         return str(self.__unicode__())
@@ -1419,3 +1434,9 @@ class Spoiler(object):
                 path_listings.append("{}\n        {}".format(location, "\n   =>   ".join(path_lines)))
 
             outfile.write('\n'.join(path_listings))
+
+
+flooded_keys = {
+    'Trench 1 Switch': 'Swamp Palace - Trench 1 Pot Key',
+    'Trench 2 Switch': 'Swamp Palace - Trench 2 Pot Key'
+}

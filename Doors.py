@@ -184,9 +184,7 @@ def create_doors(world, player):
         create_door(player, 'Desert Tiles 2 SE', Nrml).dir(Direction.South, 0x43, Right, High).small_key().pos(2),
         create_door(player, 'Desert Tiles 2 NE', Intr).dir(Direction.North, 0x43, Right, High).small_key().pos(1),
         create_door(player, 'Desert Wall Slide SE', Intr).dir(Direction.South, 0x43, Right, High).small_key().pos(1),
-        # todo: we need a new flag for a door that has a wall on it - you have to traverse it one particular way first
-        # the above is not a problem until we get to crossed mode
-        create_door(player, 'Desert Wall Slide NW', Nrml).dir(Direction.North, 0x43, Left, High).big_key().pos(0),
+        create_door(player, 'Desert Wall Slide NW', Nrml).dir(Direction.North, 0x43, Left, High).big_key().pos(0).no_entrance(),
         create_door(player, 'Desert Boss SW', Nrml).dir(Direction.South, 0x33, Left, High).no_exit().trap(0x4).pos(0),
 
         # Hera
@@ -323,9 +321,7 @@ def create_doors(world, player):
         create_door(player, 'PoD Mimics 2 SW', Nrml).dir(Direction.South, 0x1b, Left, High).pos(1),
         create_door(player, 'PoD Mimics 2 NW', Intr).dir(Direction.North, 0x1b, Left, High).pos(0),
         create_door(player, 'PoD Bow Statue SW', Intr).dir(Direction.South, 0x1b, Left, High).pos(0),
-        # todo: we need a new flag for a door that has a wall on it - you have to traverse it one particular way first
-        # the above is not a problem until we get to crossed mode
-        create_door(player, 'PoD Bow Statue Down Ladder', Lddr),
+        create_door(player, 'PoD Bow Statue Down Ladder', Lddr).no_entrance(),
         create_door(player, 'PoD Dark Pegs Up Ladder', Lddr),
         create_door(player, 'PoD Dark Pegs WN', Intr).dir(Direction.West, 0x0b, Mid, High).small_key().pos(2),
         create_door(player, 'PoD Lonely Turtle SW', Intr).dir(Direction.South, 0x0b, Mid, High).pos(0),

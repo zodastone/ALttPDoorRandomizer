@@ -1,0 +1,689 @@
+import random
+import collections
+from collections import defaultdict
+from enum import Enum, unique
+import logging
+
+from BaseClasses import DoorType, Direction, CrystalBarrier, RegionType, flooded_keys
+from Regions import key_only_locations, dungeon_events, flooded_keys_reverse
+
+
+@unique
+class Hook(Enum):
+    North = 0
+    West = 1
+    South = 2
+    East = 3
+    Stairs = 4
+
+
+class GraphPiece:
+
+    def __init__(self):
+        self.hanger_info = None
+        self.hooks = {}
+        self.visited_regions = set()
+
+
+def generate_dungeon(available_sectors, entrance_region_names, world, player):
+    logger = logging.getLogger('')
+    entrance_regions = convert_regions(entrance_region_names, world, player)
+    doors_to_connect = set()
+    all_regions = set()
+    for sector in available_sectors:
+        for door in sector.outstanding_doors:
+            doors_to_connect.add(door)
+        all_regions.update(sector.regions)
+    proposed_map = {}
+    choices_master = [[]]
+    depth = 0
+    dungeon_cache = {}
+    backtrack = False
+    # last_choice = None
+    while len(proposed_map) < len(doors_to_connect):
+        # what are my choices?
+        if depth not in dungeon_cache.keys():
+            dungeon, hangers, hooks = gen_dungeon_info(available_sectors, entrance_regions, proposed_map, doors_to_connect, world, player)
+            dungeon_cache[depth] = dungeon, hangers, hooks
+            valid = check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions)
+        else:
+            dungeon, hangers, hooks = dungeon_cache[depth]
+            valid = True
+        if valid:
+            prev_choices = choices_master[depth]
+            # make a choice
+            hanger, hook = make_a_choice(dungeon, hangers, hooks, prev_choices)
+            if hanger is None:
+                backtrack = True
+            else:
+                logger.debug(' '*depth+"%d: Linking %s to %s", depth, hanger.name, hook.name)
+                proposed_map[hanger] = hook
+                proposed_map[hook] = hanger
+                last_choice = (hanger, hook)
+                choices_master[depth].append(last_choice)
+                depth += 1
+                choices_master.append([])
+        else:
+            backtrack = True
+        if backtrack:
+            backtrack = False
+            choices_master.pop()
+            dungeon_cache.pop(depth, None)
+            depth -= 1
+            a, b = choices_master[depth][-1]
+            logger.debug(' '*depth+"%d: Rescinding %s, %s", depth, a.name, b.name)
+            proposed_map.pop(a, None)
+            proposed_map.pop(b, None)
+    queue = collections.deque(proposed_map.items())
+    while len(queue) > 0:
+        a, b = queue.pop()
+        connect_doors(a, b, world, player)
+        queue.remove((b, a))
+    master_sector = available_sectors.pop()
+    for sub_sector in available_sectors:
+        master_sector.regions.extend(sub_sector.regions)
+    return master_sector
+
+
+def gen_dungeon_info(available_sectors, entrance_regions, proposed_map, valid_doors, world, player):
+    # step 1 create dungeon: Dict<DoorName|Origin, GraphPiece>
+    dungeon = {}
+    original_state = extend_reachable_state_improved(entrance_regions, ExplorationState(), proposed_map, valid_doors, world, player)
+    dungeon['Origin'] = create_graph_piece_from_state(None, original_state, original_state, proposed_map)
+    doors_to_connect = set()
+    blue_hooks = []
+    o_state_cache = {}
+    for sector in available_sectors:
+        for door in sector.outstanding_doors:
+            doors_to_connect.add(door)
+            if not door.stonewall and door not in proposed_map.keys():
+                parent = parent_region(door, world, player).parent_region
+                o_state = extend_reachable_state_improved([parent], ExplorationState(), proposed_map, valid_doors, world, player)
+                o_state_cache[door.name] = o_state
+                piece = create_graph_piece_from_state(door, o_state, o_state, proposed_map)
+                dungeon[door.name] = piece
+                for hook, crystal in piece.hooks.items():
+                    if crystal == CrystalBarrier.Blue or crystal == CrystalBarrier.Either:
+                        h_type = hook_from_door(hook)
+                        if h_type not in blue_hooks:
+                            blue_hooks.append(h_type)  # todo: specific hooks and valid path to c_switch
+    if len(blue_hooks) > 0:
+        for sector in available_sectors:
+            for door in sector.outstanding_doors:
+                h_type = hanger_from_door(door)
+                if not door.stonewall and door not in proposed_map.keys() and h_type in blue_hooks:
+                    parent = parent_region(door, world, player).parent_region
+                    blue_start = ExplorationState(CrystalBarrier.Blue)
+                    b_state = extend_reachable_state_improved([parent], blue_start, proposed_map, valid_doors, world, player)
+                    o_state = o_state_cache[door.name]
+                    dungeon[door.name] = create_graph_piece_from_state(door, o_state, b_state, proposed_map)
+
+    # catalog hooks: Dict<Hook, Set<>
+    # and hangers:
+    avail_hooks = defaultdict(set)
+    hangers = defaultdict(set)
+    for key, piece in dungeon.items():
+        door_hang = piece.hanger_info
+        if door_hang is not None:
+            hanger = hanger_from_door(door_hang)
+            hangers[hanger].add(door_hang)
+        for door, crystal in piece.hooks.items():
+            hook = hook_from_door(door)
+            avail_hooks[hook].add((door, crystal, door_hang))
+
+    # thin out invalid hanger
+    winnow_hangers(hangers, avail_hooks)
+    return dungeon, hangers, avail_hooks
+
+
+def make_a_choice(dungeon, hangers, avail_hooks, prev_choices):
+    # choose a hanger
+    all_hooks = set()
+    origin = dungeon['Origin']
+    for key in avail_hooks.keys():
+        for hstuff in avail_hooks[key]:
+            all_hooks.add(hstuff[0])
+    candidate_hangers = []
+    for key in hangers.keys():
+        candidate_hangers.extend(hangers[key])
+    candidate_hangers.sort(key=lambda x: x.name)  # sorting to create predictable seeds
+    random.shuffle(candidate_hangers)  # randomize if equal preference
+    stage_2_hangers = []
+    hookable_hangers = collections.deque()
+    queue = collections.deque(candidate_hangers)
+    while len(queue) > 0:
+        c_hang = queue.pop()
+        if c_hang in all_hooks:
+            hookable_hangers.append(c_hang)
+        else:
+            stage_2_hangers.append(c_hang)  # prefer hangers that are not hooks
+    # todo : prefer hangers with fewer hooks at some point? not sure about this
+    # this prefer hangers of the fewest type - to catch problems fast
+    hookable_hangers = sorted(hookable_hangers, key=lambda door: len(hangers[hanger_from_door(door)]), reverse=True)
+    origin_hangers = []
+    while len(hookable_hangers) > 0:
+        c_hang = hookable_hangers.pop()
+        if c_hang in origin.hooks.keys():
+            origin_hangers.append(c_hang)
+        else:
+            stage_2_hangers.append(c_hang)  # prefer hangers that are not hooks on the 'origin'
+    stage_2_hangers.extend(origin_hangers)
+
+    hook = None
+    next_hanger = None
+    while hook is None:
+        if len(stage_2_hangers) == 0:
+            return None, None
+        next_hanger = stage_2_hangers.pop(0)
+        next_hanger_type = hanger_from_door(next_hanger)
+        hook_candidates = []
+        for door, crystal, orig_hang in avail_hooks[next_hanger_type]:
+            if filter_choices(next_hanger, door, orig_hang, prev_choices, hook_candidates):
+                hook_candidates.append(door)
+        if len(hook_candidates) > 0:
+            hook_candidates.sort(key=lambda x: x.name)  # sort for deterministic seeds
+            hook = random.choice(tuple(hook_candidates))
+
+    return next_hanger, hook
+
+
+def filter_choices(next_hanger, door, orig_hang, prev_choices, hook_candidates):
+    if (next_hanger, door) in prev_choices or (door, next_hanger) in prev_choices:
+        return False
+    return next_hanger != door and orig_hang != next_hanger and door not in hook_candidates
+
+
+def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions):
+    # evaluate if everything is still plausible
+
+    # only origin is left in the dungeon and not everything is connected
+    if len(dungeon.keys()) <= 1 and len(proposed_map.keys()) < len(doors_to_connect):
+        return False
+    # origin has no more hooks, but not all doors have been proposed
+    if len(dungeon['Origin'].hooks) == 0 and len(proposed_map.keys()) < len(doors_to_connect):
+        return False
+    for key in hangers.keys():
+        if len(hooks[key]) > 0 and len(hangers[key]) == 0:
+            return False
+    # todo: stonewall - check that there's no hook-only that is without a matching hanger
+    all_visited = set()
+    for piece in dungeon.values():
+        all_visited.update(piece.visited_regions)
+    if len(all_regions.difference(all_visited)) > 0:
+        return False
+    new_hangers_found = True
+    accessible_hook_types = []
+    hanger_matching = set()
+    all_hangers = set()
+    origin_hooks = set(dungeon['Origin'].hooks.keys())
+    for door_hook in origin_hooks:
+        h_type = hook_from_door(door_hook)
+        if h_type not in accessible_hook_types:
+            accessible_hook_types.append(h_type)
+    while new_hangers_found:
+        new_hangers_found = False
+        for hanger_set in hangers.values():
+            for hanger in hanger_set:
+                all_hangers.add(hanger)
+                h_type = hanger_from_door(hanger)
+                if (h_type in accessible_hook_types or hanger in origin_hooks) and hanger not in hanger_matching:
+                    new_hangers_found = True
+                    hanger_matching.add(hanger)
+                    matching_hooks = dungeon[hanger.name].hooks.keys()
+                    origin_hooks.update(matching_hooks)
+                    for door_hook in matching_hooks:
+                        new_h_type = hook_from_door(door_hook)
+                        if new_h_type not in accessible_hook_types:
+                            accessible_hook_types.append(new_h_type)
+    return len(all_hangers.difference(hanger_matching)) == 0
+
+
+def winnow_hangers(hangers, hooks):
+    removal_info = []
+    for hanger, door_set in hangers.items():
+        for door in door_set:
+            hook_set = hooks[hanger]
+            if len(hook_set) == 0:
+                removal_info.append((hanger, door))
+            else:
+                found_valid = False
+                for door_hook, crystal, orig_hanger in hook_set:
+                    if orig_hanger != door:
+                        found_valid = True
+                if not found_valid:
+                    removal_info.append((hanger, door))
+    for hanger, door in removal_info:
+        hangers[hanger].remove(door)
+
+
+def create_graph_piece_from_state(door, o_state, b_state, proposed_map):
+    # todo: info about dungeon events - not sure about that
+    graph_piece = GraphPiece()
+    all_unattached = {}
+    for exp_d in o_state.unattached_doors:
+        all_unattached[exp_d.door] = exp_d.crystal
+    for exp_d in b_state.unattached_doors:
+        d = exp_d.door
+        if d in all_unattached.keys():
+            if all_unattached[d] != exp_d.crystal:
+                if all_unattached[d] == CrystalBarrier.Orange and exp_d.crystal == CrystalBarrier.Blue:
+                    all_unattached[d] = CrystalBarrier.Null
+                else:
+                    logging.getLogger('').warning('Mismatched state @ %s (o:%s b:%s)', d.name, all_unattached[d], exp_d.crystal)
+        else:
+            all_unattached[exp_d.door] = exp_d.crystal
+    for d, crystal in all_unattached.items():
+        if (door is None or d != door) and not d.blocked and d not in proposed_map.keys():
+            graph_piece.hooks[d] = crystal
+    graph_piece.hanger_info = door
+    graph_piece.visited_regions.update(o_state.visited_blue)
+    graph_piece.visited_regions.update(o_state.visited_orange)
+    graph_piece.visited_regions.update(b_state.visited_blue)
+    graph_piece.visited_regions.update(b_state.visited_orange)
+    return graph_piece
+
+
+def parent_region(door, world, player):
+    return world.get_entrance(door.name, player)
+
+
+def hook_from_door(door):
+    if door.type == DoorType.SpiralStairs:
+        return Hook.Stairs
+    if door.type == DoorType.Normal:
+        dir = {
+            Direction.North: Hook.North,
+            Direction.South: Hook.South,
+            Direction.West: Hook.West,
+            Direction.East: Hook.East,
+        }
+        return dir[door.direction]
+    return None
+
+
+def hanger_from_door(door):
+    if door.type == DoorType.SpiralStairs:
+        return Hook.Stairs
+    if door.type == DoorType.Normal:
+        dir = {
+            Direction.North: Hook.South,
+            Direction.South: Hook.North,
+            Direction.West: Hook.East,
+            Direction.East: Hook.West,
+        }
+        return dir[door.direction]
+    return None
+
+
+def connect_doors(a, b, world, player):
+    # Return on unsupported types.
+    if a.type in [DoorType.Open, DoorType.StraightStairs, DoorType.Hole, DoorType.Warp, DoorType.Ladder,
+                  DoorType.Interior, DoorType.Logical]:
+        return
+    # Connect supported types
+    if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs:
+        if a.blocked:
+            connect_one_way(world, b.name, a.name, player)
+        elif b.blocked:
+            connect_one_way(world, a.name, b.name, player)
+        else:
+            connect_two_way(world, a.name, b.name, player)
+        return
+    # If we failed to account for a type, panic
+    raise RuntimeError('Unknown door type ' + a.type.name)
+
+
+def connect_two_way(world, entrancename, exitname, player):
+    entrance = world.get_entrance(entrancename, player)
+    ext = world.get_entrance(exitname, player)
+
+    # if these were already connected somewhere, remove the backreference
+    if entrance.connected_region is not None:
+        entrance.connected_region.entrances.remove(entrance)
+    if ext.connected_region is not None:
+        ext.connected_region.entrances.remove(ext)
+
+    entrance.connect(ext.parent_region)
+    ext.connect(entrance.parent_region)
+    if entrance.parent_region.dungeon:
+        ext.parent_region.dungeon = entrance.parent_region.dungeon
+    x = world.check_for_door(entrancename, player)
+    y = world.check_for_door(exitname, player)
+    if x is not None:
+        x.dest = y
+    if y is not None:
+        y.dest = x
+
+
+def connect_one_way(world, entrancename, exitname, player):
+    entrance = world.get_entrance(entrancename, player)
+    ext = world.get_entrance(exitname, player)
+
+    # if these were already connected somewhere, remove the backreference
+    if entrance.connected_region is not None:
+        entrance.connected_region.entrances.remove(entrance)
+    if ext.connected_region is not None:
+        ext.connected_region.entrances.remove(ext)
+
+    entrance.connect(ext.parent_region)
+    if entrance.parent_region.dungeon:
+        ext.parent_region.dungeon = entrance.parent_region.dungeon
+    x = world.check_for_door(entrancename, player)
+    y = world.check_for_door(exitname, player)
+    if x is not None:
+        x.dest = y
+    if y is not None:
+        y.dest = x
+
+
+class ExplorationState(object):
+
+    def __init__(self, init_crystal=CrystalBarrier.Orange):
+
+        self.unattached_doors = []
+        self.avail_doors = []
+        self.event_doors = []
+
+        self.visited_orange = []
+        self.visited_blue = []
+        self.events = set()
+        self.crystal = init_crystal
+
+        # key region stuff
+        self.door_krs = {}
+
+        # key validation stuff
+        self.small_doors = []
+        self.big_doors = []
+        self.opened_doors = []
+        self.big_key_opened = False
+        self.big_key_special = False
+
+        self.found_locations = []
+        self.ttl_locations = 0
+        self.used_locations = 0
+        self.key_locations = 0
+        self.used_smalls = 0
+
+        self.non_door_entrances = []
+
+    def copy(self):
+        ret = ExplorationState()
+        ret.unattached_doors = list(self.unattached_doors)
+        ret.avail_doors = list(self.avail_doors)
+        ret.event_doors = list(self.event_doors)
+        ret.visited_orange = list(self.visited_orange)
+        ret.visited_blue = list(self.visited_blue)
+        ret.events = set(self.events)
+        ret.crystal = self.crystal
+        ret.door_krs = self.door_krs.copy()
+
+        ret.small_doors = list(self.small_doors)
+        ret.big_doors = list(self.big_doors)
+        ret.opened_doors = list(self.opened_doors)
+        ret.big_key_opened = self.big_key_opened
+        ret.big_key_special = self.big_key_special
+        ret.ttl_locations = self.ttl_locations
+        ret.key_locations = self.key_locations
+        ret.used_locations = self.used_locations
+        ret.used_smalls = self.used_smalls
+        ret.found_locations = list(self.found_locations)
+
+        ret.non_door_entrances = list(self.non_door_entrances)
+        return ret
+
+    def next_avail_door(self):
+        exp_door = self.avail_doors.pop()
+        self.crystal = exp_door.crystal
+        return exp_door
+
+    def visit_region(self, region, key_region=None, key_checks=False):
+        if self.crystal == CrystalBarrier.Either:
+            if region not in self.visited_blue:
+                self.visited_blue.append(region)
+            if region not in self.visited_orange:
+                self.visited_orange.append(region)
+        elif self.crystal == CrystalBarrier.Orange:
+            self.visited_orange.append(region)
+        elif self.crystal == CrystalBarrier.Blue:
+            self.visited_blue.append(region)
+        for location in region.locations:
+            if key_checks and location not in self.found_locations:
+                if location.name in key_only_locations:
+                    self.key_locations += 1
+                if location.name not in dungeon_events and '- Prize' not in location.name:
+                    self.ttl_locations += 1
+            if location not in self.found_locations:
+                self.found_locations.append(location)
+            if location.name in dungeon_events and location.name not in self.events:
+                if self.flooded_key_check(location):
+                    self.perform_event(location.name, key_region)
+            if location.name in flooded_keys_reverse.keys() and self.location_found(flooded_keys_reverse[location.name]):
+                self.perform_event(flooded_keys_reverse[location.name], key_region)
+        if key_checks and region.name == 'Hyrule Dungeon Cellblock' and not self.big_key_opened:
+            self.big_key_opened = True
+            self.avail_doors.extend(self.big_doors)
+            self.big_doors.clear()
+
+    def flooded_key_check(self, location):
+        if location.name not in flooded_keys.keys():
+            return True
+        return flooded_keys[location.name] in [x.name for x in self.found_locations]
+
+    def location_found(self, location_name):
+        for l in self.found_locations:
+            if l.name == location_name:
+                return True
+        return False
+
+    def perform_event(self, location_name, key_region):
+        self.events.add(location_name)
+        queue = collections.deque(self.event_doors)
+        while len(queue) > 0:
+            exp_door = queue.pop()
+            if exp_door.door.req_event == location_name:
+                self.avail_doors.append(exp_door)
+                self.event_doors.remove(exp_door)
+                if key_region is not None:
+                    d_name = exp_door.door.name
+                    if d_name not in self.door_krs.keys():
+                        self.door_krs[d_name] = key_region
+
+    def add_all_entrance_doors_check_unattached(self, region, world, player):
+        door_list = [x for x in get_doors(world, region, player) if x.type in [DoorType.Normal, DoorType.SpiralStairs]]
+        door_list.extend(get_entrance_doors(world, region, player))
+        for door in door_list:
+            if self.can_traverse(door):
+                if door.dest is None and not self.in_door_list_ic(door, self.unattached_doors):
+                    self.append_door_to_list(door, self.unattached_doors)
+                elif door.req_event is not None and door.req_event not in self.events and not self.in_door_list(door, self.event_doors):
+                    self.append_door_to_list(door, self.event_doors)
+                elif not self.in_door_list(door, self.avail_doors):
+                    self.append_door_to_list(door, self.avail_doors)
+        for entrance in region.entrances:
+            door = world.check_for_door(entrance.name, player)
+            if door is None:
+                self.non_door_entrances.append(entrance)
+
+    def add_all_doors_check_unattached(self, region, world, player):
+        for door in get_doors(world, region, player):
+            if self.can_traverse(door):
+                if door.dest is None and not self.in_door_list_ic(door, self.unattached_doors):
+                    self.append_door_to_list(door, self.unattached_doors)
+                elif door.req_event is not None and door.req_event not in self.events and not self.in_door_list(door, self.event_doors):
+                    self.append_door_to_list(door, self.event_doors)
+                elif not self.in_door_list(door, self.avail_doors):
+                    self.append_door_to_list(door, self.avail_doors)
+
+    def add_all_doors_check_proposed(self, region, proposed_map, valid_doors, world, player):
+        for door in get_dungeon_doors(region, world, player):
+            if self.can_traverse(door):
+                if door.dest is None and not self.in_door_list_ic(door, self.unattached_doors)\
+                     and door not in proposed_map.keys() and door in valid_doors:
+                        self.append_door_to_list(door, self.unattached_doors)
+                elif door.req_event is not None and door.req_event not in self.events and not self.in_door_list(door, self.event_doors):
+                    self.append_door_to_list(door, self.event_doors)
+                elif not self.in_door_list(door, self.avail_doors):
+                    self.append_door_to_list(door, self.avail_doors)
+
+    def add_all_doors_check_key_region(self, region, key_region, world, player):
+        for door in get_doors(world, region, player):
+            if self.can_traverse(door):
+                if door.req_event is not None and door.req_event not in self.events and not self.in_door_list(door, self.event_doors):
+                    self.append_door_to_list(door, self.event_doors)
+                elif not self.in_door_list(door, self.avail_doors):
+                    self.append_door_to_list(door, self.avail_doors)
+                    if door.name not in self.door_krs.keys():
+                        self.door_krs[door.name] = key_region
+            else:
+                if door.name not in self.door_krs.keys():
+                    self.door_krs[door.name] = key_region
+
+    def add_all_doors_check_keys(self, region, key_door_proposal, world, player):
+        for door in get_doors(world, region, player):
+            if self.can_traverse(door):
+                if door in key_door_proposal and door not in self.opened_doors:
+                    if not self.in_door_list(door, self.small_doors):
+                        self.append_door_to_list(door, self.small_doors)
+                elif door.bigKey and not self.big_key_opened:
+                    if not self.in_door_list(door, self.big_doors):
+                        self.append_door_to_list(door, self.big_doors)
+                elif door.req_event is not None and door.req_event not in self.events:
+                    if not self.in_door_list(door, self.event_doors):
+                        self.append_door_to_list(door, self.event_doors)
+                elif not self.in_door_list(door, self.avail_doors):
+                    self.append_door_to_list(door, self.avail_doors)
+
+    def visited(self, region):
+        if self.crystal == CrystalBarrier.Either:
+            return region in self.visited_blue and region in self.visited_orange
+        elif self.crystal == CrystalBarrier.Orange:
+            return region in self.visited_orange
+        elif self.crystal == CrystalBarrier.Blue:
+            return region in self.visited_blue
+        return False
+
+    def visited_at_all(self, region):
+        return region in self.visited_blue or region in self.visited_orange
+
+    def can_traverse(self, door):
+        if door.blocked:
+            return False
+        if door.crystal not in [CrystalBarrier.Null, CrystalBarrier.Either]:
+            return self.crystal == CrystalBarrier.Either or door.crystal == self.crystal
+        return True
+
+    def validate(self, door, region, world):
+        return self.can_traverse(door) and not self.visited(region) and valid_region_to_explore(region, world)
+
+    def in_door_list(self, door, door_list):
+        for d in door_list:
+            if d.door == door and d.crystal == self.crystal:
+                return True
+        return False
+
+    @staticmethod
+    def in_door_list_ic(door, door_list):
+        for d in door_list:
+            if d.door == door:
+                return True
+        return False
+
+    def append_door_to_list(self, door, door_list):
+        if door.crystal == CrystalBarrier.Null:
+            door_list.append(ExplorableDoor(door, self.crystal))
+        else:
+            door_list.append(ExplorableDoor(door, door.crystal))
+
+    def key_door_sort(self, d):
+        if d.door.smallKey:
+            if d.door in self.opened_doors:
+                return 1
+            else:
+                return 0
+        return 2
+
+
+class ExplorableDoor(object):
+
+    def __init__(self, door, crystal):
+        self.door = door
+        self.crystal = crystal
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.door.name, self.crystal.name)
+
+
+def extend_reachable_state(search_regions, state, world, player):
+    local_state = state.copy()
+    for region in search_regions:
+        local_state.visit_region(region)
+        local_state.add_all_doors_check_unattached(region, world, player)
+    while len(local_state.avail_doors) > 0:
+        explorable_door = local_state.next_avail_door()
+        connect_region = world.get_entrance(explorable_door.door.name, player).connected_region
+        if connect_region is not None:
+            if valid_region_to_explore(connect_region, world) and not local_state.visited(connect_region):
+                local_state.visit_region(connect_region)
+                local_state.add_all_doors_check_unattached(connect_region, world, player)
+    return local_state
+
+
+def extend_reachable_state_improved(search_regions, state, proposed_map, valid_doors, world, player):
+    local_state = state.copy()
+    for region in search_regions:
+        local_state.visit_region(region)
+        local_state.add_all_doors_check_proposed(region, proposed_map, valid_doors, world, player)
+    while len(local_state.avail_doors) > 0:
+        explorable_door = local_state.next_avail_door()
+        if explorable_door.door in proposed_map:
+            connect_region = world.get_entrance(proposed_map[explorable_door.door].name, player).parent_region
+        else:
+            connect_region = world.get_entrance(explorable_door.door.name, player).connected_region
+        if connect_region is not None:
+            if valid_region_to_explore(connect_region, world) and not local_state.visited(connect_region):
+                local_state.visit_region(connect_region)
+                local_state.add_all_doors_check_proposed(connect_region, proposed_map, valid_doors, world, player)
+    return local_state
+
+
+# cross-utility methods
+def valid_region_to_explore(region, world):
+    return region.type == RegionType.Dungeon or region.name in world.inaccessible_regions
+
+
+def get_doors(world, region, player):
+    res = []
+    for exit in region.exits:
+        door = world.check_for_door(exit.name, player)
+        if door is not None:
+            res.append(door)
+    return res
+
+
+def get_dungeon_doors(region, world, player):
+    res = []
+    for ext in region.exits:
+        door = world.check_for_door(ext.name, player)
+        if door is not None and ext.parent_region.type == RegionType.Dungeon:
+            res.append(door)
+    return res
+
+
+def get_entrance_doors(world, region, player):
+    res = []
+    for exit in region.entrances:
+        door = world.check_for_door(exit.name, player)
+        if door is not None:
+            res.append(door)
+    return res
+
+
+def convert_regions(region_names, world, player):
+    region_list = []
+    for name in region_names:
+        region_list.append(world.get_region(name, player))
+    return region_list

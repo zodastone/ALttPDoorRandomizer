@@ -282,6 +282,7 @@ def copy_world(world):
     ret.rooms = world.rooms
     ret.inaccessible_regions = world.inaccessible_regions
     ret.dungeon_layouts = world.dungeon_layouts
+    ret.key_logic = world.key_logic
 
     for player in range(1, world.players + 1):
         set_rules(ret, player)
@@ -337,7 +338,7 @@ def create_playthrough(world):
         sphere = []
         # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
         for location in sphere_candidates:
-            if state.can_reach(location):
+            if state.can_reach(location) and state.not_flooding_a_key(world, location):
                 sphere.append(location)
 
         for location in sphere:

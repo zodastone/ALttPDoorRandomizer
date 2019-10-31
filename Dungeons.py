@@ -287,4 +287,27 @@ split_region_starts = {
     ]
 }
 
+dungeon_keys = {
+    'Hyrule Castle': 'Small Key (Escape)',
+    'Eastern Palace': 'Small Key (Eastern Palace)',
+    'Desert Palace': 'Small Key (Desert Palace)',
+    'Tower of Hera': 'Small Key (Tower of Hera)',
+    'Agahnims Tower': 'Small Key (Agahnims Tower)',
+    'Palace of Darkness': 'Small Key (Palace of Darkness)',
+    'Swamp Palace': 'Small Key (Swamp Palace)',
+    'Skull Woods': 'Small Key (Skull Woods)',
+    'Thieves Town': 'Small Key (Thieves Town)'
+}
+
+dungeon_bigs = {
+    'Hyrule Castle': 'Big Key (Escape)',
+    'Eastern Palace': 'Big Key (Eastern Palace)',
+    'Desert Palace': 'Big Key (Desert Palace)',
+    'Tower of Hera': 'Big Key (Tower of Hera)',
+    'Agahnims Tower': 'Big Key (Agahnims Tower)',
+    'Palace of Darkness': 'Big Key (Palace of Darkness)',
+    'Swamp Palace': 'Big Key (Swamp Palace)',
+    'Skull Woods': 'Big Key (Skull Woods)',
+    'Thieves Town': 'Big Key (Thieves Town)'
+}
 

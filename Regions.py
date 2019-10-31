@@ -647,11 +647,6 @@ dungeon_events = [
     'Revealing Light'
 ]
 
-flooded_keys = {
-    'Trench 1 Switch': 'Swamp Palace - Trench 1 Pot Key',
-    'Trench 2 Switch': 'Swamp Palace - Trench 2 Pot Key'
-}
-
 flooded_keys_reverse = {
     'Swamp Palace - Trench 1 Pot Key': 'Trench 1 Switch',
     'Swamp Palace - Trench 2 Pot Key': 'Trench 2 Switch'
