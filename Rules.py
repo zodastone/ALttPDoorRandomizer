@@ -259,7 +259,6 @@ def global_rules(world, player):
 
     # Start of door rando rules
     # TODO: Do these need to flag off when door rando is off? - some of them, yes
-    add_key_logic_rules(world, player)  # todo - vanilla shuffle rules
 
     # Eastern Palace
     # Eyegore room needs a bow
@@ -367,18 +366,30 @@ def global_rules(world, player):
     set_rule(world.get_location('Thieves\' Town - Boss', player), lambda state: state.has('Maiden Unmasked', player) and world.get_location('Thieves\' Town - Boss', player).parent_region.dungeon.boss.can_defeat(state))
     set_rule(world.get_location('Thieves\' Town - Prize', player), lambda state: state.has('Maiden Unmasked', player) and world.get_location('Thieves\' Town - Prize', player).parent_region.dungeon.boss.can_defeat(state))
 
+    set_rule(world.get_entrance('Ice Lobby WS', player), lambda state: state.can_melt_things(player))
+    set_rule(world.get_location('Ice Palace - Big Chest', player), lambda state: state.has('Big Key (Ice Palace)', player))
+    if world.accessibility == 'locations':
+        forbid_item(world.get_location('Ice Palace - Big Chest', player), 'Big Key (Ice Palace)', player)
+    set_rule(world.get_entrance('Ice Hammer Block ES', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
+    set_rule(world.get_location('Ice Palace - Hammer Block Key Drop', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
+    set_rule(world.get_location('Ice Palace - Map Chest', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
+    set_rule(world.get_entrance('Ice Antechamber Hole', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
+    # todo: ohko rules for spike room - could split into two regions instead of these, but can_take_damage is usually true
+    set_rule(world.get_entrance('Ice Spike Room WS', player), lambda state: state.world.can_take_damage or state.has('Hookshot', player) or state.has('Cape', player) or state.has('Cane of Byrna', player))
+    set_rule(world.get_entrance('Ice Spike Room Up Stairs', player), lambda state: state.world.can_take_damage or state.has('Hookshot', player) or state.has('Cape', player) or state.has('Cane of Byrna', player))
+    set_rule(world.get_entrance('Ice Spike Room Down Stairs', player), lambda state: state.world.can_take_damage or state.has('Hookshot', player) or state.has('Cape', player) or state.has('Cane of Byrna', player))
+    set_rule(world.get_location('Ice Palace - Spike Room', player), lambda state: state.world.can_take_damage or state.has('Hookshot', player) or state.has('Cape', player) or state.has('Cane of Byrna', player))
+    set_rule(world.get_entrance('Ice Hookshot Ledge Path', player), lambda state: state.has('Hookshot', player))
+    set_rule(world.get_entrance('Ice Hookshot Balcony Path', player), lambda state: state.has('Hookshot', player))
+    set_rule(world.get_entrance('Ice Switch Room SE', player), lambda state: state.has('Cane of Somaria', player) or state.has('Convenient Block', player))
+    set_defeat_dungeon_boss_rule(world.get_location('Ice Palace - Boss', player))
+    set_defeat_dungeon_boss_rule(world.get_location('Ice Palace - Prize', player))
+
+    add_key_logic_rules(world, player)  # todo - vanilla shuffle rules
     # End of door rando rules.
 
     add_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
 
-    set_rule(world.get_entrance('Ice Palace Entrance Room', player), lambda state: state.can_melt_things(player))
-    set_rule(world.get_location('Ice Palace - Big Chest', player), lambda state: state.has('Big Key (Ice Palace)', player))
-    set_rule(world.get_entrance('Ice Palace (Kholdstare)', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player) and state.has('Big Key (Ice Palace)', player) and (state.has_key('Small Key (Ice Palace)', player, 2) or (state.has('Cane of Somaria', player) and state.has_key('Small Key (Ice Palace)', player, 1))))
-    # TODO: investigate change from VT. Changed to hookshot or 2 keys (no checking for big key in specific chests)
-    set_rule(world.get_entrance('Ice Palace (East)', player), lambda state: (state.has('Hookshot', player) or (item_in_locations(state, 'Big Key (Ice Palace)', player, [('Ice Palace - Spike Room', player), ('Ice Palace - Big Key Chest', player), ('Ice Palace - Map Chest', player)]) and state.has_key('Small Key (Ice Palace)', player))) and (state.world.can_take_damage or state.has('Hookshot', player) or state.has('Cape', player) or state.has('Cane of Byrna', player)))
-    set_rule(world.get_entrance('Ice Palace (East Top)', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Ice Palace - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Ice Palace - Prize', player))
     for location in ['Ice Palace - Big Chest', 'Ice Palace - Boss']:
         forbid_item(world.get_location(location, player), 'Big Key (Ice Palace)', player)
 
@@ -1693,102 +1704,5 @@ def add_key_logic_rules(world, player):
                 forbid_item(location, d_logic.bk_name, player)
 
 
-def generate_key_logic(dungeon_name, small_key_name, world, player):
-    sector, start_region_names = world.dungeon_layouts[player][dungeon_name]
-    logger = logging.getLogger('')
-    # Now that the dungeon layout is done, we need to search again to generate key logic.
-    # TODO: This assumes all start doors are accessible, which isn't always true.
-    state = ExplorationState()
-    # available_doors = []  # Doors to explore
-    # visited_regions = set()  # Regions we've been to and don't need to expand
-    current_kr = 0  # Key regions are numbered, starting at 0
-    # door_krs = {}  # Map of key door name to KR it lives in
-    kr_parents = {}  # Key region to parent map
-    # kr_location_counts = defaultdict(int)  # Number of locations in each key region
-    # Everything in a start region is in key region 0.
-    for name in start_region_names:
-        region = world.get_region(name, player)
-        state.visit_region(region, current_kr)
-        state.add_all_doors_check_key_region(region, current_kr, world, player)
-    # Search into the dungeon
-    # logger.debug('Begin key region search. %s', small_key_name)
-    while len(state.avail_doors) > 0:
-        # Open as many non-key doors as possible before opening a key door.
-        # This guarantees that we're only exploring one key region at a time.
-        state.avail_doors.sort(key=state.key_door_sort)
-        explorable_door = state.next_avail_door()
-        door = explorable_door.door
-        local_kr = state.door_krs[door.name]
-        # logger.debug('  kr %s: Door %s', local_kr, door.name)
-        connect_region = world.get_entrance(door.name, player).connected_region
-        # Bail early if we've been here before or the door is blocked
-        if not state.validate(door, connect_region, world):
-            continue
-        # Once we open a key door, we need a new region.
-        if door.smallKey and door not in state.opened_doors:  # we tend to open doors in a DFS manner
-            current_kr += 1
-            kr_parents[current_kr] = local_kr
-            local_kr = current_kr
-            state.opened_doors.append(door)
-            if door.dest.smallKey:
-                state.opened_doors.append(door.dest)
-            # logger.debug('%s:    New KR %s', door.name, current_kr)
-        # Account for the new region
-        state.visit_region(connect_region, local_kr)
-        state.add_all_doors_check_key_region(connect_region, local_kr, world, player)
-        # kr_location_counts[local_kr] += len(exit.locations)
-    # Now that we have doors divided up into key regions, we can analyze the map
-    # Invert the door -> kr map into one that lists doors by region.
-    kr_doors = defaultdict(list)
-    region_krs = {}
-    for door_name in state.door_krs:
-        kr = state.door_krs[door_name]
-        entrance = world.get_entrance(door_name, player)
-        door = world.check_for_door(door_name, player)
-        ent_name = entrance.parent_region.name
-        if ent_name in region_krs.keys():
-            region_krs[entrance.parent_region.name] = min(region_krs[entrance.parent_region.name], kr)
-        else:
-            region_krs[entrance.parent_region.name] = kr
-        if door.smallKey and not door.blocked:
-            kr_doors[kr].append(entrance)
-    kr_keys = defaultdict(int)  # Number of keys each region needs
-    for kr in range(0, current_kr + 1):
-        logic_doors = []
-        keys = 0
-        for door in kr_doors[kr]:
-            dest_kr = region_krs[door.connected_region.name]
-            if dest_kr > kr:  # may be the case if dest_kr != parent_kr of kr
-                # This door heads deeper into the dungeon. It needs a full key, and logic
-                keys += 1
-                logic_doors.append(door)
-            elif dest_kr == kr:
-                # This door doesn't get us any deeper, but it's possible to waste a key.
-                # If we're going to see its sibling in this search, add half a key
-                actual_door = world.get_door(door.name, player)
-                if actual_door.type == DoorType.SpiralStairs:
-                    keys += 1
-                else:
-                    keys += 0.5
-                logic_doors.append(door)  # this may still need logic
-        # Add key count from parent region
-        if kr in kr_parents:
-            keys += kr_keys[kr_parents[kr]]
-        kr_keys[kr] = keys
-        # Generate logic
-        for door in logic_doors:
-            logger.debug('  %s in kr %s needs %s keys', door.name, kr, keys)
-            add_rule(world.get_entrance(door.name, player), create_key_rule(small_key_name, player, keys))
-
-
 def create_key_rule(small_key_name, player, keys):
     return lambda state: state.has_key(small_key_name, player, keys)
-
-
-def get_doors(world, region, player):
-    res = []
-    for exit in region.exits:
-        door = world.check_for_door(exit.name, player)
-        if door is not None:
-            res.append(door)
-    return res

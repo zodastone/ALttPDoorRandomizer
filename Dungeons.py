@@ -23,7 +23,7 @@ def create_dungeons(world, player):
     TT = make_dungeon('Thieves Town', 'Blind', thieves_regions, ItemFactory('Big Key (Thieves Town)', player), [ItemFactory('Small Key (Thieves Town)', player)], ItemFactory(['Map (Thieves Town)', 'Compass (Thieves Town)'], player))
     SW = make_dungeon('Skull Woods', 'Mothula', skull_regions, ItemFactory('Big Key (Skull Woods)', player), ItemFactory(['Small Key (Skull Woods)'] * 2, player), ItemFactory(['Map (Skull Woods)', 'Compass (Skull Woods)'], player))
     SP = make_dungeon('Swamp Palace', 'Arrghus', swamp_regions, ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
-    IP = make_dungeon('Ice Palace', 'Kholdstare', ['Ice Palace (Entrance)', 'Ice Palace (Main)', 'Ice Palace (East)', 'Ice Palace (East Top)', 'Ice Palace (Kholdstare)'], ItemFactory('Big Key (Ice Palace)', player), ItemFactory(['Small Key (Ice Palace)'] * 2, player), ItemFactory(['Map (Ice Palace)', 'Compass (Ice Palace)'], player))
+    IP = make_dungeon('Ice Palace', 'Kholdstare', ice_regions, ItemFactory('Big Key (Ice Palace)', player), ItemFactory(['Small Key (Ice Palace)'] * 2, player), ItemFactory(['Map (Ice Palace)', 'Compass (Ice Palace)'], player))
     MM = make_dungeon('Misery Mire', 'Vitreous', ['Misery Mire (Entrance)', 'Misery Mire (Main)', 'Misery Mire (West)', 'Misery Mire (Final Area)', 'Misery Mire (Vitreous)'], ItemFactory('Big Key (Misery Mire)', player), ItemFactory(['Small Key (Misery Mire)'] * 3, player), ItemFactory(['Map (Misery Mire)', 'Compass (Misery Mire)'], player))
     TR = make_dungeon('Turtle Rock', 'Trinexx', ['Turtle Rock (Entrance)', 'Turtle Rock (First Section)', 'Turtle Rock (Chain Chomp Room)', 'Turtle Rock (Second Section)', 'Turtle Rock (Big Chest)', 'Turtle Rock (Crystaroller Room)', 'Turtle Rock (Dark Room)', 'Turtle Rock (Eye Bridge)', 'Turtle Rock (Trinexx)'], ItemFactory('Big Key (Turtle Rock)', player), ItemFactory(['Small Key (Turtle Rock)'] * 4, player), ItemFactory(['Map (Turtle Rock)', 'Compass (Turtle Rock)'], player))
 
@@ -203,7 +203,7 @@ tower_regions = [
 ]
 
 pod_regions = [
-    'PoD Lobby', 'PoD Left Cage', 'PoD Middle Cage', 'PoD Shooter Room', 'PoD Pit Room', 'PoD Arena Main',
+    'PoD Lobby', 'PoD Left Cage', 'PoD Middle Cage', 'PoD Shooter Room', 'PoD Pit Room', 'PoD Arena Main', 'PoD Arena North',
     'PoD Arena Crystal', 'PoD Arena Bridge', 'PoD Arena Ledge', 'PoD Sexy Statue', 'PoD Map Balcony', 'PoD Conveyor',
     'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room', 'PoD Stalfos Basement', 'PoD Basement Ledge',
     'PoD Big Key Landing', 'PoD Falling Bridge', 'PoD Dark Maze', 'PoD Big Chest Balcony', 'PoD Compass Room',
@@ -241,6 +241,16 @@ thieves_regions = [
     'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap'
 ]
 
+ice_regions = [
+    'Ice Lobby', 'Ice Jelly Key', 'Ice Floor Switch', 'Ice Cross Left', 'Ice Cross Bottom', 'Ice Cross Right',
+    'Ice Cross Top', 'Ice Compass Room', 'Ice Pengator Switch', 'Ice Dead End', 'Ice Big Key', 'Ice Bomb Drop',
+    'Ice Stalfos Hint', 'Ice Conveyor', 'Ice Bomb Jump Ledge', 'Ice Bomb Jump Catwalk', 'Ice Narrow Corridor',
+    'Ice Pengator Trap', 'Ice Spike Cross', 'Ice Firebar', 'Ice Falling Square', 'Ice Spike Room', 'Ice Hammer Block',
+    'Ice Tongue Pull', 'Ice Freezors', 'Ice Freezors Ledge', 'Ice Tall Hint', 'Ice Hookshot Ledge',
+    'Ice Hookshot Balcony', 'Ice Spikeball', 'Ice Lonely Freezor', 'Iced T', 'Ice Catwalk', 'Ice Many Pots',
+    'Ice Crystal Right', 'Ice Crystal Left', 'Ice Crystal Block', 'Ice Big Chest View', 'Ice Big Chest Landing',
+    'Ice Backwards Room', 'Ice Anti-Fairy', 'Ice Switch Room', 'Ice Refill', 'Ice Fairy', 'Ice Antechamber', 'Ice Boss'
+]
 
 dungeon_regions = {
     'Hyrule Castle': hyrule_castle_regions,
@@ -252,7 +262,7 @@ dungeon_regions = {
     'Swamp Palace': swamp_regions,
     'Skull Woods': skull_regions,
     'Thieves Town': thieves_regions,
-    # 'Ice':
+    'Ice Palace': ice_regions,
     # 'Mire':
     # 'TR':
     # 'GT':
@@ -269,7 +279,7 @@ region_starts = {
     'Skull Woods': ['Skull 1 Lobby', 'Skull 2 East Lobby', 'Skull 2 West Lobby', 'Skull 3 Lobby', 'Skull Pot Circle',
                     'Skull Pinball', 'Skull Left Drop', 'Skull Back Drop'],
     'Thieves Town': ['Thieves Lobby'],
-    # ['Ice Lobby'],
+    'Ice Palace': ['Ice Lobby'],
     # ['Mire Lobby'],
     # ['TR Main Lobby', 'TR Eye Trap', 'TR Big Chest', 'TR Laser Bridge'],
     # ['GT Lobby']
@@ -296,7 +306,8 @@ dungeon_keys = {
     'Palace of Darkness': 'Small Key (Palace of Darkness)',
     'Swamp Palace': 'Small Key (Swamp Palace)',
     'Skull Woods': 'Small Key (Skull Woods)',
-    'Thieves Town': 'Small Key (Thieves Town)'
+    'Thieves Town': 'Small Key (Thieves Town)',
+    'Ice Palace': 'Small Key (Ice Palace)',
 }
 
 dungeon_bigs = {
@@ -308,6 +319,7 @@ dungeon_bigs = {
     'Palace of Darkness': 'Big Key (Palace of Darkness)',
     'Swamp Palace': 'Big Key (Swamp Palace)',
     'Skull Woods': 'Big Key (Skull Woods)',
-    'Thieves Town': 'Big Key (Thieves Town)'
+    'Thieves Town': 'Big Key (Thieves Town)',
+    'Ice Palace': 'Big Key (Ice Palace)',
 }
 

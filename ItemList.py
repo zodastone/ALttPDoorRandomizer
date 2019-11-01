@@ -192,6 +192,9 @@ def generate_itempool(world, player):
     world.push_item(world.get_location('Revealing Light', player), ItemFactory('Maiden Unmasked', player), False)
     world.get_location('Revealing Light', player).event = True
     world.get_location('Revealing Light', player).locked = True
+    world.push_item(world.get_location('Ice Block Drop', player), ItemFactory('Convenient Block', player), False)
+    world.get_location('Ice Block Drop', player).event = True
+    world.get_location('Ice Block Drop', player).locked = True
 
     # set up item pool
     if world.custom:

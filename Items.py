@@ -178,4 +178,5 @@ item_table = {'Bow': (True, False, None, 0x0B, 'You have\nchosen the\narcher cla
               'Shining Light': (True, False, 'Event', None, None, None, None, None, None, None, None),
               'Maiden Rescued': (True, False, 'Event', None, None, None, None, None, None, None, None),
               'Maiden Unmasked': (True, False, 'Event', None, None, None, None, None, None, None, None),
-             }
+              'Convenient Block': (True, False, 'Event', None, None, None, None, None, None, None, None),
+              }

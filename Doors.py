@@ -286,6 +286,8 @@ def create_doors(world, player):
         create_door(player, 'PoD Arena Main NW', Nrml).dir(Direction.North, 0x2a, Left, High).small_key().pos(1),
         create_door(player, 'PoD Arena Main NE', Nrml).dir(Direction.North, 0x2a, Right, High).no_exit().trap(0x4).pos(0),
         create_door(player, 'PoD Arena Main Crystal Path', Lgcl),
+        create_door(player, 'PoD Arena Main Orange Barrier', Lgcl),
+        create_door(player, 'PoD Arena North Drop Down', Lgcl),
         create_door(player, 'PoD Arena Crystals E', Nrml).dir(Direction.East, 0x2a, Mid, High).pos(3),
         create_door(player, 'PoD Arena Crystal Path', Lgcl),
         create_door(player, 'PoD Arena Bridge Drop Down', Lgcl),
@@ -554,11 +556,106 @@ def create_doors(world, player):
         create_door(player, 'Thieves Conveyor Block WN', Intr).dir(Direction.West, 0x44, Top, High).pos(0),
         create_door(player, 'Thieves Trap EN', Intr).dir(Direction.East, 0x44, Left, Top).pos(0),
 
+        create_door(player, 'Ice Lobby WS', Intr).dir(Direction.West, 0x0e, Bot, High).pos(1),
+        create_door(player, 'Ice Jelly Key ES', Intr).dir(Direction.East, 0x0e, Bot, High).pos(1),
+        create_door(player, 'Ice Jelly Key Down Stairs', Sprl).dir(Direction.Down, 0x0e, 0, HTH).ss(X, 0x11, 0x80, True, True).small_key().pos(0),
+        create_door(player, 'Ice Floor Switch Up Stairs', Sprl).dir(Direction.Up, 0x1e, 0, HTH).ss(X, 0x1a, 0x6c, True, True),
+        create_door(player, 'Ice Floor Switch ES', Intr).dir(Direction.East, 0x1e, Bot, High).pos(1),
+        create_door(player, 'Ice Cross Left WS', Intr).dir(Direction.West, 0x1e, Bot, High).pos(1),
+        create_door(player, 'Ice Cross Top NE', Intr).dir(Direction.North, 0x1e, Right, High).pos(2),
+        create_door(player, 'Ice Bomb Drop SE', Intr).dir(Direction.South, 0x1e, Right, High).pos(2),
+        create_door(player, 'Ice Cross Left Push Block', Lgcl),  # dynamic
+        create_door(player, 'Ice Cross Bottom Push Block Left', Lgcl),
+        create_door(player, 'Ice Cross Bottom Push Block Right', Lgcl),  # dynamic
+        create_door(player, 'Ice Cross Right Push Block Top', Lgcl),
+        create_door(player, 'Ice Cross Right Push Block Bottom', Lgcl),  # dynamic
+        create_door(player, 'Ice Cross Top Push Block Left', Lgcl),
+        create_door(player, 'Ice Cross Top Push Block Right', Lgcl),  # dynamic
+        create_door(player, 'Ice Cross Bottom SE', Nrml).dir(Direction.South, 0x1e, Right, High).pos(3),
+        create_door(player, 'Ice Cross Right ES', Nrml).dir(Direction.East, 0x1e, Bot, High).pos(0),
+        create_door(player, 'Ice Bomb Drop Hole', Hole),
+        create_door(player, 'Ice Compass Room NE', Nrml).dir(Direction.North, 0x2e, Right, High).pos(0),
+        create_door(player, 'Ice Pengator Switch WS', Nrml).dir(Direction.West, 0x1f, Bot, High).pos(0),
+        create_door(player, 'Ice Pengator Switch ES', Intr).dir(Direction.East, 0x1f, Bot, High).pos(1),
+        create_door(player, 'Ice Dead End WS', Intr).dir(Direction.West, 0x1f, Bot, High).pos(1),
+        create_door(player, 'Ice Big Key Push Block', Lgcl),
+        create_door(player, 'Ice Big Key Down Ladder', Lddr),
+        create_door(player, 'Ice Stalfos Hint SE', Intr).dir(Direction.South, 0x3e, Right, High).pos(0),
+        create_door(player, 'Ice Conveyor NE', Intr).dir(Direction.North, 0x3e, Right, High).no_exit().pos(0),
+        create_door(player, 'Ice Conveyor SW', Nrml).dir(Direction.South, 0x3e, Left, High).small_key().pos(1),
+        create_door(player, 'Ice Bomb Jump NW', Nrml).dir(Direction.North, 0x4e, Left, High).small_key().pos(1),
+        create_door(player, 'Ice Bomb Jump Ledge Orange Barrier', Lgcl),
+        create_door(player, 'Ice Bomb Jump Catwalk Orange Barrier', Lgcl),
+        create_door(player, 'Ice Bomb Jump EN', Intr).dir(Direction.East, 0x4e, Top, High).pos(0),
+        create_door(player, 'Ice Narrow Corridor WN', Intr).dir(Direction.West, 0x4e, Top, High).pos(0),
+        create_door(player, 'Ice Narrow Corridor Down Stairs', Sprl).dir(Direction.Down, 0x4e, 0, HTH).ss(S, 0x52, 0xc0, True, True),
+        create_door(player, 'Ice Pengator Trap Up Stairs', Sprl).dir(Direction.Up, 0x6e, 0, HTH).ss(S, 0x5a, 0xac, True, True),
+        create_door(player, 'Ice Pengator Trap NE', Nrml).dir(Direction.North, 0x6e, Right, High).pos(0),
+        create_door(player, 'Ice Spike Cross SE', Nrml).dir(Direction.South, 0x5e, Right, High).pos(2),
+        create_door(player, 'Ice Spike Cross ES', Nrml).dir(Direction.East, 0x5e, Bot, High).small_key().pos(0),
+        create_door(player, 'Ice Spike Cross WS', Intr).dir(Direction.West, 0x5e, Bot, High).pos(3),
+        create_door(player, 'Ice Firebar ES', Intr).dir(Direction.East, 0x5e, Bot, High).pos(3),
+        create_door(player, 'Ice Firebar Down Ladder', Lddr),
+        create_door(player, 'Ice Spike Cross NE', Intr).dir(Direction.North, 0x5e, Right, High).pos(1),
+        create_door(player, 'Ice Falling Square SE', Intr).dir(Direction.South, 0x5e, Right, High).pos(1),
+        create_door(player, 'Ice Falling Square Hole', Hole),
+        create_door(player, 'Ice Spike Room WS', Nrml).dir(Direction.West, 0x5f, Bot, High).small_key().pos(0),
+        create_door(player, 'Ice Spike Room Up Stairs', Sprl).dir(Direction.Up, 0x5f, 4, HTH).ss(Z, 0x11, 0x48, True, True),
+        create_door(player, 'Ice Spike Room Down Stairs', Sprl).dir(Direction.Down, 0x5f, 3, HTH).ss(Z, 0x1a, 0xa4, True, True),
+        create_door(player, 'Ice Hammer Block Down Stairs', Sprl).dir(Direction.Down, 0x3f, 0, HTH).ss(Z, 0x11, 0xb8, True, True),
+        create_door(player, 'Ice Hammer Block ES', Intr).dir(Direction.East, 0x3f, Bot, High).pos(0),
+        create_door(player, 'Ice Tongue Pull WS', Intr).dir(Direction.West, 0x3f, Bot, High).pos(0),
+        create_door(player, 'Ice Tongue Pull Up Ladder', Lddr),
+        create_door(player, 'Ice Freezors Up Ladder', Lddr),
+        create_door(player, 'Ice Freezors Hole', Hole),
+        create_door(player, 'Ice Freezors Bomb Hole', Hole), # combine these two? -- they have to lead to the same spot
+        create_door(player, 'Ice Freezors Ledge Hole', Hole),
+        create_door(player, 'Ice Freezors Ledge ES', Intr).dir(Direction.East, 0x7e, Bot, High).pos(2),
+        create_door(player, 'Ice Tall Hint WS', Intr).dir(Direction.West, 0x7e, Bot, High).pos(1),
+        create_door(player, 'Ice Tall Hint EN', Nrml).dir(Direction.East, 0x7e, Top, High).pos(1),
+        create_door(player, 'Ice Tall Hint SE', Nrml).dir(Direction.South, 0x7e, Right, High).small_key().pos(0),
+        create_door(player, 'Ice Hookshot Ledge WN', Nrml).dir(Direction.West, 0x7f, Top, High).pos(0),
+        create_door(player, 'Ice Hookshot Ledge Path', Lgcl),
+        create_door(player, 'Ice Hookshot Balcony Path', Lgcl),
+        create_door(player, 'Ice Hookshot Balcony SW', Intr).dir(Direction.South, 0x7f, Left, High).pos(1),
+        create_door(player, 'Ice Spikeball NW', Intr).dir(Direction.North, 0x7f, Left, High).pos(1),
+        create_door(player, 'Ice Spikeball Up Stairs', Sprl).dir(Direction.Up, 0x7f, 0, HTH).ss(Z, 0x1a, 0x34, True, True),
+        create_door(player, 'Ice Lonely Freezor NE', Nrml).dir(Direction.North, 0x8e, Right, High).small_key().pos(0),
+        create_door(player, 'Ice Lonely Freezor Down Stairs', Sprl).dir(Direction.Up, 0x8e, 0, HTH).ss(S, 0x11, 0x50, True, True),
+        create_door(player, 'Iced T EN', Nrml).dir(Direction.East, 0xae, Top, High).pos(0),
+        create_door(player, 'Iced T Up Stairs', Sprl).dir(Direction.Up, 0xae, 0, HTH).ss(S, 0x1a, 0x3c, True, True),
+        create_door(player, 'Ice Catwalk WN', Nrml).dir(Direction.West, 0xaf, Top, High).pos(1),
+        create_door(player, 'Ice Catwalk NW', Nrml).dir(Direction.North, 0xaf, Left, High).pos(0),
+        create_door(player, 'Ice Many Pots SW', Nrml).dir(Direction.South, 0x9f, Left, High).pos(1),
+        create_door(player, 'Ice Many Pots WS', Nrml).dir(Direction.West, 0x9f, Bot, High).pos(0),
+        create_door(player, 'Ice Crystal Right ES', Nrml).dir(Direction.East, 0x9e, Bot, High).pos(3),
+        create_door(player, 'Ice Crystal Right Orange Barrier', Lgcl),
+        create_door(player, 'Ice Crystal Right Blue Hole', Hole),  # combine holes again??
+        create_door(player, 'Ice Crystal Left Orange Barrier', Lgcl),
+        create_door(player, 'Ice Crystal Left Blue Barrier', Lgcl),
+        create_door(player, 'Ice Crystal Block Exit', Lgcl),
+        create_door(player, 'Ice Crystal Block Hole', Hole),
+        create_door(player, 'Ice Crystal Left WS', Intr).dir(Direction.West, 0x9e, Bot, High).pos(2),
+        create_door(player, 'Ice Big Chest View ES', Intr).dir(Direction.East, 0x9e, Bot, High).pos(2),
+        create_door(player, 'Ice Big Chest Landing Push Blocks', Lgcl),
+        create_door(player, 'Ice Crystal Right NE', Intr).dir(Direction.North, 0x9e, Right, High).big_key().pos(1),
+        create_door(player, 'Ice Backwards Room SE', Intr).dir(Direction.South, 0x9e, Right, High).pos(1),
+        create_door(player, 'Ice Backwards Room Down Stairs', Sprl).dir(Direction.Down, 0x9e, 0, HTH).ss(S, 0x11, 0x80, True, True).small_key().pos(0),
+        create_door(player, 'Ice Backwards Room Hole', Hole),
+        create_door(player, 'Ice Anti-Fairy Up Stairs', Sprl).dir(Direction.Up, 0xbe, 0, HTH).ss(S, 0x1a, 0x6c, True, True),
+        create_door(player, 'Ice Anti-Fairy SE', Intr).dir(Direction.South, 0xbe, Right, High).pos(2),
+        create_door(player, 'Ice Switch Room NE', Intr).dir(Direction.North, 0xbe, Right, High).pos(2),
+        create_door(player, 'Ice Switch Room ES', Nrml).dir(Direction.East, 0xbe, Bot, High).small_key().pos(1),
+        create_door(player, 'Ice Switch Room SE', Nrml).dir(Direction.South, 0xbe, Right, High).pos(0),
+        create_door(player, 'Ice Refill WS', Nrml).dir(Direction.West, 0xbf, Bot, High).small_key().pos(0),
+        create_door(player, 'Ice Fairy Warp', Warp),
+        create_door(player, 'Ice Antechamber NE', Nrml).dir(Direction.North, 0xce, Right, High).pos(0),
+        create_door(player, 'Ice Antechamber Hole', Hole),
+
         # Door Templates
-        # create_door(player, '', Nrml).dir(Direction.North, 0x00, Mid, High).pos(),
-        # create_door(player, '', Intr).dir(Direction.North, 0x00, Left, High).pos(),
-        # create_door(player, '', Sprl).dir(Direction.North, 0x00, 0, High).ss(),
-        # create_door(player, '', Open).dir(Direction.North, 0x00, None, High),
+        # create_door(player, '', Nrml).dir(Direction.North, 0x00, Right, High).pos(),
+        # create_door(player, '', Intr).dir(Direction.North, 0x00, Right, High).pos(),
+        # create_door(player, '', Sprl).dir(Direction.Up, 0x00, 0, HTH).ss(Q, 0x0, 0x0),
         # create_door(player, '', Lgcl),
         # create_door(player, '', Hole),
         # create_door(player, '', Warp),
@@ -579,6 +676,7 @@ def create_doors(world, player):
     world.get_door('Swamp Drain Right Switch', player).event('Swamp Drain')
     world.get_door('Swamp Flooded Room Ladder', player).event('Swamp Drain')
 
+
     # crystal switches and barriers
     world.get_door('Hera Lobby Down Stairs', player).c_switch()
     world.get_door('Hera Lobby Key Stairs', player).c_switch()
@@ -597,8 +695,7 @@ def create_doors(world, player):
 
     world.get_door('PoD Arena Main SW', player).c_switch()
     world.get_door('PoD Arena Bridge SE', player).c_switch()
-    world.get_door('PoD Arena Main NW', player).barrier(CrystalBarrier.Orange)
-    world.get_door('PoD Arena Main NE', player).barrier(CrystalBarrier.Orange)
+    world.get_door('PoD Arena Main Orange Barrier', player).barrier(CrystalBarrier.Orange)
     # maybe you can cross this way with blue up??
     world.get_door('PoD Arena Main Crystal Path', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Arena Crystals E', player).barrier(CrystalBarrier.Blue)
@@ -628,6 +725,26 @@ def create_doors(world, player):
     world.get_door('Thieves Hellway Orange Barrier', player).barrier(CrystalBarrier.Orange)
     world.get_door('Thieves Hellway Crystal Orange Barrier', player).barrier(CrystalBarrier.Orange)
 
+    world.get_door('Ice Bomb Drop SE', player).c_switch()
+    world.get_door('Ice Conveyor SW', player).c_switch()
+    world.get_door('Ice Refill WS', player).c_switch()
+    world.get_door('Ice Bomb Drop Hole', player).barrier(CrystalBarrier.Orange)  # not required to hit switch w/ bomb
+    world.get_door('Ice Bomb Jump Ledge Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Ice Bomb Jump Catwalk Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Ice Crystal Right Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Ice Crystal Right Blue Hole', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Ice Crystal Left Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Ice Crystal Left Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Ice Backwards Room Hole', player).barrier(CrystalBarrier.Blue)
+
+    # nifty dynamic logical doors:
+    south_controller = world.get_door('Ice Cross Bottom SE', player)
+    east_controller = world.get_door('Ice Cross Right ES', player)
+    controller_door(south_controller, world.get_door('Ice Cross Left Push Block', player))
+    controller_door(south_controller, world.get_door('Ice Cross Right Push Block Bottom', player))
+    controller_door(east_controller, world.get_door('Ice Cross Bottom Push Block Right', player))
+    controller_door(east_controller, world.get_door('Ice Cross Top Push Block Right', player))
+
 
 def create_paired_doors(world, player):
     world.paired_doors[player] = [
@@ -646,16 +763,16 @@ def create_paired_doors(world, player):
         PairedDoor('Swamp Pot Row WS', 'Swamp Trench 1 Approach ES'),  # Swamp key door early room $38
         PairedDoor('PoD Middle Cage N', 'PoD Pit Room S'),
         # PairedDoor('', ''),  # GT moldorm key door
-        # PairedDoor('', ''),  # Ice BJ key door
+        PairedDoor('Ice Conveyor SW', 'Ice Bomb Jump NW'),  # Ice BJ key door
         PairedDoor('Desert Tiles 2 SE', 'Desert Beamos Hall NE'),
         PairedDoor('Skull 3 Lobby NW', 'Skull Star Pits SW'),  # Skull 3 key door
         PairedDoor('Skull 1 Lobby WS', 'Skull Pot Prison ES'),  # Skull 1 key door - pot prison to big chest
         PairedDoor('Skull Map Room SE', 'Skull Pinball NE'),  # Skull 1 - pinball key door
         # PairedDoor('', ''),  # gt main big key door
-        # PairedDoor('', ''),  # ice door to spike chest
+        PairedDoor('Ice Spike Cross ES', 'Ice Spike Room WS'),  # ice door to spike chest
         # PairedDoor('', ''),  # gt right side key door to cape bridge
         # PairedDoor('', ''),  # gt bombable to rando room
-        # PairedDoor('', ''),  # ice's big icy room key door to lonely freezor
+        PairedDoor('Ice Tall Hint SE', 'Ice Lonely Freezor NE'),  # ice's big icy room key door to lonely freezor
         PairedDoor('Eastern Courtyard N', 'Eastern Darkness S'),
         # PairedDoor('', ''),  # mire fishbone key door
         # PairedDoor('', ''),  # mire big key door to bridges
@@ -664,12 +781,17 @@ def create_paired_doors(world, player):
         PairedDoor('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
         PairedDoor('Thieves BK Corner NW', 'Thieves Pot Alcove Bottom SW'),  # TT random bomb to pots
         PairedDoor('Thieves BK Corner NW', 'Thieves Hallway SE'),  # TT big key door
-        # PairedDoor('', ''),  # Ice last key door to crystal switch
+        PairedDoor('Ice Switch Room ES', 'Ice Refill WS'),  # Ice last key door to crystal switch
         # PairedDoor('', ''),  # mire hub key door to attic
         # PairedDoor('', ''),  # mire hub key door to map
         # PairedDoor('', ''),  # tr last key door to switch maze
         PairedDoor('Thieves Ambush E', 'Thieves BK Corner W')  # TT dashable above
     ]
+
+
+def controller_door(controller, dependent):
+    dependent.controller = controller
+    controller.dependents.append(dependent)
 
 
 def create_door(player, name, door_type):

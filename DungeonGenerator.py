@@ -21,6 +21,7 @@ class GraphPiece:
 
     def __init__(self):
         self.hanger_info = None
+        self.hanger_crystal = None
         self.hooks = {}
         self.visited_regions = set()
 
@@ -91,35 +92,22 @@ def gen_dungeon_info(available_sectors, entrance_regions, proposed_map, valid_do
     original_state = extend_reachable_state_improved(entrance_regions, ExplorationState(), proposed_map, valid_doors, world, player)
     dungeon['Origin'] = create_graph_piece_from_state(None, original_state, original_state, proposed_map)
     doors_to_connect = set()
-    blue_hooks = []
+    hanger_set = set()
     o_state_cache = {}
     for sector in available_sectors:
         for door in sector.outstanding_doors:
             doors_to_connect.add(door)
             if not door.stonewall and door not in proposed_map.keys():
+                hanger_set.add(door)
                 parent = parent_region(door, world, player).parent_region
                 o_state = extend_reachable_state_improved([parent], ExplorationState(), proposed_map, valid_doors, world, player)
                 o_state_cache[door.name] = o_state
                 piece = create_graph_piece_from_state(door, o_state, o_state, proposed_map)
                 dungeon[door.name] = piece
-                for hook, crystal in piece.hooks.items():
-                    if crystal == CrystalBarrier.Blue or crystal == CrystalBarrier.Either:
-                        h_type = hook_from_door(hook)
-                        if h_type not in blue_hooks:
-                            blue_hooks.append(h_type)  # todo: specific hooks and valid path to c_switch
-    if len(blue_hooks) > 0:
-        for sector in available_sectors:
-            for door in sector.outstanding_doors:
-                h_type = hanger_from_door(door)
-                if not door.stonewall and door not in proposed_map.keys() and h_type in blue_hooks:
-                    parent = parent_region(door, world, player).parent_region
-                    blue_start = ExplorationState(CrystalBarrier.Blue)
-                    b_state = extend_reachable_state_improved([parent], blue_start, proposed_map, valid_doors, world, player)
-                    o_state = o_state_cache[door.name]
-                    dungeon[door.name] = create_graph_piece_from_state(door, o_state, b_state, proposed_map)
+    check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_doors, world, player)
 
-    # catalog hooks: Dict<Hook, Set<>
-    # and hangers:
+    # catalog hooks: Dict<Hook, Set<Door, Crystal, Door>>
+    # and hangers: Dict<Hang, Set<Door>>
     avail_hooks = defaultdict(set)
     hangers = defaultdict(set)
     for key, piece in dungeon.items():
@@ -134,6 +122,46 @@ def gen_dungeon_info(available_sectors, entrance_regions, proposed_map, valid_do
     # thin out invalid hanger
     winnow_hangers(hangers, avail_hooks)
     return dungeon, hangers, avail_hooks
+
+
+def check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_doors, world, player):
+    not_blue = set()
+    not_blue.update(hanger_set)
+    doors_to_check = set()
+    doors_to_check.update(hanger_set)  # doors to check, check everything on first pass
+    blue_hooks = []
+    blue_hangers = []
+    new_blues = True
+    while new_blues:
+        new_blues = False
+        for door in doors_to_check:
+            piece = dungeon[door.name]
+            for hook, crystal in piece.hooks.items():
+                if crystal == CrystalBarrier.Blue or crystal == CrystalBarrier.Either:
+                    h_type = hook_from_door(hook)
+                    if h_type not in blue_hooks:
+                        new_blues = True
+                        blue_hooks.append(h_type)
+            if piece.hanger_crystal == CrystalBarrier.Either:
+                h_type = hanger_from_door(piece.hanger_info)
+                if h_type not in blue_hangers:
+                    new_blues = True
+                    blue_hangers.append(h_type)
+        doors_to_check = set()
+        for door in not_blue:  # am I now blue?
+            hang_type = hanger_from_door(door)  # am I hangable on a hook?
+            hook_type = hook_from_door(door)  # am I hookable onto a hanger?
+            if (hang_type in blue_hooks and not door.stonewall) or hook_type in blue_hangers:
+                explore_blue_state(door, dungeon, o_state_cache[door.name], proposed_map, valid_doors, world, player)
+                doors_to_check.add(door)
+        not_blue.difference_update(doors_to_check)
+
+
+def explore_blue_state(door, dungeon, o_state, proposed_map, valid_doors, world, player):
+    parent = parent_region(door, world, player).parent_region
+    blue_start = ExplorationState(CrystalBarrier.Blue)
+    b_state = extend_reachable_state_improved([parent], blue_start, proposed_map, valid_doors, world, player)
+    dungeon[door.name] = create_graph_piece_from_state(door, o_state, b_state, proposed_map)
 
 
 def make_a_choice(dungeon, hangers, avail_hooks, prev_choices):
@@ -268,14 +296,21 @@ def create_graph_piece_from_state(door, o_state, b_state, proposed_map):
             if all_unattached[d] != exp_d.crystal:
                 if all_unattached[d] == CrystalBarrier.Orange and exp_d.crystal == CrystalBarrier.Blue:
                     all_unattached[d] = CrystalBarrier.Null
-                else:
+                elif all_unattached[d] == CrystalBarrier.Blue and exp_d.crystal == CrystalBarrier.Orange:
+                    # the swapping case
                     logging.getLogger('').warning('Mismatched state @ %s (o:%s b:%s)', d.name, all_unattached[d], exp_d.crystal)
+                elif all_unattached[d] == CrystalBarrier.Either:
+                    all_unattached[d] = exp_d.crystal  # pessimism, and if not this, leave it alone
         else:
             all_unattached[exp_d.door] = exp_d.crystal
+    h_crystal = door.crystal if door is not None else None
     for d, crystal in all_unattached.items():
         if (door is None or d != door) and not d.blocked and d not in proposed_map.keys():
             graph_piece.hooks[d] = crystal
+        if d == door:
+            h_crystal = crystal
     graph_piece.hanger_info = door
+    graph_piece.hanger_crystal = h_crystal
     graph_piece.visited_regions.update(o_state.visited_blue)
     graph_piece.visited_regions.update(o_state.visited_orange)
     graph_piece.visited_regions.update(b_state.visited_blue)
@@ -328,6 +363,15 @@ def connect_doors(a, b, world, player):
             connect_one_way(world, a.name, b.name, player)
         else:
             connect_two_way(world, a.name, b.name, player)
+        dep_doors, target = [], None
+        if len(a.dependents) > 0:
+            dep_doors, target = a.dependents, b
+        elif len(b.dependents) > 0:
+            dep_doors, target = b.dependents, a
+        if target is not None:
+            target_region = world.get_entrance(target.name, player).parent_region
+            for dep in dep_doors:
+                connect_simple_door(dep, target_region, world, player)
         return
     # If we failed to account for a type, panic
     raise RuntimeError('Unknown door type ' + a.type.name)
@@ -374,6 +418,11 @@ def connect_one_way(world, entrancename, exitname, player):
         x.dest = y
     if y is not None:
         y.dest = x
+
+
+def connect_simple_door(exit_door, region, world, player):
+    world.get_entrance(exit_door.name, player).connect(region)
+    exit_door.dest = region
 
 
 class ExplorationState(object):
@@ -518,9 +567,15 @@ class ExplorationState(object):
     def add_all_doors_check_proposed(self, region, proposed_map, valid_doors, world, player):
         for door in get_dungeon_doors(region, world, player):
             if self.can_traverse(door):
-                if door.dest is None and not self.in_door_list_ic(door, self.unattached_doors)\
-                     and door not in proposed_map.keys() and door in valid_doors:
+                if door.controller is not None:
+                    door = door.controller
+                if door.dest is None and door not in proposed_map.keys() and door in valid_doors:
+                    if not self.in_door_list_ic(door, self.unattached_doors):
                         self.append_door_to_list(door, self.unattached_doors)
+                    else:
+                        other = self.find_door_in_list(door, self.unattached_doors)
+                        if self.crystal != other.crystal:
+                            other.crystal = CrystalBarrier.Either
                 elif door.req_event is not None and door.req_event not in self.events and not self.in_door_list(door, self.event_doors):
                     self.append_door_to_list(door, self.event_doors)
                 elif not self.in_door_list(door, self.avail_doors):
@@ -588,6 +643,13 @@ class ExplorationState(object):
             if d.door == door:
                 return True
         return False
+
+    @staticmethod
+    def find_door_in_list(door, door_list):
+        for d in door_list:
+            if d.door == door:
+                return d
+        return None
 
     def append_door_to_list(self, door, door_list):
         if door.crystal == CrystalBarrier.Null:

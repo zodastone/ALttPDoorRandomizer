@@ -193,12 +193,6 @@ def create_regions(world, player):
         create_lw_region(player, 'Mimic Cave Ledge', None, ['Mimic Cave']),
         create_cave_region(player, 'Mimic Cave', 'Mimic Cave', ['Mimic Cave']),
 
-        create_dungeon_region(player, 'Ice Palace (Entrance)', 'Ice Palace', None, ['Ice Palace Entrance Room', 'Ice Palace Exit']),
-        create_dungeon_region(player, 'Ice Palace (Main)', 'Ice Palace', ['Ice Palace - Compass Chest', 'Ice Palace - Freezor Chest',
-                                                                  'Ice Palace - Big Chest', 'Ice Palace - Iced T Room'], ['Ice Palace (East)', 'Ice Palace (Kholdstare)']),
-        create_dungeon_region(player, 'Ice Palace (East)', 'Ice Palace', ['Ice Palace - Spike Room'], ['Ice Palace (East Top)']),
-        create_dungeon_region(player, 'Ice Palace (East Top)', 'Ice Palace', ['Ice Palace - Big Key Chest', 'Ice Palace - Map Chest']),
-        create_dungeon_region(player, 'Ice Palace (Kholdstare)', 'Ice Palace', ['Ice Palace - Boss', 'Ice Palace - Prize']),
         create_dungeon_region(player, 'Misery Mire (Entrance)', 'Misery Mire', None, ['Misery Mire Entrance Gap', 'Misery Mire Exit']),
         create_dungeon_region(player, 'Misery Mire (Main)', 'Misery Mire', ['Misery Mire - Big Chest', 'Misery Mire - Map Chest', 'Misery Mire - Main Lobby',
                                                                     'Misery Mire - Bridge Chest', 'Misery Mire - Spike Chest'], ['Misery Mire (West)', 'Misery Mire Big Key Door']),
@@ -365,7 +359,8 @@ def create_regions(world, player):
         create_dungeon_region(player, 'PoD Middle Cage', 'Palace of Darkness', None, ['PoD Middle Cage S', 'PoD Middle Cage SE', 'PoD Middle Cage N', 'PoD Middle Cage Down Stairs']),
         create_dungeon_region(player, 'PoD Shooter Room', 'Palace of Darkness', ['Palace of Darkness - Shooter Room'], ['PoD Shooter Room Up Stairs']),
         create_dungeon_region(player, 'PoD Pit Room', 'Palace of Darkness', None, ['PoD Pit Room S', 'PoD Pit Room NW', 'PoD Pit Room NE', 'PoD Pit Room Freefall', 'PoD Pit Room Bomb Hole']),
-        create_dungeon_region(player, 'PoD Arena Main', 'Palace of Darkness', None, ['PoD Arena Main SW', 'PoD Arena Main NW', 'PoD Arena Main NE', 'PoD Arena Main Crystal Path']),
+        create_dungeon_region(player, 'PoD Arena Main', 'Palace of Darkness', None, ['PoD Arena Main SW', 'PoD Arena Main Crystal Path', 'PoD Arena Main Orange Barrier']),
+        create_dungeon_region(player, 'PoD Arena North', 'Palace of Darkness', None, ['PoD Arena Main NW', 'PoD Arena Main NE', 'PoD Arena North Drop Down']),
         create_dungeon_region(player, 'PoD Arena Crystal', 'Palace of Darkness', None, ['PoD Arena Crystals E', 'PoD Arena Crystal Path']),
         create_dungeon_region(player, 'PoD Arena Bridge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Bridge'], ['PoD Arena Bridge SE', 'PoD Arena Bridge Drop Down']),
         create_dungeon_region(player, 'PoD Arena Ledge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Ledge'], ['PoD Arena Ledge ES']),
@@ -503,6 +498,53 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Thieves Trap', 'Thieves\' Town', None, ['Thieves Trap EN']),
 
         # ice
+        create_dungeon_region(player, 'Ice Lobby', 'Ice Palace', None, ['Ice Palace Exit', 'Ice Lobby WS']),
+        create_dungeon_region(player, 'Ice Jelly Key', 'Ice Palace', ['Ice Palace - Jelly Key Drop'], ['Ice Jelly Key ES', 'Ice Jelly Key Down Stairs']),
+        create_dungeon_region(player, 'Ice Floor Switch', 'Ice Palace', None, ['Ice Floor Switch Up Stairs', 'Ice Floor Switch ES']),
+        create_dungeon_region(player, 'Ice Cross Left', 'Ice Palace', None, ['Ice Cross Left WS', 'Ice Cross Left Push Block']),
+        create_dungeon_region(player, 'Ice Cross Bottom', 'Ice Palace', None, ['Ice Cross Bottom SE', 'Ice Cross Bottom Push Block Left', 'Ice Cross Bottom Push Block Right']),
+        create_dungeon_region(player, 'Ice Cross Right', 'Ice Palace', None, ['Ice Cross Right ES', 'Ice Cross Right Push Block Top', 'Ice Cross Right Push Block Bottom']),
+        create_dungeon_region(player, 'Ice Cross Top', 'Ice Palace', None, ['Ice Cross Top NE', 'Ice Cross Top Push Block Left', 'Ice Cross Top Push Block Right']),
+        create_dungeon_region(player, 'Ice Compass Room', 'Ice Palace', ['Ice Palace - Compass Chest'], ['Ice Compass Room NE']),
+        create_dungeon_region(player, 'Ice Pengator Switch', 'Ice Palace', None, ['Ice Pengator Switch WS', 'Ice Pengator Switch ES']),
+        create_dungeon_region(player, 'Ice Dead End', 'Ice Palace', None, ['Ice Dead End WS']),
+        create_dungeon_region(player, 'Ice Big Key', 'Ice Palace', ['Ice Palace - Big Key Chest'], ['Ice Big Key Push Block', 'Ice Big Key Down Ladder']),
+        create_dungeon_region(player, 'Ice Bomb Drop', 'Ice Palace', None, ['Ice Bomb Drop SE', 'Ice Bomb Drop Hole']),
+        create_dungeon_region(player, 'Ice Stalfos Hint', 'Ice Palace', None, ['Ice Stalfos Hint SE']),
+        create_dungeon_region(player, 'Ice Conveyor', 'Ice Palace', ['Ice Palace - Conveyor Key Drop'], ['Ice Conveyor NE', 'Ice Conveyor SW']),
+        create_dungeon_region(player, 'Ice Bomb Jump Ledge', 'Ice Palace', None, ['Ice Bomb Jump NW', 'Ice Bomb Jump Ledge Orange Barrier']),
+        create_dungeon_region(player, 'Ice Bomb Jump Catwalk', 'Ice Palace', None, ['Ice Bomb Jump Catwalk Orange Barrier', 'Ice Bomb Jump EN']),
+        create_dungeon_region(player, 'Ice Narrow Corridor', 'Ice Palace', None, ['Ice Narrow Corridor WN', 'Ice Narrow Corridor Down Stairs']),
+        create_dungeon_region(player, 'Ice Pengator Trap', 'Ice Palace', None, ['Ice Pengator Trap Up Stairs', 'Ice Pengator Trap NE']),
+        create_dungeon_region(player, 'Ice Spike Cross', 'Ice Palace', None, ['Ice Spike Cross SE', 'Ice Spike Cross WS', 'Ice Spike Cross ES', 'Ice Spike Cross NE']),
+        create_dungeon_region(player, 'Ice Firebar', 'Ice Palace', None, ['Ice Firebar ES', 'Ice Firebar Down Ladder']),
+        create_dungeon_region(player, 'Ice Falling Square', 'Ice Palace', None, ['Ice Falling Square SE', 'Ice Falling Square Hole']),
+        create_dungeon_region(player, 'Ice Spike Room', 'Ice Palace', ['Ice Palace - Spike Room'], ['Ice Spike Room WS', 'Ice Spike Room Up Stairs', 'Ice Spike Room Down Stairs']),
+        create_dungeon_region(player, 'Ice Hammer Block', 'Ice Palace', ['Ice Palace - Hammer Block Key Drop', 'Ice Palace - Map Chest'], ['Ice Hammer Block Down Stairs', 'Ice Hammer Block ES']),
+        create_dungeon_region(player, 'Ice Tongue Pull', 'Ice Palace', None, ['Ice Tongue Pull Up Ladder', 'Ice Tongue Pull WS']),
+        create_dungeon_region(player, 'Ice Freezors', 'Ice Palace', ['Ice Palace - Freezor Chest'], ['Ice Freezors Up Ladder', 'Ice Freezors Hole', 'Ice Freezors Bomb Hole']),
+        create_dungeon_region(player, 'Ice Freezors Ledge', 'Ice Palace', None, ['Ice Freezors Ledge ES', 'Ice Freezors Ledge Hole']),
+        create_dungeon_region(player, 'Ice Tall Hint', 'Ice Palace', None, ['Ice Tall Hint WS', 'Ice Tall Hint SE', 'Ice Tall Hint EN']),
+        create_dungeon_region(player, 'Ice Hookshot Ledge', 'Ice Palace', None, ['Ice Hookshot Ledge WN', 'Ice Hookshot Ledge Path']),
+        create_dungeon_region(player, 'Ice Hookshot Balcony', 'Ice Palace', None, ['Ice Hookshot Balcony SW', 'Ice Hookshot Balcony Path']),
+        create_dungeon_region(player, 'Ice Spikeball', 'Ice Palace', None, ['Ice Spikeball NW', 'Ice Spikeball Up Stairs']),
+        create_dungeon_region(player, 'Ice Lonely Freezor', 'Ice Palace', None, ['Ice Lonely Freezor NE', 'Ice Lonely Freezor Down Stairs']),
+        create_dungeon_region(player, 'Iced T', 'Ice Palace', ['Ice Palace - Iced T Room'], ['Iced T Up Stairs', 'Iced T EN']),
+        create_dungeon_region(player, 'Ice Catwalk', 'Ice Palace', None, ['Ice Catwalk WN', 'Ice Catwalk NW']),
+        create_dungeon_region(player, 'Ice Many Pots', 'Ice Palace', ['Ice Palace - Many Pots Pot Key'], ['Ice Many Pots SW', 'Ice Many Pots WS']),
+        create_dungeon_region(player, 'Ice Crystal Right', 'Ice Palace', None, ['Ice Crystal Right ES', 'Ice Crystal Right NE', 'Ice Crystal Right Orange Barrier', 'Ice Crystal Right Blue Hole']),
+        create_dungeon_region(player, 'Ice Crystal Left', 'Ice Palace', None, ['Ice Crystal Left WS', 'Ice Crystal Left Orange Barrier', 'Ice Crystal Left Blue Barrier']),
+        create_dungeon_region(player, 'Ice Crystal Block', 'Ice Palace', ['Ice Block Drop'], ['Ice Crystal Block Hole', 'Ice Crystal Block Exit']),
+        create_dungeon_region(player, 'Ice Big Chest View', 'Ice Palace', None, ['Ice Big Chest View ES']),
+        create_dungeon_region(player, 'Ice Big Chest Landing', 'Ice Palace', ['Ice Palace - Big Chest'], ['Ice Big Chest Landing Push Blocks']),
+        create_dungeon_region(player, 'Ice Backwards Room', 'Ice Palace', None, ['Ice Backwards Room SE', 'Ice Backwards Room Down Stairs', 'Ice Backwards Room Hole']),
+        create_dungeon_region(player, 'Ice Anti-Fairy', 'Ice Palace', None, ['Ice Anti-Fairy Up Stairs', 'Ice Anti-Fairy SE']),
+        create_dungeon_region(player, 'Ice Switch Room', 'Ice Palace', None, ['Ice Switch Room NE', 'Ice Switch Room ES', 'Ice Switch Room SE']),
+        create_dungeon_region(player, 'Ice Refill', 'Ice Palace', None, ['Ice Refill WS']),
+        create_dungeon_region(player, 'Ice Fairy', 'Ice Palace', None, ['Ice Fairy Warp']),
+        create_dungeon_region(player, 'Ice Antechamber', 'Ice Palace', None, ['Ice Antechamber NE', 'Ice Antechamber Hole']),
+        create_dungeon_region(player, 'Ice Boss', 'Ice Palace', ['Ice Palace - Boss', 'Ice Palace - Prize']),
+
         # mire
         # tr
         # gt
@@ -635,7 +677,11 @@ key_only_locations = {
   'Skull Woods - West Lobby Pot Key': 'Small Key (Skull Woods)',
   'Skull Woods - Spike Corner Key Drop': 'Small Key (Skull Woods)',
   'Thieves\' Town - Hallway Pot Key': 'Small Key (Thieves Town)',
-  'Thieves\' Town - Spike Switch Pot Key': 'Small Key (Thieves Town)'
+  'Thieves\' Town - Spike Switch Pot Key': 'Small Key (Thieves Town)',
+  'Ice Palace - Jelly Key Drop': 'Small Key (Ice Palace)',
+  'Ice Palace - Conveyor Key Drop': 'Small Key (Ice Palace)',
+  'Ice Palace - Hammer Block Key Drop': 'Small Key (Ice Palace)',
+  'Ice Palace - Many Pots Pot Key': 'Small Key (Ice Palace)',
 }
 
 dungeon_events = [
@@ -644,7 +690,8 @@ dungeon_events = [
     'Swamp Drain',
     'Attic Cracked Floor',
     'Suspicious Maiden',
-    'Revealing Light'
+    'Revealing Light',
+    'Ice Block Drop'
 ]
 
 flooded_keys_reverse = {
@@ -883,6 +930,7 @@ location_table = {'Mushroom': (0x180013, False, 'in the woods'),
                   'Attic Cracked Floor': (None, False, None),
                   'Suspicious Maiden': (None, False, None),
                   'Revealing Light': (None, False, None),
+                  'Ice Block Drop': (None, False, None),
                   'Eastern Palace - Prize': ([0x1209D, 0x53EF8, 0x53EF9, 0x180052, 0x18007C, 0xC6FE], True, 'Eastern Palace'),
                   'Desert Palace - Prize': ([0x1209E, 0x53F1C, 0x53F1D, 0x180053, 0x180078, 0xC6FF], True, 'Desert Palace'),
                   'Tower of Hera - Prize': ([0x120A5, 0x53F0A, 0x53F0B, 0x18005A, 0x18007A, 0xC706], True, 'Tower of Hera'),

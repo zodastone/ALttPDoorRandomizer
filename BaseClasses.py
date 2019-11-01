@@ -959,6 +959,8 @@ class Door(object):
         self.ugly = False  # Indicates that it can't be seen from the front (e.g. back of a big key door)
         self.crystal = CrystalBarrier.Null  # How your crystal state changes if you use this door
         self.req_event = None  # if a dungeon event is required for this door - swamp palace mostly
+        self.controller = None
+        self.dependents = []
 
     def getAddress(self):
         if self.type == DoorType.Normal:
