@@ -169,16 +169,20 @@ hyrule_castle_regions = [
     'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Dungeon Map Room',
     'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk', 'Hyrule Dungeon South Abyss',
     'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory Main',
-    'Hyrule Dungeon Armory North Branch', 'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock',
-    'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat',
-    'Sewers Secret Room Blocked Path', 'Sewers Secret Room', 'Sewers Pull Switch', 'Sanctuary'
+    'Hyrule Dungeon Armory Boomerang',  'Hyrule Dungeon Armory North Branch', 'Hyrule Dungeon Staircase',
+    'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water',
+    'Sewers Key Rat', 'Sewers Rat Path', 'Sewers Secret Room Blocked Path', 'Sewers Secret Room',
+    'Sewers Yet More Rats', 'Sewers Pull Switch', 'Sanctuary'
 ]
 
 eastern_regions = [
-    'Eastern Lobby', 'Eastern Cannonball', 'Eastern Cannonball Ledge', 'Eastern Courtyard Ledge', 'Eastern Map Area',
-    'Eastern Compass Area', 'Eastern Hint Tile Blocked Path', 'Eastern Courtyard', 'Eastern Fairies',
-    'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Big Key', 'Eastern Darkness', 'Eastern Attic Start',
-    'Eastern Attic Switches', 'Eastern Eyegores', 'Eastern Boss'
+    'Eastern Lobby', 'Eastern Lobby Bridge', 'Eastern Lobby Left Ledge', 'Eastern Lobby Right Ledge',
+    'Eastern Cannonball', 'Eastern Cannonball Ledge', 'Eastern Courtyard Ledge', 'Eastern East Wing',
+    'Eastern Pot Switch', 'Eastern Map Balcony', 'Eastern Map Room', 'Eastern West Wing', 'Eastern Stalfos Spawn',
+    'Eastern Compass Room', 'Eastern Hint Tile', 'Eastern Hint Tile Blocked Path', 'Eastern Courtyard',
+    'Eastern Fairies', 'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Dark Pots', 'Eastern Big Key',
+    'Eastern Darkness', 'Eastern Rupees', 'Eastern Attic Start', 'Eastern False Switches', 'Eastern Cannonball Hell',
+    'Eastern Single Eyegore', 'Eastern Duo Eyegores', 'Eastern Boss'
 ]
 
 desert_regions = [

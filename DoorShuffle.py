@@ -174,7 +174,7 @@ def fix_big_key_doors_with_ugly_smalls(world, player):
 
 
 def remove_ugly_small_key_doors(world, player):
-    for d in ['Eastern Compass Area SW', 'Eastern Darkness S', 'Thieves Hallway SE']:
+    for d in ['Eastern Hint Tile Blocked Path SE', 'Eastern Darkness S', 'Thieves Hallway SE']:
         door = world.get_door(d, player)
         room = world.get_room(door.roomIndex, player)
         room.change(door.doorListPos, DoorKind.Normal)
@@ -751,10 +751,10 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
         world.key_logic[player] = {}
     world.key_logic[player][dungeon_sector.name] = key_logic
     reassign_key_doors(current_doors, proposal, world, player)
-    
+
 
 class KeyLogic(object):
-    
+
     def __init__(self, dungeon_name):
         self.door_rules = {}
         self.bk_restricted = []
@@ -1160,7 +1160,9 @@ def check_for_pinball_fix(state, bad_region, world, player):
 logical_connections = [
     ('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
     ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path'),
-    ('Eastern Hint Tile Push Block', 'Eastern Compass Area'),
+    ('Eastern Hint Tile Push Block', 'Eastern Hint Tile'),
+    ('Eastern Map Balcony Hook Path', 'Eastern Map Room'),
+    ('Eastern Map Room Drop Down', 'Eastern Map Balcony'),
     ('Hera Big Chest Landing Exit', 'Hera 4F'),
     ('PoD Arena Main Crystal Path', 'PoD Arena Crystal'),
     ('PoD Arena Crystal Path', 'PoD Arena Main'),
@@ -1355,7 +1357,24 @@ ladders = [
 
 interior_doors = [
     ('Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Armory Interior Key Door N'),
+    ('Hyrule Dungeon Armory ES', 'Hyrule Dungeon Armory Boomerang WS'),
     ('Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon North Abyss Key Door N'),
+    ('Sewers Rat Path WS', 'Sewers Secret Room ES'),
+    ('Sewers Rat Path WN', 'Sewers Secret Room EN'),
+    ('Sewers Yet More Rats S', 'Sewers Pull Switch N'),
+    ('Eastern Lobby N', 'Eastern Lobby Bridge S'),
+    ('Eastern Lobby NW', 'Eastern Lobby Left Ledge SW'),
+    ('Eastern Lobby NE', 'Eastern Lobby Right Ledge SE'),
+    ('Eastern East Wing EN', 'Eastern Pot Switch WN'),
+    ('Eastern East Wing ES', 'Eastern Map Balcony WS'),
+    ('Eastern Pot Switch SE', 'Eastern Map Room NE'),
+    ('Eastern West Wing WS', 'Eastern Stalfos Spawn ES'),
+    ('Eastern Stalfos Spawn NW', 'Eastern Compass Room SW'),
+    ('Eastern Compass Room EN', 'Eastern Hint Tile WN'),
+    ('Eastern Dark Square EN', 'Eastern Dark Pots WN'),
+    ('Eastern Darkness NE', 'Eastern Rupees SE'),
+    ('Eastern False Switches WS', 'Eastern Cannonball Hell ES'),
+    ('Eastern Single Eyegore NE', 'Eastern Duo Eyegores SE'),
     ('Desert East Lobby WS', 'Desert East Wing ES'),
     ('Desert East Wing Key Door EN', 'Desert Compass Key Door WN'),
     ('Desert North Hall NW', 'Desert Map SW'),
@@ -1457,7 +1476,7 @@ key_doors = [
     ('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
     ('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
     ('Eastern Darkness Up Stairs', 'Eastern Attic Start Down Stairs'),
-    ('Eastern Big Key NE', 'Eastern Compass Area SW'),
+    ('Eastern Big Key NE', 'Eastern Hint Tile Blocked Path SE'),
     ('Eastern Darkness S', 'Eastern Courtyard N'),
     ('Desert East Wing Key Door EN', 'Desert Compass Key Door WN'),
     ('Desert Tiles 1 Up Stairs', 'Desert Bridge Down Stairs'),
@@ -1485,18 +1504,19 @@ default_door_connections = [
     ('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
     ('Sewers Water W', 'Sewers Key Rat E'),
     ('Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S'),
-    ('Eastern Lobby N', 'Eastern Cannonball S'),
+    ('Eastern Lobby Bridge N', 'Eastern Cannonball S'),
     ('Eastern Cannonball N', 'Eastern Courtyard Ledge S'),
     ('Eastern Cannonball Ledge WN', 'Eastern Big Key EN'),
     ('Eastern Cannonball Ledge Key Door EN', 'Eastern Dark Square Key Door WN'),
-    ('Eastern Courtyard Ledge W', 'Eastern Compass Area E'),
-    ('Eastern Courtyard Ledge E', 'Eastern Map Area W'),
-    ('Eastern Compass Area EN', 'Eastern Courtyard WN'),
+    ('Eastern Courtyard Ledge W', 'Eastern West Wing E'),
+    ('Eastern Courtyard Ledge E', 'Eastern East Wing W'),
+    ('Eastern Hint Tile EN', 'Eastern Courtyard WN'),
+    ('Eastern Big Key NE', 'Eastern Hint Tile Blocked Path SW'),
     ('Eastern Courtyard EN', 'Eastern Map Valley WN'),
     ('Eastern Courtyard N', 'Eastern Darkness S'),
     ('Eastern Map Valley SW', 'Eastern Dark Square NW'),
-    ('Eastern Attic Start WS', 'Eastern Attic Switches ES'),
-    ('Eastern Attic Switches WS', 'Eastern Eyegores ES'),
+    ('Eastern Attic Start WS', 'Eastern False Switches ES'),
+    ('Eastern Cannonball Hell WS', 'Eastern Single Eyegore ES'),
     ('Desert Compass NW', 'Desert Cannonball S'),
     ('Desert Beamos Hall NE', 'Desert Tiles 2 SE'),
     ('PoD Middle Cage N', 'PoD Pit Room S'),
@@ -1554,7 +1574,7 @@ default_door_connections = [
 # ('', ''),
 default_one_way_connections = [
     ('Sewers Pull Switch S', 'Sanctuary N'),
-    ('Eastern Eyegores NE', 'Eastern Boss SE'),
+    ('Eastern Duo Eyegores NE', 'Eastern Boss SE'),
     ('Desert Wall Slide NW', 'Desert Boss SW'),
     ('Tower Altar NW', 'Tower Agahnim 1 SW'),
     ('PoD Harmless Hellway SE', 'PoD Arena Main NE'),
