@@ -538,8 +538,8 @@ def create_doors(world, player):
         create_door(player, 'Thieves BK Corner WS Edge', Open).dir(We, 0xcc, None, Low),
         create_door(player, 'Thieves BK Corner S Edge', Open).dir(So, 0xcc, None, Low),
         create_door(player, 'Thieves BK Corner SW Edge', Open).dir(So, 0xcc, None, Low),
-        create_door(player, 'Thieves BK Corner W', Nrml).dir(We, 0xcc, Mid, High).pos(2),
-        create_door(player, 'Thieves BK Corner NW', Nrml).dir(No, 0xcc, Left, High).pos(1),
+        create_door(player, 'Thieves Rail Ledge W', Nrml).dir(We, 0xcc, Mid, High).pos(2),
+        create_door(player, 'Thieves Rail Ledge NW', Nrml).dir(No, 0xcc, Left, High).pos(1),
         create_door(player, 'Thieves BK Corner NE', Nrml).dir(No, 0xcc, Right, High).big_key().pos(0),
         create_door(player, 'Thieves Compass Room NW Edge', Open).dir(No, 0xdc, None, Low),
         create_door(player, 'Thieves Compass Room N Edge', Open).dir(No, 0xdc, None, Low),
@@ -614,10 +614,10 @@ def create_doors(world, player):
         create_door(player, 'Ice Cross Top Push Block Left', Lgcl),
         create_door(player, 'Ice Cross Top Push Block Right', Lgcl),  # dynamic
         create_door(player, 'Ice Cross Bottom SE', Nrml).dir(So, 0x1e, Right, High).pos(3),
-        create_door(player, 'Ice Cross Right ES', Nrml).dir(Ea, 0x1e, Bot, High).pos(0),
+        create_door(player, 'Ice Cross Right ES', Nrml).dir(Ea, 0x1e, Bot, High).trap(0x4).pos(0),
         create_door(player, 'Ice Bomb Drop Hole', Hole),
         create_door(player, 'Ice Compass Room NE', Nrml).dir(No, 0x2e, Right, High).pos(0),
-        create_door(player, 'Ice Pengator Switch WS', Nrml).dir(We, 0x1f, Bot, High).pos(0),
+        create_door(player, 'Ice Pengator Switch WS', Nrml).dir(We, 0x1f, Bot, High).trap(0x4).pos(0),
         create_door(player, 'Ice Pengator Switch ES', Intr).dir(Ea, 0x1f, Bot, High).pos(1),
         create_door(player, 'Ice Dead End WS', Intr).dir(We, 0x1f, Bot, High).pos(1),
         create_door(player, 'Ice Big Key Push Block', Lgcl),
@@ -642,8 +642,8 @@ def create_doors(world, player):
         create_door(player, 'Ice Falling Square SE', Intr).dir(So, 0x5e, Right, High).pos(1),
         create_door(player, 'Ice Falling Square Hole', Hole),
         create_door(player, 'Ice Spike Room WS', Nrml).dir(We, 0x5f, Bot, High).small_key().pos(0),
-        create_door(player, 'Ice Spike Room Up Stairs', Sprl).dir(Up, 0x5f, 4, HTH).ss(Z, 0x11, 0x48, True, True),
-        create_door(player, 'Ice Spike Room Down Stairs', Sprl).dir(Dn, 0x5f, 3, HTH).ss(Z, 0x1a, 0xa4, True, True),
+        create_door(player, 'Ice Spike Room Down Stairs', Sprl).dir(Dn, 0x5f, 3, HTH).ss(Z, 0x11, 0x48, True, True),
+        create_door(player, 'Ice Spike Room Up Stairs', Sprl).dir(Up, 0x5f, 4, HTH).ss(Z, 0x1a, 0xa4, True, True),
         create_door(player, 'Ice Hammer Block Down Stairs', Sprl).dir(Dn, 0x3f, 0, HTH).ss(Z, 0x11, 0xb8, True, True),
         create_door(player, 'Ice Hammer Block ES', Intr).dir(Ea, 0x3f, Bot, High).pos(0),
         create_door(player, 'Ice Tongue Pull WS', Intr).dir(We, 0x3f, Bot, High).pos(0),
@@ -656,7 +656,7 @@ def create_doors(world, player):
         create_door(player, 'Ice Tall Hint WS', Intr).dir(We, 0x7e, Bot, High).pos(1),
         create_door(player, 'Ice Tall Hint EN', Nrml).dir(Ea, 0x7e, Top, High).pos(1),
         create_door(player, 'Ice Tall Hint SE', Nrml).dir(So, 0x7e, Right, High).small_key().pos(0),
-        create_door(player, 'Ice Hookshot Ledge WN', Nrml).dir(We, 0x7f, Top, High).pos(0),
+        create_door(player, 'Ice Hookshot Ledge WN', Nrml).dir(We, 0x7f, Top, High).trap(0x4).pos(0),
         create_door(player, 'Ice Hookshot Ledge Path', Lgcl),
         create_door(player, 'Ice Hookshot Balcony Path', Lgcl),
         create_door(player, 'Ice Hookshot Balcony SW', Intr).dir(So, 0x7f, Left, High).pos(1),
@@ -668,8 +668,8 @@ def create_doors(world, player):
         create_door(player, 'Iced T Up Stairs', Sprl).dir(Up, 0xae, 0, HTH).ss(S, 0x1a, 0x3c, True, True),
         create_door(player, 'Ice Catwalk WN', Nrml).dir(We, 0xaf, Top, High).pos(1),
         create_door(player, 'Ice Catwalk NW', Nrml).dir(No, 0xaf, Left, High).pos(0),
-        create_door(player, 'Ice Many Pots SW', Nrml).dir(So, 0x9f, Left, High).pos(1),
-        create_door(player, 'Ice Many Pots WS', Nrml).dir(We, 0x9f, Bot, High).pos(0),
+        create_door(player, 'Ice Many Pots SW', Nrml).dir(So, 0x9f, Left, High).trap(0x2).pos(1),
+        create_door(player, 'Ice Many Pots WS', Nrml).dir(We, 0x9f, Bot, High).trap(0x4).pos(0),
         create_door(player, 'Ice Crystal Right ES', Nrml).dir(Ea, 0x9e, Bot, High).pos(3),
         create_door(player, 'Ice Crystal Right Orange Barrier', Lgcl),
         create_door(player, 'Ice Crystal Right Blue Hole', Hole),  # combine holes again??
@@ -688,10 +688,10 @@ def create_doors(world, player):
         create_door(player, 'Ice Anti-Fairy SE', Intr).dir(So, 0xbe, Right, High).pos(2),
         create_door(player, 'Ice Switch Room NE', Intr).dir(No, 0xbe, Right, High).pos(2),
         create_door(player, 'Ice Switch Room ES', Nrml).dir(Ea, 0xbe, Bot, High).small_key().pos(1),
-        create_door(player, 'Ice Switch Room SE', Nrml).dir(So, 0xbe, Right, High).pos(0),
+        create_door(player, 'Ice Switch Room SE', Nrml).dir(So, 0xbe, Right, High).trap(0x4).pos(0),
         create_door(player, 'Ice Refill WS', Nrml).dir(We, 0xbf, Bot, High).small_key().pos(0),
         create_door(player, 'Ice Fairy Warp', Warp),
-        create_door(player, 'Ice Antechamber NE', Nrml).dir(No, 0xce, Right, High).pos(0),
+        create_door(player, 'Ice Antechamber NE', Nrml).dir(No, 0xce, Right, High).trap(0x4).pos(0),
         create_door(player, 'Ice Antechamber Hole', Hole),
 
         # Door Templates
@@ -821,13 +821,13 @@ def create_paired_doors(world, player):
         PairedDoor('Eastern Big Key NE', 'Eastern Hint Tile Blocked Path SE'),
         # PairedDoor('', ''),  # TR somaria hub to pokey
         PairedDoor('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
-        PairedDoor('Thieves BK Corner NW', 'Thieves Pot Alcove Bottom SW'),  # TT random bomb to pots
-        PairedDoor('Thieves BK Corner NW', 'Thieves Hallway SE'),  # TT big key door
+        PairedDoor('Thieves Rail Ledge NW', 'Thieves Pot Alcove Bottom SW'),  # TT random bomb to pots
+        PairedDoor('Thieves BK Corner NE', 'Thieves Hallway SE'),  # TT big key door
         PairedDoor('Ice Switch Room ES', 'Ice Refill WS'),  # Ice last key door to crystal switch
         # PairedDoor('', ''),  # mire hub key door to attic
         # PairedDoor('', ''),  # mire hub key door to map
         # PairedDoor('', ''),  # tr last key door to switch maze
-        PairedDoor('Thieves Ambush E', 'Thieves BK Corner W')  # TT dashable above
+        PairedDoor('Thieves Ambush E', 'Thieves Rail Ledge W')  # TT dashable above
     ]
 
 

@@ -56,7 +56,7 @@ class World(object):
         self.fix_trock_doors = self.shuffle != 'vanilla' or self.mode == 'inverted'
         self.save_and_quit_from_boss = True
         self.accessibility = accessibility
-        self.fix_skullwoods_exit = self.shuffle not in ['vanilla', 'simple', 'restricted', 'dungeonssimple']
+        self.fix_skullwoods_exit = self.shuffle not in ['vanilla', 'simple', 'restricted', 'dungeonssimple'] or self.doorShuffle not in ['vanilla']
         self.fix_palaceofdarkness_exit = self.shuffle not in ['vanilla', 'simple', 'restricted', 'dungeonssimple']
         self.fix_trock_exit = self.shuffle not in ['vanilla', 'simple', 'restricted', 'dungeonssimple']
         self.shuffle_ganon = shuffle_ganon

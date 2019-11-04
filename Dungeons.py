@@ -207,12 +207,12 @@ tower_regions = [
 ]
 
 pod_regions = [
-    'PoD Lobby', 'PoD Left Cage', 'PoD Middle Cage', 'PoD Shooter Room', 'PoD Pit Room', 'PoD Arena Main', 'PoD Arena North',
-    'PoD Arena Crystal', 'PoD Arena Bridge', 'PoD Arena Ledge', 'PoD Sexy Statue', 'PoD Map Balcony', 'PoD Conveyor',
-    'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room', 'PoD Stalfos Basement', 'PoD Basement Ledge',
-    'PoD Big Key Landing', 'PoD Falling Bridge', 'PoD Dark Maze', 'PoD Big Chest Balcony', 'PoD Compass Room',
-    'PoD Dark Basement', 'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue', 'PoD Dark Pegs', 'PoD Lonely Turtle',
-    'PoD Turtle Party', 'PoD Dark Alley', 'PoD Callback', 'PoD Boss'
+    'PoD Lobby', 'PoD Left Cage', 'PoD Middle Cage', 'PoD Shooter Room', 'PoD Pit Room', 'PoD Arena Main',
+    'PoD Arena North', 'PoD Arena Crystal', 'PoD Arena Bridge', 'PoD Arena Ledge', 'PoD Sexy Statue', 'PoD Map Balcony',
+    'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room', 'PoD Stalfos Basement',
+    'PoD Basement Ledge', 'PoD Big Key Landing', 'PoD Falling Bridge', 'PoD Dark Maze', 'PoD Big Chest Balcony',
+    'PoD Compass Room', 'PoD Dark Basement', 'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue', 'PoD Dark Pegs',
+    'PoD Lonely Turtle', 'PoD Turtle Party', 'PoD Dark Alley', 'PoD Callback', 'PoD Boss'
 ]
 
 swamp_regions = [
@@ -236,13 +236,13 @@ skull_regions = [
 ]
 
 thieves_regions = [
-    'Thieves Lobby', 'Thieves Ambush', 'Thieves BK Corner', 'Thieves Compass Room', 'Thieves Big Chest Nook',
-    'Thieves Hallway', 'Thieves Boss', 'Thieves Pot Alcove Mid', 'Thieves Pot Alcove Bottom', 'Thieves Pot Alcove Top',
-    'Thieves Conveyor Maze', 'Thieves Spike Track', 'Thieves Hellway', 'Thieves Hellway N Crystal',
-    'Thieves Hellway S Crystal', 'Thieves Triple Bypass', 'Thieves Spike Switch', 'Thieves Attic',
-    'Thieves Cricket Hall Left', 'Thieves Cricket Hall Right', 'Thieves Attic Window', 'Thieves Basement Block',
-    'Thieves Blocked Entry', 'Thieves Lonely Zazak', 'Thieves Blind\'s Cell', 'Thieves Conveyor Bridge',
-    'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap'
+    'Thieves Lobby', 'Thieves Ambush', 'Thieves BK Corner', 'Thieves Rail Ledge', 'Thieves Compass Room',
+    'Thieves Big Chest Nook', 'Thieves Hallway', 'Thieves Boss', 'Thieves Pot Alcove Mid', 'Thieves Pot Alcove Bottom',
+    'Thieves Pot Alcove Top', 'Thieves Conveyor Maze', 'Thieves Spike Track', 'Thieves Hellway',
+    'Thieves Hellway N Crystal', 'Thieves Hellway S Crystal', 'Thieves Triple Bypass', 'Thieves Spike Switch',
+    'Thieves Attic', 'Thieves Cricket Hall Left', 'Thieves Cricket Hall Right', 'Thieves Attic Window',
+    'Thieves Basement Block', 'Thieves Blocked Entry', 'Thieves Lonely Zazak', 'Thieves Blind\'s Cell',
+    'Thieves Conveyor Bridge', 'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap'
 ]
 
 ice_regions = [
