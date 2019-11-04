@@ -24,14 +24,16 @@ SpiralWarp: {
     sep #$30
     lda $00 : sta $a0
     ; shift quadrant if necessary
-    stz $07
+    stz $07 ; this is a x quad adjuster for those blasted staircase on the edges
     lda $01 : and #$01 : !sub $a9
     bne .xQuad
     inc $07
     lda $22 : bne .skipXQuad ; this is an edge case
     dec $23 : bra .skipXQuad ; need to -1 if $22 is 0
     .xQuad sta $06 : !add $a9 : sta $a9
-    ldy #$00 : jsr ShiftQuadSimple
+    lda $0462 : and #$04 : bne .xCont
+    inc $07 ; up stairs are going to -1 the quad anyway during transition, need to add this back
+    .xCont ldy #$00 : jsr ShiftQuadSimple
 
     .skipXQuad
     lda $aa : lsr : sta $06 : lda $01 : and #$02 : lsr : !sub $06
