@@ -694,6 +694,126 @@ def create_doors(world, player):
         create_door(player, 'Ice Antechamber NE', Nrml).dir(No, 0xce, Right, High).trap(0x4).pos(0),
         create_door(player, 'Ice Antechamber Hole', Hole),
 
+        create_door(player, 'Mire Lobby Gap', Lgcl),
+        create_door(player, 'Mire Post-Gap Gap', Lgcl),
+        create_door(player, 'Mire Post-Gap Down Stairs', Sprl).dir(Up, 0x98, 0, HTH).ss(X, 0x11, 0x90, False, True),
+        create_door(player, 'Mire 2 Up Stairs', Sprl).dir(Up, 0xd2, 0, HTH).ss(X, 0x0, 0x0, False, True),
+        create_door(player, 'Mire 2 NE', Nrml).dir(No, 0xd2, Right, High).trap(0x4).pos(0),
+        create_door(player, 'Mire Hub SE', Nrml).dir(So, 0xc2, Right, High).pos(5),
+        create_door(player, 'Mire Hub ES', Nrml).dir(Ea, 0xc2, Bot, High).pos(6),
+        create_door(player, 'Mire Hub E', Nrml).dir(Ea, 0xc2, Mid, High).pos(4),
+        create_door(player, 'Mire Hub NE', Nrml).dir(No, 0xc2, Right, High).pos(7),
+        create_door(player, 'Mire Hub WN', Nrml).dir(We, 0xc2, Top, High).pos(3),
+        create_door(player, 'Mire Hub WS', Nrml).dir(We, 0xc2, Bot, High).small_key().pos(1),
+        create_door(player, 'Mire Hub Upper Blue Barrier', Lgcl),
+        create_door(player, 'Mire Hub Lower Blue Barrier', Lgcl),
+        create_door(player, 'Mire Hub Right Blue Barrier', Lgcl),
+        create_door(player, 'Mire Hub Top Blue Barrier', Lgcl),
+        create_door(player, 'Mire Hub Right EN', Nrml).dir(Ea, 0xc2, Top, High).small_key().pos(0),
+        create_door(player, 'Mire Hub Top NW', Nrml).dir(No, 0xc2, Left, High).pos(2),
+        create_door(player, 'Mire Lone Shooter WS', Nrml).dir(We, 0xc3, Bot, High).pos(6),
+        create_door(player, 'Mire Lone Shooter ES', Intr).dir(Ea, 0xc3, Bot, High).pos(3),
+        create_door(player, 'Mire Falling Bridge WS', Intr).dir(We, 0xc3, Bot, High).no_exit().pos(3),
+        create_door(player, 'Mire Falling Bridge W', Intr).dir(We, 0xc3, Mid, High).pos(2),
+        create_door(player, 'Mire Failure Bridge E', Intr).dir(Ea, 0xc3, Mid, High).no_exit().pos(2),
+        create_door(player, 'Mire Failure Bridge W', Nrml).dir(We, 0xc3, Mid, High).pos(5),
+        create_door(player, 'Mire Falling Bridge WN', Intr).dir(We, 0xc3, Top, High).pos(1),
+        create_door(player, 'Mire Map Spike Side EN', Intr).dir(Ea, 0xc3, Top, High).no_exit().pos(1),
+        create_door(player, 'Mire Map Spot WN', Nrml).dir(We, 0xc3, Top, High).small_key().pos(0),
+        create_door(player, 'Mire Crystal Dead End NE', Nrml).dir(No, 0xc3, Right, High).pos(4),
+        create_door(player, 'Mire Map Spike Side Drop Down', Lgcl),
+        create_door(player, 'Mire Map Spike Side Blue Barrier', Lgcl),
+        create_door(player, 'Mire Map Spot Blue Barrier', Lgcl),
+        create_door(player, 'Mire Crystal Dead End Left Barrier', Lgcl),
+        create_door(player, 'Mire Crystal Dead End Right Barrier', Lgcl),
+        create_door(player, 'Mire Hidden Shooters SE', Nrml).dir(So, 0xb2, Right, High).pos(6),
+        create_door(player, 'Mire Hidden Shooters ES', Nrml).dir(Ea, 0xb2, Bot, High).pos(7),
+        create_door(player, 'Mire Hidden Shooters WS', Intr).dir(We, 0xb2, Bot, High).pos(1),
+        create_door(player, 'Mire Cross ES', Intr).dir(Ea, 0xb2, Bot, High).pos(1),
+        create_door(player, 'Mire Hidden Shooters NE', Intr).dir(No, 0xb2, Right, High).pos(2),
+        create_door(player, 'Mire Minibridge SE', Intr).dir(So, 0xb2, Right, High).pos(2),
+        create_door(player, 'Mire Cross SW', Nrml).dir(So, 0xb2, Left, High).pos(5),
+        create_door(player, 'Mire Minibridge NE', Nrml).dir(No, 0xb2, Right, High).pos(4),
+        create_door(player, 'Mire BK Door Room EN', Nrml).dir(Ea, 0xb2, Top, Low).pos(3),
+        create_door(player, 'Mire BK Door Room N', Nrml).dir(No, 0xb2, Mid, High).big_key().pos(0),
+        create_door(player, 'Mire Spikes WS', Nrml).dir(We, 0xb3, Bot, High).pos(3),
+        create_door(player, 'Mire Spikes SW', Nrml).dir(So, 0xb3, Left, High).pos(4),
+        create_door(player, 'Mire Spikes NW', Intr).dir(No, 0xb3, Left, High).small_key().pos(0),
+        create_door(player, 'Mire Ledgehop SW', Intr).dir(So, 0xb3, Left, High).small_key().pos(0),
+        create_door(player, 'Mire Ledgehop WN', Nrml).dir(We, 0xb3, Top, Low).pos(1),
+        create_door(player, 'Mire Ledgehop NW', Nrml).dir(No, 0xb3, Left, High).pos(2),
+        create_door(player, 'Mire Bent Bridge SW', Nrml).dir(So, 0xa3, Left, High).pos(1),
+        create_door(player, 'Mire Bent Bridge W', Nrml).dir(We, 0xa3, Mid, High).pos(0),
+        create_door(player, 'Mire Over Bridge E', Nrml).dir(Ea, 0xa2, Mid, High).pos(2),
+        create_door(player, 'Mire Over Bridge W', Nrml).dir(We, 0xa2, Mid, High).pos(1),
+        create_door(player, 'Mire Right Bridge SE', Nrml).dir(So, 0xa2, Right, High).pos(3),
+        create_door(player, 'Mire Left Bridge S', Nrml).dir(So, 0xa2, Mid, High).small_key().pos(0),
+        create_door(player, 'Mire Left Bridge Hook Path', Lgcl),
+        create_door(player, 'Mire Left Bridge Down Stairs', Sprl).dir(Dn, 0xa2, 0, LTH).ss(A, 0x12, 0x00),
+        create_door(player, 'Mire Fishbone E', Nrml).dir(Ea, 0xa1, Mid, High).pos(1),
+        create_door(player, 'Mire Fishbone Blue Barrier', Lgcl),
+        create_door(player, 'Mire South Fish Blue Barrier', Lgcl),
+        create_door(player, 'Mire Fishbone SE', Nrml).dir(So, 0xa1, Right, High).small_key().pos(0),
+        create_door(player, 'Mire Spike Barrier NE', Nrml).dir(No, 0xb1, Right, High).small_key().pos(1),
+        create_door(player, 'Mire Spike Barrier SE', Nrml).dir(So, 0xb1, Right, High).pos(2),
+        create_door(player, 'Mire Spike Barrier ES', Intr).dir(Ea, 0xb1, Bot, High).pos(3),
+        create_door(player, 'Mire Square Rail WS', Intr).dir(We, 0xb1, Bot, High).pos(3),
+        create_door(player, 'Mire Square Rail NW', Intr).dir(No, 0xb1, Left, High).big_key().pos(0),
+        create_door(player, 'Mire Lone Warp SW', Intr).dir(So, 0xb1, Left, High).pos(0),
+        create_door(player, 'Mire Lone Warp Warp', Warp),
+        create_door(player, 'Mire Wizzrobe Bypass EN', Nrml).dir(Ea, 0xc1, Top, High).pos(5),
+        create_door(player, 'Mire Wizzrobe Bypass NE', Nrml).dir(No, 0xc1, Right, High).pos(6),
+        create_door(player, 'Mire Conveyor Crystal ES', Nrml).dir(Ea, 0xc1, Bot, High).small_key().pos(1),
+        create_door(player, 'Mire Conveyor Crystal SE', Nrml).dir(So, 0xc1, Right, High).pos(7),
+        create_door(player, 'Mire Conveyor Crystal WS', Intr).dir(We, 0xc1, Bot, High).small_key().pos(0),
+        create_door(player, 'Mire Tile Room ES', Intr).dir(Ea, 0xc1, Bot, High).small_key().pos(0),
+        create_door(player, 'Mire Tile Room SW', Nrml).dir(So, 0xc1, Left, High).pos(4),
+        create_door(player, 'Mire Tile Room NW', Intr).dir(No, 0xc1, Left, High).pos(3),
+        create_door(player, 'Mire Compass Room SW', Intr).dir(So, 0xc1, Left, High).pos(3),
+        create_door(player, 'Mire Compass Room EN', Intr).dir(Ea, 0xc1, Top, High).pos(2),
+        create_door(player, 'Mire Wizzrobe Bypass WN', Intr).dir(We, 0xc1, Top, High).no_exit().pos(2),
+        create_door(player, 'Mire Compass Blue Barrier', Lgcl),
+        create_door(player, 'Mire Compass Chest Exit', Lgcl),
+        create_door(player, 'Mire Neglected Room NE', Nrml).dir(No, 0xd1, Right, High).pos(2),
+        create_door(player, 'Mire Conveyor Barrier NW', Nrml).dir(No, 0xd1, Left, High).pos(1),
+        create_door(player, 'Mire Conveyor Barrier Up Stairs', Sprl).dir(Up, 0xd1, 0, HTH).ss(A, 0x1a, 0x9c, True),
+        create_door(player, 'Mire Neglected Room SE', Intr).dir(So, 0xd1, Right, High).pos(3),
+        create_door(player, 'Mire Chest View NE', Intr).dir(No, 0xd1, Right, High).pos(3),
+        create_door(player, 'Mire BK Chest Ledge WS', Intr).dir(We, 0xd1, Bot, High).pos(0),
+        create_door(player, 'Mire Warping Pool ES', Intr).dir(Ea, 0xd1, Bot, High).no_exit().pos(0),
+        create_door(player, 'Mire Warping Pool Warp', Warp),
+        create_door(player, 'Mire Torches Top Down Stairs', Sprl).dir(Dn, 0x97, 0, HTH).ss(A, 0x11, 0xb0, True),
+        create_door(player, 'Mire Torches Top SW', Intr).dir(So, 0x97, Left, High).pos(1),
+        create_door(player, 'Mire Torches Bottom NW', Intr).dir(No, 0x97, Left, High).pos(1),
+        create_door(player, 'Mire Torches Bottom WS', Intr).dir(We, 0x97, Bot, High).pos(0),
+        create_door(player, 'Mire Attic Hint ES', Intr).dir(Ea, 0x97, Bot, High).pos(0),
+        create_door(player, 'Mire Attic Hint Hole', Hole),
+        create_door(player, 'Mire Dark Shooters Up Stairs', Sprl).dir(Up, 0x93, 0, HTL).ss(A, 0x32, 0xec),
+        create_door(player, 'Mire Dark Shooters SW', Intr).dir(So, 0x93, Left, High).pos(0),
+        create_door(player, 'Mire Block X NW', Intr).dir(No, 0x93, Left, High).pos(0),
+        create_door(player, 'Mire Dark Shooters SE', Intr).dir(So, 0x93, Right, High).small_key().pos(1),
+        create_door(player, 'Mire Key Rupees NE', Intr).dir(No, 0x93, Right, High).small_key().pos(1),
+        create_door(player, 'Mire Block X WS', Nrml).dir(We, 0x93, Bot, High).pos(2),
+        create_door(player, 'Mire Tall Dark and Roomy ES', Nrml).dir(Ea, 0x92, Bot, High).pos(4),
+        create_door(player, 'Mire Tall Dark and Roomy WN', Intr).dir(We, 0x92, Top, High).pos(0),
+        create_door(player, 'Mire Shooter Rupees EN', Intr).dir(Ea, 0x92, Top, High).pos(0),
+        create_door(player, 'Mire Tall Dark and Roomy WS', Intr).dir(We, 0x92, Bot, High).pos(3),
+        create_door(player, 'Mire Crystal Right ES', Intr).dir(Ea, 0x92, Bot, High).pos(3),
+        create_door(player, 'Mire Crystal Mid NW', Intr).dir(No, 0x92, Left, High).pos(1),
+        create_door(player, 'Mire Crystal Top SW', Intr).dir(So, 0x92, Left, High).pos(1),
+        create_door(player, 'Mire Crystal Right Orange Barrier', Lgcl),
+        create_door(player, 'Mire Crystal Mid Orange Barrier', Lgcl),
+        create_door(player, 'Mire Crystal Mid Blue Barrier', Lgcl),
+        create_door(player, 'Mire Crystal Left Blue Barrier', Lgcl),
+        create_door(player, 'Mire Crystal Left WS', Nrml).dir(We, 0x92, Bot, High).pos(2),
+        create_door(player, 'Mire Falling Foes ES', Nrml).dir(Ea, 0x91, Bot, High).pos(0),
+        create_door(player, 'Mire Falling Foes Up Stairs', Sprl).dir(Up, 0x91, 0, HTH).ss(S, 0x9b, 0x6c, True),
+        create_door(player, 'Mire Firesnake Skip Down Stairs', Sprl).dir(Dn, 0xa0, 0, HTH).ss(S, 0x92, 0x80, True, True),
+        create_door(player, 'Mire Firesnake Skip Orange Barrier', Lgcl),
+        create_door(player, 'Mire Antechamber Orange Barrier', Lgcl),
+        create_door(player, 'Mire Antechamber NW', Nrml).dir(No, 0xa0, Left, High).big_key().pos(0),
+        create_door(player, 'Mire Boss SW', Nrml).dir(So, 0x90, Left, High).no_exit().trap(0x4).pos(0),
+
         # Door Templates
         # create_door(player, '', Nrml).dir(No, 0x00, Right, High).pos(),
         # create_door(player, '', Intr).dir(No, 0x00, Right, High).pos(),
@@ -717,7 +837,6 @@ def create_doors(world, player):
     world.get_door('Swamp Flooded Room WS', player).event('Swamp Drain')
     world.get_door('Swamp Drain Right Switch', player).event('Swamp Drain')
     world.get_door('Swamp Flooded Room Ladder', player).event('Swamp Drain')
-
 
     # crystal switches and barriers
     world.get_door('Hera Lobby Down Stairs', player).c_switch()
@@ -779,6 +898,34 @@ def create_doors(world, player):
     world.get_door('Ice Crystal Left Blue Barrier', player).barrier(CrystalBarrier.Blue)
     world.get_door('Ice Backwards Room Hole', player).barrier(CrystalBarrier.Blue)
 
+    world.get_door('Mire Fishbone E', player).c_switch()
+    world.get_door('Mire Conveyor Crystal ES', player).c_switch()
+    world.get_door('Mire Conveyor Crystal SE', player).c_switch()
+    world.get_door('Mire Conveyor Crystal WS', player).c_switch()
+    world.get_door('Mire Tall Dark and Roomy ES', player).c_switch()
+    world.get_door('Mire Tall Dark and Roomy WN', player).c_switch()
+    world.get_door('Mire Tall Dark and Roomy WS', player).c_switch()
+    world.get_door('Mire Crystal Top SW', player).c_switch()
+    world.get_door('Mire Falling Foes ES', player).c_switch()
+    world.get_door('Mire Falling Foes Up Stairs', player).c_switch()
+    world.get_door('Mire Hub Upper Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Hub Lower Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Hub Right Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Hub Top Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Map Spike Side Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Map Spot Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Crystal Dead End Left Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Crystal Dead End Right Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Fishbone Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire South Fish Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Compass Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Crystal Mid Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Crystal Left Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Crystal Right Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Mire Crystal Mid Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Mire Firesnake Skip Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Mire Antechamber Orange Barrier', player).barrier(CrystalBarrier.Orange)
+
     # nifty dynamic logical doors:
     south_controller = world.get_door('Ice Cross Bottom SE', player)
     east_controller = world.get_door('Ice Cross Right ES', player)
@@ -816,16 +963,16 @@ def create_paired_doors(world, player):
         # PairedDoor('', ''),  # gt bombable to rando room
         PairedDoor('Ice Tall Hint SE', 'Ice Lonely Freezor NE'),  # ice's big icy room key door to lonely freezor
         PairedDoor('Eastern Courtyard N', 'Eastern Darkness S'),
-        # PairedDoor('', ''),  # mire fishbone key door
-        # PairedDoor('', ''),  # mire big key door to bridges
+        PairedDoor('Mire Fishbone SE', 'Mire Spike Barrier NE'),  # mire fishbone key door
+        PairedDoor('Mire BK Door Room N', 'Mire Left Bridge S'),  # mire big key door to bridges
         PairedDoor('Eastern Big Key NE', 'Eastern Hint Tile Blocked Path SE'),
         # PairedDoor('', ''),  # TR somaria hub to pokey
         PairedDoor('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
         PairedDoor('Thieves Rail Ledge NW', 'Thieves Pot Alcove Bottom SW'),  # TT random bomb to pots
         PairedDoor('Thieves BK Corner NE', 'Thieves Hallway SE'),  # TT big key door
         PairedDoor('Ice Switch Room ES', 'Ice Refill WS'),  # Ice last key door to crystal switch
-        # PairedDoor('', ''),  # mire hub key door to attic
-        # PairedDoor('', ''),  # mire hub key door to map
+        PairedDoor('Mire Hub WS', 'Mire Conveyor Crystal ES'),  # mire hub key door to attic
+        PairedDoor('Mire Hub Right EN', 'Mire Map Spot WN'),  # mire hub key door to map
         # PairedDoor('', ''),  # tr last key door to switch maze
         PairedDoor('Thieves Ambush E', 'Thieves Rail Ledge W')  # TT dashable above
     ]

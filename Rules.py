@@ -1,8 +1,6 @@
 import collections
-from collections import defaultdict
 import logging
-from BaseClasses import CollectionState, DoorType
-from DungeonGenerator import ExplorationState
+from BaseClasses import CollectionState
 from Regions import key_only_locations
 
 
@@ -387,33 +385,28 @@ def global_rules(world, player):
     set_defeat_dungeon_boss_rule(world.get_location('Ice Palace - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Ice Palace - Prize', player))
 
+    set_rule(world.get_entrance('Mire Lobby Gap', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))
+    set_rule(world.get_entrance('Mire Post-Gap Gap', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))
+    set_rule(world.get_entrance('Mire Falling Bridge WN', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))  # this is due to the fact the the door opposite is blocked
+    set_rule(world.get_entrance('Mire 2 NE', player), lambda state: state.has_sword(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Hammer', player) or state.has('Cane of Somaria', player) or state.can_shoot_arrows(player))  # need to defeat wizzrobes, bombs don't work ...
+    set_rule(world.get_location('Misery Mire - Big Chest', player), lambda state: state.has('Big Key (Misery Mire)', player) and (state.has_Boots(player) or state.has('Hookshot', player)))
+    if world.accessibility == 'locations':
+        forbid_item(world.get_location('Misery Mire - Big Chest', player), 'Big Key (Misery Mire)', player)
+    set_rule(world.get_location('Misery Mire - Spike Chest', player), lambda state: (state.world.can_take_damage and state.has_hearts(player, 4)) or state.has('Cane of Byrna', player) or state.has('Cape', player))
+    set_rule(world.get_entrance('Mire BK Door Room N', player), lambda state: state.has('Big Key (Misery Mire)', player))
+    set_rule(world.get_entrance('Mire Square Rail NW', player), lambda state: state.has('Big Key (Misery Mire)', player))
+    set_rule(world.get_entrance('Mire Antechamber NW', player), lambda state: state.has('Big Key (Misery Mire)', player))
+    set_rule(world.get_entrance('Mire Left Bridge Hook Path', player), lambda state: state.has('Hookshot', player))
+    set_rule(world.get_entrance('Mire Tile Room NW', player), lambda state: state.has_fire_source(player))
+    set_rule(world.get_entrance('Mire Attic Hint Hole', player), lambda state: state.has_fire_source(player))
+    set_rule(world.get_entrance('Mire Dark Shooters SW', player), lambda state: state.has('Cane of Somaria', player))
+    set_defeat_dungeon_boss_rule(world.get_location('Misery Mire - Boss', player))
+    set_defeat_dungeon_boss_rule(world.get_location('Misery Mire - Prize', player))
+
     add_key_logic_rules(world, player)  # todo - vanilla shuffle rules
     # End of door rando rules.
 
     add_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
-
-    for location in ['Ice Palace - Big Chest', 'Ice Palace - Boss']:
-        forbid_item(world.get_location(location, player), 'Big Key (Ice Palace)', player)
-
-    set_rule(world.get_entrance('Misery Mire Entrance Gap', player), lambda state: (state.has_Boots(player) or state.has('Hookshot', player)) and (state.has_sword(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Hammer', player) or state.has('Cane of Somaria', player) or state.can_shoot_arrows(player)))  # need to defeat wizzrobes, bombs don't work ...
-    set_rule(world.get_location('Misery Mire - Big Chest', player), lambda state: state.has('Big Key (Misery Mire)', player))
-    set_rule(world.get_location('Misery Mire - Spike Chest', player), lambda state: (state.world.can_take_damage and state.has_hearts(player, 4)) or state.has('Cane of Byrna', player) or state.has('Cape', player))
-    set_rule(world.get_entrance('Misery Mire Big Key Door', player), lambda state: state.has('Big Key (Misery Mire)', player))
-    # you can squander the free small key from the pot by opening the south door to the north west switch room, locking you out of accessing a color switch ...
-    # big key gives backdoor access to that from the teleporter in the north west
-    set_rule(world.get_location('Misery Mire - Map Chest', player), lambda state: state.has_key('Small Key (Misery Mire)', player, 1) or state.has('Big Key (Misery Mire)', player))
-    # in addition, you can open the door to the map room before getting access to a color switch, so this is locked behing 2 small keys or the big key...
-    set_rule(world.get_location('Misery Mire - Main Lobby', player), lambda state: state.has_key('Small Key (Misery Mire)', player, 2) or state.has_key('Big Key (Misery Mire)', player))
-    # we can place a small key in the West wing iff it also contains/blocks the Big Key, as we cannot reach and softlock with the basement key door yet
-    set_rule(world.get_entrance('Misery Mire (West)', player), lambda state: state.has_key('Small Key (Misery Mire)', player, 2) if ((item_name(state, 'Misery Mire - Compass Chest', player) in [('Big Key (Misery Mire)', player)]) or
-                                                                                                                 (item_name(state, 'Misery Mire - Big Key Chest', player) in [('Big Key (Misery Mire)', player)])) else state.has_key('Small Key (Misery Mire)', player, 3))
-    set_rule(world.get_location('Misery Mire - Compass Chest', player), lambda state: state.has_fire_source(player))
-    set_rule(world.get_location('Misery Mire - Big Key Chest', player), lambda state: state.has_fire_source(player))
-    set_rule(world.get_entrance('Misery Mire (Vitreous)', player), lambda state: state.has('Cane of Somaria', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Misery Mire - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Misery Mire - Prize', player))
-    for location in ['Misery Mire - Big Chest', 'Misery Mire - Boss']:
-        forbid_item(world.get_location(location, player), 'Big Key (Misery Mire)', player)
 
     set_rule(world.get_entrance('Turtle Rock Entrance Gap', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('Turtle Rock Entrance Gap Reverse', player), lambda state: state.has('Cane of Somaria', player))
@@ -927,10 +920,23 @@ def no_glitches_rules(world, player):
         if (not world.dark_world_light_cone and check_is_dark_world(world.get_region(region, player))) or (not world.light_world_light_cone and not check_is_dark_world(world.get_region(region, player))):
             add_lamp_requirement(spot, player)
 
-    add_conditional_lamp('Misery Mire (Vitreous)', 'Misery Mire (Entrance)', 'Entrance')
     add_conditional_lamp('Turtle Rock (Dark Room) (North)', 'Turtle Rock (Entrance)', 'Entrance')
     add_conditional_lamp('Turtle Rock (Dark Room) (South)', 'Turtle Rock (Entrance)', 'Entrance')
 
+    add_conditional_lamp('Mire Dark Shooters Up Stairs', 'Mire Dark Shooters', 'Entrance')
+    add_conditional_lamp('Mire Dark Shooters SW', 'Mire Dark Shooters', 'Entrance')
+    add_conditional_lamp('Mire Dark Shooters SE', 'Mire Dark Shooters', 'Entrance')
+    add_conditional_lamp('Mire Key Rupees NE', 'Mire Key Rupees', 'Entrance')
+    add_conditional_lamp('Mire Block X NW', 'Mire Block X', 'Entrance')
+    add_conditional_lamp('Mire Block X WS', 'Mire Block X', 'Entrance')
+    add_conditional_lamp('Mire Tall Dark and Roomy ES', 'Mire Tall Dark and Roomy', 'Entrance')
+    add_conditional_lamp('Mire Tall Dark and Roomy WS', 'Mire Tall Dark and Roomy', 'Entrance')
+    add_conditional_lamp('Mire Tall Dark and Roomy WN', 'Mire Tall Dark and Roomy', 'Entrance')
+    add_conditional_lamp('Mire Crystal Right ES', 'Mire Crystal Right', 'Entrance')
+    add_conditional_lamp('Mire Crystal Mid NW', 'Mire Crystal Mid', 'Entrance')
+    add_conditional_lamp('Mire Crystal Left WS', 'Mire Crystal Left', 'Entrance')
+    add_conditional_lamp('Mire Crystal Top SW', 'Mire Crystal Top', 'Entrance')
+    add_conditional_lamp('Mire Shooter Rupees EN', 'Mire Shooter Rupees', 'Entrance')
     add_conditional_lamp('PoD Dark Alley NE', 'PoD Dark Alley', 'Entrance')
     add_conditional_lamp('PoD Callback WS', 'PoD Callback', 'Entrance')
     add_conditional_lamp('PoD Callback Warp', 'PoD Callback', 'Entrance')

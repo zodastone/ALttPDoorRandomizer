@@ -174,7 +174,7 @@ def fix_big_key_doors_with_ugly_smalls(world, player):
 
 
 def remove_ugly_small_key_doors(world, player):
-    for d in ['Eastern Hint Tile Blocked Path SE', 'Eastern Darkness S', 'Thieves Hallway SE']:
+    for d in ['Eastern Hint Tile Blocked Path SE', 'Eastern Darkness S', 'Thieves Hallway SE', 'Mire Left Bridge S']:
         door = world.get_door(d, player)
         room = world.get_room(door.roomIndex, player)
         room.change(door.doorListPos, DoorKind.Normal)
@@ -183,7 +183,7 @@ def remove_ugly_small_key_doors(world, player):
 
 
 def unpair_big_key_doors(world, player):
-    problematic_bk_doors = ['Eastern Courtyard N', 'Eastern Big Key NE', 'Thieves BK Corner NE']
+    problematic_bk_doors = ['Eastern Courtyard N', 'Eastern Big Key NE', 'Thieves BK Corner NE', 'Mire BK Door Room N']
     for paired_door in world.paired_doors[player]:
         if paired_door.door_a in problematic_bk_doors or paired_door.door_b in problematic_bk_doors:
             paired_door.pair = False
@@ -1232,7 +1232,28 @@ logical_connections = [
     ('Ice Crystal Left Blue Barrier', 'Ice Crystal Block'),
     ('Ice Crystal Block Exit', 'Ice Crystal Left'),
     ('Ice Big Chest Landing Push Blocks', 'Ice Big Chest View'),
-    # ('', ''),
+    ('Mire Lobby Gap', 'Mire Post-Gap'),
+    ('Mire Post-Gap Gap', 'Mire Lobby'),
+    ('Mire Hub Upper Blue Barrier', 'Mire Hub Top'),
+    ('Mire Hub Lower Blue Barrier', 'Mire Hub Right'),
+    ('Mire Hub Right Blue Barrier', 'Mire Hub'),
+    ('Mire Hub Top Blue Barrier', 'Mire Hub'),
+    ('Mire Map Spike Side Drop Down', 'Mire Lone Shooter'),
+    ('Mire Map Spike Side Blue Barrier', 'Mire Crystal Dead End'),
+    ('Mire Map Spot Blue Barrier', 'Mire Crystal Dead End'),
+    ('Mire Crystal Dead End Left Barrier', 'Mire Map Spot'),
+    ('Mire Crystal Dead End Right Barrier', 'Mire Map Spike Side'),
+    ('Mire Left Bridge Hook Path', 'Mire Right Bridge'),
+    ('Mire Crystal Right Orange Barrier', 'Mire Crystal Mid'),
+    ('Mire Crystal Mid Orange Barrier', 'Mire Crystal Right'),
+    ('Mire Crystal Mid Blue Barrier', 'Mire Crystal Left'),
+    ('Mire Crystal Left Blue Barrier', 'Mire Crystal Mid'),
+    ('Mire Firesnake Skip Orange Barrier', 'Mire Antechamber'),
+    ('Mire Antechamber Orange Barrier', 'Mire Firesnake Skip'),
+    ('Mire Compass Blue Barrier', 'Mire Compass Chest'),
+    ('Mire Compass Chest Exit', 'Mire Compass Room'),
+    ('Mire South Fish Blue Barrier', 'Mire Fishbone'),
+    ('Mire Fishbone Blue Barrier', 'Mire South Fish'),
     # ('', ''),
 ]
 
@@ -1273,6 +1294,10 @@ spiral_staircases = [
     ('Ice Spike Room Down Stairs', 'Ice Spikeball Up Stairs'),
     ('Ice Lonely Freezor Down Stairs', 'Iced T Up Stairs'),
     ('Ice Backwards Room Down Stairs', 'Ice Anti-Fairy Up Stairs'),
+    ('Mire Post-Gap Down Stairs', 'Mire 2 Up Stairs'),
+    ('Mire Left Bridge Down Stairs', 'Mire Dark Shooters Up Stairs'),
+    ('Mire Conveyor Barrier Up Stairs', 'Mire Torches Top Down Stairs'),
+    ('Mire Falling Foes Up Stairs', 'Mire Firesnake Skip Down Stairs'),
     # ('', ''),
 ]
 
@@ -1333,6 +1358,7 @@ falldown_pits = [
     ('Ice Crystal Right Blue Hole', 'Ice Switch Room'),
     ('Ice Backwards Room Hole', 'Ice Fairy'),
     ('Ice Antechamber Hole', 'Ice Boss'),
+    ('Mire Attic Hint Hole', 'Mire BK Chest Ledge'),
     # ('', ''),
 ]
 
@@ -1344,6 +1370,8 @@ dungeon_warps = [
     ('PoD Stalfos Basement Warp', 'PoD Warp Room'),
     ('PoD Callback Warp', 'PoD Dark Alley'),
     ('Ice Fairy Warp', 'Ice Anti-Fairy'),
+    ('Mire Lone Warp Warp', 'Mire BK Door Room'),
+    ('Mire Warping Pool Warp', 'Mire Square Rail'),
     # ('', ''),
 ]
 
@@ -1468,6 +1496,27 @@ interior_doors = [
     ('Ice Crystal Right NE', 'Ice Backwards Room SE'),
     ('Ice Crystal Left WS', 'Ice Big Chest View ES'),
     ('Ice Anti-Fairy SE', 'Ice Switch Room NE'),
+    ('Mire Lone Shooter ES', 'Mire Falling Bridge WS'),  # technically one-way
+    ('Mire Falling Bridge W', 'Mire Failure Bridge E'),  # technically one-way
+    ('Mire Falling Bridge WN', 'Mire Map Spike Side EN'),  # technically one-way
+    ('Mire Hidden Shooters WS', 'Mire Cross ES'),  # technically one-way
+    ('Mire Hidden Shooters NE', 'Mire Minibridge SE'),
+    ('Mire Spikes NW', 'Mire Ledgehop SW'),
+    ('Mire Spike Barrier ES', 'Mire Square Rail WS'),
+    ('Mire Square Rail NW', 'Mire Lone Warp SW'),
+    ('Mire Wizzrobe Bypass WN', 'Mire Compass Room EN'),  # technically one-way
+    ('Mire Conveyor Crystal WS', 'Mire Tile Room ES'),
+    ('Mire Tile Room NW', 'Mire Compass Room SW'),
+    ('Mire Neglected Room SE', 'Mire Chest View NE'),
+    ('Mire BK Chest Ledge WS', 'Mire Warping Pool ES'),  # technically one-way
+    ('Mire Torches Top SW', 'Mire Torches Bottom NW'),
+    ('Mire Torches Bottom WS', 'Mire Attic Hint ES'),
+    ('Mire Dark Shooters SE', 'Mire Key Rupees NE'),
+    ('Mire Dark Shooters SW', 'Mire Block X NW'),
+    ('Mire Tall Dark and Roomy WS', 'Mire Crystal Right ES'),
+    ('Mire Tall Dark and Roomy WN', 'Mire Shooter Rupees EN'),
+    ('Mire Crystal Mid NW', 'Mire Crystal Top SW'),
+    # ('', ''),
     # ('', ''),
 ]
 
@@ -1568,6 +1617,31 @@ default_door_connections = [
     ('Ice Many Pots WS', 'Ice Crystal Right ES'),
     ('Ice Switch Room ES', 'Ice Refill WS'),
     ('Ice Switch Room SE', 'Ice Antechamber NE'),
+    ('Mire 2 NE', 'Mire Hub SE'),
+    ('Mire Hub ES', 'Mire Lone Shooter WS'),
+    ('Mire Hub E', 'Mire Failure Bridge W'),
+    ('Mire Hub NE', 'Mire Hidden Shooters SE'),
+    ('Mire Hub WN', 'Mire Wizzrobe Bypass EN'),
+    ('Mire Hub WS', 'Mire Conveyor Crystal ES'),
+    ('Mire Hub Right EN', 'Mire Map Spot WN'),
+    ('Mire Hub Top NW', 'Mire Cross SW'),
+    ('Mire Hidden Shooters ES', 'Mire Spikes WS'),
+    ('Mire Minibridge NE', 'Mire Right Bridge SE'),
+    ('Mire BK Door Room EN', 'Mire Ledgehop WN'),
+    ('Mire BK Door Room N', 'Mire Left Bridge S'),
+    ('Mire Spikes SW', 'Mire Crystal Dead End NE'),
+    ('Mire Ledgehop NW', 'Mire Bent Bridge SW'),
+    ('Mire Bent Bridge W', 'Mire Over Bridge E'),
+    ('Mire Over Bridge W', 'Mire Fishbone E'),
+    ('Mire Fishbone SE', 'Mire Spike Barrier NE'),
+    ('Mire Spike Barrier SE', 'Mire Wizzrobe Bypass NE'),
+    ('Mire Conveyor Crystal SE', 'Mire Neglected Room NE'),
+    ('Mire Tile Room SW', 'Mire Conveyor Barrier NW'),
+    ('Mire Block X WS', 'Mire Tall Dark and Roomy ES'),
+    ('Mire Crystal Left WS', 'Mire Falling Foes ES'),
+    # ('', ''),
+    # ('', ''),
+    # ('', ''),
     # ('', ''),
 ]
 
@@ -1581,6 +1655,7 @@ default_one_way_connections = [
     ('PoD Dark Alley NE', 'PoD Boss SE'),
     ('Swamp T NW', 'Swamp Boss SW'),
     ('Thieves Hallway NE', 'Thieves Boss SE'),
+    ('Mire Antechamber NW', 'Mire Boss SW'),
     # ('', ''),
 ]
 

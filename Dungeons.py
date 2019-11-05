@@ -24,7 +24,7 @@ def create_dungeons(world, player):
     SW = make_dungeon('Skull Woods', 'Mothula', skull_regions, ItemFactory('Big Key (Skull Woods)', player), ItemFactory(['Small Key (Skull Woods)'] * 2, player), ItemFactory(['Map (Skull Woods)', 'Compass (Skull Woods)'], player))
     SP = make_dungeon('Swamp Palace', 'Arrghus', swamp_regions, ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
     IP = make_dungeon('Ice Palace', 'Kholdstare', ice_regions, ItemFactory('Big Key (Ice Palace)', player), ItemFactory(['Small Key (Ice Palace)'] * 2, player), ItemFactory(['Map (Ice Palace)', 'Compass (Ice Palace)'], player))
-    MM = make_dungeon('Misery Mire', 'Vitreous', ['Misery Mire (Entrance)', 'Misery Mire (Main)', 'Misery Mire (West)', 'Misery Mire (Final Area)', 'Misery Mire (Vitreous)'], ItemFactory('Big Key (Misery Mire)', player), ItemFactory(['Small Key (Misery Mire)'] * 3, player), ItemFactory(['Map (Misery Mire)', 'Compass (Misery Mire)'], player))
+    MM = make_dungeon('Misery Mire', 'Vitreous', mire_regions, ItemFactory('Big Key (Misery Mire)', player), ItemFactory(['Small Key (Misery Mire)'] * 3, player), ItemFactory(['Map (Misery Mire)', 'Compass (Misery Mire)'], player))
     TR = make_dungeon('Turtle Rock', 'Trinexx', ['Turtle Rock (Entrance)', 'Turtle Rock (First Section)', 'Turtle Rock (Chain Chomp Room)', 'Turtle Rock (Second Section)', 'Turtle Rock (Big Chest)', 'Turtle Rock (Crystaroller Room)', 'Turtle Rock (Dark Room)', 'Turtle Rock (Eye Bridge)', 'Turtle Rock (Trinexx)'], ItemFactory('Big Key (Turtle Rock)', player), ItemFactory(['Small Key (Turtle Rock)'] * 4, player), ItemFactory(['Map (Turtle Rock)', 'Compass (Turtle Rock)'], player))
 
     if world.mode != 'inverted':
@@ -256,6 +256,19 @@ ice_regions = [
     'Ice Backwards Room', 'Ice Anti-Fairy', 'Ice Switch Room', 'Ice Refill', 'Ice Fairy', 'Ice Antechamber', 'Ice Boss'
 ]
 
+mire_regions = [
+    'Mire Lobby', 'Mire Post-Gap', 'Mire 2', 'Mire Hub', 'Mire Hub Right', 'Mire Hub Top', 'Mire Lone Shooter',
+    'Mire Failure Bridge', 'Mire Falling Bridge', 'Mire Map Spike Side', 'Mire Map Spot', 'Mire Crystal Dead End',
+    'Mire Hidden Shooters', 'Mire Cross', 'Mire Minibridge', 'Mire BK Door Room', 'Mire Spikes', 'Mire Ledgehop',
+    'Mire Bent Bridge', 'Mire Over Bridge', 'Mire Right Bridge', 'Mire Left Bridge', 'Mire Fishbone', 'Mire South Fish',
+    'Mire Spike Barrier', 'Mire Square Rail', 'Mire Lone Warp', 'Mire Wizzrobe Bypass', 'Mire Conveyor Crystal',
+    'Mire Tile Room', 'Mire Compass Room', 'Mire Compass Chest', 'Mire Neglected Room', 'Mire Chest View',
+    'Mire Conveyor Barrier', 'Mire BK Chest Ledge', 'Mire Warping Pool', 'Mire Torches Top', 'Mire Torches Bottom',
+    'Mire Attic Hint', 'Mire Dark Shooters', 'Mire Key Rupees', 'Mire Block X', 'Mire Tall Dark and Roomy',
+    'Mire Crystal Right', 'Mire Crystal Mid', 'Mire Crystal Left', 'Mire Crystal Top', 'Mire Shooter Rupees',
+    'Mire Falling Foes', 'Mire Firesnake Skip', 'Mire Antechamber', 'Mire Boss'
+]
+
 dungeon_regions = {
     'Hyrule Castle': hyrule_castle_regions,
     'Eastern Palace': eastern_regions,
@@ -267,7 +280,7 @@ dungeon_regions = {
     'Skull Woods': skull_regions,
     'Thieves Town': thieves_regions,
     'Ice Palace': ice_regions,
-    # 'Mire':
+    'Misery Mire': mire_regions,
     # 'TR':
     # 'GT':
 }
@@ -284,7 +297,7 @@ region_starts = {
                     'Skull Pinball', 'Skull Left Drop', 'Skull Back Drop'],
     'Thieves Town': ['Thieves Lobby'],
     'Ice Palace': ['Ice Lobby'],
-    # ['Mire Lobby'],
+    'Misery Mire': ['Mire Lobby'],
     # ['TR Main Lobby', 'TR Eye Trap', 'TR Big Chest', 'TR Laser Bridge'],
     # ['GT Lobby']
 }
@@ -312,6 +325,7 @@ dungeon_keys = {
     'Skull Woods': 'Small Key (Skull Woods)',
     'Thieves Town': 'Small Key (Thieves Town)',
     'Ice Palace': 'Small Key (Ice Palace)',
+    'Misery Mire': 'Small Key (Misery Mire)',
 }
 
 dungeon_bigs = {
@@ -325,5 +339,6 @@ dungeon_bigs = {
     'Skull Woods': 'Big Key (Skull Woods)',
     'Thieves Town': 'Big Key (Thieves Town)',
     'Ice Palace': 'Big Key (Ice Palace)',
+    'Misery Mire': 'Big Key (Misery Mire)',
 }
 
