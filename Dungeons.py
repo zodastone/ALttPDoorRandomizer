@@ -25,7 +25,7 @@ def create_dungeons(world, player):
     SP = make_dungeon('Swamp Palace', 'Arrghus', swamp_regions, ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
     IP = make_dungeon('Ice Palace', 'Kholdstare', ice_regions, ItemFactory('Big Key (Ice Palace)', player), ItemFactory(['Small Key (Ice Palace)'] * 2, player), ItemFactory(['Map (Ice Palace)', 'Compass (Ice Palace)'], player))
     MM = make_dungeon('Misery Mire', 'Vitreous', mire_regions, ItemFactory('Big Key (Misery Mire)', player), ItemFactory(['Small Key (Misery Mire)'] * 3, player), ItemFactory(['Map (Misery Mire)', 'Compass (Misery Mire)'], player))
-    TR = make_dungeon('Turtle Rock', 'Trinexx', ['Turtle Rock (Entrance)', 'Turtle Rock (First Section)', 'Turtle Rock (Chain Chomp Room)', 'Turtle Rock (Second Section)', 'Turtle Rock (Big Chest)', 'Turtle Rock (Crystaroller Room)', 'Turtle Rock (Dark Room)', 'Turtle Rock (Eye Bridge)', 'Turtle Rock (Trinexx)'], ItemFactory('Big Key (Turtle Rock)', player), ItemFactory(['Small Key (Turtle Rock)'] * 4, player), ItemFactory(['Map (Turtle Rock)', 'Compass (Turtle Rock)'], player))
+    TR = make_dungeon('Turtle Rock', 'Trinexx', tr_regions, ItemFactory('Big Key (Turtle Rock)', player), ItemFactory(['Small Key (Turtle Rock)'] * 4, player), ItemFactory(['Map (Turtle Rock)', 'Compass (Turtle Rock)'], player))
 
     if world.mode != 'inverted':
         AT = make_dungeon('Agahnims Tower', 'Agahnim', tower_regions, None, ItemFactory(['Small Key (Agahnims Tower)'] * 2, player), [])
@@ -269,6 +269,14 @@ mire_regions = [
     'Mire Falling Foes', 'Mire Firesnake Skip', 'Mire Antechamber', 'Mire Boss'
 ]
 
+tr_regions = [
+    'TR Main Lobby', 'TR Lobby Ledge', 'TR Compass Room', 'TR Hub', 'TR Torches Ledge', 'TR Torches', 'TR Roller Room',
+    'TR Tile Room', 'TR Refill', 'TR Pokey 1', 'TR Chain Chomps', 'TR Pipe Pit', 'TR Pipe Ledge', 'TR Lava Dual Pipes',
+    'TR Lava Island', 'TR Lava Escape', 'TR Pokey 2', 'TR Twin Pokeys', 'TR Hallway', 'TR Dodgers', 'TR Big View',
+    'TR Big Chest', 'TR Big Chest Entrance', 'TR Lazy Eyes', 'TR Dash Room', 'TR Tongue Pull', 'TR Rupees',
+    'TR Crystaroller', 'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge', 'TR Crystal Maze', 'TR Final Abyss', 'TR Boss'
+]
+
 dungeon_regions = {
     'Hyrule Castle': hyrule_castle_regions,
     'Eastern Palace': eastern_regions,
@@ -281,12 +289,12 @@ dungeon_regions = {
     'Thieves Town': thieves_regions,
     'Ice Palace': ice_regions,
     'Misery Mire': mire_regions,
-    # 'TR':
+    'Turtle Rock': tr_regions,
     # 'GT':
 }
 
 region_starts = {
-    'Hyrule Castle': ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Secret Room', 'Sanctuary'],
+    'Hyrule Castle': ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Rat Path', 'Sanctuary'],
     'Eastern Palace': ['Eastern Lobby'],
     'Desert Palace': ['Desert Back Lobby', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby'],
     'Tower of Hera': ['Hera Lobby'],
@@ -298,7 +306,7 @@ region_starts = {
     'Thieves Town': ['Thieves Lobby'],
     'Ice Palace': ['Ice Lobby'],
     'Misery Mire': ['Mire Lobby'],
-    # ['TR Main Lobby', 'TR Eye Trap', 'TR Big Chest', 'TR Laser Bridge'],
+    'Turtle Rock': ['TR Main Lobby', 'TR Lazy Eyes', 'TR Big Chest Entrance', 'TR Eye Bridge'],
     # ['GT Lobby']
 }
 
@@ -314,6 +322,10 @@ split_region_starts = {
     ]
 }
 
+flexible_starts = {
+    'Skull Woods': ['Skull Left Drop', 'Skull Pinball']
+}
+
 dungeon_keys = {
     'Hyrule Castle': 'Small Key (Escape)',
     'Eastern Palace': 'Small Key (Eastern Palace)',
@@ -326,6 +338,7 @@ dungeon_keys = {
     'Thieves Town': 'Small Key (Thieves Town)',
     'Ice Palace': 'Small Key (Ice Palace)',
     'Misery Mire': 'Small Key (Misery Mire)',
+    'Turtle Rock': 'Small Key (Turtle Rock)',
 }
 
 dungeon_bigs = {
@@ -340,5 +353,6 @@ dungeon_bigs = {
     'Thieves Town': 'Big Key (Thieves Town)',
     'Ice Palace': 'Big Key (Ice Palace)',
     'Misery Mire': 'Big Key (Misery Mire)',
+    'Turtle Rock': 'Big Key (Turtle Rock)',
 }
 

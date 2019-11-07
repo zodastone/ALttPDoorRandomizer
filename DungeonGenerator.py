@@ -40,9 +40,13 @@ def generate_dungeon(available_sectors, entrance_region_names, world, player):
     depth = 0
     dungeon_cache = {}
     backtrack = False
+    itr = 0
     # last_choice = None
     while len(proposed_map) < len(doors_to_connect):
         # what are my choices?
+        itr += 1
+        if itr > 5000:
+            raise Exception('Generation taking too long. Ref %s' % entrance_region_names[0])
         if depth not in dungeon_cache.keys():
             dungeon, hangers, hooks = gen_dungeon_info(available_sectors, entrance_regions, proposed_map, doors_to_connect, world, player)
             dungeon_cache[depth] = dungeon, hangers, hooks
@@ -234,6 +238,14 @@ def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_reg
         if len(hooks[key]) > 0 and len(hangers[key]) == 0:
             return False
     # todo: stonewall - check that there's no hook-only that is without a matching hanger
+    outstanding_doors = defaultdict(list)
+    for d in doors_to_connect:
+        if d not in proposed_map.keys():
+            outstanding_doors[hook_from_door(d)].append(d)
+    for key in outstanding_doors.keys():
+        opp_key = opposite_h_type(key)
+        if len(outstanding_doors[key]) > 0 and len(hangers[key]) == 0 and len(hooks[opp_key]) == 0:
+            return False
     all_visited = set()
     for piece in dungeon.values():
         all_visited.update(piece.visited_regions)
@@ -277,7 +289,7 @@ def winnow_hangers(hangers, hooks):
                 found_valid = False
                 for door_hook, crystal, orig_hanger in hook_set:
                     if orig_hanger != door:
-                        found_valid = True
+                        found_valid = True  # todo: break
                 if not found_valid:
                     removal_info.append((hanger, door))
     for hanger, door in removal_info:
@@ -320,6 +332,18 @@ def create_graph_piece_from_state(door, o_state, b_state, proposed_map):
 
 def parent_region(door, world, player):
     return world.get_entrance(door.name, player)
+
+
+def opposite_h_type(h_type):
+    type_map = {
+        Hook.Stairs: Hook.Stairs,
+        Hook.North: Hook.South,
+        Hook.South: Hook.North,
+        Hook.West: Hook.East,
+        Hook.East: Hook.West,
+
+    }
+    return type_map[h_type]
 
 
 def hook_from_door(door):
@@ -565,8 +589,8 @@ class ExplorationState(object):
                     self.append_door_to_list(door, self.avail_doors)
 
     def add_all_doors_check_proposed(self, region, proposed_map, valid_doors, world, player):
-        for door in get_dungeon_doors(region, world, player):
-            if self.can_traverse(door):
+        for door in get_doors(world, region, player):
+            if self.can_traverse_bk_check(door):
                 if door.controller is not None:
                     door = door.controller
                 if door.dest is None and door not in proposed_map.keys() and door in valid_doors:
@@ -627,6 +651,14 @@ class ExplorationState(object):
         if door.crystal not in [CrystalBarrier.Null, CrystalBarrier.Either]:
             return self.crystal == CrystalBarrier.Either or door.crystal == self.crystal
         return True
+
+    def can_traverse_bk_check(self, door):
+        if door.blocked:
+            return False
+        if door.crystal not in [CrystalBarrier.Null, CrystalBarrier.Either]:
+            return self.crystal == CrystalBarrier.Either or door.crystal == self.crystal
+        return not door.bigKey or len(self.found_locations) > 0
+        # return not door.bigKey or len([x for x in self.found_locations if '- Prize' not in x.name]) > 0
 
     def validate(self, door, region, world):
         return self.can_traverse(door) and not self.visited(region) and valid_region_to_explore(region, world)

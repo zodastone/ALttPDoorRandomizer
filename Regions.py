@@ -193,18 +193,7 @@ def create_regions(world, player):
         create_lw_region(player, 'Mimic Cave Ledge', None, ['Mimic Cave']),
         create_cave_region(player, 'Mimic Cave', 'Mimic Cave', ['Mimic Cave']),
 
-        create_dungeon_region(player, 'Turtle Rock (Entrance)', 'Turtle Rock', None, ['Turtle Rock Entrance Gap', 'Turtle Rock Exit (Front)']),
-        create_dungeon_region(player, 'Turtle Rock (First Section)', 'Turtle Rock', ['Turtle Rock - Compass Chest', 'Turtle Rock - Roller Room - Left',
-                                                                             'Turtle Rock - Roller Room - Right'], ['Turtle Rock Pokey Room', 'Turtle Rock Entrance Gap Reverse']),
-        create_dungeon_region(player, 'Turtle Rock (Chain Chomp Room)', 'Turtle Rock', ['Turtle Rock - Chain Chomps'], ['Turtle Rock (Chain Chomp Room) (North)', 'Turtle Rock (Chain Chomp Room) (South)']),
-        create_dungeon_region(player, 'Turtle Rock (Second Section)', 'Turtle Rock', ['Turtle Rock - Big Key Chest'], ['Turtle Rock Ledge Exit (West)', 'Turtle Rock Chain Chomp Staircase', 'Turtle Rock Big Key Door']),
-        create_dungeon_region(player, 'Turtle Rock (Big Chest)', 'Turtle Rock', ['Turtle Rock - Big Chest'], ['Turtle Rock (Big Chest) (North)', 'Turtle Rock Ledge Exit (East)']),
-        create_dungeon_region(player, 'Turtle Rock (Crystaroller Room)', 'Turtle Rock', ['Turtle Rock - Crystaroller Room'], ['Turtle Rock Dark Room Staircase', 'Turtle Rock Big Key Door Reverse']),
-        create_dungeon_region(player, 'Turtle Rock (Dark Room)', 'Turtle Rock', None, ['Turtle Rock (Dark Room) (North)', 'Turtle Rock (Dark Room) (South)']),
-        create_dungeon_region(player, 'Turtle Rock (Eye Bridge)', 'Turtle Rock', ['Turtle Rock - Eye Bridge - Bottom Left', 'Turtle Rock - Eye Bridge - Bottom Right',
-                                                                          'Turtle Rock - Eye Bridge - Top Left', 'Turtle Rock - Eye Bridge - Top Right'],
-                              ['Turtle Rock Dark Room (South)', 'Turtle Rock (Trinexx)', 'Turtle Rock Isolated Ledge Exit']),
-        create_dungeon_region(player, 'Turtle Rock (Trinexx)', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize']),
+
         create_dungeon_region(player, 'Ganons Tower (Entrance)', 'Ganon\'s Tower', ['Ganons Tower - Bob\'s Torch', 'Ganons Tower - Hope Room - Left', 'Ganons Tower - Hope Room - Right'],
                               ['Ganons Tower (Tile Room)', 'Ganons Tower (Hookshot Room)', 'Ganons Tower Big Key Door', 'Ganons Tower Exit']),
         create_dungeon_region(player, 'Ganons Tower (Tile Room)', 'Ganon\'s Tower', ['Ganons Tower - Tile Room'], ['Ganons Tower (Tile Room) Key Door']),
@@ -612,6 +601,43 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Mire Boss', 'Misery Mire', ['Misery Mire - Boss', 'Misery Mire - Prize'], ['Mire Boss SW']),
 
         # tr
+        create_dungeon_region(player, 'TR Main Lobby', 'Turtle Rock', None, ['TR Main Lobby Gap', 'Turtle Rock Exit (Front)']),
+        create_dungeon_region(player, 'TR Lobby Ledge', 'Turtle Rock', None, ['TR Lobby Ledge NE', 'TR Lobby Ledge Gap']),
+        create_dungeon_region(player, 'TR Compass Room', 'Turtle Rock', ['Turtle Rock - Compass Chest'], ['TR Compass Room NW']),
+        create_dungeon_region(player, 'TR Hub', 'Turtle Rock', None, ['TR Hub SW', 'TR Hub SE', 'TR Hub ES', 'TR Hub EN', 'TR Hub NW', 'TR Hub NE']),
+        create_dungeon_region(player, 'TR Torches Ledge', 'Turtle Rock', None, ['TR Torches Ledge WS']),
+        create_dungeon_region(player, 'TR Torches', 'Turtle Rock', None, ['TR Torches WN', 'TR Torches NW']),
+        create_dungeon_region(player, 'TR Roller Room', 'Turtle Rock', ['Turtle Rock - Roller Room - Left', 'Turtle Rock - Roller Room - Right'], ['TR Roller Room SW']),
+        create_dungeon_region(player, 'TR Tile Room', 'Turtle Rock', None, ['TR Tile Room SE', 'TR Tile Room NE']),
+        create_dungeon_region(player, 'TR Refill', 'Turtle Rock', None, ['TR Refill SE']),
+        create_dungeon_region(player, 'TR Pokey 1', 'Turtle Rock', ['Turtle Rock - Pokey 1 Key Drop'], ['TR Pokey 1 SW', 'TR Pokey 1 NW']),
+        create_dungeon_region(player, 'TR Chain Chomps', 'Turtle Rock', ['Turtle Rock - Chain Chomps'], ['TR Chain Chomps SW', 'TR Chain Chomps Down Stairs']),
+        create_dungeon_region(player, 'TR Pipe Pit', 'Turtle Rock', None, ['TR Pipe Pit Up Stairs', 'TR Pipe Pit WN']),
+        create_dungeon_region(player, 'TR Pipe Ledge', 'Turtle Rock', None, ['TR Pipe Ledge WS', 'TR Pipe Ledge Drop Down']),
+        create_dungeon_region(player, 'TR Lava Dual Pipes', 'Turtle Rock', None, ['TR Lava Dual Pipes EN', 'TR Lava Dual Pipes WN', 'TR Lava Dual Pipes SW']),
+        create_dungeon_region(player, 'TR Lava Island', 'Turtle Rock', ['Turtle Rock - Big Key Chest'], ['TR Lava Island WS', 'TR Lava Island ES']),
+        create_dungeon_region(player, 'TR Lava Escape', 'Turtle Rock', None, ['TR Lava Escape SE', 'TR Lava Escape NW']),
+        create_dungeon_region(player, 'TR Pokey 2', 'Turtle Rock', ['Turtle Rock - Pokey 2 Key Drop'], ['TR Pokey 2 EN', 'TR Pokey 2 ES']),
+        create_dungeon_region(player, 'TR Twin Pokeys', 'Turtle Rock', None, ['TR Twin Pokeys NW', 'TR Twin Pokeys EN', 'TR Twin Pokeys SW']),
+        create_dungeon_region(player, 'TR Hallway', 'Turtle Rock', None, ['TR Hallway NW', 'TR Hallway ES', 'TR Hallway WS']),
+        create_dungeon_region(player, 'TR Dodgers', 'Turtle Rock', None, ['TR Dodgers WN', 'TR Dodgers SE', 'TR Dodgers NE']),
+        create_dungeon_region(player, 'TR Big View', 'Turtle Rock', None, ['TR Big View WS']),
+        create_dungeon_region(player, 'TR Big Chest', 'Turtle Rock', ['Turtle Rock - Big Chest'], ['TR Big Chest Gap', 'TR Big Chest NE']),
+        create_dungeon_region(player, 'TR Big Chest Entrance', 'Turtle Rock', None, ['Turtle Rock Ledge Exit (East)', 'TR Big Chest Entrance Gap']),
+        create_dungeon_region(player, 'TR Lazy Eyes', 'Turtle Rock', None, ['Turtle Rock Ledge Exit (West)', 'TR Lazy Eyes ES']),
+        create_dungeon_region(player, 'TR Dash Room', 'Turtle Rock', None, ['TR Dash Room SW', 'TR Dash Room ES', 'TR Dash Room NW']),
+        create_dungeon_region(player, 'TR Tongue Pull', 'Turtle Rock', None, ['TR Tongue Pull WS', 'TR Tongue Pull NE']),
+        create_dungeon_region(player, 'TR Rupees', 'Turtle Rock', None, ['TR Rupees SE']),
+        create_dungeon_region(player, 'TR Crystaroller', 'Turtle Rock', ['Turtle Rock - Crystaroller Room'], ['TR Crystaroller SW', 'TR Crystaroller Down Stairs']),
+        create_dungeon_region(player, 'TR Dark Ride', 'Turtle Rock', None, ['TR Dark Ride Up Stairs', 'TR Dark Ride SW']),
+        create_dungeon_region(player, 'TR Dash Bridge', 'Turtle Rock', None, ['TR Dash Bridge NW', 'TR Dash Bridge SW', 'TR Dash Bridge WS']),
+        create_dungeon_region(player, 'TR Eye Bridge', 'Turtle Rock', ['Turtle Rock - Eye Bridge - Bottom Left', 'Turtle Rock - Eye Bridge - Bottom Right',
+                                                                       'Turtle Rock - Eye Bridge - Top Left', 'Turtle Rock - Eye Bridge - Top Right'],
+                              ['Turtle Rock Isolated Ledge Exit', 'TR Eye Bridge NW']),
+        create_dungeon_region(player, 'TR Crystal Maze', 'Turtle Rock', None, ['TR Crystal Maze ES', 'TR Crystal Maze North Stairs']),
+        create_dungeon_region(player, 'TR Final Abyss', 'Turtle Rock', None, ['TR Final Abyss South Stairs', 'TR Final Abyss NW']),
+        create_dungeon_region(player, 'TR Boss', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize'], ['TR Boss SW']),
+
         # gt
     ]
 
@@ -750,6 +776,8 @@ key_only_locations = {
   'Misery Mire - Spikes Pot Key': 'Small Key (Misery Mire)',
   'Misery Mire - Fishbone Pot Key': 'Small Key (Misery Mire)',
   'Misery Mire - Conveyor Crystal Key Drop': 'Small Key (Misery Mire)',
+  'Turtle Rock - Pokey 1 Key Drop': 'Small Key (Turtle Rock)',
+  'Turtle Rock - Pokey 2 Key Drop': 'Small Key (Turtle Rock)',
 }
 
 dungeon_events = [
@@ -766,8 +794,6 @@ flooded_keys_reverse = {
     'Swamp Palace - Trench 1 Pot Key': 'Trench 1 Switch',
     'Swamp Palace - Trench 2 Pot Key': 'Trench 2 Switch'
 }
-
-# todo: escape big key? - should be separate from above for dungeon key layout validation
 
 location_table = {'Mushroom': (0x180013, False, 'in the woods'),
                   'Bottle Merchant': (0x2eb18, False, 'with a merchant'),

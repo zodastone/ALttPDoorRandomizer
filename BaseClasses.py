@@ -1054,7 +1054,6 @@ class Sector(object):
         self.regions = []
         self.outstanding_doors = []
         self.name = None
-        # todo: make these lazy init? - when do you invalidate them
 
     def polarity(self):
         pol = Polarity()

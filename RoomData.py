@@ -97,7 +97,7 @@ def create_rooms(world, player):
         Room(player, 0x60, 0x51309).door(Position.NorthE2, DoorKind.NormalLow2).door(Position.East2, DoorKind.NormalLow2).door(Position.East2, DoorKind.ToggleFlag).door(Position.EastN, DoorKind.Normal).door(Position.SouthE, DoorKind.Normal).door(Position.SouthE, DoorKind.IncognitoEntrance),
         Room(player, 0x61, 0x51454).door(Position.West2, DoorKind.NormalLow).door(Position.West2, DoorKind.ToggleFlag).door(Position.East2, DoorKind.NormalLow).door(Position.East2, DoorKind.ToggleFlag).door(Position.South2, DoorKind.NormalLow).door(Position.South2, DoorKind.IncognitoEntrance).door(Position.WestN, DoorKind.Normal),
         Room(player, 0x62, 0x51577).door(Position.West2, DoorKind.NormalLow2).door(Position.West2, DoorKind.ToggleFlag).door(Position.NorthW2, DoorKind.NormalLow2).door(Position.North, DoorKind.Normal).door(Position.SouthW, DoorKind.Normal).door(Position.SouthW, DoorKind.IncognitoEntrance),
-        Room(player, 0x63, 0xf88ed).door(Position.NorthE, DoorKind.StairKey).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.SouthW, DoorKind.DungeonEntrance),  # todo: looks like a huge typo - I had to guess on StairKey
+        Room(player, 0x63, 0xf88ed).door(Position.NorthE, DoorKind.StairKey).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.SouthW, DoorKind.DungeonEntrance),  # looked like a huge typo - I had to guess on StairKey
         Room(player, 0x64, 0xfda53).door(Position.InteriorS, DoorKind.Trap2),
         Room(player, 0x65, 0xfdac5).door(Position.InteriorS, DoorKind.Normal),
         Room(player, 0x66, 0xfa01b).door(Position.InteriorE2, DoorKind.Waterfall).door(Position.SouthW2, DoorKind.NormalLow2).door(Position.SouthW2, DoorKind.ToggleFlag).door(Position.InteriorW2, DoorKind.NormalLow2),
@@ -195,7 +195,7 @@ def create_rooms(world, player):
         Room(player, 0xd1, 0xfb259).door(Position.InteriorS, DoorKind.Trap2).door(Position.NorthW, DoorKind.Normal).door(Position.NorthE, DoorKind.Normal).door(Position.InteriorE, DoorKind.Normal),
         Room(player, 0xd2, 0xfafd6).door(Position.NorthE, DoorKind.Trap),
         Room(player, 0xd5, 0xfee40).door(Position.SouthW, DoorKind.BombableEntrance).door(Position.NorthW, DoorKind.Normal),
-        Room(player, 0xd6, 0xfe1cb).door(Position.NorthW, DoorKind.UnknownD7).door(Position.SouthE, DoorKind.DungeonEntrance).door(Position.NorthE, DoorKind.Normal),
+        Room(player, 0xd6, 0xfe1cb).door(Position.NorthW, DoorKind.UnknownD6).door(Position.SouthE, DoorKind.DungeonEntrance).door(Position.NorthE, DoorKind.Normal),
         Room(player, 0xd8, 0x515ed).door(Position.NorthE, DoorKind.Trap).door(Position.InteriorE, DoorKind.TrapTriggerable).door(Position.EastS, DoorKind.Normal),
         Room(player, 0xd9, 0x5166f).door(Position.WestS, DoorKind.Trap).door(Position.InteriorS, DoorKind.Trap).door(Position.EastS, DoorKind.Trap),
         Room(player, 0xda, 0x5169d).door(Position.WestS, DoorKind.Trap),
@@ -326,7 +326,7 @@ class DoorKind(Enum):
     DungeonChanger = 0x14
     ToggleFlag = 0x16
     Trap = 0x18
-    UnknownD7 = 0x1A
+    UnknownD6 = 0x1A
     SmallKey = 0x1C
     BigKey = 0x1E
     StairKey = 0x20

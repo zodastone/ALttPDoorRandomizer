@@ -814,6 +814,74 @@ def create_doors(world, player):
         create_door(player, 'Mire Antechamber NW', Nrml).dir(No, 0xa0, Left, High).big_key().pos(0),
         create_door(player, 'Mire Boss SW', Nrml).dir(So, 0x90, Left, High).no_exit().trap(0x4).pos(0),
 
+        create_door(player, 'TR Lobby Ledge NE', Nrml).dir(No, 0xd6, Right, High).pos(2),
+        create_door(player, 'TR Main Lobby Gap', Lgcl),
+        create_door(player, 'TR Lobby Ledge Gap', Lgcl),
+        create_door(player, 'TR Compass Room NW', Nrml).dir(No, 0xd6, Left, High).pos(0),
+        create_door(player, 'TR Hub SW', Nrml).dir(So, 0xc6, Left, High).pos(4),
+        create_door(player, 'TR Hub SE', Nrml).dir(So, 0xc6, Right, High).pos(5),
+        create_door(player, 'TR Hub ES', Nrml).dir(Ea, 0xc6, Bot, High).pos(3),
+        create_door(player, 'TR Hub EN', Nrml).dir(Ea, 0xc6, Top, High).pos(2),
+        create_door(player, 'TR Hub NW', Nrml).dir(No, 0xc6, Left, High).small_key().pos(0),
+        create_door(player, 'TR Hub NE', Nrml).dir(No, 0xc6, Right, High).pos(1),
+        create_door(player, 'TR Torches Ledge WS', Nrml).dir(We, 0xc7, Bot, High).pos(2),
+        create_door(player, 'TR Torches WN', Nrml).dir(We, 0xc7, Top, High).pos(1),
+        create_door(player, 'TR Torches NW', Nrml).dir(No, 0xc7, Left, High).trap(0x4).pos(0),
+        create_door(player, 'TR Roller Room SW', Nrml).dir(So, 0xb7, Left, High).pos(0),
+        create_door(player, 'TR Pokey 1 SW', Nrml).dir(So, 0xb6, Left, High).small_key().pos(2),
+        create_door(player, 'TR Tile Room SE', Nrml).dir(So, 0xb6, Right, High).pos(4),
+        create_door(player, 'TR Tile Room NE', Intr).dir(No, 0xb6, Right, High).pos(1),
+        create_door(player, 'TR Refill SE', Intr).dir(So, 0xb6, Right, High).pos(1),
+        create_door(player, 'TR Pokey 1 NW', Intr).dir(No, 0xb6, Left, High).small_key().pos(3),
+        create_door(player, 'TR Chain Chomps SW', Intr).dir(So, 0xb6, Left, High).small_key().pos(3),
+        create_door(player, 'TR Chain Chomps Down Stairs', Sprl).dir(Dn, 0xb6, 0, HTH).ss(A, 0x12, 0x80, True, True).small_key().pos(0),
+        create_door(player, 'TR Pipe Pit Up Stairs', Sprl).dir(Up, 0x15, 0, HTH).ss(A, 0x1b, 0x6c),
+        create_door(player, 'TR Pipe Pit WN', Nrml).dir(We, 0x15, Top, High).pos(1),
+        create_door(player, 'TR Pipe Ledge WS', Nrml).dir(We, 0x15, Left, High).no_exit().trap(0x4).pos(0),
+        create_door(player, 'TR Pipe Ledge Drop Down', Lgcl),
+        create_door(player, 'TR Lava Dual Pipes EN', Nrml).dir(Ea, 0x14, Top, High).pos(5),
+        create_door(player, 'TR Lava Dual Pipes WN', Nrml).dir(We, 0x14, Top, High).pos(3),
+        create_door(player, 'TR Lava Dual Pipes SW', Nrml).dir(So, 0x14, Left, High).pos(4),
+        create_door(player, 'TR Lava Island WS', Nrml).dir(We, 0x14, Bot, High).small_key().pos(1),
+        create_door(player, 'TR Lava Island ES', Nrml).dir(Ea, 0x14, Bot, High).pos(6),
+        create_door(player, 'TR Lava Escape SE', Nrml).dir(So, 0x14, Right, High).small_key().pos(0),
+        create_door(player, 'TR Lava Escape NW', Nrml).dir(No, 0x14, Left, High).pos(2),
+        create_door(player, 'TR Pokey 2 EN', Nrml).dir(Ea, 0x13, Top, High).pos(1),
+        create_door(player, 'TR Pokey 2 ES', Nrml).dir(Ea, 0x13, Bot, High).small_key().pos(0),
+        create_door(player, 'TR Twin Pokeys NW', Nrml).dir(No, 0x24, Left, High).pos(5),
+        create_door(player, 'TR Twin Pokeys SW', Intr).dir(So, 0x24, Left, High).pos(2),
+        create_door(player, 'TR Hallway NW', Intr).dir(No, 0x24, Left, High).pos(2),
+        create_door(player, 'TR Hallway WS', Nrml).dir(We, 0x24, Bot, High).pos(6),
+        create_door(player, 'TR Twin Pokeys EN', Intr).dir(Ea, 0x24, Top, High).pos(1),
+        create_door(player, 'TR Dodgers WN', Intr).dir(We, 0x24, Top, High).pos(1),
+        create_door(player, 'TR Hallway ES', Intr).dir(Ea, 0x24, Bot, High).pos(7),
+        create_door(player, 'TR Big View WS', Intr).dir(We, 0x24, Bot, High).pos(7),
+        create_door(player, 'TR Big Chest Gap', Lgcl),
+        create_door(player, 'TR Big Chest Entrance Gap', Lgcl),
+        create_door(player, 'TR Big Chest NE', Intr).dir(No, 0x24, Right, High).pos(3),
+        create_door(player, 'TR Dodgers SE', Intr).dir(So, 0x24, Right, High).no_exit().pos(3),
+        create_door(player, 'TR Dodgers NE', Nrml).dir(No, 0x24, Right, High).big_key().pos(0),
+        create_door(player, 'TR Lazy Eyes ES', Nrml).dir(Ea, 0x23, Bot, High).pos(1),
+        create_door(player, 'TR Dash Room SW', Nrml).dir(So, 0x04, Left, High).pos(4),
+        create_door(player, 'TR Dash Room ES', Intr).dir(Ea, 0x04, Bot, High).pos(2),
+        create_door(player, 'TR Tongue Pull WS', Intr).dir(We, 0x04, Bot, High).pos(2),
+        create_door(player, 'TR Tongue Pull NE', Intr).dir(No, 0x04, Right, High).pos(3),
+        create_door(player, 'TR Rupees SE', Intr).dir(So, 0x04, Right, High).pos(3),
+        create_door(player, 'TR Dash Room NW', Intr).dir(No, 0x04, Left, High).pos(1),
+        create_door(player, 'TR Crystaroller SW', Intr).dir(So, 0x04, Left, High).pos(1),
+        create_door(player, 'TR Crystaroller Down Stairs', Sprl).dir(Dn, 0x04, 0, HTH).ss(A, 0x12, 0x80, True, True).small_key().pos(0),
+        create_door(player, 'TR Dark Ride Up Stairs', Sprl).dir(Up, 0xb5, 0, HTH).ss(A, 0x1b, 0x6c),
+        create_door(player, 'TR Dark Ride SW', Nrml).dir(So, 0xb5, Left, High).trap(0x4).pos(0),
+        create_door(player, 'TR Dash Bridge NW', Nrml).dir(No, 0xc5, Left, High).pos(1),
+        create_door(player, 'TR Dash Bridge SW', Nrml).dir(So, 0xc5, Left, High).pos(2),
+        create_door(player, 'TR Dash Bridge WS', Nrml).dir(We, 0xc5, Bot, High).small_key().pos(0),
+        create_door(player, 'TR Eye Bridge NW', Nrml).dir(No, 0xd5, Left, High).pos(1),
+        create_door(player, 'TR Crystal Maze ES', Nrml).dir(Ea, 0xc4, Bot, High).small_key().pos(0),
+        create_door(player, 'TR Crystal Maze North Stairs', StrS).dir(No, 0xc4, Mid, High),
+        create_door(player, 'TR Final Abyss South Stairs', StrS).dir(No, 0xb4, Right, High),
+        create_door(player, 'TR Final Abyss NW', Nrml).dir(No, 0xb4, Left, High).big_key().pos(0),
+        create_door(player, 'TR Boss SW', Nrml).dir(So, 0xa4, Left, High).no_exit().trap(0x4).pos(0),
+
         # Door Templates
         # create_door(player, '', Nrml).dir(No, 0x00, Right, High).pos(),
         # create_door(player, '', Intr).dir(No, 0x00, Right, High).pos(),
@@ -926,6 +994,15 @@ def create_doors(world, player):
     world.get_door('Mire Firesnake Skip Orange Barrier', player).barrier(CrystalBarrier.Orange)
     world.get_door('Mire Antechamber Orange Barrier', player).barrier(CrystalBarrier.Orange)
 
+    world.get_door('TR Chain Chomps SW', player).c_switch()
+    world.get_door('TR Chain Chomps Down Stairs', player).c_switch()
+    world.get_door('TR Pokey 2 EN', player).c_switch()
+    world.get_door('TR Pokey 2 ES', player).c_switch()
+    world.get_door('TR Crystaroller SW', player).c_switch()
+    world.get_door('TR Crystaroller Down Stairs', player).c_switch()
+    world.get_door('TR Crystal Maze ES', player).c_switch()
+    world.get_door('TR Crystal Maze North Stairs', player).c_switch()
+
     # nifty dynamic logical doors:
     south_controller = world.get_door('Ice Cross Bottom SE', player)
     east_controller = world.get_door('Ice Cross Right ES', player)
@@ -938,8 +1015,8 @@ def create_doors(world, player):
 def create_paired_doors(world, player):
     world.paired_doors[player] = [
         PairedDoor('Sewers Secret Room Key Door S', 'Sewers Key Rat Key Door N'),
-        # PairedDoor('', ''),  # TR Pokey Key
-        # PairedDoor('', ''),  # TR Big key door by pipes
+        PairedDoor('TR Pokey 2 ES', 'TR Lava Island WS'),  # TR Pokey Key
+        PairedDoor('TR Dodgers NE', 'TR Lava Escape SE'),  # TR Big key door by pipes
         PairedDoor('PoD Falling Bridge WN', 'PoD Dark Maze EN'),  # Pod Dark maze door
         PairedDoor('PoD Dark Maze E', 'PoD Big Chest Balcony W'),  # PoD Bombable by Big Chest
         PairedDoor('PoD Arena Main NW', 'PoD Falling Bridge SW'),  # Pod key door by bridge
@@ -966,14 +1043,14 @@ def create_paired_doors(world, player):
         PairedDoor('Mire Fishbone SE', 'Mire Spike Barrier NE'),  # mire fishbone key door
         PairedDoor('Mire BK Door Room N', 'Mire Left Bridge S'),  # mire big key door to bridges
         PairedDoor('Eastern Big Key NE', 'Eastern Hint Tile Blocked Path SE'),
-        # PairedDoor('', ''),  # TR somaria hub to pokey
+        PairedDoor('TR Hub NW', 'TR Pokey 1 SW'),  # TR somaria hub to pokey
         PairedDoor('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
         PairedDoor('Thieves Rail Ledge NW', 'Thieves Pot Alcove Bottom SW'),  # TT random bomb to pots
         PairedDoor('Thieves BK Corner NE', 'Thieves Hallway SE'),  # TT big key door
         PairedDoor('Ice Switch Room ES', 'Ice Refill WS'),  # Ice last key door to crystal switch
         PairedDoor('Mire Hub WS', 'Mire Conveyor Crystal ES'),  # mire hub key door to attic
         PairedDoor('Mire Hub Right EN', 'Mire Map Spot WN'),  # mire hub key door to map
-        # PairedDoor('', ''),  # tr last key door to switch maze
+        PairedDoor('TR Dash Bridge WS', 'TR Crystal Maze ES'),  # tr last key door to switch maze
         PairedDoor('Thieves Ambush E', 'Thieves Rail Ledge W')  # TT dashable above
     ]
 
