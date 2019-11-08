@@ -235,7 +235,9 @@ def create_rooms(world, player):
     # fix some wonky things
     world.get_room(0x60, player).swap(2, 4)  # puts the exit at pos 2 - enables pos 3
     world.get_room(0x61, player).swap(1, 6)  # puts the WN door at pos 1 - enables it
+    world.get_room(0x61, player).swap(5, 6)  # puts the Incognito Entrance at the end, so it can be deleted
     world.get_room(0x62, player).swap(1, 4)  # puts the exit at pos 1 - enables pos 3
+    world.get_room(0x77, player).swap(0, 1)  # fixes Hera Lobby Key Stairs - entrance now at pos 0
 
 
 class Room(object):
@@ -261,6 +263,9 @@ class Room(object):
         self.doorList[idx1] = item2
         self.doorList[idx2] = item1
         self.modified = True
+
+    def delete(self, list_idx):
+        self.doorList[list_idx] = (0xff, 0xff)
 
     def address(self):
         return self.doorListAddress

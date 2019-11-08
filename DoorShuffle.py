@@ -42,6 +42,7 @@ def link_doors(world, player):
             connect_two_way(world, entrance, ext, player)
         for ent, ext in default_one_way_connections:
             connect_one_way(world, ent, ext, player)
+        world.key_logic[player] = {}  # todo: actual vanilla key logic
     elif world.doorShuffle == 'basic':
         within_dungeon(world, player)
     elif world.doorShuffle == 'crossed':
@@ -1062,7 +1063,11 @@ def reassign_key_doors(current_doors, proposal, world, player):
     while len(queue) > 0:
         d = queue.pop()
         if d.type is DoorType.SpiralStairs and d not in proposal:
-            world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Waterfall)
+            room = world.get_room(d.roomIndex, player)
+            if room.doorList[d.doorListPos][1] == DoorKind.StairKeyLow:
+                room.delete(d.doorListPos)
+            else:
+                room.change(d.doorListPos, DoorKind.Waterfall)
             d.smallKey = False
         elif d.type is DoorType.Interior and d not in flat_proposal and d.dest not in flat_proposal:
             world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)
@@ -1716,7 +1721,7 @@ default_door_connections = [
     ('Eastern Courtyard Ledge W', 'Eastern West Wing E'),
     ('Eastern Courtyard Ledge E', 'Eastern East Wing W'),
     ('Eastern Hint Tile EN', 'Eastern Courtyard WN'),
-    ('Eastern Big Key NE', 'Eastern Hint Tile Blocked Path SW'),
+    ('Eastern Big Key NE', 'Eastern Hint Tile Blocked Path SE'),
     ('Eastern Courtyard EN', 'Eastern Map Valley WN'),
     ('Eastern Courtyard N', 'Eastern Darkness S'),
     ('Eastern Map Valley SW', 'Eastern Dark Square NW'),
@@ -1766,7 +1771,7 @@ default_door_connections = [
     ('Ice Conveyor SW', 'Ice Bomb Jump NW'),
     ('Ice Pengator Trap NE', 'Ice Spike Cross SE'),
     ('Ice Spike Cross ES', 'Ice Spike Room WS'),
-    ('Ice Tall Hint SE', 'Ice Lonely Freezor NW'),
+    ('Ice Tall Hint SE', 'Ice Lonely Freezor NE'),
     ('Ice Tall Hint EN', 'Ice Hookshot Ledge WN'),
     ('Iced T EN', 'Ice Catwalk WN'),
     ('Ice Catwalk NW', 'Ice Many Pots SW'),

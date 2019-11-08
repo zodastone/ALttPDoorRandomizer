@@ -14,11 +14,11 @@ from Text import Uncle_texts, Ganon1_texts, TavernMan_texts, Sahasrahla2_texts, 
 from Text import KingsReturn_texts, Sanctuary_texts, Kakariko_texts, Blacksmiths_texts, DeathMountain_texts, LostWoods_texts, WishingWell_texts, DesertPalace_texts, MountainTower_texts, LinksHouse_texts, Lumberjacks_texts, SickKid_texts, FluteBoy_texts, Zora_texts, MagicShop_texts, Sahasrahla_names
 from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_to_pc
 from Items import ItemFactory, item_table
-from EntranceShuffle import door_addresses
+from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '08d53b2249fc1598be1b94c537d0feb5'
+RANDOMIZERBASEHASH = 'f3f4b3e897857cc5fa9c138bfc4d3da0'
 
 
 class JsonRom(object):
@@ -506,6 +506,7 @@ def patch_rom(world, player, rom):
                         rom.write_int16(0x15DB5 + 2 * offset, link_y) # same as final else
                     elif room_id == 0x0059 and world.fix_skullwoods_exit:
                         rom.write_int16(0x15DB5 + 2 * offset, 0x00F8)
+                        world.fix_skullwoods_exit = False
                     elif room_id == 0x004a and world.fix_palaceofdarkness_exit:
                         rom.write_int16(0x15DB5 + 2 * offset, 0x0640)
                     elif room_id == 0x00d6 and world.fix_trock_exit:
@@ -542,6 +543,9 @@ def patch_rom(world, player, rom):
     for paired_door in world.paired_doors[player]:
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
         rom.write_bytes(paired_door.address_b(world, player), paired_door.rom_data_b(world, player))
+    if world.fix_skullwoods_exit:
+        rom.write_int16(0x15DB5 + 2 * exit_ids['Skull Woods Final Section Exit'][1], 0x00F8)
+    # todo: fix other exits if ER enabled and similar situation happens
 
     write_custom_shops(rom, world, player)
 

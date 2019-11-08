@@ -231,7 +231,7 @@ def create_doors(world, player):
 
         # Hera
         create_door(player, 'Hera Lobby Down Stairs', Sprl).dir(Dn, 0x77, 3, HTL).ss(Z, 0x21, 0x90, False, True),
-        create_door(player, 'Hera Lobby Key Stairs', Sprl).dir(Dn, 0x77, 1, HTL).ss(A, 0x12, 0x80).small_key().pos(0),
+        create_door(player, 'Hera Lobby Key Stairs', Sprl).dir(Dn, 0x77, 1, HTL).ss(A, 0x12, 0x80).small_key().pos(1),
         create_door(player, 'Hera Lobby Up Stairs', Sprl).dir(Up, 0x77, 2, HTL).ss(X, 0x2b, 0x5c, False, True),
         create_door(player, 'Hera Basement Cage Up Stairs', Sprl).dir(Up, 0x87, 3, LTH).ss(Z, 0x42, 0x7c, True, True),
         create_door(player, 'Hera Tile Room Up Stairs', Sprl).dir(Up, 0x87, 1, LTH).ss(A, 0x32, 0x6c, True, True),

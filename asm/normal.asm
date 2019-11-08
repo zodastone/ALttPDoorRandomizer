@@ -55,7 +55,7 @@ Cleanup:
 ; This sets A (00,02,04) and stores half that at $04 for later use, (src door)
 CalcIndex: ; A->low byte of Link's Coord, X-> Link's quadrant, DoorOffset x 2 -> A, DoorOffset -> $04 (vert/horz agnostic)
 	cpx.b #00 : bne .largeDoor
-	cmp.b #$90 : bcc .smallDoor
+	cmp.b #$d0 : bcc .smallDoor
 	lda #$01 : bra .done ; Middle Door
 	.smallDoor lda #$00 : bra .done
 	.largeDoor lda #$02
