@@ -265,7 +265,7 @@ class Room(object):
         self.modified = True
 
     def delete(self, list_idx):
-        self.doorList[list_idx] = (0xff, 0xff)
+        self.doorList[list_idx] = (Position.FF, DoorKind.FF)
 
     def address(self):
         return self.doorListAddress
@@ -350,6 +350,7 @@ class DoorKind(Enum):
     Warp = 0x46
     CaveEntranceLow08 = 0x48
     TrapLowE3 = 0x4A  # Maybe this is a toggle flag too?
+    FF = 0xFF
 
 
 @unique
@@ -390,6 +391,7 @@ class Position(Enum):
     EastN2 = 0x93
     East2 = 0xA3
     # EastS2 = 0xB3
+    FF = 0xFF
 
 
 class TestWorld(object):

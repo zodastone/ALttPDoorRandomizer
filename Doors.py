@@ -538,6 +538,7 @@ def create_doors(world, player):
         create_door(player, 'Thieves BK Corner WS Edge', Open).dir(We, 0xcc, None, Low),
         create_door(player, 'Thieves BK Corner S Edge', Open).dir(So, 0xcc, None, Low),
         create_door(player, 'Thieves BK Corner SW Edge', Open).dir(So, 0xcc, None, Low),
+        create_door(player, 'Thieves Rail Ledge Drop Down', Lgcl),
         create_door(player, 'Thieves Rail Ledge W', Nrml).dir(We, 0xcc, Mid, High).pos(2),
         create_door(player, 'Thieves Rail Ledge NW', Nrml).dir(No, 0xcc, Left, High).pos(1),
         create_door(player, 'Thieves BK Corner NE', Nrml).dir(No, 0xcc, Right, High).big_key().pos(0),

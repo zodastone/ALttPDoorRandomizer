@@ -468,7 +468,7 @@ def create_regions(world, player):
         # tt
         create_dungeon_region(player, 'Thieves Lobby', 'Thieves\' Town', ['Thieves\' Town - Map Chest'], ['Thieves Town Exit', 'Thieves Lobby N Edge', 'Thieves Lobby NE Edge', 'Thieves Lobby E']),
         create_dungeon_region(player, 'Thieves Ambush', 'Thieves\' Town', ['Thieves\' Town - Ambush Chest'], ['Thieves Ambush S Edge', 'Thieves Ambush SE Edge', 'Thieves Ambush ES Edge', 'Thieves Ambush EN Edge', 'Thieves Ambush E']),
-        create_dungeon_region(player, 'Thieves Rail Ledge', 'Thieves\' Town', None, ['Thieves Rail Ledge NW', 'Thieves Rail Ledge W']),
+        create_dungeon_region(player, 'Thieves Rail Ledge', 'Thieves\' Town', None, ['Thieves Rail Ledge NW', 'Thieves Rail Ledge W', 'Thieves Rail Ledge Drop Down']),
         create_dungeon_region(player, 'Thieves BK Corner', 'Thieves\' Town', None, ['Thieves BK Corner WN Edge', 'Thieves BK Corner WS Edge', 'Thieves BK Corner S Edge', 'Thieves BK Corner SW Edge', 'Thieves BK Corner NE']),
         create_dungeon_region(player, 'Thieves Compass Room', 'Thieves\' Town', ['Thieves\' Town - Compass Chest'], ['Thieves Compass Room NW Edge', 'Thieves Compass Room N Edge', 'Thieves Compass Room WS Edge', 'Thieves Compass Room W']),
         create_dungeon_region(player, 'Thieves Big Chest Nook', 'Thieves\' Town', ['Thieves\' Town - Big Key Chest'], ['Thieves Big Chest Nook WS Edge']),

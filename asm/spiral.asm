@@ -26,8 +26,9 @@ SpiralWarp: {
     stz $07 ; this is a x quad adjuster for those blasted staircase on the edges
     lda $01 : and #$01 : !sub $a9
     bne .xQuad
+    lda $0462 : and #$04 : bne .xqCont
     inc $07
-    lda $22 : bne .skipXQuad ; this is an edge case
+    .xqCont lda $22 : bne .skipXQuad ; this is an edge case
     dec $23 : bra .skipXQuad ; need to -1 if $22 is 0
     .xQuad sta $06 : !add $a9 : sta $a9
     lda $0462 : and #$04 : bne .xCont

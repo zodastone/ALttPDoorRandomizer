@@ -1349,6 +1349,7 @@ logical_connections = [
     ('Skull Pot Circle Star Path', 'Skull Map Room'),
     ('Skull Big Chest Hookpath', 'Skull 1 Lobby'),
     ('Skull Back Drop Star Path', 'Skull Small Hall'),
+    ('Thieves Rail Ledge Drop Down', 'Thieves BK Corner'),
     ('Thieves Hellway Orange Barrier', 'Thieves Hellway S Crystal'),
     ('Thieves Hellway Crystal Orange Barrier', 'Thieves Hellway'),
     ('Thieves Hellway Blue Barrier', 'Thieves Hellway N Crystal'),

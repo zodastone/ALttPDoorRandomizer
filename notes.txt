@@ -1,5 +1,8 @@
 Notes:
 
+Ice Spike Stairs seems to be off and maybe Lonely Freezor
+Pod bk ledge stairs
+
 AgaTower usually doesn't have enough Key Door candidates
 (Testing) Camera spots in Aga Tower: Push Statue, Lone Statue maybe?
 (Testing Waterfall Now) Spiral stairs without keys look funny - change to Incognito instead of Normal
