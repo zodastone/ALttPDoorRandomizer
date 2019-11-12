@@ -326,6 +326,10 @@ flexible_starts = {
     'Skull Woods': ['Skull Left Drop', 'Skull Pinball']
 }
 
+drop_entrances = [
+    'Sewers Rat Path', 'Skull Pot Circle', 'Skull Pinball', 'Skull Left Drop', 'Skull Back Drop'
+]
+
 dungeon_keys = {
     'Hyrule Castle': 'Small Key (Escape)',
     'Eastern Palace': 'Small Key (Eastern Palace)',
