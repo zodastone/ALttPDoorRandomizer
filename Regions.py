@@ -557,7 +557,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Mire Falling Bridge', 'Misery Mire', ['Misery Mire - Big Chest'], ['Mire Falling Bridge WS', 'Mire Falling Bridge W', 'Mire Falling Bridge WN']),
         create_dungeon_region(player, 'Mire Map Spike Side', 'Misery Mire', None, ['Mire Map Spike Side EN', 'Mire Map Spike Side Drop Down', 'Mire Map Spike Side Blue Barrier']),
         create_dungeon_region(player, 'Mire Map Spot', 'Misery Mire', ['Misery Mire - Map Chest'], ['Mire Map Spot WN', 'Mire Map Spot Blue Barrier']),
-        create_dungeon_region(player, 'Mire Crystal Dead End', 'Misery Mire', None, ['Mire Crystal Dead End Left Barrier', 'Mire Crystal Dead End Right Barrier', 'Mire Crystal Dead End NE']),
+        create_dungeon_region(player, 'Mire Crystal Dead End', 'Misery Mire', None, ['Mire Crystal Dead End Left Barrier', 'Mire Crystal Dead End Right Barrier', 'Mire Crystal Dead End NW']),
         create_dungeon_region(player, 'Mire Hidden Shooters', 'Misery Mire', None, ['Mire Hidden Shooters SE', 'Mire Hidden Shooters WS', 'Mire Hidden Shooters ES', 'Mire Hidden Shooters NE']),
         create_dungeon_region(player, 'Mire Cross', 'Misery Mire', None, ['Mire Cross ES', 'Mire Cross SW']),
         create_dungeon_region(player, 'Mire Minibridge', 'Misery Mire', None, ['Mire Minibridge SE', 'Mire Minibridge NE']),

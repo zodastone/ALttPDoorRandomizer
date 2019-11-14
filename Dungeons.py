@@ -327,7 +327,7 @@ flexible_starts = {
 }
 
 drop_entrances = [
-    'Sewers Rat Path', 'Skull Pot Circle', 'Skull Pinball', 'Skull Left Drop', 'Skull Back Drop'
+    'Sewers Rat Path', 'Skull Pinball', 'Skull Left Drop', 'Skull Back Drop'  # Pot circle is unique
 ]
 
 dungeon_keys = {

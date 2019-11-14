@@ -1797,7 +1797,7 @@ default_door_connections = [
     ('Mire Minibridge NE', 'Mire Right Bridge SE'),
     ('Mire BK Door Room EN', 'Mire Ledgehop WN'),
     ('Mire BK Door Room N', 'Mire Left Bridge S'),
-    ('Mire Spikes SW', 'Mire Crystal Dead End NE'),
+    ('Mire Spikes SW', 'Mire Crystal Dead End NW'),
     ('Mire Ledgehop NW', 'Mire Bent Bridge SW'),
     ('Mire Bent Bridge W', 'Mire Over Bridge E'),
     ('Mire Over Bridge W', 'Mire Fishbone E'),
