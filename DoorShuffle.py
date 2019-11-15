@@ -3,6 +3,7 @@ import collections
 from collections import defaultdict
 import logging
 import operator as op
+import time
 
 from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, Polarity, CrystalBarrier
@@ -42,7 +43,7 @@ def link_doors(world, player):
             connect_two_way(world, entrance, ext, player)
         for ent, ext in default_one_way_connections:
             connect_one_way(world, ent, ext, player)
-        world.key_logic[player] = {}  # todo: actual vanilla key logic
+        vanilla_key_logic(world, player)
     elif world.doorShuffle == 'basic':
         within_dungeon(world, player)
     elif world.doorShuffle == 'crossed':
@@ -105,6 +106,28 @@ def create_door_spoiler(world, player):
     #         logger.debug('Unpaired Doors: %s not paired with %s (p%d)', dp.door_a, dp.door_b, player)
 
 
+def vanilla_key_logic(world, player):
+    sectors = []
+    for dungeon in [dungeon for dungeon in world.dungeons if dungeon.player == player]:
+        sector = Sector()
+        sector.name = dungeon.name
+        sector.regions.extend(convert_regions(dungeon.regions, world, player))
+        sectors.append(sector)
+
+    overworld_prep(world, player)
+    entrances_map, potentials, connections = determine_entrance_list(world, player)
+    for sector in sectors:
+        start_regions = convert_regions(entrances_map[sector.name], world, player)
+        doors = convert_key_doors(default_small_key_doors[sector.name], world, player)
+        key_layout = KeyLayout(sector, start_regions, doors)
+        valid = validate_key_layout(key_layout, world, player)
+        if not valid:
+            raise Exception('Vanilla key layout not valid %s' % sector.name)
+        if player not in world.key_logic.keys():
+            world.key_logic[player] = {}
+        world.key_logic[player][sector.name] = key_layout.key_logic
+
+
 # some useful functions
 oppositemap = {
     Direction.South: Direction.North,
@@ -118,6 +141,16 @@ oppositemap = {
 
 def switch_dir(direction):
     return oppositemap[direction]
+
+
+def convert_key_doors(key_doors, world, player):
+    result = []
+    for d in key_doors:
+        if type(d) is tuple:
+            result.append((world.get_door(d[0], player), world.get_door(d[1], player)))
+        else:
+            result.append(world.get_door(d, player))
+    return result
 
 
 def connect_simple_door(world, exit_name, region_name, player):
@@ -196,7 +229,7 @@ def fix_big_key_doors_with_ugly_smalls(world, player):
 
 def remove_ugly_small_key_doors(world, player):
     for d in ['Eastern Hint Tile Blocked Path SE', 'Eastern Darkness S', 'Thieves Hallway SE', 'Mire Left Bridge S',
-              'TR Lava Escape SE']:
+              'TR Lava Escape SE', 'GT Hidden Spikes SE']:
         door = world.get_door(d, player)
         room = world.get_room(door.roomIndex, player)
         room.change(door.doorListPos, DoorKind.Normal)
@@ -206,7 +239,7 @@ def remove_ugly_small_key_doors(world, player):
 
 def unpair_big_key_doors(world, player):
     problematic_bk_doors = ['Eastern Courtyard N', 'Eastern Big Key NE', 'Thieves BK Corner NE', 'Mire BK Door Room N',
-                            'TR Dodgers NE']
+                            'TR Dodgers NE', 'GT Dash Hall NE']
     for paired_door in world.paired_doors[player]:
         if paired_door.door_a in problematic_bk_doors or paired_door.door_b in problematic_bk_doors:
             paired_door.pair = False
@@ -268,8 +301,10 @@ def within_dungeon(world, player):
     check_required_paths(paths, world, player)
 
     # shuffle_key_doors for dungeons
+    start = time.process_time()
     for sector, entrances in world.dungeon_layouts[player].values():
         shuffle_key_doors(sector, entrances, world, player)
+    logging.getLogger('').info('Key door shuffle time: %s', time.process_time()-start)
 
 
 def determine_entrance_list(world, player):
@@ -732,6 +767,8 @@ def valid_region_to_explore(region, world):
 
 
 def shuffle_key_doors(dungeon_sector, entrances, world, player):
+    logger = logging.getLogger('')
+    logger.info('Shuffling Key doors for %s', dungeon_sector.name)
     start_regions = convert_regions(entrances, world, player)
     # count number of key doors - this could be a table?
     num_key_doors = 0
@@ -772,28 +809,43 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
     paired_candidates = build_pair_list(flat_candidates)
     if len(paired_candidates) < num_key_doors:
         num_key_doors = len(paired_candidates)  # reduce number of key doors
-        logging.getLogger('').info('Lowering key door count because not enough candidates: %s', dungeon_sector.name)
+        logger.info('Lowering key door count because not enough candidates: %s', dungeon_sector.name)
     random.shuffle(paired_candidates)
     combinations = ncr(len(paired_candidates), num_key_doors)
     itr = 0
     proposal = kth_combination(itr, paired_candidates, num_key_doors)
-    key_logic = KeyLogic(dungeon_sector.name)
-    while not validate_key_layout(dungeon_sector, start_regions, proposal, key_logic, world, player):
+    key_layout = KeyLayout(dungeon_sector, start_regions, proposal)
+    while not validate_key_layout(key_layout, world, player):
         itr += 1
         if itr >= combinations:
-            logging.getLogger('').info('Lowering key door count because no valid layouts: %s', dungeon_sector.name)
+            logger.info('Lowering key door count because no valid layouts: %s', dungeon_sector.name)
             num_key_doors -= 1
             if num_key_doors < 0:
                 raise Exception('Bad dungeon %s - 0 key doors not valid' % dungeon_sector.name)
             combinations = ncr(len(paired_candidates), num_key_doors)
             itr = 0
         proposal = kth_combination(itr, paired_candidates, num_key_doors)
-        key_logic = KeyLogic(dungeon_sector.name)
+        key_layout.reset(proposal)
     # make changes
     if player not in world.key_logic.keys():
         world.key_logic[player] = {}
-    world.key_logic[player][dungeon_sector.name] = key_logic
+    world.key_logic[player][dungeon_sector.name] = key_layout.key_logic
     reassign_key_doors(current_doors, proposal, world, player)
+
+
+class KeyLayout(object):
+
+    def __init__(self, sector, starts, proposal):
+        self.sector = sector
+        self.start_regions = starts
+        self.proposal = proposal
+        self.key_logic = KeyLogic(sector.name)
+        self.checked_states = {}
+
+    def reset(self, proposal):
+        self.proposal = proposal
+        self.key_logic = KeyLogic(self.sector.name)
+        self.checked_states = {}
 
 
 class KeyLogic(object):
@@ -890,21 +942,19 @@ def ncr(n, r):
     return numerator / denominator
 
 
-def validate_key_layout(sector, start_regions, key_door_proposal, key_logic, world, player):
-    flat_proposal = flatten_pair_list(key_door_proposal)
+def validate_key_layout(key_layout, world, player):
+    flat_proposal = flatten_pair_list(key_layout.proposal)
     state = ExplorationState()
-    state.key_locations = len(world.get_dungeon(sector.name, player).small_keys)
-    state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in sector.regions
+    state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
+    state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in key_layout.sector.regions
     # Everything in a start region is in key region 0.
-    for region in start_regions:
+    for region in key_layout.start_regions:
         state.visit_region(region, key_checks=True)
         state.add_all_doors_check_keys(region, flat_proposal, world, player)
-    checked_states = set()
-    return validate_key_layout_r(state, flat_proposal, checked_states, key_logic, world, player)
+    return validate_key_layout_r(state, key_layout, flat_proposal, world, player)
 
 
-def validate_key_layout_r(state, flat_proposal, checked_states, key_logic, world, player):
-
+def validate_key_layout_r(state, key_layout, flat_proposal, world, player):
     # improvements: remove recursion to make this iterative
     # store a cache of various states of opened door to increase speed of checks - many are repetitive
     while len(state.avail_doors) > 0:
@@ -932,13 +982,15 @@ def validate_key_layout_r(state, flat_proposal, checked_states, key_logic, world
             state_copy.avail_doors.extend(state.big_doors)
             state_copy.big_doors.clear()
             code = state_id(state_copy, flat_proposal)
-            if code not in checked_states:
-                valid = validate_key_layout_r(state_copy, flat_proposal, checked_states, key_logic, world, player)
-                if valid:
-                    checked_states.add(code)
+            if code not in key_layout.checked_states.keys():
+                valid = validate_key_layout_r(state_copy, key_layout, flat_proposal, world, player)
+                key_layout.checked_states[code] = valid
+            else:
+                valid = key_layout.checked_states[code]
             if not valid:
                 return False
         if smalls_avail and available_small_locations > 0:
+            key_logic = key_layout.key_logic
             key_rule_num = min(available_small_locations, count_unique_doors(state.small_doors)) + state.used_smalls
             if key_rule_num == ttl_locations:
                 key_logic.bk_restricted.extend([x for x in get_valid_small_key_locations(state) if x not in key_logic.bk_restricted])
@@ -963,10 +1015,11 @@ def validate_key_layout_r(state, flat_proposal, checked_states, key_logic, world
                 state_copy.used_locations += 1
                 state_copy.used_smalls += 1
                 code = state_id(state_copy, flat_proposal)
-                if code not in checked_states:
-                    valid = validate_key_layout_r(state_copy, flat_proposal, checked_states, key_logic, world, player)
-                    if valid:
-                        checked_states.add(code)
+                if code not in key_layout.checked_states.keys():
+                    valid = validate_key_layout_r(state_copy, key_layout, flat_proposal, world, player)
+                    key_layout.checked_states[code] = valid
+                else:
+                    valid = key_layout.checked_states[code]
                 if not valid:
                     return False
     return valid
@@ -1138,6 +1191,7 @@ def determine_required_paths(world):
         'Ice Palace': ['Ice Boss'],
         'Misery Mire': ['Mire Boss'],
         'Turtle Rock': ['TR Boss'],
+        'Ganons Tower': ['GT Agahnim 2']
         }
     if world.shuffle == 'vanilla':
         paths['Skull Woods'].insert(0, 'Skull 2 West Lobby')
@@ -1398,7 +1452,29 @@ logical_connections = [
     ('TR Pipe Ledge Drop Down', 'TR Pipe Pit'),
     ('TR Big Chest Gap', 'TR Big Chest Entrance'),
     ('TR Big Chest Entrance Gap', 'TR Big Chest'),
-    # ('', ''),
+    ('GT Blocked Stairs Block Path', 'GT Big Chest'),
+    ('GT Hookshot East-North Path', 'GT Hookshot North Platform'),
+    ('GT Hookshot East-South Path', 'GT Hookshot South Platform'),
+    ('GT Hookshot North-East Path', 'GT Hookshot East Platform'),
+    ('GT Hookshot North-South Path', 'GT Hookshot South Platform'),
+    ('GT Hookshot South-East Path', 'GT Hookshot East Platform'),
+    ('GT Hookshot South-North Path', 'GT Hookshot North Platform'),
+    ('GT Hookshot Platform Blue Barrier', 'GT Hookshot South Entry'),
+    ('GT Hookshot Entry Blue Barrier', 'GT Hookshot South Platform'),
+    ('GT Double Switch Orange Barrier', 'GT Double Switch Switches'),
+    ('GT Double Switch Orange Barrier 2', 'GT Double Switch Key Spot'),
+    ('GT Double Switch Transition Blue', 'GT Double Switch Exit'),
+    ('GT Double Switch Blue Path', 'GT Double Switch Transition'),
+    ('GT Double Switch Orange Path', 'GT Double Switch Entry'),
+    ('GT Double Switch Key Blue Path', 'GT Double Switch Exit'),
+    ('GT Double Switch Key Orange Path', 'GT Double Switch Entry'),
+    ('GT Double Switch Blue Barrier', 'GT Double Switch Key Spot'),
+    ('GT Warp Maze - Pit Section Warp Spot', 'GT Warp Maze - Pit Exit Warp Spot'),
+    ('GT Warp Maze Exit Section Warp Spot', 'GT Warp Maze - Pit Exit Warp Spot'),
+    ('GT Firesnake Room Hook Path', 'GT Firesnake Room Ledge'),
+    ('GT Left Moldorm Ledge Drop Down', 'GT Moldorm'),
+    ('GT Right Moldorm Ledge Drop Down', 'GT Moldorm'),
+    ('GT Moldorm Gap', 'GT Validation')
 ]
 
 vanilla_logical_connections = [
@@ -1451,7 +1527,14 @@ spiral_staircases = [
     ('Mire Falling Foes Up Stairs', 'Mire Firesnake Skip Down Stairs'),
     ('TR Chain Chomps Down Stairs', 'TR Pipe Pit Up Stairs'),
     ('TR Crystaroller Down Stairs', 'TR Dark Ride Up Stairs'),
-    # ('', ''),
+    ('GT Lobby Left Down Stairs', 'GT Torch Up Stairs'),
+    ('GT Lobby Up Stairs', 'GT Crystal Paths Down Stairs'),
+    ('GT Lobby Right Down Stairs', 'GT Hope Room Up Stairs'),
+    ('GT Blocked Stairs Down Stairs', 'GT Four Torches Up Stairs'),
+    ('GT Cannonball Bridge Up Stairs', 'GT Gauntlet 1 Down Stairs'),
+    ('GT Quad Pot Up Stairs', 'GT Wizzrobes 1 Down Stairs'),
+    ('GT Moldorm Pit Up Stairs', 'GT Right Moldorm Ledge Down Stairs'),
+    ('GT Frozen Over Up Stairs', 'GT Brightly Lit Hall Down Stairs')
 ]
 
 straight_staircases = [
@@ -1459,7 +1542,7 @@ straight_staircases = [
     ('Sewers Rope Room North Stairs', 'Sewers Dark Cross South Stairs'),
     ('Tower Catwalk North Stairs', 'Tower Antechamber South Stairs'),
     ('PoD Conveyor North Stairs', 'PoD Map Balcony South Stairs'),
-    ('TR Crystal Maze North Stairs', 'TR Final Abyss South Stairs'),
+    ('TR Crystal Maze North Stairs', 'TR Final Abyss South Stairs')
 ]
 
 open_edges = [
@@ -1513,7 +1596,9 @@ falldown_pits = [
     ('Ice Backwards Room Hole', 'Ice Fairy'),
     ('Ice Antechamber Hole', 'Ice Boss'),
     ('Mire Attic Hint Hole', 'Mire BK Chest Ledge'),
-    # ('', ''),
+    ('GT Bob\'s Room Hole', 'GT Ice Armos'),
+    ('GT Falling Torches Hole', 'GT Staredown'),
+    ('GT Moldorm Hole', 'GT Moldorm Pit')
 ]
 
 dungeon_warps = [
@@ -1526,15 +1611,30 @@ dungeon_warps = [
     ('Ice Fairy Warp', 'Ice Anti-Fairy'),
     ('Mire Lone Warp Warp', 'Mire BK Door Room'),
     ('Mire Warping Pool Warp', 'Mire Square Rail'),
-    # ('', ''),
+    ('GT Compass Room Warp', 'GT Conveyor Star Pits'),
+    ('GT Spike Crystals Warp', 'GT Firesnake Room'),
+    ('GT Warp Maze - Left Section Warp', 'GT Warp Maze - Rando Rail'),
+    ('GT Warp Maze - Mid Section Left Warp', 'GT Warp Maze - Main Rails'),
+    ('GT Warp Maze - Mid Section Right Warp', 'GT Warp Maze - Main Rails'),
+    ('GT Warp Maze - Right Section Warp', 'GT Warp Maze - Main Rails'),
+    ('GT Warp Maze - Pit Exit Warp', 'GT Warp Maze - Pot Rail'),
+    ('GT Warp Maze - Rail Choice Left Warp', 'GT Warp Maze - Left Section'),
+    ('GT Warp Maze - Rail Choice Right Warp', 'GT Warp Maze - Mid Section'),
+    ('GT Warp Maze - Rando Rail Warp', 'GT Warp Maze - Mid Section'),
+    ('GT Warp Maze - Main Rails Best Warp', 'GT Warp Maze - Pit Section'),
+    ('GT Warp Maze - Main Rails Mid Left Warp', 'GT Warp Maze - Mid Section'),
+    ('GT Warp Maze - Main Rails Mid Right Warp', 'GT Warp Maze - Mid Section'),
+    ('GT Warp Maze - Main Rails Right Top Warp', 'GT Warp Maze - Right Section'),
+    ('GT Warp Maze - Main Rails Right Mid Warp', 'GT Warp Maze - Right Section'),
+    ('GT Warp Maze - Pot Rail Warp', 'GT Warp Maze Exit Section'),
+    ('GT Hidden Star Warp', 'GT Invisible Bridges')
 ]
 
 ladders = [
     ('PoD Bow Statue Down Ladder', 'PoD Dark Pegs Up Ladder'),
     ('Ice Big Key Down Ladder', 'Ice Tongue Pull Up Ladder'),
     ('Ice Firebar Down Ladder', 'Ice Freezors Up Ladder'),
-    # ('', ''),
-    # ('', ''),
+    ('GT Staredown Up Ladder', 'GT Falling Torches Down Ladder')
 ]
 
 interior_doors = [
@@ -1679,7 +1779,33 @@ interior_doors = [
     ('TR Dash Room ES', 'TR Tongue Pull WS'),
     ('TR Dash Room NW', 'TR Crystaroller SW'),
     ('TR Tongue Pull NE', 'TR Rupees SE'),
-    # ('', ''),
+    ('GT Torch EN', 'GT Hope Room WN'),
+    ('GT Torch SW', 'GT Big Chest NW'),
+    ('GT Tile Room EN', 'GT Speed Torch WN'),
+    ('GT Speed Torch WS', 'GT Pots n Blocks ES'),
+    ('GT Crystal Conveyor WN', 'GT Compass Room EN'),
+    ('GT Conveyor Cross WN', 'GT Hookshot EN'),
+    ('GT Hookshot ES', 'GT Map Room WS'),
+    ('GT Double Switch EN', 'GT Spike Crystals WN'),
+    ('GT Firesnake Room SW', 'GT Warp Maze (Rails) NW'),
+    ('GT Ice Armos NE', 'GT Big Key Room SE'),
+    ('GT Ice Armos WS', 'GT Four Torches ES'),
+    ('GT Four Torches NW', 'GT Fairy Abyss SW'),
+    ('GT Crystal Paths SW', 'GT Mimics 1 NW'),
+    ('GT Mimics 1 ES', 'GT Mimics 2 WS'),
+    ('GT Mimics 2 NE', 'GT Dash Hall SE'),
+    ('GT Cannonball Bridge SE', 'GT Refill NE'),
+    ('GT Gauntlet 1 WN', 'GT Gauntlet 2 EN'),
+    ('GT Gauntlet 2 SW', 'GT Gauntlet 3 NW'),
+    ('GT Gauntlet 4 SW', 'GT Gauntlet 5 NW'),
+    ('GT Beam Dash WS', 'GT Lanmolas 2 ES'),
+    ('GT Lanmolas 2 NW', 'GT Quad Pot SW'),
+    ('GT Wizzrobes 1 SW', 'GT Dashing Bridge NW'),
+    ('GT Dashing Bridge NE', 'GT Wizzrobes 2 SE'),
+    ('GT Torch Cross ES', 'GT Staredown WS'),
+    ('GT Falling Torches NE', 'GT Mini Helmasaur Room SE'),
+    ('GT Mini Helmasaur Room WN', 'GT Bomb Conveyor EN'),
+    ('GT Bomb Conveyor SW', 'GT Crystal Circles NW')
 ]
 
 key_doors = [
@@ -1700,6 +1826,96 @@ key_doors = [
     ('PoD Arena Main NW', 'PoD Falling Bridge SW'),
     ('PoD Falling Bridge WN', 'PoD Dark Maze EN'),
 ]
+
+default_small_key_doors = {
+    'Hyrule Castle': [
+        ('Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S'),
+        ('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
+        ('Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon North Abyss Key Door N'),
+        ('Hyrule Dungeon Armory Interior Key Door N', 'Hyrule Dungeon Armory Interior Key Door S')
+    ],
+    'Eastern Palace': [
+        ('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
+        'Eastern Darkness Up Stairs',
+    ],
+    'Desert Palace': [
+        ('Desert East Wing Key Door EN', 'Desert Compass Key Door WN'),
+        'Desert Tiles 1 Up Stairs',
+        ('Desert Beamos Hall NE', 'Desert Tiles 2 SE'),
+        ('Desert Tiles 2 NE', 'Desert Wall Slide SE'),
+    ],
+    'Tower of Hera': [
+        'Hera Lobby Key Stairs'
+    ],
+    'Agahnims Tower': [
+        'Tower Room 03 Up Stairs',
+        ('Tower Dark Maze ES', 'Tower Dark Chargers WS'),
+        'Tower Dark Archers Up Stairs',
+        ('Tower Circle of Pots WS', 'Tower Pacifist Run ES'),
+    ],
+    'Palace of Darkness': [
+        ('PoD Middle Cage N', 'PoD Pit Room S'),
+        ('PoD Arena Main NW', 'PoD Falling Bridge SW'),
+        ('PoD Falling Bridge WN', 'PoD Dark Maze EN'),
+        'PoD Basement Ledge Up Stairs',
+        ('PoD Compass Room SE', 'PoD Harmless Hellway NE'),
+        ('PoD Dark Pegs WN', 'PoD Lonely Turtle EN')
+    ],
+    'Swamp Palace': [
+        'Swamp Entrance Down Stairs',
+        ('Swamp Pot Row WS', 'Swamp Trench 1 Approach ES'),
+        ('Swamp Trench 1 Key Ledge NW', 'Swamp Hammer Switch SW'),
+        ('Swamp Hub WN', 'Swamp Crystal Switch EN'),
+        ('Swamp Hub North Ledge N', 'Swamp Push Statue S'),
+        ('Swamp Waterway NW', 'Swamp T SW')
+    ],
+    'Skull Woods': [
+        ('Skull 1 Lobby WS', 'Skull Pot Prison ES'),
+        ('Skull Map Room SE', 'Skull Pinball NE'),
+        ('Skull 2 West Lobby NW', 'Skull X Room SW'),
+        ('Skull 3 Lobby NW', 'Skull Star Pits SW'),
+        ('Skull Spike Corner WS', 'Skull Final Drop ES')
+    ],
+    'Thieves Town': [
+        ('Thieves Hallway WS', 'Thieves Pot Alcove Mid ES'),
+        'Thieves Spike Switch Up Stairs',
+        ('Thieves Conveyor Bridge WS', 'Thieves Big Chest Room ES')
+    ],
+    'Ice Palace': [
+        'Ice Jelly Key Down Stairs',
+        ('Ice Conveyor SW', 'Ice Bomb Jump NW'),
+        ('Ice Spike Cross ES', 'Ice Spike Room WS'),
+        ('Ice Tall Hint SE', 'Ice Lonely Freezor NE'),
+        'Ice Backwards Room Down Stairs',
+        ('Ice Switch Room ES', 'Ice Refill WS')
+    ],
+    'Misery Mire': [
+        ('Mire Hub WS', 'Mire Conveyor Crystal ES'),
+        ('Mire Hub Right EN', 'Mire Map Spot WN'),
+        ('Mire Spikes NW', 'Mire Ledgehop SW'),
+        ('Mire Fishbone SE', 'Mire Spike Barrier NE'),
+        ('Mire Conveyor Crystal WS', 'Mire Tile Room ES'),
+        ('Mire Dark Shooters SE', 'Mire Key Rupees NE')
+    ],
+    'Turtle Rock': [
+        ('TR Hub NW', 'TR Pokey 1 SW'),
+        ('TR Pokey 1 NW', 'TR Chain Chomps SW'),
+        'TR Chain Chomps Down Stairs',
+        ('TR Pokey 2 ES', 'TR Lava Island WS'),
+        'TR Crystaroller Down Stairs',
+        ('TR Dash Bridge WS', 'TR Crystal Maze ES')
+    ],
+    'Ganons Tower': [
+        ('GT Torch EN', 'GT Hope Room WN'),
+        ('GT Tile Room EN', 'GT Speed Torch WN'),
+        ('GT Hookshot ES', 'GT Map Room WS'),
+        ('GT Double Switch EN', 'GT Spike Crystals WN'),
+        ('GT Firesnake Room SW', 'GT Warp Maze (Rails) NW'),
+        ('GT Conveyor Star Pits EN', 'GT Falling Bridge WN'),
+        ('GT Mini Helmasaur Room WN', 'GT Bomb Conveyor EN'),
+        ('GT Crystal Circles SW', 'GT Left Moldorm Ledge NW')
+    ]
+}
 
 default_door_connections = [
     ('Hyrule Castle Lobby W', 'Hyrule Castle West Lobby E'),
@@ -1819,10 +2035,27 @@ default_door_connections = [
     ('TR Dark Ride SW', 'TR Dash Bridge NW'),
     ('TR Dash Bridge SW', 'TR Eye Bridge NW'),
     ('TR Dash Bridge WS', 'TR Crystal Maze ES'),
-    # ('', ''),
+    ('GT Torch WN', 'GT Conveyor Cross EN'),
+    ('GT Hope Room EN', 'GT Tile Room WN'),
+    ('GT Big Chest SW', 'GT Invisible Catwalk NW'),
+    ('GT Bob\'s Room SE', 'GT Invisible Catwalk NE'),
+    ('GT Speed Torch NE', 'GT Trap Room SE'),
+    ('GT Speed Torch SE', 'GT Crystal Conveyor NE'),
+    ('GT Warp Maze (Pits) ES', 'GT Invisible Catwalk WS'),
+    ('GT Hookshot NW', 'GT DMs Room SW'),
+    ('GT Hookshot SW', 'GT Double Switch NW'),
+    ('GT Warp Maze (Rails) WS', 'GT Randomizer Room ES'),
+    ('GT Conveyor Star Pits EN', 'GT Falling Bridge WN'),
+    ('GT Falling Bridge WS', 'GT Hidden Star ES'),
+    ('GT Dash Hall NE', 'GT Hidden Spikes SE'),
+    ('GT Hidden Spikes EN', 'GT Cannonball Bridge WN'),
+    ('GT Gauntlet 3 SW', 'GT Gauntlet 4 NW'),
+    ('GT Gauntlet 5 WS', 'GT Beam Dash ES'),
+    ('GT Wizzrobes 2 NE', 'GT Conveyor Bridge SE'),
+    ('GT Conveyor Bridge EN', 'GT Torch Cross WN'),
+    ('GT Crystal Circles SW', 'GT Left Moldorm Ledge NW')
 ]
 
-# ('', ''),
 default_one_way_connections = [
     ('Sewers Pull Switch S', 'Sanctuary N'),
     ('Eastern Duo Eyegores NE', 'Eastern Boss SE'),
@@ -1834,7 +2067,9 @@ default_one_way_connections = [
     ('Thieves Hallway NE', 'Thieves Boss SE'),
     ('Mire Antechamber NW', 'Mire Boss SW'),
     ('TR Final Abyss NW', 'TR Boss SW'),
-    # ('', ''),
+    ('GT Invisible Bridges WS', 'GT Invisible Catwalk ES'),
+    ('GT Validation WS', 'GT Frozen Over ES'),
+    ('GT Brightly Lit Hall NW', 'GT Agahnim 2 SW')
 ]
 
 # For crossed
@@ -1852,7 +2087,8 @@ default_dungeon_sets = [
     ['Thieves Lobby', 'Thieves Attic Window', 'Thieves Blind\'s Cell', 'Thieves Boss'],
     ['Ice Lobby', 'Ice Boss'],
     ['Mire Lobby', 'Mire Boss'],
-    ['TR Main Lobby', 'TR Boss', 'TR Eye Bridge', 'TR Big Chest Entrance', 'TR Lazy Eyes']
+    ['TR Main Lobby', 'TR Boss', 'TR Eye Bridge', 'TR Big Chest Entrance', 'TR Lazy Eyes'],
+    ['GT Lobby', 'GT Agahnim 2']
 ]
 
 dungeon_x_idx_to_name = {
@@ -1868,5 +2104,5 @@ dungeon_x_idx_to_name = {
     9: 'Ice Palace',
     10: 'Misery Mire',
     11: 'Turtle Rock',
-    12: 'Ganon\'s Tower'
+    12: 'Ganons Tower'
 }

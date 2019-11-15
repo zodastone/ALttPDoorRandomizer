@@ -88,14 +88,6 @@ def main(args, seed=None):
     for player in range(1, world.players + 1):
         set_rules(world, player)
 
-    # todo: remove this later. this is for debugging
-    for player in range(1, world.players + 1):
-        all_state = world.get_all_state(keys=True)
-        for bossregion in ['Eastern Boss', 'Desert Boss', 'Hera Boss', 'Tower Agahnim 1', 'PoD Boss', 'Swamp Boss',
-                           'Skull Boss', 'Thieves Boss', 'Ice Boss', 'Mire Boss', 'TR Boss']:
-            if world.get_region(bossregion, player) not in all_state.reachable_regions[player]:
-                raise Exception(bossregion + ' missing from generation')
-
     logger.info('Placing Dungeon Prizes.')
 
     fill_prizes(world)

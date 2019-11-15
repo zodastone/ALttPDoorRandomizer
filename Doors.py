@@ -883,13 +883,165 @@ def create_doors(world, player):
         create_door(player, 'TR Final Abyss NW', Nrml).dir(No, 0xb4, Left, High).big_key().pos(0),
         create_door(player, 'TR Boss SW', Nrml).dir(So, 0xa4, Left, High).no_exit().trap(0x4).pos(0),
 
-        # Door Templates
-        # create_door(player, '', Nrml).dir(No, 0x00, Right, High).pos(),
-        # create_door(player, '', Intr).dir(No, 0x00, Right, High).pos(),
-        # create_door(player, '', Sprl).dir(Up, 0x00, 0, HTH).ss(Q, 0x0, 0x0),
-        # create_door(player, '', Lgcl),
-        # create_door(player, '', Hole),
-        # create_door(player, '', Warp),
+        create_door(player, 'GT Lobby Left Down Stairs', Sprl).dir(Dn, 0x0c, 1, HTL).ss(A, 0x0f, 0x80),
+        create_door(player, 'GT Lobby Up Stairs', Sprl).dir(Up, 0x0c, 2, HTH).ss(A, 0x1b, 0xec),
+        create_door(player, 'GT Lobby Right Down Stairs', Sprl).dir(Dn, 0x0c, 0, HTL).ss(S, 0x12, 0x80),
+        create_door(player, 'GT Torch Up Stairs', Sprl).dir(Up, 0x8c, 1, LTH).ss(A, 0x33, 0x6c, True, True),
+        create_door(player, 'GT Torch WN', Nrml).dir(We, 0x8c, Top, High).pos(3),
+        create_door(player, 'GT Hope Room Up Stairs', Sprl).dir(Up, 0x8c, 0, LTH).ss(S, 0x33, 0x6c, True, True),
+        create_door(player, 'GT Hope Room EN', Nrml).dir(Ea, 0x8c, Top, High).trap(0x4).pos(0),
+        create_door(player, 'GT Torch EN', Intr).dir(Ea, 0x8c, Top, High).small_key().pos(2),
+        create_door(player, 'GT Hope Room WN', Intr).dir(We, 0x8c, Top, High).small_key().pos(2),
+        create_door(player, 'GT Torch SW', Intr).dir(So, 0x8c, Left, High).no_exit().pos(1),
+        create_door(player, 'GT Big Chest NW', Intr).dir(So, 0x8c, Left, High).pos(1),
+        create_door(player, 'GT Blocked Stairs Down Stairs', Sprl).dir(Dn, 0x8c, 3, HTH).ss(Z, 0x12, 0x40, True, True),
+        create_door(player, 'GT Blocked Stairs Block Path', Lgcl),
+        create_door(player, 'GT Big Chest SW', Nrml).dir(So, 0x8c, Left, High).pos(4),
+        create_door(player, 'GT Bob\'s Room SE', Nrml).dir(So, 0x8c, Right, High).pos(5),
+        create_door(player, 'GT Bob\'s Room Hole', Hole),
+        create_door(player, 'GT Tile Room WN', Nrml).dir(We, 0x8d, Top, High).pos(2),
+        create_door(player, 'GT Tile Room EN', Intr).dir(Ea, 0x8d, Top, High).small_key().pos(1),
+        create_door(player, 'GT Speed Torch WN', Intr).dir(We, 0x8d, Top, High).small_key().pos(1),
+        create_door(player, 'GT Speed Torch NE', Nrml).dir(No, 0x8d, Right, High).pos(3),
+        create_door(player, 'GT Speed Torch WS', Intr).dir(We, 0x8d, Bot, High).pos(4),
+        create_door(player, 'GT Pots n Blocks ES', Intr).dir(Ea, 0x8d, Bot, High).pos(4),
+        create_door(player, 'GT Speed Torch SE', Nrml).dir(So, 0x8d, Right, High).trap(0x4).pos(0),
+        create_door(player, 'GT Crystal Conveyor NE', Nrml).dir(No, 0x9d, Right, High).pos(0),
+        create_door(player, 'GT Crystal Conveyor WN', Intr).dir(We, 0x9d, Top, High).pos(2),
+        create_door(player, 'GT Compass Room EN', Intr).dir(Ea, 0x9d, Top, High).pos(2),
+        create_door(player, 'GT Compass Room Warp', Warp),
+        create_door(player, 'GT Invisible Bridges WS', Nrml).dir(We, 0x9d, Bot, High).pos(1),
+        create_door(player, 'GT Invisible Catwalk ES', Nrml).dir(Ea, 0x9c, Bot, High).no_exit().pos(0),
+        create_door(player, 'GT Invisible Catwalk WS', Nrml).dir(We, 0x9c, Bot, High).pos(3),
+        create_door(player, 'GT Invisible Catwalk NW', Nrml).dir(No, 0x9c, Left, High).pos(1),
+        create_door(player, 'GT Invisible Catwalk NE', Nrml).dir(No, 0x9c, Right, High).pos(2),
+        create_door(player, 'GT Conveyor Cross EN', Nrml).dir(Ea, 0x8b, Top, High).pos(2),
+        create_door(player, 'GT Conveyor Cross WN', Intr).dir(We, 0x8b, Top, High).pos(0),
+        create_door(player, 'GT Hookshot EN', Intr).dir(Ea, 0x8b, Top, High).pos(0),
+        create_door(player, 'GT Hookshot East-North Path', Lgcl),
+        create_door(player, 'GT Hookshot East-South Path', Lgcl),
+        create_door(player, 'GT Hookshot North-East Path', Lgcl),
+        create_door(player, 'GT Hookshot North-South Path', Lgcl),
+        create_door(player, 'GT Hookshot South-East Path', Lgcl),
+        create_door(player, 'GT Hookshot South-North Path', Lgcl),
+        create_door(player, 'GT Hookshot Platform Blue Barrier', Lgcl),
+        create_door(player, 'GT Hookshot Entry Blue Barrier', Lgcl),
+        create_door(player, 'GT Hookshot NW', Nrml).dir(No, 0x8b, Left, High).pos(4),
+        create_door(player, 'GT Hookshot ES', Intr).dir(Ea, 0x8b, Bot, High).small_key().pos(1),
+        create_door(player, 'GT Map Room WS', Intr).dir(We, 0x8b, Bot, High).small_key().pos(1),
+        create_door(player, 'GT Hookshot SW', Nrml).dir(So, 0x8b, Left, High).pos(3),
+        create_door(player, 'GT Double Switch NW', Nrml).dir(No, 0x9b, Left, High).pos(1),
+        create_door(player, 'GT Double Switch Orange Barrier', Lgcl),
+        create_door(player, 'GT Double Switch Orange Barrier 2', Lgcl),
+        create_door(player, 'GT Double Switch Blue Path', Lgcl),
+        create_door(player, 'GT Double Switch Orange Path', Lgcl),
+        create_door(player, 'GT Double Switch Key Blue Path', Lgcl),
+        create_door(player, 'GT Double Switch Key Orange Path', Lgcl),
+        create_door(player, 'GT Double Switch Blue Barrier', Lgcl),
+        create_door(player, 'GT Double Switch Transition Blue', Lgcl),
+        create_door(player, 'GT Double Switch EN', Intr).dir(Ea, 0x9b, Top, High).small_key().pos(0),
+        create_door(player, 'GT Spike Crystals WN', Intr).dir(We, 0x9b, Top, High).small_key().pos(0),
+        create_door(player, 'GT Spike Crystals Warp', Warp),
+        create_door(player, 'GT Warp Maze - Left Section Warp', Warp),
+        create_door(player, 'GT Warp Maze - Mid Section Left Warp', Warp),
+        create_door(player, 'GT Warp Maze - Mid Section Right Warp', Warp),
+        create_door(player, 'GT Warp Maze - Right Section Warp', Warp),
+        create_door(player, 'GT Warp Maze - Pit Section Warp Spot', Lgcl),
+        create_door(player, 'GT Warp Maze Exit Section Warp Spot', Lgcl),
+        create_door(player, 'GT Warp Maze - Pit Exit Warp', Warp),
+        create_door(player, 'GT Warp Maze (Pits) ES', Nrml).dir(Ea, 0x9b, Bot, High).pos(2),
+        create_door(player, 'GT Firesnake Room Hook Path', Lgcl),
+        create_door(player, 'GT Firesnake Room SW', Intr).dir(So, 0x7d, Left, High).small_key().pos(2),
+        create_door(player, 'GT Warp Maze (Rails) NW', Intr).dir(No, 0x7d, Left, High).small_key().pos(2),
+        create_door(player, 'GT Warp Maze - Rail Choice Left Warp', Warp),
+        create_door(player, 'GT Warp Maze - Rail Choice Right Warp', Warp),
+        create_door(player, 'GT Warp Maze - Rando Rail Warp', Warp),
+        create_door(player, 'GT Warp Maze - Main Rails Best Warp', Warp),
+        create_door(player, 'GT Warp Maze - Main Rails Mid Left Warp', Warp),
+        create_door(player, 'GT Warp Maze - Main Rails Mid Right Warp', Warp),
+        create_door(player, 'GT Warp Maze - Main Rails Right Top Warp', Warp),
+        create_door(player, 'GT Warp Maze - Main Rails Right Mid Warp', Warp),
+        create_door(player, 'GT Warp Maze - Pot Rail Warp', Warp),
+        create_door(player, 'GT Warp Maze (Rails) WS', Nrml).dir(We, 0x7d, Bot, High).pos(1),
+        create_door(player, 'GT Trap Room SE', Nrml).dir(So, 0x7d, Right, High).trap(0x4).pos(0),
+        create_door(player, 'GT Conveyor Star Pits EN', Nrml).dir(Ea, 0x7b, Top, High).small_key().pos(1),
+        create_door(player, 'GT Hidden Star ES', Nrml).dir(Ea, 0x7b, Bot, High).pos(2),
+        create_door(player, 'GT Hidden Star Warp', Warp),
+        create_door(player, 'GT DMs Room SW', Nrml).dir(So, 0x7b, Left, High).trap(0x4).pos(0),
+        create_door(player, 'GT Falling Bridge WN', Nrml).dir(We, 0x7c, Top, High).small_key().pos(2),
+        create_door(player, 'GT Falling Bridge WS', Nrml).dir(We, 0x7c, Bot, High).pos(3),
+        create_door(player, 'GT Randomizer Room ES', Nrml).dir(Ea, 0x7c, Bot, High).pos(1),
+        create_door(player, 'GT Ice Armos NE', Intr).dir(No, 0x1c, Right, High).pos(0),
+        create_door(player, 'GT Big Key Room SE', Intr).dir(So, 0x1c, Right, High).pos(0),
+        create_door(player, 'GT Ice Armos WS', Intr).dir(We, 0x1c, Bot, High).pos(1),
+        create_door(player, 'GT Four Torches ES', Intr).dir(Ea, 0x1c, Bot, High).pos(1),
+        create_door(player, 'GT Four Torches NW', Intr).dir(No, 0x1c, Left, High).pos(2),
+        create_door(player, 'GT Fairy Abyss SW', Intr).dir(So, 0x1c, Left, High).pos(2),
+        create_door(player, 'GT Four Torches Up Stairs', Sprl).dir(Up, 0x1c, 0, HTH).ss(Z, 0x1b, 0x2c, True, True),
+        create_door(player, 'GT Crystal Paths Down Stairs', Sprl).dir(Dn, 0x6b, 0, HTH).ss(A, 0x12, 0x00, True),
+        create_door(player, 'GT Crystal Paths SW', Intr).dir(So, 0x6b, Left, High).pos(3),
+        create_door(player, 'GT Mimics 1 NW', Intr).dir(No, 0x6b, Left, High).pos(3),
+        create_door(player, 'GT Mimics 1 ES', Intr).dir(Ea, 0x6b, Bot, High).pos(2),
+        create_door(player, 'GT Mimics 2 WS', Intr).dir(We, 0x6b, Bot, High).pos(2),
+        create_door(player, 'GT Mimics 2 NE', Intr).dir(No, 0x6b, Right, High).pos(1),
+        create_door(player, 'GT Dash Hall SE', Intr).dir(So, 0x6b, Right, High).pos(1),
+        create_door(player, 'GT Dash Hall NE', Nrml).dir(No, 0x6b, Right, High).big_key().pos(0),
+        create_door(player, 'GT Hidden Spikes SE', Nrml).dir(So, 0x5b, Right, High).small_key().pos(0),
+        create_door(player, 'GT Hidden Spikes EN', Nrml).dir(Ea, 0x5b, Top, High).trap(0x2).pos(1),
+        create_door(player, 'GT Cannonball Bridge WN', Nrml).dir(We, 0x5c, Top, High).pos(1),
+        create_door(player, 'GT Cannonball Bridge SE', Intr).dir(So, 0x5c, Right, High).pos(0),
+        create_door(player, 'GT Refill NE', Intr).dir(No, 0x5c, Right, High).pos(0),
+        create_door(player, 'GT Cannonball Bridge Up Stairs', Sprl).dir(Up, 0x5c, 0, HTH).ss(S, 0x1a, 0x6c, True),
+        create_door(player, 'GT Gauntlet 1 Down Stairs', Sprl).dir(Dn, 0x5d, 0, HTH).ss(S, 0x11, 0x80, True, True),
+        create_door(player, 'GT Gauntlet 1 WN', Intr).dir(We, 0x5d, Top, High).pos(2),
+        create_door(player, 'GT Gauntlet 2 EN', Intr).dir(Ea, 0x5d, Top, High).pos(2),
+        create_door(player, 'GT Gauntlet 2 SW', Intr).dir(So, 0x5d, Left, High).pos(0),
+        create_door(player, 'GT Gauntlet 3 NW', Intr).dir(No, 0x5d, Left, High).pos(0),
+        create_door(player, 'GT Gauntlet 3 SW', Nrml).dir(So, 0x5d, Left, High).pos(1),
+        create_door(player, 'GT Gauntlet 4 NW', Nrml).dir(No, 0x6d, Left, High).pos(0),
+        create_door(player, 'GT Gauntlet 4 SW', Intr).dir(So, 0x6d, Left, High).pos(1),
+        create_door(player, 'GT Gauntlet 5 NW', Intr).dir(No, 0x6d, Left, High).pos(1),
+        create_door(player, 'GT Gauntlet 5 WS', Nrml).dir(We, 0x6d, Bot, High).pos(2),
+        create_door(player, 'GT Beam Dash ES', Nrml).dir(Ea, 0x6c, Bot, High).pos(2),
+        create_door(player, 'GT Beam Dash WS', Intr).dir(We, 0x6c, Bot, High).pos(0),
+        create_door(player, 'GT Lanmolas 2 ES', Intr).dir(Ea, 0x6c, Bot, High).pos(0),
+        create_door(player, 'GT Lanmolas 2 NW', Intr).dir(No, 0x6c, Left, High).pos(1),
+        create_door(player, 'GT Quad Pot SW', Intr).dir(So, 0x6c, Left, High).pos(1),
+        create_door(player, 'GT Quad Pot Up Stairs', Sprl).dir(Up, 0x6c, 0, HTH).ss(A, 0x1b, 0x6c, True, True),
+        create_door(player, 'GT Wizzrobes 1 Down Stairs', Sprl).dir(Dn, 0xa5, 0, HTH).ss(A, 0x12, 0x80, True, True),
+        create_door(player, 'GT Wizzrobes 1 SW', Intr).dir(So, 0xa5, Left, High).pos(2),
+        create_door(player, 'GT Dashing Bridge NW', Intr).dir(No, 0xa5, Left, High).pos(2),
+        create_door(player, 'GT Dashing Bridge NE', Intr).dir(No, 0xa5, Right, High).pos(1),
+        create_door(player, 'GT Wizzrobes 2 SE', Intr).dir(So, 0xa5, Right, High).pos(1),
+        create_door(player, 'GT Wizzrobes 2 NE', Nrml).dir(No, 0xa5, Right, High).trap(0x4).pos(0),
+        create_door(player, 'GT Conveyor Bridge SE', Nrml).dir(So, 0x95, Right, High).pos(0),
+        create_door(player, 'GT Conveyor Bridge EN', Nrml).dir(Ea, 0x95, Top, High).pos(1),
+        create_door(player, 'GT Torch Cross WN', Nrml).dir(We, 0x96, Top, High).pos(1),
+        create_door(player, 'GT Torch Cross ES', Intr).dir(Ea, 0x96, Bot, High).pos(0),
+        create_door(player, 'GT Staredown WS', Intr).dir(We, 0x96, Bot, High).pos(0),
+        create_door(player, 'GT Staredown Up Ladder', Lddr),
+        create_door(player, 'GT Falling Torches Down Ladder', Lddr),
+        create_door(player, 'GT Falling Torches NE', Intr).dir(No, 0x3d, Right, High).pos(0),
+        create_door(player, 'GT Mini Helmasaur Room SE', Intr).dir(So, 0x3d, Right, High).pos(0),
+        create_door(player, 'GT Falling Torches Hole', Hole),
+        create_door(player, 'GT Mini Helmasaur Room WN', Intr).dir(We, 0x3d, Top, High).small_key().pos(1),
+        create_door(player, 'GT Bomb Conveyor EN', Intr).dir(Ea, 0x3d, Top, High).small_key().pos(1),
+        create_door(player, 'GT Bomb Conveyor SW', Intr).dir(So, 0x3d, Left, High).pos(3),
+        create_door(player, 'GT Crystal Circles NW', Intr).dir(No, 0x3d, Left, High).pos(3),
+        create_door(player, 'GT Crystal Circles SW', Nrml).dir(So, 0x3d, Left, High).small_key().pos(2),
+        create_door(player, 'GT Left Moldorm Ledge NW', Nrml).dir(No, 0x4d, Left, High).small_key().pos(0),
+        create_door(player, 'GT Left Moldorm Ledge Drop Down', Lgcl),
+        create_door(player, 'GT Right Moldorm Ledge Drop Down', Lgcl),
+        create_door(player, 'GT Moldorm Gap', Lgcl),
+        create_door(player, 'GT Moldorm Hole', Hole),
+        create_door(player, 'GT Validation WS', Nrml).dir(We, 0x4d, Bot, High).pos(1),
+        create_door(player, 'GT Right Moldorm Ledge Down Stairs', Sprl).dir(Dn, 0x4d, 0, HTH).ss(S, 0x12, 0x80),
+        create_door(player, 'GT Moldorm Pit Up Stairs', Sprl).dir(Up, 0xa6, 0, HTH).ss(S, 0x1b, 0x6c),
+        create_door(player, 'GT Frozen Over ES', Nrml).dir(Ea, 0x4c, Bot, High).trap(0x4).pos(0),
+        create_door(player, 'GT Frozen Over Up Stairs', Sprl).dir(Up, 0x4c, 0, HTH).ss(S, 0x1a, 0x6c, False, True),
+        create_door(player, 'GT Brightly Lit Hall Down Stairs', Sprl).dir(Dn, 0x1d, 0, HTH).ss(S, 0x11, 0x80, False, True),
+        create_door(player, 'GT Brightly Lit Hall NW', Nrml).dir(No, 0x1d, Left, High).big_key().pos(0),
+        create_door(player, 'GT Agahnim 2 SW', Nrml).dir(So, 0x0d, Left, High).no_exit().trap(0x4).pos(0)
     ]
     create_paired_doors(world, player)
 
@@ -1004,6 +1156,30 @@ def create_doors(world, player):
     world.get_door('TR Crystal Maze ES', player).c_switch()
     world.get_door('TR Crystal Maze North Stairs', player).c_switch()
 
+    world.get_door('GT Crystal Conveyor NE', player).c_switch()
+    world.get_door('GT Crystal Conveyor WN', player).c_switch()
+    world.get_door('GT Hookshot South-North Path', player).c_switch()
+    world.get_door('GT Hookshot South-East Path', player).c_switch()
+    world.get_door('GT Hookshot ES', player).c_switch()
+    world.get_door('GT Hookshot Platform Blue Barrier', player).c_switch()
+    world.get_door('GT Double Switch Orange Path', player).c_switch()
+    world.get_door('GT Double Switch Blue Path', player).c_switch()
+    world.get_door('GT Spike Crystals WN', player).c_switch()
+    world.get_door('GT Spike Crystals Warp', player).c_switch()
+    world.get_door('GT Crystal Paths Down Stairs', player).c_switch()
+    world.get_door('GT Crystal Paths SW', player).c_switch()
+    world.get_door('GT Hidden Spikes SE', player).c_switch()
+    world.get_door('GT Hidden Spikes EN', player).c_switch()
+    world.get_door('GT Crystal Circles NW', player).c_switch()
+    world.get_door('GT Crystal Circles SW', player).c_switch()
+    world.get_door('GT Hookshot Entry Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Double Switch Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Orange Barrier 2', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Key Orange Path', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Key Blue Path', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Double Switch Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Double Switch Transition Blue', player).barrier(CrystalBarrier.Blue)
+
     # nifty dynamic logical doors:
     south_controller = world.get_door('Ice Cross Bottom SE', player)
     east_controller = world.get_door('Ice Cross Right ES', player)
@@ -1029,16 +1205,16 @@ def create_paired_doors(world, player):
         PairedDoor('Swamp Pot Row WN', 'Swamp Map Ledge EN'),  # Swamp bombable to map chest
         PairedDoor('Swamp Pot Row WS', 'Swamp Trench 1 Approach ES'),  # Swamp key door early room $38
         PairedDoor('PoD Middle Cage N', 'PoD Pit Room S'),
-        # PairedDoor('', ''),  # GT moldorm key door
+        PairedDoor('GT Crystal Circles SW', 'GT Left Moldorm Ledge NW'),  # GT moldorm key door
         PairedDoor('Ice Conveyor SW', 'Ice Bomb Jump NW'),  # Ice BJ key door
         PairedDoor('Desert Tiles 2 SE', 'Desert Beamos Hall NE'),
         PairedDoor('Skull 3 Lobby NW', 'Skull Star Pits SW'),  # Skull 3 key door
         PairedDoor('Skull 1 Lobby WS', 'Skull Pot Prison ES'),  # Skull 1 key door - pot prison to big chest
         PairedDoor('Skull Map Room SE', 'Skull Pinball NE'),  # Skull 1 - pinball key door
-        # PairedDoor('', ''),  # gt main big key door
+        PairedDoor('GT Dash Hall NE', 'GT Hidden Spikes SE'),  # gt main big key door
         PairedDoor('Ice Spike Cross ES', 'Ice Spike Room WS'),  # ice door to spike chest
-        # PairedDoor('', ''),  # gt right side key door to cape bridge
-        # PairedDoor('', ''),  # gt bombable to rando room
+        PairedDoor('GT Conveyor Star Pits EN', 'GT Falling Bridge WN'),  # gt right side key door to cape bridge
+        PairedDoor('GT Warp Maze (Rails) WS', 'GT Randomizer Room ES'),  # gt bombable to rando room
         PairedDoor('Ice Tall Hint SE', 'Ice Lonely Freezor NE'),  # ice's big icy room key door to lonely freezor
         PairedDoor('Eastern Courtyard N', 'Eastern Darkness S'),
         PairedDoor('Mire Fishbone SE', 'Mire Spike Barrier NE'),  # mire fishbone key door
