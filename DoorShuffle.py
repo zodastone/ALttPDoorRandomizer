@@ -345,7 +345,7 @@ def find_enabled_origins(sectors, enabled, entrance_list):
 
 
 def remove_drop_origins(entrance_list):
-    entrance_list[:] = [x for x in entrance_list if x not in drop_entrances]
+    return [x for x in entrance_list if x not in drop_entrances]
 
 
 def find_new_entrances(sector, connections, potentials, enabled):
@@ -1213,61 +1213,65 @@ def determine_required_paths(world):
 
 
 def overworld_prep(world, player):
+    find_inaccessible_regions(world, player)
+    add_inaccessible_doors(world, player)
+
+
+# todo : multiplayer?
+def find_inaccessible_regions(world, player):
     if world.mode != 'inverted':
-        if world.mode == 'standard':
-            world.inaccessible_regions.append('Hyrule Castle Ledge')  # maybe only with er off
-            world.inaccessible_regions.append('Sewer Drop')
-        world.inaccessible_regions.append('Skull Woods Forest (West)')
-        world.inaccessible_regions.append('Dark Death Mountain Ledge')
-        world.inaccessible_regions.append('Dark Death Mountain Isolated Ledge')
-        world.inaccessible_regions.append('Desert Palace Lone Stairs')
-        world.inaccessible_regions.append('Bumper Cave Ledge')
-        world.inaccessible_regions.append('Death Mountain Floating Island (Dark World)')
+        start_regions = ['Links House', 'Sanctuary']
     else:
-        world.inaccessible_regions.append('Desert Ledge')
-        # world.inaccessible_regions.append('Hyrule Castle Ledge')  # accessible via aga 1?
-        world.inaccessible_regions.append('Desert Palace Lone Stairs')
-        world.inaccessible_regions.append('Death Mountain Return Ledge')
-        world.inaccessible_regions.append('Maze Race Ledge')
-    if world.shuffle == 'vanilla':
-        skull_doors = [
-            Door(player, 'Skull Woods Second Section Exit (West)', DoorType.Logical),
-            Door(player, 'Skull Woods Second Section Door (West)', DoorType.Logical),
-            Door(player, 'Skull Woods Second Section Hole', DoorType.Logical),
-            Door(player, 'Skull Woods Final Section', DoorType.Logical)
-        ]
-        world.doors += skull_doors
-        connect_door_only(world, skull_doors[0].name, 'Skull Woods Forest (West)', player)
-        connect_door_only(world, skull_doors[1].name, 'Skull 2 West Lobby', player)
-        connect_door_only(world, skull_doors[2].name, 'Skull Back Drop', player)
-        connect_door_only(world, skull_doors[3].name, 'Skull 3 Lobby', player)
-        tr_doors = [
-            Door(player, 'Turtle Rock Ledge Exit (West)', DoorType.Logical),
-            Door(player, 'Turtle Rock Ledge Exit (East)', DoorType.Logical),
-            Door(player, 'Dark Death Mountain Ledge (East)', DoorType.Logical),
-            Door(player, 'Dark Death Mountain Ledge (West)', DoorType.Logical),
-            Door(player, 'Turtle Rock Isolated Ledge Exit', DoorType.Logical),
-            Door(player, 'Turtle Rock Isolated Ledge Entrance', DoorType.Logical),
-        ]
-        world.doors += tr_doors
-        connect_door_only(world, tr_doors[0].name, 'Dark Death Mountain Ledge', player)
-        connect_door_only(world, tr_doors[1].name, 'Dark Death Mountain Ledge', player)
-        connect_door_only(world, tr_doors[2].name, 'TR Big Chest Entrance', player)
-        connect_door_only(world, tr_doors[3].name, 'TR Lazy Eyes', player)
-        connect_door_only(world, tr_doors[4].name, 'Dark Death Mountain Isolated Ledge', player)
-        connect_door_only(world, tr_doors[5].name, 'TR Eye Bridge', player)
-        if world.mode == 'standard':
-            castle_doors = [
-                Door(player, 'Hyrule Castle Exit (West)', DoorType.Logical),
-                Door(player, 'Hyrule Castle Exit (East)', DoorType.Logical),
-                Door(player, 'Hyrule Castle Entrance (East)', DoorType.Logical),
-                Door(player, 'Hyrule Castle Entrance (West)', DoorType.Logical)
-            ]
-            world.doors += castle_doors
-            connect_door_only(world, castle_doors[0].name, 'Hyrule Castle Ledge', player)
-            connect_door_only(world, castle_doors[1].name, 'Hyrule Castle Ledge', player)
-            connect_door_only(world, castle_doors[2].name, 'Hyrule Castle East Lobby', player)
-            connect_door_only(world, castle_doors[3].name, 'Hyrule Castle West Lobby', player)
+        start_regions = ['Inverted Links House', 'Inverted Dark Sanctuary']
+    regs = convert_regions(start_regions, world, player)
+    all_regions = set([r for r in world.regions if r.player == player and r.type is not RegionType.Dungeon])
+    visited_regions = set()
+    queue = collections.deque(regs)
+    while len(queue) > 0:
+        next_region = queue.popleft()
+        visited_regions.add(next_region)
+        for ext in next_region.exits:
+            connect = ext.connected_region
+            if connect is not None and connect.type is not RegionType.Dungeon and connect not in queue and connect not in visited_regions:
+                queue.append(connect)
+    world.inaccessible_regions.extend([r.name for r in all_regions.difference(visited_regions) if r.type is not RegionType.Cave])
+    logger = logging.getLogger('')
+    logger.info('Inaccessible Regions:')
+    for r in world.inaccessible_regions:
+        logger.info('%s', r)
+
+
+def add_inaccessible_doors(world, player):
+    if 'Skull Woods Forest (West)' in world.inaccessible_regions:
+        create_door(world, player, 'Skull Woods Second Section Door (West)', 'Skull Woods Forest (West)')
+        create_door(world, player, 'Skull Woods Second Section Hole', 'Skull Woods Forest (West)')
+        create_door(world, player, 'Skull Woods Final Section', 'Skull Woods Forest (West)')
+    if 'Dark Death Mountain Ledge' in world.inaccessible_regions:
+        create_door(world, player, 'Dark Death Mountain Ledge (East)', 'Dark Death Mountain Ledge')
+        create_door(world, player, 'Dark Death Mountain Ledge (West)', 'Dark Death Mountain Ledge')
+        create_door(world, player, 'Mimic Cave Mirror Spot', 'Dark Death Mountain Ledge')
+    if 'Mimic Cave Ledge' in world.inaccessible_regions:
+        create_door(world, player, 'Mimic Cave', 'Mimic Cave Ledge')
+    if 'Dark Death Mountain Isolated Ledge' in world.inaccessible_regions:
+        create_door(world, player, 'Turtle Rock Isolated Ledge Entrance', 'Dark Death Mountain Isolated Ledge')
+    if 'Death Mountain Floating Island (Dark World)' in world.inaccessible_regions:
+        create_door(world, player, 'Hookshot Cave Back Entrance', 'Death Mountain Floating Island (Dark World)')
+    # todo: desert palace lone stairs
+    if world.mode == 'standard' and 'Hyrule Castle Ledge' in world.inaccessible_regions:
+        create_door(world, player, 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge')
+        create_door(world, player, 'Hyrule Castle Entrance (West)', 'Hyrule Castle Ledge')
+
+
+def create_door(world, player, entName, region_name):
+    connect = world.get_entrance(entName, player).connected_region
+    for ext in connect.exits:
+        if ext.connected_region is not None and ext.connected_region.name == region_name:
+            d = Door(player, ext.name, DoorType.Logical),
+            world.doors += d
+            connect_door_only(world, ext.name, ext.connected_region, player)
+    d = Door(player, entName, DoorType.Logical),
+    world.doors += d
+    connect_door_only(world, entName, connect, player)
 
 
 def check_required_paths(paths, world, player):
