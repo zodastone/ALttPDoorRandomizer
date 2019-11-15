@@ -9,6 +9,7 @@ from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, Polarity, CrystalBarrier
 from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions, pod_regions
 from Dungeons import dungeon_regions, region_starts, split_region_starts, dungeon_keys, dungeon_bigs, flexible_starts
+from Dungeons import drop_entrances
 from RoomData import DoorKind, PairedDoor
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon
 
@@ -287,6 +288,7 @@ def within_dungeon(world, player):
     for key, sector_list, entrance_list in dungeon_sectors:
         origin_list = list(entrance_list)
         find_enabled_origins(sector_list, enabled_entrances, origin_list)
+        remove_drop_origins(origin_list)
         ds = generate_dungeon(sector_list, origin_list, world, player)
         find_new_entrances(ds, connections, potentials, enabled_entrances)
         ds.name = key
@@ -340,6 +342,10 @@ def find_enabled_origins(sectors, enabled, entrance_list):
         for region in sector.regions:
             if region.name in enabled and region.name not in entrance_list:
                 entrance_list.append(region.name)
+
+
+def remove_drop_origins(entrance_list):
+    entrance_list[:] = [x for x in entrance_list if x not in drop_entrances]
 
 
 def find_new_entrances(sector, connections, potentials, enabled):
@@ -2007,7 +2013,7 @@ default_door_connections = [
     ('Mire Minibridge NE', 'Mire Right Bridge SE'),
     ('Mire BK Door Room EN', 'Mire Ledgehop WN'),
     ('Mire BK Door Room N', 'Mire Left Bridge S'),
-    ('Mire Spikes SW', 'Mire Crystal Dead End NE'),
+    ('Mire Spikes SW', 'Mire Crystal Dead End NW'),
     ('Mire Ledgehop NW', 'Mire Bent Bridge SW'),
     ('Mire Bent Bridge W', 'Mire Over Bridge E'),
     ('Mire Over Bridge W', 'Mire Fishbone E'),
