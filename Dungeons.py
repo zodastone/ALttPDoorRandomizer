@@ -21,7 +21,7 @@ def create_dungeons(world, player):
     ToH = make_dungeon('Tower of Hera', 'Moldorm', hera_regions, ItemFactory('Big Key (Tower of Hera)', player), [ItemFactory('Small Key (Tower of Hera)', player)], ItemFactory(['Map (Tower of Hera)', 'Compass (Tower of Hera)'], player))
     PoD = make_dungeon('Palace of Darkness', 'Helmasaur King', pod_regions, ItemFactory('Big Key (Palace of Darkness)', player), ItemFactory(['Small Key (Palace of Darkness)'] * 6, player), ItemFactory(['Map (Palace of Darkness)', 'Compass (Palace of Darkness)'], player))
     TT = make_dungeon('Thieves Town', 'Blind', thieves_regions, ItemFactory('Big Key (Thieves Town)', player), [ItemFactory('Small Key (Thieves Town)', player)], ItemFactory(['Map (Thieves Town)', 'Compass (Thieves Town)'], player))
-    SW = make_dungeon('Skull Woods', 'Mothula', skull_regions, ItemFactory('Big Key (Skull Woods)', player), ItemFactory(['Small Key (Skull Woods)'] * 2, player), ItemFactory(['Map (Skull Woods)', 'Compass (Skull Woods)'], player))
+    SW = make_dungeon('Skull Woods', 'Mothula', skull_regions, ItemFactory('Big Key (Skull Woods)', player), ItemFactory(['Small Key (Skull Woods)'] * 3, player), ItemFactory(['Map (Skull Woods)', 'Compass (Skull Woods)'], player))
     SP = make_dungeon('Swamp Palace', 'Arrghus', swamp_regions, ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
     IP = make_dungeon('Ice Palace', 'Kholdstare', ice_regions, ItemFactory('Big Key (Ice Palace)', player), ItemFactory(['Small Key (Ice Palace)'] * 2, player), ItemFactory(['Map (Ice Palace)', 'Compass (Ice Palace)'], player))
     MM = make_dungeon('Misery Mire', 'Vitreous', mire_regions, ItemFactory('Big Key (Misery Mire)', player), ItemFactory(['Small Key (Misery Mire)'] * 3, player), ItemFactory(['Map (Misery Mire)', 'Compass (Misery Mire)'], player))
@@ -29,7 +29,7 @@ def create_dungeons(world, player):
 
     if world.mode != 'inverted':
         AT = make_dungeon('Agahnims Tower', 'Agahnim', tower_regions, None, ItemFactory(['Small Key (Agahnims Tower)'] * 2, player), [])
-        GT = make_dungeon('Ganons Tower', 'Agahnim2', ['Ganons Tower (Entrance)', 'Ganons Tower (Tile Room)', 'Ganons Tower (Compass Room)', 'Ganons Tower (Hookshot Room)', 'Ganons Tower (Map Room)', 'Ganons Tower (Firesnake Room)', 'Ganons Tower (Teleport Room)', 'Ganons Tower (Bottom)', 'Ganons Tower (Top)', 'Ganons Tower (Before Moldorm)', 'Ganons Tower (Moldorm)', 'Agahnim 2'], ItemFactory('Big Key (Ganons Tower)', player), ItemFactory(['Small Key (Ganons Tower)'] * 4, player), ItemFactory(['Map (Ganons Tower)', 'Compass (Ganons Tower)'], player))
+        GT = make_dungeon('Ganons Tower', 'Agahnim2', gt_regions, ItemFactory('Big Key (Ganons Tower)', player), ItemFactory(['Small Key (Ganons Tower)'] * 4, player), ItemFactory(['Map (Ganons Tower)', 'Compass (Ganons Tower)'], player))
     else:
         AT = make_dungeon('Inverted Agahnims Tower', 'Agahnim', ['Inverted Agahnims Tower', 'Agahnim 1'], None, ItemFactory(['Small Key (Agahnims Tower)'] * 2, player), [])
         GT = make_dungeon('Inverted Ganons Tower', 'Agahnim2', ['Inverted Ganons Tower (Entrance)', 'Ganons Tower (Tile Room)', 'Ganons Tower (Compass Room)', 'Ganons Tower (Hookshot Room)', 'Ganons Tower (Map Room)', 'Ganons Tower (Firesnake Room)', 'Ganons Tower (Teleport Room)', 'Ganons Tower (Bottom)', 'Ganons Tower (Top)', 'Ganons Tower (Before Moldorm)', 'Ganons Tower (Moldorm)', 'Agahnim 2'], ItemFactory('Big Key (Ganons Tower)', player), ItemFactory(['Small Key (Ganons Tower)'] * 4, player), ItemFactory(['Map (Ganons Tower)', 'Compass (Ganons Tower)'], player))
@@ -125,15 +125,15 @@ def get_dungeon_item_pool(world):
 def fill_dungeons_restrictive(world, shuffled_locations):
     all_state_base = world.get_all_state()
 
-    for player in range(1, world.players + 1):
-        pinball_room = world.get_location('Skull Woods - Pinball Room', player)
-        if world.retro:
-            world.push_item(pinball_room, ItemFactory('Small Key (Universal)', player), False)
-        else:
-            world.push_item(pinball_room, ItemFactory('Small Key (Skull Woods)', player), False)
-        pinball_room.event = True
-        pinball_room.locked = True
-        shuffled_locations.remove(pinball_room)
+    # for player in range(1, world.players + 1):
+    #     pinball_room = world.get_location('Skull Woods - Pinball Room', player)
+    #     if world.retro:
+    #         world.push_item(pinball_room, ItemFactory('Small Key (Universal)', player), False)
+    #     else:
+    #         world.push_item(pinball_room, ItemFactory('Small Key (Skull Woods)', player), False)
+    #     pinball_room.event = True
+    #     pinball_room.locked = True
+    #     shuffled_locations.remove(pinball_room)
 
     if world.keysanity:
         #in keysanity dungeon items are distributed as part of the normal item pool
@@ -277,6 +277,27 @@ tr_regions = [
     'TR Crystaroller', 'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge', 'TR Crystal Maze', 'TR Final Abyss', 'TR Boss'
 ]
 
+gt_regions = [
+    'GT Lobby', 'GT Bob\'s Torch', 'GT Hope Room', 'GT Big Chest', 'GT Blocked Stairs', 'GT Bob\'s Room',
+    'GT Tile Room', 'GT Speed Torch', 'GT Pots n Blocks', 'GT Crystal Conveyor', 'GT Compass Room',
+    'GT Invisible Bridges', 'GT Invisible Catwalk', 'GT Conveyor Cross', 'GT Hookshot East Platform',
+    'GT Hookshot North Platform', 'GT Hookshot South Platform', 'GT Hookshot South Entry', 'GT Map Room',
+    'GT Double Switch Entry', 'GT Double Switch Switches', 'GT Double Switch Transition', 'GT Double Switch Key Spot',
+    'GT Double Switch Exit', 'GT Spike Crystals', 'GT Warp Maze - Left Section', 'GT Warp Maze - Mid Section',
+    'GT Warp Maze - Right Section', 'GT Warp Maze - Pit Section', 'GT Warp Maze - Pit Exit Warp Spot',
+    'GT Warp Maze Exit Section', 'GT Firesnake Room', 'GT Firesnake Room Ledge', 'GT Warp Maze - Rail Choice',
+    'GT Warp Maze - Rando Rail', 'GT Warp Maze - Main Rails', 'GT Warp Maze - Pot Rail', 'GT Trap Room',
+    'GT Conveyor Star Pits', 'GT Hidden Star', 'GT DMs Room', 'GT Falling Bridge', 'GT Randomizer Room', 'GT Ice Armos',
+    'GT Big Key Room', 'GT Four Torches', 'GT Fairy Abyss', 'GT Crystal Paths', 'GT Mimics 1', 'GT Mimics 2',
+    'GT Dash Hall', 'GT Hidden Spikes', 'GT Cannonball Bridge', 'GT Refill', 'GT Gauntlet 1', 'GT Gauntlet 2',
+    'GT Gauntlet 3', 'GT Gauntlet 4', 'GT Gauntlet 5', 'GT Beam Dash', 'GT Lanmolas 2', 'GT Quad Pot', 'GT Wizzrobes 1',
+    'GT Dashing Bridge', 'GT Wizzrobes 2', 'GT Conveyor Bridge', 'GT Torch Cross', 'GT Staredown', 'GT Falling Torches',
+    'GT Mini Helmasaur Room', 'GT Bomb Conveyor', 'GT Crystal Circles', 'GT Left Moldorm Ledge',
+    'GT Right Moldorm Ledge', 'GT Moldorm', 'GT Moldorm Pit', 'GT Validation', 'GT Frozen Over', 'GT Brightly Lit Hall',
+    'GT Agahnim 2'
+]
+
+
 dungeon_regions = {
     'Hyrule Castle': hyrule_castle_regions,
     'Eastern Palace': eastern_regions,
@@ -290,7 +311,7 @@ dungeon_regions = {
     'Ice Palace': ice_regions,
     'Misery Mire': mire_regions,
     'Turtle Rock': tr_regions,
-    # 'GT':
+    'Ganons Tower': gt_regions
 }
 
 region_starts = {
@@ -307,7 +328,7 @@ region_starts = {
     'Ice Palace': ['Ice Lobby'],
     'Misery Mire': ['Mire Lobby'],
     'Turtle Rock': ['TR Main Lobby', 'TR Lazy Eyes', 'TR Big Chest Entrance', 'TR Eye Bridge'],
-    # ['GT Lobby']
+    'Ganons Tower': ['GT Lobby']
 }
 
 split_region_starts = {
@@ -326,6 +347,10 @@ flexible_starts = {
     'Skull Woods': ['Skull Left Drop', 'Skull Pinball']
 }
 
+drop_entrances = [
+    'Sewers Rat Path', 'Skull Pinball', 'Skull Left Drop'  # Pot circle, Back drop have unique access
+]
+
 dungeon_keys = {
     'Hyrule Castle': 'Small Key (Escape)',
     'Eastern Palace': 'Small Key (Eastern Palace)',
@@ -339,6 +364,7 @@ dungeon_keys = {
     'Ice Palace': 'Small Key (Ice Palace)',
     'Misery Mire': 'Small Key (Misery Mire)',
     'Turtle Rock': 'Small Key (Turtle Rock)',
+    'Ganons Tower': 'Small Key (Ganons Tower)'
 }
 
 dungeon_bigs = {
@@ -354,5 +380,6 @@ dungeon_bigs = {
     'Ice Palace': 'Big Key (Ice Palace)',
     'Misery Mire': 'Big Key (Misery Mire)',
     'Turtle Rock': 'Big Key (Turtle Rock)',
+    'Ganons Tower': 'Big Key (Ganons Tower)'
 }
 

@@ -18,7 +18,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '9202f6cce45bd7ee04d1e969be29936b'
+RANDOMIZERBASEHASH = 'f96bdced8c89426bd4d1380db8a02220'
 
 
 class JsonRom(object):
@@ -930,7 +930,7 @@ def patch_rom(world, player, rom):
     # compasses showing dungeon count
     if world.clock_mode != 'off':
         rom.write_byte(0x18003C, 0x00)  # Currently must be off if timer is on, because they use same HUD location
-    elif world.keysanity:
+    elif world.keysanity or world.doorShuffle != 'vanilla':  # todo: turn off for basic?
         rom.write_byte(0x18003C, 0x01)  # show on pickup
     else:
         rom.write_byte(0x18003C, 0x00)

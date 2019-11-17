@@ -1049,7 +1049,7 @@ def link_entrances(world, player):
         raise NotImplementedError('Shuffling not supported yet')
 
     # check for swamp palace fix
-    if world.get_entrance('Dam', player).connected_region.name != 'Dam' or world.get_entrance('Swamp Palace', player).connected_region.name != 'Swamp Palace (Entrance)':
+    if world.get_entrance('Dam', player).connected_region.name != 'Dam' or world.get_entrance('Swamp Palace', player).connected_region.name != 'Swamp Lobby':
         world.swamp_patch_required[player] = True
 
     # check for potion shop location
@@ -1061,7 +1061,7 @@ def link_entrances(world, player):
         world.ganon_at_pyramid[player] = False
 
     # check for Ganon's Tower location
-    if world.get_entrance('Ganons Tower', player).connected_region.name != 'Ganons Tower (Entrance)':
+    if world.get_entrance('Ganons Tower', player).connected_region.name != 'GT Lobby':
         world.ganonstower_vanilla[player] = False
 
 def link_inverted_entrances(world, player):
@@ -2946,22 +2946,9 @@ mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia Central 
                          ('Mimic Cave Mirror Spot', 'Mimic Cave Ledge'),
                          ('Cave 45 Mirror Spot', 'Cave 45 Ledge'),
                          ('Graveyard Ledge Mirror Spot', 'Graveyard Ledge'),
-
-                         ('Ganons Tower (Tile Room)', 'Ganons Tower (Tile Room)'),
-                         ('Ganons Tower (Tile Room) Key Door', 'Ganons Tower (Compass Room)'),
-                         ('Ganons Tower (Bottom) (East)', 'Ganons Tower (Bottom)'),
-                         ('Ganons Tower (Hookshot Room)', 'Ganons Tower (Hookshot Room)'),
-                         ('Ganons Tower (Map Room)', 'Ganons Tower (Map Room)'),
-                         ('Ganons Tower (Double Switch Room)', 'Ganons Tower (Firesnake Room)'),
-                         ('Ganons Tower (Firesnake Room)', 'Ganons Tower (Teleport Room)'),
-                         ('Ganons Tower (Bottom) (West)', 'Ganons Tower (Bottom)'),
-                         ('Ganons Tower Big Key Door', 'Ganons Tower (Top)'),
-                         ('Ganons Tower Torch Rooms', 'Ganons Tower (Before Moldorm)'),
-                         ('Ganons Tower Moldorm Door', 'Ganons Tower (Moldorm)'),
-                         ('Ganons Tower Moldorm Gap', 'Agahnim 2'),
                          ('Ganon Drop', 'Bottom of Pyramid'),
                          ('Pyramid Drop', 'East Dark World')
-                        ]
+                         ]
 
 inverted_mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia Central Island'), 
                                   ('Zoras River', 'Zoras River'), 
@@ -3065,18 +3052,6 @@ inverted_mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia
                                   ('Turtle Rock (Dark Room) (South)', 'Turtle Rock (Eye Bridge)'),
                                   ('Turtle Rock Dark Room (South)', 'Turtle Rock (Dark Room)'),
                                   ('Turtle Rock (Trinexx)', 'Turtle Rock (Trinexx)'),
-                                  ('Ganons Tower (Tile Room)', 'Ganons Tower (Tile Room)'),
-                                  ('Ganons Tower (Tile Room) Key Door', 'Ganons Tower (Compass Room)'),
-                                  ('Ganons Tower (Bottom) (East)', 'Ganons Tower (Bottom)'),
-                                  ('Ganons Tower (Hookshot Room)', 'Ganons Tower (Hookshot Room)'),
-                                  ('Ganons Tower (Map Room)', 'Ganons Tower (Map Room)'),
-                                  ('Ganons Tower (Double Switch Room)', 'Ganons Tower (Firesnake Room)'),
-                                  ('Ganons Tower (Firesnake Room)', 'Ganons Tower (Teleport Room)'),
-                                  ('Ganons Tower (Bottom) (West)', 'Ganons Tower (Bottom)'),
-                                  ('Ganons Tower Big Key Door', 'Ganons Tower (Top)'),
-                                  ('Ganons Tower Torch Rooms', 'Ganons Tower (Before Moldorm)'),
-                                  ('Ganons Tower Moldorm Door', 'Ganons Tower (Moldorm)'),
-                                  ('Ganons Tower Moldorm Gap', 'Agahnim 2'),
                                   ('Ganon Drop', 'Bottom of Pyramid'),
                                   ('Pyramid Drop', 'East Dark World'),
                                   ('Post Aga Teleporter', 'Light World'),
@@ -3512,7 +3487,7 @@ default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert Main L
                                ('Turtle Rock Isolated Ledge Exit', 'Dark Death Mountain Isolated Ledge'),
                                ('Turtle Rock Isolated Ledge Entrance', 'TR Eye Bridge'),
 
-                               ('Ganons Tower', 'Ganons Tower (Entrance)'),
+                               ('Ganons Tower', 'GT Lobby'),
                                ('Ganons Tower Exit', 'Dark Death Mountain (Top)')
                               ]
 

@@ -75,6 +75,8 @@ def generate_dungeon(available_sectors, entrance_region_names, world, player):
             choices_master.pop()
             dungeon_cache.pop(depth, None)
             depth -= 1
+            if depth < 0:
+                raise Exception('Invalid dungeon. Ref %s' % entrance_region_names[0])
             a, b = choices_master[depth][-1]
             logger.debug(' '*depth+"%d: Rescinding %s, %s", depth, a.name, b.name)
             proposed_map.pop(a, None)
@@ -289,7 +291,8 @@ def winnow_hangers(hangers, hooks):
                 found_valid = False
                 for door_hook, crystal, orig_hanger in hook_set:
                     if orig_hanger != door:
-                        found_valid = True  # todo: break
+                        found_valid = True
+                        break
                 if not found_valid:
                     removal_info.append((hanger, door))
     for hanger, door in removal_info:
@@ -746,7 +749,7 @@ def extend_reachable_state_improved(search_regions, state, proposed_map, valid_d
 
 # cross-utility methods
 def valid_region_to_explore(region, world):
-    return region.type == RegionType.Dungeon or region.name in world.inaccessible_regions
+    return region is not None and (region.type == RegionType.Dungeon or region.name in world.inaccessible_regions)
 
 
 def get_doors(world, region, player):
