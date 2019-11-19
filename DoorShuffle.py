@@ -287,15 +287,25 @@ def within_dungeon(world, player):
 
     enabled_entrances = []
     dungeon_layouts = []
-    for key, sector_list, entrance_list in dungeon_sectors:
+    sector_queue = collections.deque(dungeon_sectors)
+    last_key = None
+    while len(sector_queue) > 0:
+        key, sector_list, entrance_list = sector_queue.popleft()
         origin_list = list(entrance_list)
         find_enabled_origins(sector_list, enabled_entrances, origin_list)
         origin_list = remove_drop_origins(origin_list)
-        ds = generate_dungeon(sector_list, origin_list, world, player)
-        find_new_entrances(ds, connections, potentials, enabled_entrances)
-        ds.name = key
-        layout_starts = origin_list if len(entrance_list) <= 0 else entrance_list
-        dungeon_layouts.append((ds, layout_starts))
+        if len(origin_list) <= 0:
+            if last_key == key:
+                raise Exception('Infinte loop detected %s' % key)
+            sector_queue.append((key, sector_list, entrance_list))
+            last_key = key
+        else:
+            ds = generate_dungeon(sector_list, origin_list, world, player)
+            find_new_entrances(ds, connections, potentials, enabled_entrances)
+            ds.name = key
+            layout_starts = origin_list if len(entrance_list) <= 0 else entrance_list
+            dungeon_layouts.append((ds, layout_starts))
+            last_key = None
 
     combine_layouts(dungeon_layouts, entrances_map)
     world.dungeon_layouts[player] = {}

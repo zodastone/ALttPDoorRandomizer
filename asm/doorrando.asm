@@ -2,7 +2,7 @@
 !sub = "sec : sbc"
 
 ; Free RAM notes
-; Normal doors use $0127 for scrolling indicator
+; Normal doors use $FE for scrolling indicator
 ; Normal doors use $AB to store the trap door indicator
 ; Spiral doors use $045e to store stair type
 ; Gfx uses $b1 to for sub-sub-sub-module thing

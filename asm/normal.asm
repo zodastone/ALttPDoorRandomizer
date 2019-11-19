@@ -152,7 +152,7 @@ ShiftLowCoord:
 {
 	lda $01 : and.b #$03 ; high byte index
 	jsr CalcOpposingShift
-	lda $0127 : and.b #$f0 : cmp.b #$20 : bne .lowDone
+	lda $fe : and.b #$f0 : cmp.b #$20 : bne .lowDone
 	lda OppCoordIndex,y : tax
 	lda #$80 : !add $20,x : sta $20,x
 	.lowDone
@@ -166,7 +166,7 @@ ShiftLowCoord:
 ; q - quadrant, if set, then quadrant needs to be modified
 CalcOpposingShift:
 {
-	stz $0127 ; set up (can you zero out 127 alone?)
+	stz $fe ; set up (can you zero out 127 alone?)
 	cmp.b $04 : beq .noOffset ; (equal, no shifts to do)
 	phy : tay ; reserve these
 	lda $04 : tax : tya : !sub $04 : sta $04 : cmp.b #$00 : bpl .shiftPos
@@ -174,8 +174,8 @@ CalcOpposingShift:
 	cpx.b #$01 : beq .skipNegQuad
 	ora #$08
 	.skipNegQuad
-	sta $0127 : lda $04 : cmp.b #$FE : beq .done ;already set $0127
-	lda $0127 : eor #$60
+	sta $fe : lda $04 : cmp.b #$FE : beq .done ;already set $0127
+	lda $fe : eor #$60
 	bra .setDone
 
 	.shiftPos
@@ -183,10 +183,10 @@ CalcOpposingShift:
 	cpy.b #$01 : beq .skipPosQuad
 	ora #$08
 	.skipPosQuad
-	sta $0127 : lda $04 : cmp.b #$02 : bcs .done ;already set $0127
-	lda $0127 : eor #$60
+	sta $fe : lda $04 : cmp.b #$02 : bcs .done ;already set $0127
+	lda $fe : eor #$60
 
-	.setDone  sta $0127
+	.setDone  sta $fe
 	.done     ply
 	.noOffset rts
 }
@@ -194,9 +194,9 @@ CalcOpposingShift:
 
 ShiftQuad:
 {
-	lda $0127 : and #$08 : cmp.b #$00 : beq .quadDone
+	lda $fe : and #$08 : cmp.b #$00 : beq .quadDone
 	lda ShiftQuadIndex,y : tax ; X should be set to either 1 (vertical) or 2 (horizontal) (for a9,aa quadrant)
-	lda $0127 : and #$01 : cmp.b #$00 : beq .decQuad
+	lda $fe : and #$01 : cmp.b #$00 : beq .decQuad
 	inc $02
 	txa : sta $a8, x ; alter a9/aa
 	bra .quadDone
@@ -224,8 +224,8 @@ ShiftCameraBounds:
 {
 	lda CamBoundIndex,y : tax ; should be 0 for horz travel (vert bounds) or 4 for vert travel (horz bounds)
 	rep #$30
-	lda $0127 : and #$00f0 : asl #2 : sta $06
-	lda $0127 : and #$0001 : cmp #$0000 : beq .subIt
+	lda $fe : and #$00f0 : asl #2 : sta $06
+	lda $fe : and #$0001 : cmp #$0000 : beq .subIt
 	lda $0618, x : !add $06 : sta $0618, x
 	lda $061A, x : !add $06 : sta $061A, x
 	sep #$30
@@ -239,18 +239,18 @@ ShiftCameraBounds:
 
 AdjustTransition:
 {
-	lda $0127 : and #$00F0 : lsr
+	lda $fe : and #$00f0 : lsr
 	sep #$20 : cmp $0126 : bcc .reset
 	rep #$20
 	phy : ldy #$06 ; operating on vertical registers during horizontal trans
 	cpx.b #$02 : bcs .horizontalScrolling
 	ldy #$00  ; operate on horizontal regs during vert trans
 	.horizontalScrolling
-	lda $0127 : and #$0001 : asl : tax
+	lda $fe : and #$0001 : asl : tax
 	lda.l OffsetTable,x : adc $00E2,y : and.w #$FFFE : sta $00E2,y : sta $00E0,y
 	ply : bra .done
 	.reset ; clear the 0127 variable so to not disturb intra-tile doors
-	stz $0127
+	stz $fe
 	.done
 	rep #$20 : lda $00 : and #$01fc
 	rtl

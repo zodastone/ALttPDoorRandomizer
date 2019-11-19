@@ -18,7 +18,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'f96bdced8c89426bd4d1380db8a02220'
+RANDOMIZERBASEHASH = '1292e65465342d79bee038eb58270e64'
 
 
 class JsonRom(object):
@@ -543,8 +543,15 @@ def patch_rom(world, player, rom):
     for paired_door in world.paired_doors[player]:
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
         rom.write_bytes(paired_door.address_b(world, player), paired_door.rom_data_b(world, player))
-    if world.fix_skullwoods_exit:
-        rom.write_int16(0x15DB5 + 2 * exit_ids['Skull Woods Final Section Exit'][1], 0x00F8)
+    if world.fix_skullwoods_exit and world.shuffle in ['vanilla', 'simple', 'restricted', 'dungeonssimple']:
+        connect = world.get_entrance('Skull Woods Final Section', player).connected_region
+        exit_name = None
+        for ext in connect.exits:
+            if ext.connected_region.name == 'Skull Woods Forest (West)':
+                exit_name = ext.name
+                break
+        if exit_name is not None and exit_name == 'Skull Woods Final Section Exit':
+            rom.write_int16(0x15DB5 + 2 * exit_ids['Skull Woods Final Section Exit'][1], 0x00F8)
     # todo: fix other exits if ER enabled and similar situation happens
 
     write_custom_shops(rom, world, player)
