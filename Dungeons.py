@@ -187,9 +187,9 @@ eastern_regions = [
 
 desert_regions = [
     'Desert Main Lobby', 'Desert Dead End', 'Desert East Lobby', 'Desert East Wing', 'Desert Compass Room',
-    'Desert Cannonball', 'Desert Arrow Pot Corner', 'Desert North Hall', 'Desert Map Room', 'Desert Sandworm Corner',
-    'Desert Bonk Torch', 'Desert Circle of Pots', 'Desert Big Chest Room', 'Desert West Wing',
-    'Desert West Lobby', 'Desert Back Lobby', 'Desert Tiles 1',
+    'Desert Cannonball', 'Desert Arrow Pot Corner', 'Desert Trap Room', 'Desert North Hall', 'Desert Map Room',
+    'Desert Sandworm Corner', 'Desert Bonk Torch', 'Desert Circle of Pots', 'Desert Big Chest Room', 'Desert West Wing',
+    'Desert West Lobby', 'Desert Fairy Fountain', 'Desert Back Lobby', 'Desert Tiles 1',
     'Desert Bridge', 'Desert Four Statues', 'Desert Beamos Hall', 'Desert Tiles 2', 'Desert Wall Slide', 'Desert Boss',
 ]
 

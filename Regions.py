@@ -275,8 +275,8 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Desert East Wing', 'Desert Palace', None, ['Desert East Wing ES', 'Desert East Wing Key Door EN', 'Desert East Wing W Edge', 'Desert East Wing N Edge']),
         create_dungeon_region(player, 'Desert Compass Room', 'Desert Palace', ['Desert Palace - Compass Chest'], ['Desert Compass Key Door WN', 'Desert Compass NW']),
         create_dungeon_region(player, 'Desert Cannonball', 'Desert Palace', ['Desert Palace - Big Key Chest'], ['Desert Cannonball S']),
-        create_dungeon_region(player, 'Desert Arrow Pot Corner', 'Desert Palace', None, ['Desert Arrow Pot Corner S Edge', 'Desert Arrow Pot Corner W Edge']),
-        # skip the trap room for now
+        create_dungeon_region(player, 'Desert Arrow Pot Corner', 'Desert Palace', None, ['Desert Arrow Pot Corner S Edge', 'Desert Arrow Pot Corner W Edge', 'Desert Arrow Pot Corner NW']),
+        create_dungeon_region(player, 'Desert Trap Room', 'Desert Palace', None, ['Desert Trap Room SW']),
         create_dungeon_region(player, 'Desert North Hall', 'Desert Palace', None, ['Desert North Hall SE Edge', 'Desert North Hall SW Edge', 'Desert North Hall W Edge', 'Desert North Hall E Edge', 'Desert North Hall NW', 'Desert North Hall NE']),
         create_dungeon_region(player, 'Desert Map Room', 'Desert Palace', ['Desert Palace - Map Chest'], ['Desert Map SW', 'Desert Map SE']),
         create_dungeon_region(player, 'Desert Sandworm Corner', 'Desert Palace', None, ['Desert Sandworm Corner S Edge', 'Desert Sandworm Corner E Edge', 'Desert Sandworm Corner NE', 'Desert Sandworm Corner WS']),
@@ -284,8 +284,8 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Desert Circle of Pots', 'Desert Palace', None, ['Desert Circle of Pots ES', 'Desert Circle of Pots NW']),
         create_dungeon_region(player, 'Desert Big Chest Room', 'Desert Palace', ['Desert Palace - Big Chest'], ['Desert Big Chest SW']),
         create_dungeon_region(player, 'Desert West Wing', 'Desert Palace', None, ['Desert West Wing N Edge', 'Desert West Wing WS']),
-        create_dungeon_region(player, 'Desert West Lobby', 'Desert Palace', None, ['Desert West Lobby ES', 'Desert Palace Exit (West)']),
-        # skipping the fairy room for now
+        create_dungeon_region(player, 'Desert West Lobby', 'Desert Palace', None, ['Desert West Lobby ES', 'Desert Palace Exit (West)', 'Desert West Lobby NW']),
+        create_dungeon_region(player, 'Desert Fairy Fountain', 'Desert Palace', None, ['Desert Fairy Fountain SW']),
         create_dungeon_region(player, 'Desert Back Lobby', 'Desert Palace', None, ['Desert Palace Exit (North)', 'Desert Back Lobby NW']),
         create_dungeon_region(player, 'Desert Tiles 1', 'Desert Palace', ['Desert Palace - Desert Tiles 1 Pot Key'], ['Desert Tiles 1 SW', 'Desert Tiles 1 Up Stairs']),
         create_dungeon_region(player, 'Desert Bridge', 'Desert Palace', None, ['Desert Bridge Down Stairs', 'Desert Bridge SW']),
