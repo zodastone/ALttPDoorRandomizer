@@ -12,6 +12,7 @@ from Dungeons import dungeon_regions, region_starts, split_region_starts, dungeo
 from Dungeons import drop_entrances
 from RoomData import DoorKind, PairedDoor
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon
+from KeyDoorShuffle import analyze_dungeon
 
 
 def link_doors(world, player):
@@ -124,6 +125,7 @@ def vanilla_key_logic(world, player):
         valid = validate_key_layout(key_layout, world, player)
         if not valid:
             raise Exception('Vanilla key layout not valid %s' % sector.name)
+        analyze_dungeon(key_layout, world, player)
         if player not in world.key_logic.keys():
             world.key_logic[player] = {}
         world.key_logic[player][sector.name] = key_layout.key_logic
@@ -288,11 +290,12 @@ def within_dungeon(world, player):
     for key, sector_list, entrance_list in dungeon_sectors:
         origin_list = list(entrance_list)
         find_enabled_origins(sector_list, enabled_entrances, origin_list)
-        remove_drop_origins(origin_list)
+        origin_list = remove_drop_origins(origin_list)
         ds = generate_dungeon(sector_list, origin_list, world, player)
         find_new_entrances(ds, connections, potentials, enabled_entrances)
         ds.name = key
-        dungeon_layouts.append((ds, entrance_list))
+        layout_starts = origin_list if len(entrance_list) <= 0 else entrance_list
+        dungeon_layouts.append((ds, layout_starts))
 
     combine_layouts(dungeon_layouts, entrances_map)
     world.dungeon_layouts[player] = {}
@@ -891,6 +894,7 @@ def flatten_pair_list(paired_list):
 
 
 def find_key_door_candidates(region, checked, world, player):
+    dungeon = region.dungeon
     candidates = []
     checked_doors = list(checked)
     queue = collections.deque([(region, None, None)])
@@ -920,7 +924,8 @@ def find_key_door_candidates(region, checked, world, player):
                             valid = True
                 if valid:
                     candidates.append(d)
-                queue.append((ext.connected_region, d, current)) # - todo: fix isolated ledge from re-entering
+                if ext.connected_region.type != RegionType.Dungeon or ext.connected_region.dungeon == dungeon:
+                    queue.append((ext.connected_region, d, current))
                 if d is not None:
                     checked_doors.append(d)
     return candidates, checked_doors
@@ -1206,7 +1211,8 @@ def determine_required_paths(world):
         paths['Turtle Rock'].insert(0, 'TR Lazy Eyes')
         if world.mode == 'standard':
             paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
-            paths['Hyrule Castle'].append('Sanctuary')
+            # noinspection PyTypeChecker
+            paths['Hyrule Castle'].append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
     if world.doorShuffle in ['basic', 'experimental']:
         paths['Thieves Town'].append('Thieves Attic Window')
     return paths
@@ -1235,6 +1241,9 @@ def find_inaccessible_regions(world, player):
             if connect is not None and connect.type is not RegionType.Dungeon and connect not in queue and connect not in visited_regions:
                 queue.append(connect)
     world.inaccessible_regions.extend([r.name for r in all_regions.difference(visited_regions) if r.type is not RegionType.Cave])
+    if world.mode == 'standard':
+        world.inaccessible_regions.append('Hyrule Castle Ledge')
+        world.inaccessible_regions.append('Sewer Drop')
     logger = logging.getLogger('')
     logger.info('Inaccessible Regions:')
     for r in world.inaccessible_regions:
@@ -1462,6 +1471,9 @@ logical_connections = [
     ('TR Pipe Ledge Drop Down', 'TR Pipe Pit'),
     ('TR Big Chest Gap', 'TR Big Chest Entrance'),
     ('TR Big Chest Entrance Gap', 'TR Big Chest'),
+    ('TR Crystal Maze Forwards Path', 'TR Crystal Maze End'),
+    ('TR Crystal Maze Blue Path', 'TR Crystal Maze'),
+    ('TR Crystal Maze Cane Path', 'TR Crystal Maze'),
     ('GT Blocked Stairs Block Path', 'GT Big Chest'),
     ('GT Hookshot East-North Path', 'GT Hookshot North Platform'),
     ('GT Hookshot East-South Path', 'GT Hookshot South Platform'),

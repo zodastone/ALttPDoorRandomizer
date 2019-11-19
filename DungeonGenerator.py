@@ -41,8 +41,9 @@ def generate_dungeon(available_sectors, entrance_region_names, world, player):
     dungeon_cache = {}
     backtrack = False
     itr = 0
+    finished = False
     # last_choice = None
-    while len(proposed_map) < len(doors_to_connect):
+    while not finished:
         # what are my choices?
         itr += 1
         if itr > 5000:
@@ -55,6 +56,9 @@ def generate_dungeon(available_sectors, entrance_region_names, world, player):
             dungeon, hangers, hooks = dungeon_cache[depth]
             valid = True
         if valid:
+            if len(proposed_map) == len(doors_to_connect):
+                finished = True
+                continue
             prev_choices = choices_master[depth]
             # make a choice
             hanger, hook = make_a_choice(dungeon, hangers, hooks, prev_choices)

@@ -878,6 +878,9 @@ def create_doors(world, player):
         create_door(player, 'TR Dash Bridge WS', Nrml).dir(We, 0xc5, Bot, High).small_key().pos(0),
         create_door(player, 'TR Eye Bridge NW', Nrml).dir(No, 0xd5, Left, High).pos(1),
         create_door(player, 'TR Crystal Maze ES', Nrml).dir(Ea, 0xc4, Bot, High).small_key().pos(0),
+        create_door(player, 'TR Crystal Maze Forwards Path', Lgcl),
+        create_door(player, 'TR Crystal Maze Blue Path', Lgcl),
+        create_door(player, 'TR Crystal Maze Cane Path', Lgcl),
         create_door(player, 'TR Crystal Maze North Stairs', StrS).dir(No, 0xc4, Mid, High),
         create_door(player, 'TR Final Abyss South Stairs', StrS).dir(No, 0xb4, Right, High),
         create_door(player, 'TR Final Abyss NW', Nrml).dir(No, 0xb4, Left, High).big_key().pos(0),
@@ -1154,7 +1157,9 @@ def create_doors(world, player):
     world.get_door('TR Crystaroller SW', player).c_switch()
     world.get_door('TR Crystaroller Down Stairs', player).c_switch()
     world.get_door('TR Crystal Maze ES', player).c_switch()
-    world.get_door('TR Crystal Maze North Stairs', player).c_switch()
+    world.get_door('TR Crystal Maze Forwards Path', player).c_switch()
+    world.get_door('TR Crystal Maze Cane Path', player).c_switch()
+    world.get_door('TR Crystal Maze Blue Path', player).barrier(CrystalBarrier.Blue)
 
     world.get_door('GT Crystal Conveyor NE', player).c_switch()
     world.get_door('GT Crystal Conveyor WN', player).c_switch()

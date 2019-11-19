@@ -420,6 +420,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Dodgers NE', player), lambda state: state.has('Big Key (Turtle Rock)', player))
     set_rule(world.get_entrance('TR Dark Ride Up Stairs', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Dark Ride SW', player), lambda state: state.has('Cane of Somaria', player))
+    set_rule(world.get_entrance('TR Crystal Maze Cane Path', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Final Abyss South Stairs', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Final Abyss NW', player), lambda state: state.has('Cane of Somaria', player) and state.has('Big Key (Turtle Rock)', player))
     set_rule(world.get_location('Turtle Rock - Eye Bridge - Bottom Left', player), lambda state: state.has('Cane of Byrna', player) or state.has('Cape', player) or state.has('Mirror Shield', player))
@@ -1046,7 +1047,10 @@ def standard_rules(world, player):
     set_rule(world.get_location('Hyrule Castle - Boomerang Chest', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_location('Hyrule Castle - Zelda\'s Chest', player), lambda state: state.can_kill_most_things(player))
 
-
+    set_rule(world.get_location('Hyrule Castle - Map Guard Key Drop', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_location('Hyrule Castle - Boomerang Guard Key Drop', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_location('Hyrule Castle - Key Rat Key Drop', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Hyrule Dungeon Armory S', player), lambda state: state.can_kill_most_things(player))
 
 
 def set_trock_key_rules(world, player):

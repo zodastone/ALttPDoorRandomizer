@@ -611,7 +611,8 @@ def create_regions(world, player):
         create_dungeon_region(player, 'TR Eye Bridge', 'Turtle Rock', ['Turtle Rock - Eye Bridge - Bottom Left', 'Turtle Rock - Eye Bridge - Bottom Right',
                                                                        'Turtle Rock - Eye Bridge - Top Left', 'Turtle Rock - Eye Bridge - Top Right'],
                               ['Turtle Rock Isolated Ledge Exit', 'TR Eye Bridge NW']),
-        create_dungeon_region(player, 'TR Crystal Maze', 'Turtle Rock', None, ['TR Crystal Maze ES', 'TR Crystal Maze North Stairs']),
+        create_dungeon_region(player, 'TR Crystal Maze', 'Turtle Rock', None, ['TR Crystal Maze ES', 'TR Crystal Maze Forwards Path']),
+        create_dungeon_region(player, 'TR Crystal Maze End', 'Turtle Rock', None, ['TR Crystal Maze Blue Path', 'TR Crystal Maze Cane Path', 'TR Crystal Maze North Stairs']),
         create_dungeon_region(player, 'TR Final Abyss', 'Turtle Rock', None, ['TR Final Abyss South Stairs', 'TR Final Abyss NW']),
         create_dungeon_region(player, 'TR Boss', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize'], ['TR Boss SW']),
 
@@ -692,7 +693,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'GT Mini Helmasaur Room', 'Ganon\'s Tower', ['Ganons Tower - Mini Helmasaur Room - Left',
                                                                                    'Ganons Tower - Mini Helmasaur Room - Right', 'Ganons Tower - Mini Helmasuar Key Drop'], ['GT Mini Helmasaur Room SE', 'GT Mini Helmasaur Room WN']),
         create_dungeon_region(player, 'GT Bomb Conveyor', 'Ganon\'s Tower', None, ['GT Bomb Conveyor EN', 'GT Bomb Conveyor SW']),
-        create_dungeon_region(player, 'GT Crystal Circles', 'Ganon\'s Tower', None, ['GT Crystal Circles NW', 'GT Crystal Circles SW']),
+        create_dungeon_region(player, 'GT Crystal Circles', 'Ganon\'s Tower', ['Ganons Tower - Pre-Moldorm Chest'], ['GT Crystal Circles NW', 'GT Crystal Circles SW']),
         create_dungeon_region(player, 'GT Left Moldorm Ledge', 'Ganon\'s Tower', None, ['GT Left Moldorm Ledge Drop Down', 'GT Left Moldorm Ledge NW']),
         create_dungeon_region(player, 'GT Right Moldorm Ledge', 'Ganon\'s Tower', None, ['GT Right Moldorm Ledge Down Stairs', 'GT Right Moldorm Ledge Drop Down']),
         create_dungeon_region(player, 'GT Moldorm', 'Ganon\'s Tower', None, ['GT Moldorm Hole', 'GT Moldorm Gap']),

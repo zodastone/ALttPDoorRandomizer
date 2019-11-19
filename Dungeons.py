@@ -274,7 +274,8 @@ tr_regions = [
     'TR Tile Room', 'TR Refill', 'TR Pokey 1', 'TR Chain Chomps', 'TR Pipe Pit', 'TR Pipe Ledge', 'TR Lava Dual Pipes',
     'TR Lava Island', 'TR Lava Escape', 'TR Pokey 2', 'TR Twin Pokeys', 'TR Hallway', 'TR Dodgers', 'TR Big View',
     'TR Big Chest', 'TR Big Chest Entrance', 'TR Lazy Eyes', 'TR Dash Room', 'TR Tongue Pull', 'TR Rupees',
-    'TR Crystaroller', 'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge', 'TR Crystal Maze', 'TR Final Abyss', 'TR Boss'
+    'TR Crystaroller', 'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge', 'TR Crystal Maze', 'TR Crystal Maze End',
+    'TR Final Abyss', 'TR Boss'
 ]
 
 gt_regions = [
