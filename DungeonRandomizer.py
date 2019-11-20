@@ -169,7 +169,7 @@ def start():
                                         (Not yet implemented)
                             Crossed:    Doors are mixed between all dungeons.
                                         (Not yet implemented)
-                            Vanilla:    All doors are connected the same way the were in the
+                            Vanilla:    All doors are connected the same way they were in the
                                         base game.
                             Experimental: Experimental mixes live here. Use at your own risk.                        
                         ''')

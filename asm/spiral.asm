@@ -94,8 +94,9 @@ LookupSpiralOffset: {
     inc $01 : lda $a2
     cmp #$0c : beq .q0diff ;gt ent
     cmp #$70 : bne .done   ;hc stairwell
-    .q0diff lda $22 : cmp #$98 : bcc .done ;gt ent and hc stairwell
-    inc $01 : bra .done
+    .q0diff lda $22 : cmp #$00 : beq .secondDoor
+    cmp #$98 : bcc .done ;gt ent and hc stairwell
+    .secondDoor inc $01 : bra .done
     .quad1
     lda $a2
     cmp #$1a : beq .q1diff ;pod compass
