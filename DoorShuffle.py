@@ -301,7 +301,7 @@ def within_dungeon(world, player):
             last_key = key
         else:
             ds = generate_dungeon(sector_list, origin_list, world, player)
-            find_new_entrances(ds, connections, potentials, enabled_entrances)
+            find_new_entrances(ds, connections, potentials, enabled_entrances, world, player)
             ds.name = key
             layout_starts = origin_list if len(entrance_list) <= 0 else entrance_list
             dungeon_layouts.append((ds, layout_starts))
@@ -333,7 +333,7 @@ def determine_entrance_list(world, player):
             for ent in region.entrances:
                 parent = ent.parent_region
                 if parent.type != RegionType.Dungeon or parent.name == 'Sewer Drop':
-                    if parent.name not in world.inaccessible_regions:
+                    if parent.name not in world.inaccessible_regions[player]:
                         entrance_map[key].append(region_name)
                     else:
                         if ent.parent_region not in potential_entrances.keys():
@@ -361,10 +361,20 @@ def remove_drop_origins(entrance_list):
     return [x for x in entrance_list if x not in drop_entrances]
 
 
-def find_new_entrances(sector, connections, potentials, enabled):
+def find_new_entrances(sector, connections, potentials, enabled, world, player):
     for region in sector.regions:
         if region.name in connections.keys() and connections[region.name] in potentials.keys():
-            enabled.extend(potentials.pop(connections[region.name]))
+            new_region = connections[region.name]
+            enabled.extend(potentials.pop(new_region))
+            # see if this unexplored region connects elsewhere
+            queue = collections.deque(new_region.exits)
+            while len(queue) > 0:
+                ext = queue.popleft()
+                region_name = ext.connected_region.name
+                if region_name in connections.keys() and connections[region_name] in potentials.keys():
+                    enabled.extend(potentials.pop(connections[region_name]))
+                if ext.connected_region.name in world.inaccessible_regions[player]:
+                    queue.extend(ext.connected_region.exits)
 
 
 def within_dungeon_legacy(world, player):
@@ -781,8 +791,8 @@ def find_proposal(proposal, buckets, candidates):
     return proposal
 
 
-def valid_region_to_explore(region, world):
-    return region.type == RegionType.Dungeon or region.name in world.inaccessible_regions
+def valid_region_to_explore(region, world, player):
+    return region.type == RegionType.Dungeon or region.name in world.inaccessible_regions[player]
 
 
 def shuffle_key_doors(dungeon_sector, entrances, world, player):
@@ -982,7 +992,7 @@ def validate_key_layout_r(state, key_layout, flat_proposal, world, player):
         exp_door = state.next_avail_door()
         door = exp_door.door
         connect_region = world.get_entrance(door.name, player).connected_region
-        if state.validate(door, connect_region, world):
+        if state.validate(door, connect_region, world, player):
             state.visit_region(connect_region, key_checks=True)
             state.add_all_doors_check_keys(connect_region, flat_proposal, world, player)
     smalls_avail = len(state.small_doors) > 0
@@ -1235,6 +1245,7 @@ def overworld_prep(world, player):
 
 # todo : multiplayer?
 def find_inaccessible_regions(world, player):
+    world.inaccessible_regions[player] = []
     if world.mode != 'inverted':
         start_regions = ['Links House', 'Sanctuary']
     else:
@@ -1250,33 +1261,39 @@ def find_inaccessible_regions(world, player):
             connect = ext.connected_region
             if connect is not None and connect.type is not RegionType.Dungeon and connect not in queue and connect not in visited_regions:
                 queue.append(connect)
-    world.inaccessible_regions.extend([r.name for r in all_regions.difference(visited_regions) if r.type is not RegionType.Cave])
+    world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if r.type is not RegionType.Cave])
     if world.mode == 'standard':
-        world.inaccessible_regions.append('Hyrule Castle Ledge')
-        world.inaccessible_regions.append('Sewer Drop')
+        world.inaccessible_regions[player].append('Hyrule Castle Ledge')
+        world.inaccessible_regions[player].append('Sewer Drop')
     logger = logging.getLogger('')
     logger.info('Inaccessible Regions:')
-    for r in world.inaccessible_regions:
+    for r in world.inaccessible_regions[player]:
         logger.info('%s', r)
 
 
 def add_inaccessible_doors(world, player):
-    if 'Skull Woods Forest (West)' in world.inaccessible_regions:
+    if 'Skull Woods Forest (West)' in world.inaccessible_regions[player]:
         create_door(world, player, 'Skull Woods Second Section Door (West)', 'Skull Woods Forest (West)')
         create_door(world, player, 'Skull Woods Second Section Hole', 'Skull Woods Forest (West)')
         create_door(world, player, 'Skull Woods Final Section', 'Skull Woods Forest (West)')
-    if 'Dark Death Mountain Ledge' in world.inaccessible_regions:
+    if 'Dark Death Mountain Ledge' in world.inaccessible_regions[player]:
         create_door(world, player, 'Dark Death Mountain Ledge (East)', 'Dark Death Mountain Ledge')
         create_door(world, player, 'Dark Death Mountain Ledge (West)', 'Dark Death Mountain Ledge')
         create_door(world, player, 'Mimic Cave Mirror Spot', 'Dark Death Mountain Ledge')
-    if 'Mimic Cave Ledge' in world.inaccessible_regions:
+    if 'Mimic Cave Ledge' in world.inaccessible_regions[player]:
         create_door(world, player, 'Mimic Cave', 'Mimic Cave Ledge')
-    if 'Dark Death Mountain Isolated Ledge' in world.inaccessible_regions:
+    if 'Dark Death Mountain Isolated Ledge' in world.inaccessible_regions[player]:
         create_door(world, player, 'Turtle Rock Isolated Ledge Entrance', 'Dark Death Mountain Isolated Ledge')
-    if 'Death Mountain Floating Island (Dark World)' in world.inaccessible_regions:
+    if 'Death Mountain Floating Island (Dark World)' in world.inaccessible_regions[player]:
         create_door(world, player, 'Hookshot Cave Back Entrance', 'Death Mountain Floating Island (Dark World)')
-    # todo: desert palace lone stairs
-    if world.mode == 'standard' and 'Hyrule Castle Ledge' in world.inaccessible_regions:
+    if 'Bumper Cave Ledge' in world.inaccessible_regions[player]:
+        create_door(world, player, 'Bumper Cave (Top)', 'Bumper Cave Ledge')
+        create_door(world, player, 'Bumper Cave Ledge Mirror Spot', 'Bumper Cave Ledge')
+    if 'Death Mountain Return Ledge' in world.inaccessible_regions[player]:
+        create_door(world, player, 'Death Mountain Return Cave (West)', 'Death Mountain Return Ledge')
+    if 'Desert Palace Lone Stairs' in world.inaccessible_regions[player]:
+        create_door(world, player, 'Desert Palace Entrance (East)', 'Desert Palace Lone Stairs')
+    if world.mode == 'standard' and 'Hyrule Castle Ledge' in world.inaccessible_regions[player]:
         create_door(world, player, 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge')
         create_door(world, player, 'Hyrule Castle Entrance (West)', 'Hyrule Castle Ledge')
 
@@ -1349,7 +1366,7 @@ def explore_state(state, world, player):
     while len(state.avail_doors) > 0:
         door = state.next_avail_door().door
         connect_region = world.get_entrance(door.name, player).connected_region
-        if state.can_traverse(door) and not state.visited(connect_region) and valid_region_to_explore(connect_region, world):
+        if state.can_traverse(door) and not state.visited(connect_region) and valid_region_to_explore(connect_region, world, player):
             state.visit_region(connect_region)
             state.add_all_doors_check_unattached(connect_region, world, player)
 

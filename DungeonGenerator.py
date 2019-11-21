@@ -679,8 +679,8 @@ class ExplorationState(object):
         return not isOrigin or not door.bigKey or len(self.found_locations) > 0
         # return not door.bigKey or len([x for x in self.found_locations if '- Prize' not in x.name]) > 0
 
-    def validate(self, door, region, world):
-        return self.can_traverse(door) and not self.visited(region) and valid_region_to_explore(region, world)
+    def validate(self, door, region, world, player):
+        return self.can_traverse(door) and not self.visited(region) and valid_region_to_explore(region, world, player)
 
     def in_door_list(self, door, door_list):
         for d in door_list:
@@ -739,7 +739,7 @@ def extend_reachable_state(search_regions, state, world, player):
         explorable_door = local_state.next_avail_door()
         connect_region = world.get_entrance(explorable_door.door.name, player).connected_region
         if connect_region is not None:
-            if valid_region_to_explore(connect_region, world) and not local_state.visited(connect_region):
+            if valid_region_to_explore(connect_region, world, player) and not local_state.visited(connect_region):
                 local_state.visit_region(connect_region)
                 local_state.add_all_doors_check_unattached(connect_region, world, player)
     return local_state
@@ -757,15 +757,15 @@ def extend_reachable_state_improved(search_regions, state, proposed_map, valid_d
         else:
             connect_region = world.get_entrance(explorable_door.door.name, player).connected_region
         if connect_region is not None:
-            if valid_region_to_explore(connect_region, world) and not local_state.visited(connect_region):
+            if valid_region_to_explore(connect_region, world, player) and not local_state.visited(connect_region):
                 local_state.visit_region(connect_region)
                 local_state.add_all_doors_check_proposed(connect_region, proposed_map, valid_doors, isOrigin, world, player)
     return local_state
 
 
 # cross-utility methods
-def valid_region_to_explore(region, world):
-    return region is not None and (region.type == RegionType.Dungeon or region.name in world.inaccessible_regions)
+def valid_region_to_explore(region, world, player):
+    return region is not None and (region.type == RegionType.Dungeon or region.name in world.inaccessible_regions[player])
 
 
 def get_doors(world, region, player):

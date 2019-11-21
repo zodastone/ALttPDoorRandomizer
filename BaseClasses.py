@@ -89,7 +89,7 @@ class World(object):
         self.rooms = []
         self._room_cache = {}
         self.dungeon_layouts = {}
-        self.inaccessible_regions = []
+        self.inaccessible_regions = {}
         self.key_logic = {}
 
     def intialize_regions(self):
