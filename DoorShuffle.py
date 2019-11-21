@@ -281,26 +281,27 @@ def within_dungeon(world, player):
                 # shuffable entrances like pinball, left pit need to be added to entrance list
                 if key in flexible_starts.keys():
                     add_shuffled_entrances(sub_sector_list, flexible_starts[key], entrance_list)
-                dungeon_sectors.append((key, sub_sector_list, entrance_list))
+                filtered_list = [x for x in entrance_list if x in entrances_map[key]]
+                dungeon_sectors.append((key, sub_sector_list, filtered_list))
         else:
-            dungeon_sectors.append((key, sector_list, entrances_map[key]))
+            dungeon_sectors.append((key, sector_list, list(entrances_map[key])))
 
-    enabled_entrances = []
+    enabled_entrances = {}
     dungeon_layouts = []
     sector_queue = collections.deque(dungeon_sectors)
     last_key = None
     while len(sector_queue) > 0:
         key, sector_list, entrance_list = sector_queue.popleft()
         origin_list = list(entrance_list)
-        find_enabled_origins(sector_list, enabled_entrances, origin_list)
-        origin_list = remove_drop_origins(origin_list)
+        find_enabled_origins(sector_list, enabled_entrances, origin_list, entrances_map, key)
+        origin_list_sans_drops = remove_drop_origins(origin_list)
         if len(origin_list) <= 0:
             if last_key == key:
                 raise Exception('Infinte loop detected %s' % key)
             sector_queue.append((key, sector_list, entrance_list))
             last_key = key
         else:
-            ds = generate_dungeon(sector_list, origin_list, world, player)
+            ds = generate_dungeon(sector_list, origin_list_sans_drops, world, player)
             find_new_entrances(ds, connections, potentials, enabled_entrances, world, player)
             ds.name = key
             layout_starts = origin_list if len(entrance_list) <= 0 else entrance_list
@@ -310,7 +311,8 @@ def within_dungeon(world, player):
     combine_layouts(dungeon_layouts, entrances_map)
     world.dungeon_layouts[player] = {}
     for sector, entrances in dungeon_layouts:
-        world.dungeon_layouts[player][sector.name] = (sector, entrances)
+        find_enabled_origins([sector], enabled_entrances, entrances, entrances_map, sector.name)
+        world.dungeon_layouts[player][sector.name] = (sector, entrances_map[sector.name])
 
     paths = determine_required_paths(world)
     check_required_paths(paths, world, player)
@@ -333,7 +335,7 @@ def determine_entrance_list(world, player):
             for ent in region.entrances:
                 parent = ent.parent_region
                 if parent.type != RegionType.Dungeon or parent.name == 'Sewer Drop':
-                    if parent.name not in world.inaccessible_regions[player]:
+                    if parent.name not in world.inaccessible_regions[player] or drop_exception(region_name):
                         entrance_map[key].append(region_name)
                     else:
                         if ent.parent_region not in potential_entrances.keys():
@@ -343,6 +345,10 @@ def determine_entrance_list(world, player):
     return entrance_map, potential_entrances, connections
 
 
+def drop_exception(name):
+    return name in ['Skull Pot Circle', 'Skull Back Drop']
+
+
 def add_shuffled_entrances(sectors, region_list, entrance_list):
     for sector in sectors:
         for region in sector.regions:
@@ -350,11 +356,13 @@ def add_shuffled_entrances(sectors, region_list, entrance_list):
                 entrance_list.append(region.name)
 
 
-def find_enabled_origins(sectors, enabled, entrance_list):
+def find_enabled_origins(sectors, enabled, entrance_list, entrance_map, key):
     for sector in sectors:
         for region in sector.regions:
-            if region.name in enabled and region.name not in entrance_list:
+            if region.name in enabled.keys() and region.name not in entrance_list:
                 entrance_list.append(region.name)
+                if enabled[region.name] != region.name:
+                    entrance_map[key].append(region.name)
 
 
 def remove_drop_origins(entrance_list):
@@ -365,16 +373,22 @@ def find_new_entrances(sector, connections, potentials, enabled, world, player):
     for region in sector.regions:
         if region.name in connections.keys() and connections[region.name] in potentials.keys():
             new_region = connections[region.name]
-            enabled.extend(potentials.pop(new_region))
+            for potential in potentials.pop(new_region):
+                enabled[potential] = region.name
             # see if this unexplored region connects elsewhere
             queue = collections.deque(new_region.exits)
+            visited = set()
             while len(queue) > 0:
                 ext = queue.popleft()
+                visited.add(ext)
                 region_name = ext.connected_region.name
                 if region_name in connections.keys() and connections[region_name] in potentials.keys():
-                    enabled.extend(potentials.pop(connections[region_name]))
+                    for potential in potentials.pop(connections[region_name]):
+                        enabled[potential] = region.name
                 if ext.connected_region.name in world.inaccessible_regions[player]:
-                    queue.extend(ext.connected_region.exits)
+                    for new_exit in ext.connected_region.exits:
+                        if new_exit not in visited:
+                            queue.append(new_exit)
 
 
 def within_dungeon_legacy(world, player):
@@ -653,7 +667,7 @@ def combine_layouts(dungeon_layouts, entrances_map):
             else:
                 combined[sector.name].regions.extend(sector.regions)
     for key in combined.keys():
-        dungeon_layouts.append((combined[key], entrances_map[key]))
+        dungeon_layouts.append((combined[key], list(entrances_map[key])))
 
 
 def split_up_sectors(sector_list, entrance_sets):
@@ -1243,7 +1257,6 @@ def overworld_prep(world, player):
     add_inaccessible_doors(world, player)
 
 
-# todo : multiplayer?
 def find_inaccessible_regions(world, player):
     world.inaccessible_regions[player] = []
     if world.mode != 'inverted':
@@ -1261,7 +1274,7 @@ def find_inaccessible_regions(world, player):
             connect = ext.connected_region
             if connect is not None and connect.type is not RegionType.Dungeon and connect not in queue and connect not in visited_regions:
                 queue.append(connect)
-    world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if r.type is not RegionType.Cave])
+    world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if r.type is not RegionType.Cave or len(r.exits) > 1])
     if world.mode == 'standard':
         world.inaccessible_regions[player].append('Hyrule Castle Ledge')
         world.inaccessible_regions[player].append('Sewer Drop')
