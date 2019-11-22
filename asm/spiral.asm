@@ -107,8 +107,10 @@ LookupSpiralOffset: {
     inc $01 : bra .done
     .quad2
     lda #$03 : sta $01 : lda $a2
-    cmp #$5f : bne .done ;ice u room
-    lda $22 : cmp #$78 : bcc .done
+    cmp #$5f : beq .iceu ;ice u room
+    cmp #$3f : bne .done ;hammer ice exception
+    stz $01 : bra .done
+    .iceu lda $22 : cmp #$78 : bcc .done
     inc $01 : bra .done
     .quad3 lda #$02 : sta $01 ; always 2
 

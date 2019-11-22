@@ -12,7 +12,7 @@ from Dungeons import dungeon_regions, region_starts, split_region_starts, dungeo
 from Dungeons import drop_entrances
 from RoomData import DoorKind, PairedDoor
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon
-from KeyDoorShuffle import analyze_dungeon
+from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic
 
 
 def link_doors(world, player):
@@ -125,10 +125,15 @@ def vanilla_key_logic(world, player):
         valid = validate_key_layout(key_layout, world, player)
         if not valid:
             raise Exception('Vanilla key layout not valid %s' % sector.name)
-        analyze_dungeon(key_layout, world, player)
         if player not in world.key_logic.keys():
             world.key_logic[player] = {}
-        world.key_logic[player][sector.name] = key_layout.key_logic
+        if sector.name in ['Agahnims Tower', 'Tower of Hera', 'Desert Palace', 'Eastern Palace']:
+            key_layout_2 = KeyLayout(sector, start_regions, doors)
+            key_layout_2 = analyze_dungeon(key_layout_2, world, player)
+            world.key_logic[player][sector.name] = key_layout_2.key_logic
+        else:
+            world.key_logic[player][sector.name] = key_layout.key_logic
+    validate_vanilla_key_logic(world, player)
 
 
 # some useful functions
