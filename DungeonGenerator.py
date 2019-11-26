@@ -24,17 +24,20 @@ class GraphPiece:
         self.hanger_crystal = None
         self.hooks = {}
         self.visited_regions = set()
+        self.possible_bk_locations = set()
 
 
-def generate_dungeon(available_sectors, entrance_region_names, world, player):
+def generate_dungeon(available_sectors, entrance_region_names, split_dungeon, world, player):
     logger = logging.getLogger('')
     entrance_regions = convert_regions(entrance_region_names, world, player)
     doors_to_connect = set()
     all_regions = set()
+    bk_needed = False
     for sector in available_sectors:
         for door in sector.outstanding_doors:
             doors_to_connect.add(door)
         all_regions.update(sector.regions)
+        bk_needed = bk_needed or determine_if_bk_needed(sector, split_dungeon, world, player)
     proposed_map = {}
     choices_master = [[]]
     depth = 0
@@ -51,7 +54,7 @@ def generate_dungeon(available_sectors, entrance_region_names, world, player):
         if depth not in dungeon_cache.keys():
             dungeon, hangers, hooks = gen_dungeon_info(available_sectors, entrance_regions, proposed_map, doors_to_connect, world, player)
             dungeon_cache[depth] = dungeon, hangers, hooks
-            valid = check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions)
+            valid = check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed)
         else:
             dungeon, hangers, hooks = dungeon_cache[depth]
             valid = True
@@ -96,10 +99,20 @@ def generate_dungeon(available_sectors, entrance_region_names, world, player):
     return master_sector
 
 
+def determine_if_bk_needed(sector, split_dungeon, world, player):
+    if not split_dungeon:
+        for region in sector.regions:
+            for ext in region.exits:
+                door = world.check_for_door(ext.name, player)
+                if door is not None and door.bigKey:
+                    return True
+    return False
+
+
 def gen_dungeon_info(available_sectors, entrance_regions, proposed_map, valid_doors, world, player):
     # step 1 create dungeon: Dict<DoorName|Origin, GraphPiece>
     dungeon = {}
-    original_state = extend_reachable_state_improved(entrance_regions, ExplorationState(), proposed_map, valid_doors, True, world, player)
+    original_state = extend_reachable_state_improved(entrance_regions, ExplorationState(), proposed_map, valid_doors, world, player)
     dungeon['Origin'] = create_graph_piece_from_state(None, original_state, original_state, proposed_map)
     doors_to_connect = set()
     hanger_set = set()
@@ -110,7 +123,7 @@ def gen_dungeon_info(available_sectors, entrance_regions, proposed_map, valid_do
             if not door.stonewall and door not in proposed_map.keys():
                 hanger_set.add(door)
                 parent = parent_region(door, world, player).parent_region
-                o_state = extend_reachable_state_improved([parent], ExplorationState(), proposed_map, valid_doors, False, world, player)
+                o_state = extend_reachable_state_improved([parent], ExplorationState(), proposed_map, valid_doors, world, player)
                 o_state_cache[door.name] = o_state
                 piece = create_graph_piece_from_state(door, o_state, o_state, proposed_map)
                 dungeon[door.name] = piece
@@ -170,7 +183,7 @@ def check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_do
 def explore_blue_state(door, dungeon, o_state, proposed_map, valid_doors, world, player):
     parent = parent_region(door, world, player).parent_region
     blue_start = ExplorationState(CrystalBarrier.Blue)
-    b_state = extend_reachable_state_improved([parent], blue_start, proposed_map, valid_doors, False, world, player)
+    b_state = extend_reachable_state_improved([parent], blue_start, proposed_map, valid_doors, world, player)
     dungeon[door.name] = create_graph_piece_from_state(door, o_state, b_state, proposed_map)
 
 
@@ -231,7 +244,7 @@ def filter_choices(next_hanger, door, orig_hang, prev_choices, hook_candidates):
     return next_hanger != door and orig_hang != next_hanger and door not in hook_candidates
 
 
-def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions):
+def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed):
     # evaluate if everything is still plausible
 
     # only origin is left in the dungeon and not everything is connected
@@ -265,9 +278,14 @@ def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_reg
         if len(outstanding_doors[key]) > 0 and len(hangers[key]) == 0 and len(hooks[opp_key]) == 0:
             return False
     all_visited = set()
+    bk_possible = not bk_needed
     for piece in dungeon.values():
         all_visited.update(piece.visited_regions)
+        if not bk_possible and len(piece.possible_bk_locations) > 0:
+            bk_possible = True
     if len(all_regions.difference(all_visited)) > 0:
+        return False
+    if not bk_possible:
         return False
     new_hangers_found = True
     accessible_hook_types = []
@@ -346,7 +364,13 @@ def create_graph_piece_from_state(door, o_state, b_state, proposed_map):
     graph_piece.visited_regions.update(o_state.visited_orange)
     graph_piece.visited_regions.update(b_state.visited_blue)
     graph_piece.visited_regions.update(b_state.visited_orange)
+    graph_piece.possible_bk_locations.update(filter_for_potential_bk_locations(o_state.bk_found))
+    graph_piece.possible_bk_locations.update(filter_for_potential_bk_locations(b_state.bk_found))
     return graph_piece
+
+
+def filter_for_potential_bk_locations(locations):
+    return [x for x in locations if '- Big Chest' not in x.name and '- Prize' not in x.name and x.name not in dungeon_events and x.name not in key_only_locations.keys()]
 
 
 def parent_region(door, world, player):
@@ -496,6 +520,7 @@ class ExplorationState(object):
         self.used_locations = 0
         self.key_locations = 0
         self.used_smalls = 0
+        self.bk_found = set()
 
         self.non_door_entrances = []
 
@@ -520,6 +545,7 @@ class ExplorationState(object):
         ret.used_locations = self.used_locations
         ret.used_smalls = self.used_smalls
         ret.found_locations = list(self.found_locations)
+        ret.bk_found = set(self.bk_found)
 
         ret.non_door_entrances = list(self.non_door_entrances)
         return ret
@@ -529,7 +555,7 @@ class ExplorationState(object):
         self.crystal = exp_door.crystal
         return exp_door
 
-    def visit_region(self, region, key_region=None, key_checks=False):
+    def visit_region(self, region, key_region=None, key_checks=False, bk_Flag=False):
         if self.crystal == CrystalBarrier.Either:
             if region not in self.visited_blue:
                 self.visited_blue.append(region)
@@ -547,6 +573,8 @@ class ExplorationState(object):
                     self.ttl_locations += 1
             if location not in self.found_locations:
                 self.found_locations.append(location)
+                if not bk_Flag:
+                    self.bk_found.add(location)
             if location.name in dungeon_events and location.name not in self.events:
                 if self.flooded_key_check(location):
                     self.perform_event(location.name, key_region)
@@ -607,22 +635,22 @@ class ExplorationState(object):
                 elif not self.in_door_list(door, self.avail_doors):
                     self.append_door_to_list(door, self.avail_doors)
 
-    def add_all_doors_check_proposed(self, region, proposed_map, valid_doors, isOrigin, world, player):
+    def add_all_doors_check_proposed(self, region, proposed_map, valid_doors, flag, world, player):
         for door in get_doors(world, region, player):
-            if self.can_traverse_bk_check(door, isOrigin):
+            if self.can_traverse(door):
                 if door.controller is not None:
                     door = door.controller
                 if door.dest is None and door not in proposed_map.keys() and door in valid_doors:
                     if not self.in_door_list_ic(door, self.unattached_doors):
-                        self.append_door_to_list(door, self.unattached_doors)
+                        self.append_door_to_list(door, self.unattached_doors, flag)
                     else:
                         other = self.find_door_in_list(door, self.unattached_doors)
                         if self.crystal != other.crystal:
                             other.crystal = CrystalBarrier.Either
                 elif door.req_event is not None and door.req_event not in self.events and not self.in_door_list(door, self.event_doors):
-                    self.append_door_to_list(door, self.event_doors)
+                    self.append_door_to_list(door, self.event_doors, flag)
                 elif not self.in_door_list(door, self.avail_doors):
-                    self.append_door_to_list(door, self.avail_doors)
+                    self.append_door_to_list(door, self.avail_doors, flag)
 
     def add_all_doors_check_key_region(self, region, key_region, world, player):
         for door in get_doors(world, region, player):
@@ -676,8 +704,15 @@ class ExplorationState(object):
             return False
         if door.crystal not in [CrystalBarrier.Null, CrystalBarrier.Either]:
             return self.crystal == CrystalBarrier.Either or door.crystal == self.crystal
-        return not isOrigin or not door.bigKey or len(self.found_locations) > 0
+        return not isOrigin or not door.bigKey or self.count_locations_exclude_specials() > 0
         # return not door.bigKey or len([x for x in self.found_locations if '- Prize' not in x.name]) > 0
+
+    def count_locations_exclude_specials(self):
+        cnt = 0
+        for loc in self.found_locations:
+            if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc.name not in dungeon_events and loc.name not in key_only_locations.keys():
+                cnt += 1
+        return cnt
 
     def validate(self, door, region, world, player):
         return self.can_traverse(door) and not self.visited(region) and valid_region_to_explore(region, world, player)
@@ -702,11 +737,11 @@ class ExplorationState(object):
                 return d
         return None
 
-    def append_door_to_list(self, door, door_list):
+    def append_door_to_list(self, door, door_list, flag=False):
         if door.crystal == CrystalBarrier.Null:
-            door_list.append(ExplorableDoor(door, self.crystal))
+            door_list.append(ExplorableDoor(door, self.crystal, flag))
         else:
-            door_list.append(ExplorableDoor(door, door.crystal))
+            door_list.append(ExplorableDoor(door, door.crystal, flag))
 
     def key_door_sort(self, d):
         if d.door.smallKey:
@@ -719,9 +754,10 @@ class ExplorationState(object):
 
 class ExplorableDoor(object):
 
-    def __init__(self, door, crystal):
+    def __init__(self, door, crystal, flag):
         self.door = door
         self.crystal = crystal
+        self.flag = flag
 
     def __str__(self):
         return str(self.__unicode__())
@@ -745,11 +781,11 @@ def extend_reachable_state(search_regions, state, world, player):
     return local_state
 
 
-def extend_reachable_state_improved(search_regions, state, proposed_map, valid_doors, isOrigin, world, player):
+def extend_reachable_state_improved(search_regions, state, proposed_map, valid_doors, world, player):
     local_state = state.copy()
     for region in search_regions:
         local_state.visit_region(region)
-        local_state.add_all_doors_check_proposed(region, proposed_map, valid_doors, isOrigin, world, player)
+        local_state.add_all_doors_check_proposed(region, proposed_map, valid_doors, False, world, player)
     while len(local_state.avail_doors) > 0:
         explorable_door = local_state.next_avail_door()
         if explorable_door.door in proposed_map:
@@ -758,8 +794,9 @@ def extend_reachable_state_improved(search_regions, state, proposed_map, valid_d
             connect_region = world.get_entrance(explorable_door.door.name, player).connected_region
         if connect_region is not None:
             if valid_region_to_explore(connect_region, world, player) and not local_state.visited(connect_region):
-                local_state.visit_region(connect_region)
-                local_state.add_all_doors_check_proposed(connect_region, proposed_map, valid_doors, isOrigin, world, player)
+                flag = explorable_door.flag or explorable_door.door.bigKey
+                local_state.visit_region(connect_region, bk_Flag=flag)
+                local_state.add_all_doors_check_proposed(connect_region, proposed_map, valid_doors, flag, world, player)
     return local_state
 
 

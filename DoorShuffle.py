@@ -127,12 +127,9 @@ def vanilla_key_logic(world, player):
             raise Exception('Vanilla key layout not valid %s' % sector.name)
         if player not in world.key_logic.keys():
             world.key_logic[player] = {}
-        if sector.name in ['Agahnims Tower', 'Tower of Hera', 'Desert Palace', 'Eastern Palace']:
-            key_layout_2 = KeyLayout(sector, start_regions, doors)
-            key_layout_2 = analyze_dungeon(key_layout_2, world, player)
-            world.key_logic[player][sector.name] = key_layout_2.key_logic
-        else:
-            world.key_logic[player][sector.name] = key_layout.key_logic
+        key_layout_2 = KeyLayout(sector, start_regions, doors)
+        key_layout_2 = analyze_dungeon(key_layout_2, world, player)
+        world.key_logic[player][sector.name] = key_layout_2.key_logic
     validate_vanilla_key_logic(world, player)
 
 
@@ -297,16 +294,17 @@ def within_dungeon(world, player):
     last_key = None
     while len(sector_queue) > 0:
         key, sector_list, entrance_list = sector_queue.popleft()
+        split_dungeon = key in split_region_starts.keys()
         origin_list = list(entrance_list)
         find_enabled_origins(sector_list, enabled_entrances, origin_list, entrances_map, key)
         origin_list_sans_drops = remove_drop_origins(origin_list)
-        if len(origin_list) <= 0:
+        if len(origin_list_sans_drops) <= 0:
             if last_key == key:
                 raise Exception('Infinte loop detected %s' % key)
             sector_queue.append((key, sector_list, entrance_list))
             last_key = key
         else:
-            ds = generate_dungeon(sector_list, origin_list_sans_drops, world, player)
+            ds = generate_dungeon(sector_list, origin_list_sans_drops, split_dungeon, world, player)
             find_new_entrances(ds, connections, potentials, enabled_entrances, world, player)
             ds.name = key
             layout_starts = origin_list if len(entrance_list) <= 0 else entrance_list
@@ -340,7 +338,7 @@ def determine_entrance_list(world, player):
             for ent in region.entrances:
                 parent = ent.parent_region
                 if parent.type != RegionType.Dungeon or parent.name == 'Sewer Drop':
-                    if parent.name not in world.inaccessible_regions[player] or drop_exception(region_name):
+                    if parent.name not in world.inaccessible_regions[player]:
                         entrance_map[key].append(region_name)
                     else:
                         if ent.parent_region not in potential_entrances.keys():
@@ -366,8 +364,11 @@ def find_enabled_origins(sectors, enabled, entrance_list, entrance_map, key):
         for region in sector.regions:
             if region.name in enabled.keys() and region.name not in entrance_list:
                 entrance_list.append(region.name)
-                if enabled[region.name] != region.name:
+                origin_reg, origin_dungeon = enabled[region.name]
+                if origin_reg != region.name and origin_dungeon != region.dungeon:
                     entrance_map[key].append(region.name)
+            if drop_exception(region.name):  # only because they have unique regions
+                entrance_list.append(region.name)
 
 
 def remove_drop_origins(entrance_list):
@@ -379,7 +380,7 @@ def find_new_entrances(sector, connections, potentials, enabled, world, player):
         if region.name in connections.keys() and connections[region.name] in potentials.keys():
             new_region = connections[region.name]
             for potential in potentials.pop(new_region):
-                enabled[potential] = region.name
+                enabled[potential] = (region.name, region.dungeon)
             # see if this unexplored region connects elsewhere
             queue = collections.deque(new_region.exits)
             visited = set()
@@ -389,7 +390,7 @@ def find_new_entrances(sector, connections, potentials, enabled, world, player):
                 region_name = ext.connected_region.name
                 if region_name in connections.keys() and connections[region_name] in potentials.keys():
                     for potential in potentials.pop(connections[region_name]):
-                        enabled[potential] = region.name
+                        enabled[potential] = (region.name, region.dungeon)
                 if ext.connected_region.name in world.inaccessible_regions[player]:
                     for new_exit in ext.connected_region.exits:
                         if new_exit not in visited:
@@ -527,6 +528,7 @@ def find_compatible_door_in_regions(world, door, regions, player):
             if doors_compatible(door, proposed_door):
                 return region, proposed_door
     return None, None
+
 
 def find_compatible_door_in_list(ugly_regions, world, door, doors, player):
     if door.type in [DoorType.Hole, DoorType.Warp, DoorType.Logical]:
@@ -877,8 +879,30 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
     # make changes
     if player not in world.key_logic.keys():
         world.key_logic[player] = {}
-    world.key_logic[player][dungeon_sector.name] = key_layout.key_logic
+    key_layout_new = analyze_dungeon(key_layout, world, player)
     reassign_key_doors(current_doors, proposal, world, player)
+    log_key_logic(dungeon_sector.name, key_layout_new.key_logic)
+    world.key_logic[player][dungeon_sector.name] = key_layout_new.key_logic
+
+
+def log_key_logic(d_name, key_logic):
+    logger = logging.getLogger('')
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug('Key Logic for %s', d_name)
+        if len(key_logic.bk_restricted) > 0:
+            logger.debug('-BK Restrictions')
+            for restriction in key_logic.bk_restricted:
+                logger.debug(restriction)
+        if len(key_logic.sm_restricted) > 0:
+            logger.debug('-Small Restrictions')
+            for restriction in key_logic.sm_restricted:
+                logger.debug(restriction)
+        for key in key_logic.door_rules.keys():
+            rule = key_logic.door_rules[key]
+            logger.debug('--Rule for %s: Nrm:%s Allow:%s Loc:%s Alt:%s', key, rule.small_key_num, rule.allow_small, rule.small_location, rule.alternate_small_key)
+            if rule.alternate_small_key is not None:
+                for loc in rule.alternate_big_key_loc:
+                    logger.debug('---BK Loc %s', loc.name)
 
 
 class KeyLayout(object):
@@ -1792,7 +1816,7 @@ interior_doors = [
     ('Skull East Bridge ES', 'Skull West Bridge Nook WS'),
     ('Skull Star Pits WS', 'Skull Torch Room ES'),
     ('Skull Torch Room EN', 'Skull Vines WN'),
-    ('Skull Spike Corner WS', 'Skull Final Drop ES'),
+    ('Skull Spike Corner ES', 'Skull Final Drop WS'),
     ('Thieves Hallway WS', 'Thieves Pot Alcove Mid ES'),
     ('Thieves Conveyor Maze SW', 'Thieves Pot Alcove Top NW'),
     ('Thieves Conveyor Maze EN', 'Thieves Hallway WN'),
@@ -1943,7 +1967,7 @@ default_small_key_doors = {
         ('Skull Map Room SE', 'Skull Pinball NE'),
         ('Skull 2 West Lobby NW', 'Skull X Room SW'),
         ('Skull 3 Lobby NW', 'Skull Star Pits SW'),
-        ('Skull Spike Corner WS', 'Skull Final Drop ES')
+        ('Skull Spike Corner ES', 'Skull Final Drop WS')
     ],
     'Thieves Town': [
         ('Thieves Hallway WS', 'Thieves Pot Alcove Mid ES'),

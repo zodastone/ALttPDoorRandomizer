@@ -265,8 +265,6 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Eastern Map Balcony Hook Path', player), lambda state: state.has('Hookshot', player))
     # Big key rules
     set_rule(world.get_location('Eastern Palace - Big Chest', player), lambda state: state.has('Big Key (Eastern Palace)', player))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Eastern Palace - Big Chest', player), 'Big Key (Eastern Palace)', player)
     set_rule(world.get_entrance('Eastern Big Key NE', player), lambda state: state.has('Big Key (Eastern Palace)', player))
     set_rule(world.get_entrance('Eastern Courtyard N', player), lambda state: state.has('Big Key (Eastern Palace)', player))
 
@@ -276,8 +274,6 @@ def global_rules(world, player):
 
     # Desert
     set_rule(world.get_location('Desert Palace - Big Chest', player), lambda state: state.has('Big Key (Desert Palace)', player))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Desert Palace - Big Chest', player), 'Big Key (Desert Palace)', player)
     set_rule(world.get_location('Desert Palace - Torch', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('Desert Wall Slide NW', player), lambda state: state.has_fire_source(player))
     set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Prize', player))
@@ -285,8 +281,6 @@ def global_rules(world, player):
 
     # Tower of Hera
     set_rule(world.get_location('Tower of Hera - Big Chest', player), lambda state: state.has('Big Key (Tower of Hera)', player))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Tower of Hera - Big Chest', player), 'Big Key (Tower of Hera)', player)
     set_rule(world.get_location('Tower of Hera - Big Key Chest', player), lambda state: state.has_fire_source(player))
     set_rule(world.get_entrance('Hera Startile Corner NW', player), lambda state: state.has('Big Key (Tower of Hera)', player))
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Boss', player))
@@ -299,8 +293,6 @@ def global_rules(world, player):
     set_rule(world.get_entrance('PoD Bow Statue Down Ladder', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Dark Alley NE', player), lambda state: state.has('Big Key (Palace of Darkness)', player))
     set_rule(world.get_location('Palace of Darkness - Big Chest', player), lambda state: state.has('Big Key (Palace of Darkness)', player))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Palace of Darkness - Big Chest', player), 'Big Key (Palace of Darkness)', player)
     set_rule(world.get_entrance('PoD Map Balcony Drop Down', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('PoD Dark Pegs WN', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('PoD Dark Pegs Up Ladder', player), lambda state: state.has('Hammer', player))
@@ -336,15 +328,11 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Swamp Waterway NE', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_location('Swamp Palace - Waterway Pot Key', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_location('Swamp Palace - Big Chest', player), lambda state: state.has('Big Key (Swamp Palace)', player))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Swamp Palace - Big Chest', player), 'Big Key (Swamp Palace)', player)
     set_defeat_dungeon_boss_rule(world.get_location('Swamp Palace - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Swamp Palace - Prize', player))
 
     set_rule(world.get_entrance('Skull Big Chest Hookpath', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_location('Skull Woods - Big Chest', player), lambda state: state.has('Big Key (Skull Woods)', player))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Skull Woods - Big Chest', player), 'Big Key (Skull Woods)', player)
     set_rule(world.get_entrance('Skull Torch Room EN', player), lambda state: state.has('Fire Rod', player))
     set_rule(world.get_entrance('Skull Vines NW', player), lambda state: state.has_sword(player))
     set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Boss', player))
@@ -353,8 +341,6 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Thieves BK Corner NE', player), lambda state: state.has('Big Key (Thieves Town)', player))
     # blind can't have the small key? - not necessarily true anymore - but likely still
     set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: (state.has('Big Key (Thieves Town)', player) and state.has('Hammer', player)))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Thieves\' Town - Big Chest', player), 'Big Key (Thieves Town)', player)
     for entrance in ['Thieves Basement Block Path', 'Thieves Blocked Entry Path', 'Thieves Conveyor Block Path', 'Thieves Conveyor Bridge Block Path']:
         set_rule(world.get_entrance(entrance, player), lambda state: state.can_lift_rocks(player))
     for location in ['Thieves\' Town - Blind\'s Cell', 'Thieves\' Town - Boss']:
@@ -368,8 +354,6 @@ def global_rules(world, player):
 
     set_rule(world.get_entrance('Ice Lobby WS', player), lambda state: state.can_melt_things(player))
     set_rule(world.get_location('Ice Palace - Big Chest', player), lambda state: state.has('Big Key (Ice Palace)', player))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Ice Palace - Big Chest', player), 'Big Key (Ice Palace)', player)
     set_rule(world.get_entrance('Ice Hammer Block ES', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
     set_rule(world.get_location('Ice Palace - Hammer Block Key Drop', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
     set_rule(world.get_location('Ice Palace - Map Chest', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
@@ -390,8 +374,6 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Mire Falling Bridge WN', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))  # this is due to the fact the the door opposite is blocked
     set_rule(world.get_entrance('Mire 2 NE', player), lambda state: state.has_sword(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Hammer', player) or state.has('Cane of Somaria', player) or state.can_shoot_arrows(player))  # need to defeat wizzrobes, bombs don't work ...
     set_rule(world.get_location('Misery Mire - Big Chest', player), lambda state: state.has('Big Key (Misery Mire)', player) and (state.has_Boots(player) or state.has('Hookshot', player)))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Misery Mire - Big Chest', player), 'Big Key (Misery Mire)', player)
     set_rule(world.get_location('Misery Mire - Spike Chest', player), lambda state: (state.world.can_take_damage and state.has_hearts(player, 4)) or state.has('Cane of Byrna', player) or state.has('Cape', player))
     set_rule(world.get_entrance('Mire BK Door Room N', player), lambda state: state.has('Big Key (Misery Mire)', player))
     set_rule(world.get_entrance('Mire Square Rail NW', player), lambda state: state.has('Big Key (Misery Mire)', player))
@@ -413,8 +395,6 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Hub NE', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Torches NW', player), lambda state: state.has('Cane of Somaria', player) and state.has('Fire Rod', player))
     set_rule(world.get_location('Turtle Rock - Big Chest', player), lambda state: state.has('Big Key (Turtle Rock)', player))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Turtle Rock - Big Chest', player), 'Big Key (Turtle Rock)', player)
     set_rule(world.get_entrance('TR Big Chest Entrance Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('TR Big Chest Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('TR Dodgers NE', player), lambda state: state.has('Big Key (Turtle Rock)', player))
@@ -443,8 +423,6 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Firesnake Room Hook Path', player), lambda state: state.has('Hookshot', player))
     # I am tempted to stick an invincibility rule for getting across falling bridge
     set_rule(world.get_location('Ganons Tower - Big Chest', player), lambda state: state.has('Big Key (Ganons Tower)', player))
-    if world.accessibility == 'locations':
-        forbid_item(world.get_location('Ganons Tower - Big Chest', player), 'Big Key (Ganons Tower)', player)
     set_rule(world.get_entrance('GT Ice Armos NE', player), lambda state: world.get_region('GT Ice Armos', player).dungeon.bosses['bottom'].can_defeat(state))
     set_rule(world.get_entrance('GT Ice Armos WS', player), lambda state: world.get_region('GT Ice Armos', player).dungeon.bosses['bottom'].can_defeat(state))
 
@@ -1700,12 +1678,10 @@ def set_inverted_bunny_rules(world, player):
 
 
 def add_key_logic_rules(world, player):
-    logger = logging.getLogger('')
     key_logic = world.key_logic[player]
     for d_name, d_logic in key_logic.items():
         for door_name, keys in d_logic.door_rules.items():
-            logger.debug('  %s needs %s keys', door_name, keys)
-            add_rule(world.get_entrance(door_name, player), create_key_rule(d_logic.small_key_name, player, keys))
+            add_rule(world.get_entrance(door_name, player), create_advanced_key_rule(d_logic, player, keys))
         for location in d_logic.bk_restricted:
             if location.name not in key_only_locations.keys():
                 forbid_item(location, d_logic.bk_name, player)
@@ -1717,5 +1693,31 @@ def create_key_rule(small_key_name, player, keys):
     return lambda state: state.has_key(small_key_name, player, keys)
 
 
-def create_forced_small_rule(small_key_name, player):
-    return lambda item: item.name == small_key_name and item.player == player
+def create_key_rule_allow_small(small_key_name, player, keys, location):
+    loc = location.name
+    return lambda state: state.has_key(small_key_name, player, keys) or (item_name(state, loc, player) in [(small_key_name, player)] and state.has_key(small_key_name, player, keys-1))
+
+
+def create_key_rule_bk_exception(small_key_name, big_key_name, player, keys, bk_keys, bk_locs):
+    chest_names = [x.name for x in bk_locs]
+    return lambda state: state.has_key(small_key_name, player, keys) or (item_in_locations(state, big_key_name, player, zip(chest_names, [player] * len(chest_names))) and state.has_key(small_key_name, player, bk_keys))
+
+
+def create_key_rule_bk_exception_or_allow(small_key_name, big_key_name, player, keys, location, bk_keys, bk_locs):
+    loc = location.name
+    chest_names = [x.name for x in bk_locs]
+    return lambda state: state.has_key(small_key_name, player, keys) or (item_name(state, loc, player) in [(small_key_name, player)] and state.has_key(small_key_name, player, keys-1)) or (item_in_locations(state, big_key_name, player, zip(chest_names, [player] * len(chest_names))) and state.has_key(small_key_name, player, bk_keys))
+
+
+def create_advanced_key_rule(key_logic, player, rule):
+    if not rule.allow_small and rule.alternate_small_key is None:
+        return create_key_rule(key_logic.small_key_name, player, rule.small_key_num)
+    if rule.allow_small and rule.alternate_small_key is None:
+        return create_key_rule_allow_small(key_logic.small_key_name, player, rule.small_key_num, rule.small_location)
+    if not rule.allow_small and rule.alternate_small_key is not None:
+        return create_key_rule_bk_exception(key_logic.small_key_name, key_logic.bk_name, player, rule.small_key_num,
+                                            rule.alternate_small_key, rule.alternate_big_key_loc)
+    if rule.allow_small and rule.alternate_small_key is not None:
+        return create_key_rule_bk_exception_or_allow(key_logic.small_key_name, key_logic.bk_name, player,
+                                                     rule.small_key_num, rule.small_location, rule.alternate_small_key,
+                                                     rule.alternate_big_key_loc)

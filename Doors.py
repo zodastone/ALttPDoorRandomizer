@@ -524,8 +524,8 @@ def create_doors(world, player):
         create_door(player, 'Skull Vines WN', Intr).dir(We, 0x49, Top, High).pos(1),
         create_door(player, 'Skull Vines NW', Nrml).dir(No, 0x49, Left, High).pos(0),
         create_door(player, 'Skull Spike Corner SW', Nrml).dir(So, 0x39, Left, High).no_exit().trap(0x4).pos(0),
-        create_door(player, 'Skull Spike Corner WS', Intr).dir(We, 0x39, Bot, High).small_key().pos(1),
-        create_door(player, 'Skull Final Drop ES', Intr).dir(Ea, 0x39, Bot, High).small_key().pos(1),
+        create_door(player, 'Skull Spike Corner ES', Intr).dir(Ea, 0x39, Bot, High).small_key().pos(1),
+        create_door(player, 'Skull Final Drop WS', Intr).dir(We, 0x39, Bot, High).small_key().pos(1),
         create_door(player, 'Skull Final Drop Hole', Hole),
 
         create_door(player, 'Thieves Lobby N Edge', Open).dir(No, 0xdb, None, Low),
@@ -984,7 +984,7 @@ def create_doors(world, player):
         create_door(player, 'GT Four Torches NW', Intr).dir(No, 0x1c, Left, High).pos(2),
         create_door(player, 'GT Fairy Abyss SW', Intr).dir(So, 0x1c, Left, High).pos(2),
         create_door(player, 'GT Four Torches Up Stairs', Sprl).dir(Up, 0x1c, 0, HTH).ss(Z, 0x1b, 0x2c, True, True),
-        create_door(player, 'GT Crystal Paths Down Stairs', Sprl).dir(Dn, 0x6b, 0, HTH).ss(A, 0x12, 0x00, True),
+        create_door(player, 'GT Crystal Paths Down Stairs', Sprl).dir(Dn, 0x6b, 0, HTH).ss(A, 0x12, 0x00, False, True),
         create_door(player, 'GT Crystal Paths SW', Intr).dir(So, 0x6b, Left, High).pos(3),
         create_door(player, 'GT Mimics 1 NW', Intr).dir(No, 0x6b, Left, High).pos(3),
         create_door(player, 'GT Mimics 1 ES', Intr).dir(Ea, 0x6b, Bot, High).pos(2),
@@ -1044,7 +1044,7 @@ def create_doors(world, player):
         create_door(player, 'GT Right Moldorm Ledge Down Stairs', Sprl).dir(Dn, 0x4d, 0, HTH).ss(S, 0x12, 0x80),
         create_door(player, 'GT Moldorm Pit Up Stairs', Sprl).dir(Up, 0xa6, 0, HTH).ss(S, 0x1b, 0x6c),
         create_door(player, 'GT Frozen Over ES', Nrml).dir(Ea, 0x4c, Bot, High).trap(0x4).pos(0),
-        create_door(player, 'GT Frozen Over Up Stairs', Sprl).dir(Up, 0x4c, 0, HTH).ss(S, 0x1a, 0x6c, False, True),
+        create_door(player, 'GT Frozen Over Up Stairs', Sprl).dir(Up, 0x4c, 0, HTH).ss(S, 0x1a, 0x6c, True),
         create_door(player, 'GT Brightly Lit Hall Down Stairs', Sprl).dir(Dn, 0x1d, 0, HTH).ss(S, 0x11, 0x80, False, True),
         create_door(player, 'GT Brightly Lit Hall NW', Nrml).dir(No, 0x1d, Left, High).big_key().pos(0),
         create_door(player, 'GT Agahnim 2 SW', Nrml).dir(So, 0x0d, Left, High).no_exit().trap(0x4).pos(0)

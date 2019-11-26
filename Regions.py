@@ -438,8 +438,8 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Skull Star Pits', 'Skull Woods', None, ['Skull Star Pits SW', 'Skull Star Pits WS']),
         create_dungeon_region(player, 'Skull Torch Room', 'Skull Woods', None, ['Skull Torch Room ES', 'Skull Torch Room EN']),
         create_dungeon_region(player, 'Skull Vines', 'Skull Woods', None, ['Skull Vines WN', 'Skull Vines NW']),
-        create_dungeon_region(player, 'Skull Spike Corner', 'Skull Woods', ['Skull Woods - Spike Corner Key Drop'], ['Skull Spike Corner SW', 'Skull Spike Corner WS']),
-        create_dungeon_region(player, 'Skull Final Drop', 'Skull Woods', None, ['Skull Final Drop ES', 'Skull Final Drop Hole']),
+        create_dungeon_region(player, 'Skull Spike Corner', 'Skull Woods', ['Skull Woods - Spike Corner Key Drop'], ['Skull Spike Corner SW', 'Skull Spike Corner ES']),
+        create_dungeon_region(player, 'Skull Final Drop', 'Skull Woods', None, ['Skull Final Drop WS', 'Skull Final Drop Hole']),
         create_dungeon_region(player, 'Skull Boss', 'Skull Woods', ['Skull Woods - Boss', 'Skull Woods - Prize']),
 
         # tt
