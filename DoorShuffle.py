@@ -1565,7 +1565,8 @@ logical_connections = [
     ('GT Firesnake Room Hook Path', 'GT Firesnake Room Ledge'),
     ('GT Left Moldorm Ledge Drop Down', 'GT Moldorm'),
     ('GT Right Moldorm Ledge Drop Down', 'GT Moldorm'),
-    ('GT Moldorm Gap', 'GT Validation')
+    ('GT Moldorm Gap', 'GT Validation'),
+    ('GT Validation Block Path', 'GT Validation Door')
 ]
 
 vanilla_logical_connections = [

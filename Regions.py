@@ -698,7 +698,8 @@ def create_regions(world, player):
         create_dungeon_region(player, 'GT Right Moldorm Ledge', 'Ganon\'s Tower', None, ['GT Right Moldorm Ledge Down Stairs', 'GT Right Moldorm Ledge Drop Down']),
         create_dungeon_region(player, 'GT Moldorm', 'Ganon\'s Tower', None, ['GT Moldorm Hole', 'GT Moldorm Gap']),
         create_dungeon_region(player, 'GT Moldorm Pit', 'Ganon\'s Tower', None, ['GT Moldorm Pit Up Stairs']),
-        create_dungeon_region(player, 'GT Validation', 'Ganon\'s Tower', ['Ganons Tower - Validation Chest'], ['GT Validation WS']),
+        create_dungeon_region(player, 'GT Validation', 'Ganon\'s Tower', ['Ganons Tower - Validation Chest'], ['GT Validation Block Path']),
+        create_dungeon_region(player, 'GT Validation Door', 'Ganon\'s Tower', None, ['GT Validation WS']),
         create_dungeon_region(player, 'GT Frozen Over', 'Ganon\'s Tower', None, ['GT Frozen Over ES', 'GT Frozen Over Up Stairs']),
         create_dungeon_region(player, 'GT Brightly Lit Hall', 'Ganon\'s Tower', None, ['GT Brightly Lit Hall Down Stairs', 'GT Brightly Lit Hall NW']),
         create_dungeon_region(player, 'GT Agahnim 2', 'Ganon\'s Tower', ['Agahnim 2'], ['GT Agahnim 2 SW'])

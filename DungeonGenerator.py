@@ -251,7 +251,9 @@ def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_reg
     if len(dungeon.keys()) <= 1 and len(proposed_map.keys()) < len(doors_to_connect):
         return False
     # origin has no more hooks, but not all doors have been proposed
-    if len(dungeon['Origin'].hooks) == 0 and len(proposed_map.keys()) < len(doors_to_connect):
+    possible_bks = len(dungeon['Origin'].possible_bk_locations)
+    true_origin_hooks = [x for x in dungeon['Origin'].hooks.keys() if not x.bigKey or possible_bks > 0]
+    if len(true_origin_hooks) == 0 and len(proposed_map.keys()) < len(doors_to_connect):
         return False
     for key in hangers.keys():
         if len(hooks[key]) > 0 and len(hangers[key]) == 0:
@@ -551,6 +553,7 @@ class ExplorationState(object):
         return ret
 
     def next_avail_door(self):
+        self.avail_doors.sort(key=lambda x: 0 if x.flag else 1)
         exp_door = self.avail_doors.pop()
         self.crystal = exp_door.crystal
         return exp_door
