@@ -52,7 +52,7 @@ def generate_dungeon(available_sectors, entrance_region_names, split_dungeon, wo
         if itr > 5000:
             raise Exception('Generation taking too long. Ref %s' % entrance_region_names[0])
         if depth not in dungeon_cache.keys():
-            dungeon, hangers, hooks = gen_dungeon_info(available_sectors, entrance_regions, proposed_map, doors_to_connect, world, player)
+            dungeon, hangers, hooks = gen_dungeon_info(available_sectors, entrance_regions, proposed_map, doors_to_connect, bk_needed, world, player)
             dungeon_cache[depth] = dungeon, hangers, hooks
             valid = check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed)
         else:
@@ -109,10 +109,10 @@ def determine_if_bk_needed(sector, split_dungeon, world, player):
     return False
 
 
-def gen_dungeon_info(available_sectors, entrance_regions, proposed_map, valid_doors, world, player):
+def gen_dungeon_info(available_sectors, entrance_regions, proposed_map, valid_doors, bk_needed, world, player):
     # step 1 create dungeon: Dict<DoorName|Origin, GraphPiece>
     dungeon = {}
-    original_state = extend_reachable_state_improved(entrance_regions, ExplorationState(), proposed_map, valid_doors, world, player)
+    original_state = extend_reachable_state_improved(entrance_regions, ExplorationState(), proposed_map, valid_doors, bk_needed, world, player)
     dungeon['Origin'] = create_graph_piece_from_state(None, original_state, original_state, proposed_map)
     doors_to_connect = set()
     hanger_set = set()
@@ -123,7 +123,7 @@ def gen_dungeon_info(available_sectors, entrance_regions, proposed_map, valid_do
             if not door.stonewall and door not in proposed_map.keys():
                 hanger_set.add(door)
                 parent = parent_region(door, world, player).parent_region
-                o_state = extend_reachable_state_improved([parent], ExplorationState(), proposed_map, valid_doors, world, player)
+                o_state = extend_reachable_state_improved([parent], ExplorationState(), proposed_map, valid_doors, False, world, player)
                 o_state_cache[door.name] = o_state
                 piece = create_graph_piece_from_state(door, o_state, o_state, proposed_map)
                 dungeon[door.name] = piece
@@ -183,7 +183,7 @@ def check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_do
 def explore_blue_state(door, dungeon, o_state, proposed_map, valid_doors, world, player):
     parent = parent_region(door, world, player).parent_region
     blue_start = ExplorationState(CrystalBarrier.Blue)
-    b_state = extend_reachable_state_improved([parent], blue_start, proposed_map, valid_doors, world, player)
+    b_state = extend_reachable_state_improved([parent], blue_start, proposed_map, valid_doors, False, world, player)
     dungeon[door.name] = create_graph_piece_from_state(door, o_state, b_state, proposed_map)
 
 
@@ -234,6 +234,8 @@ def make_a_choice(dungeon, hangers, avail_hooks, prev_choices):
         if len(hook_candidates) > 0:
             hook_candidates.sort(key=lambda x: x.name)  # sort for deterministic seeds
             hook = random.choice(tuple(hook_candidates))
+        else:
+            return None, None
 
     return next_hanger, hook
 
@@ -252,7 +254,7 @@ def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_reg
         return False
     # origin has no more hooks, but not all doors have been proposed
     possible_bks = len(dungeon['Origin'].possible_bk_locations)
-    true_origin_hooks = [x for x in dungeon['Origin'].hooks.keys() if not x.bigKey or possible_bks > 0]
+    true_origin_hooks = [x for x in dungeon['Origin'].hooks.keys() if not x.bigKey or possible_bks > 0 or not bk_needed]
     if len(true_origin_hooks) == 0 and len(proposed_map.keys()) < len(doors_to_connect):
         return False
     for key in hangers.keys():
@@ -553,7 +555,7 @@ class ExplorationState(object):
         return ret
 
     def next_avail_door(self):
-        self.avail_doors.sort(key=lambda x: 0 if x.flag else 1)
+        self.avail_doors.sort(key=lambda x: 0 if x.flag else 1 if x.door.bigKey else 2)
         exp_door = self.avail_doors.pop()
         self.crystal = exp_door.crystal
         return exp_door
@@ -784,13 +786,16 @@ def extend_reachable_state(search_regions, state, world, player):
     return local_state
 
 
-def extend_reachable_state_improved(search_regions, state, proposed_map, valid_doors, world, player):
+def extend_reachable_state_improved(search_regions, state, proposed_map, valid_doors, isOrigin, world, player):
     local_state = state.copy()
     for region in search_regions:
         local_state.visit_region(region)
         local_state.add_all_doors_check_proposed(region, proposed_map, valid_doors, False, world, player)
     while len(local_state.avail_doors) > 0:
         explorable_door = local_state.next_avail_door()
+        if explorable_door.door.bigKey:
+            if isOrigin and local_state.count_locations_exclude_specials() == 0:
+                continue  # we can't open this door
         if explorable_door.door in proposed_map:
             connect_region = world.get_entrance(proposed_map[explorable_door.door].name, player).parent_region
         else:

@@ -12,7 +12,7 @@ from Dungeons import dungeon_regions, region_starts, split_region_starts, dungeo
 from Dungeons import drop_entrances
 from RoomData import DoorKind, PairedDoor
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon
-from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic
+from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, validate_key_layout_ex
 
 
 def link_doors(world, player):

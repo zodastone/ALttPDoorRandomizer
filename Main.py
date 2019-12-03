@@ -381,7 +381,7 @@ def create_playthrough(world):
         if not world.keysanity:
             state.sweep_for_events(key_only=True)
 
-        sphere = list(filter(state.can_reach, required_locations))
+        sphere = list(filter(lambda loc: state.can_reach(loc) and state.not_flooding_a_key(world, loc), required_locations))
 
         for location in sphere:
             required_locations.remove(location)

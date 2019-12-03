@@ -138,7 +138,8 @@ def analyze_dungeon(key_layout, world, player):
         key_sphere, key_counter = queue.popleft()
         chest_keys = available_chest_small_keys(key_counter, False, world)
         # chest_keys_bk = available_chest_small_keys(key_counter, True, world)
-        available = chest_keys + len(key_counter.key_only_locations) - key_counter.used_keys
+        raw_avail = chest_keys + len(key_counter.key_only_locations)
+        available = raw_avail - key_counter.used_keys
         possible_smalls = count_unique_small_doors(key_counter, key_layout.flat_prop)
         if not key_counter.big_key_opened:
             if chest_keys == count_locations_big_optional(key_counter.free_locations) and available <= possible_smalls:
@@ -167,10 +168,10 @@ def analyze_dungeon(key_layout, world, player):
                     true_min = minimal_keys
                 last_small_child = len([x for x in childqueue if not x[0].bigKey]) == 0
                 force_min = not minimal_satisfied and last_small_child
-                rule = create_rule(expanded_counter, key_layout, true_min, force_min, world)
+                rule = create_rule(expanded_counter, key_layout, true_min, force_min, raw_avail, world)
                 minimal_satisfied = minimal_satisfied or rule.small_key_num <= minimal_keys
                 check_for_self_lock_key(rule, next_sphere, key_layout, world)
-                bk_restricted_rules(rule, next_sphere, key_counter, key_layout, true_min, force_min, world)
+                bk_restricted_rules(rule, next_sphere, key_counter, key_layout, true_min, force_min, raw_avail, world)
                 key_logic.door_rules[child.name] = rule
             doors_completed.add(next_sphere.access_door)
             next_counter = increment_key_counter(child, next_sphere, key_counter, key_layout.flat_prop)
@@ -298,10 +299,12 @@ def expand_counter_to_last_door(door, key_counter, key_layout, ignored_doors):
     return new_counter
 
 
-def create_rule(key_counter, key_layout, minimal_keys, force_min, world):
+def create_rule(key_counter, key_layout, minimal_keys, force_min, prev_avail, world):
     chest_keys = available_chest_small_keys(key_counter, key_counter.big_key_opened, world)
-    available = chest_keys + len(key_counter.key_only_locations) - key_counter.used_keys
+    raw_avail = chest_keys + len(key_counter.key_only_locations)
+    available = raw_avail - key_counter.used_keys
     possible_smalls = count_unique_small_doors(key_counter, key_layout.flat_prop)
+    # key_gain = max(raw_avail - prev_avail, 0)
     required_keys = min(available, possible_smalls) + key_counter.used_keys
     if not force_min or required_keys <= minimal_keys:
         return DoorRules(required_keys)
@@ -347,11 +350,11 @@ def available_chest_small_keys(key_counter, bk, world):
         return key_counter.max_chests
 
 
-def bk_restricted_rules(rule, sphere, key_counter, key_layout, minimal_keys, force_min, world):
+def bk_restricted_rules(rule, sphere, key_counter, key_layout, minimal_keys, force_min, prev_avail, world):
     if sphere.bk_locked:
         return
     expanded_counter = expand_counter_no_big_doors(sphere.access_door, key_counter, key_layout, set())
-    bk_number = create_rule(expanded_counter, key_layout, minimal_keys, force_min, world).small_key_num
+    bk_number = create_rule(expanded_counter, key_layout, minimal_keys, force_min, prev_avail, world).small_key_num
     if bk_number == rule.small_key_num:
         return
     post_counter = KeyCounter(key_layout.max_chests)
@@ -491,6 +494,15 @@ def unique_doors(doors):
     return unique_d_set
 
 
+# does not allow dest doors
+def count_unique_doors(doors):
+    unique_d_set = set()
+    for d in doors:
+        if d not in unique_d_set and d.dest not in unique_d_set:
+            unique_d_set.add(d)
+    return len(unique_d_set)
+
+
 # doesn't count dest doors
 def count_unique_small_doors(key_counter, proposal):
     cnt = 0
@@ -545,6 +557,71 @@ def flatten_pair_list(paired_list):
 
 
 # Soft lock stuff
+def validate_key_layout_ex(key_layout, world, player):
+    key_layout = KeyLayout(key_layout.sector, key_layout.start_regions, key_layout.proposal)
+    key_layout.flat_prop = flatten_pair_list(key_layout.proposal)
+    key_layout.max_chests = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
+    counters = create_key_counters(key_layout, world, player)
+    pass
+
+
+def create_key_counters(key_layout, world, player):
+    key_counters = {}
+    flat_proposal = key_layout.flat_prop
+    state = ExplorationState()
+    state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
+    state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in key_layout.sector.regions
+    for region in key_layout.start_regions:
+        state.visit_region(region, key_checks=True)
+        state.add_all_doors_check_keys(region, flat_proposal, world, player)
+    expand_key_state(state, flat_proposal, world, player)
+    code = state_id(state, key_layout.flat_prop)
+    key_counters[code] = create_key_counter_x(state, key_layout.max_chests, world, player)
+    queue = collections.deque([(key_counters[code], state)])
+    while len(queue) > 0:
+        next_key_sphere, parent_state = queue.popleft()
+        for door in next_key_sphere.child_doors:
+            child_state = parent_state.copy()
+            # open the door
+            open_a_door(door, child_state, flat_proposal)
+            expand_key_state(child_state, flat_proposal, world, player)
+            code = state_id(child_state, key_layout.flat_prop)
+            if code not in key_counters.keys():
+                child_kr = create_key_counter_x(child_state, key_layout.max_chests, world, player)
+                key_counters[code] = child_kr
+                queue.append((child_kr, child_state))
+    return key_counters
+
+
+def create_key_counter_x(state, max_chests, world, player):
+    key_sphere = KeyCounter(max_chests)
+    key_sphere.child_doors.update(unique_doors(state.small_doors+state.big_doors))
+    for loc in state.found_locations:
+        if '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2']:
+            key_sphere.important_location = True
+        # todo: zelda's cell is special in standard, and probably crossed too
+        elif loc.name in ['Attic Cracked Floor', 'Suspicious Maiden']:
+            key_sphere.important_location = True
+        elif loc.event and 'Small Key' in loc.item.name:
+            key_sphere.key_only_locations.add(loc)
+        elif loc.name not in dungeon_events:
+            key_sphere.free_locations.add(loc)
+    key_sphere.open_doors.update(state.opened_doors)
+    key_sphere.used_keys = count_unique_doors(state.opened_doors)
+    if state.big_key_special:
+        key_sphere.big_key_opened = state.visited(world.get_region('Hyrule Dungeon Cellblock', player))
+    else:
+        key_sphere.big_key_opened = state.big_key_opened
+    return key_sphere
+
+
+def state_id(state, flat_proposal):
+    s_id = '1' if state.big_key_opened else '0'
+    for d in flat_proposal:
+        s_id += '1' if d in state.opened_doors else '0'
+    return s_id
+
+
 class SoftLockException(Exception):
     pass
 
