@@ -8,11 +8,11 @@ import time
 from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, Polarity, CrystalBarrier
 from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions, pod_regions
-from Dungeons import dungeon_regions, region_starts, split_region_starts, dungeon_keys, dungeon_bigs, flexible_starts
+from Dungeons import dungeon_regions, region_starts, split_region_starts, flexible_starts
 from Dungeons import drop_entrances
 from RoomData import DoorKind, PairedDoor
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon
-from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, validate_key_layout_ex
+from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout_ex
 
 
 def link_doors(world, player):
@@ -121,15 +121,14 @@ def vanilla_key_logic(world, player):
     for sector in sectors:
         start_regions = convert_regions(entrances_map[sector.name], world, player)
         doors = convert_key_doors(default_small_key_doors[sector.name], world, player)
-        key_layout = KeyLayout(sector, start_regions, doors)
-        valid = validate_key_layout(key_layout, world, player)
+        key_layout = build_key_layout(sector, start_regions, doors, world, player)
+        valid = validate_key_layout_ex(key_layout, world, player)
         if not valid:
             raise Exception('Vanilla key layout not valid %s' % sector.name)
         if player not in world.key_logic.keys():
             world.key_logic[player] = {}
-        key_layout_2 = KeyLayout(sector, start_regions, doors)
-        key_layout_2 = analyze_dungeon(key_layout_2, world, player)
-        world.key_logic[player][sector.name] = key_layout_2.key_logic
+        key_layout = analyze_dungeon(key_layout, world, player)
+        world.key_logic[player][sector.name] = key_layout.key_logic
     validate_vanilla_key_logic(world, player)
 
 
@@ -757,14 +756,6 @@ def shuffle_sectors(buckets, candidates):
         buckets[solution[i]].append(candidates[i])
 
 
-# def find_proposal_greedy_backtrack(bucket, candidates):
-#     choices = []
-#
-#     # todo: stick things on the queue in interesting order
-#     queue = collections.deque(candidates):
-#
-
-
 # monte carlo proposal generation
 def find_proposal_monte_carlo(proposal, buckets, candidates):
     n = len(candidates)
@@ -860,12 +851,15 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
     if len(paired_candidates) < num_key_doors:
         num_key_doors = len(paired_candidates)  # reduce number of key doors
         logger.info('Lowering key door count because not enough candidates: %s', dungeon_sector.name)
-    random.shuffle(paired_candidates)
     combinations = ncr(len(paired_candidates), num_key_doors)
     itr = 0
-    proposal = kth_combination(itr, paired_candidates, num_key_doors)
-    key_layout = KeyLayout(dungeon_sector, start_regions, proposal)
-    while not validate_key_layout(key_layout, world, player):
+    start = time.process_time()
+    sample_list = list(range(0, int(combinations)))
+    random.shuffle(sample_list)
+    proposal = kth_combination(sample_list[itr], paired_candidates, num_key_doors)
+
+    key_layout = build_key_layout(dungeon_sector, start_regions, proposal, world, player)
+    while not validate_key_layout_ex(key_layout, world, player):
         itr += 1
         if itr >= combinations:
             logger.info('Lowering key door count because no valid layouts: %s', dungeon_sector.name)
@@ -874,8 +868,11 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
                 raise Exception('Bad dungeon %s - 0 key doors not valid' % dungeon_sector.name)
             combinations = ncr(len(paired_candidates), num_key_doors)
             itr = 0
-        proposal = kth_combination(itr, paired_candidates, num_key_doors)
+        proposal = kth_combination(sample_list[itr], paired_candidates, num_key_doors)
         key_layout.reset(proposal)
+        if (itr+1) % 1000 == 0:
+            mark = time.process_time()-start
+            logger.info('%s time elapsed. %s iterations/s', mark, itr/mark)
     # make changes
     if player not in world.key_logic.keys():
         world.key_logic[player] = {}
@@ -903,33 +900,6 @@ def log_key_logic(d_name, key_logic):
             if rule.alternate_small_key is not None:
                 for loc in rule.alternate_big_key_loc:
                     logger.debug('---BK Loc %s', loc.name)
-
-
-class KeyLayout(object):
-
-    def __init__(self, sector, starts, proposal):
-        self.sector = sector
-        self.start_regions = starts
-        self.proposal = proposal
-        self.key_logic = KeyLogic(sector.name)
-        self.checked_states = {}
-
-    def reset(self, proposal):
-        self.proposal = proposal
-        self.key_logic = KeyLogic(self.sector.name)
-        self.checked_states = {}
-
-
-class KeyLogic(object):
-
-    def __init__(self, dungeon_name):
-        self.door_rules = {}
-        self.bk_restricted = []
-        self.sm_restricted = []
-        self.small_key_name = dungeon_keys[dungeon_name]
-        self.bk_name = dungeon_bigs[dungeon_name]
-        self.logic_min = {}
-        self.logic_max = {}
 
 
 def build_pair_list(flat_list):
@@ -1014,173 +984,6 @@ def ncr(n, r):
     numerator = reduce(op.mul, range(n, n-r, -1), 1)
     denominator = reduce(op.mul, range(1, r+1), 1)
     return numerator / denominator
-
-
-def validate_key_layout(key_layout, world, player):
-    flat_proposal = flatten_pair_list(key_layout.proposal)
-    state = ExplorationState()
-    state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
-    state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in key_layout.sector.regions
-    # Everything in a start region is in key region 0.
-    for region in key_layout.start_regions:
-        state.visit_region(region, key_checks=True)
-        state.add_all_doors_check_keys(region, flat_proposal, world, player)
-    return validate_key_layout_r(state, key_layout, flat_proposal, world, player)
-
-
-def validate_key_layout_r(state, key_layout, flat_proposal, world, player):
-    # improvements: remove recursion to make this iterative
-    # store a cache of various states of opened door to increase speed of checks - many are repetitive
-    while len(state.avail_doors) > 0:
-        exp_door = state.next_avail_door()
-        door = exp_door.door
-        connect_region = world.get_entrance(door.name, player).connected_region
-        if state.validate(door, connect_region, world, player):
-            state.visit_region(connect_region, key_checks=True)
-            state.add_all_doors_check_keys(connect_region, flat_proposal, world, player)
-    smalls_avail = len(state.small_doors) > 0
-    num_bigs = 1 if len(state.big_doors) > 0 else 0  # all or nothing
-    if not smalls_avail and num_bigs == 0:
-        return True   # I think that's the end
-    ttl_locations = state.ttl_locations if state.big_key_opened else count_locations_exclude_big_chest(state)
-    available_small_locations = min(ttl_locations - state.used_locations, state.key_locations - state.used_smalls)
-    available_big_locations = ttl_locations - state.used_locations if not state.big_key_special else 0
-    valid = True
-    if (not smalls_avail or available_small_locations == 0) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
-        return False
-    else:
-        if not state.big_key_opened and available_big_locations >= num_bigs > 0:  # bk first for better key rules
-            state_copy = state.copy()
-            state_copy.big_key_opened = True
-            state_copy.used_locations += 1
-            state_copy.avail_doors.extend(state.big_doors)
-            state_copy.big_doors.clear()
-            code = state_id(state_copy, flat_proposal)
-            if code not in key_layout.checked_states.keys():
-                valid = validate_key_layout_r(state_copy, key_layout, flat_proposal, world, player)
-                key_layout.checked_states[code] = valid
-            else:
-                valid = key_layout.checked_states[code]
-            if not valid:
-                return False
-        if smalls_avail and available_small_locations > 0:
-            key_logic = key_layout.key_logic
-            key_rule_num = min(available_small_locations, count_unique_doors(state.small_doors)) + state.used_smalls
-            if key_rule_num == ttl_locations:
-                key_logic.bk_restricted.extend([x for x in get_valid_small_key_locations(state) if x not in key_logic.bk_restricted])
-                set_logic_min(key_logic, state, key_rule_num)
-                if not state.big_key_opened and big_chest_in_locations(state):
-                    key_logic.sm_restricted.extend([x for x in find_big_chest_locations(state) if x not in key_logic.sm_restricted])
-            for exp_door in state.small_doors:
-                state_copy = state.copy()
-                state_copy.opened_doors.append(exp_door.door)
-                doors_to_open = [x for x in state_copy.small_doors if x.door == exp_door.door]
-                state_copy.small_doors[:] = [x for x in state_copy.small_doors if x.door != exp_door.door]
-                state_copy.avail_doors.extend(doors_to_open)
-                dest_door = exp_door.door.dest
-                if dest_door in flat_proposal:
-                    state_copy.opened_doors.append(dest_door)
-                    if state_copy.in_door_list_ic(dest_door, state_copy.small_doors):
-                        now_available = [x for x in state_copy.small_doors if x.door == dest_door]
-                        state_copy.small_doors[:] = [x for x in state_copy.small_doors if x.door != dest_door]
-                        state_copy.avail_doors.extend(now_available)
-                        set_key_rules(key_logic, dest_door, key_rule_num)
-                set_key_rules(key_logic, exp_door.door, key_rule_num)
-                state_copy.used_locations += 1
-                state_copy.used_smalls += 1
-                code = state_id(state_copy, flat_proposal)
-                if code not in key_layout.checked_states.keys():
-                    valid = validate_key_layout_r(state_copy, key_layout, flat_proposal, world, player)
-                    key_layout.checked_states[code] = valid
-                else:
-                    valid = key_layout.checked_states[code]
-                if not valid:
-                    return False
-    return valid
-
-
-def count_locations_exclude_big_chest(state):
-    cnt = 0
-    for loc in state.found_locations:
-        if '- Big Chest' not in loc.name and '- Prize' not in loc.name:
-            cnt += 1
-    return cnt
-
-
-def big_chest_in_locations(state):
-    return len(find_big_chest_locations(state)) > 0
-
-
-def find_big_chest_locations(state):
-    ret = []
-    for loc in state.found_locations:
-        if 'Big Chest' in loc.name:
-            ret.append(loc)
-    return ret
-
-
-def get_valid_small_key_locations(state):
-    locations = []
-    for loc in state.found_locations:
-        if '- Prize' not in loc.name and (state.big_key_opened or '- Big Chest' not in loc.name):
-            locations.append(loc)
-    return locations
-
-
-def get_valid_big_key_locations(state, key_logic):
-    locs = []
-    for loc in state.found_locations:
-        if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc not in key_logic.bk_restricted:
-            locs.append(loc)
-    return locs
-
-
-def count_unique_doors(doors_to_count):
-    cnt = 0
-    counted = set()
-    for d in doors_to_count:
-        if d.door not in counted:
-            cnt += 1
-            counted.add(d.door)
-            counted.add(d.door.dest)
-    return cnt
-
-
-def set_logic_min(key_logic, state, number):
-    for exp_door in state.small_doors:
-        name = exp_door.door.name
-        if name not in key_logic.logic_min.keys():
-            c_min = key_logic.logic_min[name] = number
-        else:
-            new_min = max(number, key_logic.logic_min[name])
-            if name in key_logic.logic_max.keys():
-                new_min = min(new_min, key_logic.logic_max[name])
-            c_min = key_logic.logic_min[name] = new_min
-        if name not in key_logic.door_rules.keys():
-            key_logic.door_rules[name] = max(c_min, number)
-        else:
-            key_logic.door_rules[name] = max(c_min, key_logic.door_rules[name])
-    for door in state.opened_doors:
-        if door.name in key_logic.logic_min.keys():
-            key_logic.logic_max[door.name] = key_logic.logic_min[door.name]
-
-
-def set_key_rules(key_logic, door, number):
-    if door.name not in key_logic.logic_min.keys():
-        key_logic.logic_min[door.name] = 0
-    logic_min = key_logic.logic_min[door.name]
-    if door.name not in key_logic.door_rules.keys():
-        key_logic.door_rules[door.name] = max(logic_min, number)
-    else:
-        smallest_logic = min(number, key_logic.door_rules[door.name])
-        key_logic.door_rules[door.name] = max(logic_min, smallest_logic)
-
-
-def state_id(state, flat_proposal):
-    s_id = '1' if state.big_key_opened else '0'
-    for d in flat_proposal:
-        s_id += '1' if d in state.opened_doors else '0'
-    return s_id
 
 
 def reassign_key_doors(current_doors, proposal, world, player):
