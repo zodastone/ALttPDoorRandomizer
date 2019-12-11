@@ -917,7 +917,7 @@ def create_doors(world, player):
         create_door(player, 'GT Compass Room EN', Intr).dir(Ea, 0x9d, Top, High).pos(2),
         create_door(player, 'GT Compass Room Warp', Warp),
         create_door(player, 'GT Invisible Bridges WS', Nrml).dir(We, 0x9d, Bot, High).pos(1),
-        create_door(player, 'GT Invisible Catwalk ES', Nrml).dir(Ea, 0x9c, Bot, High).no_exit().pos(0),
+        create_door(player, 'GT Invisible Catwalk ES', Nrml).dir(Ea, 0x9c, Bot, High).no_exit().trap(0x4).pos(0),
         create_door(player, 'GT Invisible Catwalk WS', Nrml).dir(We, 0x9c, Bot, High).pos(3),
         create_door(player, 'GT Invisible Catwalk NW', Nrml).dir(No, 0x9c, Left, High).pos(1),
         create_door(player, 'GT Invisible Catwalk NE', Nrml).dir(No, 0x9c, Right, High).pos(2),
