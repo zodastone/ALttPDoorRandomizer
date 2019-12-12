@@ -376,10 +376,11 @@ def remove_drop_origins(entrance_list):
 
 def find_new_entrances(sector, connections, potentials, enabled, world, player):
     for region in sector.regions:
-        if region.name in connections.keys() and connections[region.name] in potentials.keys():
+        if region.name in connections.keys() and (connections[region.name] in potentials.keys() or connections[region.name].name in world.inaccessible_regions[player]):
             new_region = connections[region.name]
-            for potential in potentials.pop(new_region):
-                enabled[potential] = (region.name, region.dungeon)
+            if new_region in potentials.keys():
+                for potential in potentials.pop(new_region):
+                    enabled[potential] = (region.name, region.dungeon)
             # see if this unexplored region connects elsewhere
             queue = collections.deque(new_region.exits)
             visited = set()
@@ -867,6 +868,8 @@ def shuffle_key_doors(dungeon_sector, entrances, world, player):
             if num_key_doors < 0:
                 raise Exception('Bad dungeon %s - 0 key doors not valid' % dungeon_sector.name)
             combinations = ncr(len(paired_candidates), num_key_doors)
+            sample_list = list(range(0, int(combinations)))
+            random.shuffle(sample_list)
             itr = 0
         proposal = kth_combination(sample_list[itr], paired_candidates, num_key_doors)
         key_layout.reset(proposal)
@@ -1106,7 +1109,7 @@ def find_inaccessible_regions(world, player):
             connect = ext.connected_region
             if connect is not None and connect.type is not RegionType.Dungeon and connect not in queue and connect not in visited_regions:
                 queue.append(connect)
-    world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if r.type is not RegionType.Cave or len(r.exits) > 1])
+    world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if valid_inaccessible_region(r)])
     if world.mode == 'standard':
         world.inaccessible_regions[player].append('Hyrule Castle Ledge')
         world.inaccessible_regions[player].append('Sewer Drop')
@@ -1114,6 +1117,10 @@ def find_inaccessible_regions(world, player):
     logger.info('Inaccessible Regions:')
     for r in world.inaccessible_regions[player]:
         logger.info('%s', r)
+
+
+def valid_inaccessible_region(r):
+    return r.type is not RegionType.Cave or len(r.exits) > 1 or r.name in ['Spiral Cave (Bottom)']
 
 
 def add_inaccessible_doors(world, player):

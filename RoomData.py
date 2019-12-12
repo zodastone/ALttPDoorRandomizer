@@ -3,7 +3,7 @@ from Tables import door_pair_offset_table
 
 
 def create_rooms(world, player):
-    world.rooms = [
+    world.rooms += [
         Room(player, 0x01, 0x51168).door(Position.WestN2, DoorKind.Warp).door(Position.EastN2, DoorKind.Warp),
         Room(player, 0x02, 0x50b97).door(Position.South2, DoorKind.TrapTriggerableLow).door(Position.InteriorV2, DoorKind.NormalLow2).door(Position.South2, DoorKind.ToggleFlag),
         # Room(player, 0x03, 0x509cf).door(Position.SouthW, DoorKind.CaveEntrance),
