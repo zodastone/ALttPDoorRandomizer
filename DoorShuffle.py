@@ -303,7 +303,7 @@ def within_dungeon(world, player):
             sector_queue.append((key, sector_list, entrance_list))
             last_key = key
         else:
-            ds = generate_dungeon(sector_list, origin_list_sans_drops, split_dungeon, world, player)
+            ds = generate_dungeon(key, sector_list, origin_list_sans_drops, split_dungeon, world, player)
             find_new_entrances(ds, connections, potentials, enabled_entrances, world, player)
             ds.name = key
             layout_starts = origin_list if len(entrance_list) <= 0 else entrance_list
@@ -1120,7 +1120,7 @@ def find_inaccessible_regions(world, player):
 
 
 def valid_inaccessible_region(r):
-    return r.type is not RegionType.Cave or len(r.exits) > 1 or r.name in ['Spiral Cave (Bottom)']
+    return r.type is not RegionType.Cave or (len(r.exits) > 0 and r.name not in ['Links House', 'Chris Houlihan Room'])
 
 
 def add_inaccessible_doors(world, player):
@@ -1178,7 +1178,8 @@ def check_required_paths(paths, world, player):
                 start_regions = convert_regions(start_regs, world, player)
                 initial = start_regs == tuple(entrances)
                 if not initial or cached_initial_state is None:
-                    state = ExplorationState(determine_init_crystal(initial, cached_initial_state, start_regions))
+                    init = determine_init_crystal(initial, cached_initial_state, start_regions)
+                    state = ExplorationState(init, dungeon_name)
                     for region in start_regions:
                         state.visit_region(region)
                         state.add_all_doors_check_unattached(region, world, player)

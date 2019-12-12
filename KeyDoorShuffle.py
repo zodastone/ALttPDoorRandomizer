@@ -32,9 +32,8 @@ class KeySphere(object):
             return False
         if len(set(self.key_only_locations).symmetric_difference(set(other.key_only_locations))) > 0:
             return False
-        # they only differ in child doors - I don't care
-        # if len(set(self.child_doors).symmetric_difference(set(other.child_doors))) > 0:
-        #     return False
+        if len(set(self.child_doors).symmetric_difference(set(other.child_doors))) > 0:
+            return False
         return True
 
 
@@ -156,7 +155,7 @@ def analyze_dungeon(key_layout, world, player):
 
     find_bk_locked_sections(key_layout, world)
 
-    init_bk = check_special_locations(key_layout.key_spheres['Origin'].free_locations)
+    init_bk = check_special_locations(key_layout.key_spheres['Origin'].free_locations.keys())
     key_counter = key_layout.key_counters[counter_id({}, init_bk, key_layout.flat_prop)]
     queue = collections.deque([(key_layout.key_spheres['Origin'], key_counter)])
     doors_completed = set()
@@ -473,7 +472,7 @@ def expand_counter_no_big_doors(door, key_counter, key_layout, ignored_doors):
 def create_key_spheres(key_layout, world, player):
     key_spheres = {}
     flat_proposal = key_layout.flat_prop
-    state = ExplorationState()
+    state = ExplorationState(dungeon=key_layout.sector.name)
     state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
     state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in key_layout.sector.regions
     for region in key_layout.start_regions:
@@ -498,12 +497,19 @@ def create_key_spheres(key_layout, world, player):
                 if empty_sphere(old_sphere) and not empty_sphere(child_kr):
                     key_spheres[door.name] = merge_sphere = child_kr
                     queue.append((child_kr, child_state))
-                merge_sphere.bk_locked = old_sphere.bk_locked and child_kr.bk_locked
                 if not empty_sphere(old_sphere) and not empty_sphere(child_kr) and not old_sphere == child_kr:
                     # ugly sphere merge function - just union locations - ugh
-                    merge_sphere.free_locations = {**old_sphere.free_locations, **child_kr.free_locations}
-                    merge_sphere.key_only_locations = {**old_sphere.key_only_locations, **child_kr.key_only_locations}
-                    # this feels so ugly, key counters are much smarter than this - would love to get rid of spheres
+                    if old_sphere.bk_locked != child_kr.bk_locked:
+                        if old_sphere.bk_locked:
+                            merge_sphere.child_doors = child_kr.child_doors
+                            merge_sphere.free_locations = child_kr.free_locations
+                            merge_sphere.key_only_locations = child_kr.key_only_locations
+                    else:
+                        merge_sphere.child_doors = {**old_sphere.child_doors, **child_kr.child_doors}
+                        merge_sphere.free_locations = {**old_sphere.free_locations, **child_kr.free_locations}
+                        merge_sphere.key_only_locations = {**old_sphere.key_only_locations, **child_kr.key_only_locations}
+                merge_sphere.bk_locked = old_sphere.bk_locked and child_kr.bk_locked
+                # this feels so ugly, key counters are much smarter than this - would love to get rid of spheres
     return key_spheres
 
 
@@ -519,9 +525,9 @@ def create_key_sphere(state, parent_sphere, door):
         parent_locations.update(p_region.key_only_locations)
         parent_locations.update(p_region.other_locations)
         p_region = p_region.parent_sphere
-    u_doors = set(unique_doors(state.small_doors+state.big_doors)).difference(parent_doors)
+    u_doors = [x for x in unique_doors(state.small_doors+state.big_doors) if x not in parent_doors]
     key_sphere.child_doors.update(dict.fromkeys(u_doors))
-    region_locations = list(set(state.found_locations).difference(parent_locations))
+    region_locations = [x for x in state.found_locations if x not in parent_locations]
     for loc in region_locations:
         if '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2']:
             key_sphere.prize_region = True
@@ -712,7 +718,7 @@ def validate_key_layout_ex(key_layout, world, player):
 
 def validate_key_layout_main_loop(key_layout, world, player):
     flat_proposal = key_layout.flat_prop
-    state = ExplorationState()
+    state = ExplorationState(dungeon=key_layout.sector.name)
     state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
     state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in key_layout.sector.regions
     for region in key_layout.start_regions:
@@ -765,7 +771,7 @@ def validate_key_layout_sub_loop(state, checked_states, flat_proposal, world, pl
 def create_key_counters(key_layout, world, player):
     key_counters = {}
     flat_proposal = key_layout.flat_prop
-    state = ExplorationState()
+    state = ExplorationState(dungeon=key_layout.sector.name)
     state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
     state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in key_layout.sector.regions
     for region in key_layout.start_regions:
@@ -885,11 +891,11 @@ def validate_vanilla_key_logic(world, player):
 
 
 def val_hyrule(key_logic, world, player):
-    val_rule(key_logic.door_rules['Sewers Secret Room Key Door S'], 2)
-    val_rule(key_logic.door_rules['Sewers Dark Cross Key Door N'], 2)
+    val_rule(key_logic.door_rules['Sewers Secret Room Key Door S'], 3)
+    val_rule(key_logic.door_rules['Sewers Dark Cross Key Door N'], 3)
     val_rule(key_logic.door_rules['Hyrule Dungeon Map Room Key Door S'], 2)
     # why is allow_small actually false? - because chest key is forced elsewhere?
-    val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 4, True, 'Hyrule Castle - Zelda\'s Chest')
+    val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 3, True, 'Hyrule Castle - Zelda\'s Chest')
     # val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 4)
 
 
