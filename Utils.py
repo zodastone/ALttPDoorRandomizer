@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import subprocess
 import sys
@@ -112,3 +113,76 @@ def make_new_base2current(old_rom='Zelda no Densetsu - Kamigami no Triforce (Jap
     basemd5 = hashlib.md5()
     basemd5.update(new_rom_data)
     return "New Rom Hash: " + basemd5.hexdigest()
+
+
+entrance_offsets = {
+    'Sanctuary': 0x2,
+    'HC West': 0x3,
+    'HC South': 0x4,
+    'HC East': 0x5,
+    'Eastern': 0x8,
+    'Desert West': 0x0,
+    'Desert South': 0xa,
+    'Desert East': 0xb,
+    'Desert Back': 0xc,
+    'TR Lazy Eyes': 0x15,
+    'TR Eye Bridge': 0x18,
+    'TR Chest': 0x19,
+    'Aga Tower': 0x24,
+    'Swamp': 0x25,
+    'Palace of Darkness': 0x26,
+    'Mire': 0x27,
+    'Skull 2 West': 0x28,
+    'Skull 2 East': 0x29,
+    'Skull 1': 0x2a,
+    'Skull 3': 0x2b,
+    'Ice': 0x2d,
+    'Hera': 0x33,
+    'Thieves': 0x34,
+    'TR Main': 0x35,
+    'GT': 0x37,
+    'Skull Pots': 0x76,
+    'Skull Left Drop': 0x77,
+    'Skull Pinball': 0x78,
+    'Skull Back Drop': 0x79,
+    'Sewer Drop': 0x81
+}
+
+entrance_data = {
+    'Room Ids': (0x14577, 2),
+    'Relative coords': (0x14681, 8),
+    'ScrollX': (0x14AA9, 2),
+    'ScrollY': (0x14BB3, 2),
+    'LinkX': (0x14CBD, 2),
+    'LinkY': (0x14DC7, 2),
+    'CameraX': (0x14ED1, 2),
+    'CameraY': (0x14FDB, 2),
+    'Blockset': (0x150e5, 1),
+    'FloorValues': (0x1516A, 1),
+    'Dungeon Value': (0x151EF, 1),
+    'Frame on Exit': (0x15274, 1),
+    'BG Setting': (0x152F9, 1),
+    'HV Scroll': (0x1537E, 1),
+    'Scroll Quad': (0x15403, 1),
+    'Exit Door': (0x15488, 2),
+    'Music': (0x15592, 1)
+}
+
+
+def read_entrance_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan).sfc'):
+    with open(old_rom, 'rb') as stream:
+        old_rom_data = bytearray(stream.read())
+
+    for ent, offset in entrance_offsets.items():
+        print(ent)
+        for dp, data in entrance_data.items():
+            byte_array = []
+            address, size = data
+            for i in range(0, size):
+                byte_array.append(old_rom_data[address+(offset*size)+i])
+            bytes = ', '.join('0x{:02x}'.format(x) for x in byte_array)
+            print("%s: %s" % (dp, bytes))
+
+
+if __name__ == '__main__':
+    read_entrance_data(old_rom='C:\\Users\\Randall\\Documents\\kwyn\\orig\\z3.sfc')
