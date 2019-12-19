@@ -257,6 +257,16 @@ class Room(object):
         self.doorList[list_idx] = (prev[0], kind)
         self.modified = True
 
+    def mirror(self, list_idx):
+        prev = self.doorList[list_idx]
+        mirror_door = None
+        for door in self.doorList:
+            if door != prev:
+                mirror_door = door
+                break
+        self.doorList[list_idx] = (mirror_door[0], mirror_door[1])
+        self.modified = True
+
     def swap(self, idx1, idx2):
         item1 = self.doorList[idx1]
         item2 = self.doorList[idx2]

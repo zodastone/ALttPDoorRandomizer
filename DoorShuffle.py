@@ -1000,7 +1000,10 @@ def reassign_key_doors(current_doors, proposal, world, player):
             if room.doorList[d.doorListPos][1] == DoorKind.StairKeyLow:
                 room.delete(d.doorListPos)
             else:
-                room.change(d.doorListPos, DoorKind.Waterfall)
+                if len(room.doorList) > 1:
+                    room.mirror(d.doorListPos)
+                else:
+                    room.delete(d.doorListPos)
             d.smallKey = False
         elif d.type is DoorType.Interior and d not in flat_proposal and d.dest not in flat_proposal:
             world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)
