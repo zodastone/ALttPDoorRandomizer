@@ -534,6 +534,10 @@ def patch_rom(world, player, rom):
         patch_shuffled_dark_sanc(world, rom, player)
 
     # patch doors
+    if world.doorShuffle == 'crossed':
+        rom.write_byte(0x151f1, 2)
+        rom.write_byte(0x15270, 2)
+        rom.write_byte(0x1597b, 2)
     for door in world.doors:
         if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door.toggle))
