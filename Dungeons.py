@@ -333,15 +333,15 @@ region_starts = {
 }
 
 split_region_starts = {
-    'Desert Palace': [
-        ['Desert Back Lobby'],
-        ['Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
-    ],
-    'Skull Woods': [
-        ['Skull 1 Lobby', 'Skull Pot Circle'],
-        ['Skull 2 West Lobby', 'Skull 2 East Lobby', 'Skull Back Drop'],
-        ['Skull 3 Lobby']
-    ]
+    'Desert Palace': {
+        'Back': ['Desert Back Lobby'],
+        'Main': ['Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
+    },
+    'Skull Woods': {
+        '1': ['Skull 1 Lobby', 'Skull Pot Circle'],
+        '2': ['Skull 2 West Lobby', 'Skull 2 East Lobby', 'Skull Back Drop'],
+        '3': ['Skull 3 Lobby']
+    }
 }
 
 flexible_starts = {

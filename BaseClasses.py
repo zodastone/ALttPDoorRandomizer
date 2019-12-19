@@ -229,11 +229,15 @@ class World(object):
 
         if keys:
             for p in range(1, self.players + 1):
+                key_list = []
+                player_dungeons = [x for x in self.dungeons if x.player == p]
+                for dungeon in player_dungeons:
+                    if dungeon.big_key is not None:
+                        key_list += [dungeon.big_key.name]
+                    if len(dungeon.small_keys) > 0:
+                        key_list += [x.name for x in dungeon.small_keys]
                 from Items import ItemFactory
-                for item in ItemFactory(['Small Key (Escape)', 'Big Key (Eastern Palace)', 'Big Key (Desert Palace)', 'Small Key (Desert Palace)', 'Big Key (Tower of Hera)', 'Small Key (Tower of Hera)', 'Small Key (Agahnims Tower)', 'Small Key (Agahnims Tower)',
-                                         'Big Key (Palace of Darkness)'] + ['Small Key (Palace of Darkness)'] * 6 + ['Big Key (Thieves Town)', 'Small Key (Thieves Town)', 'Big Key (Skull Woods)'] + ['Small Key (Skull Woods)'] * 3 + ['Big Key (Swamp Palace)',
-                                         'Small Key (Swamp Palace)', 'Big Key (Ice Palace)'] + ['Small Key (Ice Palace)'] * 2 + ['Big Key (Misery Mire)', 'Big Key (Turtle Rock)', 'Big Key (Ganons Tower)'] + ['Small Key (Misery Mire)'] * 3 + ['Small Key (Turtle Rock)'] * 4 + ['Small Key (Ganons Tower)'] * 4,
-                                         p):
+                for item in ItemFactory(key_list, p):
                     soft_collect(item)
         ret.sweep_for_events()
         return ret
@@ -889,11 +893,29 @@ class Polarity:
     def __getitem__(self, item):
         return self.vector[item]
 
+    def __eq__(self, other):
+        for i in range(len(self.vector)):
+            if self.vector[i] != other.vector[i]:
+                return False
+        return True
+
     def is_neutral(self):
         for i in range(len(self.vector)):
             if self.vector[i] != 0:
                 return False
         return True
+
+    def complement(self):
+        result = Polarity()
+        for i in range(len(self.vector)):
+            result.vector[i] = pol_comp[pol_idx_2[i]](self.vector[i])
+        return result
+
+    def charge(self):
+        result = 0
+        for i in range(len(self.vector)):
+            result += abs(self.vector[i])
+        return result
 
 
 pol_idx = {
@@ -918,6 +940,11 @@ pol_add = {
     'Add': lambda x, y: x + y,
     'Mod': lambda x, y: (x + y) % 2
 }
+pol_comp = {
+    'Add': lambda x: -x,
+    'Mod': lambda x: 0 if x == 0 else 1
+}
+
 
 @unique
 class CrystalBarrier(Enum):
@@ -961,6 +988,7 @@ class Door(object):
         self.req_event = None  # if a dungeon event is required for this door - swamp palace mostly
         self.controller = None
         self.dependents = []
+        self.dead = False
 
     def getAddress(self):
         if self.type == DoorType.Normal:
@@ -1035,6 +1063,10 @@ class Door(object):
         self.crystal = CrystalBarrier.Either
         return self
 
+    def kill(self):
+        self.dead = True
+        return self
+
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.name == other.name
 
@@ -1054,6 +1086,19 @@ class Sector(object):
         self.regions = []
         self.outstanding_doors = []
         self.name = None
+        self.r_name_set = None
+        self.chest_locations = 0
+        self.key_only_locations = 0
+        self.c_switch = False
+        self.orange_barrier = False
+        self.blue_barrier = False
+        self.bk_required = False
+        self.bk_provided = False
+
+    def region_set(self):
+        if self.r_name_set is None:
+            self.r_name_set = dict.fromkeys(map(lambda r: r.name, self.regions))
+        return self.r_name_set.keys()
 
     def polarity(self):
         pol = Polarity()
@@ -1075,6 +1120,19 @@ class Sector(object):
             if not door.blocked:
                 outflow = outflow + 1
         return outflow
+
+    def adj_outflow(self):
+        outflow = 0
+        for door in self.outstanding_doors:
+            if not door.blocked and not door.dead:
+                outflow = outflow + 1
+        return outflow
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+    def __unicode__(self):
+        return '%s' % next(iter(self.region_set()))
 
 
 class Boss(object):
@@ -1335,14 +1393,9 @@ class Spoiler(object):
             self.bosses[str(player)]["Ice Palace"] = self.world.get_dungeon("Ice Palace", player).boss.name
             self.bosses[str(player)]["Misery Mire"] = self.world.get_dungeon("Misery Mire", player).boss.name
             self.bosses[str(player)]["Turtle Rock"] = self.world.get_dungeon("Turtle Rock", player).boss.name
-            if self.world.mode != 'inverted':
-                self.bosses[str(player)]["Ganons Tower Basement"] = self.world.get_dungeon('Ganons Tower', player).bosses['bottom'].name
-                self.bosses[str(player)]["Ganons Tower Middle"] = self.world.get_dungeon('Ganons Tower', player).bosses['middle'].name
-                self.bosses[str(player)]["Ganons Tower Top"] = self.world.get_dungeon('Ganons Tower', player).bosses['top'].name
-            else:
-                self.bosses[str(player)]["Ganons Tower Basement"] = self.world.get_dungeon('Inverted Ganons Tower', player).bosses['bottom'].name
-                self.bosses[str(player)]["Ganons Tower Middle"] = self.world.get_dungeon('Inverted Ganons Tower', player).bosses['middle'].name
-                self.bosses[str(player)]["Ganons Tower Top"] = self.world.get_dungeon('Inverted Ganons Tower', player).bosses['top'].name
+            self.bosses[str(player)]["Ganons Tower Basement"] = [x for x in self.world.dungeons if x.player == player and 'bottom' in x.bosses.keys()][0].bosses['bottom'].name
+            self.bosses[str(player)]["Ganons Tower Middle"] = [x for x in self.world.dungeons if x.player == player and 'middle' in x.bosses.keys()][0].bosses['middle'].name
+            self.bosses[str(player)]["Ganons Tower Top"] = [x for x in self.world.dungeons if x.player == player and 'top' in x.bosses.keys()][0].bosses['top'].name
 
             self.bosses[str(player)]["Ganons Tower"] = "Agahnim 2"
             self.bosses[str(player)]["Ganon"] = "Ganon"
