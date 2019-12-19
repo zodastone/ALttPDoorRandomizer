@@ -219,7 +219,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Hyrule Dungeon Armory Boomerang', 'Hyrule Castle', ['Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Boomerang Guard Key Drop'], ['Hyrule Dungeon Armory Boomerang WS']),
         create_dungeon_region(player, 'Hyrule Dungeon Armory North Branch', 'Hyrule Castle', None, ['Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Armory Down Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon Staircase', 'Hyrule Castle', None, ['Hyrule Dungeon Staircase Up Stairs', 'Hyrule Dungeon Staircase Down Stairs']),
-        create_dungeon_region(player, 'Hyrule Dungeon Cellblock', 'Hyrule Castle', ['Hyrule Castle - Big Key Drop', 'Hyrule Castle - Zelda\'s Chest'], ['Hyrule Dungeon Cellblock Up Stairs']),
+        create_dungeon_region(player, 'Hyrule Dungeon Cellblock', 'Hyrule Castle', ['Hyrule Castle - Zelda\'s Chest'], ['Hyrule Dungeon Cellblock Up Stairs']),
 
 
         create_dungeon_region(player, 'Sewers Behind Tapestry', 'Hyrule Castle', None, ['Sewers Behind Tapestry S', 'Sewers Behind Tapestry Down Stairs']),
@@ -817,7 +817,6 @@ key_only_locations = {
   'Hyrule Castle - Map Guard Key Drop': 'Small Key (Escape)',
   'Hyrule Castle - Boomerang Guard Key Drop': 'Small Key (Escape)',
   'Hyrule Castle - Key Rat Key Drop': 'Small Key (Escape)',
-  'Hyrule Castle - Big Key Drop': 'Big Key (Escape)',
   'Eastern Palace - Dark Square Pot Key': 'Small Key (Eastern Palace)',
   'Eastern Palace - Dark Eyegore Key Drop': 'Small Key (Eastern Palace)',
   'Desert Palace - Desert Tiles 1 Pot Key': 'Small Key (Desert Palace)',
