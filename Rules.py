@@ -276,6 +276,7 @@ def global_rules(world, player):
     set_rule(world.get_location('Desert Palace - Big Chest', player), lambda state: state.has('Big Key (Desert Palace)', player))
     set_rule(world.get_location('Desert Palace - Torch', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('Desert Wall Slide NW', player), lambda state: state.has_fire_source(player))
+    add_rule(world.get_entrance('Desert Wall Slide NW', player), lambda state: state.has('Big Key (Desert Palace)', player))
     set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Prize', player))
     set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Boss', player))
 
@@ -288,6 +289,7 @@ def global_rules(world, player):
 
     set_rule(world.get_entrance('Tower Altar NW', player), lambda state: state.has_sword(player))
 
+    set_rule(world.get_entrance('PoD Arena Bonk Path', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('PoD Mimics 1 NW', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Mimics 2 NW', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Bow Statue Down Ladder', player), lambda state: state.can_shoot_arrows(player))
@@ -414,6 +416,7 @@ def global_rules(world, player):
     set_rule(world.get_location('Ganons Tower - Bob\'s Torch', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('GT Hope Room EN', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('GT Conveyor Cross WN', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('GT Conveyor Cross WN', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('GT Speed Torch SE', player), lambda state: state.has('Fire Rod', player))
     set_rule(world.get_entrance('GT Hookshot East-North Path', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('GT Hookshot South-East Path', player), lambda state: state.has('Hookshot', player))
