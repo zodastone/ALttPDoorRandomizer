@@ -1292,6 +1292,7 @@ logical_connections = [
     ('Eastern Map Balcony Hook Path', 'Eastern Map Room'),
     ('Eastern Map Room Drop Down', 'Eastern Map Balcony'),
     ('Hera Big Chest Landing Exit', 'Hera 4F'),
+    ('PoD Arena Bonk Path', 'PoD Arena Bridge'),
     ('PoD Arena Main Crystal Path', 'PoD Arena Crystal'),
     ('PoD Arena Crystal Path', 'PoD Arena Main'),
     ('PoD Arena Main Orange Barrier', 'PoD Arena North'),

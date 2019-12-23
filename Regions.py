@@ -336,7 +336,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'PoD Middle Cage', 'Palace of Darkness', None, ['PoD Middle Cage S', 'PoD Middle Cage SE', 'PoD Middle Cage N', 'PoD Middle Cage Down Stairs']),
         create_dungeon_region(player, 'PoD Shooter Room', 'Palace of Darkness', ['Palace of Darkness - Shooter Room'], ['PoD Shooter Room Up Stairs']),
         create_dungeon_region(player, 'PoD Pit Room', 'Palace of Darkness', None, ['PoD Pit Room S', 'PoD Pit Room NW', 'PoD Pit Room NE', 'PoD Pit Room Freefall', 'PoD Pit Room Bomb Hole']),
-        create_dungeon_region(player, 'PoD Arena Main', 'Palace of Darkness', None, ['PoD Arena Main SW', 'PoD Arena Main Crystal Path', 'PoD Arena Main Orange Barrier']),
+        create_dungeon_region(player, 'PoD Arena Main', 'Palace of Darkness', None, ['PoD Arena Main SW', 'PoD Arena Main Crystal Path', 'PoD Arena Main Orange Barrier', 'PoD Arena Bonk Path']),
         create_dungeon_region(player, 'PoD Arena North', 'Palace of Darkness', None, ['PoD Arena Main NW', 'PoD Arena Main NE', 'PoD Arena North Drop Down']),
         create_dungeon_region(player, 'PoD Arena Crystal', 'Palace of Darkness', None, ['PoD Arena Crystals E', 'PoD Arena Crystal Path']),
         create_dungeon_region(player, 'PoD Arena Bridge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Bridge'], ['PoD Arena Bridge SE', 'PoD Arena Bridge Drop Down']),

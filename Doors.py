@@ -333,6 +333,7 @@ def create_doors(world, player):
         create_door(player, 'PoD Arena Main Crystal Path', Lgcl),
         create_door(player, 'PoD Arena Main Orange Barrier', Lgcl),
         create_door(player, 'PoD Arena North Drop Down', Lgcl),
+        create_door(player, 'PoD Arena Bonk Path', Lgcl),
         create_door(player, 'PoD Arena Crystals E', Nrml).dir(Ea, 0x2a, Mid, High).pos(3),
         create_door(player, 'PoD Arena Crystal Path', Lgcl),
         create_door(player, 'PoD Arena Bridge Drop Down', Lgcl),
