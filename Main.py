@@ -63,20 +63,19 @@ def main(args, seed=None):
     if world.mode != 'inverted':
         for player in range(1, world.players + 1):
             link_entrances(world, player)
-
-        mark_light_world_regions(world)
     else:
         for player in range(1, world.players + 1):
             link_inverted_entrances(world, player)
-
-        mark_dark_world_regions(world)
 
     logger.info('Shuffling dungeons')
 
     for player in range(1, world.players + 1):
         link_doors(world, player)
 
-    # todo: mark regions after linking doors - for bunny logic?
+    if world.mode != 'inverted':
+        mark_light_world_regions(world)
+    else:
+        mark_dark_world_regions(world)
 
     logger.info('Generating Item Pool.')
 
