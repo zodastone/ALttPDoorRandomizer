@@ -304,11 +304,11 @@ def create_doors(world, player):
         create_door(player, 'Tower Agahnim 1 SW', Nrml).dir(So, 0x20, Left, High).no_exit().trap(0x4).pos(0),
 
         # Palace of Darkness
-        create_door(player, 'PoD Lobby N', Intr).dir(No, 0x4a, Mid, High).pos(2),
+        create_door(player, 'PoD Lobby N', Intr).dir(No, 0x4a, Mid, High).pos(3),
         create_door(player, 'PoD Lobby NW', Intr).dir(No, 0x4a, Left, High).pos(0),
         create_door(player, 'PoD Lobby NE', Intr).dir(No, 0x4a, Right, High).pos(1),
         create_door(player, 'PoD Left Cage SW', Intr).dir(No, 0x4a, Left, High).pos(0),
-        create_door(player, 'PoD Middle Cage S', Intr).dir(No, 0x4a, Mid, High).pos(2),
+        create_door(player, 'PoD Middle Cage S', Intr).dir(No, 0x4a, Mid, High).pos(3),
         create_door(player, 'PoD Middle Cage SE', Intr).dir(No, 0x4a, Right, High).pos(1),
         create_door(player, 'PoD Left Cage Down Stairs', Sprl).dir(Dn, 0x4a, 1, HTH).ss(A, 0x12, 0x80, False, True),
         create_door(player, 'PoD Middle Cage Down Stairs', Sprl).dir(Dn, 0x4a, 0, HTH).ss(S, 0x12, 0x80, False, True),
