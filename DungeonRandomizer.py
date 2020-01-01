@@ -306,6 +306,7 @@ def start():
         for _ in range(args.count):
             main(seed=seed, args=args)
             seed = random.randint(0, 999999999)
+            logging.getLogger('').info('Finished run %s', _)
     else:
         main(seed=args.seed, args=args)
 

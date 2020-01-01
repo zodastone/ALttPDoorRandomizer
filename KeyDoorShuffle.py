@@ -118,8 +118,9 @@ def analyze_dungeon(key_layout, world, player):
         raw_avail = chest_keys + len(key_counter.key_only_locations)
         available = raw_avail - key_counter.used_keys
         possible_smalls = count_unique_small_doors(key_counter, key_layout.flat_prop)
+        avail_bigs = count_unique_big_doors(key_counter)
         if not key_counter.big_key_opened:
-            if chest_keys == count_locations_big_optional(key_counter.free_locations) and available <= possible_smalls:
+            if chest_keys == count_locations_big_optional(key_counter.free_locations) and available <= possible_smalls and avail_bigs == 0:
                 key_logic.bk_restricted.update(filter_big_chest(key_counter.free_locations))
                 if not key_counter.big_key_opened and big_chest_in_locations(key_counter.free_locations):
                     key_logic.sm_restricted.update(find_big_chest_locations(key_counter.free_locations))
@@ -473,6 +474,17 @@ def count_unique_small_doors(key_counter, proposal):
     counted = set()
     for door in key_counter.child_doors:
         if door in proposal and door not in counted:
+            cnt += 1
+            counted.add(door)
+            counted.add(door.dest)
+    return cnt
+
+
+def count_unique_big_doors(key_counter):
+    cnt = 0
+    counted = set()
+    for door in key_counter.child_doors:
+        if door.bigKey and door not in counted:
             cnt += 1
             counted.add(door)
             counted.add(door.dest)
