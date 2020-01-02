@@ -190,9 +190,17 @@ def fill_restrictive(world, base_state, locations, itempool):
         for item_to_place in items_to_place:
             spot_to_fill = None
             for location in locations:
-                if location.can_fill(maximum_exploration_state, item_to_place, perform_access_check):
+                if item_to_place.key:  # a better test to see if a key can go there
+                    location.item = item_to_place
+                    test_state = maximum_exploration_state.copy()
+                    test_state.stale[item_to_place.player] = True
+                else:
+                    test_state = maximum_exploration_state
+                if location.can_fill(test_state, item_to_place, perform_access_check):
                     spot_to_fill = location
                     break
+                elif item_to_place.key:
+                    location.item = None
 
             if spot_to_fill is None:
                 # we filled all reachable spots. Maybe the game can be beaten anyway?

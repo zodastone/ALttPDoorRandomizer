@@ -8,6 +8,7 @@ import sys
 
 from Main import main
 from Utils import is_bundled, close_console, output_path
+from Fill import FillError
 
 
 class ArgumentDefaultsHelpFormatter(argparse.RawTextHelpFormatter):
@@ -303,12 +304,22 @@ def start():
         guiMain(args)
     elif args.count is not None:
         seed = args.seed
+        failures = []
+        logger = logging.getLogger('')
         for _ in range(args.count):
-            main(seed=seed, args=args)
+            try:
+                main(seed=seed, args=args)
+                logger.info('Finished run %s', _+1)
+            except (FillError, Exception, RuntimeError) as err:
+                failures.append((err, seed))
+                logger.warning('Generation failed: %s', err)
             seed = random.randint(0, 999999999)
-            logging.getLogger('').info('Finished run %s', _)
+        for fail in failures:
+            logger.info('%s seed failed with: %s', fail[1], fail[0])
+        logger.info('Generation fail rate: %f%%', 100*len(failures)/args.count)
     else:
         main(seed=args.seed, args=args)
+
 
 if __name__ == '__main__':
     start()

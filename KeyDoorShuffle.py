@@ -162,6 +162,13 @@ def queue_sorter(queue_item):
     return 1 if door.bigKey else 0
 
 
+def queue_sorter_2(queue_item):
+    door, counter, key_only = queue_item
+    if door is None:
+        return 0
+    return 1 if door.bigKey else 0
+
+
 def find_bk_locked_sections(key_layout, world):
     key_counters = key_layout.key_counters
     key_logic = key_layout.key_logic
@@ -547,13 +554,13 @@ def flatten_pair_list(paired_list):
 def check_rules(original_counter, key_layout):
     all_key_only = set()
     key_only_map = {}
-    queue = collections.deque([(None, original_counter)])
+    queue = collections.deque([(None, original_counter, original_counter.key_only_locations)])
     completed = set()
     completed.add(cid(original_counter, key_layout))
     while len(queue) > 0:
-        queue = collections.deque(sorted(queue, key=queue_sorter))
-        access_door, counter = queue.popleft()
-        for loc in counter.key_only_locations:
+        queue = collections.deque(sorted(queue, key=queue_sorter_2))
+        access_door, counter, key_only_loc = queue.popleft()
+        for loc in key_only_loc:
             if loc not in all_key_only:
                 all_key_only.add(loc)
                 access_rules = []
@@ -561,16 +568,20 @@ def check_rules(original_counter, key_layout):
             else:
                 access_rules = key_only_map[loc]
             if access_door is None or access_door.name not in key_layout.key_logic.door_rules.keys():
-                access_rules.append(DoorRules(0))
+                if access_door is None or not access_door.bigKey:
+                    access_rules.append(DoorRules(0))
             else:
-                access_rules.append(key_layout.key_logic.door_rules[access_door.name])
+                rule = key_layout.key_logic.door_rules[access_door.name]
+                if rule not in access_rules:
+                    access_rules.append(rule)
         for child in counter.child_doors.keys():
             if not child.bigKey or not key_layout.big_key_special or counter.big_key_opened:
                 next_counter = find_next_counter(child, counter, key_layout)
                 c_id = cid(next_counter, key_layout)
                 if c_id not in completed:
                     completed.add(c_id)
-                    queue.append((child, next_counter))
+                    new_key_only = dict_difference(next_counter.key_only_locations, counter.key_only_locations)
+                    queue.append((child, next_counter, new_key_only))
     min_rule_bk = defaultdict(list)
     min_rule_non_bk = defaultdict(list)
     check_non_bk = False

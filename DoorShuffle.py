@@ -1150,9 +1150,9 @@ def find_inaccessible_regions(world, player):
         world.inaccessible_regions[player].append('Hyrule Castle Ledge')
         world.inaccessible_regions[player].append('Sewer Drop')
     logger = logging.getLogger('')
-    logger.info('Inaccessible Regions:')
+    logger.debug('Inaccessible Regions:')
     for r in world.inaccessible_regions[player]:
-        logger.info('%s', r)
+        logger.debug('%s', r)
 
 
 def valid_inaccessible_region(r):
@@ -1661,10 +1661,10 @@ interior_doors = [
     ('Skull Big Key WN', 'Skull Lone Pot EN'),
     ('Skull Small Hall WS', 'Skull 2 West Lobby ES'),
     ('Skull 2 West Lobby NW', 'Skull X Room SW'),
-    ('Skull 3 Lobby WN', 'Skull East Bridge EN'),
-    ('Skull East Bridge ES', 'Skull West Bridge Nook WS'),
-    ('Skull Star Pits WS', 'Skull Torch Room ES'),
-    ('Skull Torch Room EN', 'Skull Vines WN'),
+    ('Skull 3 Lobby EN', 'Skull East Bridge WN'),
+    ('Skull East Bridge WS', 'Skull West Bridge Nook ES'),
+    ('Skull Star Pits ES', 'Skull Torch Room WS'),
+    ('Skull Torch Room WN', 'Skull Vines EN'),
     ('Skull Spike Corner ES', 'Skull Final Drop WS'),
     ('Thieves Hallway WS', 'Thieves Pot Alcove Mid ES'),
     ('Thieves Conveyor Maze SW', 'Thieves Pot Alcove Top NW'),
