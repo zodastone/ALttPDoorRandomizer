@@ -324,7 +324,7 @@ def global_rules(world, player):
     set_defeat_dungeon_boss_rule(world.get_location('Swamp Palace - Prize', player))
 
     set_rule(world.get_entrance('Skull Big Chest Hookpath', player), lambda state: state.has('Hookshot', player))
-    set_rule(world.get_entrance('Skull Torch Room EN', player), lambda state: state.has('Fire Rod', player))
+    set_rule(world.get_entrance('Skull Torch Room WN', player), lambda state: state.has('Fire Rod', player))
     set_rule(world.get_entrance('Skull Vines NW', player), lambda state: state.has_sword(player))
     set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Prize', player))

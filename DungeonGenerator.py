@@ -1482,7 +1482,7 @@ def valid_polarized_assignment(builder, sector_list):
         sector_mag = sector.magnitude()
         for i in range(len(sector_mag)):
             if sector_mag[i] > 0 and other_mag[i] == 0:
-                return True
+                return False
     # dead_ends = 0
     # branches = 0
     # for sector in sector_list:
