@@ -1480,9 +1480,12 @@ def valid_polarized_assignment(builder, sector_list):
         others = [x for x in full_list if x != sector]
         other_mag = sum_magnitude(others)
         sector_mag = sector.magnitude()
+        hookable = False
         for i in range(len(sector_mag)):
-            if sector_mag[i] > 0 and other_mag[i] == 0:
-                return False
+            if sector_mag[i] > 0 and other_mag[i] > 0:
+                hookable = True
+        if not hookable:
+            return False
     # dead_ends = 0
     # branches = 0
     # for sector in sector_list:
