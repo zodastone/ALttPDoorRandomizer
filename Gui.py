@@ -2,6 +2,7 @@
 from argparse import Namespace
 from glob import glob
 import json
+import logging
 import random
 import os
 import shutil
@@ -10,10 +11,11 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from AdjusterMain import adjust
+from EntranceRandomizer import parse_arguments
 from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
 from Main import main, __version__ as ESVersion
 from Rom import Sprite
-from Utils import is_bundled, local_path, output_path, open_file
+from Utils import is_bundled, local_path, output_path, open_file, parse_names_string
 
 
 def guiMain(args=None):
@@ -60,12 +62,20 @@ def guiMain(args=None):
     suppressRomCheckbutton = Checkbutton(checkBoxFrame, text="Do not create patched Rom", variable=suppressRomVar)
     quickSwapVar = IntVar()
     quickSwapCheckbutton = Checkbutton(checkBoxFrame, text="Enabled L/R Item quickswapping", variable=quickSwapVar)
-    keysanityVar = IntVar()
-    keysanityCheckbutton = Checkbutton(checkBoxFrame, text="Keysanity (keys anywhere)", variable=keysanityVar)
+    openpyramidVar = IntVar()
+    openpyramidCheckbutton = Checkbutton(checkBoxFrame, text="Pre-open Pyramid Hole", variable=openpyramidVar)
+    mcsbshuffleFrame = Frame(checkBoxFrame)
+    mcsbLabel = Label(mcsbshuffleFrame, text="Shuffle: ")
+    mapshuffleVar = IntVar()
+    mapshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="Maps", variable=mapshuffleVar)
+    compassshuffleVar = IntVar()
+    compassshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="Compasses", variable=compassshuffleVar)
+    keyshuffleVar = IntVar()
+    keyshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="Keys", variable=keyshuffleVar)
+    bigkeyshuffleVar = IntVar()
+    bigkeyshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="BigKeys", variable=bigkeyshuffleVar)
     retroVar = IntVar()
     retroCheckbutton = Checkbutton(checkBoxFrame, text="Retro mode (universal keys)", variable=retroVar)
-    dungeonItemsVar = IntVar()
-    dungeonItemsCheckbutton = Checkbutton(checkBoxFrame, text="Place Dungeon Items (Compasses/Maps)", onvalue=0, offvalue=1, variable=dungeonItemsVar)
     disableMusicVar = IntVar()
     disableMusicCheckbutton = Checkbutton(checkBoxFrame, text="Disable game music", variable=disableMusicVar)
     shuffleGanonVar = IntVar()
@@ -80,9 +90,14 @@ def guiMain(args=None):
     createSpoilerCheckbutton.pack(expand=True, anchor=W)
     suppressRomCheckbutton.pack(expand=True, anchor=W)
     quickSwapCheckbutton.pack(expand=True, anchor=W)
-    keysanityCheckbutton.pack(expand=True, anchor=W)
+    openpyramidCheckbutton.pack(expand=True, anchor=W)
+    mcsbshuffleFrame.pack(expand=True, anchor=W)
+    mcsbLabel.grid(row=0, column=0)
+    mapshuffleCheckbutton.grid(row=0, column=1)
+    compassshuffleCheckbutton.grid(row=0, column=2)
+    keyshuffleCheckbutton.grid(row=0, column=3)
+    bigkeyshuffleCheckbutton.grid(row=0, column=4)
     retroCheckbutton.pack(expand=True, anchor=W)
-    dungeonItemsCheckbutton.pack(expand=True, anchor=W)
     disableMusicCheckbutton.pack(expand=True, anchor=W)
     shuffleGanonCheckbutton.pack(expand=True, anchor=W)
     hintsCheckbutton.pack(expand=True, anchor=W)
@@ -120,7 +135,7 @@ def guiMain(args=None):
 
     romDialogFrame = Frame(fileDialogFrame)
     baseRomLabel = Label(romDialogFrame, text='Base Rom')
-    romVar = StringVar()
+    romVar = StringVar(value="Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
     romEntry = Entry(romDialogFrame, textvariable=romVar)
 
     def RomSelect():
@@ -346,6 +361,9 @@ def guiMain(args=None):
     worldLabel = Label(bottomFrame, text='Worlds')
     worldVar = StringVar()
     worldSpinbox = Spinbox(bottomFrame, from_=1, to=100, width=5, textvariable=worldVar)
+    namesLabel = Label(bottomFrame, text='Player names')
+    namesVar = StringVar()
+    namesEntry = Entry(bottomFrame, textvariable=namesVar)
     seedLabel = Label(bottomFrame, text='Seed #')
     seedVar = StringVar()
     seedEntry = Entry(bottomFrame, width=15, textvariable=seedVar)
@@ -354,8 +372,9 @@ def guiMain(args=None):
     countSpinbox = Spinbox(bottomFrame, from_=1, to=100, width=5, textvariable=countVar)
 
     def generateRom():
-        guiargs = Namespace
+        guiargs = Namespace()
         guiargs.multi = int(worldVar.get())
+        guiargs.names = namesVar.get()
         guiargs.seed = int(seedVar.get()) if seedVar.get() else None
         guiargs.count = int(countVar.get()) if countVar.get() != '1' else None
         guiargs.mode = modeVar.get()
@@ -376,16 +395,19 @@ def guiMain(args=None):
         guiargs.fastmenu = fastMenuVar.get()
         guiargs.create_spoiler = bool(createSpoilerVar.get())
         guiargs.suppress_rom = bool(suppressRomVar.get())
-        guiargs.keysanity = bool(keysanityVar.get())
+        guiargs.openpyramid = bool(openpyramidVar.get())
+        guiargs.mapshuffle = bool(mapshuffleVar.get())
+        guiargs.compassshuffle = bool(compassshuffleVar.get())
+        guiargs.keyshuffle = bool(keyshuffleVar.get())
+        guiargs.bigkeyshuffle = bool(bigkeyshuffleVar.get())
         guiargs.retro = bool(retroVar.get())
-        guiargs.nodungeonitems = bool(dungeonItemsVar.get())
         guiargs.quickswap = bool(quickSwapVar.get())
         guiargs.disablemusic = bool(disableMusicVar.get())
         guiargs.shuffleganon = bool(shuffleGanonVar.get())
         guiargs.hints = bool(hintsVar.get())
         guiargs.enemizercli = enemizerCLIpathVar.get()
         guiargs.shufflebosses = enemizerBossVar.get()
-        guiargs.shuffleenemies = bool(enemyShuffleVar.get())
+        guiargs.shuffleenemies = 'chaos' if bool(enemyShuffleVar.get()) else 'none'
         guiargs.enemy_health = enemizerHealthVar.get()
         guiargs.enemy_damage = enemizerDamageVar.get()
         guiargs.shufflepalette = bool(paletteShuffleVar.get())
@@ -401,10 +423,13 @@ def guiMain(args=None):
                                    int(rupee300Var.get()), int(rupoorVar.get()), int(blueclockVar.get()), int(greenclockVar.get()), int(redclockVar.get()), int(progbowVar.get()), int(bomb10Var.get()), int(triforcepieceVar.get()),
                                    int(triforcecountVar.get()), int(triforceVar.get()),  int(rupoorcostVar.get()), int(universalkeyVar.get())]
         guiargs.rom = romVar.get()
-        guiargs.jsonout = None
         guiargs.sprite = sprite
-        guiargs.skip_playthrough = False
-        guiargs.outputpath = None
+        # get default values for missing parameters
+        for k,v in vars(parse_arguments(['--multi', str(guiargs.multi)])).items():
+            if k not in vars(guiargs):
+                setattr(guiargs, k, v)
+            elif type(v) is dict: # use same settings for every player
+                setattr(guiargs, k, {player: getattr(guiargs, k) for player in range(1, guiargs.multi + 1)})
         try:
             if guiargs.count is not None:
                 seed = guiargs.seed
@@ -414,14 +439,21 @@ def guiMain(args=None):
             else:
                 main(seed=guiargs.seed, args=guiargs)
         except Exception as e:
+            logging.exception(e)
             messagebox.showerror(title="Error while creating seed", message=str(e))
         else:
-            messagebox.showinfo(title="Success", message="Rom patched successfully")
+            msgtxt = "Rom patched successfully"
+            if guiargs.names:
+                for player, name in parse_names_string(guiargs.names).items():
+                    msgtxt += "\nPlayer %d => %s" % (player, name)
+            messagebox.showinfo(title="Success", message=msgtxt)
 
     generateButton = Button(bottomFrame, text='Generate Patched Rom', command=generateRom)
 
     worldLabel.pack(side=LEFT)
     worldSpinbox.pack(side=LEFT)
+    namesLabel.pack(side=LEFT)
+    namesEntry.pack(side=LEFT)
     seedLabel.pack(side=LEFT,  padx=(5, 0))
     seedEntry.pack(side=LEFT)
     countLabel.pack(side=LEFT, padx=(5, 0))
@@ -502,15 +534,23 @@ def guiMain(args=None):
     fastMenuLabel2 = Label(fastMenuFrame2, text='Menu speed')
     fastMenuLabel2.pack(side=LEFT)
 
+    namesFrame2 = Frame(drowDownFrame2)
+    namesLabel2 = Label(namesFrame2, text='Player names')
+    namesVar2 = StringVar()
+    namesEntry2 = Entry(namesFrame2, textvariable=namesVar2)
+
+    namesLabel2.pack(side=LEFT)
+    namesEntry2.pack(side=LEFT)
 
     heartbeepFrame2.pack(expand=True, anchor=E)
     heartcolorFrame2.pack(expand=True, anchor=E)
     fastMenuFrame2.pack(expand=True, anchor=E)
+    namesFrame2.pack(expand=True, anchor=E)
 
     bottomFrame2 = Frame(topFrame2)
 
     def adjustRom():
-        guiargs = Namespace
+        guiargs = Namespace()
         guiargs.heartbeep = heartbeepVar.get()
         guiargs.heartcolor = heartcolorVar.get()
         guiargs.fastmenu = fastMenuVar.get()
@@ -518,12 +558,18 @@ def guiMain(args=None):
         guiargs.disablemusic = bool(disableMusicVar.get())
         guiargs.rom = romVar2.get()
         guiargs.sprite = sprite
+        guiargs.names = namesEntry2.get()
         try:
             adjust(args=guiargs)
         except Exception as e:
+            logging.exception(e)
             messagebox.showerror(title="Error while creating seed", message=str(e))
         else:
-            messagebox.showinfo(title="Success", message="Rom patched successfully")
+            msgtxt = "Rom patched successfully"
+            if guiargs.names:
+                for player, name in parse_names_string(guiargs.names).items():
+                    msgtxt += "\nPlayer %d => %s" % (player, name)
+            messagebox.showinfo(title="Success", message=msgtxt)
 
     adjustButton = Button(bottomFrame2, text='Adjust Rom', command=adjustRom)
 
@@ -1127,13 +1173,17 @@ def guiMain(args=None):
     topFrame3.pack(side=TOP, pady=(17,0))
 
     if args is not None:
+        for k,v in vars(args).items():
+            if type(v) is dict:
+                setattr(args, k, v[1]) # only get values for player 1 for now
         # load values from commandline args
         createSpoilerVar.set(int(args.create_spoiler))
         suppressRomVar.set(int(args.suppress_rom))
-        keysanityVar.set(args.keysanity)
+        mapshuffleVar.set(args.mapshuffle)
+        compassshuffleVar.set(args.compassshuffle)
+        keyshuffleVar.set(args.keyshuffle)
+        bigkeyshuffleVar.set(args.bigkeyshuffle)
         retroVar.set(args.retro)
-        if args.nodungeonitems:
-            dungeonItemsVar.set(int(not args.nodungeonitems))
         quickSwapVar.set(int(args.quickswap))
         disableMusicVar.set(int(args.disablemusic))
         if args.count:

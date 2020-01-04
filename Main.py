@@ -4,6 +4,7 @@ from itertools import zip_longest
 import json
 import logging
 import os
+import pickle
 import random
 import time
 
@@ -11,20 +12,27 @@ from BaseClasses import World, CollectionState, Item, Region, Location, Shop
 from Regions import create_regions, mark_light_world_regions
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
 from EntranceShuffle import link_entrances, link_inverted_entrances
-from Rom import patch_rom, get_enemizer_patch, apply_rom_settings, Sprite, LocalRom, JsonRom
+from Rom import patch_rom, get_race_rom_patches, get_enemizer_patch, apply_rom_settings, Sprite, LocalRom, JsonRom
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, balance_multiworld_progression
 from ItemList import generate_itempool, difficulties, fill_prizes
-from Utils import output_path
+from Utils import output_path, parse_names_string
 
 __version__ = '0.6.3-pre'
 
 def main(args, seed=None):
+    if args.outputpath:
+        try:
+            os.mkdir(args.outputpath)
+        except OSError:
+            pass
+        output_path.cached_path = args.outputpath
+
     start = time.perf_counter()
 
     # initialize the world
-    world = World(args.multi, args.shuffle, args.logic, args.mode, args.swords, args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm, not args.nodungeonitems, args.accessibility, args.shuffleganon, args.quickswap, args.fastmenu, args.disablemusic, args.keysanity, args.retro, args.custom, args.customitemarray, args.shufflebosses, args.hints)
+    world = World(args.multi, args.shuffle, args.logic, args.mode, args.swords, args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm, args.accessibility, args.shuffleganon, args.quickswap, args.fastmenu, args.disablemusic, args.retro, args.custom, args.customitemarray, args.hints)
     logger = logging.getLogger('')
     if seed is None:
         random.seed(None)
@@ -33,36 +41,44 @@ def main(args, seed=None):
         world.seed = int(seed)
     random.seed(world.seed)
 
-    world.crystals_needed_for_ganon = random.randint(0, 7) if args.crystals_ganon == 'random' else int(args.crystals_ganon)
-    world.crystals_needed_for_gt = random.randint(0, 7) if args.crystals_gt == 'random' else int(args.crystals_gt)
+    world.mapshuffle = args.mapshuffle.copy()
+    world.compassshuffle = args.compassshuffle.copy()
+    world.keyshuffle = args.keyshuffle.copy()
+    world.bigkeyshuffle = args.bigkeyshuffle.copy()
+    world.crystals_needed_for_ganon = {player: random.randint(0, 7) if args.crystals_ganon[player] == 'random' else int(args.crystals_ganon[player]) for player in range(1, world.players + 1)}
+    world.crystals_needed_for_gt = {player: random.randint(0, 7) if args.crystals_gt[player] == 'random' else int(args.crystals_gt[player]) for player in range(1, world.players + 1)}
+    world.open_pyramid = args.openpyramid.copy()
+    world.boss_shuffle = args.shufflebosses.copy()
+    world.enemy_shuffle = args.shuffleenemies.copy()
+    world.enemy_health = args.enemy_health.copy()
+    world.enemy_damage = args.enemy_damage.copy()
+    world.beemizer = args.beemizer.copy()
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
     logger.info('ALttP Entrance Randomizer Version %s  -  Seed: %s\n\n', __version__, world.seed)
 
-    world.difficulty_requirements = difficulties[world.difficulty]
+    for player in range(1, world.players + 1):
+        world.difficulty_requirements[player] = difficulties[world.difficulty[player]]
 
-    if world.mode != 'inverted':
-        for player in range(1, world.players + 1):
+        if world.mode[player] == 'standard' and world.enemy_shuffle[player] != 'none':
+            world.escape_assist[player].append('bombs') # enemized escape assumes infinite bombs available and will likely be unbeatable without it
+
+        if world.mode[player] != 'inverted':
             create_regions(world, player)
-            create_dungeons(world, player)
-    else:
-        for player in range(1, world.players + 1):
+        else:
             create_inverted_regions(world, player)
-            create_dungeons(world, player)
+        create_dungeons(world, player)
 
     logger.info('Shuffling the World about.')
 
-    if world.mode != 'inverted':
-        for player in range(1, world.players + 1):
+    for player in range(1, world.players + 1):
+        if world.mode[player] != 'inverted':
             link_entrances(world, player)
-
-        mark_light_world_regions(world)
-    else:
-        for player in range(1, world.players + 1):
+            mark_light_world_regions(world, player)
+        else:
             link_inverted_entrances(world, player)
-
-        mark_dark_world_regions(world)
+            mark_dark_world_regions(world, player)
 
     logger.info('Generating Item Pool.')
 
@@ -81,7 +97,8 @@ def main(args, seed=None):
     logger.info('Placing Dungeon Items.')
 
     shuffled_locations = None
-    if args.algorithm in ['balanced', 'vt26'] or args.keysanity:
+    if args.algorithm in ['balanced', 'vt26'] or any(list(args.mapshuffle.values()) + list(args.compassshuffle.values()) +
+                                                     list(args.keyshuffle.values()) + list(args.bigkeyshuffle.values())):
         shuffled_locations = world.get_unfilled_locations()
         random.shuffle(shuffled_locations)
         fill_dungeons_restrictive(world, shuffled_locations)
@@ -99,12 +116,12 @@ def main(args, seed=None):
     elif args.algorithm == 'freshness':
         distribute_items_staleness(world)
     elif args.algorithm == 'vt25':
-        distribute_items_restrictive(world, 0)
+        distribute_items_restrictive(world, False)
     elif args.algorithm == 'vt26':
 
-        distribute_items_restrictive(world, gt_filler(world), shuffled_locations)
+        distribute_items_restrictive(world, True, shuffled_locations)
     elif args.algorithm == 'balanced':
-        distribute_items_restrictive(world, gt_filler(world))
+        distribute_items_restrictive(world, True)
 
     if world.players > 1:
         logger.info('Balancing multiworld progression.')
@@ -120,16 +137,19 @@ def main(args, seed=None):
     else:
         sprite = None
 
-    outfilebase = 'ER_%s_%s-%s-%s-%s%s_%s-%s%s%s%s%s_%s' % (world.logic, world.difficulty, world.difficulty_adjustments, world.mode, world.goal, "" if world.timer in ['none', 'display'] else "-" + world.timer, world.shuffle, world.algorithm, "-keysanity" if world.keysanity else "", "-retro" if world.retro else "", "-prog_" + world.progressive if world.progressive in ['off', 'random'] else "", "-nohints" if not world.hints else "", world.seed)
-
-    use_enemizer = args.enemizercli and (args.shufflebosses != 'none' or args.shuffleenemies or args.enemy_health != 'default' or args.enemy_health != 'default' or args.enemy_damage or args.shufflepalette or args.shufflepots)
+    player_names = parse_names_string(args.names)
+    outfilebase = 'ER_%s' % (args.outputname if args.outputname else world.seed)
 
     jsonout = {}
     if not args.suppress_rom:
-        if world.players > 1:
-            raise NotImplementedError("Multiworld rom writes have not been implemented")
-        else:
-            player = 1
+        from MultiServer import MultiWorld
+        multidata = MultiWorld()
+        multidata.players = world.players
+
+        for player in range(1, world.players + 1):
+            use_enemizer = (world.boss_shuffle[player] != 'none' or world.enemy_shuffle[player] != 'none'
+                            or world.enemy_health[player] != 'default' or world.enemy_damage[player] != 'default'
+                            or args.shufflepalette[player] or args.shufflepots[player])
 
             local_rom = None
             if args.jsonout:
@@ -140,24 +160,56 @@ def main(args, seed=None):
                     rom = JsonRom()
                 else:
                     rom = LocalRom(args.rom)
-
-            patch_rom(world, player, rom)
+            patch_rom(world, player, rom, use_enemizer)
 
             enemizer_patch = []
-            if use_enemizer:
-                enemizer_patch = get_enemizer_patch(world, player, rom, args.rom, args.enemizercli, args.shuffleenemies, args.enemy_health, args.enemy_damage, args.shufflepalette, args.shufflepots)
+            if use_enemizer and (args.enemizercli or not args.jsonout):
+                enemizer_patch = get_enemizer_patch(world, player, rom, args.rom, args.enemizercli, args.shufflepalette[player], args.shufflepots[player])
+
+            multidata.rom_names[player] = list(rom.name)
+            for location in world.get_filled_locations(player):
+                if type(location.address) is int:
+                    multidata.locations[(location.address, player)] = (location.item.code, location.item.player)
 
             if args.jsonout:
-                jsonout['patch'] = rom.patches
+                jsonout[f'patch{player}'] = rom.patches
                 if use_enemizer:
-                    jsonout['enemizer' % player] = enemizer_patch
+                    jsonout[f'enemizer{player}'] = enemizer_patch
+                if args.race:
+                    jsonout[f'race{player}'] = get_race_rom_patches(rom)
             else:
                 if use_enemizer:
                     local_rom.patch_enemizer(rom.patches, os.path.join(os.path.dirname(args.enemizercli), "enemizerBasePatch.json"), enemizer_patch)
                     rom = local_rom
 
-                apply_rom_settings(rom, args.heartbeep, args.heartcolor, world.quickswap, world.fastmenu, world.disable_music, sprite)
-                rom.write_to_file(output_path('%s.sfc' % outfilebase))
+                if args.race:
+                    for addr, values in  get_race_rom_patches(rom).items():
+                        rom.write_bytes(int(addr), values)
+
+                apply_rom_settings(rom, args.heartbeep, args.heartcolor, world.quickswap, world.fastmenu, world.disable_music, sprite, player_names)
+
+                mcsb_name = ''
+                if all([world.mapshuffle[player], world.compassshuffle[player], world.keyshuffle[player], world.bigkeyshuffle[player]]):
+                    mcsb_name = '-keysanity'
+                elif [world.mapshuffle[player], world.compassshuffle[player], world.keyshuffle[player], world.bigkeyshuffle[player]].count(True) == 1:
+                    mcsb_name = '-mapshuffle' if world.mapshuffle[player] else '-compassshuffle' if world.compassshuffle[player] else '-keyshuffle' if world.keyshuffle[player] else '-bigkeyshuffle'
+                elif any([world.mapshuffle[player], world.compassshuffle[player], world.keyshuffle[player], world.bigkeyshuffle[player]]):
+                    mcsb_name = '-%s%s%s%sshuffle' % (
+                    'M' if world.mapshuffle[player] else '', 'C' if world.compassshuffle[player] else '',
+                    'S' if world.keyshuffle[player] else '', 'B' if world.bigkeyshuffle[player] else '')
+
+                playername = f"{f'_P{player}' if world.players > 1 else ''}{f'_{player_names[player]}' if player in player_names else ''}"
+                outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s-%s%s%s%s%s' % (world.logic[player], world.difficulty[player], world.difficulty_adjustments[player],
+                                                                          world.mode[player], world.goal[player],
+                                                                          "" if world.timer in ['none', 'display'] else "-" + world.timer,
+                                                                          world.shuffle[player], world.algorithm, mcsb_name,
+                                                                          "-retro" if world.retro[player] else "",
+                                                                          "-prog_" + world.progressive if world.progressive in ['off', 'random'] else "",
+                                                                          "-nohints" if not world.hints[player] else "")) if not args.outputname else ''
+                rom.write_to_file(output_path(f'{outfilebase}{playername}{outfilesuffix}.sfc'))
+
+        with open(output_path('%s_multidata' % outfilebase), 'wb') as f:
+            pickle.dump(multidata, f, pickle.HIGHEST_PROTOCOL)
 
     if args.create_spoiler and not args.jsonout:
         world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
@@ -176,44 +228,47 @@ def main(args, seed=None):
 
     return world
 
-def gt_filler(world):
-    if world.goal == 'triforcehunt':
-        return random.randint(15, 50)
-    return random.randint(0, 15)
-
 def copy_world(world):
     # ToDo: Not good yet
-    ret = World(world.players, world.shuffle, world.logic, world.mode, world.swords, world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm, world.place_dungeon_items, world.accessibility, world.shuffle_ganon, world.quickswap, world.fastmenu, world.disable_music, world.keysanity, world.retro, world.custom, world.customitemarray, world.boss_shuffle, world.hints)
+    ret = World(world.players, world.shuffle, world.logic, world.mode, world.swords, world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm, world.accessibility, world.shuffle_ganon, world.quickswap, world.fastmenu, world.disable_music, world.retro, world.custom, world.customitemarray, world.hints)
     ret.required_medallions = world.required_medallions.copy()
     ret.swamp_patch_required = world.swamp_patch_required.copy()
     ret.ganon_at_pyramid = world.ganon_at_pyramid.copy()
     ret.powder_patch_required = world.powder_patch_required.copy()
     ret.ganonstower_vanilla = world.ganonstower_vanilla.copy()
-    ret.treasure_hunt_count = world.treasure_hunt_count
-    ret.treasure_hunt_icon = world.treasure_hunt_icon
-    ret.sewer_light_cone = world.sewer_light_cone
+    ret.treasure_hunt_count = world.treasure_hunt_count.copy()
+    ret.treasure_hunt_icon = world.treasure_hunt_icon.copy()
+    ret.sewer_light_cone = world.sewer_light_cone.copy()
     ret.light_world_light_cone = world.light_world_light_cone
     ret.dark_world_light_cone = world.dark_world_light_cone
     ret.seed = world.seed
-    ret.can_access_trock_eyebridge = world.can_access_trock_eyebridge
-    ret.can_access_trock_front = world.can_access_trock_front
-    ret.can_access_trock_big_chest = world.can_access_trock_big_chest
-    ret.can_access_trock_middle = world.can_access_trock_middle
+    ret.can_access_trock_eyebridge = world.can_access_trock_eyebridge.copy()
+    ret.can_access_trock_front = world.can_access_trock_front.copy()
+    ret.can_access_trock_big_chest = world.can_access_trock_big_chest.copy()
+    ret.can_access_trock_middle = world.can_access_trock_middle.copy()
     ret.can_take_damage = world.can_take_damage
-    ret.difficulty_requirements = world.difficulty_requirements
-    ret.fix_fake_world = world.fix_fake_world
+    ret.difficulty_requirements = world.difficulty_requirements.copy()
+    ret.fix_fake_world = world.fix_fake_world.copy()
     ret.lamps_needed_for_dark_rooms = world.lamps_needed_for_dark_rooms
-    ret.crystals_needed_for_ganon = world.crystals_needed_for_ganon
-    ret.crystals_needed_for_gt = world.crystals_needed_for_gt
+    ret.mapshuffle = world.mapshuffle.copy()
+    ret.compassshuffle = world.compassshuffle.copy()
+    ret.keyshuffle = world.keyshuffle.copy()
+    ret.bigkeyshuffle = world.bigkeyshuffle.copy()
+    ret.crystals_needed_for_ganon = world.crystals_needed_for_ganon.copy()
+    ret.crystals_needed_for_gt = world.crystals_needed_for_gt.copy()
+    ret.open_pyramid = world.open_pyramid.copy()
+    ret.boss_shuffle = world.boss_shuffle.copy()
+    ret.enemy_shuffle = world.enemy_shuffle.copy()
+    ret.enemy_health = world.enemy_health.copy()
+    ret.enemy_damage = world.enemy_damage.copy()
+    ret.beemizer = world.beemizer.copy()
 
-    if world.mode != 'inverted':
-        for player in range(1, world.players + 1):
+    for player in range(1, world.players + 1):
+        if world.mode[player] != 'inverted':
             create_regions(ret, player)
-            create_dungeons(ret, player)
-    else:
-        for player in range(1, world.players + 1):
+        else:
             create_inverted_regions(ret, player)
-            create_dungeons(ret, player)
+        create_dungeons(ret, player)
 
     copy_dynamic_regions_and_locations(world, ret)
 
@@ -263,8 +318,8 @@ def copy_world(world):
 def copy_dynamic_regions_and_locations(world, ret):
     for region in world.dynamic_regions:
         new_reg = Region(region.name, region.type, region.hint_text, region.player)
-        new_reg.world = ret
         ret.regions.append(new_reg)
+        ret.initialize_regions([new_reg])
         ret.dynamic_regions.append(new_reg)
 
         # Note: ideally exits should be copied here, but the current use case (Take anys) do not require this
@@ -292,7 +347,7 @@ def create_playthrough(world):
     world = copy_world(world)
 
     # if we only check for beatable, we can do this sanity check first before writing down spheres
-    if world.accessibility == 'none' and not world.can_beat_game():
+    if not world.can_beat_game():
         raise RuntimeError('Cannot beat game. Something went terribly wrong here!')
 
     # get locations containing progress items
@@ -303,8 +358,7 @@ def create_playthrough(world):
     sphere_candidates = list(prog_locations)
     logging.getLogger('').debug('Building up collection spheres.')
     while sphere_candidates:
-        if not world.keysanity:
-            state.sweep_for_events(key_only=True)
+        state.sweep_for_events(key_only=True)
 
         sphere = []
         # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
@@ -323,9 +377,10 @@ def create_playthrough(world):
         logging.getLogger('').debug('Calculated sphere %i, containing %i of %i progress items.', len(collection_spheres), len(sphere), len(prog_locations))
         if not sphere:
             logging.getLogger('').debug('The following items could not be reached: %s', ['%s (Player %d) at %s (Player %d)' % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
-            if not world.accessibility == 'none':
+            if any([world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
                 raise RuntimeError('Not all progression items reachable. Something went terribly wrong here.')
             else:
+                old_world.spoiler.unreachables = sphere_candidates.copy()
                 break
 
     # in the second phase, we cull each sphere such that the game is still beatable, reducing each range of influence to the bare minimum required inside it
@@ -357,8 +412,7 @@ def create_playthrough(world):
     state = CollectionState(world)
     collection_spheres = []
     while required_locations:
-        if not world.keysanity:
-            state.sweep_for_events(key_only=True)
+        state.sweep_for_events(key_only=True)
 
         sphere = list(filter(state.can_reach, required_locations))
 
@@ -393,7 +447,7 @@ def create_playthrough(world):
         old_world.spoiler.paths.update({ str(location) : get_path(state, location.parent_region) for sphere in collection_spheres for location in sphere if location.player == player})
         for _, path in dict(old_world.spoiler.paths).items():
             if any(exit == 'Pyramid Fairy' for (_, exit) in path):
-                if world.mode != 'inverted':
+                if world.mode[player] != 'inverted':
                     old_world.spoiler.paths[str(world.get_region('Big Bomb Shop', player))] = get_path(state, world.get_region('Big Bomb Shop', player))
                 else:
                     old_world.spoiler.paths[str(world.get_region('Inverted Big Bomb Shop', player))] = get_path(state, world.get_region('Inverted Big Bomb Shop', player))

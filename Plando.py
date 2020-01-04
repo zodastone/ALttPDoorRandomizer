@@ -10,7 +10,7 @@ import sys
 from BaseClasses import World
 from Regions import create_regions
 from EntranceShuffle import link_entrances, connect_entrance, connect_two_way, connect_exit
-from Rom import patch_rom, LocalRom, Sprite, write_string_to_rom
+from Rom import patch_rom, LocalRom, Sprite, write_string_to_rom, apply_rom_settings
 from Rules import set_rules
 from Dungeons import create_dungeons
 from Items import ItemFactory
@@ -23,7 +23,7 @@ def main(args):
     start_time = time.perf_counter()
 
     # initialize the world
-    world = World(1, 'vanilla', 'noglitches', 'standard', 'normal', 'none', 'on', 'ganon', 'freshness', False, False, False, args.quickswap, args.fastmenu, args.disablemusic, False, False, False, None, 'none', False)
+    world = World(1, 'vanilla', 'noglitches', 'standard', 'normal', 'none', 'on', 'ganon', 'freshness', False, False, False, args.quickswap, args.fastmenu, args.disablemusic, False, False, False, None, False)
     logger = logging.getLogger('')
 
     hasher = hashlib.md5()
@@ -36,7 +36,7 @@ def main(args):
 
     logger.info('ALttP Plandomizer Version %s  -  Seed: %s\n\n', __version__, args.plando)
 
-    world.difficulty_requirements = difficulties[world.difficulty]
+    world.difficulty_requirements[1] = difficulties[world.difficulty[1]]
 
     create_regions(world, 1)
     create_dungeons(world, 1)
@@ -74,7 +74,9 @@ def main(args):
         sprite = None
 
     rom = LocalRom(args.rom)
-    patch_rom(world, 1, rom, args.heartbeep, args.heartcolor, sprite)
+    patch_rom(world, 1, rom)
+
+    apply_rom_settings(rom, args.heartbeep, args.heartcolor, world.quickswap, world.fastmenu, world.disable_music, sprite)
 
     for textname, texttype, text in text_patches:
         if texttype == 'text':
@@ -114,16 +116,16 @@ def fill_world(world, plando, text_patches):
                         tr_medallion = medallionstr.strip()
                     elif line.startswith('!mode'):
                         _, modestr = line.split(':', 1)
-                        world.mode = modestr.strip()
+                        world.mode = {1: modestr.strip()}
                     elif line.startswith('!logic'):
                         _, logicstr = line.split(':', 1)
-                        world.logic = logicstr.strip()
+                        world.logic = {1: logicstr.strip()}
                     elif line.startswith('!goal'):
                         _, goalstr = line.split(':', 1)
-                        world.goal = goalstr.strip()
+                        world.goal = {1: goalstr.strip()}
                     elif line.startswith('!light_cone_sewers'):
                         _, sewerstr = line.split(':', 1)
-                        world.sewer_light_cone = sewerstr.strip().lower() == 'true'
+                        world.sewer_light_cone = {1: sewerstr.strip().lower() == 'true'}
                     elif line.startswith('!light_cone_lw'):
                         _, lwconestr = line.split(':', 1)
                         world.light_world_light_cone = lwconestr.strip().lower() == 'true'
@@ -132,19 +134,19 @@ def fill_world(world, plando, text_patches):
                         world.dark_world_light_cone = dwconestr.strip().lower() == 'true'
                     elif line.startswith('!fix_trock_doors'):
                         _, trdstr = line.split(':', 1)
-                        world.fix_trock_doors = trdstr.strip().lower() == 'true'
+                        world.fix_trock_doors = {1: trdstr.strip().lower() == 'true'}
                     elif line.startswith('!fix_trock_exit'):
                         _, trfstr = line.split(':', 1)
-                        world.fix_trock_exit = trfstr.strip().lower() == 'true'
+                        world.fix_trock_exit = {1: trfstr.strip().lower() == 'true'}
                     elif line.startswith('!fix_gtower_exit'):
                         _, gtfstr = line.split(':', 1)
                         world.fix_gtower_exit = gtfstr.strip().lower() == 'true'
                     elif line.startswith('!fix_pod_exit'):
                         _, podestr = line.split(':', 1)
-                        world.fix_palaceofdarkness_exit = podestr.strip().lower() == 'true'
+                        world.fix_palaceofdarkness_exit = {1: podestr.strip().lower() == 'true'}
                     elif line.startswith('!fix_skullwoods_exit'):
                         _, swestr = line.split(':', 1)
-                        world.fix_skullwoods_exit = swestr.strip().lower() == 'true'
+                        world.fix_skullwoods_exit = {1: swestr.strip().lower() == 'true'}
                     elif line.startswith('!check_beatable_only'):
                         _, chkbtstr = line.split(':', 1)
                         world.check_beatable_only = chkbtstr.strip().lower() == 'true'
@@ -172,7 +174,7 @@ def fill_world(world, plando, text_patches):
                     item = ItemFactory(itemstr.strip(), 1)
                     if item is not None:
                         world.push_item(location, item)
-                    if item.key:
+                    if item.smallkey or item.bigkey:
                         location.event = True
             elif '<=>' in line:
                 entrance, exit = line.split('<=>', 1)
