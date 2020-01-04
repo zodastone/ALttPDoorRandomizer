@@ -20,7 +20,7 @@ from Utils import is_bundled, local_path, output_path, open_file, parse_names_st
 
 def guiMain(args=None):
     mainWindow = Tk()
-    mainWindow.wm_title("Entrance Shuffle %s" % ESVersion)
+    mainWindow.wm_title("Door Shuffle %s" % ESVersion)
 
     set_icon(mainWindow)
 
@@ -286,19 +286,56 @@ def guiMain(args=None):
     shuffleLabel = Label(shuffleFrame, text='Entrance shuffle algorithm')
     shuffleLabel.pack(side=LEFT)
 
-    modeFrame.pack(expand=True, anchor=E)
+    doorShuffleFrame = Frame(drowDownFrame)
+    doorShuffleVar = StringVar()
+    doorShuffleVar.set('vanilla')
+    doorShuffleOptionMenu = OptionMenu(doorShuffleFrame, doorShuffleVar, 'vanilla', 'basic', 'crosssed', 'experimental')
+    doorShuffleOptionMenu.pack(side=RIGHT)
+    doorShuffleLabel = Label(doorShuffleFrame, text='Door shuffle algorithm')
+    doorShuffleLabel.pack(side=LEFT)
+
+    heartbeepFrame = Frame(drowDownFrame)
+    heartbeepVar = StringVar()
+    heartbeepVar.set('normal')
+    heartbeepOptionMenu = OptionMenu(heartbeepFrame, heartbeepVar, 'double', 'normal', 'half', 'quarter', 'off')
+    heartbeepOptionMenu.pack(side=RIGHT)
+    heartbeepLabel = Label(heartbeepFrame, text='Heartbeep sound rate')
+    heartbeepLabel.pack(side=LEFT)
+
+    heartcolorFrame = Frame(drowDownFrame)
+    heartcolorVar = StringVar()
+    heartcolorVar.set('red')
+    heartcolorOptionMenu = OptionMenu(heartcolorFrame, heartcolorVar, 'red', 'blue', 'green', 'yellow', 'random')
+    heartcolorOptionMenu.pack(side=RIGHT)
+    heartcolorLabel = Label(heartcolorFrame, text='Heart color')
+    heartcolorLabel.pack(side=LEFT)
+
+    fastMenuFrame = Frame(drowDownFrame)
+    fastMenuVar = StringVar()
+    fastMenuVar.set('normal')
+    fastMenuOptionMenu = OptionMenu(fastMenuFrame, fastMenuVar, 'normal', 'instant', 'double', 'triple', 'quadruple', 'half')
+    fastMenuOptionMenu.pack(side=RIGHT)
+    fastMenuLabel = Label(fastMenuFrame, text='Menu speed')
+    fastMenuLabel.pack(side=LEFT)
+
     logicFrame.pack(expand=True, anchor=E)
+    accessibilityFrame.pack(expand=True, anchor=E)
+
     goalFrame.pack(expand=True, anchor=E)
     crystalsGTFrame.pack(expand=True, anchor=E)
     crystalsGanonFrame.pack(expand=True, anchor=E)
-    swordFrame.pack(expand=True, anchor=E)
+
+    modeFrame.pack(expand=True, anchor=E)
+    shuffleFrame.pack(expand=True, anchor=E)
+    doorShuffleFrame.pack(expand=True, anchor=E)
+
+    swordsFrame.pack(expand=True, anchor=E)
     difficultyFrame.pack(expand=True, anchor=E)
     itemfunctionFrame.pack(expand=True, anchor=E)
     timerFrame.pack(expand=True, anchor=E)
     progressiveFrame.pack(expand=True, anchor=E)
     accessibilityFrame.pack(expand=True, anchor=E)
     algorithmFrame.pack(expand=True, anchor=E)
-    shuffleFrame.pack(expand=True, anchor=E)
 
     enemizerFrame = LabelFrame(randomizerWindow, text="Enemizer", padx=5, pady=5)
     enemizerFrame.columnconfigure(0, weight=1)
@@ -379,6 +416,7 @@ def guiMain(args=None):
         guiargs.count = int(countVar.get()) if countVar.get() != '1' else None
         guiargs.mode = modeVar.get()
         guiargs.logic = logicVar.get()
+
         guiargs.goal = goalVar.get()
         guiargs.crystals_gt = crystalsGTVar.get()
         guiargs.crystals_ganon = crystalsGanonVar.get()
@@ -390,6 +428,7 @@ def guiMain(args=None):
         guiargs.accessibility = accessibilityVar.get()
         guiargs.algorithm = algorithmVar.get()
         guiargs.shuffle = shuffleVar.get()
+        guiargs.door_shuffle = doorShuffleVar.get()
         guiargs.heartbeep = heartbeepVar.get()
         guiargs.heartcolor = heartcolorVar.get()
         guiargs.fastmenu = fastMenuVar.get()
@@ -1202,6 +1241,7 @@ def guiMain(args=None):
         crystalsGanonVar.set(args.crystals_ganon)
         algorithmVar.set(args.algorithm)
         shuffleVar.set(args.shuffle)
+        doorShuffleVar.set(args.door_shuffle)
         heartbeepVar.set(args.heartbeep)
         fastMenuVar.set(args.fastmenu)
         logicVar.set(args.logic)

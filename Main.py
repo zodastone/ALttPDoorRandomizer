@@ -13,13 +13,16 @@ from Regions import create_regions, mark_light_world_regions
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
 from EntranceShuffle import link_entrances, link_inverted_entrances
 from Rom import patch_rom, get_race_rom_patches, get_enemizer_patch, apply_rom_settings, Sprite, LocalRom, JsonRom
+from Doors import create_doors
+from DoorShuffle import link_doors
+from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, balance_multiworld_progression
 from ItemList import generate_itempool, difficulties, fill_prizes
 from Utils import output_path, parse_names_string
 
-__version__ = '0.6.3-pre'
+__version__ = '0.0.1-pre'
 
 def main(args, seed=None):
     if args.outputpath:
@@ -32,7 +35,7 @@ def main(args, seed=None):
     start = time.perf_counter()
 
     # initialize the world
-    world = World(args.multi, args.shuffle, args.logic, args.mode, args.swords, args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm, args.accessibility, args.shuffleganon, args.quickswap, args.fastmenu, args.disablemusic, args.retro, args.custom, args.customitemarray, args.hints)
+    world = World(args.multi, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords, args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm, args.accessibility, args.shuffleganon, args.quickswap, args.fastmenu, args.disablemusic, args.retro, args.custom, args.customitemarray, args.shufflebosses, args.hints)
     logger = logging.getLogger('')
     if seed is None:
         random.seed(None)
@@ -56,7 +59,7 @@ def main(args, seed=None):
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
-    logger.info('ALttP Entrance Randomizer Version %s  -  Seed: %s\n\n', __version__, world.seed)
+    logger.info('ALttP Door Randomizer Version %s  -  Seed: %s\n\n', __version__, world.seed)
 
     for player in range(1, world.players + 1):
         world.difficulty_requirements[player] = difficulties[world.difficulty[player]]
@@ -66,20 +69,33 @@ def main(args, seed=None):
 
         if world.mode[player] != 'inverted':
             create_regions(world, player)
-        else:
-            create_inverted_regions(world, player)
-        create_dungeons(world, player)
+            create_doors(world, player)
+            create_rooms(world, player)
+            create_dungeons(world, player)
+    else:
+        for player in range(1, world.players + 1):
+            create_inverted_regions(world, player)  # todo: port all the dungeon region work
+            create_doors(world, player)
+            create_rooms(world, player)
+            create_dungeons(world, player)
 
     logger.info('Shuffling the World about.')
 
     for player in range(1, world.players + 1):
         if world.mode[player] != 'inverted':
             link_entrances(world, player)
-            mark_light_world_regions(world, player)
+        for player in range(1, world.players + 1):
         else:
             link_inverted_entrances(world, player)
-            mark_dark_world_regions(world, player)
 
+    logger.info('Shuffling dungeons')
+
+    for player in range(1, world.players + 1):
+        link_doors(world, player)
+        if world.mode[player] != 'inverted':
+            mark_light_world_regions(world, player)
+        else:
+            mark_dark_world_regions(world, player)
     logger.info('Generating Item Pool.')
 
     for player in range(1, world.players + 1):
@@ -230,7 +246,7 @@ def main(args, seed=None):
 
 def copy_world(world):
     # ToDo: Not good yet
-    ret = World(world.players, world.shuffle, world.logic, world.mode, world.swords, world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm, world.accessibility, world.shuffle_ganon, world.quickswap, world.fastmenu, world.disable_music, world.retro, world.custom, world.customitemarray, world.hints)
+    ret = World(world.players, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords, world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm, world.accessibility, world.shuffle_ganon, world.quickswap, world.fastmenu, world.disable_music, world.retro, world.custom, world.customitemarray, world.boss_shuffle, world.hints)
     ret.required_medallions = world.required_medallions.copy()
     ret.swamp_patch_required = world.swamp_patch_required.copy()
     ret.ganon_at_pyramid = world.ganon_at_pyramid.copy()
@@ -310,6 +326,13 @@ def copy_world(world):
     ret.precollected_items = world.precollected_items.copy()
     ret.state.stale = {player: True for player in range(1, world.players + 1)}
 
+    ret.doors = world.doors
+    ret.paired_doors = world.paired_doors
+    ret.rooms = world.rooms
+    ret.inaccessible_regions = world.inaccessible_regions
+    ret.dungeon_layouts = world.dungeon_layouts
+    ret.key_logic = world.key_logic
+
     for player in range(1, world.players + 1):
         set_rules(ret, player)
 
@@ -325,7 +348,7 @@ def copy_dynamic_regions_and_locations(world, ret):
         # Note: ideally exits should be copied here, but the current use case (Take anys) do not require this
 
         if region.shop:
-            new_reg.shop = Shop(new_reg, region.shop.room_id, region.shop.type, region.shop.shopkeeper_config, region.shop.replaceable)
+            new_reg.shop = Shop(new_reg, region.shop.room_id, region.shop.default_door_id, region.shop.type, region.shop.shopkeeper_config, region.shop.replaceable)
             ret.shops.append(new_reg.shop)
 
     for location in world.dynamic_locations:
@@ -363,7 +386,7 @@ def create_playthrough(world):
         sphere = []
         # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
         for location in sphere_candidates:
-            if state.can_reach(location):
+            if state.can_reach(location) and state.not_flooding_a_key(world, location):
                 sphere.append(location)
 
         for location in sphere:
@@ -414,7 +437,7 @@ def create_playthrough(world):
     while required_locations:
         state.sweep_for_events(key_only=True)
 
-        sphere = list(filter(state.can_reach, required_locations))
+        sphere = list(filter(lambda loc: state.can_reach(loc) and state.not_flooding_a_key(world, loc), required_locations))
 
         for location in sphere:
             required_locations.remove(location)

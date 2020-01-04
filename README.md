@@ -1,37 +1,36 @@
-# ALttPEntranceRandomizer
+# ALttPDoorRandomizer
 
-This is a entrance randomizer for _The Legend of Zelda: A Link to the Past_ for the SNES.
+This is a door randomizer for _The Legend of Zelda: A Link to the Past_ for the SNES
+based on the Entrance Randomizer found at [KevinCathcart's Github Project.](https://github.com/KevinCathcart/ALttPEntranceRandomizer)
 See https://alttpr.com/ for more details on the normal randomizer.
+
+# Known Issues
+
+[List of Known Issues and Their Status](https://docs.google.com/document/d/1Bk-m-QRvH5iF60ndptKYgyaV7P93D3TiG8xmdxp_bdQ/edit?usp=sharing)
+
+# Feedback and Bug Reports
+
+Please just DM me on discord for now. I (Aerinon) can be found at the [ALTTP Randomizer discord](https://discordapp.com/invite/alttprandomizer).
 
 # Installation
 
-Clone this repository and then run ```EntranceRandomizer.py``` (requires Python 3).
+Clone this repository and then run ```DungeonRandomizer.py``` (requires Python 3).
 
-Alternatively, run ```Gui.py``` for a simple graphical user interface.
-
-For releases, a Windows standalone executable is available for users without Python 3.
+Alternatively, run ```Gui.py``` for a simple graphical user interface. (WIP)
 
 # Settings
 
-## Game Mode
+Only extra settings are found here. All entrance randomizer settings are supported. See their [readme](https://github.com/KevinCathcart/ALttPEntranceRandomizer/blob/master/README.md)
 
-### Standard
+## Door Shuffle
 
-Fixes Hyrule Castle Secret Entrance and Front Door, but may lead to weird rain state issues if you exit through the Hyrule Castle side exits before rescuing Zelda in a full shuffle.
+### Basic
 
-Gives lightcone in Hyrule Castle Sewers even without the Lamp.
+Doors are shuffled only within a single dungeon.
 
-### Open
+### Crossed
 
-This mode starts with the option to start in your house or the sanctuary, you are free to explore.
-
-Special notes:
-
-- Uncle already in sewers and most likely does not have a sword.
-- Sewers do not get a free light cone.
-- It may be a while before you find a sword, think of other ways to do damage to enemies. (bombs are a great tool, as well as picking up bushes in over world).
-
-### Swordless
+Doors are shuffled between dungeons as well.
 
 This mode removes all swords from the itempool. Otherwise just like open.
 
@@ -207,12 +206,11 @@ two sections of Skull Woods remain confined to the general Skull Woods area. Lin
 
 ### Vanilla
 
-Places entrances in the same locations they were in the original The Legend of Zelda: A Link to the Past.
+Doors are not shuffled.
 
-### Simple
+### Experimental
 
-Shuffles dungeon entrances between each other and keeps all 4-entrance dungeons confined to one location such that dungeons will one to one swap with each other.
-Other than on Light World Death Mountain, interiors are shuffled but still connect the same points on the overworld. On Death Mountain, entrances are connected more freely.
+Used for development testing. This will be removed in a future version. Use at your own risk. Might play like a plando.
 
 ### Restricted
 
@@ -319,9 +317,10 @@ Use to batch generate multiple seeds with same settings. If a seed number is pro
 Show the help message and exit.
 
 ```
---create_spoiler      
+--door_shuffle      
 ```
 
+For specifying the door shuffle you want as above. (default: basic)
 Output a Spoiler File (default: False)
 
 ```

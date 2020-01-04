@@ -3,6 +3,8 @@
 *_Spoiler.txt
 *.pyc
 *.sfc
+*.srm
+*.bst
 *.wixobj
 build
 bundle/components.wxs
@@ -14,3 +16,5 @@ README.html
 EnemizerCLI/
 .mypy_cache/
 RaceRom.py
+venv
+test

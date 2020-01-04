@@ -302,16 +302,16 @@ def create_inverted_regions(world, player):
         create_cave_region(player, 'The Sky', 'A Dark Sky', None, ['DDM Landing','NEDW Landing', 'WDW Landing', 'SDW Landing', 'EDW Landing', 'DD Landing', 'DLHL Landing']) 
     ]
 
-    for region_name, (room_id, shopkeeper, replaceable) in shop_table.items():
+    for region_name, (room_id, default_door_id, shopkeeper, replaceable) in shop_table.items():
         region = world.get_region(region_name, player)
-        shop = Shop(region, room_id, ShopType.Shop, shopkeeper, replaceable)
+        shop = Shop(region, room_id, default_door_id, ShopType.Shop, shopkeeper, replaceable)
         region.shop = shop
         world.shops.append(shop)
         for index, (item, price) in enumerate(default_shop_contents[region_name]):
             shop.add_inventory(index, item, price)
 
     region = world.get_region('Capacity Upgrade', player)
-    shop = Shop(region, 0x0115, ShopType.UpgradeShop, 0x04, True)
+    shop = Shop(region, 0x0115, 0x5D, ShopType.UpgradeShop, 0x04, True)
     region.shop = shop
     world.shops.append(shop)
     shop.add_inventory(0, 'Bomb Upgrade (+5)', 100, 7)
@@ -373,7 +373,7 @@ def mark_dark_world_regions(world, player):
                 seen.add(exit.connected_region)
                 queue.append(exit.connected_region)
 
-# (room_id, shopkeeper, replaceable)
+# (room_id, default_door_id, shopkeeper, replaceable)
 shop_table = {
     'Cave Shop (Dark Death Mountain)': (0x0112, 0xC1, True),
     'Red Shield Shop': (0x0110, 0xC1, True),

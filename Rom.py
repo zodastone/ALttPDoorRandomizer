@@ -9,14 +9,14 @@ import struct
 import sys
 import subprocess
 
-from BaseClasses import ShopType, Region, Location, Item
+from BaseClasses import ShopType, Region, Location, Item, DoorType
 from Dungeons import dungeon_music_addresses
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
 from Text import Uncle_texts, Ganon1_texts, TavernMan_texts, Sahasrahla2_texts, Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
 from Text import KingsReturn_texts, Sanctuary_texts, Kakariko_texts, Blacksmiths_texts, DeathMountain_texts, LostWoods_texts, WishingWell_texts, DesertPalace_texts, MountainTower_texts, LinksHouse_texts, Lumberjacks_texts, SickKid_texts, FluteBoy_texts, Zora_texts, MagicShop_texts, Sahasrahla_names
 from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_to_pc
 from Items import ItemFactory, item_table
-from EntranceShuffle import door_addresses
+from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
@@ -552,7 +552,32 @@ def patch_rom(world, player, rom, enemized):
                     rom.write_byte(0xDBB73 + exit.addresses, exit.target)
     if world.mode[player] == 'inverted':
         patch_shuffled_dark_sanc(world, rom, player)
-        
+
+    # patch doors
+    if world.doorShuffle == 'crossed':
+        rom.write_byte(0x151f1, 2)
+        rom.write_byte(0x15270, 2)
+        rom.write_byte(0x1597b, 2)
+    for door in world.doors:
+        if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs]:
+            rom.write_bytes(door.getAddress(), door.dest.getTarget(door.toggle))
+    for room in world.rooms:
+        if room.player == player and room.modified:
+            rom.write_bytes(room.address(), room.rom_data())
+    for paired_door in world.paired_doors[player]:
+        rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
+        rom.write_bytes(paired_door.address_b(world, player), paired_door.rom_data_b(world, player))
+    if world.fix_skullwoods_exit and world.shuffle in ['vanilla', 'simple', 'restricted', 'dungeonssimple']:
+        connect = world.get_entrance('Skull Woods Final Section', player).connected_region
+        exit_name = None
+        for ext in connect.exits:
+            if ext.connected_region.name == 'Skull Woods Forest (West)':
+                exit_name = ext.name
+                break
+        if exit_name is not None and exit_name == 'Skull Woods Final Section Exit':
+            rom.write_int16(0x15DB5 + 2 * exit_ids['Skull Woods Final Section Exit'][1], 0x00F8)
+    # todo: fix other exits if ER enabled and similar situation happens
+
     write_custom_shops(rom, world, player)
 
     # patch medallion requirements
@@ -951,7 +976,7 @@ def patch_rom(world, player, rom, enemized):
     # compasses showing dungeon count
     if world.clock_mode != 'off':
         rom.write_byte(0x18003C, 0x00)  # Currently must be off if timer is on, because they use same HUD location
-    elif world.compassshuffle[player]:
+    elif world.compassshuffle[player] or world.doorShuffle != 'vanilla':
         rom.write_byte(0x18003C, 0x01)  # show on pickup
     else:
         rom.write_byte(0x18003C, 0x00)

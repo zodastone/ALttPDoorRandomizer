@@ -10,6 +10,7 @@ import sys
 
 from Main import main
 from Utils import is_bundled, close_console
+from Fill import FillError
 
 
 class ArgumentDefaultsHelpFormatter(argparse.RawTextHelpFormatter):
@@ -127,7 +128,7 @@ def parse_arguments(argv, no_defaults=False):
     parser.add_argument('--algorithm', default=defval('balanced'), const='balanced', nargs='?', choices=['freshness', 'flood', 'vt21', 'vt22', 'vt25', 'vt26', 'balanced'],
                         help='''\
                              Select item filling algorithm. (default: %(default)s
-                             balanced:    vt26 derivitive that aims to strike a balance between
+                             balanced:    vt26 derivative that aims to strike a balance between
                                           the overworld heavy vt25 and the dungeon heavy vt26
                                           algorithm.
                              vt26:        Shuffle items and place them in a random location
@@ -171,6 +172,17 @@ def parse_arguments(argv, no_defaults=False):
                              The dungeon variants only mix up dungeons and keep the rest of
                              the overworld vanilla.
                              ''')
+    parser.add_argument('--door_shuffle', default=defvalue('vanilla'), const='vanilla', nargs='?', choices=['vanilla', 'basic', 'crossed', 'experimental'],
+                        help='''\
+                            Select Door Shuffling Algorithm. (default: %(default)s)
+                            Basic:      Doors are mixed within a single dungeon.
+                                        (Not yet implemented)
+                            Crossed:    Doors are mixed between all dungeons.
+                                        (Not yet implemented)
+                            Vanilla:    All doors are connected the same way they were in the
+                                        base game.
+                            Experimental: Experimental mixes live here. Use at your own risk.                        
+                        ''')
     parser.add_argument('--crystals_ganon', default=defval('7'), const='7', nargs='?', choices=['random', '0', '1', '2', '3', '4', '5', '6', '7'],
                         help='''\
                              How many crystals are needed to defeat ganon. Any other 
@@ -325,11 +337,22 @@ def start():
         guiMain(args)
     elif args.count is not None:
         seed = args.seed
+        failures = []
+        logger = logging.getLogger('')
         for _ in range(args.count):
-            main(seed=seed, args=args)
+            try:
+                main(seed=seed, args=args)
+                logger.info('Finished run %s', _+1)
+            except (FillError, Exception, RuntimeError) as err:
+                failures.append((err, seed))
+                logger.warning('Generation failed: %s', err)
             seed = random.randint(0, 999999999)
+        for fail in failures:
+            logger.info('%s seed failed with: %s', fail[1], fail[0])
+        logger.info('Generation fail rate: %f%%', 100*len(failures)/args.count)
     else:
         main(seed=args.seed, args=args)
+
 
 if __name__ == '__main__':
     start()
