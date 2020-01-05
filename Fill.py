@@ -194,7 +194,7 @@ def fill_restrictive(world, base_state, locations, itempool, single_player_place
                 spot_to_fill = None
 
                 for location in locations:
-                    if item_to_place.key:  # a better test to see if a key can go there
+                    if item_to_place.smallkey or item_to_place.bigkey:  # a better test to see if a key can go there
                         location.item = item_to_place
                         test_state = maximum_exploration_state.copy()
                         test_state.stale[item_to_place.player] = True
@@ -204,7 +204,7 @@ def fill_restrictive(world, base_state, locations, itempool, single_player_place
                             and location.can_fill(test_state, item_to_place, perform_access_check):
                         spot_to_fill = location
                         break
-                    elif item_to_place.key:
+                    elif item_to_place.smallkey or item_to_place.bigkey:
                         location.item = None
 
                 if spot_to_fill is None:

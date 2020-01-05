@@ -744,10 +744,10 @@ def _create_region(player, name, type, hint='Hyrule', locations=None, exits=None
         ret.exits.append(Entrance(player, exit, ret))
     for location in locations:
         if location in key_only_locations:
-          ret.locations.append(Location(player, location, None, False, None, ret, key_only_locations[location], player_address))
+          ret.locations.append(Location(player, location, None, False, None, ret, key_only_locations[location]))
         else:
-          address, crystal, hint_text = location_table[location]
-          ret.locations.append(Location(player, location, address, crystal, hint_text, ret, player_address))
+          address, player_address, crystal, hint_text = location_table[location]
+          ret.locations.append(Location(player, location, address, crystal, hint_text, ret, None, player_address))
     return ret
 
 def mark_light_world_regions(world, player):
@@ -1086,6 +1086,13 @@ location_table = {'Mushroom': (0x180013, 0x186338, False, 'in the woods'),
                   'Frog': (None, None, False, None),
                   'Missing Smith': (None, None, False, None),
                   'Dark Blacksmith Ruins': (None, None, False, None),
+                  'Trench 1 Switch': (None, None, False, None),
+                  'Trench 2 Switch': (None, None, False, None),
+                  'Swamp Drain': (None, None, False, None),
+                  'Attic Cracked Floor': (None, None, False, None),
+                  'Suspicious Maiden': (None, None, False, None),
+                  'Revealing Light': (None, None, False, None),
+                  'Ice Block Drop': (None, None, False, None),
                   'Eastern Palace - Prize': ([0x1209D, 0x53EF8, 0x53EF9, 0x180052, 0x18007C, 0xC6FE], None, True, 'Eastern Palace'),
                   'Desert Palace - Prize': ([0x1209E, 0x53F1C, 0x53F1D, 0x180053, 0x180078, 0xC6FF], None, True, 'Desert Palace'),
                   'Tower of Hera - Prize': ([0x120A5, 0x53F0A, 0x53F0B, 0x18005A, 0x18007A, 0xC706], None, True, 'Tower of Hera'),

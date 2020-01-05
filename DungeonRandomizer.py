@@ -172,7 +172,7 @@ def parse_arguments(argv, no_defaults=False):
                              The dungeon variants only mix up dungeons and keep the rest of
                              the overworld vanilla.
                              ''')
-    parser.add_argument('--door_shuffle', default=defvalue('vanilla'), const='vanilla', nargs='?', choices=['vanilla', 'basic', 'crossed', 'experimental'],
+    parser.add_argument('--door_shuffle', default=defval('vanilla'), const='vanilla', nargs='?', choices=['vanilla', 'basic', 'crossed', 'experimental'],
                         help='''\
                             Select Door Shuffling Algorithm. (default: %(default)s)
                             Basic:      Doors are mixed within a single dungeon.

@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from AdjusterMain import adjust
-from EntranceRandomizer import parse_arguments
+from DungeonRandomizer import parse_arguments
 from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
 from Main import main, __version__ as ESVersion
 from Rom import Sprite
@@ -329,7 +329,6 @@ def guiMain(args=None):
     shuffleFrame.pack(expand=True, anchor=E)
     doorShuffleFrame.pack(expand=True, anchor=E)
 
-    swordsFrame.pack(expand=True, anchor=E)
     difficultyFrame.pack(expand=True, anchor=E)
     itemfunctionFrame.pack(expand=True, anchor=E)
     timerFrame.pack(expand=True, anchor=E)

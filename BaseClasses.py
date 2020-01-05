@@ -14,7 +14,7 @@ class World(object):
     def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments, timer, progressive, goal, algorithm, accessibility, shuffle_ganon, quickswap, fastmenu, disable_music, retro, custom, customitemarray, hints):
         self.players = players
         self.shuffle = shuffle.copy()
-        self.doorShuffle = doorShuffle.copy()
+        self.doorShuffle = doorShuffle
         self.logic = logic.copy()
         self.mode = mode.copy()
         self.swords = swords.copy()
@@ -45,9 +45,9 @@ class World(object):
         self.lock_aga_door_in_escape = False
         self.save_and_quit_from_boss = True
         self.accessibility = accessibility.copy()
-        self.fix_skullwoods_exit = self.shuffle not in ['vanilla', 'simple', 'restricted', 'dungeonssimple'] or self.doorShuffle not in ['vanilla']
-        self.fix_palaceofdarkness_exit = self.shuffle not in ['vanilla', 'simple', 'restricted', 'dungeonssimple']
-        self.fix_trock_exit = self.shuffle not in ['vanilla', 'simple', 'restricted', 'dungeonssimple']
+        self.fix_skullwoods_exit = {}
+        self.fix_palaceofdarkness_exit = {}
+        self.fix_trock_exit = {}
         self.shuffle_ganon = shuffle_ganon
         self.fix_gtower_exit = self.shuffle_ganon
         self.quickswap = quickswap
