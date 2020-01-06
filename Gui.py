@@ -90,6 +90,34 @@ def guiMain(args=None):
 
     fileDialogFrame = Frame(rightHalfFrame)
 
+    heartbeepFrame = Frame(fileDialogFrame)
+    heartbeepVar = StringVar()
+    heartbeepVar.set('normal')
+    heartbeepOptionMenu = OptionMenu(heartbeepFrame, heartbeepVar, 'double', 'normal', 'half', 'quarter', 'off')
+    heartbeepOptionMenu.pack(side=RIGHT)
+    heartbeepLabel = Label(heartbeepFrame, text='Heartbeep sound rate')
+    heartbeepLabel.pack(side=LEFT, padx=(0,52))
+
+    heartcolorFrame = Frame(fileDialogFrame)
+    heartcolorVar = StringVar()
+    heartcolorVar.set('red')
+    heartcolorOptionMenu = OptionMenu(heartcolorFrame, heartcolorVar, 'red', 'blue', 'green', 'yellow', 'random')
+    heartcolorOptionMenu.pack(side=RIGHT)
+    heartcolorLabel = Label(heartcolorFrame, text='Heart color')
+    heartcolorLabel.pack(side=LEFT, padx=(0,127))
+
+    fastMenuFrame = Frame(fileDialogFrame)
+    fastMenuVar = StringVar()
+    fastMenuVar.set('normal')
+    fastMenuOptionMenu = OptionMenu(fastMenuFrame, fastMenuVar, 'normal', 'instant', 'double', 'triple', 'quadruple', 'half')
+    fastMenuOptionMenu.pack(side=RIGHT)
+    fastMenuLabel = Label(fastMenuFrame, text='Menu speed')
+    fastMenuLabel.pack(side=LEFT, padx=(0,100))
+
+    heartbeepFrame.pack(expand=True, anchor=E)
+    heartcolorFrame.pack(expand=True, anchor=E)
+    fastMenuFrame.pack(expand=True, anchor=E)
+
     romDialogFrame = Frame(fileDialogFrame)
     baseRomLabel = Label(romDialogFrame, text='Base Rom')
     romVar = StringVar()
@@ -144,7 +172,7 @@ def guiMain(args=None):
     modeVar.set('open')
     modeOptionMenu = OptionMenu(modeFrame, modeVar, 'standard', 'open', 'inverted')
     modeOptionMenu.pack(side=RIGHT)
-    modeLabel = Label(modeFrame, text='Game Mode')
+    modeLabel = Label(modeFrame, text='Game mode')
     modeLabel.pack(side=LEFT)
 
     logicFrame = Frame(drowDownFrame)
@@ -208,7 +236,7 @@ def guiMain(args=None):
     difficultyVar.set('normal')
     difficultyOptionMenu = OptionMenu(difficultyFrame, difficultyVar, 'normal', 'hard', 'expert')
     difficultyOptionMenu.pack(side=RIGHT)
-    difficultyLabel = Label(difficultyFrame, text='Game difficulty')
+    difficultyLabel = Label(difficultyFrame, text='Difficulty: item pool')
     difficultyLabel.pack(side=LEFT)
 
     timerFrame = Frame(drowDownFrame)
@@ -1137,10 +1165,15 @@ def guiMain(args=None):
         if args.seed:
             seedVar.set(str(args.seed))
         modeVar.set(args.mode)
+        swordsVar.set(args.swords)
         difficultyVar.set(args.difficulty)
+        itemFuncVar.set(args.item_functionality)
         timerVar.set(args.timer)
         progressiveVar.set(args.progressive)
+        accessibilityVar.set(args.accessibility)
         goalVar.set(args.goal)
+        crystalsGTVar.set(args.crystals_gt)
+        crystalsGanonVar.set(args.crystals_ganon)
         algorithmVar.set(args.algorithm)
         shuffleVar.set(args.shuffle)
         doorShuffleVar.set(args.door_shuffle)
