@@ -118,9 +118,9 @@ def analyze_dungeon(key_layout, world, player):
         raw_avail = chest_keys + len(key_counter.key_only_locations)
         available = raw_avail - key_counter.used_keys
         possible_smalls = count_unique_small_doors(key_counter, key_layout.flat_prop)
-        avail_bigs = count_unique_big_doors(key_counter)
+        avail_bigs = exist_relevant_big_doors(key_counter, key_layout)
         if not key_counter.big_key_opened:
-            if chest_keys == count_locations_big_optional(key_counter.free_locations) and available <= possible_smalls and avail_bigs == 0:
+            if chest_keys == count_locations_big_optional(key_counter.free_locations) and available <= possible_smalls and not avail_bigs:
                 key_logic.bk_restricted.update(filter_big_chest(key_counter.free_locations))
                 if not key_counter.big_key_opened and big_chest_in_locations(key_counter.free_locations):
                     key_logic.sm_restricted.update(find_big_chest_locations(key_counter.free_locations))
@@ -318,6 +318,7 @@ def create_rule(key_counter, prev_counter, key_layout, world):
     available = raw_avail - key_counter.used_keys
     possible_smalls = count_unique_small_doors(key_counter, key_layout.flat_prop)
     required_keys = min(available, possible_smalls) + key_counter.used_keys
+    # required_keys = key_counter.used_keys + 1 # this sometimes makes more sense
     # if prev_avail < required_keys:
     #     required_keys = prev_avail + prev_counter.used_keys
     #     return DoorRules(required_keys)
@@ -487,15 +488,16 @@ def count_unique_small_doors(key_counter, proposal):
     return cnt
 
 
-def count_unique_big_doors(key_counter):
-    cnt = 0
-    counted = set()
-    for door in key_counter.child_doors:
-        if door.bigKey and door not in counted:
-            cnt += 1
-            counted.add(door)
-            counted.add(door.dest)
-    return cnt
+def exist_relevant_big_doors(key_counter, key_layout):
+    bk_counter = find_counter(key_counter.open_doors, True, key_layout, False)
+    if bk_counter is not None:
+        diff = dict_difference(bk_counter.free_locations, key_counter.free_locations)
+        if len(diff) > 0:
+            return True
+        diff = dict_difference(bk_counter.key_only_locations, key_counter.key_only_locations)
+        if len(diff) > 0:
+            return True
+    return False
 
 
 def count_locations_big_optional(locations, bk=False):
@@ -788,7 +790,7 @@ def state_id(state, flat_proposal):
     return s_id
 
 
-def find_counter(opened_doors, bk_hint, key_layout):
+def find_counter(opened_doors, bk_hint, key_layout, raise_on_error=True):
     counter = find_counter_hint(opened_doors, bk_hint, key_layout)
     if counter is not None:
         return counter
@@ -801,7 +803,9 @@ def find_counter(opened_doors, bk_hint, key_layout):
         counter = find_counter_hint(dict.fromkeys(more_doors), bk_hint, key_layout)
         if counter is not None:
             return counter
-    raise Exception('Unable to find door permutation. Init CID: %s' % counter_id(opened_doors, bk_hint, key_layout.flat_prop))
+    if raise_on_error:
+        raise Exception('Unable to find door permutation. Init CID: %s' % counter_id(opened_doors, bk_hint, key_layout.flat_prop))
+    return None
 
 
 def find_counter_hint(opened_doors, bk_hint, key_layout):

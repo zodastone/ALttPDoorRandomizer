@@ -1034,7 +1034,7 @@ def reassign_key_doors(builder, proposal, world, player):
                 room.delete(d.doorListPos)
             else:
                 if len(room.doorList) > 1:
-                    room.mirror(d.doorListPos)
+                    room.mirror(d.doorListPos)  # todo: I don't think this works for crossed - maybe it will
                 else:
                     room.delete(d.doorListPos)
             d.smallKey = False

@@ -1084,11 +1084,12 @@ def create_doors(world, player):
     world.get_door('Hera Startile Wide Holes', player).c_switch()
 
     world.get_door('PoD Arena Main SW', player).c_switch()
+    world.get_door('PoD Arena Bonk Path', player).c_switch()
     world.get_door('PoD Arena Bridge SE', player).c_switch()
+    world.get_door('PoD Arena Bridge Drop Down', player).c_switch()
     world.get_door('PoD Arena Main Orange Barrier', player).barrier(CrystalBarrier.Orange)
     # maybe you can cross this way with blue up??
     world.get_door('PoD Arena Main Crystal Path', player).barrier(CrystalBarrier.Blue)
-    world.get_door('PoD Arena Crystals E', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Arena Crystal Path', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Sexy Statue W', player).c_switch()
     world.get_door('PoD Sexy Statue NW', player).c_switch()
@@ -1185,6 +1186,7 @@ def create_doors(world, player):
     world.get_door('GT Hookshot Entry Blue Barrier', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT Double Switch Orange Barrier', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Orange Barrier 2', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Orange Path', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Key Orange Path', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Key Blue Path', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT Double Switch Blue Barrier', player).barrier(CrystalBarrier.Blue)
