@@ -290,7 +290,7 @@ def copy_dynamic_regions_and_locations(world, ret):
         # Note: ideally exits should be copied here, but the current use case (Take anys) do not require this
 
         if region.shop:
-            new_reg.shop = Shop(new_reg, region.shop.room_id, region.shop.default_door_id, region.shop.type, region.shop.shopkeeper_config, region.shop.replaceable)
+            new_reg.shop = Shop(new_reg, region.shop.room_id, region.shop.type, region.shop.shopkeeper_config, region.shop.replaceable)
             ret.shops.append(new_reg.shop)
 
     for location in world.dynamic_locations:
@@ -325,6 +325,7 @@ def create_playthrough(world):
     while sphere_candidates:
         if not world.keysanity:
             state.sweep_for_events(key_only=True)
+        state.sweep_for_crystal_access()
 
         sphere = []
         # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
@@ -379,6 +380,7 @@ def create_playthrough(world):
     while required_locations:
         if not world.keysanity:
             state.sweep_for_events(key_only=True)
+        state.sweep_for_crystal_access()
 
         sphere = list(filter(lambda loc: state.can_reach(loc) and state.not_flooding_a_key(world, loc), required_locations))
 
