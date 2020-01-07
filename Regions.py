@@ -481,7 +481,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Ice Cross Left', 'Ice Palace', None, ['Ice Cross Left WS', 'Ice Cross Left Push Block']),
         create_dungeon_region(player, 'Ice Cross Bottom', 'Ice Palace', None, ['Ice Cross Bottom SE', 'Ice Cross Bottom Push Block Left', 'Ice Cross Bottom Push Block Right']),
         create_dungeon_region(player, 'Ice Cross Right', 'Ice Palace', None, ['Ice Cross Right ES', 'Ice Cross Right Push Block Top', 'Ice Cross Right Push Block Bottom']),
-        create_dungeon_region(player, 'Ice Cross Top', 'Ice Palace', None, ['Ice Cross Top NE', 'Ice Cross Top Push Block Left', 'Ice Cross Top Push Block Right']),
+        create_dungeon_region(player, 'Ice Cross Top', 'Ice Palace', None, ['Ice Cross Top NE', 'Ice Cross Top Push Block Bottom', 'Ice Cross Top Push Block Right']),
         create_dungeon_region(player, 'Ice Compass Room', 'Ice Palace', ['Ice Palace - Compass Chest'], ['Ice Compass Room NE']),
         create_dungeon_region(player, 'Ice Pengator Switch', 'Ice Palace', None, ['Ice Pengator Switch WS', 'Ice Pengator Switch ES']),
         create_dungeon_region(player, 'Ice Dead End', 'Ice Palace', None, ['Ice Dead End WS']),

@@ -1350,7 +1350,6 @@ logical_connections = [
     ('Thieves Conveyor Block Path', 'Thieves Conveyor Bridge'),
     ('Ice Cross Bottom Push Block Left', 'Ice Floor Switch'),
     ('Ice Cross Right Push Block Top', 'Ice Bomb Drop'),
-    ('Ice Cross Top Push Block Left', 'Ice Floor Switch'),
     ('Ice Big Key Push Block', 'Ice Dead End'),
     ('Ice Bomb Jump Ledge Orange Barrier', 'Ice Bomb Jump Catwalk'),
     ('Ice Bomb Jump Catwalk Orange Barrier', 'Ice Bomb Jump Ledge'),

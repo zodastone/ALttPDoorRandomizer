@@ -616,7 +616,7 @@ def create_doors(world, player):
         create_door(player, 'Ice Cross Bottom Push Block Right', Lgcl),  # dynamic
         create_door(player, 'Ice Cross Right Push Block Top', Lgcl),
         create_door(player, 'Ice Cross Right Push Block Bottom', Lgcl),  # dynamic
-        create_door(player, 'Ice Cross Top Push Block Left', Lgcl),
+        create_door(player, 'Ice Cross Top Push Block Bottom', Lgcl),  # dynamic
         create_door(player, 'Ice Cross Top Push Block Right', Lgcl),  # dynamic
         create_door(player, 'Ice Cross Bottom SE', Nrml).dir(So, 0x1e, Right, High).pos(3),
         create_door(player, 'Ice Cross Right ES', Nrml).dir(Ea, 0x1e, Bot, High).trap(0x4).pos(0),
@@ -1199,6 +1199,7 @@ def create_doors(world, player):
     east_controller = world.get_door('Ice Cross Right ES', player)
     controller_door(south_controller, world.get_door('Ice Cross Left Push Block', player))
     controller_door(south_controller, world.get_door('Ice Cross Right Push Block Bottom', player))
+    controller_door(south_controller, world.get_door('Ice Cross Top Push Block Bottom', player))
     controller_door(east_controller, world.get_door('Ice Cross Bottom Push Block Right', player))
     controller_door(east_controller, world.get_door('Ice Cross Top Push Block Right', player))
 

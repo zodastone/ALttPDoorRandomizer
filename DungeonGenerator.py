@@ -1583,7 +1583,7 @@ dungeon_boss_sectors = {
     'Palace of Darkness': ['PoD Boss'],
     'Swamp Palace': ['Swamp Boss'],
     'Skull Woods': ['Skull Boss'],
-    'Thieves Town': ['Thieves Attic Window', 'Thieves Blind\'s Cell', 'Thieves Boss'],
+    'Thieves Town': ['Thieves Blind\'s Cell', 'Thieves Boss'],
     'Ice Palace': ['Ice Boss'],
     'Misery Mire': ['Mire Boss'],
     'Turtle Rock': ['TR Boss'],
