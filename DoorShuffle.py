@@ -1536,6 +1536,8 @@ falldown_pits = [
     ('Ice Backwards Room Hole', 'Ice Fairy'),
     ('Ice Antechamber Hole', 'Ice Boss'),
     ('Mire Attic Hint Hole', 'Mire BK Chest Ledge'),
+    ('Mire Torches Top Holes', 'Mire Conveyor Barrier'),
+    ('Mire Torches Bottom Holes', 'Mire Warping Pool'),
     ('GT Bob\'s Room Hole', 'GT Ice Armos'),
     ('GT Falling Torches Hole', 'GT Staredown'),
     ('GT Moldorm Hole', 'GT Moldorm Pit')
