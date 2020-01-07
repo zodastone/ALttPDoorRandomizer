@@ -900,7 +900,7 @@ def create_doors(world, player):
         create_door(player, 'GT Torch EN', Intr).dir(Ea, 0x8c, Top, High).small_key().pos(2),
         create_door(player, 'GT Hope Room WN', Intr).dir(We, 0x8c, Top, High).small_key().pos(2),
         create_door(player, 'GT Torch SW', Intr).dir(So, 0x8c, Left, High).no_exit().pos(1),
-        create_door(player, 'GT Big Chest NW', Intr).dir(So, 0x8c, Left, High).pos(1),
+        create_door(player, 'GT Big Chest NW', Intr).dir(No, 0x8c, Left, High).pos(1),
         create_door(player, 'GT Blocked Stairs Down Stairs', Sprl).dir(Dn, 0x8c, 3, HTH).ss(Z, 0x12, 0x40, True, True).kill(),
         create_door(player, 'GT Blocked Stairs Block Path', Lgcl),
         create_door(player, 'GT Big Chest SW', Nrml).dir(So, 0x8c, Left, High).pos(4),

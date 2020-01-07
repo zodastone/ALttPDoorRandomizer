@@ -4,7 +4,7 @@ GfxFixer:
     jsl LoadRoomHook ; this is the rando version - let's only call this guy once - may fix star tiles and slower loads
     jsl Dungeon_InitStarTileCh
     jsl LoadTransAuxGfx
-    ;jsl Dungeon_LoadCustomTileAttr
+    jsl Dungeon_LoadCustomTileAttr
     jsl PrepTransAuxGfx
     lda #$09 : sta $17 : sta $0710
     jsl Palette_SpriteAux3

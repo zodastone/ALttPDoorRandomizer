@@ -43,8 +43,8 @@ org $00d6ae ;(PC: 56ae)
 LoadTransAuxGfx:
 org $00df5a ;(PC: 5f5a)
 PrepTransAuxGfx:
-;org $0ffd65 ;(PC: 07fd65)
-;Dungeon_LoadCustomTileAttr:
+org $0ffd65 ;(PC: 07fd65)
+Dungeon_LoadCustomTileAttr:
 ;org $01fec1
 ;Dungeon_ApproachFixedColor_variable:
 ;org $a0f972 ; Rando version
