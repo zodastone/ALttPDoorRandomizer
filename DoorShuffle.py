@@ -734,6 +734,7 @@ def reassign_boss(boss_region, boss_key, builder, gt, world, player):
 
 
 def experiment(world, player):
+    # print_wiki_doors(dungeon_regions, world, player)
     cross_dungeon(world, player)
 
 
@@ -750,8 +751,12 @@ def convert_to_sectors(region_names, world, player):
         matching_sectors = []
         while len(exits) > 0:
             ext = exits.pop()
-            if ext.connected_region is not None:
-                connect_region = ext.connected_region
+            door = world.check_for_door(ext.name, player)
+            if ext.connected_region is not None or door is not None and door.controller is not None:
+                if door is not None and door.controller is not None:
+                    connect_region = world.get_entrance(door.controller.name, player).parent_region
+                else:
+                    connect_region = ext.connected_region
                 if connect_region not in region_chunk and connect_region in region_list:
                     region_list.remove(connect_region)
                     region_chunk.append(connect_region)
@@ -763,7 +768,6 @@ def convert_to_sectors(region_names, world, player):
                             if existing not in matching_sectors:
                                 matching_sectors.append(existing)
             else:
-                door = world.check_for_door(ext.name, player)
                 if door is not None and door.controller is None and door.dest is None:
                     outstanding_doors.append(door)
         sector = Sector()
