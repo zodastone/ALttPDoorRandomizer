@@ -271,7 +271,6 @@ def global_rules(world, player):
     # Desert
     set_rule(world.get_location('Desert Palace - Torch', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('Desert Wall Slide NW', player), lambda state: state.has_fire_source(player))
-    add_rule(world.get_entrance('Desert Wall Slide NW', player), lambda state: state.has('Big Key (Desert Palace)', player))
     set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Prize', player))
     set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Boss', player))
 

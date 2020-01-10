@@ -320,9 +320,6 @@ def guiMain(args=None):
     timerFrame.pack(expand=True, anchor=E)
     progressiveFrame.pack(expand=True, anchor=E)
     algorithmFrame.pack(expand=True, anchor=E)
-    heartbeepFrame.pack(expand=True, anchor=E)
-    heartcolorFrame.pack(expand=True, anchor=E)
-    fastMenuFrame.pack(expand=True, anchor=E)
 
     enemizerFrame = LabelFrame(randomizerWindow, text="Enemizer", padx=5, pady=5)
     enemizerFrame.columnconfigure(0, weight=1)

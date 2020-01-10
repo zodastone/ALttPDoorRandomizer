@@ -112,7 +112,9 @@ LookupSpiralOffset: {
     stz $01 : bra .done
     .iceu lda $22 : cmp #$78 : bcc .done
     inc $01 : bra .done
-    .quad3 lda #$02 : sta $01 ; always 2
+    .quad3
+    lda $a2 : cmp #$40 : beq .done ; top of aga exception
+    lda #$02 : sta $01 ; always 2
 
     .done
     lda $a2 : tax : lda SpiralOffset,x
