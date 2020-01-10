@@ -1105,10 +1105,13 @@ def weighted_random_locations(dungeon_map, free_location_sectors):
 
 
 def minimal_locations(dungeon_name):
+    # bump to 5 if maps do something useful for all these dungeons
     if dungeon_name == 'Hyrule Castle':
-        return 3
+        return 4  # bk + compass + 2 others
     if dungeon_name == 'Agahnims Tower':
-        return 2  # bump to 3 once compasses work
+        return 4
+    if dungeon_name == 'Ganons Tower':
+        return 4
     # reduce gt to 4 once compasses work
     return 5
 

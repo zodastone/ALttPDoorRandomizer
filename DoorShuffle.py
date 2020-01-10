@@ -640,6 +640,14 @@ def cross_dungeon(world, player):
     paths = determine_required_paths(world)
     check_required_paths(paths, world, player)
 
+    hc = world.get_dungeon('Hyrule Castle', player)
+    del hc.dungeon_items[0]  # removes map
+    hc.dungeon_items.append(ItemFactory('Compass (Escape)', player))
+    at = world.get_dungeon('Agahnims Tower', player)
+    at.dungeon_items.append(ItemFactory('Compass (Agahnims Tower)', player))
+    gt = world.get_dungeon('Ganons Tower', player)
+    del gt.dungeon_items[0]  # removes map
+
     start = time.process_time()
     total_keys = remaining = 29
     total_candidates = 0
