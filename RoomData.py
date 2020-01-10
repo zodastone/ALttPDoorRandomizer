@@ -233,6 +233,7 @@ def create_rooms(world, player):
         # Room(player, 0xff, 0x52c9a).door(Position.InteriorW, DoorKind.Bombable).door(Position.InteriorE, DoorKind.Bombable).door(Position.SouthE, DoorKind.CaveEntrance),
     ]
     # fix some wonky things
+    world.get_room(0x51, player).change(1, DoorKind.Normal)  # fix the dungeon changer
     world.get_room(0x60, player).swap(2, 4)  # puts the exit at pos 2 - enables pos 3
     world.get_room(0x61, player).swap(1, 6)  # puts the WN door at pos 1 - enables it
     world.get_room(0x61, player).swap(5, 6)  # puts the Incognito Entrance at the end, so it can be deleted

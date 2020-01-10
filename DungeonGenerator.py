@@ -1128,7 +1128,7 @@ def assign_crystal_switch_sectors(dungeon_map, crystal_switches, assign_one=Fals
             assign_sector(random.choice(list(crystal_switches)), builder, crystal_switches)
         return crystal_switches
     sector_list = list(crystal_switches)
-    choices = random.choices(sector_list, k=len(population))
+    choices = random.sample(sector_list, k=len(population))
     for i, choice in enumerate(choices):
         builder = dungeon_map[population[i]]
         assign_sector(choice, builder, crystal_switches)
@@ -1583,7 +1583,7 @@ dungeon_boss_sectors = {
     'Palace of Darkness': ['PoD Boss'],
     'Swamp Palace': ['Swamp Boss'],
     'Skull Woods': ['Skull Boss'],
-    'Thieves Town': ['Thieves Attic Window', 'Thieves Blind\'s Cell', 'Thieves Boss'],
+    'Thieves Town': ['Thieves Blind\'s Cell', 'Thieves Boss'],
     'Ice Palace': ['Ice Boss'],
     'Misery Mire': ['Mire Boss'],
     'Turtle Rock': ['TR Boss'],

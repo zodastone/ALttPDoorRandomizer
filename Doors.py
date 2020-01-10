@@ -616,7 +616,7 @@ def create_doors(world, player):
         create_door(player, 'Ice Cross Bottom Push Block Right', Lgcl),  # dynamic
         create_door(player, 'Ice Cross Right Push Block Top', Lgcl),
         create_door(player, 'Ice Cross Right Push Block Bottom', Lgcl),  # dynamic
-        create_door(player, 'Ice Cross Top Push Block Left', Lgcl),
+        create_door(player, 'Ice Cross Top Push Block Bottom', Lgcl),  # dynamic
         create_door(player, 'Ice Cross Top Push Block Right', Lgcl),  # dynamic
         create_door(player, 'Ice Cross Bottom SE', Nrml).dir(So, 0x1e, Right, High).pos(3),
         create_door(player, 'Ice Cross Right ES', Nrml).dir(Ea, 0x1e, Bot, High).trap(0x4).pos(0),
@@ -789,8 +789,10 @@ def create_doors(world, player):
         create_door(player, 'Mire Warping Pool Warp', Warp),
         create_door(player, 'Mire Torches Top Down Stairs', Sprl).dir(Dn, 0x97, 0, HTH).ss(A, 0x11, 0xb0, True).kill(),
         create_door(player, 'Mire Torches Top SW', Intr).dir(So, 0x97, Left, High).pos(1),
+        create_door(player, 'Mire Torches Bottom Holes', Hole),
         create_door(player, 'Mire Torches Bottom NW', Intr).dir(No, 0x97, Left, High).pos(1),
         create_door(player, 'Mire Torches Bottom WS', Intr).dir(We, 0x97, Bot, High).pos(0),
+        create_door(player, 'Mire Torches Top Holes', Hole),
         create_door(player, 'Mire Attic Hint ES', Intr).dir(Ea, 0x97, Bot, High).pos(0),
         create_door(player, 'Mire Attic Hint Hole', Hole),
         create_door(player, 'Mire Dark Shooters Up Stairs', Sprl).dir(Up, 0x93, 0, LTH).ss(A, 0x32, 0xec),
@@ -900,7 +902,7 @@ def create_doors(world, player):
         create_door(player, 'GT Torch EN', Intr).dir(Ea, 0x8c, Top, High).small_key().pos(2),
         create_door(player, 'GT Hope Room WN', Intr).dir(We, 0x8c, Top, High).small_key().pos(2),
         create_door(player, 'GT Torch SW', Intr).dir(So, 0x8c, Left, High).no_exit().pos(1),
-        create_door(player, 'GT Big Chest NW', Intr).dir(So, 0x8c, Left, High).pos(1),
+        create_door(player, 'GT Big Chest NW', Intr).dir(No, 0x8c, Left, High).pos(1),
         create_door(player, 'GT Blocked Stairs Down Stairs', Sprl).dir(Dn, 0x8c, 3, HTH).ss(Z, 0x12, 0x40, True, True).kill(),
         create_door(player, 'GT Blocked Stairs Block Path', Lgcl),
         create_door(player, 'GT Big Chest SW', Nrml).dir(So, 0x8c, Left, High).pos(4),
@@ -1004,11 +1006,11 @@ def create_doors(world, player):
         create_door(player, 'GT Gauntlet 2 EN', Intr).dir(Ea, 0x5d, Top, High).pos(2),
         create_door(player, 'GT Gauntlet 2 SW', Intr).dir(So, 0x5d, Left, High).pos(0),
         create_door(player, 'GT Gauntlet 3 NW', Intr).dir(No, 0x5d, Left, High).pos(0),
-        create_door(player, 'GT Gauntlet 3 SW', Nrml).dir(So, 0x5d, Left, High).pos(1),
-        create_door(player, 'GT Gauntlet 4 NW', Nrml).dir(No, 0x6d, Left, High).pos(0),
+        create_door(player, 'GT Gauntlet 3 SW', Nrml).dir(So, 0x5d, Left, High).trap(0x2).pos(1),
+        create_door(player, 'GT Gauntlet 4 NW', Nrml).dir(No, 0x6d, Left, High).trap(0x4).pos(0),
         create_door(player, 'GT Gauntlet 4 SW', Intr).dir(So, 0x6d, Left, High).pos(1),
         create_door(player, 'GT Gauntlet 5 NW', Intr).dir(No, 0x6d, Left, High).pos(1),
-        create_door(player, 'GT Gauntlet 5 WS', Nrml).dir(We, 0x6d, Bot, High).pos(2),
+        create_door(player, 'GT Gauntlet 5 WS', Nrml).dir(We, 0x6d, Bot, High).trap(0x1).pos(2),
         create_door(player, 'GT Beam Dash ES', Nrml).dir(Ea, 0x6c, Bot, High).pos(2).kill(),
         create_door(player, 'GT Beam Dash WS', Intr).dir(We, 0x6c, Bot, High).pos(0),
         create_door(player, 'GT Lanmolas 2 ES', Intr).dir(Ea, 0x6c, Bot, High).pos(0),
@@ -1084,11 +1086,12 @@ def create_doors(world, player):
     world.get_door('Hera Startile Wide Holes', player).c_switch()
 
     world.get_door('PoD Arena Main SW', player).c_switch()
+    world.get_door('PoD Arena Bonk Path', player).c_switch()
     world.get_door('PoD Arena Bridge SE', player).c_switch()
+    world.get_door('PoD Arena Bridge Drop Down', player).c_switch()
     world.get_door('PoD Arena Main Orange Barrier', player).barrier(CrystalBarrier.Orange)
     # maybe you can cross this way with blue up??
     world.get_door('PoD Arena Main Crystal Path', player).barrier(CrystalBarrier.Blue)
-    world.get_door('PoD Arena Crystals E', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Arena Crystal Path', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Sexy Statue W', player).c_switch()
     world.get_door('PoD Sexy Statue NW', player).c_switch()
@@ -1185,6 +1188,7 @@ def create_doors(world, player):
     world.get_door('GT Hookshot Entry Blue Barrier', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT Double Switch Orange Barrier', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Orange Barrier 2', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Orange Path', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Key Orange Path', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Key Blue Path', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT Double Switch Blue Barrier', player).barrier(CrystalBarrier.Blue)
@@ -1195,6 +1199,7 @@ def create_doors(world, player):
     east_controller = world.get_door('Ice Cross Right ES', player)
     controller_door(south_controller, world.get_door('Ice Cross Left Push Block', player))
     controller_door(south_controller, world.get_door('Ice Cross Right Push Block Bottom', player))
+    controller_door(south_controller, world.get_door('Ice Cross Top Push Block Bottom', player))
     controller_door(east_controller, world.get_door('Ice Cross Bottom Push Block Right', player))
     controller_door(east_controller, world.get_door('Ice Cross Top Push Block Right', player))
 

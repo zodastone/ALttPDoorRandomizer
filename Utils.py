@@ -188,5 +188,44 @@ def read_entrance_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan)
             print("%s: %s" % (dp, bytes))
 
 
+def print_wiki_doors(d_regions, world, player):
+
+    for d, region_list in d_regions.items():
+        tile_map = {}
+        for region in region_list:
+            tile = None
+            r = world.get_region(region, player)
+            for ext in r.exits:
+                door = world.check_for_door(ext.name, player)
+                if door is not None and door.roomIndex != -1:
+                    tile = door.roomIndex
+                    break
+            if tile is not None:
+                if tile not in tile_map:
+                    tile_map[tile] = []
+                tile_map[tile].append(r)
+        print(d)
+        print('{| class="wikitable"')
+        print('|-')
+        print('! Room')
+        print('! Supertile')
+        print('! Doors')
+        for tile, region_list in tile_map.items():
+            tile_done = False
+            for region in region_list:
+                print('|-')
+                print('| '+region.name)
+                if not tile_done:
+                    listlen = len(region_list)
+                    link = '| {{UnderworldMapLink|'+str(tile)+'}}'
+                    print(link if listlen < 2 else '| rowspan = '+str(listlen)+' '+link)
+                    tile_done = True
+                strs_to_print = []
+                for ext in region.exits:
+                    strs_to_print.append(ext.name)
+                print('| '+' <br /> '.join(strs_to_print))
+        print('|}')
+
+
 if __name__ == '__main__':
     read_entrance_data(old_rom='C:\\Users\\Randall\\Documents\\kwyn\\orig\\z3.sfc')

@@ -734,6 +734,7 @@ def reassign_boss(boss_region, boss_key, builder, gt, world, player):
 
 
 def experiment(world, player):
+    # print_wiki_doors(dungeon_regions, world, player)
     cross_dungeon(world, player)
 
 
@@ -750,8 +751,12 @@ def convert_to_sectors(region_names, world, player):
         matching_sectors = []
         while len(exits) > 0:
             ext = exits.pop()
-            if ext.connected_region is not None:
-                connect_region = ext.connected_region
+            door = world.check_for_door(ext.name, player)
+            if ext.connected_region is not None or door is not None and door.controller is not None:
+                if door is not None and door.controller is not None:
+                    connect_region = world.get_entrance(door.controller.name, player).parent_region
+                else:
+                    connect_region = ext.connected_region
                 if connect_region not in region_chunk and connect_region in region_list:
                     region_list.remove(connect_region)
                     region_chunk.append(connect_region)
@@ -763,7 +768,6 @@ def convert_to_sectors(region_names, world, player):
                             if existing not in matching_sectors:
                                 matching_sectors.append(existing)
             else:
-                door = world.check_for_door(ext.name, player)
                 if door is not None and door.controller is None and door.dest is None:
                     outstanding_doors.append(door)
         sector = Sector()
@@ -1034,7 +1038,7 @@ def reassign_key_doors(builder, proposal, world, player):
                 room.delete(d.doorListPos)
             else:
                 if len(room.doorList) > 1:
-                    room.mirror(d.doorListPos)
+                    room.mirror(d.doorListPos)  # todo: I don't think this works for crossed - maybe it will
                 else:
                     room.delete(d.doorListPos)
             d.smallKey = False
@@ -1350,7 +1354,6 @@ logical_connections = [
     ('Thieves Conveyor Block Path', 'Thieves Conveyor Bridge'),
     ('Ice Cross Bottom Push Block Left', 'Ice Floor Switch'),
     ('Ice Cross Right Push Block Top', 'Ice Bomb Drop'),
-    ('Ice Cross Top Push Block Left', 'Ice Floor Switch'),
     ('Ice Big Key Push Block', 'Ice Dead End'),
     ('Ice Bomb Jump Ledge Orange Barrier', 'Ice Bomb Jump Catwalk'),
     ('Ice Bomb Jump Catwalk Orange Barrier', 'Ice Bomb Jump Ledge'),
@@ -1536,6 +1539,8 @@ falldown_pits = [
     ('Ice Backwards Room Hole', 'Ice Fairy'),
     ('Ice Antechamber Hole', 'Ice Boss'),
     ('Mire Attic Hint Hole', 'Mire BK Chest Ledge'),
+    ('Mire Torches Top Holes', 'Mire Conveyor Barrier'),
+    ('Mire Torches Bottom Holes', 'Mire Warping Pool'),
     ('GT Bob\'s Room Hole', 'GT Ice Armos'),
     ('GT Falling Torches Hole', 'GT Staredown'),
     ('GT Moldorm Hole', 'GT Moldorm Pit')

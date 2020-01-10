@@ -303,7 +303,7 @@ def guiMain(args=None):
 
     shuffleFrame = Frame(drowDownFrame)
     shuffleVar = StringVar()
-    shuffleVar.set('full')
+    shuffleVar.set('vanilla')
     shuffleOptionMenu = OptionMenu(shuffleFrame, shuffleVar, 'vanilla', 'simple', 'restricted', 'full', 'crossed', 'insanity', 'restricted_legacy', 'full_legacy', 'madness_legacy', 'insanity_legacy', 'dungeonsfull', 'dungeonssimple')
     shuffleOptionMenu.pack(side=RIGHT)
     shuffleLabel = Label(shuffleFrame, text='Entrance shuffle algorithm')
@@ -311,8 +311,8 @@ def guiMain(args=None):
 
     doorShuffleFrame = Frame(drowDownFrame)
     doorShuffleVar = StringVar()
-    doorShuffleVar.set('vanilla')
-    doorShuffleOptionMenu = OptionMenu(doorShuffleFrame, doorShuffleVar, 'vanilla', 'basic', 'crosssed', 'experimental')
+    doorShuffleVar.set('basic')
+    doorShuffleOptionMenu = OptionMenu(doorShuffleFrame, doorShuffleVar, 'vanilla', 'basic', 'crossed', 'experimental')
     doorShuffleOptionMenu.pack(side=RIGHT)
     doorShuffleLabel = Label(doorShuffleFrame, text='Door shuffle algorithm')
     doorShuffleLabel.pack(side=LEFT)

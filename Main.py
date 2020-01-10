@@ -361,6 +361,7 @@ def create_playthrough(world):
     logging.getLogger('').debug('Building up collection spheres.')
     while sphere_candidates:
         state.sweep_for_events(key_only=True)
+        state.sweep_for_crystal_access()
 
         sphere = []
         # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
@@ -422,6 +423,7 @@ def create_playthrough(world):
     collection_spheres = []
     while required_locations:
         state.sweep_for_events(key_only=True)
+        state.sweep_for_crystal_access()
 
         sphere = list(filter(lambda loc: state.can_reach(loc) and state.not_flooding_a_key(world, loc), required_locations))
 
