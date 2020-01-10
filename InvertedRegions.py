@@ -1,5 +1,6 @@
 import collections
-from BaseClasses import Region, Location, Entrance, RegionType, Shop, ShopType
+from BaseClasses import RegionType
+from Regions import create_lw_region, create_dw_region, create_cave_region, create_dungeon_region
 
 
 def create_inverted_regions(world, player):
@@ -318,31 +319,6 @@ def create_inverted_regions(world, player):
     shop.add_inventory(1, 'Arrow Upgrade (+5)', 100, 7)
     world.initialize_regions()
 
-def create_lw_region(player, name, locations=None, exits=None):
-    return _create_region(player, name, RegionType.LightWorld, 'Light World', locations, exits)
-
-def create_dw_region(player, name, locations=None, exits=None):
-    return _create_region(player, name, RegionType.DarkWorld, 'Dark World', locations, exits)
-
-def create_cave_region(player, name, hint='Hyrule', locations=None, exits=None):
-    return _create_region(player, name, RegionType.Cave, hint, locations, exits)
-
-def create_dungeon_region(player, name, hint='Hyrule', locations=None, exits=None):
-    return _create_region(player, name, RegionType.Dungeon, hint, locations, exits)
-
-def _create_region(player, name, type, hint='Hyrule', locations=None, exits=None):
-    ret = Region(name, type, hint, player)
-    if locations is None:
-        locations = []
-    if exits is None:
-        exits = []
-
-    for exit in exits:
-        ret.exits.append(Entrance(player, exit, ret))
-    for location in locations:
-        address, player_address, crystal, hint_text = location_table[location]
-        ret.locations.append(Location(player, location, address, crystal, hint_text, ret, player_address))
-    return ret
 
 def mark_dark_world_regions(world, player):
     # cross world caves may have some sections marked as both in_light_world, and in_dark_work.
