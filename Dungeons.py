@@ -288,7 +288,7 @@ gt_regions = [
     'GT Double Switch Exit', 'GT Spike Crystals', 'GT Warp Maze - Left Section', 'GT Warp Maze - Mid Section',
     'GT Warp Maze - Right Section', 'GT Warp Maze - Pit Section', 'GT Warp Maze - Pit Exit Warp Spot',
     'GT Warp Maze Exit Section', 'GT Firesnake Room', 'GT Firesnake Room Ledge', 'GT Warp Maze - Rail Choice',
-    'GT Warp Maze - Rando Rail', 'GT Warp Maze - Main Rails', 'GT Warp Maze - Pot Rail', 'GT Trap Room',
+    'GT Warp Maze - Rando Rail', 'GT Warp Maze - Main Rails', 'GT Warp Maze - Pot Rail', 'GT Petting Zoo',
     'GT Conveyor Star Pits', 'GT Hidden Star', 'GT DMs Room', 'GT Falling Bridge', 'GT Randomizer Room', 'GT Ice Armos',
     'GT Big Key Room', 'GT Four Torches', 'GT Fairy Abyss', 'GT Crystal Paths', 'GT Mimics 1', 'GT Mimics 2',
     'GT Dash Hall', 'GT Hidden Spikes', 'GT Cannonball Bridge', 'GT Refill', 'GT Gauntlet 1', 'GT Gauntlet 2',

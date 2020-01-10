@@ -1122,7 +1122,7 @@ def determine_required_paths(world, player):
             paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
             # noinspection PyTypeChecker
             paths['Hyrule Castle'].append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
-    if world.doorShuffle[player] in ['basic', 'experimental']:  # todo: crossed?
+    if world.doorShuffle[player] in ['basic']:
         paths['Thieves Town'].append('Thieves Attic Window')
     return paths
 
@@ -1986,7 +1986,7 @@ default_door_connections = [
     ('GT Hope Room EN', 'GT Tile Room WN'),
     ('GT Big Chest SW', 'GT Invisible Catwalk NW'),
     ('GT Bob\'s Room SE', 'GT Invisible Catwalk NE'),
-    ('GT Speed Torch NE', 'GT Trap Room SE'),
+    ('GT Speed Torch NE', 'GT Petting Zoo SE'),
     ('GT Speed Torch SE', 'GT Crystal Conveyor NE'),
     ('GT Warp Maze (Pits) ES', 'GT Invisible Catwalk WS'),
     ('GT Hookshot NW', 'GT DMs Room SW'),

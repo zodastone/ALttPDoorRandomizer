@@ -972,7 +972,7 @@ def create_doors(world, player):
         create_door(player, 'GT Warp Maze - Main Rails Right Mid Warp', Warp),
         create_door(player, 'GT Warp Maze - Pot Rail Warp', Warp),
         create_door(player, 'GT Warp Maze (Rails) WS', Nrml).dir(We, 0x7d, Bot, High).pos(1),
-        create_door(player, 'GT Trap Room SE', Nrml).dir(So, 0x7d, Right, High).trap(0x4).pos(0),
+        create_door(player, 'GT Petting Zoo SE', Nrml).dir(So, 0x7d, Right, High).trap(0x4).pos(0),
         create_door(player, 'GT Conveyor Star Pits EN', Nrml).dir(Ea, 0x7b, Top, High).small_key().pos(1),
         create_door(player, 'GT Hidden Star ES', Nrml).dir(Ea, 0x7b, Bot, High).pos(2).kill(),
         create_door(player, 'GT Hidden Star Warp', Warp),

@@ -655,7 +655,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'GT Warp Maze - Rando Rail', 'Ganon\'s Tower', None, ['GT Warp Maze (Rails) WS', 'GT Warp Maze - Rando Rail Warp']),
         create_dungeon_region(player, 'GT Warp Maze - Main Rails', 'Ganon\'s Tower', None, ['GT Warp Maze - Main Rails Best Warp', 'GT Warp Maze - Main Rails Mid Left Warp', 'GT Warp Maze - Main Rails Mid Right Warp', 'GT Warp Maze - Main Rails Right Top Warp', 'GT Warp Maze - Main Rails Right Mid Warp']),
         create_dungeon_region(player, 'GT Warp Maze - Pot Rail', 'Ganon\'s Tower', None, ['GT Warp Maze - Pot Rail Warp']),
-        create_dungeon_region(player, 'GT Trap Room', 'Ganon\'s Tower', None, ['GT Trap Room SE']),
+        create_dungeon_region(player, 'GT Petting Zoo', 'Ganon\'s Tower', None, ['GT Petting Zoo SE']),
         create_dungeon_region(player, 'GT Conveyor Star Pits', 'Ganon\'s Tower', ['Ganons Tower - Conveyor Star Pits Pot Key'], ['GT Conveyor Star Pits EN']),
         create_dungeon_region(player, 'GT Hidden Star', 'Ganon\'s Tower', None, ['GT Hidden Star ES', 'GT Hidden Star Warp']),
         create_dungeon_region(player, 'GT DMs Room', 'Ganon\'s Tower', ['Ganons Tower - DMs Room - Top Left', 'Ganons Tower - DMs Room - Top Right',
