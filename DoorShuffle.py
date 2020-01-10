@@ -2020,36 +2020,18 @@ default_one_way_connections = [
 ]
 
 # For crossed
-default_dungeon_sets = [
-    ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Rat Path', 'Sanctuary',
-     'Hyrule Dungeon Cellblock'],
-    ['Eastern Lobby', 'Eastern Boss'],
-    ['Desert Back Lobby', 'Desert Boss', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby'],
-    ['Hera Lobby', 'Hera Boss'],
-    ['Tower Lobby', 'Tower Agahnim 1'],
-    ['PoD Lobby', 'PoD Boss'],
-    ['Swamp Lobby', 'Swamp Boss'],
-    ['Skull 1 Lobby', 'Skull Pinball', 'Skull Left Drop', 'Skull Pot Circle', 'Skull 2 East Lobby',
-     'Skull 2 West Lobby', 'Skull Back Drop', 'Skull 3 Lobby', 'Skull Boss'],
-    ['Thieves Lobby', 'Thieves Attic Window', 'Thieves Blind\'s Cell', 'Thieves Boss'],
-    ['Ice Lobby', 'Ice Boss'],
-    ['Mire Lobby', 'Mire Boss'],
-    ['TR Main Lobby', 'TR Boss', 'TR Eye Bridge', 'TR Big Chest Entrance', 'TR Lazy Eyes'],
-    ['GT Lobby', 'GT Agahnim 2']
-]
-
-dungeon_x_idx_to_name = {
-    0: 'Hyrule Castle',
-    1: 'Eastern Palace',
-    2: 'Desert Palace',
-    3: 'Tower of Hera',
-    4: 'Agahnims Tower',
-    5: 'Palace of Darkness',
-    6: 'Swamp Palace',
-    7: 'Skull Woods',
-    8: 'Thieves Town',
-    9: 'Ice Palace',
-    10: 'Misery Mire',
-    11: 'Turtle Rock',
-    12: 'Ganons Tower'
+compass_data = {  # offset from 0x122e17, sram storage, write offset from 1037b9, 0 = jmp or # of nops
+    'Hyrule Castle': (0x1, 0xc0, 0x16, 0),
+    'Eastern Palace': (0x1C, 0xc1, 0x28, 0),
+    'Desert Palace': (0x35, 0xc2, 0x4a, 0),
+    'Tower of Hera': (0xEB, 0xc3, 0x5c, 0),
+    'Agahnims Tower': (0x51, 0xc4, 0x7e, 0),
+    'Palace of Darkness': (0x83, 0xc5, 0xa4, 0),
+    'Swamp Palace': (0x6A, 0xc6, 0xca, 0),
+    'Skull Woods': (0xB5, 0xc7, 0xf0, 0),
+    'Thieves Town': (0x106, 0xc8, 0x102, 0),
+    'Ice Palace': (0xD0, 0xc9, 0x114, 0),
+    'Misery Mire': (0x9C, 0xca, 0x138, 0),
+    'Turtle Rock': (0x11F, 0xcb, 0x15e, 0),
+    'Ganons Tower': (0x13A, 0xcc, 0x170, 2)
 }
