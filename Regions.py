@@ -705,20 +705,6 @@ def create_regions(world, player):
         create_dungeon_region(player, 'GT Agahnim 2', 'Ganon\'s Tower', ['Agahnim 2'], ['GT Agahnim 2 SW'])
     ]
 
-    for region_name, (room_id, default_door_id, shopkeeper, replaceable) in shop_table.items():
-        region = world.get_region(region_name, player)
-        shop = Shop(region, room_id, default_door_id, ShopType.Shop, shopkeeper, replaceable)
-        region.shop = shop
-        world.shops.append(shop)
-        for index, (item, price) in enumerate(default_shop_contents[region_name]):
-            shop.add_inventory(index, item, price)
-
-    region = world.get_region('Capacity Upgrade', player)
-    shop = Shop(region, 0x0115, 0x5D, ShopType.UpgradeShop, 0x04, True)
-    region.shop = shop
-    world.shops.append(shop)
-    shop.add_inventory(0, 'Bomb Upgrade (+5)', 100, 7)
-    shop.add_inventory(1, 'Arrow Upgrade (+5)', 100, 7)
     world.initialize_regions()
 
 
@@ -781,23 +767,6 @@ def mark_light_world_regions(world, player):
                     seen.add(exit.connected_region)
                     queue.append(exit.connected_region)
 
-# (room_id, default_door_id, shopkeeper, replaceable)
-shop_table = {
-    'Cave Shop (Dark Death Mountain)': (0x0112, 0x6E, 0xC1, True),
-    'Red Shield Shop': (0x0110, 0x75, 0xC1, True),
-    'Dark Lake Hylia Shop': (0x010F, 0x74, 0xC1, True),
-    'Dark World Lumberjack Shop': (0x010F, 0x57, 0xC1, True),
-    'Village of Outcasts Shop': (0x010F, 0x60, 0xC1, True),
-    'Dark World Potion Shop': (0x010F, 0x6F, 0xC1, True),
-    'Light World Death Mountain Shop': (0x00FF, None, 0xA0, True),
-    'Kakariko Shop': (0x011F, 0x46, 0xA0, True),
-    'Cave Shop (Lake Hylia)': (0x0112, 0x58, 0xA0, True),
-    'Potion Shop': (0x0109, 0x4C, 0xFF, False),
-    # Bomb Shop not currently modeled as a shop, due to special nature of items
-}
-# region, [item]
-# slot, item, price, max=0, replacement=None, replacement_price=0
-# item = (item, price)
 
 def create_shops(world, player):
     for region_name, (room_id, type, shopkeeper, custom, locked, inventory) in shop_table.items():
