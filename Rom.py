@@ -579,7 +579,7 @@ def patch_rom(world, player, rom, enemized):
         patch_shuffled_dark_sanc(world, rom, player)
 
     # patch doors
-    if world.doorShuffle == 'crossed':
+    if world.doorShuffle[player] == 'crossed':
         rom.write_byte(0x151f1, 2)
         rom.write_byte(0x15270, 2)
         rom.write_byte(0x1597b, 2)
@@ -1137,7 +1137,7 @@ def patch_rom(world, player, rom, enemized):
     # compasses showing dungeon count
     if world.clock_mode != 'off':
         rom.write_byte(0x18003C, 0x00)  # Currently must be off if timer is on, because they use same HUD location
-    elif world.compassshuffle[player] or world.doorShuffle != 'vanilla':
+    elif world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla':
         rom.write_byte(0x18003C, 0x01)  # show on pickup
     else:
         rom.write_byte(0x18003C, 0x00)

@@ -145,7 +145,7 @@ def main(args, seed=None):
     logger.info('Patching ROM.')
 
     player_names = parse_names_string(args.names)
-    outfilebase = 'ER_%s' % (args.outputname if args.outputname else world.seed)
+    outfilebase = 'DR_%s' % (args.outputname if args.outputname else world.seed)
 
     rom_names = []
     jsonout = {}
@@ -225,7 +225,7 @@ def main(args, seed=None):
 
 def copy_world(world):
     # ToDo: Not good yet
-    ret = World(world.players, world.shuffle, world.door_shuffle, world.logic, world.mode, world.swords, world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm, world.accessibility, world.shuffle_ganon, world.retro, world.custom, world.customitemarray, world.hints)
+    ret = World(world.players, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords, world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm, world.accessibility, world.shuffle_ganon, world.retro, world.custom, world.customitemarray, world.hints)
     ret.required_medallions = world.required_medallions.copy()
     ret.swamp_patch_required = world.swamp_patch_required.copy()
     ret.ganon_at_pyramid = world.ganon_at_pyramid.copy()
@@ -264,6 +264,8 @@ def copy_world(world):
         else:
             create_inverted_regions(ret, player)
         create_shops(ret, player)
+        create_doors(ret, player)
+        create_rooms(ret, player)
         create_dungeons(ret, player)
 
     copy_dynamic_regions_and_locations(world, ret)

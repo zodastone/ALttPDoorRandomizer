@@ -16,7 +16,7 @@ class World(object):
     def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments, timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
         self.players = players
         self.shuffle = shuffle.copy()
-        self.doorShuffle = doorShuffle
+        self.doorShuffle = doorShuffle.copy()
         self.logic = logic.copy()
         self.mode = mode.copy()
         self.swords = swords.copy()
@@ -1510,6 +1510,7 @@ class Spoiler(object):
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'shuffle': self.world.shuffle,
+                         'door_shuffle': self.world.doorShuffle,
                          'item_pool': self.world.difficulty,
                          'item_functionality': self.world.difficulty_adjustments,
                          'gt_crystals': self.world.crystals_needed_for_gt,
@@ -1560,6 +1561,7 @@ class Spoiler(object):
             outfile.write('Difficulty:                      %s\n' % self.metadata['item_pool'])
             outfile.write('Item Functionality:              %s\n' % self.metadata['item_functionality'])
             outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'])
+            outfile.write('Door Shuffle:                    %s\n' % self.metadata['door_shuffle'])
             outfile.write('Crystals required for GT:        %s\n' % self.metadata['gt_crystals'])
             outfile.write('Crystals required for Ganon:     %s\n' % self.metadata['ganon_crystals'])
             outfile.write('Pyramid hole pre-opened:         %s\n' % {k: 'Yes' if v else 'No' for k, v in self.metadata['open_pyramid'].items()})
