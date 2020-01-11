@@ -4,8 +4,8 @@ import random
 import urllib.request
 import urllib.parse
 
-from EntranceRandomizer import parse_arguments
-from Main import main as ERmain
+from DungeonRandomizer import parse_arguments
+from Main import main as DRMain
 
 def parse_yaml(txt):
     def strip(s):
@@ -97,7 +97,7 @@ def main():
     loglevel = {'error': logging.ERROR, 'info': logging.INFO, 'warning': logging.WARNING, 'debug': logging.DEBUG}[erargs.loglevel]
     logging.basicConfig(format='%(message)s', level=loglevel)
 
-    ERmain(erargs, seed)
+    DRMain(erargs, seed)
 
 def get_weights(path):
     try:
@@ -143,6 +143,8 @@ def roll_settings(weights):
 
     entrance_shuffle = get_choice('entrance_shuffle')
     ret.shuffle = entrance_shuffle if entrance_shuffle != 'none' else 'vanilla'
+    door_shuffle = get_choice('door_shuffle')
+    ret.door_shuffle = door_shuffle if door_shuffle != 'none' else 'vanilla'
 
     ret.goal = {'ganon': 'ganon',
                 'fast_ganon': 'crystals',
