@@ -187,10 +187,10 @@ def main(args, seed=None):
                     'S' if world.keyshuffle[player] else '', 'B' if world.bigkeyshuffle[player] else '')
 
                 playername = f"{f'_P{player}' if world.players > 1 else ''}{f'_{player_names[player]}' if player in player_names else ''}"
-                outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s-%s%s%s%s%s' % (world.logic[player], world.difficulty[player], world.difficulty_adjustments[player],
+                outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s-%s-%s%s%s%s%s' % (world.logic[player], world.difficulty[player], world.difficulty_adjustments[player],
                                                                           world.mode[player], world.goal[player],
                                                                           "" if world.timer in ['none', 'display'] else "-" + world.timer,
-                                                                          world.shuffle[player], world.algorithm, mcsb_name,
+                                                                          world.shuffle[player], world.doorShuffle[player], world.algorithm, mcsb_name,
                                                                           "-retro" if world.retro[player] else "",
                                                                           "-prog_" + world.progressive if world.progressive in ['off', 'random'] else "",
                                                                           "-nohints" if not world.hints[player] else "")) if not args.outputname else ''

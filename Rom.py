@@ -1258,7 +1258,6 @@ def patch_rom(world, player, rom, enemized):
     rom.name = bytearray('ER_{0}_{1:09}\0'.format(__version__[0:7], world.seed), 'utf8')
     assert len(rom.name) <= 21
     rom.write_bytes(0x7FC0, rom.name)
-    rom.name[0] = ord('D')
 
     # Write title screen Code
     hashint = int(rom.get_hash(), 16)
