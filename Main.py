@@ -209,6 +209,10 @@ def main(args, seed=None):
     if args.create_spoiler and not args.jsonout:
         world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
 
+    # if we only check for beatable, we can do this sanity check first before writing down spheres
+    if not world.can_beat_game():
+        raise RuntimeError('Cannot beat game. Something went terribly wrong here!')
+
     if not args.skip_playthrough:
         logger.info('Calculating playthrough.')
         create_playthrough(world)
@@ -349,10 +353,6 @@ def create_playthrough(world):
     # create a copy as we will modify it
     old_world = world
     world = copy_world(world)
-
-    # if we only check for beatable, we can do this sanity check first before writing down spheres
-    if not world.can_beat_game():
-        raise RuntimeError('Cannot beat game. Something went terribly wrong here!')
 
     # get locations containing progress items
     prog_locations = [location for location in world.get_filled_locations() if location.item.advancement]
