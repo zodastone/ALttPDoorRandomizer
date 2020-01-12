@@ -1277,7 +1277,7 @@ def check_if_regions_visited(state, check_paths):
 
 def check_for_pinball_fix(state, bad_region, world, player):
     pinball_region = world.get_region('Skull Pinball', player)
-    if bad_region.name == 'Skull 2 West Lobby' and state.visited_at_all(pinball_region):
+    if bad_region.name in ('Skull 2 West Lobby', 'Skull Boss') and state.visited_at_all(pinball_region):
         door = world.get_door('Skull Pinball WS', player)
         room = world.get_room(door.roomIndex, player)
         if room.doorList[door.doorListPos][1] == DoorKind.Trap:
