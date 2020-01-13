@@ -109,6 +109,8 @@ def analyze_dungeon(key_layout, world, player):
     original_key_counter = find_counter({}, False, key_layout)
     queue = deque([(None, original_key_counter)])
     doors_completed = set()
+    visited_cid = set()
+    visited_cid.add(cid(original_key_counter, key_layout))
 
     while len(queue) > 0:
         queue = deque(sorted(queue, key=queue_sorter))
@@ -131,25 +133,28 @@ def analyze_dungeon(key_layout, world, player):
         for child in key_counter.child_doors.keys():
             if not child.bigKey or not key_layout.big_key_special or key_counter.big_key_opened:
                 odd_counter = create_odd_key_counter(child, key_counter, key_layout, world)
-                if child not in doors_completed:
-                    child_queue.append((child, odd_counter))
+                empty_flag = empty_counter(odd_counter)
+                child_queue.append((child, odd_counter, empty_flag))
                 if child in doors_completed and child in key_logic.door_rules.keys():
                     rule = key_logic.door_rules[child]
                     if smallest_rule is None or rule.small_key_num < smallest_rule:
                         smallest_rule = rule.small_key_num
         while len(child_queue) > 0:
-            child, odd_counter = child_queue.popleft()
-            if not child.bigKey:
-                best_counter = find_best_counter(child, odd_counter, key_counter, key_layout, world, False)
+            child, odd_counter, empty_flag = child_queue.popleft()
+            if not child.bigKey and child not in doors_completed:
+                best_counter = find_best_counter(child, odd_counter, key_counter, key_layout, world, False, empty_flag)
                 rule = create_rule(best_counter, key_counter, key_layout, world)
                 if smallest_rule is None or rule.small_key_num < smallest_rule:
                     smallest_rule = rule.small_key_num
                 check_for_self_lock_key(rule, child, best_counter, key_layout, world)
-                bk_restricted_rules(rule, child, odd_counter, key_counter, key_layout, world)
+                bk_restricted_rules(rule, child, odd_counter, empty_flag, key_counter, key_layout, world)
                 key_logic.door_rules[child.name] = rule
             doors_completed.add(child)
             next_counter = find_next_counter(child, key_counter, key_layout)
-            queue.append((child, next_counter))
+            ctr_id = cid(next_counter, key_layout)
+            if ctr_id not in visited_cid:
+                queue.append((child, next_counter))
+                visited_cid.add(ctr_id)
         possible_smalls_collected = len(key_counter.key_only_locations) + non_big_locs
         if not key_counter.big_key_opened:
             if smallest_rule is not None and smallest_rule >= possible_smalls_collected and not avail_bigs:
@@ -183,6 +188,8 @@ def queue_sorter_2(queue_item):
 
 
 def find_bk_locked_sections(key_layout, world):
+    if key_layout.big_key_special:
+        return
     key_counters = key_layout.key_counters
     key_logic = key_layout.key_logic
 
@@ -230,7 +237,7 @@ def unique_child_door(child, key_counter):
     return True
 
 
-def find_best_counter(door, odd_counter, key_counter, key_layout, world, skip_bk):  # try to waste as many keys as possible?
+def find_best_counter(door, odd_counter, key_counter, key_layout, world, skip_bk, empty_flag):  # try to waste as many keys as possible?
     ignored_doors = {door, door.dest} if door is not None else {}
     finished = False
     opened_doors = dict(key_counter.open_doors)
@@ -248,15 +255,14 @@ def find_best_counter(door, odd_counter, key_counter, key_layout, world, skip_bk
             new_counter = find_counter(proposed_doors, bk_open, key_layout)
             bk_open = new_counter.big_key_opened
             # this means the new_door invalidates the door / leads to the same stuff
-            if relative_empty_counter(odd_counter, new_counter):
+            if not empty_flag and relative_empty_counter(odd_counter, new_counter):
                 ignored_doors.add(new_door)
+            elif empty_flag or key_wasted(new_door, door, last_counter, new_counter, key_layout, world):
+                last_counter = new_counter
+                opened_doors = proposed_doors
+                bk_opened = bk_open
             else:
-                if not key_wasted(new_door, door, last_counter, new_counter, key_layout, world):
-                    ignored_doors.add(new_door)
-                else:
-                    last_counter = new_counter
-                    opened_doors = proposed_doors
-                    bk_opened = bk_open
+                ignored_doors.add(new_door)
     return last_counter
 
 
@@ -441,10 +447,10 @@ def available_chest_small_keys_logic(key_counter, world, sm_restricted):
         return key_counter.max_chests
 
 
-def bk_restricted_rules(rule, door, odd_counter, key_counter, key_layout, world):
+def bk_restricted_rules(rule, door, odd_counter, empty_flag, key_counter, key_layout, world):
     if key_counter.big_key_opened:
         return
-    best_counter = find_best_counter(door, odd_counter, key_counter, key_layout, world, True)
+    best_counter = find_best_counter(door, odd_counter, key_counter, key_layout, world, True, empty_flag)
     bk_number = create_rule(best_counter, key_counter, key_layout, world).small_key_num
     if bk_number == rule.small_key_num:
         return
@@ -519,6 +525,9 @@ def exist_relevant_big_doors(key_counter, key_layout):
         if len(diff) > 0:
             return True
         diff = dict_difference(bk_counter.key_only_locations, key_counter.key_only_locations)
+        if len(diff) > 0:
+            return True
+        diff = dict_difference(bk_counter.child_doors, key_counter.child_doors)
         if len(diff) > 0:
             return True
     return False
@@ -659,6 +668,7 @@ def adjust_key_location_mins(key_layout, min_rules, getter, setter):
 
 def check_rules_deep(original_counter, key_layout, world):
     key_logic = key_layout.key_logic
+    big_locations = {x for x in key_layout.all_chest_locations if x not in key_logic.bk_restricted}
     queue = deque([original_counter])
     completed = set()
     completed.add(cid(original_counter, key_layout))
@@ -670,19 +680,28 @@ def check_rules_deep(original_counter, key_layout, world):
             bail += 1
             if bail > 10:
                 raise Exception('Key logic issue, during deep rule check: %s' % key_layout.sector.name)
+        else:
+            bail = 0
         last_counter = counter
         chest_keys = available_chest_small_keys_logic(counter, world, key_logic.sm_restricted)
         big_avail = counter.big_key_opened
+        big_maybe_not_found = not counter.big_key_opened
         if not key_layout.big_key_special and not big_avail:
             for location in counter.free_locations:
                 if location not in key_logic.bk_restricted:
                     big_avail = True
                     break
+        outstanding_big_locs = {x for x in big_locations if x not in counter.free_locations}
+        if big_maybe_not_found:
+            if len(outstanding_big_locs) == 0:
+                big_maybe_not_found = False
         big_uses_chest = big_avail and not key_layout.big_key_special
+        collected_alt = len(counter.key_only_locations) + chest_keys
         if big_uses_chest and chest_keys == count_locations_big_optional(counter.free_locations, counter.big_key_opened):
             chest_keys -= 1
         collected = len(counter.key_only_locations) + chest_keys
         can_progress = len(counter.child_doors) == 0
+        smalls_opened = False
         small_rules = []
         for door in counter.child_doors.keys():
             can_open = False
@@ -691,33 +710,62 @@ def check_rules_deep(original_counter, key_layout, world):
             elif door.name in key_logic.door_rules.keys():
                 rule = key_logic.door_rules[door.name]
                 small_rules.append(rule)
-                # todo: satisfies alternate big key rule?
-                if collected >= rule.small_key_num or \
-                  (rule.allow_small and collected >= rule.small_key_num-1 and chest_keys < key_layout.max_chests):
+                if rule_satisfied(rule, collected, collected_alt, outstanding_big_locs, chest_keys, key_layout):
                     can_open = True
+                    smalls_opened = True
             elif not door.bigKey:
                 can_open = True
             if can_open:
-                can_progress = True
+                can_progress = smalls_opened or not big_maybe_not_found
                 next_counter = find_next_counter(door, counter, key_layout)
                 c_id = cid(next_counter, key_layout)
                 if c_id not in completed:
                     completed.add(c_id)
                     queue.append(next_counter)
         if not can_progress:
-            smallest_rules = []
-            min_num = None
-            for rule in small_rules:
-                if min_num is None or rule.small_key_num <= min_num:
-                    if min_num is not None and rule.small_key_num < min_num:
-                        min_num = rule.small_key_num
-                        smallest_rules.clear()
-                    elif min_num is None:
-                        min_num = rule.small_key_num
-                    smallest_rules.append(rule)
-            for rule in smallest_rules:
-                rule.small_key_num = collected
-            queue.append(counter)  # run it through again
+            if len(small_rules) > 0:  # zero could be indicative of a problem, but also, the big key is now required
+                reduce_rules(small_rules, collected, collected_alt)
+                queue.append(counter)  # run it through again
+            else:
+                raise Exception('Possible problem with generation or bk rules')
+
+
+def rule_satisfied(rule, collected, collected_alt, outstanding_big_locs, chest_keys, key_layout):
+    if collected >= rule.small_key_num:
+        return True
+    if rule.allow_small and collected >= rule.small_key_num-1 and chest_keys < key_layout.max_chests:
+        return True
+    rule_diff = outstanding_big_locs.difference(rule.alternate_big_key_loc)
+    if rule.alternate_small_key is not None and len(rule_diff) == 0 and collected >= rule.alternate_small_key:
+        return True
+    if collected_alt > collected:
+        if collected_alt >= rule.small_key_num:
+            return True
+        if rule.allow_small and collected_alt >= rule.small_key_num-1 and chest_keys+1 < key_layout.max_chests:
+            return True
+        if rule.alternate_small_key is not None and len(rule_diff) == 0 and collected_alt >= rule.alternate_small_key:
+            return True
+    return False
+
+
+def reduce_rules(small_rules, collected, collected_alt):
+    smallest_rules = []
+    min_num = None
+    for rule in small_rules:
+        if min_num is None or rule.small_key_num <= min_num:
+            if min_num is not None and rule.small_key_num < min_num:
+                min_num = rule.small_key_num
+                smallest_rules.clear()
+            elif min_num is None:
+                min_num = rule.small_key_num
+            smallest_rules.append(rule)
+    for rule in smallest_rules:
+        if rule.allow_small:  # we are already reducing it
+            rule.allow_small = False
+        if min_num > collected_alt > collected:
+            rule.small_key_num = collected_alt
+        else:
+            rule.small_key_num = collected
 
 
 # Soft lock stuff
@@ -776,7 +824,7 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
 def cnt_avail_small_locations(key_layout, ttl_locations, state, world):
     if not world.keysanity and world.mode != 'retro':
         return min(ttl_locations - state.used_locations, state.key_locations - state.used_smalls)
-    return key_layout.max_chests + state.key_locations - state.used_smalls
+    return state.key_locations - state.used_smalls
 
 
 def cnt_avail_big_locations(ttl_locations, state, world):
@@ -1073,9 +1121,9 @@ def val_ganons(key_logic, world, player):
     compass_room = {'Ganons Tower - Compass Room - Top Left', 'Ganons Tower - Compass Room - Top Right', 'Ganons Tower - Compass Room - Bottom Left', 'Ganons Tower - Compass Room - Bottom Right'}
     gt_middle = {'Ganons Tower - Big Key Room - Left', 'Ganons Tower - Big Key Chest', 'Ganons Tower - Big Key Room - Right', 'Ganons Tower - Bob\'s Chest', 'Ganons Tower - Big Chest'}
     val_rule(key_logic.door_rules['GT Double Switch EN'], 6, False, None, 4, rando_room.union({'Ganons Tower - Firesnake Room'}))
-    val_rule(key_logic.door_rules['GT Hookshot ES'], 8, True, 'Ganons Tower - Map Chest', 5, {'Ganons Tower - Map Chest'})
+    val_rule(key_logic.door_rules['GT Hookshot ES'], 7, False, 'Ganons Tower - Map Chest', 5, {'Ganons Tower - Map Chest'})
     val_rule(key_logic.door_rules['GT Tile Room EN'], 6, False, None, 5, compass_room)
-    val_rule(key_logic.door_rules['GT Firesnake Room SW'], 8, False, None, 5, rando_room)
+    val_rule(key_logic.door_rules['GT Firesnake Room SW'], 7, False, None, 5, rando_room)
     val_rule(key_logic.door_rules['GT Conveyor Star Pits EN'], 6, False, None, 5, gt_middle)  # should be 7?
     val_rule(key_logic.door_rules['GT Mini Helmasaur Room WN'], 6)  # not sure about this 6...
     val_rule(key_logic.door_rules['GT Crystal Circles SW'], 8)

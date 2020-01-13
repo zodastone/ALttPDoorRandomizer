@@ -711,6 +711,7 @@ def cross_dungeon(world, player):
                 queue = collections.deque(sorted(queue, key=lambda b: b.combo_size))
         else:
             logger.info('Cross Dungeon: Increase failed for %s', name)
+            builder.key_doors_num -= 1
             builder.flex = 0
     logger.info('Cross Dungeon: Keys unable to assign in pool %s', remaining)
 
