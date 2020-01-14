@@ -94,7 +94,7 @@ def build_key_layout(builder, start_regions, proposal, world, player):
 
 
 def calc_max_chests(builder, key_layout, world, player):
-    if world.doorShuffle != 'crossed':
+    if world.doorShuffle[player] != 'crossed':
         return len(world.get_dungeon(key_layout.sector.name, player).small_keys)
     return builder.key_doors_num - key_layout.max_drops
 
@@ -115,7 +115,7 @@ def analyze_dungeon(key_layout, world, player):
     while len(queue) > 0:
         queue = deque(sorted(queue, key=queue_sorter))
         parent_door, key_counter = queue.popleft()
-        chest_keys = available_chest_small_keys(key_counter, world)
+        chest_keys = available_chest_small_keys(key_counter, world, player)
         raw_avail = chest_keys + len(key_counter.key_only_locations)
         available = raw_avail - key_counter.used_keys
         possible_smalls = count_unique_small_doors(key_counter, key_layout.flat_prop)
@@ -132,7 +132,7 @@ def analyze_dungeon(key_layout, world, player):
         smallest_rule = None
         for child in key_counter.child_doors.keys():
             if not child.bigKey or not key_layout.big_key_special or key_counter.big_key_opened:
-                odd_counter = create_odd_key_counter(child, key_counter, key_layout, world)
+                odd_counter = create_odd_key_counter(child, key_counter, key_layout, world, player)
                 empty_flag = empty_counter(odd_counter)
                 child_queue.append((child, odd_counter, empty_flag))
                 if child in doors_completed and child in key_logic.door_rules.keys():
@@ -142,12 +142,12 @@ def analyze_dungeon(key_layout, world, player):
         while len(child_queue) > 0:
             child, odd_counter, empty_flag = child_queue.popleft()
             if not child.bigKey and child not in doors_completed:
-                best_counter = find_best_counter(child, odd_counter, key_counter, key_layout, world, False, empty_flag)
-                rule = create_rule(best_counter, key_counter, key_layout, world)
+                best_counter = find_best_counter(child, odd_counter, key_counter, key_layout, world, player, False, empty_flag)
+                rule = create_rule(best_counter, key_counter, key_layout, world, player)
                 if smallest_rule is None or rule.small_key_num < smallest_rule:
                     smallest_rule = rule.small_key_num
-                check_for_self_lock_key(rule, child, best_counter, key_layout, world)
-                bk_restricted_rules(rule, child, odd_counter, empty_flag, key_counter, key_layout, world)
+                check_for_self_lock_key(rule, child, best_counter, key_layout, world, player)
+                bk_restricted_rules(rule, child, odd_counter, empty_flag, key_counter, key_layout, world, player)
                 key_logic.door_rules[child.name] = rule
             doors_completed.add(child)
             next_counter = find_next_counter(child, key_counter, key_layout)
@@ -161,7 +161,7 @@ def analyze_dungeon(key_layout, world, player):
                 key_logic.bk_restricted.update(filter_big_chest(key_counter.free_locations))
                 if not key_counter.big_key_opened and big_chest_in_locations(key_counter.free_locations):
                     key_logic.sm_restricted.update(find_big_chest_locations(key_counter.free_locations))
-    check_rules(original_key_counter, key_layout, world)
+    check_rules(original_key_counter, key_layout, world, player)
 
 
 def count_key_drops(sector):
@@ -237,7 +237,7 @@ def unique_child_door(child, key_counter):
     return True
 
 
-def find_best_counter(door, odd_counter, key_counter, key_layout, world, skip_bk, empty_flag):  # try to waste as many keys as possible?
+def find_best_counter(door, odd_counter, key_counter, key_layout, world, player, skip_bk, empty_flag):  # try to waste as many keys as possible?
     ignored_doors = {door, door.dest} if door is not None else {}
     finished = False
     opened_doors = dict(key_counter.open_doors)
@@ -257,7 +257,7 @@ def find_best_counter(door, odd_counter, key_counter, key_layout, world, skip_bk
             # this means the new_door invalidates the door / leads to the same stuff
             if not empty_flag and relative_empty_counter(odd_counter, new_counter):
                 ignored_doors.add(new_door)
-            elif empty_flag or key_wasted(new_door, door, last_counter, new_counter, key_layout, world):
+            elif empty_flag or key_wasted(new_door, door, last_counter, new_counter, key_layout, world, player):
                 last_counter = new_counter
                 opened_doors = proposed_doors
                 bk_opened = bk_open
@@ -285,13 +285,13 @@ def find_potential_open_doors(key_counter, ignored_doors, key_layout, skip_bk):
     return small_doors + big_doors
 
 
-def key_wasted(new_door, old_door, old_counter, new_counter, key_layout, world):
+def key_wasted(new_door, old_door, old_counter, new_counter, key_layout, world, player):
     if new_door.bigKey:  # big keys are not wastes - it uses up a location
         return True
-    chest_keys = available_chest_small_keys(old_counter, world)
+    chest_keys = available_chest_small_keys(old_counter, world, player)
     old_key_diff = len(old_counter.key_only_locations) - old_counter.used_keys
     old_avail = chest_keys + old_key_diff
-    new_chest_keys = available_chest_small_keys(new_counter, world)
+    new_chest_keys = available_chest_small_keys(new_counter, world, player)
     new_key_diff = len(new_counter.key_only_locations) - new_counter.used_keys
     new_avail = new_chest_keys + new_key_diff
     if new_key_diff < old_key_diff or new_avail < old_avail:
@@ -306,7 +306,7 @@ def key_wasted(new_door, old_door, old_counter, new_counter, key_layout, world):
             proposed_doors = {**opened_doors, **dict.fromkeys([new_child, new_child.dest])}
             bk_open = bk_opened or new_door.bigKey
             new_counter = find_counter(proposed_doors, bk_open, key_layout)
-            if key_wasted(new_child, old_door, current_counter, new_counter, key_layout, world):
+            if key_wasted(new_child, old_door, current_counter, new_counter, key_layout, world, player):
                 return True  # waste is possible
     return False
 
@@ -324,16 +324,16 @@ def check_special_locations(locations):
     return False
 
 
-def calc_avail_keys(key_counter, world):
-    chest_keys = available_chest_small_keys(key_counter, world)
+def calc_avail_keys(key_counter, world, player):
+    chest_keys = available_chest_small_keys(key_counter, world, player)
     raw_avail = chest_keys + len(key_counter.key_only_locations)
     return raw_avail - key_counter.used_keys
 
 
-def create_rule(key_counter, prev_counter, key_layout, world):
+def create_rule(key_counter, prev_counter, key_layout, world, player):
     # prev_chest_keys = available_chest_small_keys(prev_counter, world)
     # prev_avail = prev_chest_keys + len(prev_counter.key_only_locations)
-    chest_keys = available_chest_small_keys(key_counter, world)
+    chest_keys = available_chest_small_keys(key_counter, world, player)
     key_gain = len(key_counter.key_only_locations) - len(prev_counter.key_only_locations)
     # previous method
     # raw_avail = chest_keys + len(key_counter.key_only_locations)
@@ -348,9 +348,9 @@ def create_rule(key_counter, prev_counter, key_layout, world):
     return DoorRules(rule_num)
 
 
-def check_for_self_lock_key(rule, door, parent_counter, key_layout, world):
+def check_for_self_lock_key(rule, door, parent_counter, key_layout, world, player):
     if world.accessibility != 'locations':
-        counter = find_inverted_counter(door, parent_counter, key_layout, world)
+        counter = find_inverted_counter(door, parent_counter, key_layout, world, player)
         if not self_lock_possible(counter):
             return
         if len(counter.free_locations) == 1 and len(counter.key_only_locations) == 0 and not counter.important_location:
@@ -358,7 +358,7 @@ def check_for_self_lock_key(rule, door, parent_counter, key_layout, world):
             rule.small_location = next(iter(counter.free_locations))
 
 
-def find_inverted_counter(door, parent_counter, key_layout, world):
+def find_inverted_counter(door, parent_counter, key_layout, world, player):
     # open all doors in counter
     counter = open_all_counter(parent_counter, key_layout, door=door)
     max_counter = find_max_counter(key_layout)
@@ -371,7 +371,7 @@ def find_inverted_counter(door, parent_counter, key_layout, world):
     inverted_counter.open_doors = dict_difference(max_counter.open_doors, counter.open_doors)
     inverted_counter.other_locations = dict_difference(max_counter.other_locations, counter.other_locations)
     for loc in inverted_counter.other_locations:
-        if important_location(loc, world):
+        if important_location(loc, world, player):
             inverted_counter.important_location = True
     return inverted_counter
 
@@ -425,8 +425,8 @@ def self_lock_possible(counter):
     return len(counter.free_locations) <= 1 and len(counter.key_only_locations) == 0 and not counter.important_location
 
 
-def available_chest_small_keys(key_counter, world):
-    if not world.keysanity and world.mode != 'retro':
+def available_chest_small_keys(key_counter, world, player):
+    if not world.keyshuffle[player] and not world.retro[player]:
         cnt = 0
         for loc in key_counter.free_locations:
             if key_counter.big_key_opened or '- Big Chest' not in loc.name:
@@ -436,8 +436,8 @@ def available_chest_small_keys(key_counter, world):
         return key_counter.max_chests
 
 
-def available_chest_small_keys_logic(key_counter, world, sm_restricted):
-    if not world.keysanity and world.mode != 'retro':
+def available_chest_small_keys_logic(key_counter, world, player, sm_restricted):
+    if not world.keyshuffle[player] and not world.retro[player]:
         cnt = 0
         for loc in key_counter.free_locations:
             if loc not in sm_restricted and (key_counter.big_key_opened or '- Big Chest' not in loc.name):
@@ -447,11 +447,11 @@ def available_chest_small_keys_logic(key_counter, world, sm_restricted):
         return key_counter.max_chests
 
 
-def bk_restricted_rules(rule, door, odd_counter, empty_flag, key_counter, key_layout, world):
+def bk_restricted_rules(rule, door, odd_counter, empty_flag, key_counter, key_layout, world, player):
     if key_counter.big_key_opened:
         return
-    best_counter = find_best_counter(door, odd_counter, key_counter, key_layout, world, True, empty_flag)
-    bk_number = create_rule(best_counter, key_counter, key_layout, world).small_key_num
+    best_counter = find_best_counter(door, odd_counter, key_counter, key_layout, world, player, True, empty_flag)
+    bk_number = create_rule(best_counter, key_counter, key_layout, world, player).small_key_num
     if bk_number == rule.small_key_num:
         return
     door_open = find_next_counter(door, best_counter, key_layout)
@@ -586,7 +586,7 @@ def flatten_pair_list(paired_list):
     return flat_list
 
 
-def check_rules(original_counter, key_layout, world):
+def check_rules(original_counter, key_layout, world, player):
     all_key_only = set()
     key_only_map = {}
     queue = deque([(None, original_counter, original_counter.key_only_locations)])
@@ -639,7 +639,7 @@ def check_rules(original_counter, key_layout, world):
     if check_non_bk:
         adjust_key_location_mins(key_layout, min_rule_non_bk, lambda r: r.small_key_num if r.alternate_small_key is None else r.alternate_small_key,
                                  lambda r, v: r if r.alternate_small_key is None else setattr(r, 'alternate_small_key', v))
-    check_rules_deep(original_counter, key_layout, world)
+    check_rules_deep(original_counter, key_layout, world, player)
 
 
 def adjust_key_location_mins(key_layout, min_rules, getter, setter):
@@ -666,7 +666,7 @@ def adjust_key_location_mins(key_layout, min_rules, getter, setter):
                 setter(rule, collected_keys)
 
 
-def check_rules_deep(original_counter, key_layout, world):
+def check_rules_deep(original_counter, key_layout, world, player):
     key_logic = key_layout.key_logic
     big_locations = {x for x in key_layout.all_chest_locations if x not in key_logic.bk_restricted}
     queue = deque([original_counter])
@@ -683,7 +683,7 @@ def check_rules_deep(original_counter, key_layout, world):
         else:
             bail = 0
         last_counter = counter
-        chest_keys = available_chest_small_keys_logic(counter, world, key_logic.sm_restricted)
+        chest_keys = available_chest_small_keys_logic(counter, world, player, key_logic.sm_restricted)
         big_avail = counter.big_key_opened
         big_maybe_not_found = not counter.big_key_opened
         if not key_layout.big_key_special and not big_avail:
@@ -787,8 +787,8 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     if not smalls_avail and num_bigs == 0:
         return True   # I think that's the end
     ttl_locations = state.ttl_locations if state.big_key_opened else count_locations_exclude_big_chest(state)
-    available_small_locations = cnt_avail_small_locations(key_layout, ttl_locations, state, world)
-    available_big_locations = cnt_avail_big_locations(ttl_locations, state, world)
+    available_small_locations = cnt_avail_small_locations(key_layout, ttl_locations, state, world, player)
+    available_big_locations = cnt_avail_big_locations(ttl_locations, state, world, player)
     if (not smalls_avail or available_small_locations == 0) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
         return False
     else:
@@ -821,14 +821,14 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     return True
 
 
-def cnt_avail_small_locations(key_layout, ttl_locations, state, world):
-    if not world.keysanity and world.mode != 'retro':
+def cnt_avail_small_locations(key_layout, ttl_locations, state, world, player):
+    if not world.keyshuffle[player] and not world.retro[player]:
         return min(ttl_locations - state.used_locations, state.key_locations - state.used_smalls)
     return state.key_locations - state.used_smalls
 
 
-def cnt_avail_big_locations(ttl_locations, state, world):
-    if not world.keysanity:
+def cnt_avail_big_locations(ttl_locations, state, world, player):
+    if not world.bigkeyshuffle[player]:
         return ttl_locations - state.used_locations if not state.big_key_special else 0
     return 1 if not state.big_key_special else 0
 
@@ -868,7 +868,7 @@ def create_key_counter(state, key_layout, world, player):
     key_counter = KeyCounter(key_layout.max_chests)
     key_counter.child_doors.update(dict.fromkeys(unique_doors(state.small_doors+state.big_doors)))
     for loc in state.found_locations:
-        if important_location(loc, world):
+        if important_location(loc, world, player):
             key_counter.important_location = True
             key_counter.other_locations[loc] = None
         elif loc.event and 'Small Key' in loc.item.name:
@@ -891,14 +891,14 @@ def create_key_counter(state, key_layout, world, player):
     return key_counter
 
 
-def important_location(loc, world):
+def important_location(loc, world, player):
     important_locations = ['Agahnim 1', 'Agahnim 2', 'Attic Cracked Floor', 'Suspicious Maiden']
-    if world.mode == 'standard' or world.doorShuffle == 'crossed':
+    if world.mode[player] == 'standard' or world.doorShuffle[player] == 'crossed':
         important_locations.append('Hyrule Dungeon Cellblock')
     return '- Prize' in loc.name or loc.name in important_locations
 
 
-def create_odd_key_counter(door, parent_counter, key_layout, world):
+def create_odd_key_counter(door, parent_counter, key_layout, world, player):
     odd_counter = KeyCounter(key_layout.max_chests)
     next_counter = find_next_counter(door, parent_counter, key_layout)
     odd_counter.free_locations = dict_difference(next_counter.free_locations, parent_counter.free_locations)
@@ -906,7 +906,7 @@ def create_odd_key_counter(door, parent_counter, key_layout, world):
     odd_counter.child_doors = dict_difference(next_counter.child_doors, parent_counter.child_doors)
     odd_counter.other_locations = dict_difference(next_counter.other_locations, parent_counter.other_locations)
     for loc in odd_counter.other_locations:
-        if important_location(loc, world):
+        if important_location(loc, world, player):
             odd_counter.important_location = True
     return odd_counter
 

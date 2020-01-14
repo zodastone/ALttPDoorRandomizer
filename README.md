@@ -40,6 +40,32 @@ Doors are not shuffled.
 
 Used for development testing. This will be removed in a future version. Use at your own risk. Might play like a plando.
 
+## Map/Compass/Small Key/Big Key shuffle (aka Keysanity)
+
+These settings allow dungeon specific items to be distributed anywhere in the world and not just in their native dungeon.
+Small Keys dropped by enemies or found in pots are not affected. The chest in southeast Skull Woods that is traditionally
+a guaranteed Small Key still is. These items will be distributed according to the v26/balanced algorithm, but the rest
+of the itempool will respect the algorithm setting. Music for dungeons is randomized so it cannot be used as a tell
+for which dungeons contain pendants and crystals; finding a Map for a dungeon will allow the overworld map to display its prize.
+
+## Retro
+
+This setting turns all Small Keys into universal Small Keys that can be used in any dungeon and are distributed across the world.
+The Bow now consumed rupees to shoot; the cost is 10 rupees per Wood Arrow and 50 per Silver Arrow. Shooting Wood Arrows requires
+the purchase of an arrow item from shops, and to account for this and the dynamic use of keys, both Wood Arrows and Small Keys will
+be added to several shops around the world. Four "take any" caves are added that allow the player to choose between an extra Heart
+Container and a Bottle being filled with Blue Potion, and one of the four swords from the item pool is placed into a special cave as
+well. The five caves that are removed for these will be randomly selected single entrance caves that did not contain any items or any shops.
+In further concert with the Bow changes, all arrows under pots, in chests, and elsewhere in the seed will be replaced with rupees.
+
+## Seed
+
+Can be used to set a seed number to generate. Using the same seed with same settings on the same version of the entrance randomizer will always yield an identical output.
+
+## Count
+
+Use to batch generate multiple seeds with same settings. If a seed number is provided, it will be used for the first seed, then used to derive the next seed (i.e. generating 10 seeds with the same seed number given will produce the same 10 (different) roms each time).
+
 # Command Line Options
 
 ```

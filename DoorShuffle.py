@@ -39,7 +39,7 @@ def link_doors(world, player):
     for ent, ext in ladders:
         connect_two_way(world, ent, ext, player)
 
-    if world.doorShuffle == 'vanilla':
+    if world.doorShuffle[player] == 'vanilla':
         for exitName, regionName in vanilla_logical_connections:
             connect_simple_door(world, exitName, regionName, player)
         for entrance, ext in spiral_staircases:
@@ -49,14 +49,14 @@ def link_doors(world, player):
         for ent, ext in default_one_way_connections:
             connect_one_way(world, ent, ext, player)
         vanilla_key_logic(world, player)
-    elif world.doorShuffle == 'basic':
+    elif world.doorShuffle[player] == 'basic':
         within_dungeon(world, player)
-    elif world.doorShuffle == 'crossed':
+    elif world.doorShuffle[player] == 'crossed':
         cross_dungeon(world, player)
-    elif world.doorShuffle == 'experimental':
+    elif world.doorShuffle[player] == 'experimental':
         experiment(world, player)
 
-    if world.doorShuffle != 'vanilla':
+    if world.doorShuffle[player] != 'vanilla':
         create_door_spoiler(world, player)
 
 
@@ -83,7 +83,7 @@ def mark_regions(world, player):
 
 def create_door_spoiler(world, player):
     logger = logging.getLogger('')
-    queue = collections.deque(world.doors)
+    queue = collections.deque((door for door in world.doors if door.player == player))
     while len(queue) > 0:
         door_a = queue.popleft()
         if door_a.type in [DoorType.Normal, DoorType.SpiralStairs]:
@@ -283,7 +283,7 @@ def within_dungeon(world, player):
     handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map)
     main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player)
 
-    paths = determine_required_paths(world)
+    paths = determine_required_paths(world, player)
     check_required_paths(paths, world, player)
 
     # shuffle_key_doors for dungeons
@@ -637,7 +637,7 @@ def cross_dungeon(world, player):
 
     main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player)
 
-    paths = determine_required_paths(world)
+    paths = determine_required_paths(world, player)
     check_required_paths(paths, world, player)
 
     hc = world.get_dungeon('Hyrule Castle', player)
@@ -1106,7 +1106,7 @@ def change_door_to_small_key(d, world, player):
         room.change(d.doorListPos, DoorKind.SmallKey)
 
 
-def determine_required_paths(world):
+def determine_required_paths(world, player):
     paths = {
         'Hyrule Castle': [],
         'Eastern Palace': ['Eastern Boss'],
@@ -1122,7 +1122,7 @@ def determine_required_paths(world):
         'Turtle Rock': ['TR Boss'],
         'Ganons Tower': ['GT Agahnim 2']
         }
-    if world.shuffle == 'vanilla':
+    if world.shuffle[player] == 'vanilla':
         paths['Skull Woods'].insert(0, 'Skull 2 West Lobby')
         paths['Turtle Rock'].insert(0, 'TR Eye Bridge')
         paths['Turtle Rock'].insert(0, 'TR Big Chest Entrance')
@@ -1131,7 +1131,7 @@ def determine_required_paths(world):
             paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
             # noinspection PyTypeChecker
             paths['Hyrule Castle'].append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
-    if world.doorShuffle in ['basic']:
+    if world.doorShuffle[player] in ['basic']:
         paths['Thieves Town'].append('Thieves Attic Window')
     return paths
 
@@ -1194,7 +1194,7 @@ def add_inaccessible_doors(world, player):
         create_door(world, player, 'Death Mountain Return Cave (West)', 'Death Mountain Return Ledge')
     if 'Desert Palace Lone Stairs' in world.inaccessible_regions[player]:
         create_door(world, player, 'Desert Palace Entrance (East)', 'Desert Palace Lone Stairs')
-    if world.mode == 'standard' and 'Hyrule Castle Ledge' in world.inaccessible_regions[player]:
+    if world.mode[player] == 'standard' and 'Hyrule Castle Ledge' in world.inaccessible_regions[player]:
         create_door(world, player, 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge')
         create_door(world, player, 'Hyrule Castle Entrance (West)', 'Hyrule Castle Ledge')
 

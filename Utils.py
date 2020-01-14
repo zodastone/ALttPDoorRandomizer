@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 import os
+import re
 import subprocess
 import sys
+
+def parse_names_string(names):
+    return {player: name for player, name in enumerate([n for n in re.split(r'[, ]', names) if n], 1)}
 
 def int16_as_bytes(value):
     value = value & 0xFFFF
@@ -224,4 +228,6 @@ def print_wiki_doors(d_regions, world, player):
 
 
 if __name__ == '__main__':
-    read_entrance_data(old_rom='C:\\Users\\Randall\\Documents\\kwyn\\orig\\z3.sfc')
+    pass
+    # make_new_base2current()
+    # read_entrance_data(old_rom='')
