@@ -2029,7 +2029,7 @@ default_one_way_connections = [
 ]
 
 # For crossed
-compass_data = {  # offset from 0x122e17, sram storage, write offset from 1037b9, 0 = jmp or # of nops
+compass_data = {  # offset from 0x122e17, sram storage, write offset from compass_w_addr, 0 = jmp or # of nops
     'Hyrule Castle': (0x1, 0xc0, 0x16, 0),
     'Eastern Palace': (0x1C, 0xc1, 0x28, 0),
     'Desert Palace': (0x35, 0xc2, 0x4a, 0),

@@ -16,7 +16,7 @@ from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Cred
 from Text import Uncle_texts, Ganon1_texts, TavernMan_texts, Sahasrahla2_texts, Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
 from Text import KingsReturn_texts, Sanctuary_texts, Kakariko_texts, Blacksmiths_texts, DeathMountain_texts, LostWoods_texts, WishingWell_texts, DesertPalace_texts, MountainTower_texts, LinksHouse_texts, Lumberjacks_texts, SickKid_texts, FluteBoy_texts, Zora_texts, MagicShop_texts, Sahasrahla_names
 from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_to_pc
-from Items import ItemFactory, item_table
+from Items import ItemFactory
 from EntranceShuffle import door_addresses, exit_ids
 
 
@@ -2065,9 +2065,10 @@ def patch_shuffled_dark_sanc(world, rom, player):
     write_int16s(rom, 0x180253, [vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x])
     rom.write_bytes(0x180262, [unknown_1, unknown_2, 0x00])
 
-# 24AE17 and 20B7B9
-compass_r_addr = 0x122e17  # a9 90 24 8f 9a c7 7e
-compass_w_addr = 0x1037b9  # e2 20 ad 0c 04 c9 00 d0
+
+# 24B116 and 20BA72
+compass_r_addr = 0x123116  # a9 90 24 8f 9a c7 7e
+compass_w_addr = 0x103a72  # e2 20 ad 0c 04 c9 00 d0
 
 
 def compass_code_good(rom):
@@ -2095,29 +2096,25 @@ def update_compasses(rom, world, player):
 
         # read compass count code
         start_address = compass_r_addr+digit_offset+15
-        # lda $7ef4(sb); jmp $adbe (or 0x122dbe is the next instruction 2dbe=bead)
-        rom.write_bytes(start_address, [0xaf, sram_byte, 0xf4, 0x7e, 0x4c, 0xbe, 0xad])
+
+        # -0x59 relative to compass_r_addr, +8000 because rom -120000 to get rid of high byte
+        jmp_address = compass_r_addr-0x118059
+        # lda $7ef4(sb); jmp $jmp_address
+        rom.write_bytes(start_address, [0xaf, sram_byte, 0xf4, 0x7e, 0x4c, jmp_address % 0x100, jmp_address // 0x100])
 
         # write compass count code
         write_address = compass_w_addr+write_offset
+        # 0x186 relative to compass_r_addr, +8000 because rom -100000 to get rid of high byte
+        jmp_address = compass_w_addr-0xf7e7a
         # lda $7ef4(sb); inc; sta $7ef4(sb)
         rom.write_bytes(write_address, [0xaf, sram_byte, 0xf4, 0x7e, 0x1a, 0x8f, sram_byte, 0xf4, 0x7e])
         if jmp_nop_flag == 0:
-            rom.write_bytes(write_address+9, [0x4c, 0x3f, 0xb9])  # jmp $b93f (or 0x10393f is the next instruction 393f=3fb9)
+            rom.write_bytes(write_address+9, [0x4c, jmp_address % 0x100, jmp_address // 0x100])  # jmp $jmp_address
         else:
             for i in range(0, jmp_nop_flag):
                 rom.write_byte(write_address+9+i, 0xea)  # nop
 
 
-InconvenientEntrances = {'Turtle Rock': 'Turtle Rock Main',
-                         'Misery Mire': 'Misery Mire',
-                         'Ice Palace': 'Ice Palace',
-                         'Skull Woods Final Section': 'The back of Skull Woods',
-                         'Death Mountain Return Cave (West)': 'The SW DM foothills cave',
-                         'Mimic Cave': 'Mimic Ledge',
-                         'Dark World Hammer Peg Cave': 'The rows of pegs',
-                         'Pyramid Fairy': 'The crack on the pyramid'
-                         }
 InconvenientDungeonEntrances = {'Turtle Rock': 'Turtle Rock Main',
                                 'Misery Mire': 'Misery Mire',
                                 'Ice Palace': 'Ice Palace',
