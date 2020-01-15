@@ -375,6 +375,8 @@ class CollectionState(object):
         self.world = parent
         self.reachable_regions = {player: set() for player in range(1, parent.players + 1)}
         self.colored_regions = {player: {} for player in range(1, parent.players + 1)}
+        # todo: I don't know if these are required to check or not, when should they be checked?
+        self.crystal_connections = {player: set() for player in range(1, parent.players + 1)}
         self.events = []
         self.path = {}
         self.locations_checked = set()
@@ -390,8 +392,9 @@ class CollectionState(object):
         new_regions = True
         reachable_regions_count = len(rrp)
         while new_regions:
-            player_regions = [region for region in player_regions if region not in rrp]
-            for candidate in player_regions:
+            region_queue = deque([region for region in player_regions if region not in rrp])
+            while len(region_queue) > 0:
+                candidate = region_queue.popleft()
                 if candidate.can_reach_private(self):
                     rrp.add(candidate)
                     if candidate.type == RegionType.Dungeon:
@@ -402,20 +405,34 @@ class CollectionState(object):
                                 c_switch_present = True
                         if c_switch_present:
                             ccr[candidate] = CrystalBarrier.Either
-                            self.spread_crystal_access(candidate, CrystalBarrier.Either, rrp, ccr, player)
+                            self.spread_crystal_access(candidate, CrystalBarrier.Either, rrp, ccr, region_queue, player)
                         else:
+                            color_changed = False
                             for entrance in candidate.entrances:
                                 door = self.world.check_for_door(entrance.name, player)
                                 if door is None or entrance.parent_region.type != RegionType.Dungeon:
                                     ccr[candidate] = CrystalBarrier.Orange
-                                if entrance.parent_region in ccr.keys():
-                                    color_type = ccr[entrance.parent_region]
-                                    current_type = ccr[candidate] if candidate in ccr.keys() else None
-                                    ccr[candidate] = color_type if current_type is None or color_type == current_type else CrystalBarrier.Either
+                                else:
+                                    color_type = None
+                                    if door.crystal in [CrystalBarrier.Orange, CrystalBarrier.Blue]:
+                                        color_type = door.crystal
+                                    elif entrance.parent_region in ccr.keys():
+                                        color_type = ccr[entrance.parent_region]
+                                    if color_type is not None:
+                                        current_type = ccr[candidate] if candidate in ccr.keys() else None
+                                        if current_type is None:
+                                            color_changed = True
+                                        if current_type is not None and current_type != CrystalBarrier.Either and color_type != current_type:
+                                            color_changed = True
+                                            ccr[candidate] = CrystalBarrier.Either
+                                        else:
+                                            ccr[candidate] = color_type
+                            if color_changed:
+                                self.spread_crystal_access(candidate, ccr[candidate], rrp, ccr, region_queue, player)
             new_regions = len(rrp) > reachable_regions_count
             reachable_regions_count = len(rrp)
 
-    def spread_crystal_access(self, region, crystal, rrp, ccr, player):
+    def spread_crystal_access(self, region, crystal, rrp, ccr, region_queue, player):
         queue = deque([(region, crystal)])
         visited = set()
         while len(queue) > 0:
@@ -424,23 +441,36 @@ class CollectionState(object):
             for ext in region.exits:
                 connect = ext.connected_region
                 if connect not in visited and connect is not None and connect.type == RegionType.Dungeon:
-                    if connect in rrp and ext.can_reach(self) and connect:
-                        door = self.world.check_for_door(ext.name, player)
-                        current_crystal = ccr[connect]
-                        if door is not None and not door.blocked and current_crystal != crystal and current_crystal != CrystalBarrier.Either:
-                            if door.crystal in [CrystalBarrier.Either, CrystalBarrier.Null]:
-                                ccr[connect] = crystal
-                                queue.append((connect, crystal))
-                            else:
-                                queue.append((connect, door.crystal))
-                                if door.crystal != current_crystal:
-                                    ccr[connect] = CrystalBarrier.Either
+                    if connect in rrp:
+                        if ext.can_reach(self):
+                            rc_pair = self.spread_crystal_door(crystal, ext, connect, ccr, player)
+                            if rc_pair is not None:
+                                queue.append(rc_pair)
+                        else:
+                            self.crystal_connections[player].add((ext, crystal))
+
+                    elif connect not in rrp and connect not in region_queue and connect.can_reach_private(self):
+                        region_queue.append(connect)
+
+    def spread_crystal_door(self, crystal, ext, connect, ccr, player):
+        door = self.world.check_for_door(ext.name, player)
+        current_crystal = ccr[connect]
+        if door is not None and not door.blocked and current_crystal != crystal and current_crystal != CrystalBarrier.Either:
+            if door.crystal in [CrystalBarrier.Either, CrystalBarrier.Null]:
+                ccr[connect] = crystal
+                return connect, crystal
+            else:
+                if door.crystal != current_crystal:
+                    ccr[connect] = CrystalBarrier.Either
+                return connect, door.crystal
+        return None
 
     def copy(self):
         ret = CollectionState(self.world)
         ret.prog_items = self.prog_items.copy()
         ret.reachable_regions = {player: copy.copy(self.reachable_regions[player]) for player in range(1, self.world.players + 1)}
         ret.colored_regions = {player: copy.copy(self.colored_regions[player]) for player in range(1, self.world.players + 1)}
+        ret.crystal_connections = {player: copy.copy(self.crystal_connections[player]) for player in range(1, self.world.players + 1)}
         ret.events = copy.copy(self.events)
         ret.path = copy.copy(self.path)
         ret.locations_checked = copy.copy(self.locations_checked)
@@ -461,14 +491,27 @@ class CollectionState(object):
 
         return spot.can_reach(self)
 
-    def sweep_for_crystal_access(self):
-        for player, rrp in self.reachable_regions.items():
-            dungeon_regions = [x for x in rrp if x.type == RegionType.Dungeon]
-            ccr = self.colored_regions[player]
-            for region in dungeon_regions:
-                if region in ccr.keys():
-                    self.spread_crystal_access(region, ccr[region], rrp, ccr, player)
-            self.stale[player] = True
+    # def sweep_for_crystal_access(self):
+    #     repeat = True
+    #     while repeat:
+    #         repeat = False
+    #         for player, crystal_conn in self.crystal_connections.items():
+    #             self.update_reachable_regions(player)
+    #             new_regions = deque()
+    #             remove_list = []
+    #             for connection, crystal in crystal_conn:
+    #                 if connection.can_reach(self):
+    #                     remove_list.append((connection, crystal))
+    #                     rrp, ccr = self.reachable_regions[player], self.colored_regions[player]
+    #                     rc_pair = self.spread_crystal_door(crystal, connection, connection.parent_region, ccr, player)
+    #                     if rc_pair is not None:
+    #                         conn, new_crystal = rc_pair
+    #                         self.spread_crystal_access(conn, new_crystal, rrp, ccr, new_regions, player)
+    #             for pair in remove_list:
+    #                 crystal_conn.remove(pair)
+    #             if len(new_regions) > 0:
+    #                 self.update_reachable_regions(player)
+    #                 repeat = True
 
     def sweep_for_events(self, key_only=False, locations=None):
         # this may need improvement
@@ -487,8 +530,8 @@ class CollectionState(object):
                     self.collect(event.item, True, event)
             new_locations = len(reachable_events) > checked_locations
             checked_locations = len(reachable_events)
-            if new_locations:
-                self.sweep_for_crystal_access()
+            # if new_locations:
+            #     self.sweep_for_crystal_access()
 
     def can_reach_blue(self, region, player):
         if region not in self.colored_regions[player].keys():
@@ -719,6 +762,7 @@ class CollectionState(object):
         self.stale[item.player] = True
 
         if changed:
+            # self.sweep_for_crystal_access(item.player)
             if not event:
                 self.sweep_for_events()
 
