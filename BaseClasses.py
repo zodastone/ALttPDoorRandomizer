@@ -474,14 +474,14 @@ class CollectionState(object):
 
         return spot.can_reach(self)
 
-    def sweep_for_crystal_access(self):
-        for player, rrp in self.reachable_regions.items():
-            dungeon_regions = [x for x in rrp if x.type == RegionType.Dungeon]
-            ccr = self.colored_regions[player]
-            for region in dungeon_regions:
-                if region in ccr.keys():
-                    self.spread_crystal_access(region, ccr[region], rrp, ccr, player)
-            self.stale[player] = True
+    # def sweep_for_crystal_access(self):
+    #     for player, rrp in self.reachable_regions.items():
+    #         dungeon_regions = [x for x in rrp if x.type == RegionType.Dungeon]
+    #         ccr = self.colored_regions[player]
+    #         for region in dungeon_regions:
+    #             if region in ccr.keys():
+    #                 self.spread_crystal_access(region, ccr[region], rrp, ccr, player)
+    #         self.stale[player] = True
 
     def sweep_for_events(self, key_only=False, locations=None):
         # this may need improvement
@@ -500,8 +500,8 @@ class CollectionState(object):
                     self.collect(event.item, True, event)
             new_locations = len(reachable_events) > checked_locations
             checked_locations = len(reachable_events)
-            if new_locations:
-                self.sweep_for_crystal_access()
+            #if new_locations:
+            #    self.sweep_for_crystal_access()
 
     def can_reach_blue(self, region, player):
         if region not in self.colored_regions[player].keys():
