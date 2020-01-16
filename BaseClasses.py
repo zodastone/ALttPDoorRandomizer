@@ -1,5 +1,5 @@
 import copy
-from enum import Enum, unique
+from enum import Enum, unique, Flag
 import logging
 import json
 from collections import OrderedDict, deque
@@ -411,8 +411,21 @@ class CollectionState(object):
                                     ccr[candidate] = CrystalBarrier.Orange
                                 if entrance.parent_region in ccr.keys():
                                     color_type = ccr[entrance.parent_region]
-                                    current_type = ccr[candidate] if candidate in ccr.keys() else None
-                                    ccr[candidate] = color_type if current_type is None or color_type == current_type else CrystalBarrier.Either
+                                    if door is not None and door.crystal != CrystalBarrier.Null:
+                                        color_type &= door.crystal
+                                    if candidate in ccr.keys():
+                                        color_type |= ccr[candidate]
+                                    ccr[candidate] = color_type
+                            for ext in candidate.exits:
+                                connect = ext.connected_region
+                                if connect in rrp and connect in ccr:
+                                    door = self.world.check_for_door(ext.name, player)
+                                    if door is not None and not door.blocked:
+                                        color_type = ccr[candidate]
+                                        if door.crystal != CrystalBarrier.Null:
+                                            color_type &= door.crystal
+                                        if (ccr[connect] | color_type) != ccr[connect]:
+                                            self.spread_crystal_access(candidate, CrystalBarrier.Either, rrp, ccr, player)
             new_regions = len(rrp) > reachable_regions_count
             reachable_regions_count = len(rrp)
 
@@ -1037,11 +1050,11 @@ pol_comp = {
 
 
 @unique
-class CrystalBarrier(Enum):
-    Null = 1  # no special requirement
-    Blue = 2  # blue must be down and explore state set to Blue
-    Orange = 3  # orange must be down and explore state set to Orange
-    Either = 4  # you choose to leave this room in Either state
+class CrystalBarrier(Flag):
+    Null = 0  # no special requirement
+    Blue = 1  # blue must be down and explore state set to Blue
+    Orange = 2  # orange must be down and explore state set to Orange
+    Either = 3  # you choose to leave this room in Either state
 
 
 class Door(object):
