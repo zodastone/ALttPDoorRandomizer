@@ -149,7 +149,7 @@ def parse_arguments(argv, no_defaults=False):
                                           slightly biased to placing progression items with
                                           less restrictions.
                              ''')
-    parser.add_argument('--shuffle', default=defval('full'), const='full', nargs='?', choices=['vanilla', 'simple', 'restricted', 'full', 'crossed', 'insanity', 'restricted_legacy', 'full_legacy', 'madness_legacy', 'insanity_legacy', 'dungeonsfull', 'dungeonssimple'],
+    parser.add_argument('--shuffle', default=defval('vanilla'), const='full', nargs='?', choices=['vanilla', 'simple', 'restricted', 'full', 'crossed', 'insanity', 'restricted_legacy', 'full_legacy', 'madness_legacy', 'insanity_legacy', 'dungeonsfull', 'dungeonssimple'],
                         help='''\
                              Select Entrance Shuffling Algorithm. (default: %(default)s)
                              Full:       Mix cave and dungeon entrances freely while limiting
@@ -173,7 +173,7 @@ def parse_arguments(argv, no_defaults=False):
                              The dungeon variants only mix up dungeons and keep the rest of
                              the overworld vanilla.
                              ''')
-    parser.add_argument('--door_shuffle', default=defval('vanilla'), const='vanilla', nargs='?', choices=['vanilla', 'basic', 'crossed', 'experimental'],
+    parser.add_argument('--door_shuffle', default=defval('basic'), const='vanilla', nargs='?', choices=['vanilla', 'basic', 'crossed', 'experimental'],
                         help='''\
                             Select Door Shuffling Algorithm. (default: %(default)s)
                             Basic:      Doors are mixed within a single dungeon.

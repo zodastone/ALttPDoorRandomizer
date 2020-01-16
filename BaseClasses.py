@@ -6,7 +6,6 @@ from collections import OrderedDict, deque
 
 from EntranceShuffle import door_addresses
 from _vendor.collections_extended import bag
-from EntranceShuffle import door_addresses
 from Utils import int16_as_bytes
 from Tables import normal_offset_table, spiral_offset_table
 from RoomData import Room
@@ -122,7 +121,7 @@ class World(object):
         except KeyError:
             for region in self.regions:
                 if region.name == regionname and region.player == player:
-                    assert not region.world # this should only happen before initialization
+                    assert not region.world  # this should only happen before initialization
                     return region
             raise RuntimeError('No such region %s for player %d' % (regionname, player))
 

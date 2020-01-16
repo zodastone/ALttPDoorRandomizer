@@ -228,4 +228,6 @@ def print_wiki_doors(d_regions, world, player):
 
 
 if __name__ == '__main__':
-    read_entrance_data(old_rom='C:\\Users\\Randall\\Documents\\kwyn\\orig\\z3.sfc')
+    pass
+    # make_new_base2current()
+    # read_entrance_data(old_rom='')
