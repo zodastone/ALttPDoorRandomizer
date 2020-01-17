@@ -402,6 +402,54 @@ def winnow_hangers(hangers, hooks):
         hangers[hanger].remove(door)
 
 
+def stonewalls_valid(valid_doors, proposed_map):
+    stonewall_doors = []
+    for door in valid_doors.values():
+        if door.stonewall:
+            stonewall_doors.append(door)
+    for stonewall in stonewall_doors:
+        if not stonewall_valid(stonewall, valid_doors, proposed_map):
+            return False
+    return True
+
+
+def stonewall_valid(stonewall, valid_doors, proposed_map):
+    if stonewall in proposed_map:
+        bad_entrance = proposed_map[stonewall].entrance
+        if bad_entrance.door.blocked:
+            return True  # great we're done with this one
+        loop_region = stonewall.entrance.parent_region
+        start_region = proposed_map[stonewall].entrance.parent_region
+        queue = deque([start_region])
+        visited = {start_region}
+        while len(queue) > 0:
+            region = queue.popleft()
+            if region == loop_region:
+                return False  # guaranteed loop
+            possible_entrances = list(region.entrances)
+            for d in proposed_map:
+                if d.entrance.parent_region == region:
+                    possible_entrances.append(proposed_map[d].entrance)
+            for entrance in possible_entrances:
+                parent = entrance.parent_region
+                if entrance.name in valid_doors:
+                    door = entrance.door
+                    if not door.blocked and door != stonewall:
+                        if door in proposed_map:
+                            if parent not in visited:
+                                visited.add(parent)
+                                queue.append(parent)
+                else:
+                    if parent.type != RegionType.Dungeon:
+                        return False  # you can get stuck from an entrance
+                    else:
+                        door = entrance.door
+                        if door is not None and not door.blocked and parent not in visited:
+                            visited.add(parent)
+                            queue.append(parent)
+    return True  # we didn't find anything bad
+
+
 def create_graph_piece_from_state(door, o_state, b_state, proposed_map):
     # todo: info about dungeon events - not sure about that
     graph_piece = GraphPiece()
