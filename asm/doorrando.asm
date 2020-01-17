@@ -16,6 +16,8 @@ incsrc normal.asm
 incsrc spiral.asm
 incsrc gfx.asm
 incsrc keydoors.asm
+incsrc overrides.asm
+warnpc $279000
 
 ; Data Section
 org $279000

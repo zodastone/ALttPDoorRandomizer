@@ -184,6 +184,19 @@ class World(object):
                     return door
             return None
 
+    def check_for_entrance(self, entrance, player):
+        if isinstance(entrance, Entrance):
+            return entrance
+        try:
+            return self._entrance_cache[(entrance, player)]
+        except KeyError:
+            for region in self.regions:
+                for ext in region.exits:
+                    if ext.name == entrance and ext.player == player:
+                        self._entrance_cache[(entrance, player)] = ext
+                        return ext
+            return None
+
     def get_room(self, room_idx, player):
         if isinstance(room_idx, Room):
             return room_idx
@@ -882,6 +895,7 @@ class Entrance(object):
         self.vanilla = None
         self.access_rule = lambda state: True
         self.player = player
+        self.door = None
 
     def can_reach(self, state):
         if self.parent_region.can_reach(state) and self.access_rule(state):
@@ -1067,7 +1081,7 @@ class CrystalBarrier(Flag):
 
 
 class Door(object):
-    def __init__(self, player, name, type):
+    def __init__(self, player, name, type, entrance=None):
         self.player = player
         self.name = name
         self.type = type
@@ -1101,6 +1115,10 @@ class Door(object):
         self.controller = None
         self.dependents = []
         self.dead = False
+
+        self.entrance = entrance
+        if entrance is not None:
+            entrance.door = self
 
     def getAddress(self):
         if self.type == DoorType.Normal:

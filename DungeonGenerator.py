@@ -1,6 +1,6 @@
 import random
 import collections
-from collections import defaultdict
+from collections import defaultdict, deque
 from enum import Enum, unique
 import logging
 from functools import reduce
@@ -34,13 +34,13 @@ class GraphPiece:
 def generate_dungeon(name, available_sectors, entrance_region_names, split_dungeon, world, player):
     logger = logging.getLogger('')
     entrance_regions = convert_regions(entrance_region_names, world, player)
-    doors_to_connect = set()
+    doors_to_connect = {}
     all_regions = set()
     bk_needed = False
     bk_special = False
     for sector in available_sectors:
         for door in sector.outstanding_doors:
-            doors_to_connect.add(door)
+            doors_to_connect[door.name] = door
         all_regions.update(sector.regions)
         bk_needed = bk_needed or determine_if_bk_needed(sector, split_dungeon, world, player)
         bk_special = bk_special or check_for_special(sector)
@@ -51,7 +51,9 @@ def generate_dungeon(name, available_sectors, entrance_region_names, split_dunge
     backtrack = False
     itr = 0
     finished = False
-    # last_choice = None
+    # flag if standard and this is hyrule castle
+    # std_flag = world.mode[player] == 'standard' and bk_special  # todo: multi
+    std_flag = world.mode == 'standard' and bk_special
     while not finished:
         # what are my choices?
         itr += 1
@@ -61,7 +63,7 @@ def generate_dungeon(name, available_sectors, entrance_region_names, split_dunge
             dungeon, hangers, hooks = gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map,
                                                        doors_to_connect, bk_needed, bk_special, world, player)
             dungeon_cache[depth] = dungeon, hangers, hooks
-            valid = check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed)
+            valid = check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed, std_flag)
         else:
             dungeon, hangers, hooks = dungeon_cache[depth]
             valid = True
@@ -98,7 +100,7 @@ def generate_dungeon(name, available_sectors, entrance_region_names, split_dunge
     queue = collections.deque(proposed_map.items())
     while len(queue) > 0:
         a, b = queue.pop()
-        connect_doors(a, b, world, player)
+        connect_doors(a, b)
         queue.remove((b, a))
     master_sector = available_sectors.pop()
     for sub_sector in available_sectors:
@@ -136,7 +138,7 @@ def gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map, va
         for door in sector.outstanding_doors:
             if not door.stonewall and door not in proposed_map.keys():
                 hanger_set.add(door)
-                parent = parent_region(door, world, player).parent_region
+                parent = door.entrance.parent_region
                 init_state = ExplorationState(dungeon=name)
                 init_state.big_key_special = start.big_key_special
                 o_state = extend_reachable_state_improved([parent], init_state, proposed_map,
@@ -198,7 +200,7 @@ def check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_do
 
 
 def explore_blue_state(door, dungeon, o_state, proposed_map, valid_doors, world, player):
-    parent = parent_region(door, world, player).parent_region
+    parent = door.entrance.parent_region
     blue_start = ExplorationState(CrystalBarrier.Blue, o_state.dungeon)
     blue_start.big_key_special = o_state.big_key_special
     b_state = extend_reachable_state_improved([parent], blue_start, proposed_map, valid_doors, False, world, player)
@@ -269,7 +271,7 @@ def filter_choices(next_hanger, door, orig_hang, prev_choices, hook_candidates):
     return next_hanger != door and orig_hang != next_hanger and door not in hook_candidates
 
 
-def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed):
+def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed, std_flag):
     # evaluate if everything is still plausible
 
     # only origin is left in the dungeon and not everything is connected
@@ -300,7 +302,7 @@ def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_reg
         if len(must_hang[key]) > len(hooks[key]):
             return False
     outstanding_doors = defaultdict(list)
-    for d in doors_to_connect:
+    for d in doors_to_connect.values():
         if d not in proposed_map.keys():
             outstanding_doors[hook_from_door(d)].append(d)
     for key in outstanding_doors.keys():
@@ -316,6 +318,8 @@ def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_reg
     if len(all_regions.difference(all_visited)) > 0:
         return False
     if not bk_possible:
+        return False
+    if std_flag and not cellblock_valid(doors_to_connect, all_regions, proposed_map):
         return False
     new_hangers_found = True
     accessible_hook_types = []
@@ -342,6 +346,41 @@ def check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_reg
                         if new_h_type not in accessible_hook_types:
                             accessible_hook_types.append(new_h_type)
     return len(all_hangers.difference(hanger_matching)) == 0
+
+
+def cellblock_valid(valid_doors, all_regions, proposed_map):
+    cellblock = None
+    for region in all_regions:
+        if 'Hyrule Dungeon Cellblock' == region.name:
+            cellblock = region
+            break
+    queue = deque([cellblock])
+    visited = {cellblock}
+    while len(queue) > 0:
+        region = queue.popleft()
+        if region.name == 'Sanctuary':
+            return True
+        for ext in region.exits:
+            connect = ext.connected_region
+            if connect is None and ext.name in valid_doors:
+                door = valid_doors[ext.name]
+                if not door.blocked:
+                    if door in proposed_map:
+                        new_region = proposed_map[door].entrance.parent_region
+                        if new_region not in visited:
+                            visited.add(new_region)
+                            queue.append(new_region)
+                    else:
+                        return True  # outstanding connection possible
+            elif connect is not None:
+                door = ext.door
+                if door is not None and not door.blocked and connect not in visited:
+                    visited.add(connect)
+                    queue.append(connect)
+    return False  # couldn't find an outstanding door or the sanctuary
+
+
+
 
 
 def winnow_hangers(hangers, hooks):
@@ -406,10 +445,6 @@ def filter_for_potential_bk_locations(locations):
             and x.name not in key_only_locations.keys() and x.name not in ['Agahnim 1', 'Agahnim 2']]
 
 
-def parent_region(door, world, player):
-    return world.get_entrance(door.name, player)
-
-
 def opposite_h_type(h_type):
     type_map = {
         Hook.Stairs: Hook.Stairs,
@@ -450,7 +485,7 @@ def hanger_from_door(door):
     return None
 
 
-def connect_doors(a, b, world, player):
+def connect_doors(a, b):
     # Return on unsupported types.
     if a.type in [DoorType.Open, DoorType.StraightStairs, DoorType.Hole, DoorType.Warp, DoorType.Ladder,
                   DoorType.Interior, DoorType.Logical]:
@@ -458,28 +493,26 @@ def connect_doors(a, b, world, player):
     # Connect supported types
     if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs:
         if a.blocked:
-            connect_one_way(world, b.name, a.name, player)
+            connect_one_way(b.entrance, a.entrance)
         elif b.blocked:
-            connect_one_way(world, a.name, b.name, player)
+            connect_one_way(a.entrance, b.entrance)
         else:
-            connect_two_way(world, a.name, b.name, player)
+            connect_two_way(a.entrance, b.entrance)
         dep_doors, target = [], None
         if len(a.dependents) > 0:
             dep_doors, target = a.dependents, b
         elif len(b.dependents) > 0:
             dep_doors, target = b.dependents, a
         if target is not None:
-            target_region = world.get_entrance(target.name, player).parent_region
+            target_region = target.entrance.parent_region
             for dep in dep_doors:
-                connect_simple_door(dep, target_region, world, player)
+                connect_simple_door(dep, target_region)
         return
     # If we failed to account for a type, panic
     raise RuntimeError('Unknown door type ' + a.type.name)
 
 
-def connect_two_way(world, entrancename, exitname, player):
-    entrance = world.get_entrance(entrancename, player)
-    ext = world.get_entrance(exitname, player)
+def connect_two_way(entrance, ext):
 
     # if these were already connected somewhere, remove the backreference
     if entrance.connected_region is not None:
@@ -491,17 +524,15 @@ def connect_two_way(world, entrancename, exitname, player):
     ext.connect(entrance.parent_region)
     if entrance.parent_region.dungeon:
         ext.parent_region.dungeon = entrance.parent_region.dungeon
-    x = world.check_for_door(entrancename, player)
-    y = world.check_for_door(exitname, player)
+    x = entrance.door
+    y = ext.door
     if x is not None:
         x.dest = y
     if y is not None:
         y.dest = x
 
 
-def connect_one_way(world, entrancename, exitname, player):
-    entrance = world.get_entrance(entrancename, player)
-    ext = world.get_entrance(exitname, player)
+def connect_one_way(entrance, ext):
 
     # if these were already connected somewhere, remove the backreference
     if entrance.connected_region is not None:
@@ -512,16 +543,16 @@ def connect_one_way(world, entrancename, exitname, player):
     entrance.connect(ext.parent_region)
     if entrance.parent_region.dungeon:
         ext.parent_region.dungeon = entrance.parent_region.dungeon
-    x = world.check_for_door(entrancename, player)
-    y = world.check_for_door(exitname, player)
+    x = entrance.door
+    y = ext.door
     if x is not None:
         x.dest = y
     if y is not None:
         y.dest = x
 
 
-def connect_simple_door(exit_door, region, world, player):
-    world.get_entrance(exit_door.name, player).connect(region)
+def connect_simple_door(exit_door, region):
+    exit_door.entrance.connect(region)
     exit_door.dest = region
 
 
@@ -679,7 +710,7 @@ class ExplorationState(object):
             if self.can_traverse(door):
                 if door.controller is not None:
                     door = door.controller
-                if door.dest is None and door not in proposed_map.keys() and door in valid_doors:
+                if door.dest is None and door not in proposed_map.keys() and door.name in valid_doors.keys():
                     if not self.in_door_list_ic(door, self.unattached_doors):
                         self.append_door_to_list(door, self.unattached_doors, flag)
                     else:
