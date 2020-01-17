@@ -1194,19 +1194,20 @@ def add_inaccessible_doors(world, player):
         create_door(world, player, 'Death Mountain Return Cave (West)', 'Death Mountain Return Ledge')
     if 'Desert Palace Lone Stairs' in world.inaccessible_regions[player]:
         create_door(world, player, 'Desert Palace Entrance (East)', 'Desert Palace Lone Stairs')
-    if world.mode == 'standard' and 'Hyrule Castle Ledge' in world.inaccessible_regions[player]:
-        create_door(world, player, 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge')
-        create_door(world, player, 'Hyrule Castle Entrance (West)', 'Hyrule Castle Ledge')
+    # if world.mode == 'standard' and 'Hyrule Castle Ledge' in world.inaccessible_regions[player]:
+    #     create_door(world, player, 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge')
+    #     create_door(world, player, 'Hyrule Castle Entrance (West)', 'Hyrule Castle Ledge')
 
 
 def create_door(world, player, entName, region_name):
-    connect = world.get_entrance(entName, player).connected_region
+    entrance = world.get_entrance(entName, player)
+    connect = entrance.connected_region
     for ext in connect.exits:
         if ext.connected_region is not None and ext.connected_region.name == region_name:
-            d = Door(player, ext.name, DoorType.Logical),
+            d = Door(player, ext.name, DoorType.Logical, ext),
             world.doors += d
             connect_door_only(world, ext.name, ext.connected_region, player)
-    d = Door(player, entName, DoorType.Logical),
+    d = Door(player, entName, DoorType.Logical, entrance),
     world.doors += d
     connect_door_only(world, entName, connect, player)
 

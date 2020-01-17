@@ -59,6 +59,9 @@ org $1bece4
 Palette_SpriteAux1:
 
 
+org $0DFA53
+jsl.l LampCheckOverride
+
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes
 ; Hera BK door back can be seen with Pot clipping - likely useful for no logic seeds

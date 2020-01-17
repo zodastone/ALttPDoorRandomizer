@@ -116,8 +116,7 @@ def global_rules(world, player):
 
     if world.mode == 'standard':
         world.get_region('Hyrule Castle Secret Entrance', player).can_reach_private = lambda state: True
-        old_rule = world.get_region('Links House', player).can_reach_private
-        world.get_region('Links House', player).can_reach_private = lambda state: state.can_reach('Sanctuary', 'Region', player) or old_rule(state)
+        world.get_region('Links House', player).can_reach_private = lambda state: True
     else:
         # these are default save&quit points and always accessible
         world.get_region('Links House', player).can_reach_private = lambda state: True
@@ -877,19 +876,19 @@ def inverted_rules(world, player):
 
 def no_glitches_rules(world, player):
     if world.mode != 'inverted':
-        set_rule(world.get_entrance('Zoras River', player), lambda state: state.has('Flippers', player) or state.can_lift_rocks(player))
-        set_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: state.has('Flippers', player))  # can be fake flippered to
-        set_rule(world.get_entrance('Hobo Bridge', player), lambda state: state.has('Flippers', player))
-        set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
-        set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))
-        set_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+        add_rule(world.get_entrance('Zoras River', player), lambda state: state.has('Flippers', player) or state.can_lift_rocks(player))
+        add_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: state.has('Flippers', player))  # can be fake flippered to
+        add_rule(world.get_entrance('Hobo Bridge', player), lambda state: state.has('Flippers', player))
+        add_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+        add_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))
+        add_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     else:
-        set_rule(world.get_entrance('Zoras River', player), lambda state: state.has_Pearl(player) and (state.has('Flippers', player) or state.can_lift_rocks(player)))
-        set_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # can be fake flippered to
-        set_rule(world.get_entrance('Hobo Bridge', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
-        set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has('Flippers', player))
-        set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has('Flippers', player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))
-        set_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: state.has('Flippers', player))
+        add_rule(world.get_entrance('Zoras River', player), lambda state: state.has_Pearl(player) and (state.has('Flippers', player) or state.can_lift_rocks(player)))
+        add_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # can be fake flippered to
+        add_rule(world.get_entrance('Hobo Bridge', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+        add_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has('Flippers', player))
+        add_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has('Flippers', player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))
+        add_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: state.has('Flippers', player))
 
     # todo: move some dungeon rules to no glictes logic - see these for examples
     # add_rule(world.get_entrance('Ganons Tower (Hookshot Room)', player), lambda state: state.has('Hookshot', player) or state.has_Boots(player))
@@ -1032,27 +1031,30 @@ def swordless_rules(world, player):
         set_rule(world.get_entrance('Misery Mire', player), lambda state: state.has_misery_mire_medallion(player))  # sword not required to use medallion for opening in swordless (!)
         set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has('Hammer', player))
 
+
 def standard_rules(world, player):
-#    add_rule(world.get_entrance('Sewers Door', player), lambda state: state.can_kill_most_things(player))
+    # these are because of rails
+    set_rule(world.get_entrance('Hyrule Castle Exit (East)', player), lambda state: state.has('Zelda Delivered', player))
+    set_rule(world.get_entrance('Hyrule Castle Exit (West)', player), lambda state: state.has('Zelda Delivered', player))
 
-    set_rule(world.get_entrance('Hyrule Castle Exit (East)', player), lambda state: state.can_reach('Sanctuary', 'Region', player))
-    set_rule(world.get_entrance('Hyrule Castle Exit (West)', player), lambda state: state.can_reach('Sanctuary', 'Region', player))
-
-    # ensures the required weapon for escape lands on uncle (unless player has it pre-equipped)
-    add_rule(world.get_location('Secret Passage', player), lambda state: state.can_kill_most_things(player))
-    add_rule(world.get_location('Hyrule Castle - Map Chest', player), lambda state: state.can_kill_most_things(player))
-
+    # too restrictive for crossed?
     def uncle_item_rule(item):
         copy_state = CollectionState(world)
         copy_state.collect(item)
         copy_state.sweep_for_events()
-        return copy_state.can_reach('Sanctuary', 'Region', player)
+        return copy_state.has('Zelda Delivered', player)
 
     add_item_rule(world.get_location('Link\'s Uncle', player), uncle_item_rule)
 
-    # easiest way to enforce key placement not relevant for open
-    set_rule(world.get_location('Sewers - Dark Cross', player), lambda state: state.can_kill_most_things(player))
+    # ensures the required weapon for escape lands on uncle (unless player has it pre-equipped)
+    for location in ['Link\'s House', 'Sanctuary', 'Sewers - Secret Room - Left', 'Sewers - Secret Room - Middle',
+                     'Sewers - Secret Room - Right']:
+        add_rule(world.get_location(location, player), lambda state: state.can_kill_most_things(player))
+    add_rule(world.get_location('Secret Passage', player), lambda state: state.can_kill_most_things(player))
 
+    # todo: in crossed these chest/key drops are not necessarily present
+    add_rule(world.get_location('Hyrule Castle - Map Chest', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_location('Sewers - Dark Cross', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_location('Hyrule Castle - Boomerang Chest', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_location('Hyrule Castle - Zelda\'s Chest', player), lambda state: state.can_kill_most_things(player))
 
@@ -1061,6 +1063,31 @@ def standard_rules(world, player):
     set_rule(world.get_location('Hyrule Castle - Key Rat Key Drop', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_entrance('Hyrule Dungeon Armory S', player), lambda state: state.can_kill_most_things(player))
 
+    set_rule(world.get_location('Hyrule Castle - Big Key Drop', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_location('Zelda Pickup', player), lambda state: state.has('Big Key (Escape)', player))
+    set_rule(world.get_entrance('Hyrule Castle Throne Room N', player), lambda state: state.has('Zelda Herself', player))
+    set_rule(world.get_location('Zelda Drop Off', player), lambda state: state.has('Zelda Herself', player))
+
+    for location in ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'Purple Chest']:
+        add_rule(world.get_location(location, player), lambda state: state.has('Zelda Delivered', player))
+
+    # Bonk Fairy (Light) is a notable omission in ER shuffles/Retro
+    for entrance in ['Blinds Hideout', 'Zoras River', 'Kings Grave Outer Rocks', 'Dam', 'Tavern North', 'Chicken House',
+                     'Aginahs Cave', 'Sahasrahlas Hut', 'Kakariko Well Drop', 'Kakariko Well Cave', 'Blacksmiths Hut',
+                     'Bat Cave Drop Ledge', 'Bat Cave Cave', 'Sick Kids House', 'Hobo Bridge',
+                     'Lost Woods Hideout Drop', 'Lost Woods Hideout Stump', 'Lumberjack Tree Tree',
+                     'Lumberjack Tree Cave', 'Mini Moldorm Cave', 'Ice Rod Cave', 'Lake Hylia Central Island Pier',
+                     'Bonk Rock Cave', 'Library', 'Potion Shop', 'Two Brothers House (East)', 'Desert Palace Stairs',
+                     'Eastern Palace', 'Master Sword Meadow', 'Sanctuary', 'Sanctuary Grave',
+                     'Death Mountain Entrance Rock', 'Flute Spot 1', 'Dark Desert Teleporter', 'East Hyrule Teleporter',
+                     'South Hyrule Teleporter', 'Kakariko Teleporter', 'Elder House (East)', 'Elder House (West)',
+                     'North Fairy Cave', 'North Fairy Cave Drop', 'Lost Woods Gamble', 'Snitch Lady (East)',
+                     'Snitch Lady (West)', 'Tavern (Front)', 'Bush Covered House', 'Light World Bomb Hut',
+                     'Kakariko Shop', 'Long Fairy Cave', 'Good Bee Cave', '20 Rupee Cave', 'Cave Shop (Lake Hylia)',
+                     'Waterfall of Wishing', 'Hyrule Castle Main Gate', '50 Rupee Cave',
+                     'Fortune Teller (Light)', 'Lake Hylia Fairy', 'Light Hype Fairy', 'Desert Fairy',
+                     'Lumberjack House', 'Lake Hylia Fortune Teller', 'Kakariko Gamble Game', 'Top of Pyramid']:
+        add_rule(world.get_entrance(entrance, player), lambda state: state.has('Zelda Delivered', player))
 
 def set_trock_key_rules(world, player):
 
