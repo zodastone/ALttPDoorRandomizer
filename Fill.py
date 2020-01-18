@@ -346,7 +346,7 @@ def balance_multiworld_progression(world):
 
     def get_sphere_locations(sphere_state, locations):
         sphere_state.sweep_for_events(key_only=True, locations=locations)
-        return [loc for loc in locations if sphere_state.can_reach(loc)]
+        return [loc for loc in locations if sphere_state.can_reach(loc) and sphere_state.not_flooding_a_key(sphere_state.world, loc)]
 
     while True:
         sphere_locations = get_sphere_locations(state, unchecked_locations)
