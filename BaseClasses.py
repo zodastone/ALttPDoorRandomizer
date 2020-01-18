@@ -375,6 +375,7 @@ class CollectionState(object):
         self.world = parent
         self.reachable_regions = {player: set() for player in range(1, parent.players + 1)}
         self.colored_regions = {player: {} for player in range(1, parent.players + 1)}
+        self.blocked_color_regions = {player: set() for player in range(1, parent.players + 1)}
         self.events = []
         self.path = {}
         self.locations_checked = set()
@@ -387,6 +388,7 @@ class CollectionState(object):
         self.stale[player] = False
         rrp = self.reachable_regions[player]
         ccr = self.colored_regions[player]
+        blocked = self.blocked_color_regions[player]
         new_regions = True
         reachable_regions_count = len(rrp)
         while new_regions:
@@ -403,30 +405,35 @@ class CollectionState(object):
                         if c_switch_present:
                             ccr[candidate] = CrystalBarrier.Either
                             self.spread_crystal_access(candidate, CrystalBarrier.Either, rrp, ccr, player)
-                        else:
-                            for entrance in candidate.entrances:
-                                if entrance.can_reach(self):
-                                    door = self.world.check_for_door(entrance.name, player)
-                                    if door is None or entrance.parent_region.type != RegionType.Dungeon:
-                                        ccr[candidate] = CrystalBarrier.Orange
-                                    if entrance.parent_region in ccr.keys():
-                                        color_type = ccr[entrance.parent_region]
-                                        if door is not None and door.crystal != CrystalBarrier.Null:
-                                            color_type &= door.crystal
-                                        if candidate in ccr.keys():
-                                            color_type |= ccr[candidate]
-                                        if not candidate in ccr.keys() or color_type != ccr[candidate]:
-                                            ccr[candidate] = color_type
                             for ext in candidate.exits:
                                 connect = ext.connected_region
-                                if connect in rrp and ext.can_reach(self) and connect in ccr:
+                                if connect in rrp and not ext.access_rule(self):
+                                    blocked.add(candidate)
+                        else:
+                            color_type = CrystalBarrier.Null
+                            for entrance in candidate.entrances:
+                                if entrance.parent_region in rrp:
+                                    if entrance.access_rule(self):
+                                        door = self.world.check_for_door(entrance.name, player)
+                                        if door is None or entrance.parent_region.type != RegionType.Dungeon:
+                                            color_type |= CrystalBarrier.Orange
+                                        elif entrance.parent_region in ccr.keys():
+                                            color_type |= (ccr[entrance.parent_region] & (door.crystal or CrystalBarrier.Either))
+                                    else:
+                                        blocked.add(entrance.parent_region)
+                            if color_type:
+                                ccr[candidate] = color_type
+                            for ext in candidate.exits:
+                                connect = ext.connected_region
+                                if connect in rrp and connect in ccr:
                                     door = self.world.check_for_door(ext.name, player)
                                     if door is not None and not door.blocked:
-                                        color_type = ccr[candidate]
-                                        if door.crystal != CrystalBarrier.Null:
-                                            color_type &= door.crystal
-                                        if (ccr[connect] | color_type) != ccr[connect]:
-                                            self.spread_crystal_access(candidate, CrystalBarrier.Either, rrp, ccr, player)
+                                        if ext.access_rule(self):
+                                            new_color = ccr[connect] | (ccr[candidate] & (door.crystal or CrystalBarrier.Either))
+                                            if new_color != ccr[connect]:
+                                                self.spread_crystal_access(candidate, new_color, rrp, ccr, player)
+                                        else:
+                                            blocked.add(candidate)
             new_regions = len(rrp) > reachable_regions_count
             reachable_regions_count = len(rrp)
 
@@ -438,24 +445,23 @@ class CollectionState(object):
             visited.add(region)
             for ext in region.exits:
                 connect = ext.connected_region
-                if connect not in visited and connect is not None and connect.type == RegionType.Dungeon:
-                    if connect in rrp and connect in ccr and ext.can_reach(self) and connect:
-                        door = self.world.check_for_door(ext.name, player)
-                        if door is not None and not door.blocked:
-                            current_crystal = ccr[connect]
-                            new_crystal = crystal
-                            if door.crystal != CrystalBarrier.Null:
-                                new_crystal &= door.crystal
-                            new_crystal |= current_crystal
-                            if current_crystal != new_crystal:
-                                ccr[connect] = new_crystal
-                                queue.append((connect, new_crystal))
+                if connect is not None and connect.type == RegionType.Dungeon:
+                    if connect not in visited and connect in rrp and connect in ccr:
+                        if ext.access_rule(self):
+                            door = self.world.check_for_door(ext.name, player)
+                            if door is not None and not door.blocked:
+                                current_crystal = ccr[connect]
+                                new_crystal = current_crystal | (crystal & (door.crystal or CrystalBarrier.Either))
+                                if current_crystal != new_crystal:
+                                    ccr[connect] = new_crystal
+                                    queue.append((connect, new_crystal))
 
     def copy(self):
         ret = CollectionState(self.world)
         ret.prog_items = self.prog_items.copy()
         ret.reachable_regions = {player: copy.copy(self.reachable_regions[player]) for player in range(1, self.world.players + 1)}
         ret.colored_regions = {player: copy.copy(self.colored_regions[player]) for player in range(1, self.world.players + 1)}
+        ret.blocked_color_regions = {player: copy.copy(self.blocked_color_regions[player]) for player in range(1, self.world.players + 1)}
         ret.events = copy.copy(self.events)
         ret.path = copy.copy(self.path)
         ret.locations_checked = copy.copy(self.locations_checked)
@@ -477,11 +483,12 @@ class CollectionState(object):
         return spot.can_reach(self)
 
     def sweep_for_crystal_access(self):
-
         for player, rrp in self.reachable_regions.items():
-            dungeon_regions = [x for x in rrp if x.type == RegionType.Dungeon]
+            if self.stale[player]:
+                self.update_reachable_regions(player)
+            dungeon_regions = self.blocked_color_regions[player]
             ccr = self.colored_regions[player]
-            for region in dungeon_regions:
+            for region in dungeon_regions.copy():
                 if region in ccr.keys():
                     self.spread_crystal_access(region, ccr[region], rrp, ccr, player)
 
