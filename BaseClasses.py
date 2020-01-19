@@ -349,6 +349,7 @@ class World(object):
         prog_locations = [location for location in self.get_locations() if location.item is not None and (location.item.advancement or location.event) and location not in state.locations_checked]
 
         while prog_locations:
+            state.sweep_for_events()
             sphere = []
             # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
             for location in prog_locations:
