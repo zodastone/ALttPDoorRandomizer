@@ -193,7 +193,7 @@ def generate_itempool(world, player):
     world.get_location('Ice Block Drop', player).event = True
     world.get_location('Ice Block Drop', player).locked = True
     # if world.mode[player] == 'standard': todo: multi
-    if world.mode == 'standard':
+    if world.mode[player] == 'standard':
         world.push_item(world.get_location('Zelda Pickup', player), ItemFactory('Zelda Herself', player), False)
         world.get_location('Zelda Pickup', player).event = True
         world.get_location('Zelda Pickup', player).locked = True

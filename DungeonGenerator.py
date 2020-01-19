@@ -53,7 +53,7 @@ def generate_dungeon(name, available_sectors, entrance_region_names, split_dunge
     finished = False
     # flag if standard and this is hyrule castle
     # std_flag = world.mode[player] == 'standard' and bk_special  # todo: multi
-    std_flag = world.mode == 'standard' and bk_special
+    std_flag = world.mode[player] == 'standard' and bk_special
     while not finished:
         # what are my choices?
         itr += 1
@@ -992,7 +992,7 @@ def create_dungeon_builders(all_sectors, world, player, dungeon_entrances=None):
         current_dungeon = dungeon_map[key]
         for r_name in dungeon_boss_sectors[key]:
             assign_sector(find_sector(r_name, candidate_sectors), current_dungeon, candidate_sectors)
-        if key == 'Hyrule Castle' and world.mode == 'standard':
+        if key == 'Hyrule Castle' and world.mode[player] == 'standard':
             for r_name in ['Hyrule Dungeon Cellblock', 'Sanctuary']:  # need to deliver zelda
                 assign_sector(find_sector(r_name, candidate_sectors), current_dungeon, candidate_sectors)
     for key in dungeon_entrances.keys():

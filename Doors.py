@@ -1069,8 +1069,7 @@ def create_doors(world, player):
     world.get_door('Swamp Drain Right Switch', player).event('Swamp Drain')
     world.get_door('Swamp Flooded Room Ladder', player).event('Swamp Drain')
 
-    # if world.mode[player] == 'standard':  # todo: multi
-    if world.mode == 'standard':
+    if world.mode[player] == 'standard':
         world.get_door('Hyrule Castle Throne Room N', player).event('Zelda Pickup')
 
     # crystal switches and barriers

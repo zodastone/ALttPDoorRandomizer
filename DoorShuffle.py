@@ -1127,7 +1127,7 @@ def determine_required_paths(world, player):
         paths['Turtle Rock'].insert(0, 'TR Eye Bridge')
         paths['Turtle Rock'].insert(0, 'TR Big Chest Entrance')
         paths['Turtle Rock'].insert(0, 'TR Lazy Eyes')
-        if world.mode == 'standard':
+        if world.mode[player] == 'standard':
             paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
             # noinspection PyTypeChecker
             paths['Hyrule Castle'].append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
@@ -1159,7 +1159,7 @@ def find_inaccessible_regions(world, player):
             if connect is not None and connect.type is not RegionType.Dungeon and connect not in queue and connect not in visited_regions:
                 queue.append(connect)
     world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if valid_inaccessible_region(r)])
-    if world.mode == 'standard':
+    if world.mode[player] == 'standard':
         world.inaccessible_regions[player].append('Hyrule Castle Ledge')
         world.inaccessible_regions[player].append('Sewer Drop')
     logger = logging.getLogger('')
