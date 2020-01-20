@@ -1000,12 +1000,16 @@ def validate_vanilla_key_logic(world, player):
 
 
 def val_hyrule(key_logic, world, player):
-    val_rule(key_logic.door_rules['Sewers Secret Room Key Door S'], 2)
-    val_rule(key_logic.door_rules['Sewers Dark Cross Key Door N'], 2)
-    val_rule(key_logic.door_rules['Hyrule Dungeon Map Room Key Door S'], 2)
-    # why is allow_small actually false? - because chest key is forced elsewhere?
-    # val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 3, True, 'Hyrule Castle - Zelda\'s Chest')
-    val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 4)
+    if world.mode[player] == 'standard':
+        val_rule(key_logic.door_rules['Hyrule Dungeon Map Room Key Door S'], 1)
+        val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 2)
+        val_rule(key_logic.door_rules['Sewers Dark Cross Key Door N'], 3)
+        val_rule(key_logic.door_rules['Sewers Key Rat Key Door N'], 4)
+    else:
+        val_rule(key_logic.door_rules['Sewers Secret Room Key Door S'], 2)
+        val_rule(key_logic.door_rules['Sewers Dark Cross Key Door N'], 2)
+        val_rule(key_logic.door_rules['Hyrule Dungeon Map Room Key Door S'], 2)
+        val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 4)
 
 
 def val_eastern(key_logic, world, player):

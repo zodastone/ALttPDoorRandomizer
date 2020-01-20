@@ -846,7 +846,8 @@ dungeon_events = [
     'Attic Cracked Floor',
     'Suspicious Maiden',
     'Revealing Light',
-    'Ice Block Drop'
+    'Ice Block Drop',
+    'Zelda Pickup'
 ]
 
 flooded_keys_reverse = {

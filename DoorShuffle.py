@@ -118,17 +118,34 @@ def vanilla_key_logic(world, player):
 
     overworld_prep(world, player)
     entrances_map, potentials, connections = determine_entrance_list(world, player)
-    for builder in builders:
-        start_regions = convert_regions(entrances_map[builder.name], world, player)
-        doors = convert_key_doors(default_small_key_doors[builder.name], world, player)
-        key_layout = build_key_layout(builder, start_regions, doors, world, player)
-        valid = validate_key_layout(key_layout, world, player)
-        if not valid:
-            raise Exception('Vanilla key layout not valid %s' % builder.name)
-        if player not in world.key_logic.keys():
-            world.key_logic[player] = {}
-        analyze_dungeon(key_layout, world, player)
-        world.key_logic[player][builder.name] = key_layout.key_logic
+
+    enabled_entrances = {}
+    sector_queue = collections.deque(builders)
+    last_key = None
+    while len(sector_queue) > 0:
+        builder = sector_queue.popleft()
+
+        origin_list = list(entrances_map[builder.name])
+        find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, builder.name)
+        origin_list_sans_drops = remove_drop_origins(origin_list)
+        if len(origin_list_sans_drops) <= 0:
+            if last_key == builder.name:
+                raise Exception('Infinte loop detected %s' % builder.name)
+            sector_queue.append(builder)
+            last_key = builder.name
+        else:
+            find_new_entrances(builder.master_sector, connections, potentials, enabled_entrances, world, player)
+            start_regions = convert_regions(origin_list, world, player)
+            doors = convert_key_doors(default_small_key_doors[builder.name], world, player)
+            key_layout = build_key_layout(builder, start_regions, doors, world, player)
+            valid = validate_key_layout(key_layout, world, player)
+            if not valid:
+                raise Exception('Vanilla key layout not valid %s' % builder.name)
+            if player not in world.key_logic.keys():
+                world.key_logic[player] = {}
+            analyze_dungeon(key_layout, world, player)
+            world.key_logic[player][builder.name] = key_layout.key_logic
+            last_key = None
     validate_vanilla_key_logic(world, player)
 
 
