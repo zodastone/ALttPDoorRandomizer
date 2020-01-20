@@ -52,7 +52,6 @@ def generate_dungeon(name, available_sectors, entrance_region_names, split_dunge
     itr = 0
     finished = False
     # flag if standard and this is hyrule castle
-    # std_flag = world.mode[player] == 'standard' and bk_special  # todo: multi
     std_flag = world.mode[player] == 'standard' and bk_special
     while not finished:
         # what are my choices?

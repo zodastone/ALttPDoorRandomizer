@@ -1125,29 +1125,24 @@ def change_door_to_small_key(d, world, player):
 
 def determine_required_paths(world, player):
     paths = {
-        'Hyrule Castle': [],
+        'Hyrule Castle': ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby'],
         'Eastern Palace': ['Eastern Boss'],
-        'Desert Palace': ['Desert Boss'],
+        'Desert Palace': ['Desert Main Lobby', 'Desert East Lobby', 'Desert West Lobby', 'Desert Boss'],
         'Tower of Hera': ['Hera Boss'],
         'Agahnims Tower': ['Tower Agahnim 1'],
         'Palace of Darkness': ['PoD Boss'],
         'Swamp Palace': ['Swamp Boss'],
-        'Skull Woods': ['Skull Boss'],
+        'Skull Woods': ['Skull 1 Lobby', 'Skull 2 East Lobby', 'Skull 2 West Lobby', 'Skull Boss'],
         'Thieves Town': ['Thieves Boss', ('Thieves Blind\'s Cell', 'Thieves Boss')],
         'Ice Palace': ['Ice Boss'],
         'Misery Mire': ['Mire Boss'],
-        'Turtle Rock': ['TR Boss'],
+        'Turtle Rock': ['TR Main Lobby', 'TR Lazy Eyes', 'TR Big Chest Entrance', 'TR Eye Bridge', 'TR Boss'],
         'Ganons Tower': ['GT Agahnim 2']
         }
-    if world.shuffle[player] == 'vanilla':
-        paths['Skull Woods'].insert(0, 'Skull 2 West Lobby')
-        paths['Turtle Rock'].insert(0, 'TR Eye Bridge')
-        paths['Turtle Rock'].insert(0, 'TR Big Chest Entrance')
-        paths['Turtle Rock'].insert(0, 'TR Lazy Eyes')
-        if world.mode[player] == 'standard':
-            paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
-            # noinspection PyTypeChecker
-            paths['Hyrule Castle'].append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
+    if world.mode[player] == 'standard':
+        paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
+        # noinspection PyTypeChecker
+        paths['Hyrule Castle'].append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
     if world.doorShuffle[player] in ['basic']:
         paths['Thieves Town'].append('Thieves Attic Window')
     return paths
