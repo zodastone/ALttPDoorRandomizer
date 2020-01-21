@@ -167,6 +167,14 @@ def analyze_dungeon(key_layout, world, player):
                     key_logic.sm_restricted.update(find_big_chest_locations(key_counter.free_locations))
     check_rules(original_key_counter, key_layout, world, player)
 
+    # Flip bk rules if more restrictive, to prevent placing a big key in a softlocking location
+    for rule in key_logic.door_rules.values():
+        if rule.alternate_small_key is not None and rule.alternate_small_key > rule.small_key_num:
+            max_counter = find_max_counter(key_layout)
+            rule.alternate_big_key_loc = set(max_counter.free_locations.keys()).difference(rule.alternate_big_key_loc)
+            rule.small_key_num, rule.alternate_small_key = rule.alternate_small_key, rule.small_key_num
+
+
 
 def count_key_drops(sector):
     cnt = 0
