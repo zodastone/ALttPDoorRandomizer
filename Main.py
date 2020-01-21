@@ -152,6 +152,10 @@ def main(args, seed=None):
         logger.info('Balancing multiworld progression.')
         balance_multiworld_progression(world)
 
+    # if we only check for beatable, we can do this sanity check first before creating the rom
+    if not world.can_beat_game():
+        raise RuntimeError('Cannot beat game. Something went terribly wrong here!')
+
     logger.info('Patching ROM.')
 
     outfilebase = 'DR_%s' % (args.outputname if args.outputname else world.seed)
@@ -224,10 +228,6 @@ def main(args, seed=None):
 
     if args.create_spoiler and not args.jsonout:
         world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
-
-    # if we only check for beatable, we can do this sanity check first before writing down spheres
-    if not world.can_beat_game():
-        raise RuntimeError('Cannot beat game. Something went terribly wrong here!')
 
     if not args.skip_playthrough:
         logger.info('Calculating playthrough.')
