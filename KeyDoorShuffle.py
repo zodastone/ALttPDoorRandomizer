@@ -1,7 +1,8 @@
 import logging
 from collections import defaultdict, deque
 
-from Regions import dungeon_events
+from BaseClasses import DoorType
+from Regions import dungeon_events, key_only_locations
 from Dungeons import dungeon_keys, dungeon_bigs
 from DungeonGenerator import ExplorationState
 
@@ -98,7 +99,7 @@ def build_key_layout(builder, start_regions, proposal, world, player):
 def calc_max_chests(builder, key_layout, world, player):
     if world.doorShuffle[player] != 'crossed':
         return len(world.get_dungeon(key_layout.sector.name, player).small_keys)
-    return builder.key_doors_num - key_layout.max_drops
+    return max(0, builder.key_doors_num - key_layout.max_drops)
 
 
 def analyze_dungeon(key_layout, world, player):
@@ -124,7 +125,7 @@ def analyze_dungeon(key_layout, world, player):
         avail_bigs = exist_relevant_big_doors(key_counter, key_layout)
         non_big_locs = count_locations_big_optional(key_counter.free_locations)
         if not key_counter.big_key_opened:
-            if chest_keys == non_big_locs and available <= possible_smalls and not avail_bigs:
+            if chest_keys == non_big_locs and chest_keys > 0 and available <= possible_smalls and not avail_bigs:
                 key_logic.bk_restricted.update(filter_big_chest(key_counter.free_locations))
                 if not key_counter.big_key_opened and big_chest_in_locations(key_counter.free_locations):
                     key_logic.sm_restricted.update(find_big_chest_locations(key_counter.free_locations))
@@ -308,7 +309,8 @@ def key_wasted(new_door, old_door, old_counter, new_counter, key_layout, world, 
     new_avail = new_chest_keys + new_key_diff
     if new_key_diff < old_key_diff or new_avail < old_avail:
         return True
-    if new_avail == old_avail:
+    if new_avail >= old_avail:
+        wasted_keys = 0
         old_children = old_counter.child_doors.keys()
         new_children = [x for x in new_counter.child_doors.keys() if x != old_door and x.dest != old_door and (not x.bigKey or x not in old_children)]
         current_counter = new_counter
@@ -319,6 +321,8 @@ def key_wasted(new_door, old_door, old_counter, new_counter, key_layout, world, 
             bk_open = bk_opened or new_door.bigKey
             new_counter = find_counter(proposed_doors, bk_open, key_layout)
             if key_wasted(new_child, old_door, current_counter, new_counter, key_layout, world, player):
+                wasted_keys += 1
+            if new_avail - wasted_keys < old_avail:
                 return True  # waste is possible
     return False
 
@@ -476,11 +480,13 @@ def bk_restricted_rules(rule, door, odd_counter, empty_flag, key_counter, key_la
     ignored_doors = {**ignored_doors, **dict.fromkeys(dest_ignored)}
     post_counter = open_some_counter(door_open, key_layout, ignored_doors.keys())
     unique_loc = dict_difference(post_counter.free_locations, best_counter.free_locations)
-    if bk_rule.is_valid and len(unique_loc) > 0:
+    # todo: figure out the intention behind this change - better way to detect the big key is blocking needed key onlys?
+    if len(unique_loc) > 0:  # and bk_rule.is_valid
         rule.alternate_small_key = bk_rule.small_key_num
         rule.alternate_big_key_loc.update(unique_loc)
-    elif not bk_rule.is_valid:
-        key_layout.key_logic.bk_restricted.update(unique_loc)
+    # elif not bk_rule.is_valid:
+    #     key_layout.key_logic.bk_restricted.update(unique_loc)
+
 
 def open_a_door(door, child_state, flat_proposal):
     if door.bigKey:
@@ -494,7 +500,7 @@ def open_a_door(door, child_state, flat_proposal):
         child_state.small_doors[:] = [x for x in child_state.small_doors if x.door != door]
         child_state.avail_doors.extend(doors_to_open)
         dest_door = door.dest
-        if dest_door in flat_proposal:
+        if dest_door in flat_proposal and door.type != DoorType.SpiralStairs:
             child_state.opened_doors.append(dest_door)
             if child_state.in_door_list_ic(dest_door, child_state.small_doors):
                 now_available = [x for x in child_state.small_doors if x.door == dest_door]
@@ -559,10 +565,26 @@ def filter_big_chest(locations):
     return [x for x in locations if '- Big Chest' not in x.name]
 
 
+def count_free_locations(state):
+    cnt = 0
+    for loc in state.found_locations:
+        if '- Prize' not in loc.name and loc.name not in dungeon_events and loc.name not in key_only_locations and loc.name not in ['Agahnim 1', 'Agahnim 2', 'Hyrule Castle - Big Key Drop']:
+            cnt += 1
+    return cnt
+
+
 def count_locations_exclude_big_chest(state):
     cnt = 0
     for loc in state.found_locations:
-        if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc.name not in dungeon_events and loc.name not in ['Agahnim 1', 'Agahnim 2', 'Hyrule Castle - Big Key Drop']:
+        if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc.name not in dungeon_events and loc.name not in key_only_locations and loc.name not in ['Agahnim 1', 'Agahnim 2', 'Hyrule Castle - Big Key Drop']:
+            cnt += 1
+    return cnt
+
+
+def count_key_only_locations(state):
+    cnt = 0
+    for loc in state.found_locations:
+        if loc.name in key_only_locations:
             cnt += 1
     return cnt
 
@@ -784,6 +806,8 @@ def reduce_rules(small_rules, collected, collected_alt):
 
 # Soft lock stuff
 def validate_key_layout(key_layout, world, player):
+    if world.retro[player]:  # retro is all good - don't care how the doors are laid out
+        return True
     flat_proposal = key_layout.flat_prop
     state = ExplorationState(dungeon=key_layout.sector.name)
     state.key_locations = key_layout.max_chests
@@ -800,8 +824,10 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     num_bigs = 1 if len(state.big_doors) > 0 else 0  # all or nothing
     if not smalls_avail and num_bigs == 0:
         return True   # I think that's the end
-    ttl_locations = state.ttl_locations if state.big_key_opened else count_locations_exclude_big_chest(state)
-    available_small_locations = cnt_avail_small_locations(key_layout, ttl_locations, state, world, player)
+    # todo: fix state to separate out these types
+    ttl_locations = count_free_locations(state) if state.big_key_opened else count_locations_exclude_big_chest(state)
+    ttl_key_only = count_key_only_locations(state)
+    available_small_locations = cnt_avail_small_locations(ttl_locations + ttl_key_only, state, world, player)
     available_big_locations = cnt_avail_big_locations(ttl_locations, state, world, player)
     if (not smalls_avail or available_small_locations == 0) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
         return False
@@ -810,8 +836,9 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
             for exp_door in state.small_doors:
                 state_copy = state.copy()
                 open_a_door(exp_door.door, state_copy, flat_proposal)
-                state_copy.used_locations += 1
                 state_copy.used_smalls += 1
+                if state_copy.used_smalls > ttl_key_only:
+                    state_copy.used_locations += 1
                 code = state_id(state_copy, flat_proposal)
                 if code not in checked_states.keys():
                     valid = validate_key_layout_sub_loop(key_layout, state_copy, checked_states, flat_proposal, world, player)
@@ -835,7 +862,7 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     return True
 
 
-def cnt_avail_small_locations(key_layout, ttl_locations, state, world, player):
+def cnt_avail_small_locations(ttl_locations, state, world, player):
     if not world.keyshuffle[player] and not world.retro[player]:
         return min(ttl_locations - state.used_locations, state.key_locations - state.used_smalls)
     return state.key_locations - state.used_smalls
@@ -843,7 +870,7 @@ def cnt_avail_small_locations(key_layout, ttl_locations, state, world, player):
 
 def cnt_avail_big_locations(ttl_locations, state, world, player):
     if not world.bigkeyshuffle[player]:
-        return ttl_locations - state.used_locations if not state.big_key_special else 0
+        return max(0, ttl_locations - state.used_locations) if not state.big_key_special else 0
     return 1 if not state.big_key_special else 0
 
 
