@@ -465,6 +465,7 @@ class CollectionState(object):
     def spread_crystal_access(self, region, crystal, rrp, ccr, player):
         queue = deque([(region, crystal)])
         visited = set()
+        updated = False
         while len(queue) > 0:
             region, crystal = queue.popleft()
             visited.add(region)
@@ -478,8 +479,10 @@ class CollectionState(object):
                                 current_crystal = ccr[connect]
                                 new_crystal = current_crystal | (crystal & (door.crystal or CrystalBarrier.Either))
                                 if current_crystal != new_crystal:
+                                    updated = True
                                     ccr[connect] = new_crystal
                                     queue.append((connect, new_crystal))
+        return updated
 
     def copy(self):
         ret = CollectionState(self.world)
@@ -509,13 +512,17 @@ class CollectionState(object):
 
     def sweep_for_crystal_access(self):
         for player, rrp in self.reachable_regions.items():
-            if self.stale[player]:
-                self.update_reachable_regions(player)
-            dungeon_regions = self.blocked_color_regions[player]
-            ccr = self.colored_regions[player]
-            for region in dungeon_regions.copy():
-                if region in ccr.keys():
-                    self.spread_crystal_access(region, ccr[region], rrp, ccr, player)
+            updated = True
+            while updated:
+                if self.stale[player]:
+                    self.update_reachable_regions(player)
+                updated = False
+                dungeon_regions = self.blocked_color_regions[player]
+                ccr = self.colored_regions[player]
+                for region in dungeon_regions.copy():
+                    if region in ccr.keys():
+                        updated |= self.spread_crystal_access(region, ccr[region], rrp, ccr, player)
+                self.stale[player] = updated
 
     def sweep_for_events(self, key_only=False, locations=None):
         # this may need improvement
