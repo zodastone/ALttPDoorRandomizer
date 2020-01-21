@@ -1069,6 +1069,9 @@ def create_doors(world, player):
     world.get_door('Swamp Drain Right Switch', player).event('Swamp Drain')
     world.get_door('Swamp Flooded Room Ladder', player).event('Swamp Drain')
 
+    if world.mode[player] == 'standard':
+        world.get_door('Hyrule Castle Throne Room N', player).event('Zelda Pickup')
+
     # crystal switches and barriers
     world.get_door('Hera Lobby Down Stairs', player).c_switch()
     world.get_door('Hera Lobby Key Stairs', player).c_switch()
@@ -1203,6 +1206,8 @@ def create_doors(world, player):
     controller_door(east_controller, world.get_door('Ice Cross Bottom Push Block Right', player))
     controller_door(east_controller, world.get_door('Ice Cross Top Push Block Right', player))
 
+    assign_entrances(world, player)
+
 
 def create_paired_doors(world, player):
     world.paired_doors[player] = [
@@ -1245,6 +1250,15 @@ def create_paired_doors(world, player):
         PairedDoor('TR Dash Bridge WS', 'TR Crystal Maze ES'),  # tr last key door to switch maze
         PairedDoor('Thieves Ambush E', 'Thieves Rail Ledge W')  # TT dashable above
     ]
+
+
+def assign_entrances(world, player):
+    for door in world.doors:
+        if door.player == player:
+            entrance = world.check_for_entrance(door.name, player)
+            if entrance is not None:
+                door.entrance = entrance
+                entrance.door = door
 
 
 def controller_door(controller, dependent):

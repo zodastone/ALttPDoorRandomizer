@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict, deque
 
 from Regions import dungeon_events
@@ -46,8 +47,9 @@ class KeyLogic(object):
 
 class DoorRules(object):
 
-    def __init__(self, number):
+    def __init__(self, number, is_valid):
         self.small_key_num = number
+        self.is_valid = is_valid
         # allowing a different number if bk is behind this door in a set of locations
         self.alternate_small_key = None
         self.alternate_big_key_loc = set()
@@ -144,6 +146,8 @@ def analyze_dungeon(key_layout, world, player):
             if not child.bigKey and child not in doors_completed:
                 best_counter = find_best_counter(child, odd_counter, key_counter, key_layout, world, player, False, empty_flag)
                 rule = create_rule(best_counter, key_counter, key_layout, world, player)
+                if not rule.is_valid:
+                    logging.getLogger('').warning('Key logic for door %s requires too many chests.  Seed may be beatable anyway.', child.name)
                 if smallest_rule is None or rule.small_key_num < smallest_rule:
                     smallest_rule = rule.small_key_num
                 check_for_self_lock_key(rule, child, best_counter, key_layout, world, player)
@@ -162,6 +166,14 @@ def analyze_dungeon(key_layout, world, player):
                 if not key_counter.big_key_opened and big_chest_in_locations(key_counter.free_locations):
                     key_logic.sm_restricted.update(find_big_chest_locations(key_counter.free_locations))
     check_rules(original_key_counter, key_layout, world, player)
+
+    # Flip bk rules if more restrictive, to prevent placing a big key in a softlocking location
+    for rule in key_logic.door_rules.values():
+        if rule.alternate_small_key is not None and rule.alternate_small_key > rule.small_key_num:
+            max_counter = find_max_counter(key_layout)
+            rule.alternate_big_key_loc = set(max_counter.free_locations.keys()).difference(rule.alternate_big_key_loc)
+            rule.small_key_num, rule.alternate_small_key = rule.alternate_small_key, rule.small_key_num
+
 
 
 def count_key_drops(sector):
@@ -343,9 +355,10 @@ def create_rule(key_counter, prev_counter, key_layout, world, player):
     required_keys = key_counter.used_keys + 1  # this makes more sense, if key_counter has wasted all keys
     adj_chest_keys = min(chest_keys, required_keys)
     needed_chests = required_keys - len(key_counter.key_only_locations)
+    is_valid = needed_chests <= chest_keys
     unneeded_chests = min(key_gain, adj_chest_keys - needed_chests)
     rule_num = required_keys - unneeded_chests
-    return DoorRules(rule_num)
+    return DoorRules(rule_num, is_valid)
 
 
 def check_for_self_lock_key(rule, door, parent_counter, key_layout, world, player):
@@ -451,8 +464,8 @@ def bk_restricted_rules(rule, door, odd_counter, empty_flag, key_counter, key_la
     if key_counter.big_key_opened:
         return
     best_counter = find_best_counter(door, odd_counter, key_counter, key_layout, world, player, True, empty_flag)
-    bk_number = create_rule(best_counter, key_counter, key_layout, world, player).small_key_num
-    if bk_number == rule.small_key_num:
+    bk_rule = create_rule(best_counter, key_counter, key_layout, world, player)
+    if bk_rule.is_valid and bk_rule.small_key_num == rule.small_key_num:
         return
     door_open = find_next_counter(door, best_counter, key_layout)
     ignored_doors = dict_intersection(best_counter.child_doors, door_open.child_doors)
@@ -463,10 +476,11 @@ def bk_restricted_rules(rule, door, odd_counter, empty_flag, key_counter, key_la
     ignored_doors = {**ignored_doors, **dict.fromkeys(dest_ignored)}
     post_counter = open_some_counter(door_open, key_layout, ignored_doors.keys())
     unique_loc = dict_difference(post_counter.free_locations, best_counter.free_locations)
-    if len(unique_loc) > 0:
-        rule.alternate_small_key = bk_number
+    if bk_rule.is_valid and len(unique_loc) > 0:
+        rule.alternate_small_key = bk_rule.small_key_num
         rule.alternate_big_key_loc.update(unique_loc)
-
+    elif not bk_rule.is_valid:
+        key_layout.key_logic.bk_restricted.update(unique_loc)
 
 def open_a_door(door, child_state, flat_proposal):
     if door.bigKey:
@@ -604,7 +618,7 @@ def check_rules(original_counter, key_layout, world, player):
                 access_rules = key_only_map[loc]
             if access_door is None or access_door.name not in key_layout.key_logic.door_rules.keys():
                 if access_door is None or not access_door.bigKey:
-                    access_rules.append(DoorRules(0))
+                    access_rules.append(DoorRules(0, True))
             else:
                 rule = key_layout.key_logic.door_rules[access_door.name]
                 if rule not in access_rules:
@@ -1000,12 +1014,16 @@ def validate_vanilla_key_logic(world, player):
 
 
 def val_hyrule(key_logic, world, player):
-    val_rule(key_logic.door_rules['Sewers Secret Room Key Door S'], 2)
-    val_rule(key_logic.door_rules['Sewers Dark Cross Key Door N'], 2)
-    val_rule(key_logic.door_rules['Hyrule Dungeon Map Room Key Door S'], 2)
-    # why is allow_small actually false? - because chest key is forced elsewhere?
-    # val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 3, True, 'Hyrule Castle - Zelda\'s Chest')
-    val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 4)
+    if world.mode[player] == 'standard':
+        val_rule(key_logic.door_rules['Hyrule Dungeon Map Room Key Door S'], 1)
+        val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 2)
+        val_rule(key_logic.door_rules['Sewers Dark Cross Key Door N'], 3)
+        val_rule(key_logic.door_rules['Sewers Key Rat Key Door N'], 4)
+    else:
+        val_rule(key_logic.door_rules['Sewers Secret Room Key Door S'], 2)
+        val_rule(key_logic.door_rules['Sewers Dark Cross Key Door N'], 2)
+        val_rule(key_logic.door_rules['Hyrule Dungeon Map Room Key Door S'], 2)
+        val_rule(key_logic.door_rules['Hyrule Dungeon Armory Interior Key Door N'], 4)
 
 
 def val_eastern(key_logic, world, player):

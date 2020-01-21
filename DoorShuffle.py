@@ -13,7 +13,7 @@ from Dungeons import dungeon_regions, region_starts, split_region_starts, flexib
 from Dungeons import drop_entrances, dungeon_bigs, dungeon_keys
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor
-from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon
+from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, validate_tr
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder
 from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout
 
@@ -118,17 +118,34 @@ def vanilla_key_logic(world, player):
 
     overworld_prep(world, player)
     entrances_map, potentials, connections = determine_entrance_list(world, player)
-    for builder in builders:
-        start_regions = convert_regions(entrances_map[builder.name], world, player)
-        doors = convert_key_doors(default_small_key_doors[builder.name], world, player)
-        key_layout = build_key_layout(builder, start_regions, doors, world, player)
-        valid = validate_key_layout(key_layout, world, player)
-        if not valid:
-            raise Exception('Vanilla key layout not valid %s' % builder.name)
-        if player not in world.key_logic.keys():
-            world.key_logic[player] = {}
-        analyze_dungeon(key_layout, world, player)
-        world.key_logic[player][builder.name] = key_layout.key_logic
+
+    enabled_entrances = {}
+    sector_queue = collections.deque(builders)
+    last_key = None
+    while len(sector_queue) > 0:
+        builder = sector_queue.popleft()
+
+        origin_list = list(entrances_map[builder.name])
+        find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, builder.name)
+        origin_list_sans_drops = remove_drop_origins(origin_list)
+        if len(origin_list_sans_drops) <= 0:
+            if last_key == builder.name:
+                raise Exception('Infinte loop detected %s' % builder.name)
+            sector_queue.append(builder)
+            last_key = builder.name
+        else:
+            find_new_entrances(builder.master_sector, connections, potentials, enabled_entrances, world, player)
+            start_regions = convert_regions(origin_list, world, player)
+            doors = convert_key_doors(default_small_key_doors[builder.name], world, player)
+            key_layout = build_key_layout(builder, start_regions, doors, world, player)
+            valid = validate_key_layout(key_layout, world, player)
+            if not valid:
+                raise Exception('Vanilla key layout not valid %s' % builder.name)
+            if player not in world.key_logic.keys():
+                world.key_logic[player] = {}
+            analyze_dungeon(key_layout, world, player)
+            world.key_logic[player][builder.name] = key_layout.key_logic
+            last_key = None
     validate_vanilla_key_logic(world, player)
 
 
@@ -322,7 +339,7 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
         origin_list = list(builder.entrance_list)
         find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, name)
         origin_list_sans_drops = remove_drop_origins(origin_list)
-        if len(origin_list_sans_drops) <= 0:
+        if len(origin_list_sans_drops) <= 0 or name == "Turtle Rock" and not validate_tr(name, builder.sectors, origin_list_sans_drops, world, player):
             if last_key == builder.name:
                 raise Exception('Infinte loop detected %s' % builder.name)
             sector_queue.append(builder)
@@ -1108,29 +1125,24 @@ def change_door_to_small_key(d, world, player):
 
 def determine_required_paths(world, player):
     paths = {
-        'Hyrule Castle': [],
+        'Hyrule Castle': ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby'],
         'Eastern Palace': ['Eastern Boss'],
-        'Desert Palace': ['Desert Boss'],
+        'Desert Palace': ['Desert Main Lobby', 'Desert East Lobby', 'Desert West Lobby', 'Desert Boss'],
         'Tower of Hera': ['Hera Boss'],
         'Agahnims Tower': ['Tower Agahnim 1'],
         'Palace of Darkness': ['PoD Boss'],
         'Swamp Palace': ['Swamp Boss'],
-        'Skull Woods': ['Skull Boss'],
+        'Skull Woods': ['Skull 1 Lobby', 'Skull 2 East Lobby', 'Skull 2 West Lobby', 'Skull Boss'],
         'Thieves Town': ['Thieves Boss', ('Thieves Blind\'s Cell', 'Thieves Boss')],
         'Ice Palace': ['Ice Boss'],
         'Misery Mire': ['Mire Boss'],
-        'Turtle Rock': ['TR Boss'],
+        'Turtle Rock': ['TR Main Lobby', 'TR Lazy Eyes', 'TR Big Chest Entrance', 'TR Eye Bridge', 'TR Boss'],
         'Ganons Tower': ['GT Agahnim 2']
         }
-    if world.shuffle[player] == 'vanilla':
-        paths['Skull Woods'].insert(0, 'Skull 2 West Lobby')
-        paths['Turtle Rock'].insert(0, 'TR Eye Bridge')
-        paths['Turtle Rock'].insert(0, 'TR Big Chest Entrance')
-        paths['Turtle Rock'].insert(0, 'TR Lazy Eyes')
-        if world.mode == 'standard':
-            paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
-            # noinspection PyTypeChecker
-            paths['Hyrule Castle'].append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
+    if world.mode[player] == 'standard':
+        paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
+        # noinspection PyTypeChecker
+        paths['Hyrule Castle'].append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
     if world.doorShuffle[player] in ['basic']:
         paths['Thieves Town'].append('Thieves Attic Window')
     return paths
@@ -1159,7 +1171,7 @@ def find_inaccessible_regions(world, player):
             if connect is not None and connect.type is not RegionType.Dungeon and connect not in queue and connect not in visited_regions:
                 queue.append(connect)
     world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if valid_inaccessible_region(r)])
-    if world.mode == 'standard':
+    if world.mode[player] == 'standard':
         world.inaccessible_regions[player].append('Hyrule Castle Ledge')
         world.inaccessible_regions[player].append('Sewer Drop')
     logger = logging.getLogger('')
@@ -1194,19 +1206,20 @@ def add_inaccessible_doors(world, player):
         create_door(world, player, 'Death Mountain Return Cave (West)', 'Death Mountain Return Ledge')
     if 'Desert Palace Lone Stairs' in world.inaccessible_regions[player]:
         create_door(world, player, 'Desert Palace Entrance (East)', 'Desert Palace Lone Stairs')
-    if world.mode[player] == 'standard' and 'Hyrule Castle Ledge' in world.inaccessible_regions[player]:
-        create_door(world, player, 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge')
-        create_door(world, player, 'Hyrule Castle Entrance (West)', 'Hyrule Castle Ledge')
+    # if world.mode[player] == 'standard' and 'Hyrule Castle Ledge' in world.inaccessible_regions[player]:
+    #     create_door(world, player, 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge')
+    #     create_door(world, player, 'Hyrule Castle Entrance (West)', 'Hyrule Castle Ledge')
 
 
 def create_door(world, player, entName, region_name):
-    connect = world.get_entrance(entName, player).connected_region
+    entrance = world.get_entrance(entName, player)
+    connect = entrance.connected_region
     for ext in connect.exits:
         if ext.connected_region is not None and ext.connected_region.name == region_name:
-            d = Door(player, ext.name, DoorType.Logical),
+            d = Door(player, ext.name, DoorType.Logical, ext),
             world.doors += d
             connect_door_only(world, ext.name, ext.connected_region, player)
-    d = Door(player, entName, DoorType.Logical),
+    d = Door(player, entName, DoorType.Logical, entrance),
     world.doors += d
     connect_door_only(world, entName, connect, player)
 
@@ -1286,7 +1299,7 @@ def check_if_regions_visited(state, check_paths):
 
 def check_for_pinball_fix(state, bad_region, world, player):
     pinball_region = world.get_region('Skull Pinball', player)
-    if bad_region.name == 'Skull 2 West Lobby' and state.visited_at_all(pinball_region):
+    if bad_region.name == 'Skull 2 West Lobby' and state.visited_at_all(pinball_region): #revisit this for entrance shuffle
         door = world.get_door('Skull Pinball WS', player)
         room = world.get_room(door.roomIndex, player)
         if room.doorList[door.doorListPos][1] == DoorKind.Trap:

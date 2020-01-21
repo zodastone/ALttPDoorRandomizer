@@ -255,7 +255,8 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
     fill_locations.reverse()
 
     # Make sure the escape small key is placed first in standard with key shuffle to prevent running out of spots
-    progitempool.sort(key=lambda item: 1 if item.name == 'Small Key (Escape)' and world.mode[item.player] == 'standard' and world.keyshuffle[item.player] else 0)
+    # todo: crossed
+    progitempool.sort(key=lambda item: 1 if item.name == 'Small Key (Escape)' and world.keyshuffle[item.player] and world.mode[item.player] == 'standard' else 0)
 
     fill_restrictive(world, world.state, fill_locations, progitempool)
 
@@ -346,7 +347,7 @@ def balance_multiworld_progression(world):
 
     def get_sphere_locations(sphere_state, locations):
         sphere_state.sweep_for_events(key_only=True, locations=locations)
-        return [loc for loc in locations if sphere_state.can_reach(loc)]
+        return [loc for loc in locations if sphere_state.can_reach(loc) and sphere_state.not_flooding_a_key(sphere_state.world, loc)]
 
     while True:
         sphere_locations = get_sphere_locations(state, unchecked_locations)

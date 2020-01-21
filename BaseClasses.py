@@ -1,5 +1,5 @@
 import copy
-from enum import Enum, unique
+from enum import Enum, unique, Flag
 import logging
 import json
 from collections import OrderedDict, deque
@@ -14,6 +14,7 @@ class World(object):
 
     def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments, timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
         self.players = players
+        self.teams = 1
         self.shuffle = shuffle.copy()
         self.doorShuffle = doorShuffle.copy()
         self.logic = logic.copy()
@@ -73,6 +74,8 @@ class World(object):
             def set_player_attr(attr, val):
                 self.__dict__.setdefault(attr, {})[player] = val
             set_player_attr('_region_cache', {})
+            set_player_attr('player_names', [])
+            set_player_attr('remote_items', False)
             set_player_attr('required_medallions', ['Ether', 'Quake'])
             set_player_attr('swamp_patch_required', False)
             set_player_attr('powder_patch_required', False)
@@ -104,6 +107,12 @@ class World(object):
             set_player_attr('open_pyramid', False)
             set_player_attr('treasure_hunt_icon', 'Triforce Piece')
             set_player_attr('treasure_hunt_count', 0)
+
+    def get_name_string_for_object(self, obj):
+        return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_names(obj.player)})'
+
+    def get_player_names(self, player):
+        return ", ".join([name for i, name in enumerate(self.player_names[player]) if self.player_names[player].index(name) == i])
 
     def initialize_regions(self, regions=None):
         for region in regions if regions else self.regions:
@@ -182,6 +191,19 @@ class World(object):
                 if door.name == doorname and door.player == player:
                     self._door_cache[(doorname, player)] = door
                     return door
+            return None
+
+    def check_for_entrance(self, entrance, player):
+        if isinstance(entrance, Entrance):
+            return entrance
+        try:
+            return self._entrance_cache[(entrance, player)]
+        except KeyError:
+            for region in self.regions:
+                for ext in region.exits:
+                    if ext.name == entrance and ext.player == player:
+                        self._entrance_cache[(entrance, player)] = ext
+                        return ext
             return None
 
     def get_room(self, room_idx, player):
@@ -266,6 +288,7 @@ class World(object):
         return [location for location in self.get_locations() if location.item is not None and location.item.name == item and location.item.player == player]
 
     def push_precollected(self, item):
+        item.world = self
         if (item.smallkey and self.keyshuffle[item.player]) or (item.bigkey and self.bigkeyshuffle[item.player]):
             item.advancement = True
         self.precollected_items.append(item)
@@ -278,6 +301,7 @@ class World(object):
         if location.can_fill(self.state, item, False):
             location.item = item
             item.location = location
+            item.world = self
             if collect:
                 self.state.collect(item, location.event, location)
 
@@ -349,6 +373,7 @@ class World(object):
         prog_locations = [location for location in self.get_locations() if location.item is not None and (location.item.advancement or location.event) and location not in state.locations_checked]
 
         while prog_locations:
+            state.sweep_for_crystal_access()
             sphere = []
             # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
             for location in prog_locations:
@@ -368,6 +393,7 @@ class World(object):
 
         return False
 
+
 class CollectionState(object):
 
     def __init__(self, parent):
@@ -375,8 +401,7 @@ class CollectionState(object):
         self.world = parent
         self.reachable_regions = {player: set() for player in range(1, parent.players + 1)}
         self.colored_regions = {player: {} for player in range(1, parent.players + 1)}
-        # todo: I don't know if these are required to check or not, when should they be checked?
-        self.crystal_connections = {player: set() for player in range(1, parent.players + 1)}
+        self.blocked_color_regions = {player: set() for player in range(1, parent.players + 1)}
         self.events = []
         self.path = {}
         self.locations_checked = set()
@@ -389,6 +414,7 @@ class CollectionState(object):
         self.stale[player] = False
         rrp = self.reachable_regions[player]
         ccr = self.colored_regions[player]
+        blocked = self.blocked_color_regions[player]
         new_regions = True
         reachable_regions_count = len(rrp)
         while new_regions:
@@ -405,72 +431,67 @@ class CollectionState(object):
                                 c_switch_present = True
                         if c_switch_present:
                             ccr[candidate] = CrystalBarrier.Either
-                            self.spread_crystal_access(candidate, CrystalBarrier.Either, rrp, ccr, region_queue, player)
+                            self.spread_crystal_access(candidate, CrystalBarrier.Either, rrp, ccr, player)
+                            for ext in candidate.exits:
+                                connect = ext.connected_region
+                                if connect in rrp and not ext.can_reach(self):
+                                    blocked.add(candidate)
                         else:
-                            color_changed = False
+                            color_type = CrystalBarrier.Null
                             for entrance in candidate.entrances:
-                                door = self.world.check_for_door(entrance.name, player)
-                                if door is None or entrance.parent_region.type != RegionType.Dungeon:
-                                    ccr[candidate] = CrystalBarrier.Orange
-                                else:
-                                    color_type = None
-                                    if door.crystal in [CrystalBarrier.Orange, CrystalBarrier.Blue]:
-                                        color_type = door.crystal
-                                    elif entrance.parent_region in ccr.keys():
-                                        color_type = ccr[entrance.parent_region]
-                                    if color_type is not None:
-                                        current_type = ccr[candidate] if candidate in ccr.keys() else None
-                                        if current_type is None:
-                                            color_changed = True
-                                        if current_type is not None and current_type != CrystalBarrier.Either and color_type != current_type:
-                                            color_changed = True
-                                            ccr[candidate] = CrystalBarrier.Either
+                                if entrance.parent_region in rrp:
+                                    if entrance.can_reach(self):
+                                        door = self.world.check_for_door(entrance.name, player)
+                                        if door is None or entrance.parent_region.type != RegionType.Dungeon:
+                                            color_type |= CrystalBarrier.Orange
+                                        elif entrance.parent_region in ccr.keys():
+                                            color_type |= (ccr[entrance.parent_region] & (door.crystal or CrystalBarrier.Either))
+                                    else:
+                                        blocked.add(entrance.parent_region)
+                            if color_type:
+                                ccr[candidate] = color_type
+                            for ext in candidate.exits:
+                                connect = ext.connected_region
+                                if connect in rrp and connect in ccr:
+                                    door = self.world.check_for_door(ext.name, player)
+                                    if door is not None and not door.blocked:
+                                        if ext.can_reach(self):
+                                            new_color = ccr[connect] | (ccr[candidate] & (door.crystal or CrystalBarrier.Either))
+                                            if new_color != ccr[connect]:
+                                                self.spread_crystal_access(candidate, new_color, rrp, ccr, player)
                                         else:
-                                            ccr[candidate] = color_type
-                            if color_changed:
-                                self.spread_crystal_access(candidate, ccr[candidate], rrp, ccr, region_queue, player)
+                                            blocked.add(candidate)
             new_regions = len(rrp) > reachable_regions_count
             reachable_regions_count = len(rrp)
 
-    def spread_crystal_access(self, region, crystal, rrp, ccr, region_queue, player):
+    def spread_crystal_access(self, region, crystal, rrp, ccr, player):
         queue = deque([(region, crystal)])
         visited = set()
+        updated = False
         while len(queue) > 0:
             region, crystal = queue.popleft()
             visited.add(region)
             for ext in region.exits:
                 connect = ext.connected_region
-                if connect not in visited and connect is not None and connect.type == RegionType.Dungeon:
-                    if connect in rrp:
+                if connect is not None and connect.type == RegionType.Dungeon:
+                    if connect not in visited and connect in rrp and connect in ccr:
                         if ext.can_reach(self):
-                            rc_pair = self.spread_crystal_door(crystal, ext, connect, ccr, player)
-                            if rc_pair is not None:
-                                queue.append(rc_pair)
-                        else:
-                            self.crystal_connections[player].add((ext, crystal))
-
-                    elif connect not in rrp and connect not in region_queue and connect.can_reach_private(self):
-                        region_queue.append(connect)
-
-    def spread_crystal_door(self, crystal, ext, connect, ccr, player):
-        door = self.world.check_for_door(ext.name, player)
-        current_crystal = ccr[connect]
-        if door is not None and not door.blocked and current_crystal != crystal and current_crystal != CrystalBarrier.Either:
-            if door.crystal in [CrystalBarrier.Either, CrystalBarrier.Null]:
-                ccr[connect] = crystal
-                return connect, crystal
-            else:
-                if door.crystal != current_crystal:
-                    ccr[connect] = CrystalBarrier.Either
-                return connect, door.crystal
-        return None
+                            door = self.world.check_for_door(ext.name, player)
+                            if door is not None and not door.blocked:
+                                current_crystal = ccr[connect]
+                                new_crystal = current_crystal | (crystal & (door.crystal or CrystalBarrier.Either))
+                                if current_crystal != new_crystal:
+                                    updated = True
+                                    ccr[connect] = new_crystal
+                                    queue.append((connect, new_crystal))
+        return updated
 
     def copy(self):
         ret = CollectionState(self.world)
         ret.prog_items = self.prog_items.copy()
         ret.reachable_regions = {player: copy.copy(self.reachable_regions[player]) for player in range(1, self.world.players + 1)}
         ret.colored_regions = {player: copy.copy(self.colored_regions[player]) for player in range(1, self.world.players + 1)}
-        ret.crystal_connections = {player: copy.copy(self.crystal_connections[player]) for player in range(1, self.world.players + 1)}
+        ret.blocked_color_regions = {player: copy.copy(self.blocked_color_regions[player]) for player in range(1, self.world.players + 1)}
         ret.events = copy.copy(self.events)
         ret.path = copy.copy(self.path)
         ret.locations_checked = copy.copy(self.locations_checked)
@@ -491,27 +512,19 @@ class CollectionState(object):
 
         return spot.can_reach(self)
 
-    # def sweep_for_crystal_access(self):
-    #     repeat = True
-    #     while repeat:
-    #         repeat = False
-    #         for player, crystal_conn in self.crystal_connections.items():
-    #             self.update_reachable_regions(player)
-    #             new_regions = deque()
-    #             remove_list = []
-    #             for connection, crystal in crystal_conn:
-    #                 if connection.can_reach(self):
-    #                     remove_list.append((connection, crystal))
-    #                     rrp, ccr = self.reachable_regions[player], self.colored_regions[player]
-    #                     rc_pair = self.spread_crystal_door(crystal, connection, connection.parent_region, ccr, player)
-    #                     if rc_pair is not None:
-    #                         conn, new_crystal = rc_pair
-    #                         self.spread_crystal_access(conn, new_crystal, rrp, ccr, new_regions, player)
-    #             for pair in remove_list:
-    #                 crystal_conn.remove(pair)
-    #             if len(new_regions) > 0:
-    #                 self.update_reachable_regions(player)
-    #                 repeat = True
+    def sweep_for_crystal_access(self):
+        for player, rrp in self.reachable_regions.items():
+            updated = True
+            while updated:
+                if self.stale[player]:
+                    self.update_reachable_regions(player)
+                updated = False
+                dungeon_regions = self.blocked_color_regions[player]
+                ccr = self.colored_regions[player]
+                for region in dungeon_regions.copy():
+                    if region in ccr.keys():
+                        updated |= self.spread_crystal_access(region, ccr[region], rrp, ccr, player)
+                self.stale[player] = updated
 
     def sweep_for_events(self, key_only=False, locations=None):
         # this may need improvement
@@ -530,8 +543,6 @@ class CollectionState(object):
                     self.collect(event.item, True, event)
             new_locations = len(reachable_events) > checked_locations
             checked_locations = len(reachable_events)
-            # if new_locations:
-            #     self.sweep_for_crystal_access()
 
     def can_reach_blue(self, region, player):
         if region not in self.colored_regions[player].keys():
@@ -884,10 +895,7 @@ class Region(object):
         return str(self.__unicode__())
 
     def __unicode__(self):
-        if self.world and self.world.players == 1:
-            return self.name
-        else:
-            return '%s (Player %d)' % (self.name, self.player)
+        return self.world.get_name_string_for_object(self) if self.world else f'{self.name} (Player {self.player})'
 
 
 class Entrance(object):
@@ -903,6 +911,7 @@ class Entrance(object):
         self.vanilla = None
         self.access_rule = lambda state: True
         self.player = player
+        self.door = None
 
     def can_reach(self, state):
         if self.parent_region.can_reach(state) and self.access_rule(state):
@@ -923,11 +932,8 @@ class Entrance(object):
         return str(self.__unicode__())
 
     def __unicode__(self):
-        if self.parent_region and self.parent_region.world and self.parent_region.world.players == 1:
-            return self.name
-        else:
-            return '%s (Player %d)' % (self.name, self.player)
-
+        world = self.parent_region.world if self.parent_region else None
+        return world.get_name_string_for_object(self) if world else f'{self.name} (Player {self.player})'
 
 class Dungeon(object):
 
@@ -976,10 +982,7 @@ class Dungeon(object):
         return str(self.__unicode__())
 
     def __unicode__(self):
-        if self.world and self.world.players==1:
-            return self.name
-        else:
-            return '%s (Player %d)' % (self.name, self.player)
+        return self.world.get_name_string_for_object(self) if self.world else f'{self.name} (Player {self.player})'
 
 
 @unique
@@ -1080,15 +1083,15 @@ pol_comp = {
 
 
 @unique
-class CrystalBarrier(Enum):
-    Null = 1  # no special requirement
-    Blue = 2  # blue must be down and explore state set to Blue
-    Orange = 3  # orange must be down and explore state set to Orange
-    Either = 4  # you choose to leave this room in Either state
+class CrystalBarrier(Flag):
+    Null = 0  # no special requirement
+    Blue = 1  # blue must be down and explore state set to Blue
+    Orange = 2  # orange must be down and explore state set to Orange
+    Either = 3  # you choose to leave this room in Either state
 
 
 class Door(object):
-    def __init__(self, player, name, type):
+    def __init__(self, player, name, type, entrance=None):
         self.player = player
         self.name = name
         self.type = type
@@ -1122,6 +1125,10 @@ class Door(object):
         self.controller = None
         self.dependents = []
         self.dead = False
+
+        self.entrance = entrance
+        if entrance is not None:
+            entrance.door = self
 
     def getAddress(self):
         if self.type == DoorType.Normal:
@@ -1317,10 +1324,8 @@ class Location(object):
         return str(self.__unicode__())
 
     def __unicode__(self):
-        if self.parent_region and self.parent_region.world and self.parent_region.world.players == 1:
-            return self.name
-        else:
-            return '%s (Player %d)' % (self.name, self.player)
+        world = self.parent_region.world if self.parent_region and self.parent_region.world else None
+        return world.get_name_string_for_object(self) if world else f'{self.name} (Player {self.player})'
 
 
 class Item(object):
@@ -1339,6 +1344,7 @@ class Item(object):
         self.hint_text = hint_text
         self.code = code
         self.location = None
+        self.world = None
         self.player = player
 
     @property
@@ -1365,10 +1371,7 @@ class Item(object):
         return str(self.__unicode__())
 
     def __unicode__(self):
-        if self.location and self.location.parent_region and self.location.parent_region.world and self.location.parent_region.world.players == 1:
-            return self.name
-        else:
-            return '%s (Player %d)' % (self.name, self.player)
+        return self.world.get_name_string_for_object(self) if self.world else f'{self.name} (Player {self.player})'
 
 
 # have 6 address that need to be filled
@@ -1441,6 +1444,7 @@ class Spoiler(object):
 
     def __init__(self, world):
         self.world = world
+        self.hashes = {}
         self.entrances = OrderedDict()
         self.doors = OrderedDict()
         self.doorTypes = OrderedDict()
@@ -1479,8 +1483,8 @@ class Spoiler(object):
             self.medallions['Turtle Rock'] = self.world.required_medallions[1][1]
         else:
             for player in range(1, self.world.players + 1):
-                self.medallions['Misery Mire (Player %d)' % player] = self.world.required_medallions[player][0]
-                self.medallions['Turtle Rock (Player %d)' % player] = self.world.required_medallions[player][1]
+                self.medallions[f'Misery Mire ({self.world.get_player_names(player)})'] = self.world.required_medallions[player][0]
+                self.medallions[f'Turtle Rock ({self.world.get_player_names(player)})'] = self.world.required_medallions[player][1]
 
         self.startinventory = list(map(str, self.world.precollected_items))
 
@@ -1569,7 +1573,8 @@ class Spoiler(object):
                          'enemy_shuffle': self.world.enemy_shuffle,
                          'enemy_health': self.world.enemy_health,
                          'enemy_damage': self.world.enemy_damage,
-                         'players': self.world.players
+                         'players': self.world.players,
+                         'teams': self.world.teams
                          }
 
     def to_json(self):
@@ -1581,6 +1586,8 @@ class Spoiler(object):
         out.update(self.locations)
         out['Starting Inventory'] = self.startinventory
         out['Special'] = self.medallions
+        if self.hashes:
+            out['Hashes'] = {f"{self.world.player_names[player][team]} (Team {team+1})": hash for (player, team), hash in self.hashes.items()}
         if self.shops:
             out['Shops'] = self.shops
         out['playthrough'] = self.playthrough
@@ -1594,30 +1601,35 @@ class Spoiler(object):
         self.parse_data()
         with open(filename, 'w') as outfile:
             outfile.write('ALttP Entrance Randomizer Version %s  -  Seed: %s\n\n' % (self.metadata['version'], self.world.seed))
-            outfile.write('Players:                         %d\n' % self.world.players)
             outfile.write('Filling Algorithm:               %s\n' % self.world.algorithm)
-            outfile.write('Logic:                           %s\n' % self.metadata['logic'])
-            outfile.write('Mode:                            %s\n' % self.metadata['mode'])
-            outfile.write('Retro:                           %s\n' % {k: 'Yes' if v else 'No' for k, v in self.metadata['retro'].items()})
-            outfile.write('Swords:                          %s\n' % self.metadata['weapons'])
-            outfile.write('Goal:                            %s\n' % self.metadata['goal'])
-            outfile.write('Difficulty:                      %s\n' % self.metadata['item_pool'])
-            outfile.write('Item Functionality:              %s\n' % self.metadata['item_functionality'])
-            outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'])
-            outfile.write('Door Shuffle:                    %s\n' % self.metadata['door_shuffle'])
-            outfile.write('Crystals required for GT:        %s\n' % self.metadata['gt_crystals'])
-            outfile.write('Crystals required for Ganon:     %s\n' % self.metadata['ganon_crystals'])
-            outfile.write('Pyramid hole pre-opened:         %s\n' % {k: 'Yes' if v else 'No' for k, v in self.metadata['open_pyramid'].items()})
-            outfile.write('Accessibility:                   %s\n' % self.metadata['accessibility'])
-            outfile.write('Map shuffle:                     %s\n' % {k: 'Yes' if v else 'No' for k, v in self.metadata['mapshuffle'].items()})
-            outfile.write('Compass shuffle:                 %s\n' % {k: 'Yes' if v else 'No' for k, v in self.metadata['compassshuffle'].items()})
-            outfile.write('Small Key shuffle:               %s\n' % {k: 'Yes' if v else 'No' for k, v in self.metadata['keyshuffle'].items()})
-            outfile.write('Big Key shuffle:                 %s\n' % {k: 'Yes' if v else 'No' for k, v in self.metadata['bigkeyshuffle'].items()})
-            outfile.write('Boss shuffle:                    %s\n' % self.metadata['boss_shuffle'])
-            outfile.write('Enemy shuffle:                   %s\n' % self.metadata['enemy_shuffle'])
-            outfile.write('Enemy health:                    %s\n' % self.metadata['enemy_health'])
-            outfile.write('Enemy damage:                    %s\n' % self.metadata['enemy_damage'])
-            outfile.write('Hints:                           %s\n' % {k: 'Yes' if v else 'No' for k, v in self.metadata['hints'].items()})
+            outfile.write('Players:                         %d\n' % self.world.players)
+            outfile.write('Teams:                           %d\n' % self.world.teams)
+            for player in range(1, self.world.players + 1):
+                if self.world.players > 1:
+                    outfile.write('\nPlayer %d: %s\n' % (player, self.world.get_player_names(player)))
+                for team in range(self.world.teams):
+                    outfile.write('%s%s\n' % (f"Hash - {self.world.player_names[player][team]} (Team {team+1}): " if self.world.teams > 1 else 'Hash: ', self.hashes[player, team]))
+                outfile.write('Logic:                           %s\n' % self.metadata['logic'][player])
+                outfile.write('Mode:                            %s\n' % self.metadata['mode'][player])
+                outfile.write('Retro:                           %s\n' % ('Yes' if self.metadata['retro'][player] else 'No'))
+                outfile.write('Swords:                          %s\n' % self.metadata['weapons'][player])
+                outfile.write('Goal:                            %s\n' % self.metadata['goal'][player])
+                outfile.write('Difficulty:                      %s\n' % self.metadata['item_pool'][player])
+                outfile.write('Item Functionality:              %s\n' % self.metadata['item_functionality'][player])
+                outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'][player])
+                outfile.write('Crystals required for GT:        %s\n' % self.metadata['gt_crystals'][player])
+                outfile.write('Crystals required for Ganon:     %s\n' % self.metadata['ganon_crystals'][player])
+                outfile.write('Pyramid hole pre-opened:         %s\n' % ('Yes' if self.metadata['open_pyramid'][player] else 'No'))
+                outfile.write('Accessibility:                   %s\n' % self.metadata['accessibility'][player])
+                outfile.write('Map shuffle:                     %s\n' % ('Yes' if self.metadata['mapshuffle'][player] else 'No'))
+                outfile.write('Compass shuffle:                 %s\n' % ('Yes' if self.metadata['compassshuffle'][player] else 'No'))
+                outfile.write('Small Key shuffle:               %s\n' % ('Yes' if self.metadata['keyshuffle'][player] else 'No'))
+                outfile.write('Big Key shuffle:                 %s\n' % ('Yes' if self.metadata['bigkeyshuffle'][player] else 'No'))
+                outfile.write('Boss shuffle:                    %s\n' % self.metadata['boss_shuffle'][player])
+                outfile.write('Enemy shuffle:                   %s\n' % self.metadata['enemy_shuffle'][player])
+                outfile.write('Enemy health:                    %s\n' % self.metadata['enemy_health'][player])
+                outfile.write('Enemy damage:                    %s\n' % self.metadata['enemy_damage'][player])
+                outfile.write('Hints:                           %s\n' % ('Yes' if self.metadata['hints'][player] else 'No'))
             if self.doors:
                 outfile.write('\n\nDoors:\n\n')
                 outfile.write('\n'.join(['%s%s %s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', entry['entrance'], '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', entry['exit']) for entry in self.doors.values()]))
@@ -1626,17 +1638,13 @@ class Spoiler(object):
                 outfile.write('\n'.join(['%s%s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', entry['doorNames'], entry['type']) for entry in self.doorTypes.values()]))
             if self.entrances:
                 outfile.write('\n\nEntrances:\n\n')
-                outfile.write('\n'.join(['%s%s %s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', entry['entrance'], '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', entry['exit']) for entry in self.entrances.values()]))
-            outfile.write('\n\nMedallions\n')
-            if self.world.players == 1:
-                outfile.write('\nMisery Mire Medallion: %s' % (self.medallions['Misery Mire']))
-                outfile.write('\nTurtle Rock Medallion: %s' % (self.medallions['Turtle Rock']))
-            else:
-                for player in range(1, self.world.players + 1):
-                    outfile.write('\nMisery Mire Medallion (Player %d): %s' % (player, self.medallions['Misery Mire (Player %d)' % player]))
-                    outfile.write('\nTurtle Rock Medallion (Player %d): %s' % (player, self.medallions['Turtle Rock (Player %d)' % player]))
-            outfile.write('\n\nStarting Inventory:\n\n')
-            outfile.write('\n'.join(self.startinventory))
+                outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', entry['entrance'], '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', entry['exit']) for entry in self.entrances.values()]))
+            outfile.write('\n\nMedallions:\n')
+            for dungeon, medallion in self.medallions.items():
+                outfile.write(f'\n{dungeon}: {medallion}')
+            if self.startinventory:
+                outfile.write('\n\nStarting Inventory:\n\n')
+                outfile.write('\n'.join(self.startinventory))
             outfile.write('\n\nLocations:\n\n')
             outfile.write('\n'.join(['%s: %s' % (location, item) for grouping in self.locations.values() for (location, item) in grouping.items()]))
             outfile.write('\n\nShops:\n\n')

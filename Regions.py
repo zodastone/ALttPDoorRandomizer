@@ -3,7 +3,7 @@ from BaseClasses import Region, Location, Entrance, RegionType, Shop, ShopType
 
 
 def create_regions(world, player):
-
+    std_flag = world.mode[player] == 'standard'
     world.regions += [
         create_lw_region(player, 'Light World', ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'Purple Chest'],
                          ["Blinds Hideout", "Hyrule Castle Secret Entrance Drop", 'Zoras River', 'Kings Grave Outer Rocks', 'Dam',
@@ -219,7 +219,10 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Hyrule Dungeon Armory Boomerang', 'Hyrule Castle', ['Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Boomerang Guard Key Drop'], ['Hyrule Dungeon Armory Boomerang WS']),
         create_dungeon_region(player, 'Hyrule Dungeon Armory North Branch', 'Hyrule Castle', None, ['Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Armory Down Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon Staircase', 'Hyrule Castle', None, ['Hyrule Dungeon Staircase Up Stairs', 'Hyrule Dungeon Staircase Down Stairs']),
-        create_dungeon_region(player, 'Hyrule Dungeon Cellblock', 'Hyrule Castle', ['Hyrule Castle - Big Key Drop', 'Hyrule Castle - Zelda\'s Chest'], ['Hyrule Dungeon Cellblock Up Stairs']),
+        create_dungeon_region(player, 'Hyrule Dungeon Cellblock', 'Hyrule Castle',
+                              ['Hyrule Castle - Big Key Drop', 'Hyrule Castle - Zelda\'s Chest'] if not std_flag else
+                              ['Hyrule Castle - Big Key Drop', 'Hyrule Castle - Zelda\'s Chest', 'Zelda Pickup'],
+                              ['Hyrule Dungeon Cellblock Up Stairs']),
 
 
         create_dungeon_region(player, 'Sewers Behind Tapestry', 'Hyrule Castle', None, ['Sewers Behind Tapestry S', 'Sewers Behind Tapestry Down Stairs']),
@@ -233,7 +236,9 @@ def create_regions(world, player):
                               ['Sewers Secret Room ES', 'Sewers Secret Room EN']),
         create_dungeon_region(player, 'Sewers Yet More Rats', 'Hyrule Castle', None, ['Sewers Pull Switch Down Stairs', 'Sewers Yet More Rats S']),
         create_dungeon_region(player, 'Sewers Pull Switch', 'Hyrule Castle', None, ['Sewers Pull Switch N', 'Sewers Pull Switch S']),
-        create_dungeon_region(player, 'Sanctuary', 'Hyrule Castle', ['Sanctuary'], ['Sanctuary Exit', 'Sanctuary N']),
+        create_dungeon_region(player, 'Sanctuary', 'Hyrule Castle',
+                              ['Sanctuary'] if not std_flag else ['Sanctuary', 'Zelda Drop Off'],
+                              ['Sanctuary Exit', 'Sanctuary N']),
 
         # Eastern Palace
         create_dungeon_region(player, 'Eastern Lobby', 'Eastern Palace', None, ['Eastern Lobby N', 'Eastern Palace Exit', 'Eastern Lobby NW', 'Eastern Lobby NE']),
@@ -841,7 +846,9 @@ dungeon_events = [
     'Attic Cracked Floor',
     'Suspicious Maiden',
     'Revealing Light',
-    'Ice Block Drop'
+    'Ice Block Drop',
+    'Zelda Pickup',
+    'Zelda Drop Off'
 ]
 
 flooded_keys_reverse = {
@@ -1078,6 +1085,8 @@ location_table = {'Mushroom': (0x180013, 0x186338, False, 'in the woods'),
                   'Suspicious Maiden': (None, None, False, None),
                   'Revealing Light': (None, None, False, None),
                   'Ice Block Drop': (None, None, False, None),
+                  'Zelda Pickup': (None, None, False, None),
+                  'Zelda Drop Off': (None, None, False, None),
                   'Eastern Palace - Prize': ([0x1209D, 0x53EF8, 0x53EF9, 0x180052, 0x18007C, 0xC6FE], None, True, 'Eastern Palace'),
                   'Desert Palace - Prize': ([0x1209E, 0x53F1C, 0x53F1D, 0x180053, 0x180078, 0xC6FF], None, True, 'Desert Palace'),
                   'Tower of Hera - Prize': ([0x120A5, 0x53F0A, 0x53F0B, 0x18005A, 0x18007A, 0xC706], None, True, 'Tower of Hera'),

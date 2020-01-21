@@ -12,6 +12,7 @@ import subprocess
 from BaseClasses import CollectionState, ShopType, Region, Location, Item, DoorType
 from DoorShuffle import compass_data
 from Dungeons import dungeon_music_addresses
+from Regions import location_table
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
 from Text import Uncle_texts, Ganon1_texts, TavernMan_texts, Sahasrahla2_texts, Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
 from Text import KingsReturn_texts, Sanctuary_texts, Kakariko_texts, Blacksmiths_texts, DeathMountain_texts, LostWoods_texts, WishingWell_texts, DesertPalace_texts, MountainTower_texts, LinksHouse_texts, Lumberjacks_texts, SickKid_texts, FluteBoy_texts, Zora_texts, MagicShop_texts, Sahasrahla_names
@@ -21,13 +22,14 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'a5ae693acf449264533429d4dbd217e4'
+RANDOMIZERBASEHASH = 'c1361fcf13239f8677bacc6f9bc5e9dd'
 
 
 class JsonRom(object):
 
-    def __init__(self):
-        self.name = None
+    def __init__(self, name=None, hash=None):
+        self.name = name
+        self.hash = hash
         self.orig_buffer = None
         self.patches = {}
         self.addresses = []
@@ -72,8 +74,9 @@ class JsonRom(object):
 
 class LocalRom(object):
 
-    def __init__(self, file, patch=True):
-        self.name = None
+    def __init__(self, file, patch=True, name=None, hash=None):
+        self.name = name
+        self.hash = hash
         self.orig_buffer = None
         with open(file, 'rb') as stream:
             self.buffer = read_rom(stream)
@@ -91,6 +94,14 @@ class LocalRom(object):
     def write_to_file(self, file):
         with open(file, 'wb') as outfile:
             outfile.write(self.buffer)
+
+    @staticmethod
+    def fromJsonRom(rom, file, rom_size = 0x200000):
+        ret = LocalRom(file, True, rom.name, rom.hash)
+        ret.buffer.extend(bytearray([0x00] * (rom_size - len(ret.buffer))))
+        for address, values in rom.patches.items():
+            ret.write_bytes(int(address), values)
+        return ret
 
     def patch_base_rom(self):
         # verify correct checksum of baserom
@@ -115,11 +126,6 @@ class LocalRom(object):
         patchedmd5.update(self.buffer)
         if RANDOMIZERBASEHASH != patchedmd5.hexdigest():
             raise RuntimeError('Provided Base Rom unsuitable for patching. Please provide a JAP(1.0) "Zelda no Densetsu - Kamigami no Triforce (Japan).sfc" rom to use as a base.')
-
-    def merge_enemizer_patches(self, patches):
-        self.buffer.extend(bytearray([0x00] * (0x400000 - len(self.buffer))))
-        for address, values in patches.items():
-            self.write_bytes(int(address), values)
 
     def write_crc(self):
         crc = (sum(self.buffer[:0x7FDC] + self.buffer[0x7FE0:]) + 0x01FE) & 0xFFFF
@@ -471,7 +477,7 @@ class Sprite(object):
         # split into palettes of 15 colors
         return array_chunk(palette_as_colors, 15)
 
-def patch_rom(world, player, rom, enemized):
+def patch_rom(world, rom, player, team, enemized):
     random.seed(world.rom_seeds[player])
 
     # progressive bow silver arrow hint hack
@@ -492,23 +498,27 @@ def patch_rom(world, player, rom, enemized):
             continue
 
         if not location.crystal:
-            # Keys in their native dungeon should use the orignal item code for keys
-            if location.parent_region.dungeon:
-                dungeon = location.parent_region.dungeon
-                if location.item is not None and dungeon.is_dungeon_item(location.item):
-                    if location.item.bigkey:
-                        itemid = 0x32
-                    if location.item.smallkey:
-                        itemid = 0x24
-                    if location.item.map:
-                        itemid = 0x33
-                    if location.item.compass:
-                        itemid = 0x25
-            if location.item and location.item.player != player:
-                if location.player_address is not None:
-                    rom.write_byte(location.player_address, location.item.player)
-                else:
-                    itemid = 0x5A
+            if location.item is not None:
+                # Keys in their native dungeon should use the orignal item code for keys
+                if location.parent_region.dungeon:
+                    if location.parent_region.dungeon.is_dungeon_item(location.item):
+                        if location.item.bigkey:
+                            itemid = 0x32
+                        if location.item.smallkey:
+                            itemid = 0x24
+                        if location.item.map:
+                            itemid = 0x33
+                        if location.item.compass:
+                            itemid = 0x25
+                if world.remote_items[player]:
+                    itemid = list(location_table.keys()).index(location.name) + 1
+                    assert itemid < 0x100
+                    rom.write_byte(location.player_address, 0xFF)
+                elif location.item.player != player:
+                    if location.player_address is not None:
+                        rom.write_byte(location.player_address, location.item.player)
+                    else:
+                        itemid = 0x5A
             rom.write_byte(location.address, itemid)
         else:
             # crystals
@@ -1255,15 +1265,21 @@ def patch_rom(world, player, rom, enemized):
         rom.write_byte(0xFED31, 0x2A)  # preopen bombable exit
         rom.write_byte(0xFEE41, 0x2A)  # preopen bombable exit
 
-    write_strings(rom, world, player)
+    write_strings(rom, world, player, team)
+
+    rom.write_byte(0x18636C, 1 if world.remote_items[player] else 0)
 
     # set rom name
     # 21 bytes
     from Main import __version__
     # todo: change to DR when Enemizer is okay with DR
-    rom.name = bytearray('ER_{0}_{1:09}\0'.format(__version__[0:7], world.seed), 'utf8')
-    assert len(rom.name) <= 21
+    rom.name = bytearray(f'ER{__version__.split("-")[0].replace(".","")[0:3]}_{team+1}_{player}_{world.seed:09}\0', 'utf8')[:21]
+    rom.name.extend([0] * (21 - len(rom.name)))
     rom.write_bytes(0x7FC0, rom.name)
+
+    # set player names
+    for p in range(1, min(world.players, 64) + 1):
+        rom.write_bytes(0x186380 + ((p - 1) * 32), hud_format_text(world.player_names[p][team]))
 
     # Write title screen Code
     hashint = int(rom.get_hash(), 16)
@@ -1275,6 +1291,7 @@ def patch_rom(world, player, rom, enemized):
         hashint & 0x1F,
     ]
     rom.write_bytes(0x180215, code)
+    rom.hash = code
 
     return rom
 
@@ -1338,7 +1355,7 @@ def hud_format_text(text):
     return output[:32]
 
 
-def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite, ow_palettes, uw_palettes, names = None):
+def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite, ow_palettes, uw_palettes):
     if sprite and not isinstance(sprite, Sprite):
         sprite = Sprite(sprite) if os.path.isfile(sprite) else get_sprite_from_name(sprite)
 
@@ -1406,11 +1423,6 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
         randomize_uw_palettes(rom)
     elif uw_palettes == 'blackout':
         blackout_uw_palettes(rom)
-
-    # set player names
-    for player, name in names.items():
-        if 0 < player <= 64:
-            rom.write_bytes(0x186380 + ((player - 1) * 32), hud_format_text(name))
 
     if isinstance(rom, LocalRom):
         rom.write_crc()
@@ -1548,12 +1560,15 @@ def blackout_uw_palettes(rom):
         rom.write_bytes(i+44, [0] * 76)
         rom.write_bytes(i+136, [0] * 44)
 
+def get_hash_string(hash):
+    return ", ".join([hash_alphabet[code & 0x1F] for code in hash])
+
 def write_string_to_rom(rom, target, string):
     address, maxbytes = text_addresses[target]
     rom.write_bytes(address, MultiByteTextMapper.convert(string, maxbytes))
 
 
-def write_strings(rom, world, player):
+def write_strings(rom, world, player, team):
     tt = TextTable()
     tt.removeUnwantedText()
 
@@ -1571,11 +1586,11 @@ def write_strings(rom, world, player):
             hint = dest.hint_text if dest.hint_text else "something"
         if dest.player != player:
             if ped_hint:
-                hint += " for p%d!" % dest.player
+                hint += f" for {world.player_names[dest.player][team]}!"
             elif type(dest) in [Region, Location]:
-                hint += " in p%d's world" % dest.player
+                hint += f" in {world.player_names[dest.player][team]}'s world"
             else:
-                hint += " for p%d" % dest.player
+                hint += f" for {world.player_names[dest.player][team]}"
         return hint
 
     # For hints, first we write hints about entrances, some from the inconvenient list others from all reasonable entrances.
@@ -2066,9 +2081,9 @@ def patch_shuffled_dark_sanc(world, rom, player):
     rom.write_bytes(0x180262, [unknown_1, unknown_2, 0x00])
 
 
-# 24B116 and 20BA72
+# 24B116 and 20BAD8
 compass_r_addr = 0x123116  # a9 90 24 8f 9a c7 7e
-compass_w_addr = 0x103a72  # e2 20 ad 0c 04 c9 00 d0
+compass_w_addr = 0x103ad8  # e2 20 ad 0c 04 c9 00 d0
 
 
 def compass_code_good(rom):
@@ -2366,3 +2381,9 @@ BigKeys = ['Big Key (Eastern Palace)',
            'Big Key (Turtle Rock)',
            'Big Key (Ganons Tower)'
            ]
+
+hash_alphabet = [
+    "Bow", "Boomerang", "Hookshot", "Bomb", "Mushroom", "Powder", "Rod", "Pendant", "Bombos", "Ether", "Quake",
+    "Lamp", "Hammer", "Shovel", "Ocarina", "Bug Net", "Book", "Bottle", "Potion", "Cane", "Cape", "Mirror", "Boots",
+    "Gloves", "Flippers", "Pearl", "Shield", "Tunic", "Heart", "Map", "Compass", "Key"
+]
