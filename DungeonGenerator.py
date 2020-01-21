@@ -31,6 +31,25 @@ class GraphPiece:
         self.possible_bk_locations = set()
 
 
+# Turtle Rock shouldn't be generated until the Big Chest entrance is reachable
+def validate_tr(name, available_sectors, entrance_region_names, world, player):
+    entrance_regions = convert_regions(entrance_region_names, world, player)
+    proposed_map = {}
+    doors_to_connect = {}
+    all_regions = set()
+    bk_needed = False
+    bk_special = False
+    for sector in available_sectors:
+        for door in sector.outstanding_doors:
+            doors_to_connect[door.name] = door
+        all_regions.update(sector.regions)
+        bk_needed = bk_needed or determine_if_bk_needed(sector, False, world, player)
+        bk_special = bk_special or check_for_special(sector)
+    dungeon, hangers, hooks = gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map,
+                                               doors_to_connect, bk_needed, bk_special, world, player)
+    return check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed, False)
+
+
 def generate_dungeon(name, available_sectors, entrance_region_names, split_dungeon, world, player):
     logger = logging.getLogger('')
     entrance_regions = convert_regions(entrance_region_names, world, player)

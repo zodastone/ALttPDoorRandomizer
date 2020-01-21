@@ -13,7 +13,7 @@ from Dungeons import dungeon_regions, region_starts, split_region_starts, flexib
 from Dungeons import drop_entrances, dungeon_bigs, dungeon_keys
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor
-from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon
+from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, validate_tr
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder
 from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout
 
@@ -339,7 +339,7 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
         origin_list = list(builder.entrance_list)
         find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, name)
         origin_list_sans_drops = remove_drop_origins(origin_list)
-        if len(origin_list_sans_drops) <= 0:
+        if len(origin_list_sans_drops) <= 0 or name == "Turtle Rock" and not validate_tr(name, builder.sectors, origin_list_sans_drops, world, player):
             if last_key == builder.name:
                 raise Exception('Infinte loop detected %s' % builder.name)
             sector_queue.append(builder)
