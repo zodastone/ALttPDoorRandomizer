@@ -847,7 +847,8 @@ dungeon_events = [
     'Suspicious Maiden',
     'Revealing Light',
     'Ice Block Drop',
-    'Zelda Pickup'
+    'Zelda Pickup',
+    'Zelda Drop Off'
 ]
 
 flooded_keys_reverse = {

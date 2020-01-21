@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-#RANDOMIZERBASEHASH = '4e291b6f6227de32db2735423889a780'
+RANDOMIZERBASEHASH = 'c1361fcf13239f8677bacc6f9bc5e9dd'
 
 
 class JsonRom(object):
@@ -124,8 +124,8 @@ class LocalRom(object):
         # verify md5
         patchedmd5 = hashlib.md5()
         patchedmd5.update(self.buffer)
-        # if RANDOMIZERBASEHASH != patchedmd5.hexdigest():
-        #     raise RuntimeError('Provided Base Rom unsuitable for patching. Please provide a JAP(1.0) "Zelda no Densetsu - Kamigami no Triforce (Japan).sfc" rom to use as a base.')
+        if RANDOMIZERBASEHASH != patchedmd5.hexdigest():
+            raise RuntimeError('Provided Base Rom unsuitable for patching. Please provide a JAP(1.0) "Zelda no Densetsu - Kamigami no Triforce (Japan).sfc" rom to use as a base.')
 
     def write_crc(self):
         crc = (sum(self.buffer[:0x7FDC] + self.buffer[0x7FE0:]) + 0x01FE) & 0xFFFF
@@ -2081,9 +2081,9 @@ def patch_shuffled_dark_sanc(world, rom, player):
     rom.write_bytes(0x180262, [unknown_1, unknown_2, 0x00])
 
 
-# 24B116 and 20BA72
+# 24B116 and 20BAD8
 compass_r_addr = 0x123116  # a9 90 24 8f 9a c7 7e
-compass_w_addr = 0x103a72  # e2 20 ad 0c 04 c9 00 d0
+compass_w_addr = 0x103ad8  # e2 20 ad 0c 04 c9 00 d0
 
 
 def compass_code_good(rom):
