@@ -31,6 +31,25 @@ class GraphPiece:
         self.possible_bk_locations = set()
 
 
+# Turtle Rock shouldn't be generated until the Big Chest entrance is reachable
+def validate_tr(name, available_sectors, entrance_region_names, world, player):
+    entrance_regions = convert_regions(entrance_region_names, world, player)
+    proposed_map = {}
+    doors_to_connect = {}
+    all_regions = set()
+    bk_needed = False
+    bk_special = False
+    for sector in available_sectors:
+        for door in sector.outstanding_doors:
+            doors_to_connect[door.name] = door
+        all_regions.update(sector.regions)
+        bk_needed = bk_needed or determine_if_bk_needed(sector, False, world, player)
+        bk_special = bk_special or check_for_special(sector)
+    dungeon, hangers, hooks = gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map,
+                                               doors_to_connect, bk_needed, bk_special, world, player)
+    return check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed, False)
+
+
 def generate_dungeon(name, available_sectors, entrance_region_names, split_dungeon, world, player):
     logger = logging.getLogger('')
     entrance_regions = convert_regions(entrance_region_names, world, player)
@@ -52,8 +71,7 @@ def generate_dungeon(name, available_sectors, entrance_region_names, split_dunge
     itr = 0
     finished = False
     # flag if standard and this is hyrule castle
-    # std_flag = world.mode[player] == 'standard' and bk_special  # todo: multi
-    std_flag = world.mode == 'standard' and bk_special
+    std_flag = world.mode[player] == 'standard' and bk_special
     while not finished:
         # what are my choices?
         itr += 1
@@ -1040,7 +1058,7 @@ def create_dungeon_builders(all_sectors, world, player, dungeon_entrances=None):
         current_dungeon = dungeon_map[key]
         for r_name in dungeon_boss_sectors[key]:
             assign_sector(find_sector(r_name, candidate_sectors), current_dungeon, candidate_sectors)
-        if key == 'Hyrule Castle' and world.mode == 'standard':
+        if key == 'Hyrule Castle' and world.mode[player] == 'standard':
             for r_name in ['Hyrule Dungeon Cellblock', 'Sanctuary']:  # need to deliver zelda
                 assign_sector(find_sector(r_name, candidate_sectors), current_dungeon, candidate_sectors)
     for key in dungeon_entrances.keys():
