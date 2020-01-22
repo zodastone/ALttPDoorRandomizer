@@ -23,7 +23,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes
 from Utils import output_path, parse_player_names
 
-__version__ = '0.0.3-pre'
+__version__ = '0.0.4-pre'
 
 def main(args, seed=None):
     if args.outputpath:
@@ -385,7 +385,7 @@ def create_playthrough(world):
     logging.getLogger('').debug('Building up collection spheres.')
     while sphere_candidates:
         state.sweep_for_events(key_only=True)
-        # state.sweep_for_crystal_access()
+        state.sweep_for_crystal_access()
 
         sphere = []
         # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
@@ -447,7 +447,7 @@ def create_playthrough(world):
     collection_spheres = []
     while required_locations:
         state.sweep_for_events(key_only=True)
-        # state.sweep_for_crystal_access()
+        state.sweep_for_crystal_access()
 
         sphere = list(filter(lambda loc: state.can_reach(loc) and state.not_flooding_a_key(world, loc), required_locations))
 

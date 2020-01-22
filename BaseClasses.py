@@ -429,6 +429,7 @@ class CollectionState(object):
                             door = self.world.check_for_door(ext.name, player)
                             if door is not None and door.crystal == CrystalBarrier.Either:
                                 c_switch_present = True
+                                break
                         if c_switch_present:
                             ccr[candidate] = CrystalBarrier.Either
                             self.spread_crystal_access(candidate, CrystalBarrier.Either, rrp, ccr, player)
@@ -543,6 +544,8 @@ class CollectionState(object):
                     self.collect(event.item, True, event)
             new_locations = len(reachable_events) > checked_locations
             checked_locations = len(reachable_events)
+            if new_locations:
+                self.sweep_for_crystal_access()
 
     def can_reach_blue(self, region, player):
         if region not in self.colored_regions[player].keys():
@@ -773,9 +776,9 @@ class CollectionState(object):
         self.stale[item.player] = True
 
         if changed:
-            # self.sweep_for_crystal_access(item.player)
             if not event:
                 self.sweep_for_events()
+            self.sweep_for_crystal_access()
 
     def remove(self, item):
         if item.advancement:

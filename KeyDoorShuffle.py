@@ -360,7 +360,7 @@ def create_rule(key_counter, prev_counter, key_layout, world, player):
     adj_chest_keys = min(chest_keys, required_keys)
     needed_chests = required_keys - len(key_counter.key_only_locations)
     is_valid = needed_chests <= chest_keys
-    unneeded_chests = min(key_gain, adj_chest_keys - needed_chests)
+    unneeded_chests = min(key_gain, max(0, adj_chest_keys - needed_chests))
     rule_num = required_keys - unneeded_chests
     return DoorRules(rule_num, is_valid)
 
@@ -469,7 +469,7 @@ def bk_restricted_rules(rule, door, odd_counter, empty_flag, key_counter, key_la
         return
     best_counter = find_best_counter(door, odd_counter, key_counter, key_layout, world, player, True, empty_flag)
     bk_rule = create_rule(best_counter, key_counter, key_layout, world, player)
-    if bk_rule.is_valid and bk_rule.small_key_num == rule.small_key_num:
+    if bk_rule.small_key_num >= rule.small_key_num:
         return
     door_open = find_next_counter(door, best_counter, key_layout)
     ignored_doors = dict_intersection(best_counter.child_doors, door_open.child_doors)
@@ -827,7 +827,7 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     # todo: fix state to separate out these types
     ttl_locations = count_free_locations(state) if state.big_key_opened else count_locations_exclude_big_chest(state)
     ttl_key_only = count_key_only_locations(state)
-    available_small_locations = cnt_avail_small_locations(ttl_locations + ttl_key_only, state, world, player)
+    available_small_locations = cnt_avail_small_locations(ttl_locations, ttl_key_only, state, world, player)
     available_big_locations = cnt_avail_big_locations(ttl_locations, state, world, player)
     if (not smalls_avail or available_small_locations == 0) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
         return False
@@ -862,9 +862,10 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     return True
 
 
-def cnt_avail_small_locations(ttl_locations, state, world, player):
+def cnt_avail_small_locations(free_locations, key_only, state, world, player):
     if not world.keyshuffle[player] and not world.retro[player]:
-        return min(ttl_locations - state.used_locations, state.key_locations - state.used_smalls)
+        avail_chest_keys = min(free_locations - state.used_locations, state.key_locations - key_only)
+        return max(0, avail_chest_keys + key_only - state.used_smalls)
     return state.key_locations - state.used_smalls
 
 
