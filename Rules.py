@@ -639,8 +639,6 @@ def inverted_rules(world, player):
     if world.swords[player] == 'swordless':
         swordless_rules(world, player)
 
-    set_trock_key_rules(world, player)
-
     set_rule(world.get_entrance('Inverted Ganons Tower', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
 
 def no_glitches_rules(world, player):
@@ -732,24 +730,20 @@ def no_glitches_rules(world, player):
     add_conditional_lamp('Eastern Rupees SE', 'Eastern Rupees', 'Entrance')
     add_conditional_lamp('Eastern Palace - Dark Square Pot Key', 'Eastern Dark Square', 'Location')
     add_conditional_lamp('Eastern Palace - Dark Eyegore Key Drop', 'Eastern Darkness', 'Location')
-    if world.mode[player] != 'inverted':
-        add_conditional_lamp('Tower Lone Statue Down Stairs', 'Tower Lone Statue', 'Entrance')
-        add_conditional_lamp('Tower Lone Statue WN', 'Tower Lone Statue', 'Entrance')
-        add_conditional_lamp('Tower Dark Maze EN', 'Tower Dark Maze', 'Entrance')
-        add_conditional_lamp('Tower Dark Maze ES', 'Tower Dark Maze', 'Entrance')
-        add_conditional_lamp('Tower Dark Chargers WS', 'Tower Dark Chargers', 'Entrance')
-        add_conditional_lamp('Tower Dark Chargers Up Stairs', 'Tower Dark Chargers', 'Entrance')
-        add_conditional_lamp('Tower Dual Statues Down Stairs', 'Tower Dual Statues', 'Entrance')
-        add_conditional_lamp('Tower Dual Statues WS', 'Tower Dual Statues', 'Entrance')
-        add_conditional_lamp('Tower Dark Pits ES', 'Tower Dark Pits', 'Entrance')
-        add_conditional_lamp('Tower Dark Pits EN', 'Tower Dark Pits', 'Entrance')
-        add_conditional_lamp('Tower Dark Archers WN', 'Tower Dark Archers', 'Entrance')
-        add_conditional_lamp('Tower Dark Archers Up Stairs', 'Tower Dark Archers', 'Entrance')
-        add_conditional_lamp('Castle Tower - Dark Maze', 'Tower Dark Maze', 'Location')
-        add_conditional_lamp('Castle Tower - Dark Archer Key Drop', 'Tower Dark Archers', 'Location')
-    else:
-        add_conditional_lamp('Agahnim 1', 'Inverted Agahnims Tower', 'Entrance')
-        add_conditional_lamp('Castle Tower - Dark Maze', 'Inverted Agahnims Tower', 'Location')
+    add_conditional_lamp('Tower Lone Statue Down Stairs', 'Tower Lone Statue', 'Entrance')
+    add_conditional_lamp('Tower Lone Statue WN', 'Tower Lone Statue', 'Entrance')
+    add_conditional_lamp('Tower Dark Maze EN', 'Tower Dark Maze', 'Entrance')
+    add_conditional_lamp('Tower Dark Maze ES', 'Tower Dark Maze', 'Entrance')
+    add_conditional_lamp('Tower Dark Chargers WS', 'Tower Dark Chargers', 'Entrance')
+    add_conditional_lamp('Tower Dark Chargers Up Stairs', 'Tower Dark Chargers', 'Entrance')
+    add_conditional_lamp('Tower Dual Statues Down Stairs', 'Tower Dual Statues', 'Entrance')
+    add_conditional_lamp('Tower Dual Statues WS', 'Tower Dual Statues', 'Entrance')
+    add_conditional_lamp('Tower Dark Pits ES', 'Tower Dark Pits', 'Entrance')
+    add_conditional_lamp('Tower Dark Pits EN', 'Tower Dark Pits', 'Entrance')
+    add_conditional_lamp('Tower Dark Archers WN', 'Tower Dark Archers', 'Entrance')
+    add_conditional_lamp('Tower Dark Archers Up Stairs', 'Tower Dark Archers', 'Entrance')
+    add_conditional_lamp('Castle Tower - Dark Maze', 'Tower Dark Maze', 'Location')
+    add_conditional_lamp('Castle Tower - Dark Archer Key Drop', 'Tower Dark Archers', 'Location')
     add_conditional_lamp('Old Man', 'Old Man Cave', 'Location')
     add_conditional_lamp('Old Man Cave Exit (East)', 'Old Man Cave', 'Entrance')
     add_conditional_lamp('Death Mountain Return Cave Exit (East)', 'Death Mountain Return Cave', 'Entrance')
@@ -856,109 +850,6 @@ def standard_rules(world, player):
                      'Fortune Teller (Light)', 'Lake Hylia Fairy', 'Light Hype Fairy', 'Desert Fairy',
                      'Lumberjack House', 'Lake Hylia Fortune Teller', 'Kakariko Gamble Game', 'Top of Pyramid']:
         add_rule(world.get_entrance(entrance, player), lambda state: state.has('Zelda Delivered', player))
-
-def set_trock_key_rules(world, player):
-
-
-    # First set all relevant locked doors to impassible.
-    for entrance in ['Turtle Rock Dark Room Staircase', 'Turtle Rock (Chain Chomp Room) (North)', 'Turtle Rock (Chain Chomp Room) (South)', 'Turtle Rock Pokey Room']:
-        set_rule(world.get_entrance(entrance, player), lambda state: False)
-
-    all_state = world.get_all_state(True)
-    
-    # Check if each of the four main regions of the dungoen can be reached. The previous code section prevents key-costing moves within the dungeon.
-    can_reach_back = all_state.can_reach(world.get_region('Turtle Rock (Eye Bridge)', player)) if world.can_access_trock_eyebridge[player] is None else world.can_access_trock_eyebridge[player]
-    world.can_access_trock_eyebridge[player] = can_reach_back
-    can_reach_front = all_state.can_reach(world.get_region('Turtle Rock (Entrance)', player)) if world.can_access_trock_front[player] is None else world.can_access_trock_front[player]
-    world.can_access_trock_front[player] = can_reach_front
-    can_reach_big_chest = all_state.can_reach(world.get_region('Turtle Rock (Big Chest)', player)) if world.can_access_trock_big_chest[player] is None else world.can_access_trock_big_chest[player]
-    world.can_access_trock_big_chest[player] = can_reach_big_chest
-    can_reach_middle = all_state.can_reach(world.get_region('Turtle Rock (Second Section)', player)) if world.can_access_trock_middle[player] is None else world.can_access_trock_middle[player]
-    world.can_access_trock_middle[player] = can_reach_middle
-
-    # No matter what, the key requirement for going from the middle to the bottom should be three keys.
-    set_rule(world.get_entrance('Turtle Rock Dark Room Staircase', player), lambda state: state.has_key('Small Key (Turtle Rock)', player, 3))
-
-    # The following represent the most common and most restrictive key rules. These are overwritten later as needed.
-    set_rule(world.get_entrance('Turtle Rock (Chain Chomp Room) (South)', player), lambda state: state.has_key('Small Key (Turtle Rock)', player, 4))
-    set_rule(world.get_entrance('Turtle Rock (Chain Chomp Room) (North)', player), lambda state: state.has_key('Small Key (Turtle Rock)', player, 4))
-    set_rule(world.get_entrance('Turtle Rock Pokey Room', player), lambda state: state.has_key('Small Key (Turtle Rock)', player, 4))
-
-    # No matter what, the Big Key cannot be in the Big Chest or held by Trinexx.
-    non_big_key_locations = ['Turtle Rock - Big Chest', 'Turtle Rock - Boss']
-
-    def tr_big_key_chest_keys_needed(state):
-        # This function handles the key requirements for the TR Big Chest in the situations it having the Big Key should logically require 2 keys, small key
-        # should logically require no keys, and anything else should logically require 4 keys.
-        item = item_name(state, 'Turtle Rock - Big Key Chest', player)
-        if item in [('Small Key (Turtle Rock)', player)]:
-            return 0
-        if item in [('Big Key (Turtle Rock)', player)]:
-            return 2
-        return 4
-
-    # Now we need to set rules based on which entrances we have access to. The most important point is whether we have back access. If we have back access, we
-    # might open all the locked doors in any order so we need maximally restrictive rules.
-    if can_reach_back:
-        set_rule(world.get_location('Turtle Rock - Big Key Chest', player), lambda state: (state.has_key('Small Key (Turtle Rock)', player, 4) or item_name(state, 'Turtle Rock - Big Key Chest', player) == ('Small Key (Turtle Rock)', player)))
-        if world.accessibility[player] != 'locations':
-            set_always_allow(world.get_location('Turtle Rock - Big Key Chest', player), lambda state, item: item.name == 'Small Key (Turtle Rock)' and item.player == player
-                                                                                                            and state.can_reach(world.get_region('Turtle Rock (Eye Bridge)', player)))
-        else:
-            forbid_item(world.get_location('Turtle Rock - Big Key Chest', player), 'Small Key (Turtle Rock)', player)
-    elif can_reach_front and can_reach_middle:
-        set_rule(world.get_location('Turtle Rock - Big Key Chest', player), lambda state: state.has_key('Small Key (Turtle Rock)', player, tr_big_key_chest_keys_needed(state)))
-        if world.accessibility[player] != 'locations':
-            set_always_allow(world.get_location('Turtle Rock - Big Key Chest', player), lambda state, item: item.name == 'Small Key (Turtle Rock)' and item.player == player
-                                                                                                            and state.can_reach(world.get_region('Turtle Rock (Entrance)', player)) and state.can_reach(world.get_region('Turtle Rock (Second Section)', player)))
-        else:
-            forbid_item(world.get_location('Turtle Rock - Big Key Chest', player), 'Small Key (Turtle Rock)', player)
-        non_big_key_locations += ['Turtle Rock - Crystaroller Room', 'Turtle Rock - Eye Bridge - Bottom Left',
-                                  'Turtle Rock - Eye Bridge - Bottom Right', 'Turtle Rock - Eye Bridge - Top Left',
-                                  'Turtle Rock - Eye Bridge - Top Right']
-    elif can_reach_front:
-        set_rule(world.get_entrance('Turtle Rock (Chain Chomp Room) (North)', player), lambda state: state.has_key('Small Key (Turtle Rock)', player, 2))
-        set_rule(world.get_entrance('Turtle Rock Pokey Room', player), lambda state: state.has_key('Small Key (Turtle Rock)', player, 1))
-        set_rule(world.get_location('Turtle Rock - Big Key Chest', player), lambda state: state.has_key('Small Key (Turtle Rock)', player, tr_big_key_chest_keys_needed(state)))
-        if world.accessibility[player] != 'locations':
-            set_always_allow(world.get_location('Turtle Rock - Big Key Chest', player), lambda state, item: item.name == 'Small Key (Turtle Rock)' and item.player == player and state.has_key('Small Key (Turtle Rock)', player, 2)
-                                                                                                            and state.can_reach(world.get_region('Turtle Rock (Entrance)', player)))
-        else:
-            forbid_item(world.get_location('Turtle Rock - Big Key Chest', player), 'Small Key (Turtle Rock)', player)
-        non_big_key_locations += ['Turtle Rock - Crystaroller Room', 'Turtle Rock - Eye Bridge - Bottom Left',
-                                  'Turtle Rock - Eye Bridge - Bottom Right', 'Turtle Rock - Eye Bridge - Top Left',
-                                  'Turtle Rock - Eye Bridge - Top Right']
-    elif can_reach_big_chest:
-        set_rule(world.get_entrance('Turtle Rock (Chain Chomp Room) (South)', player), lambda state: state.has_key('Small Key (Turtle Rock)', player, 2) if item_in_locations(state, 'Big Key (Turtle Rock)', player, [('Turtle Rock - Compass Chest', player), ('Turtle Rock - Roller Room - Left', player), ('Turtle Rock - Roller Room - Right', player)]) else state.has_key('Small Key (Turtle Rock)', player, 4))
-        set_rule(world.get_location('Turtle Rock - Big Key Chest', player), lambda state: (state.has_key('Small Key (Turtle Rock)', player, 4) or item_name(state, 'Turtle Rock - Big Key Chest', player) == ('Small Key (Turtle Rock)', player)))
-        if world.accessibility[player] != 'locations':
-            set_always_allow(world.get_location('Turtle Rock - Big Key Chest', player), lambda state, item: item.name == 'Small Key (Turtle Rock)' and item.player == player
-                                                                                                            and state.can_reach(world.get_region('Turtle Rock (Big Chest)', player)))
-        else:
-            forbid_item(world.get_location('Turtle Rock - Big Key Chest', player), 'Small Key (Turtle Rock)', player)
-        non_big_key_locations += ['Turtle Rock - Crystaroller Room', 'Turtle Rock - Eye Bridge - Bottom Left',
-                                  'Turtle Rock - Eye Bridge - Bottom Right', 'Turtle Rock - Eye Bridge - Top Left',
-                                  'Turtle Rock - Eye Bridge - Top Right']
-        if not world.keyshuffle[player]:
-            non_big_key_locations += ['Turtle Rock - Big Key Chest']
-    else:
-        set_rule(world.get_entrance('Turtle Rock (Chain Chomp Room) (South)', player), lambda state: state.has_key('Small Key (Turtle Rock)', player, 2) if item_in_locations(state, 'Big Key (Turtle Rock)', player, [('Turtle Rock - Compass Chest', player), ('Turtle Rock - Roller Room - Left', player), ('Turtle Rock - Roller Room - Right', player)]) else state.has_key('Small Key (Turtle Rock)', player, 4))
-        set_rule(world.get_location('Turtle Rock - Big Key Chest', player), lambda state: (state.has_key('Small Key (Turtle Rock)', player, 4) or item_name(state, 'Turtle Rock - Big Key Chest', player) == ('Small Key (Turtle Rock)', player)))
-        if world.accessibility[player] != 'locations':
-            set_always_allow(world.get_location('Turtle Rock - Big Key Chest', player), lambda state, item: item.name == 'Small Key (Turtle Rock)' and item.player == player)
-        non_big_key_locations += ['Turtle Rock - Crystaroller Room', 'Turtle Rock - Eye Bridge - Bottom Left',
-                                  'Turtle Rock - Eye Bridge - Bottom Right', 'Turtle Rock - Eye Bridge - Top Left',
-                                  'Turtle Rock - Eye Bridge - Top Right']
-        if not world.keyshuffle[player]:
-            non_big_key_locations += ['Turtle Rock - Big Key Chest', 'Turtle Rock - Chain Chomps']
-
-    # set big key restrictions
-    for location in non_big_key_locations:
-        forbid_item(world.get_location(location, player), 'Big Key (Turtle Rock)', player)
-
-    # small key restriction
-    for location in ['Turtle Rock - Boss']:
-        forbid_item(world.get_location(location, player), 'Small Key (Turtle Rock)', player)
 
 
 def set_big_bomb_rules(world, player):
@@ -1443,8 +1334,13 @@ def set_inverted_bunny_rules(world, player):
 
     # regions for the exits of multi-entrace caves/drops that bunny cannot pass
     # Note spiral cave may be technically passible, but it would be too absurd to require since OHKO mode is a thing.
-    bunny_impassable_caves = ['Bumper Cave', 'Two Brothers House', 'Hookshot Cave', 'Skull Woods First Section (Right)', 'Skull Woods First Section (Left)', 'Skull Woods First Section (Top)', 'Turtle Rock (Entrance)', 'Turtle Rock (Second Section)', 'Turtle Rock (Big Chest)', 'Skull Woods Second Section (Drop)',
-                              'Turtle Rock (Eye Bridge)', 'Sewers', 'Pyramid', 'Spiral Cave (Top)', 'Desert Palace Main (Inner)', 'Fairy Ascension Cave (Drop)', 'The Sky']
+    bunny_impassable_caves = ['Bumper Cave', 'Two Brothers House', 'Hookshot Cave',
+                              'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)', 'The Sky']
+    # todo: bunny impassable caves
+    #  sewers drop may or may not be - maybe just new terminology
+    #  desert pots are impassible by bunny - need rules for those transitions
+    #  skull woods drops tend to soft lock bunny
+    #  tr too - dark ride, chest gap, entrance gap, pots in lazy eyes, etc
 
     bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree', 'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid', 'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins', 'Bombos Tablet', 'Ether Tablet', 'Purple Chest']
 

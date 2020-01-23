@@ -418,9 +418,8 @@ class CollectionState(object):
         new_regions = True
         reachable_regions_count = len(rrp)
         while new_regions:
-            region_queue = deque([region for region in player_regions if region not in rrp])
-            while len(region_queue) > 0:
-                candidate = region_queue.popleft()
+            player_regions = [region for region in player_regions if region not in rrp]
+            for candidate in player_regions:
                 if candidate.can_reach_private(self):
                     rrp.add(candidate)
                     if candidate.type == RegionType.Dungeon:
@@ -778,7 +777,6 @@ class CollectionState(object):
         if changed:
             if not event:
                 self.sweep_for_events()
-            self.sweep_for_crystal_access()
 
     def remove(self, item):
         if item.advancement:
@@ -1625,6 +1623,7 @@ class Spoiler(object):
                 outfile.write('Difficulty:                      %s\n' % self.metadata['item_pool'][player])
                 outfile.write('Item Functionality:              %s\n' % self.metadata['item_functionality'][player])
                 outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'][player])
+                outfile.write('Door Shuffle:                    %s\n' % self.metadata['door_shuffle'][player])
                 outfile.write('Crystals required for GT:        %s\n' % self.metadata['gt_crystals'][player])
                 outfile.write('Crystals required for Ganon:     %s\n' % self.metadata['ganon_crystals'][player])
                 outfile.write('Pyramid hole pre-opened:         %s\n' % ('Yes' if self.metadata['open_pyramid'][player] else 'No'))

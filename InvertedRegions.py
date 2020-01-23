@@ -34,6 +34,7 @@ def create_inverted_regions(world, player):
         create_lw_region(player, 'Graveyard Cave Area', None, ['Graveyard Cave', 'Graveyard Cave Inner Bushes', 'Graveyard Cave Mirror Spot']),
         create_lw_region(player, 'River', None, ['Light World Pier', 'Potion Shop Pier']),
         create_cave_region(player, 'Hyrule Castle Secret Entrance', 'a drop\'s exit', ['Link\'s Uncle', 'Secret Passage'], ['Hyrule Castle Secret Entrance Exit']),
+        create_dungeon_region(player, 'Sewer Drop', 'a drop\'s exit', None, ['Sewer Drop']), # This exists only to be referenced for access checks
         create_lw_region(player, 'Zoras River', ['King Zora', 'Zora\'s Ledge']),
         create_cave_region(player, 'Waterfall of Wishing', 'a cave with two chests', ['Waterfall Fairy - Left', 'Waterfall Fairy - Right']),
         create_lw_region(player, 'Kings Grave Area', None, ['Kings Grave', 'Kings Grave Inner Rocks']),
@@ -102,25 +103,9 @@ def create_inverted_regions(world, player):
         create_lw_region(player, 'Desert Palace Stairs', None, ['Desert Palace Entrance (South)', 'Desert Palace Stairs Mirror Spot']),
         create_lw_region(player, 'Desert Palace Lone Stairs', None, ['Desert Palace Stairs Drop', 'Desert Palace Entrance (East)']),
         create_lw_region(player, 'Desert Palace Entrance (North) Spot', None, ['Desert Palace Entrance (North)', 'Desert Ledge Return Rocks', 'Desert Palace North Mirror Spot']),
-        create_dungeon_region(player, 'Desert Palace Main (Outer)', 'Desert Palace', ['Desert Palace - Big Chest', 'Desert Palace - Torch', 'Desert Palace - Map Chest'],
-                              ['Desert Palace Pots (Outer)', 'Desert Palace Exit (West)', 'Desert Palace Exit (East)', 'Desert Palace East Wing']),
-        create_dungeon_region(player, 'Desert Palace Main (Inner)', 'Desert Palace', None, ['Desert Palace Exit (South)', 'Desert Palace Pots (Inner)']),
-        create_dungeon_region(player, 'Desert Palace East', 'Desert Palace', ['Desert Palace - Compass Chest', 'Desert Palace - Big Key Chest']),
-        create_dungeon_region(player, 'Desert Palace North', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize'], ['Desert Palace Exit (North)']),
-        create_dungeon_region(player, 'Eastern Palace', 'Eastern Palace', ['Eastern Palace - Compass Chest', 'Eastern Palace - Big Chest', 'Eastern Palace - Cannonball Chest',
-                                                 'Eastern Palace - Big Key Chest', 'Eastern Palace - Map Chest', 'Eastern Palace - Boss', 'Eastern Palace - Prize'], ['Eastern Palace Exit']),
         create_lw_region(player, 'Master Sword Meadow', ['Master Sword Pedestal']),
         create_cave_region(player, 'Lost Woods Gamble', 'a game of chance'),
         create_lw_region(player, 'Hyrule Castle Ledge', None, ['Hyrule Castle Entrance (East)', 'Hyrule Castle Entrance (West)', 'Inverted Ganons Tower', 'Hyrule Castle Ledge Courtyard Drop', 'Inverted Pyramid Hole']),
-        create_dungeon_region(player, 'Hyrule Castle', 'Hyrule Castle', ['Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Map Chest', 'Hyrule Castle - Zelda\'s Chest'],
-                              ['Hyrule Castle Exit (East)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (South)', 'Throne Room']),
-        create_dungeon_region(player, 'Sewer Drop', 'a drop\'s exit', None, ['Sewer Drop']),  # This exists only to be referenced for access checks
-        create_dungeon_region(player, 'Sewers (Dark)', 'a drop\'s exit', ['Sewers - Dark Cross'], ['Sewers Door']),
-        create_dungeon_region(player, 'Sewers', 'a drop\'s exit', ['Sewers - Secret Room - Left', 'Sewers - Secret Room - Middle',
-                                         'Sewers - Secret Room - Right'], ['Sanctuary Push Door', 'Sewers Back Door']),
-        create_dungeon_region(player, 'Sanctuary', 'a drop\'s exit', ['Sanctuary'], ['Sanctuary Exit']),
-        create_dungeon_region(player, 'Inverted Agahnims Tower', 'Castle Tower', ['Castle Tower - Room 03', 'Castle Tower - Dark Maze'], ['Agahnim 1', 'Inverted Agahnims Tower Exit']),
-        create_dungeon_region(player, 'Agahnim 1', 'Castle Tower', ['Agahnim 1'], None),
         create_cave_region(player, 'Old Man Cave', 'a connector', ['Old Man'], ['Old Man Cave Exit (East)', 'Old Man Cave Exit (West)']),
         create_cave_region(player, 'Old Man House', 'a connector', None, ['Old Man House Exit (Bottom)', 'Old Man House Front to Back']),
         create_cave_region(player, 'Old Man House Back', 'a connector', None, ['Old Man House Exit (Top)', 'Old Man House Back to Front']),
@@ -158,9 +143,6 @@ def create_inverted_regions(world, player):
         create_lw_region(player, 'Fairy Ascension Ledge', None, ['Fairy Ascension Ledge Drop', 'Fairy Ascension Cave (Top)', 'Laser Bridge Mirror Spot']),
         create_lw_region(player, 'Death Mountain (Top)', ['Ether Tablet', 'Spectacle Rock'], ['East Death Mountain (Top)', 'Tower of Hera', 'Death Mountain Drop', 'Death Mountain (Top) Mirror Spot']),
         create_dw_region(player, 'Bumper Cave Ledge', ['Bumper Cave Ledge'], ['Bumper Cave Ledge Drop', 'Bumper Cave (Top)']),
-        create_dungeon_region(player, 'Tower of Hera (Bottom)', 'Tower of Hera', ['Tower of Hera - Basement Cage', 'Tower of Hera - Map Chest'], ['Tower of Hera Small Key Door', 'Tower of Hera Big Key Door', 'Tower of Hera Exit']),
-        create_dungeon_region(player, 'Tower of Hera (Basement)', 'Tower of Hera', ['Tower of Hera - Big Key Chest']),
-        create_dungeon_region(player, 'Tower of Hera (Top)', 'Tower of Hera', ['Tower of Hera - Compass Chest', 'Tower of Hera - Big Chest', 'Tower of Hera - Boss', 'Tower of Hera - Prize']),
 
         create_dw_region(player, 'East Dark World', ['Pyramid'], ['Pyramid Fairy', 'South Dark World Bridge', 'Palace of Darkness', 'Dark Lake Hylia Drop (East)', 
                                                           'Dark Lake Hylia Fairy', 'Palace of Darkness Hint', 'East Dark World Hint', 'Northeast Dark World Broken Bridge Pass', 'East Dark World Teleporter', 'EDW Flute']),
@@ -217,84 +199,6 @@ def create_inverted_regions(world, player):
         create_dw_region(player, 'Death Mountain Floating Island (Dark World)', None, ['Floating Island Drop', 'Hookshot Cave Back Entrance']),
         create_cave_region(player, 'Mimic Cave', 'Mimic Cave', ['Mimic Cave']),
 
-        create_dungeon_region(player, 'Swamp Palace (Entrance)', 'Swamp Palace', None, ['Swamp Palace Moat', 'Swamp Palace Exit']),
-        create_dungeon_region(player, 'Swamp Palace (First Room)', 'Swamp Palace', ['Swamp Palace - Entrance'], ['Swamp Palace Small Key Door']),
-        create_dungeon_region(player, 'Swamp Palace (Starting Area)', 'Swamp Palace', ['Swamp Palace - Map Chest'], ['Swamp Palace (Center)']),
-        create_dungeon_region(player, 'Swamp Palace (Center)', 'Swamp Palace', ['Swamp Palace - Big Chest', 'Swamp Palace - Compass Chest',
-                                                                        'Swamp Palace - Big Key Chest', 'Swamp Palace - West Chest'], ['Swamp Palace (North)']),
-        create_dungeon_region(player, 'Swamp Palace (North)', 'Swamp Palace', ['Swamp Palace - Flooded Room - Left', 'Swamp Palace - Flooded Room - Right',
-                                                                       'Swamp Palace - Waterfall Room', 'Swamp Palace - Boss', 'Swamp Palace - Prize']),
-        create_dungeon_region(player, 'Thieves Town (Entrance)', 'Thieves\' Town', ['Thieves\' Town - Big Key Chest',
-                                                                            'Thieves\' Town - Map Chest',
-                                                                            'Thieves\' Town - Compass Chest',
-                                                                            'Thieves\' Town - Ambush Chest'], ['Thieves Town Big Key Door', 'Thieves Town Exit']),
-        create_dungeon_region(player, 'Thieves Town (Deep)', 'Thieves\' Town', ['Thieves\' Town - Attic',
-                                                                        'Thieves\' Town - Big Chest',
-                                                                        'Thieves\' Town - Blind\'s Cell'], ['Blind Fight']),
-        create_dungeon_region(player, 'Blind Fight', 'Thieves\' Town', ['Thieves\' Town - Boss', 'Thieves\' Town - Prize']),
-        create_dungeon_region(player, 'Skull Woods First Section', 'Skull Woods', ['Skull Woods - Map Chest'], ['Skull Woods First Section Exit', 'Skull Woods First Section Bomb Jump', 'Skull Woods First Section South Door', 'Skull Woods First Section West Door']),
-        create_dungeon_region(player, 'Skull Woods First Section (Right)', 'Skull Woods', ['Skull Woods - Pinball Room'], ['Skull Woods First Section (Right) North Door']),
-        create_dungeon_region(player, 'Skull Woods First Section (Left)', 'Skull Woods', ['Skull Woods - Compass Chest', 'Skull Woods - Pot Prison'], ['Skull Woods First Section (Left) Door to Exit', 'Skull Woods First Section (Left) Door to Right']),
-        create_dungeon_region(player, 'Skull Woods First Section (Top)', 'Skull Woods', ['Skull Woods - Big Chest'], ['Skull Woods First Section (Top) One-Way Path']),
-        create_dungeon_region(player, 'Skull Woods Second Section (Drop)', 'Skull Woods', None, ['Skull Woods Second Section (Drop)']),
-        create_dungeon_region(player, 'Skull Woods Second Section', 'Skull Woods', ['Skull Woods - Big Key Chest'], ['Skull Woods Second Section Exit (East)', 'Skull Woods Second Section Exit (West)']),
-        create_dungeon_region(player, 'Skull Woods Final Section (Entrance)', 'Skull Woods', ['Skull Woods - Bridge Room'], ['Skull Woods Torch Room', 'Skull Woods Final Section Exit']),
-        create_dungeon_region(player, 'Skull Woods Final Section (Mothula)', 'Skull Woods', ['Skull Woods - Boss', 'Skull Woods - Prize']),
-        create_dungeon_region(player, 'Ice Palace (Entrance)', 'Ice Palace', None, ['Ice Palace Entrance Room', 'Ice Palace Exit']),
-        create_dungeon_region(player, 'Ice Palace (Main)', 'Ice Palace', ['Ice Palace - Compass Chest', 'Ice Palace - Freezor Chest',
-                                                                  'Ice Palace - Big Chest', 'Ice Palace - Iced T Room'], ['Ice Palace (East)', 'Ice Palace (Kholdstare)']),
-        create_dungeon_region(player, 'Ice Palace (East)', 'Ice Palace', ['Ice Palace - Spike Room'], ['Ice Palace (East Top)']),
-        create_dungeon_region(player, 'Ice Palace (East Top)', 'Ice Palace', ['Ice Palace - Big Key Chest', 'Ice Palace - Map Chest']),
-        create_dungeon_region(player, 'Ice Palace (Kholdstare)', 'Ice Palace', ['Ice Palace - Boss', 'Ice Palace - Prize']),
-        create_dungeon_region(player, 'Misery Mire (Entrance)', 'Misery Mire', None, ['Misery Mire Entrance Gap', 'Misery Mire Exit']),
-        create_dungeon_region(player, 'Misery Mire (Main)', 'Misery Mire', ['Misery Mire - Big Chest', 'Misery Mire - Map Chest', 'Misery Mire - Main Lobby',
-                                                                    'Misery Mire - Bridge Chest', 'Misery Mire - Spike Chest'], ['Misery Mire (West)', 'Misery Mire Big Key Door']),
-        create_dungeon_region(player, 'Misery Mire (West)', 'Misery Mire', ['Misery Mire - Compass Chest', 'Misery Mire - Big Key Chest']),
-        create_dungeon_region(player, 'Misery Mire (Final Area)', 'Misery Mire', None, ['Misery Mire (Vitreous)']),
-        create_dungeon_region(player, 'Misery Mire (Vitreous)', 'Misery Mire', ['Misery Mire - Boss', 'Misery Mire - Prize']),
-        create_dungeon_region(player, 'Turtle Rock (Entrance)', 'Turtle Rock', None, ['Turtle Rock Entrance Gap', 'Turtle Rock Exit (Front)']),
-        create_dungeon_region(player, 'Turtle Rock (First Section)', 'Turtle Rock', ['Turtle Rock - Compass Chest', 'Turtle Rock - Roller Room - Left',
-                                                                             'Turtle Rock - Roller Room - Right'], ['Turtle Rock Pokey Room', 'Turtle Rock Entrance Gap Reverse']),
-        create_dungeon_region(player, 'Turtle Rock (Chain Chomp Room)', 'Turtle Rock', ['Turtle Rock - Chain Chomps'], ['Turtle Rock (Chain Chomp Room) (North)', 'Turtle Rock (Chain Chomp Room) (South)']),
-        create_dungeon_region(player, 'Turtle Rock (Second Section)', 'Turtle Rock', ['Turtle Rock - Big Key Chest'], ['Turtle Rock Ledge Exit (West)', 'Turtle Rock Chain Chomp Staircase', 'Turtle Rock Big Key Door']),
-        create_dungeon_region(player, 'Turtle Rock (Big Chest)', 'Turtle Rock', ['Turtle Rock - Big Chest'], ['Turtle Rock (Big Chest) (North)', 'Turtle Rock Ledge Exit (East)']),
-        create_dungeon_region(player, 'Turtle Rock (Crystaroller Room)', 'Turtle Rock', ['Turtle Rock - Crystaroller Room'], ['Turtle Rock Dark Room Staircase', 'Turtle Rock Big Key Door Reverse']),
-        create_dungeon_region(player, 'Turtle Rock (Dark Room)', 'Turtle Rock', None, ['Turtle Rock (Dark Room) (North)', 'Turtle Rock (Dark Room) (South)']),
-        create_dungeon_region(player, 'Turtle Rock (Eye Bridge)', 'Turtle Rock', ['Turtle Rock - Eye Bridge - Bottom Left', 'Turtle Rock - Eye Bridge - Bottom Right',
-                                                                          'Turtle Rock - Eye Bridge - Top Left', 'Turtle Rock - Eye Bridge - Top Right'],
-                              ['Turtle Rock Dark Room (South)', 'Turtle Rock (Trinexx)', 'Turtle Rock Isolated Ledge Exit']),
-        create_dungeon_region(player, 'Turtle Rock (Trinexx)', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize']),
-        create_dungeon_region(player, 'Palace of Darkness (Entrance)', 'Palace of Darkness', ['Palace of Darkness - Shooter Room'], ['Palace of Darkness Bridge Room', 'Palace of Darkness Bonk Wall', 'Palace of Darkness Exit']),
-        create_dungeon_region(player, 'Palace of Darkness (Center)', 'Palace of Darkness', ['Palace of Darkness - The Arena - Bridge', 'Palace of Darkness - Stalfos Basement'],
-                              ['Palace of Darkness Big Key Chest Staircase', 'Palace of Darkness (North)', 'Palace of Darkness Big Key Door']),
-        create_dungeon_region(player, 'Palace of Darkness (Big Key Chest)', 'Palace of Darkness', ['Palace of Darkness - Big Key Chest']),
-        create_dungeon_region(player, 'Palace of Darkness (Bonk Section)', 'Palace of Darkness', ['Palace of Darkness - The Arena - Ledge', 'Palace of Darkness - Map Chest'], ['Palace of Darkness Hammer Peg Drop']),
-        create_dungeon_region(player, 'Palace of Darkness (North)', 'Palace of Darkness', ['Palace of Darkness - Compass Chest', 'Palace of Darkness - Dark Basement - Left', 'Palace of Darkness - Dark Basement - Right'],
-                              ['Palace of Darkness Spike Statue Room Door', 'Palace of Darkness Maze Door']),
-        create_dungeon_region(player, 'Palace of Darkness (Maze)', 'Palace of Darkness', ['Palace of Darkness - Dark Maze - Top', 'Palace of Darkness - Dark Maze - Bottom', 'Palace of Darkness - Big Chest']),
-        create_dungeon_region(player, 'Palace of Darkness (Harmless Hellway)', 'Palace of Darkness', ['Palace of Darkness - Harmless Hellway']),
-        create_dungeon_region(player, 'Palace of Darkness (Final Section)', 'Palace of Darkness', ['Palace of Darkness - Boss', 'Palace of Darkness - Prize']),
-        create_dungeon_region(player, 'Inverted Ganons Tower (Entrance)', 'Ganon\'s Tower', ['Ganons Tower - Bob\'s Torch', 'Ganons Tower - Hope Room - Left', 'Ganons Tower - Hope Room - Right'],
-                              ['Ganons Tower (Tile Room)', 'Ganons Tower (Hookshot Room)', 'Ganons Tower Big Key Door', 'Inverted Ganons Tower Exit']),
-        create_dungeon_region(player, 'Ganons Tower (Tile Room)', 'Ganon\'s Tower', ['Ganons Tower - Tile Room'], ['Ganons Tower (Tile Room) Key Door']),
-        create_dungeon_region(player, 'Ganons Tower (Compass Room)', 'Ganon\'s Tower', ['Ganons Tower - Compass Room - Top Left', 'Ganons Tower - Compass Room - Top Right',
-                                                                                'Ganons Tower - Compass Room - Bottom Left', 'Ganons Tower - Compass Room - Bottom Right'],
-                              ['Ganons Tower (Bottom) (East)']),
-        create_dungeon_region(player, 'Ganons Tower (Hookshot Room)', 'Ganon\'s Tower', ['Ganons Tower - DMs Room - Top Left', 'Ganons Tower - DMs Room - Top Right',
-                                                                                 'Ganons Tower - DMs Room - Bottom Left', 'Ganons Tower - DMs Room - Bottom Right'],
-                              ['Ganons Tower (Map Room)', 'Ganons Tower (Double Switch Room)']),
-        create_dungeon_region(player, 'Ganons Tower (Map Room)', 'Ganon\'s Tower', ['Ganons Tower - Map Chest']),
-        create_dungeon_region(player, 'Ganons Tower (Firesnake Room)', 'Ganon\'s Tower', ['Ganons Tower - Firesnake Room'], ['Ganons Tower (Firesnake Room)']),
-        create_dungeon_region(player, 'Ganons Tower (Teleport Room)', 'Ganon\'s Tower', ['Ganons Tower - Randomizer Room - Top Left', 'Ganons Tower - Randomizer Room - Top Right',
-                                                                                 'Ganons Tower - Randomizer Room - Bottom Left', 'Ganons Tower - Randomizer Room - Bottom Right'],
-                              ['Ganons Tower (Bottom) (West)']),
-        create_dungeon_region(player, 'Ganons Tower (Bottom)', 'Ganon\'s Tower', ['Ganons Tower - Bob\'s Chest', 'Ganons Tower - Big Chest', 'Ganons Tower - Big Key Room - Left',
-                                                                          'Ganons Tower - Big Key Room - Right', 'Ganons Tower - Big Key Chest']),
-        create_dungeon_region(player, 'Ganons Tower (Top)', 'Ganon\'s Tower', None, ['Ganons Tower Torch Rooms']),
-        create_dungeon_region(player, 'Ganons Tower (Before Moldorm)', 'Ganon\'s Tower', ['Ganons Tower - Mini Helmasaur Room - Left', 'Ganons Tower - Mini Helmasaur Room - Right',
-                                                                                  'Ganons Tower - Pre-Moldorm Chest'], ['Ganons Tower Moldorm Door']),
-        create_dungeon_region(player, 'Ganons Tower (Moldorm)', 'Ganon\'s Tower', None, ['Ganons Tower Moldorm Gap']),
-        create_dungeon_region(player, 'Agahnim 2', 'Ganon\'s Tower', ['Ganons Tower - Validation Chest', 'Agahnim 2'], None),
         create_cave_region(player, 'Pyramid', 'a drop\'s exit', ['Ganon'], ['Ganon Drop']),
         create_cave_region(player, 'Bottom of Pyramid', 'a drop\'s exit', None, ['Pyramid Exit']),
         create_dw_region(player, 'Pyramid Ledge', None, ['Pyramid Drop']),  # houlihan room exits here in inverted 
@@ -313,8 +217,8 @@ def mark_dark_world_regions(world, player):
         current = queue.popleft()
         current.is_dark_world = True
         for exit in current.exits:
-            if exit.connected_region.type == RegionType.LightWorld:
-                # Don't venture into the dark world
+            if exit.connected_region is None or exit.connected_region.type == RegionType.LightWorld:  # todo: remove none check
+                # Don't venture into the light world
                 continue
             if exit.connected_region not in seen:
                 seen.add(exit.connected_region)
@@ -326,12 +230,13 @@ def mark_dark_world_regions(world, player):
         current = queue.popleft()
         current.is_light_world = True
         for exit in current.exits:
-            if exit.connected_region.type == RegionType.DarkWorld:
-                # Don't venture into the light world
-                continue
-            if exit.connected_region not in seen:
-                seen.add(exit.connected_region)
-                queue.append(exit.connected_region)
+            if exit.connected_region is not None:
+                if exit.connected_region.type == RegionType.DarkWorld:
+                    # Don't venture into the dark world
+                    continue
+                if exit.connected_region not in seen:
+                    seen.add(exit.connected_region)
+                    queue.append(exit.connected_region)
 
 
 location_table = {'Mushroom': (0x180013, 0x186338, False, 'in the woods'),
