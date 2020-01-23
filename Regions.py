@@ -3,7 +3,6 @@ from BaseClasses import Region, Location, Entrance, RegionType, Shop, ShopType
 
 
 def create_regions(world, player):
-    std_flag = world.mode[player] == 'standard'
     world.regions += [
         create_lw_region(player, 'Light World', ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'Purple Chest'],
                          ["Blinds Hideout", "Hyrule Castle Secret Entrance Drop", 'Zoras River', 'Kings Grave Outer Rocks', 'Dam',
@@ -196,7 +195,12 @@ def create_regions(world, player):
         create_cave_region(player, 'Pyramid', 'a drop\'s exit', ['Ganon'], ['Ganon Drop']),
         create_cave_region(player, 'Bottom of Pyramid', 'a drop\'s exit', None, ['Pyramid Exit']),
         create_dw_region(player, 'Pyramid Ledge', None, ['Pyramid Entrance', 'Pyramid Drop']),
+    ]
 
+def create_dungeon_regions(world, player):
+    std_flag = world.mode[player] == 'standard'
+    inv_flag = world.mode[player] == 'inverted'
+    world.regions += [
         create_dungeon_region(player, 'Hyrule Castle Lobby', 'Hyrule Castle', None, ['Hyrule Castle Lobby W', 'Hyrule Castle Lobby E',
                                                             'Hyrule Castle Lobby WN', 'Hyrule Castle Lobby North Stairs', 'Hyrule Castle Exit (South)']),
         create_dungeon_region(player, 'Hyrule Castle West Lobby', 'Hyrule Castle', None, ['Hyrule Castle West Lobby E', 'Hyrule Castle West Lobby N',
@@ -316,7 +320,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'Hera Boss', 'Tower of Hera', ['Tower of Hera - Boss', 'Tower of Hera - Prize'], ['Hera Boss Down Stairs', 'Hera Boss Outer Hole', 'Hera Boss Inner Hole']),
 
         # AgaTower
-        create_dungeon_region(player, 'Tower Lobby', 'Castle Tower', None, ['Tower Lobby NW', 'Agahnims Tower Exit']),
+        create_dungeon_region(player, 'Tower Lobby', 'Castle Tower', None, ['Tower Lobby NW', inv_flag and 'Inverted Agahnims Tower Exit' or 'Agahnims Tower Exit']),
         create_dungeon_region(player, 'Tower Gold Knights', 'Castle Tower', None, ['Tower Gold Knights SW', 'Tower Gold Knights EN']),
         create_dungeon_region(player, 'Tower Room 03', 'Castle Tower', ['Castle Tower - Room 03'], ['Tower Room 03 WN', 'Tower Room 03 Up Stairs']),
         create_dungeon_region(player, 'Tower Lone Statue', 'Castle Tower', None, ['Tower Lone Statue Down Stairs', 'Tower Lone Statue WN']),
@@ -622,7 +626,7 @@ def create_regions(world, player):
         create_dungeon_region(player, 'TR Boss', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize'], ['TR Boss SW']),
 
         # gt
-        create_dungeon_region(player, 'GT Lobby', 'Ganon\'s Tower', None, ['GT Lobby Left Down Stairs', 'GT Lobby Up Stairs', 'GT Lobby Right Down Stairs', 'Ganons Tower Exit']),
+        create_dungeon_region(player, 'GT Lobby', 'Ganon\'s Tower', None, ['GT Lobby Left Down Stairs', 'GT Lobby Up Stairs', 'GT Lobby Right Down Stairs', inv_flag and 'Inverted Ganons Tower Exit' or 'Ganons Tower Exit']),
         create_dungeon_region(player, 'GT Bob\'s Torch', 'Ganon\'s Tower', ['Ganons Tower - Bob\'s Torch'], ['GT Torch Up Stairs', 'GT Torch WN', 'GT Torch EN', 'GT Torch SW']),
         create_dungeon_region(player, 'GT Hope Room', 'Ganon\'s Tower', ['Ganons Tower - Hope Room - Left', 'Ganons Tower - Hope Room - Right'], ['GT Hope Room Up Stairs', 'GT Hope Room WN', 'GT Hope Room EN']),
         create_dungeon_region(player, 'GT Big Chest', 'Ganon\'s Tower', ['Ganons Tower - Big Chest'], ['GT Big Chest NW', 'GT Big Chest SW']),

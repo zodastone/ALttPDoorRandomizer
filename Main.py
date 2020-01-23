@@ -10,7 +10,7 @@ import zlib
 
 from BaseClasses import World, CollectionState, Item, Region, Location, Shop
 from Items import ItemFactory
-from Regions import create_regions, create_shops, mark_light_world_regions
+from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
 from EntranceShuffle import link_entrances, link_inverted_entrances
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, JsonRom, get_hash_string
@@ -84,6 +84,7 @@ def main(args, seed=None):
             create_regions(world, player)
         else:
             create_inverted_regions(world, player)
+        create_dungeon_regions(world, player)
         create_shops(world, player)
         create_doors(world, player)
         create_rooms(world, player)
@@ -286,6 +287,7 @@ def copy_world(world):
             create_regions(ret, player)
         else:
             create_inverted_regions(ret, player)
+        create_dungeon_regions(ret, player)
         create_shops(ret, player)
         create_doors(ret, player)
         create_rooms(ret, player)

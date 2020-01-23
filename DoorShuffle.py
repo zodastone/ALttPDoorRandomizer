@@ -1155,7 +1155,7 @@ def overworld_prep(world, player):
 
 def find_inaccessible_regions(world, player):
     world.inaccessible_regions[player] = []
-    if world.mode != 'inverted':
+    if world.mode[player] != 'inverted':
         start_regions = ['Links House', 'Sanctuary']
     else:
         start_regions = ['Inverted Links House', 'Inverted Dark Sanctuary']
@@ -1185,30 +1185,11 @@ def valid_inaccessible_region(r):
 
 
 def add_inaccessible_doors(world, player):
-    if 'Skull Woods Forest (West)' in world.inaccessible_regions[player]:
-        create_door(world, player, 'Skull Woods Second Section Door (West)', 'Skull Woods Forest (West)')
-        create_door(world, player, 'Skull Woods Second Section Hole', 'Skull Woods Forest (West)')
-        create_door(world, player, 'Skull Woods Final Section', 'Skull Woods Forest (West)')
-    if 'Dark Death Mountain Ledge' in world.inaccessible_regions[player]:
-        create_door(world, player, 'Dark Death Mountain Ledge (East)', 'Dark Death Mountain Ledge')
-        create_door(world, player, 'Dark Death Mountain Ledge (West)', 'Dark Death Mountain Ledge')
-        create_door(world, player, 'Mimic Cave Mirror Spot', 'Dark Death Mountain Ledge')
-    if 'Mimic Cave Ledge' in world.inaccessible_regions[player]:
-        create_door(world, player, 'Mimic Cave', 'Mimic Cave Ledge')
-    if 'Dark Death Mountain Isolated Ledge' in world.inaccessible_regions[player]:
-        create_door(world, player, 'Turtle Rock Isolated Ledge Entrance', 'Dark Death Mountain Isolated Ledge')
-    if 'Death Mountain Floating Island (Dark World)' in world.inaccessible_regions[player]:
-        create_door(world, player, 'Hookshot Cave Back Entrance', 'Death Mountain Floating Island (Dark World)')
-    if 'Bumper Cave Ledge' in world.inaccessible_regions[player]:
-        create_door(world, player, 'Bumper Cave (Top)', 'Bumper Cave Ledge')
-        create_door(world, player, 'Bumper Cave Ledge Mirror Spot', 'Bumper Cave Ledge')
-    if 'Death Mountain Return Ledge' in world.inaccessible_regions[player]:
-        create_door(world, player, 'Death Mountain Return Cave (West)', 'Death Mountain Return Ledge')
-    if 'Desert Palace Lone Stairs' in world.inaccessible_regions[player]:
-        create_door(world, player, 'Desert Palace Entrance (East)', 'Desert Palace Lone Stairs')
-    # if world.mode[player] == 'standard' and 'Hyrule Castle Ledge' in world.inaccessible_regions[player]:
-    #     create_door(world, player, 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge')
-    #     create_door(world, player, 'Hyrule Castle Entrance (West)', 'Hyrule Castle Ledge')
+    # todo: ignore standard mode hyrule castle ledge?
+    for inaccessible_region in world.inaccessible_regions[player]:
+        region = world.get_region(inaccessible_region, player)
+        for exit in region.exits:
+            create_door(world, player, exit.name, region.name)
 
 
 def create_door(world, player, entName, region_name):
