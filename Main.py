@@ -23,7 +23,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes
 from Utils import output_path, parse_player_names
 
-__version__ = '0.0.4-pre'
+__version__ = '0.0.6-pre'
 
 def main(args, seed=None):
     if args.outputpath:
@@ -205,10 +205,10 @@ def main(args, seed=None):
                         outfilepname += f'_P{player}'
                     if world.players > 1 or world.teams > 1:
                         outfilepname += f"_{world.player_names[player][team].replace(' ', '_')}" if world.player_names[player][team] != 'Player %d' % player else ''
-                    outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s-%s%s%s%s%s' % (world.logic[player], world.difficulty[player], world.difficulty_adjustments[player],
+                    outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s_%s-%s%s%s%s%s' % (world.logic[player], world.difficulty[player], world.difficulty_adjustments[player],
                                                                               world.mode[player], world.goal[player],
                                                                               "" if world.timer in ['none', 'display'] else "-" + world.timer,
-                                                                              world.shuffle[player], world.algorithm, mcsb_name,
+                                                                              world.shuffle[player], world.doorShuffle[player], world.algorithm, mcsb_name,
                                                                               "-retro" if world.retro[player] else "",
                                                                               "-prog_" + world.progressive if world.progressive in ['off', 'random'] else "",
                                                                               "-nohints" if not world.hints[player] else "")) if not args.outputname else ''

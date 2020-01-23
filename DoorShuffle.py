@@ -339,14 +339,14 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
         origin_list = list(builder.entrance_list)
         find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, name)
         origin_list_sans_drops = remove_drop_origins(origin_list)
-        if len(origin_list_sans_drops) <= 0 or name == "Turtle Rock" and not validate_tr(name, builder.sectors, origin_list_sans_drops, world, player):
+        if len(origin_list_sans_drops) <= 0 or name == "Turtle Rock" and not validate_tr(builder, origin_list_sans_drops, world, player):
             if last_key == builder.name:
                 raise Exception('Infinte loop detected %s' % builder.name)
             sector_queue.append(builder)
             last_key = builder.name
         else:
             logging.getLogger('').info('Generating dungeon: %s', builder.name)
-            ds = generate_dungeon(name, builder.sectors, origin_list_sans_drops, split_dungeon, world, player)
+            ds = generate_dungeon(builder, origin_list_sans_drops, split_dungeon, world, player)
             find_new_entrances(ds, connections, potentials, enabled_entrances, world, player)
             ds.name = name
             builder.master_sector = ds

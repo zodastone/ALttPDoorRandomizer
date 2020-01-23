@@ -7,7 +7,7 @@ from functools import reduce
 import operator as op
 from typing import List
 
-from BaseClasses import DoorType, Direction, CrystalBarrier, RegionType, Polarity, flooded_keys
+from BaseClasses import DoorType, Direction, CrystalBarrier, RegionType, Polarity, Sector, PolSlot, flooded_keys
 from Regions import key_only_locations, dungeon_events, flooded_keys_reverse
 from Dungeons import dungeon_regions
 
@@ -32,32 +32,73 @@ class GraphPiece:
 
 
 # Turtle Rock shouldn't be generated until the Big Chest entrance is reachable
-def validate_tr(name, available_sectors, entrance_region_names, world, player):
+def validate_tr(builder, entrance_region_names, world, player):
     entrance_regions = convert_regions(entrance_region_names, world, player)
     proposed_map = {}
     doors_to_connect = {}
     all_regions = set()
     bk_needed = False
     bk_special = False
-    for sector in available_sectors:
+    for sector in builder.sectors:
         for door in sector.outstanding_doors:
             doors_to_connect[door.name] = door
         all_regions.update(sector.regions)
         bk_needed = bk_needed or determine_if_bk_needed(sector, False, world, player)
         bk_special = bk_special or check_for_special(sector)
-    dungeon, hangers, hooks = gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map,
+    dungeon, hangers, hooks = gen_dungeon_info(builder.name, builder.sectors, entrance_regions, proposed_map,
                                                doors_to_connect, bk_needed, bk_special, world, player)
     return check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed, False)
 
 
-def generate_dungeon(name, available_sectors, entrance_region_names, split_dungeon, world, player):
+def generate_dungeon(builder, entrance_region_names, split_dungeon, world, player):
+    builder_list = [builder]
+    queue = deque(builder_list)
+    finished_stonewalls = []
+    while len(queue) > 0:
+        builder = queue.popleft()
+        stonewall = check_for_stonewall(builder, finished_stonewalls)
+        if stonewall is not None:
+            dungeon_map = stonewall_dungeon_builder(builder, stonewall, entrance_region_names)
+            builder_list.remove(builder)
+            for sub_builder in dungeon_map.values():
+                builder_list.append(sub_builder)
+                queue.append(sub_builder)
+            finished_stonewalls.append(stonewall)
+    if len(builder_list) == 1:
+        return generate_dungeon_main(builder, entrance_region_names, split_dungeon, world, player)
+    else:
+        sector_list = []
+        for split_builder in builder_list:
+            sector = generate_dungeon_main(split_builder, split_builder.stonewall_entrances, True, world, player)
+            sector_list.append(sector)
+        master_sector = sector_list.pop()
+        for sub_sector in sector_list:
+            master_sector.regions.extend(sub_sector.regions)
+        master_sector.outstanding_doors.clear()
+        master_sector.r_name_set = None
+        for stonewall in finished_stonewalls:
+            if not stonewall_valid(stonewall):
+                raise Exception('Stonewall still reachable from wrong side')
+        return master_sector
+
+
+def check_for_stonewall(builder, finished_stonewalls):
+    for sector in builder.sectors:
+        for door in sector.outstanding_doors:
+            if door.stonewall and door not in finished_stonewalls:
+                return door
+    return None
+
+
+def generate_dungeon_main(builder, entrance_region_names, split_dungeon, world, player):
     logger = logging.getLogger('')
+    name = builder.name
     entrance_regions = convert_regions(entrance_region_names, world, player)
     doors_to_connect = {}
     all_regions = set()
     bk_needed = False
     bk_special = False
-    for sector in available_sectors:
+    for sector in builder.sectors:
         for door in sector.outstanding_doors:
             doors_to_connect[door.name] = door
         all_regions.update(sector.regions)
@@ -78,7 +119,7 @@ def generate_dungeon(name, available_sectors, entrance_region_names, split_dunge
         if itr > 5000:
             raise Exception('Generation taking too long. Ref %s' % name)
         if depth not in dungeon_cache.keys():
-            dungeon, hangers, hooks = gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map,
+            dungeon, hangers, hooks = gen_dungeon_info(name, builder.sectors, entrance_regions, proposed_map,
                                                        doors_to_connect, bk_needed, bk_special, world, player)
             dungeon_cache[depth] = dungeon, hangers, hooks
             valid = check_valid(dungeon, hangers, hooks, proposed_map, doors_to_connect, all_regions, bk_needed, std_flag)
@@ -120,6 +161,7 @@ def generate_dungeon(name, available_sectors, entrance_region_names, split_dunge
         a, b = queue.pop()
         connect_doors(a, b)
         queue.remove((b, a))
+    available_sectors = list(builder.sectors)
     master_sector = available_sectors.pop()
     for sub_sector in available_sectors:
         master_sector.regions.extend(sub_sector.regions)
@@ -150,6 +192,12 @@ def gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map, va
     original_state = extend_reachable_state_improved(entrance_regions, start, proposed_map,
                                                      valid_doors, bk_needed, world, player)
     dungeon['Origin'] = create_graph_piece_from_state(None, original_state, original_state, proposed_map)
+    either_crystal = True  # if all hooks from the origin are either, explore all bits with either
+    for hook, crystal in dungeon['Origin'].hooks.items():
+        if crystal != CrystalBarrier.Either:
+            either_crystal = False
+            break
+    init_crystal = CrystalBarrier.Either if either_crystal else CrystalBarrier.Orange
     hanger_set = set()
     o_state_cache = {}
     for sector in available_sectors:
@@ -157,7 +205,7 @@ def gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map, va
             if not door.stonewall and door not in proposed_map.keys():
                 hanger_set.add(door)
                 parent = door.entrance.parent_region
-                init_state = ExplorationState(dungeon=name)
+                init_state = ExplorationState(init_crystal, dungeon=name)
                 init_state.big_key_special = start.big_key_special
                 o_state = extend_reachable_state_improved([parent], init_state, proposed_map,
                                                           valid_doors, False, world, player)
@@ -197,7 +245,7 @@ def check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_do
         for door in doors_to_check:
             piece = dungeon[door.name]
             for hook, crystal in piece.hooks.items():
-                if crystal == CrystalBarrier.Blue or crystal == CrystalBarrier.Either:
+                if crystal != CrystalBarrier.Orange:
                     h_type = hook_from_door(hook)
                     if h_type not in blue_hooks:
                         new_blues = True
@@ -398,9 +446,6 @@ def cellblock_valid(valid_doors, all_regions, proposed_map):
     return False  # couldn't find an outstanding door or the sanctuary
 
 
-
-
-
 def winnow_hangers(hangers, hooks):
     removal_info = []
     for hanger, door_set in hangers.items():
@@ -420,52 +465,30 @@ def winnow_hangers(hangers, hooks):
         hangers[hanger].remove(door)
 
 
-def stonewalls_valid(valid_doors, proposed_map):
-    stonewall_doors = []
-    for door in valid_doors.values():
-        if door.stonewall:
-            stonewall_doors.append(door)
-    for stonewall in stonewall_doors:
-        if not stonewall_valid(stonewall, valid_doors, proposed_map):
-            return False
+def stonewall_valid(stonewall):
+    bad_door = stonewall.dest
+    if bad_door.blocked:
+        return True  # great we're done with this one
+    loop_region = stonewall.entrance.parent_region
+    start_region = bad_door.entrance.parent_region
+    queue = deque([start_region])
+    visited = {start_region}
+    while len(queue) > 0:
+        region = queue.popleft()
+        if region == loop_region:
+            return False  # guaranteed loop
+        possible_entrances = list(region.entrances)
+        for entrance in possible_entrances:
+            parent = entrance.parent_region
+            if parent.type != RegionType.Dungeon:
+                return False  # you can get stuck from an entrance
+            else:
+                door = entrance.door
+                if door is not None and door != stonewall and not door.blocked and parent not in visited:
+                    visited.add(parent)
+                    queue.append(parent)
+    # we didn't find anything bad
     return True
-
-
-def stonewall_valid(stonewall, valid_doors, proposed_map):
-    if stonewall in proposed_map:
-        bad_entrance = proposed_map[stonewall].entrance
-        if bad_entrance.door.blocked:
-            return True  # great we're done with this one
-        loop_region = stonewall.entrance.parent_region
-        start_region = proposed_map[stonewall].entrance.parent_region
-        queue = deque([start_region])
-        visited = {start_region}
-        while len(queue) > 0:
-            region = queue.popleft()
-            if region == loop_region:
-                return False  # guaranteed loop
-            possible_entrances = list(region.entrances)
-            for d in proposed_map:
-                if d.entrance.parent_region == region:
-                    possible_entrances.append(proposed_map[d].entrance)
-            for entrance in possible_entrances:
-                parent = entrance.parent_region
-                if entrance.name in valid_doors:
-                    door = entrance.door
-                    if not door.blocked and door != stonewall:
-                        if door in proposed_map:
-                            if parent not in visited:
-                                visited.add(parent)
-                                queue.append(parent)
-                else:
-                    if parent.type != RegionType.Dungeon:
-                        return False  # you can get stuck from an entrance
-                    else:
-                        door = entrance.door
-                        if door is not None and not door.blocked and parent not in visited:
-                            visited.add(parent)
-                            queue.append(parent)
-    return True  # we didn't find anything bad
 
 
 def create_graph_piece_from_state(door, o_state, b_state, proposed_map):
@@ -956,7 +979,7 @@ def special_big_key_found(state, world, player):
 def valid_region_to_explore(region, name, world, player):
     if region is None:
         return False
-    return (region.type == RegionType.Dungeon and region.dungeon.name == name) or region.name in world.inaccessible_regions[player]
+    return (region.type == RegionType.Dungeon and region.dungeon.name in name) or region.name in world.inaccessible_regions[player]
 
 
 def get_doors(world, region, player):
@@ -1016,6 +1039,8 @@ class DungeonBuilder(object):
         self.master_sector = None
         self.path_entrances = None  # used for pathing/key doors, I think
 
+        self.stonewall_entrances = []  # used by stonewall system
+
         self.candidates = None
         self.key_doors_num = None
         self.combo_size = None
@@ -1035,7 +1060,7 @@ class DungeonBuilder(object):
 
 
 def simple_dungeon_builder(name, sector_list, world, player):
-    define_sector_features(sector_list, world, player)
+    define_sector_features(sector_list)
     builder = DungeonBuilder(name)
     dummy_pool = dict.fromkeys(sector_list)
     for sector in sector_list:
@@ -1048,7 +1073,7 @@ def create_dungeon_builders(all_sectors, world, player, dungeon_entrances=None):
     logger.info('Shuffling Dungeon Sectors')
     if dungeon_entrances is None:
         dungeon_entrances = default_dungeon_entrances
-    define_sector_features(all_sectors, world, player)
+    define_sector_features(all_sectors)
     candidate_sectors = dict.fromkeys(all_sectors)
 
     dungeon_map = {}
@@ -1102,7 +1127,7 @@ def create_dungeon_builders(all_sectors, world, player, dungeon_entrances=None):
     return dungeon_map
 
 
-def define_sector_features(sectors, world, player):
+def define_sector_features(sectors):
     for sector in sectors:
         if 'Hyrule Dungeon Cellblock' in sector.region_set():
             sector.bk_provided = True
@@ -1119,7 +1144,7 @@ def define_sector_features(sectors, world, player):
                     if '- Big Chest' in loc.name:
                         sector.bk_required = True
             for ext in region.exits:
-                door = world.check_for_door(ext.name, player)
+                door = ext.door
                 if door is not None:
                     if door.crystal == CrystalBarrier.Either:
                         sector.c_switch = True
@@ -1258,17 +1283,43 @@ def identify_polarity_issues(dungeon_map):
                 return x != y
         else:
             def sector_filter(x, y):
-                return x != y and x.outflow() > 1
+                return x != y and x.outflow() > 1  # todo: entrance sector being filtered
+        connection_flags = {}
+        for slot in PolSlot:
+            connection_flags[slot] = {}
+            for slot2 in PolSlot:
+                connection_flags[slot][slot2] = False
         for sector in builder.sectors:
             others = [x for x in builder.sectors if sector_filter(x, sector)]
             other_mag = sum_magnitude(others)
             sector_mag = sector.magnitude()
+            check_flags(sector_mag, connection_flags)
             for i in range(len(sector_mag)):
                 if sector_mag[i] > 0 and other_mag[i] == 0:
                     builder.mag_needed[i] = True
                     if name not in unconnected_builders.keys():
                         unconnected_builders[name] = builder
+        ttl_mag = sum_magnitude(builder.sectors)
+        for slot in PolSlot:
+            for slot2 in PolSlot:
+                if ttl_mag[slot.value] > 0 and ttl_mag[slot2.value] > 0 and not connection_flags[slot][slot2]:
+                    builder.mag_needed[slot.value] = True
+                    builder.mag_needed[slot2.value] = True
+                    if name not in unconnected_builders.keys():
+                        unconnected_builders[name] = builder
     return unconnected_builders
+
+
+def check_flags(sector_mag, connection_flags):
+    for slot in PolSlot:
+        for slot2 in PolSlot:
+            if sector_mag[slot.value] > 0 and sector_mag[slot2.value] > 0:
+                connection_flags[slot][slot2] = True
+                if slot != slot2:
+                    for check_slot in PolSlot:  # transitivity check
+                        if check_slot not in [slot, slot2] and connection_flags[slot2][check_slot]:
+                            connection_flags[slot][check_slot] = True
+                            connection_flags[check_slot][slot] = True
 
 
 def identify_branching_issues(dungeon_map):
@@ -1431,7 +1482,7 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, logger):
             sector = random.choice(candidates)
             assign_sector(sector, builder, polarized_sectors)
             builder.mag_needed = [False, False, False]
-        unconnected_builders = identify_polarity_issues(dungeon_map)
+        unconnected_builders = identify_polarity_issues(unconnected_builders)
 
     # step 2: fix neutrality issues
     builder_order = list(dungeon_map.values())
@@ -1450,13 +1501,16 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, logger):
     while len(problem_builders) > 0:
         for name, builder in problem_builders.items():
             candidates = find_branching_candidates(builder, neutral_choices)
+            # if len(candidates) <= 0:
+            #     problem_builders = {}
+            #     continue
             choice = random.choice(candidates)
             if valid_polarized_assignment(builder, choice):
                 neutral_choices.remove(choice)
                 for sector in choice:
                     assign_sector(sector, builder, polarized_sectors)
             builder.unfulfilled.clear()
-        problem_builders = identify_branching_issues(dungeon_map)
+        problem_builders = identify_branching_issues(problem_builders)
 
     # step 4: assign randomly until gone - must maintain connectedness, neutral polarity
     while len(polarized_sectors) > 0:
@@ -1495,7 +1549,7 @@ def find_neutralizing_candidates(polarity, sector_pool):
         for r in r_range:
             if r > len(main_pool):
                 if len(candidates) == 0:
-                    raise Exception('Cross Dungeon Builder: No possible neutralizers left')
+                    raise NeutralizingException('Cross Dungeon Builder: No possible neutralizers left')
                 else:
                     continue
             last_r = r
@@ -1620,7 +1674,11 @@ def split_dungeon_builder(builder, split_list):
         sub_builder.all_entrances = split_entrances
         for r_name in split_entrances:
             assign_sector(find_sector(r_name, candidate_sectors), sub_builder, candidate_sectors)
+    return balance_split(candidate_sectors, dungeon_map)
 
+
+def balance_split(candidate_sectors, dungeon_map):
+    logger = logging.getLogger('')
     # categorize sectors
     crystal_switches = {}
     crystal_barriers = {}
@@ -1644,12 +1702,147 @@ def split_dungeon_builder(builder, split_list):
     # blue barriers
     assign_crystal_barrier_sectors(dungeon_map, crystal_barriers)
     # polarity:
-    logger.info('-Re-balancing Desert/Skull')
+    logger.info('-Re-balancing ' + next(iter(dungeon_map.keys())) + ' et al')
     assign_polarized_sectors(dungeon_map, polarized_sectors, logger)
     # the rest
     assign_the_rest(dungeon_map, neutral_sectors)
     return dungeon_map
 
+
+def stonewall_dungeon_builder(builder, stonewall, entrance_region_names):
+    logger = logging.getLogger('')
+    logger.info('Stonewall treatment')
+    candidate_sectors = dict.fromkeys(builder.sectors)
+    dungeon_map = {}
+
+    # split stonewall sector
+    region = stonewall.entrance.parent_region
+    sector = find_sector(region.name, candidate_sectors)
+    del candidate_sectors[sector]
+    stonewall_start = Sector()
+    stonewall_connector = Sector()
+    stonewall_start.outstanding_doors.append(stonewall)
+    stonewall_start.regions.append(region)
+    stonewall_connector.outstanding_doors += [x for x in sector.outstanding_doors if x != stonewall]
+    stonewall_connector.regions += [x for x in sector.regions if x != region]
+    define_sector_features([stonewall_connector, stonewall_start])
+    candidate_sectors[stonewall_start] = None
+    candidate_sectors[stonewall_connector] = None
+    stone_builder = create_stone_builder(builder, dungeon_map, region, stonewall_start, candidate_sectors)
+    origin_builder = create_origin_builder(builder, dungeon_map, entrance_region_names, stonewall_connector, candidate_sectors)
+
+    # dependent sector splits
+    dependency_list = []
+    removal = []
+    for sector in candidate_sectors.keys():
+        dependency = split_sector(sector)
+        if dependency is not None:
+            removal.append(sector)
+            dependency_list.append(dependency)
+    for sector in removal:
+        del candidate_sectors[sector]
+    retry_candidates = candidate_sectors.copy()
+    tries = 0
+    while tries < 10:
+        try:
+            # re-assign dependent regions
+            for parent, child in dependency_list:
+                candidate_sectors[parent] = None
+                candidate_sectors[child] = None
+                chosen_builder = random.choice([stone_builder, origin_builder])
+                assign_sector(child, chosen_builder, candidate_sectors)
+                if chosen_builder == stone_builder:
+                    assign_sector(parent, chosen_builder, candidate_sectors)
+            return balance_split(candidate_sectors, dungeon_map)
+        except NeutralizingException:
+            tries += 1
+            candidate_sectors = retry_candidates
+            stone_builder = create_stone_builder(builder, dungeon_map, region, stonewall_start, candidate_sectors)
+            origin_builder = create_origin_builder(builder, dungeon_map, entrance_region_names, stonewall_connector, candidate_sectors)
+
+    raise NeutralizingException('Unable to find a valid combination')
+
+
+def create_origin_builder(builder, dungeon_map, entrance_region_names, stonewall_connector, candidate_sectors):
+    key = builder.name + ' Prewall'
+    dungeon_map[key] = origin_builder = DungeonBuilder(key)
+    origin_builder.stonewall_entrances += entrance_region_names
+    origin_builder.all_entrances = []
+    for ent in builder.all_entrances:
+        sector = find_sector(ent, candidate_sectors)
+        for door in sector.outstanding_doors:
+            if not door.blocked:
+                origin_builder.all_entrances.append(ent)
+                assign_sector(sector, origin_builder, candidate_sectors)
+                break
+    assign_sector(stonewall_connector, origin_builder, candidate_sectors)
+    return origin_builder
+
+
+def create_stone_builder(builder, dungeon_map, region, stonewall_start, candidate_sectors):
+    key = builder.name + ' Stonewall'
+    dungeon_map[key] = stone_builder = DungeonBuilder(key)
+    stone_builder.stonewall_entrances += [region.name]
+    stone_builder.all_entrances = [region.name]
+    assign_sector(stonewall_start, stone_builder, candidate_sectors)
+    return stone_builder
+
+
+def split_sector(sector):
+    entrance_set = set()
+    exit_map = {}
+    visited_regions = {}
+    min_cardinality = None
+    for door in sector.outstanding_doors:
+        reachable_doors = {door}
+        start_region = door.entrance.parent_region
+        visited = {start_region}
+        queue = deque([start_region])
+        while len(queue) > 0:
+            region = queue.popleft()
+            for ext in region.exits:
+                connect = ext.connected_region
+                if connect is not None and connect.type == RegionType.Dungeon and connect not in visited:
+                    visited.add(connect)
+                    queue.append(connect)
+                elif ext.door in sector.outstanding_doors:
+                    reachable_doors.add(ext.door)
+        visited_regions[door] = visited
+        if len(reachable_doors) >= len(sector.outstanding_doors):
+            entrance_set.add(door)
+        else:
+            door_cardinality = len(reachable_doors)
+            if door_cardinality not in exit_map.keys():
+                exit_map[door_cardinality] = set()
+            exit_map[door_cardinality].add(door)
+            if min_cardinality is None or door_cardinality < min_cardinality:
+                min_cardinality = door_cardinality
+    exit_set = set()
+    if min_cardinality is not None:
+        for cardinality, door_set in exit_map.items():
+            if cardinality > min_cardinality:
+                entrance_set.update(door_set)
+        exit_set = exit_map[min_cardinality]
+    if len(entrance_set) > 0 and len(exit_set) > 0:
+        entrance_sector = Sector()
+        exit_sector = Sector()
+        entrance_sector.outstanding_doors.extend(entrance_set)
+        region_set = set()
+        for ent_door in entrance_set:
+            region_set.update(visited_regions[ent_door])
+        entrance_sector.regions.extend(region_set)
+        exit_sector.outstanding_doors.extend(exit_set)
+        region_set = set()
+        for ext_door in exit_set:
+            region_set.update(visited_regions[ext_door])
+        exit_sector.regions.extend(region_set)
+        define_sector_features([entrance_sector, exit_sector])
+        return entrance_sector, exit_sector
+    return None
+
+
+class NeutralizingException(Exception):
+    pass
 
 # common functions - todo: move to a common place
 def kth_combination(k, l, r):

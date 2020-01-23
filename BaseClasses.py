@@ -1084,6 +1084,11 @@ pol_comp = {
     'Mod': lambda x: 0 if x == 0 else 1
 }
 
+@unique
+class PolSlot(Enum):
+    NorthSouth = 0
+    EastWest = 1
+    Stairs = 2
 
 @unique
 class CrystalBarrier(Flag):
