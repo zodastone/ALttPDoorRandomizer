@@ -418,9 +418,8 @@ class CollectionState(object):
         new_regions = True
         reachable_regions_count = len(rrp)
         while new_regions:
-            region_queue = deque([region for region in player_regions if region not in rrp])
-            while len(region_queue) > 0:
-                candidate = region_queue.popleft()
+            player_regions = [region for region in player_regions if region not in rrp]
+            for candidate in player_regions:
                 if candidate.can_reach_private(self):
                     rrp.add(candidate)
                     if candidate.type == RegionType.Dungeon:
@@ -778,7 +777,6 @@ class CollectionState(object):
         if changed:
             if not event:
                 self.sweep_for_events()
-            self.sweep_for_crystal_access()
 
     def remove(self, item):
         if item.advancement:
