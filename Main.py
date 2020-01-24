@@ -215,17 +215,18 @@ def main(args, seed=None):
                                                                               "-nohints" if not world.hints[player] else "")) if not args.outputname else ''
                     rom.write_to_file(output_path(f'{outfilebase}{outfilepname}{outfilesuffix}.sfc'))
 
-        multidata = zlib.compress(json.dumps({"names": parsed_names,
-                                              "roms": rom_names,
-                                              "remote_items": [player for player in range(1, world.players + 1) if world.remote_items[player]],
-                                              "locations": [((location.address, location.player), (location.item.code, location.item.player))
-                                                            for location in world.get_filled_locations() if type(location.address) is int]
-                                              }).encode("utf-8"))
-        if args.jsonout:
-            jsonout["multidata"] = list(multidata)
-        else:
-            with open(output_path('%s_multidata' % outfilebase), 'wb') as f:
-                f.write(multidata)
+        if world.players > 1:
+            multidata = zlib.compress(json.dumps({"names": parsed_names,
+                                                  "roms": rom_names,
+                                                  "remote_items": [player for player in range(1, world.players + 1) if world.remote_items[player]],
+                                                  "locations": [((location.address, location.player), (location.item.code, location.item.player))
+                                                                for location in world.get_filled_locations() if type(location.address) is int]
+                                                  }).encode("utf-8"))
+            if args.jsonout:
+                jsonout["multidata"] = list(multidata)
+            else:
+                with open(output_path('%s_multidata' % outfilebase), 'wb') as f:
+                    f.write(multidata)
 
     if args.create_spoiler and not args.jsonout:
         world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
