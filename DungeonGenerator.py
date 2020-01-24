@@ -1031,7 +1031,7 @@ class DungeonBuilder(object):
         self.c_switch_present = False
         self.dead_ends = 0
         self.branches = 0
-        self.mag_needed = [False, False, False]
+        self.mag_needed = {}
         self.unfulfilled = defaultdict(int)
         self.all_entrances = None  # used for sector segration/branching
         self.entrance_list = None  # used for overworld accessibility
@@ -1294,17 +1294,17 @@ def identify_polarity_issues(dungeon_map):
             other_mag = sum_magnitude(others)
             sector_mag = sector.magnitude()
             check_flags(sector_mag, connection_flags)
-            for i in range(len(sector_mag)):
-                if sector_mag[i] > 0 and other_mag[i] == 0:
-                    builder.mag_needed[i] = True
+            for i in PolSlot:
+                if sector_mag[i.value] > 0 and other_mag[i.value] == 0:
+                    builder.mag_needed[i] = [x for x in PolSlot if other_mag[x.value] > 0]
                     if name not in unconnected_builders.keys():
                         unconnected_builders[name] = builder
         ttl_mag = sum_magnitude(builder.sectors)
         for slot in PolSlot:
             for slot2 in PolSlot:
                 if ttl_mag[slot.value] > 0 and ttl_mag[slot2.value] > 0 and not connection_flags[slot][slot2]:
-                    builder.mag_needed[slot.value] = True
-                    builder.mag_needed[slot2.value] = True
+                    builder.mag_needed[slot] = [slot2]
+                    builder.mag_needed[slot2] = [slot]
                     if name not in unconnected_builders.keys():
                         unconnected_builders[name] = builder
     return unconnected_builders
@@ -1333,7 +1333,7 @@ def identify_branching_issues(dungeon_map):
             is_entrance = is_entrance_sector(builder, sector)
             if is_entrance:
                 for door in sector.outstanding_doors:
-                    dependent_doors = [x for x in sector.outstanding_doors if x != door]
+                    dependent_doors = find_dependent_doors(door, sector)
                     if not door.blocked:
                         entrance_doors[hook_from_door(door)].append((door, dependent_doors))
                     else:
@@ -1344,7 +1344,7 @@ def identify_branching_issues(dungeon_map):
                 other_doors = []
                 one_way_flag = False
                 for door in sector.outstanding_doors:
-                    dependent_doors = [x for x in sector.outstanding_doors if x != door]
+                    dependent_doors = find_dependent_doors(door, sector)
                     if door.blocked or door.dead or (outflow <= 1 and len(dependent_doors) == 0):
                         unsatisfied_doors[hook_from_door(door)].append((door, dependent_doors))
                         one_way_flag = True
@@ -1373,17 +1373,60 @@ def identify_branching_issues(dungeon_map):
                     builder.unfulfilled[hook] += len(door_list)
                 satisfied = True
                 continue
-            used_doors.add(candidate)
-            used_doors.add(match_maker)
-            if candidate_is_unsated and len(match_deps) == 1:
-                for door in match_deps:
-                    door_list = multi_purpose[hook_from_door(door)]
-                    pair = find_door_in_list(door, door_list)
-                    if pair[0] is not None:
-                        door_list.remove(pair)
-                        unsatisfied_doors[hook_from_door(door)].append((pair))
+            used_doors.add((candidate, match_maker))
+            # used_doors.add(match_maker)
+            cull_dependents(match_deps, match_list, match_maker, unsatisfied_doors)
+            if not candidate_is_unsated:
+                cull_dependents(dep_list, match_list, candidate, unsatisfied_doors)
             satisfied = is_satisfied([unsatisfied_doors, entrance_doors, satisfying_doors, multi_purpose])
     return unconnected_builders
+
+
+def find_dependent_doors(door, sector):
+    dependent_doors = []
+    start_region = door.entrance.parent_region
+    visited = {start_region}
+    queue = deque([start_region])
+    found_events = set()
+    event_doors = set()
+    while len(queue) > 0:
+        region = queue.popleft()
+        for loc in region.locations:
+            if loc.name in dungeon_events:
+                found_events.add(loc.name)
+                for d in event_doors:
+                    next = d.entrance.parent_region
+                    if d.req_event in found_events and next not in visited and next.type == RegionType.Dungeon:
+                        visited.add(next)
+                        queue.append(next)
+        for ext in region.exits:
+            d = ext.door
+            if d is not None and d is not door and d in sector.outstanding_doors:
+                dependent_doors.append(d)
+        for ent in region.entrances:
+            next = ent.parent_region
+            d = ent.door
+            if d is not None:
+                if d.req_event is not None and d.req_event not in found_events:
+                    event_doors.add(d)
+                elif next.type == RegionType.Dungeon and next not in visited:
+                    visited.add(next)
+                    queue.append(next)
+    return dependent_doors
+
+
+def cull_dependents(dep_list, lists_to_cull, cullee, unsatisfied_doors):
+    for door in dep_list:
+        for list_to_cull in lists_to_cull:
+            door_list = list_to_cull[hook_from_door(door)]
+            pair = find_door_in_list(door, door_list)
+            if pair[0] is not None:
+                match_dep, rev_deps = pair
+                if cullee in rev_deps:
+                    rev_deps.remove(cullee)
+                if len(rev_deps) < 1:
+                    door_list.remove(pair)
+                    unsatisfied_doors[hook_from_door(door)].append(pair)
 
 
 def is_entrance_sector(builder, sector):
@@ -1425,7 +1468,7 @@ def find_candidate_match(candidate, dep_list, check_deps, door_dict_list):
         door_list = door_dict[dir]
         pair = None
         for match, match_deps in door_list:
-            if not check_deps or match not in dep_list:
+            if not check_deps or (match not in dep_list and candidate not in match_deps):
                 pair = match, match_deps
                 break
             elif len(filter_match_deps(candidate, match_deps)) > 0:
@@ -1481,7 +1524,7 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, logger):
                 raise Exception('Cross Dungeon Builder: Cannot find a candidate for connectedness - restart?')
             sector = random.choice(candidates)
             assign_sector(sector, builder, polarized_sectors)
-            builder.mag_needed = [False, False, False]
+            builder.mag_needed = {}
         unconnected_builders = identify_polarity_issues(unconnected_builders)
 
     # step 2: fix neutrality issues
@@ -1529,10 +1572,12 @@ def find_connection_candidates(mag_needed, sector_pool):
             continue
         mag = sector.magnitude()
         matches = False
-        for i, need in enumerate(mag_needed):
-            if need and mag[i] > 0:
-                matches = True
-                break
+        for slot, match_slot in mag_needed.items():
+            if mag[slot.value] > 0:
+                for i in PolSlot:
+                    if i in match_slot and mag[i.value] > 0:
+                        matches = True
+                        break
         if matches:
             candidates.append(sector)
     return candidates
