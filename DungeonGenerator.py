@@ -1278,12 +1278,12 @@ def identify_polarity_issues(dungeon_map):
     for name, builder in dungeon_map.items():
         if len(builder.sectors) == 1:
             continue
-        if len(builder.sectors) == 2:
-            def sector_filter(x, y):
-                return x != y
         else:
             def sector_filter(x, y):
-                return x != y and x.outflow() > 1  # todo: entrance sector being filtered
+                return x != y
+        # else:
+        #     def sector_filter(x, y):
+        #         return x != y and (x.outflow() > 1 or is_entrance_sector(builder, x))
         connection_flags = {}
         for slot in PolSlot:
             connection_flags[slot] = {}
@@ -1770,11 +1770,14 @@ def create_origin_builder(builder, dungeon_map, entrance_region_names, stonewall
     origin_builder.all_entrances = []
     for ent in builder.all_entrances:
         sector = find_sector(ent, candidate_sectors)
-        for door in sector.outstanding_doors:
-            if not door.blocked:
-                origin_builder.all_entrances.append(ent)
-                assign_sector(sector, origin_builder, candidate_sectors)
-                break
+        if sector is not None:
+            for door in sector.outstanding_doors:
+                if not door.blocked:
+                    origin_builder.all_entrances.append(ent)
+                    assign_sector(sector, origin_builder, candidate_sectors)
+                    break
+        else:  # already got assigned
+            origin_builder.all_entrances.append(ent)
     assign_sector(stonewall_connector, origin_builder, candidate_sectors)
     return origin_builder
 

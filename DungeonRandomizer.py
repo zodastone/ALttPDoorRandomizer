@@ -346,7 +346,7 @@ def start():
         from Gui import guiMain
         guiMain(args)
     elif args.count is not None:
-        seed = args.seed
+        seed = args.seed or random.randint(0, 999999999)
         failures = []
         logger = logging.getLogger('')
         for _ in range(args.count):
