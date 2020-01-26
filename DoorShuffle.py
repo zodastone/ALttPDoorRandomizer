@@ -55,6 +55,9 @@ def link_doors(world, player):
         cross_dungeon(world, player)
     elif world.doorShuffle[player] == 'experimental':
         experiment(world, player)
+    else:
+        logging.getLogger('').error('Invalid door shuffle setting: %s' % world.doorShuffle[player])
+        raise Exception('Invalid door shuffle setting: %s' % world.doorShuffle[player])
 
     if world.doorShuffle[player] != 'vanilla':
         create_door_spoiler(world, player)
