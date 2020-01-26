@@ -557,7 +557,7 @@ def patch_rom(world, rom, player, team, enemized):
                     # todo fix screen scrolling
 
                     if world.shuffle[player] not in ['insanity', 'insanity_legacy', 'madness_legacy'] and \
-                            exit.name in ['Eastern Palace Exit', 'Tower of Hera Exit', 'Thieves Town Exit', 'Skull Woods Final Section Exit', 'Ice Palace Exit', 'Misery Mire Exit',
+                            exit.name in ['Eastern Palace Exit', 'Tower of Hera Exit', 'Thieves Town Exit', 'Ice Palace Exit', 'Misery Mire Exit',
                                           'Palace of Darkness Exit', 'Swamp Palace Exit', 'Ganons Tower Exit', 'Desert Palace Exit (North)', 'Agahnims Tower Exit', 'Spiral Cave Exit (Top)',
                                           'Superbunny Cave Exit (Bottom)', 'Turtle Rock Ledge Exit (East)']:
                         # For exits that connot be reached from another, no need to apply offset fixes.
@@ -608,16 +608,10 @@ def patch_rom(world, rom, player, team, enemized):
     for paired_door in world.paired_doors[player]:
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
         rom.write_bytes(paired_door.address_b(world, player), paired_door.rom_data_b(world, player))
-    if world.fix_skullwoods_exit and world.shuffle in ['vanilla', 'simple', 'restricted', 'dungeonssimple']:
-        connect = world.get_entrance('Skull Woods Final Section', player).connected_region
-        exit_name = None
-        for ext in connect.exits:
-            if ext.connected_region.name == 'Skull Woods Forest (West)':
-                exit_name = ext.name
-                break
-        if exit_name is not None and exit_name == 'Skull Woods Final Section Exit':
-            rom.write_int16(0x15DB5 + 2 * exit_ids['Skull Woods Final Section Exit'][1], 0x00F8)
-    # todo: fix other exits if ER enabled and similar situation happens
+
+    # fix skull woods exit, if not fixed during exit patching
+    if world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla':
+        write_int16(rom, 0x15DB5 + 2 * exit_ids['Skull Woods Final Section Exit'][1], 0x00F8)
 
     write_custom_shops(rom, world, player)
 
