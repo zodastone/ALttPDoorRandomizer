@@ -450,17 +450,17 @@ class CollectionState(object):
                                         blocked.add(entrance.parent_region)
                             if color_type:
                                 ccr[candidate] = color_type
-                            for ext in candidate.exits:
-                                connect = ext.connected_region
-                                if connect in rrp and connect in ccr:
-                                    door = self.world.check_for_door(ext.name, player)
-                                    if door is not None and not door.blocked:
-                                        if ext.can_reach(self):
-                                            new_color = ccr[connect] | (ccr[candidate] & (door.crystal or CrystalBarrier.Either))
-                                            if new_color != ccr[connect]:
-                                                self.spread_crystal_access(candidate, new_color, rrp, ccr, player)
-                                        else:
-                                            blocked.add(candidate)
+                                for ext in candidate.exits:
+                                    connect = ext.connected_region
+                                    if connect in rrp and connect in ccr:
+                                        door = self.world.check_for_door(ext.name, player)
+                                        if door is not None and not door.blocked:
+                                            if ext.can_reach(self):
+                                                new_color = ccr[connect] | (ccr[candidate] & (door.crystal or CrystalBarrier.Either))
+                                                if new_color != ccr[connect]:
+                                                    self.spread_crystal_access(candidate, new_color, rrp, ccr, player)
+                                            else:
+                                                blocked.add(candidate)
             new_regions = len(rrp) > reachable_regions_count
             reachable_regions_count = len(rrp)
 
