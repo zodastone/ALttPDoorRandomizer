@@ -217,6 +217,7 @@ def global_rules(world, player):
     set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Prize', player))
 
     # blind can't have the small key? - not necessarily true anymore - but likely still
+    set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: state.has('Hammer', player))
     for entrance in ['Thieves Basement Block Path', 'Thieves Blocked Entry Path', 'Thieves Conveyor Block Path', 'Thieves Conveyor Bridge Block Path']:
         set_rule(world.get_entrance(entrance, player), lambda state: state.can_lift_rocks(player))
     for location in ['Thieves\' Town - Blind\'s Cell', 'Thieves\' Town - Boss']:
