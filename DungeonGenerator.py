@@ -1031,6 +1031,10 @@ class DungeonBuilder(object):
         self.c_switch_present = False
         self.dead_ends = 0
         self.branches = 0
+        self.total_conn_lack = 0
+        self.conn_needed = defaultdict(int)
+        self.conn_supplied = defaultdict(int)
+        self.conn_balance = defaultdict(int)
         self.mag_needed = {}
         self.unfulfilled = defaultdict(int)
         self.all_entrances = None  # used for sector segration/branching
@@ -1170,10 +1174,18 @@ def assign_sector(sector, dungeon, candidate_sectors):
             dungeon.bk_required = True
         if sector.bk_provided:
             dungeon.bk_provided = True
-        if sector.outflow() == 1:
+        for door in sector.outstanding_doors:
+            # todo: destination sectors like skull 2 west should be
+            if (door.blocked or door.dead or sector.adj_outflow() <= 1) and not sector.is_entrance_sector():
+                dungeon.conn_needed[hook_from_door(door)] += 1
+            # todo: stonewall
+            else:  # todo: dungeons that need connections... skull, tr, hc, desert (when edges are done)
+                dungeon.conn_supplied[hanger_from_door(door)] += 1
+        factor = sector.branching_factor()
+        if factor <= 1:
             dungeon.dead_ends += 1
-        if sector.outflow() > 2:
-            dungeon.branches += sector.outflow() - 2
+        if factor > 2:
+            dungeon.branches += factor - 2
 
 
 def find_sector(r_name, sectors):
@@ -1322,64 +1334,110 @@ def check_flags(sector_mag, connection_flags):
                             connection_flags[check_slot][slot] = True
 
 
+class DoorInfo:
+
+    def __init__(self, dependents, entrance_flag):
+        self.dependents = dependents
+        self.original = dependents.copy()
+        self.entrance_flag = entrance_flag
+
+
+def identify_simple_branching_issues(dungeon_map):
+    problem_builders = {}
+    for name, builder in dungeon_map.items():
+        if name == 'Skull Woods 2':  # i dislike this special case
+            builder.conn_supplied[Hook.West] += 1
+            builder.conn_needed[Hook.East] -= 1
+        if builder.dead_ends > builder.branches + 1:  # todo: if entrances need to link like skull 2 then this is reduced for each linkage necessary
+            problem_builders[name] = builder
+        for h_type in Hook:
+            lack = builder.conn_balance[h_type] = builder.conn_supplied[h_type] - builder.conn_needed[h_type]
+            if lack < 0:
+                builder.total_conn_lack += -lack
+                problem_builders[name] = builder
+    return problem_builders
+
+
 def identify_branching_issues(dungeon_map):
     unconnected_builders = {}
     for name, builder in dungeon_map.items():
-        unsatisfied_doors = defaultdict(list)
-        satisfying_doors = defaultdict(list)
-        entrance_doors = defaultdict(list)
-        multi_purpose = defaultdict(list)
+        unsatisfied_doors = defaultdict(dict)
+        satisfying_doors = defaultdict(dict)
+        entrance_doors = defaultdict(dict)
+        multi_purpose = defaultdict(dict)
+        impossible_doors = defaultdict(list)
         for sector in builder.sectors:
             is_entrance = is_entrance_sector(builder, sector)
             if is_entrance:
+                other_doors = {}
+                one_way_flag = False
                 for door in sector.outstanding_doors:
-                    dependent_doors = find_dependent_doors(door, sector)
-                    if not door.blocked:
-                        entrance_doors[hook_from_door(door)].append((door, dependent_doors))
+                    door_info = find_dependent_doors(door, sector)
+                    if door_info.entrance_flag:
+                        get_dict(entrance_doors, door)[door] = door_info
+                    elif door.blocked or door.dead or len(door_info.dependents) == 0:
+                        get_dict(unsatisfied_doors, door)[door] = door_info
+                        one_way_flag = True
                     else:
-                        unsatisfied_doors[hook_from_door(door)].append((door, dependent_doors))
+                        other_doors[door] = door_info
+                if not one_way_flag:
+                    for door, info in other_doors.items():
+                        get_dict(multi_purpose, door)[door] = info
+                else:
+                    for door, info in other_doors.items():
+                        get_dict(satisfying_doors, door)[door] = info
             else:
                 outflow = sector.outflow()
                 outflow -= len([x for x in sector.outstanding_doors if x.dead])
-                other_doors = []
+                other_doors = {}
                 one_way_flag = False
                 for door in sector.outstanding_doors:
-                    dependent_doors = find_dependent_doors(door, sector)
-                    if door.blocked or door.dead or (outflow <= 1 and len(dependent_doors) == 0):
-                        unsatisfied_doors[hook_from_door(door)].append((door, dependent_doors))
+                    door_info = find_dependent_doors(door, sector)
+                    if door.blocked or door.dead or (outflow <= 1 and len(door_info.dependents) == 0):
+                        get_dict(unsatisfied_doors, door)[door] = door_info
                         one_way_flag = True
                     else:
-                        other_doors.append((door, dependent_doors))
+                        other_doors[door] = door_info
                 if not one_way_flag and outflow >= 2:
-                    for door, deps in other_doors:
-                        multi_purpose[hook_from_door(door)].append((door, deps))
+                    for door, info in other_doors.items():
+                        get_dict(multi_purpose, door)[door] = info
                 elif one_way_flag or outflow <= 1:
-                    for door, deps in other_doors:
-                        satisfying_doors[hook_from_door(door)].append((door, deps))
-        used_doors = set()
+                    for door, info in other_doors.items():
+                        get_dict(satisfying_doors, door)[door] = info
+        used_doors = []
         satisfied = is_satisfied([unsatisfied_doors, entrance_doors, satisfying_doors, multi_purpose])
         while not satisfied:
             candidate_is_unsated = True
-            candidate, dep_list = choose_candidate([unsatisfied_doors])
+            candidate, info = choose_candidate([unsatisfied_doors], builder)
             if candidate is None:
                 candidate_is_unsated = False
-                candidate, dep_list = choose_candidate([multi_purpose, satisfying_doors, entrance_doors])  # consider satifying doors here?
+                candidate, info = choose_candidate([multi_purpose, satisfying_doors, entrance_doors], builder)
             match_list = [satisfying_doors, multi_purpose, entrance_doors]
-            match_maker, match_deps = find_candidate_match(candidate, dep_list, candidate_is_unsated, match_list)
+            # todo: this can pick a bad one - even though the dungeon is fine
+            match_maker, match_info = find_candidate_match(candidate, info, candidate_is_unsated, match_list)
             if match_maker is None:
-                unconnected_builders[name] = builder
-                builder.unfulfilled[hook_from_door(candidate)] += 1
-                for hook, door_list in unsatisfied_doors.items():
-                    builder.unfulfilled[hook] += len(door_list)
-                satisfied = True
-                continue
-            used_doors.add((candidate, match_maker))
-            # used_doors.add(match_maker)
-            cull_dependents(match_deps, match_list, match_maker, unsatisfied_doors)
-            if not candidate_is_unsated:
-                cull_dependents(dep_list, match_list, candidate, unsatisfied_doors)
+                impossible_doors[hook_from_door(candidate)].append(candidate)
+            else:
+                used_doors.append((candidate, match_maker))
+                update_dependents(candidate, match_maker, match_list, info, match_info, unsatisfied_doors)
+                cull_dependents(match_info, match_list, match_maker, info, unsatisfied_doors)
+                cull_dependents(info, match_list, candidate, match_info, unsatisfied_doors)
+
+                if branches_in_trouble(match_list):
+                    impossible_doors[hook_from_door(candidate)].append(candidate)
+                    impossible_doors[hook_from_door(match_maker)].append(match_maker)
+                    satisfied = True  # early break out
+                    continue
             satisfied = is_satisfied([unsatisfied_doors, entrance_doors, satisfying_doors, multi_purpose])
+        if len(impossible_doors) > 0:
+            unconnected_builders[name] = builder
+            for hook, door_list in impossible_doors.items():
+                builder.unfulfilled[hook] += len(door_list)
     return unconnected_builders
+
+
+def get_dict(m_dict, key) -> dict:
+    return m_dict[hook_from_door(key)]
 
 
 def find_dependent_doors(door, sector):
@@ -1387,46 +1445,92 @@ def find_dependent_doors(door, sector):
     start_region = door.entrance.parent_region
     visited = {start_region}
     queue = deque([start_region])
+    if len(door.dependents) > 0:
+        for dep_door in door.dependents:
+            next_region = dep_door.entrance.parent_region
+            visited.add(next_region)
+            queue.append(next_region)
     found_events = set()
     event_doors = set()
+    entrance_flag = False
     while len(queue) > 0:
         region = queue.popleft()
         for loc in region.locations:
             if loc.name in dungeon_events:
                 found_events.add(loc.name)
-                for d in event_doors:
-                    next = d.entrance.parent_region
-                    if d.req_event in found_events and next not in visited and next.type == RegionType.Dungeon:
-                        visited.add(next)
-                        queue.append(next)
         for ext in region.exits:
             d = ext.door
             if d is not None and d is not door and d in sector.outstanding_doors:
                 dependent_doors.append(d)
+            if d is not None and len(d.dependents) > 0:
+                for dep_door in d.dependents:
+                    next_region = dep_door.entrance.parent_region
+                    if next_region not in visited:
+                        visited.add(next_region)
+                        queue.append(next_region)
         for ent in region.entrances:
             next = ent.parent_region
             d = ent.door
             if d is not None:
-                if d.req_event is not None and d.req_event not in found_events:
+                if d.req_event is not None:
                     event_doors.add(d)
                 elif next.type == RegionType.Dungeon and next not in visited:
                     visited.add(next)
                     queue.append(next)
-    return dependent_doors
+            if not door.blocked and (next.type in [RegionType.LightWorld, RegionType.DarkWorld] or next.name == 'Sewer Drop'):
+                entrance_flag = True
+        if len(queue) == 0:
+            for d in event_doors:
+                next = d.entrance.parent_region
+                if d.req_event not in found_events and next not in visited and next.type == RegionType.Dungeon:
+                    visited.add(next)
+                    queue.append(next)
+    return DoorInfo(dependent_doors, entrance_flag)
 
 
-def cull_dependents(dep_list, lists_to_cull, cullee, unsatisfied_doors):
-    for door in dep_list:
+def cull_dependents(info, lists_to_cull, door_to_cull, match_info, unsatisfied_doors):
+    for door in info.dependents:
         for list_to_cull in lists_to_cull:
             door_list = list_to_cull[hook_from_door(door)]
-            pair = find_door_in_list(door, door_list)
-            if pair[0] is not None:
-                match_dep, rev_deps = pair
-                if cullee in rev_deps:
-                    rev_deps.remove(cullee)
-                if len(rev_deps) < 1:
-                    door_list.remove(pair)
-                    unsatisfied_doors[hook_from_door(door)].append(pair)
+            match_dep, rev_info = find_door_in_list(door, door_list)
+            if match_dep is not None:
+                if match_info.entrance_flag:
+                    door_list[match_dep].entrance_flag = True
+                    # todo: this may need to propagate via used_doors
+                if door_to_cull in rev_info.dependents:
+                    rev_info.dependents = [x for x in rev_info.dependents if x != door_to_cull]
+                if len(rev_info.dependents) < 1 and not rev_info.entrance_flag:
+                    del door_list[match_dep]
+                    unsatisfied_doors[hook_from_door(door)][match_dep] = rev_info
+
+
+def update_dependents(candidate, match_maker, match_list, cand_info, match_info, candidate_is_unsated):
+    for match_map in match_list:
+        for h_type, sub_map in match_map.items():
+            for door, info in sub_map.items():
+                if candidate in info.dependents:
+                    info.dependents = [x for x in info.dependents if x != candidate]
+                    info.dependents = list(set().union(info.dependents, match_info.dependents))
+                    if match_info.entrance_flag:
+                        info.entrance_flag = True
+                if match_maker in info.dependents:
+                    info.dependents = [x for x in info.dependents if x != match_maker]
+                    info.dependents = list(set().union(info.dependents, cand_info.dependents))
+                    if cand_info.entrance_flag:
+                        info.entrance_flag = True
+
+
+def propagate_flag(match_list, used_doors):
+    pass
+
+
+def branches_in_trouble(match_list):
+    for match_map in match_list:
+        for h_type, sub_map in match_map.items():
+            for door, info in sub_map.items():
+                if info.entrance_flag:
+                    return False
+    return not is_satisfied(match_list)  # could find no more entrance flags - so hopefully we are done
 
 
 def is_entrance_sector(builder, sector):
@@ -1445,49 +1549,64 @@ def is_satisfied(door_dict_list):
     return True
 
 
-def choose_candidate(door_dict_list):
+def choose_candidate(door_dict_list, builder):
     for door_dict in door_dict_list:
-        min_len = None
+        min_constraint = None
         candidate_list = None
         for dir, door_list in door_dict.items():
-            curr_len = len(door_list)
-            if curr_len > 0 and (min_len is None or curr_len < min_len):
+            curr_constaint = builder.conn_supplied[dir] - builder.conn_needed[dir]
+            if curr_constaint == 0:
+                curr_constaint = -builder.conn_needed[dir]
+            if len(door_list) > 0 and (min_constraint is None or curr_constaint < min_constraint):
                 candidate_list = door_list
-                min_len = curr_len
-        if min_len is not None:
-            candidate, dep_list = candidate_list.pop()
-            return candidate, dep_list
+                min_constraint = curr_constaint
+        if min_constraint is not None:
+            candidate, info = next(iter(candidate_list.items()))
+            del candidate_list[candidate]
+            return candidate, info
     return None, None
 
 
-def find_candidate_match(candidate, dep_list, check_deps, door_dict_list):
+def find_candidate_match(candidate, info, check_deps, door_dict_list):
     dir = hanger_from_door(candidate)
     backup_pair = None
     backup_list = None
     for door_dict in door_dict_list:
         door_list = door_dict[dir]
-        pair = None
-        for match, match_deps in door_list:
-            if not check_deps or (match not in dep_list and candidate not in match_deps):
-                pair = match, match_deps
-                break
-            elif len(filter_match_deps(candidate, match_deps)) > 0:
-                backup_pair = match, match_deps
+        pair_list = []
+        for match, match_info in door_list.items():
+            if not check_deps or (match not in info.dependents and candidate not in match_info.dependents):
+                pair_list.append((match, match_info))
+            elif len(filter_match_deps(candidate, match_info.dependents)) > 0:
+                backup_pair = match, match_info
                 backup_list = door_list
-        if pair is not None:
-            door_list.remove(pair)
+        if len(pair_list) > 0:
+            pair = pick_most_dependent(pair_list)
+            del door_list[pair[0]]
             return pair
     if backup_pair is not None:
-        backup_list.remove(backup_pair)
-        logging.getLogger('').debug('Matching %s to %s unsure if safe', candidate, backup_pair[0])
+        del backup_list[backup_pair[0]]
+        if not backup_pair[1].entrance_flag and len(backup_pair[1].dependents) <= 1:
+            logging.getLogger('').debug('Matching %s to %s unsure if safe', candidate, backup_pair[0])
         return backup_pair
     return None, None
 
 
+def pick_most_dependent(pair_list):
+    most_dependents = None
+    chosen_pair = None
+    for pair in pair_list:
+        num_dependents = len(pair[1].dependents)
+        if most_dependents is None or num_dependents > most_dependents:
+            most_dependents = num_dependents
+            chosen_pair = pair
+    return chosen_pair
+
+
 def find_door_in_list(door, door_list):
-    for d, deps in door_list:
+    for d, info in door_list.items():
         if d == door:
-            return d, deps
+            return d, info
     return None, None
 
 
@@ -1527,18 +1646,31 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, logger):
             builder.mag_needed = {}
         unconnected_builders = identify_polarity_issues(unconnected_builders)
 
-    # step 2: fix neutrality issues
+    # step 2: fix dead ends
+    problem_builders = identify_simple_branching_issues(dungeon_map)
+    while len(problem_builders) > 0:
+        for name, builder in problem_builders.items():
+            candidates, charges = find_simple_branching_candidates(builder, polarized_sectors)
+            # todo: could use the smaller charges as weights to help pre-balance
+            choice = random.choice(candidates)
+            if valid_connected_assignment(builder, [choice]):
+                assign_sector(choice, builder, polarized_sectors)
+            builder.total_conn_lack = 0
+            builder.conn_balance.clear()
+        problem_builders = identify_simple_branching_issues(problem_builders)
+
+    # step 3: fix neutrality issues
     builder_order = list(dungeon_map.values())
     random.shuffle(builder_order)
     for builder in builder_order:
         logger.info('--Balancing %s', builder.name)
         while not builder.polarity().is_neutral():
-            candidates = find_neutralizing_candidates(builder.polarity(), polarized_sectors)
+            candidates = find_neutralizing_candidates(builder, polarized_sectors)
             sectors = random.choice(candidates)
             for sector in sectors:
                 assign_sector(sector, builder, polarized_sectors)
 
-    # step 3: fix dead ends
+    # step 4: fix dead ends again
     problem_builders = identify_branching_issues(dungeon_map)
     neutral_choices: List[List] = neutralize_the_rest(polarized_sectors)
     while len(problem_builders) > 0:
@@ -1555,7 +1687,7 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, logger):
             builder.unfulfilled.clear()
         problem_builders = identify_branching_issues(problem_builders)
 
-    # step 4: assign randomly until gone - must maintain connectedness, neutral polarity
+    # step 5: assign randomly until gone - must maintain connectedness, neutral polarity, branching, lack, etc.
     while len(polarized_sectors) > 0:
         choices = random.choices(list(dungeon_map.keys()), k=len(neutral_choices))
         for i, choice in enumerate(choices):
@@ -1583,7 +1715,46 @@ def find_connection_candidates(mag_needed, sector_pool):
     return candidates
 
 
-def find_neutralizing_candidates(polarity, sector_pool):
+def find_simple_branching_candidates(builder, sector_pool):
+    candidates = defaultdict(list)
+    charges = defaultdict(list)
+    outflow_needed = builder.dead_ends > builder.branches + 1
+    original_lack = builder.total_conn_lack
+    best_lack = original_lack
+    for sector in sector_pool:
+        if outflow_needed and sector.branching_factor() <= 2:
+            continue
+        calc_sector_balance(sector)
+        ttl_lack = 0
+        for hook in Hook:
+            lack = builder.conn_balance[hook] + sector.conn_balance[hook]
+            if lack < 0:
+                ttl_lack += -lack
+        if ttl_lack < original_lack or original_lack >= 0:
+            candidates[ttl_lack].append(sector)
+            charges[ttl_lack].append((builder.polarity()+sector.polarity()).charge())
+            if ttl_lack < best_lack:
+                best_lack = ttl_lack
+    if best_lack == original_lack and not outflow_needed:
+        raise Exception('These candidates may not help at all')
+    if len(candidates[best_lack]) <= 0:
+        raise Exception('Nothing can fix the simple branching issue. Panic ensues.')
+    return candidates[best_lack], charges[best_lack]
+
+
+def calc_sector_balance(sector):  # move to base class?
+    if sector.conn_balance is None:
+        sector.conn_balance = defaultdict(int)
+        for door in sector.outstanding_doors:
+            if door.blocked or door.dead or sector.adj_outflow() <= 1:
+                sector.conn_balance[hook_from_door(door)] -= 1
+            # todo: stonewall - not a great candidate anyway yet
+            else:
+                sector.conn_balance[hanger_from_door(door)] += 1
+
+
+def find_neutralizing_candidates(builder, sector_pool):
+    polarity = builder.polarity()
     candidates = defaultdict(list)
     original_charge = polarity.charge()
     best_charge = original_charge
@@ -1606,17 +1777,53 @@ def find_neutralizing_candidates(polarity, sector_pool):
                     candidates[p_charge].append(choice)
                     if p_charge < best_charge:
                         best_charge = p_charge
-    candidate_list = candidates[best_charge]
-    best_len = 10
+
     official_cand = []
-    for cand in candidate_list:
+    while len(official_cand) == 0:
+        if len(candidates.keys()) == 0:
+            raise NeutralizingException('Cross Dungeon Builder: Weeded out all candidates')
+        while best_charge not in candidates.keys():
+            best_charge += 1
+        candidate_list = candidates.pop(best_charge)
+        best_lack = None
+        for cand in candidate_list:
+            ttl_deads = 0
+            ttl_branches = 0
+            for sector in cand:
+                calc_sector_balance(sector)
+                factor = sector.branching_factor()
+                if factor <= 1:
+                    ttl_deads += 1
+                elif factor > 2:
+                    ttl_branches += factor - 2
+            ttl_lack = 0
+            ttl_balance = 0
+            for hook in Hook:
+                bal = 0
+                for sector in cand:
+                    bal += sector.conn_balance[hook]
+                lack = builder.conn_balance[hook] + bal
+                ttl_balance += lack
+                if lack < 0:
+                    ttl_lack += -lack
+            if ttl_balance >= 0 and builder.dead_ends + ttl_deads <= builder.branches + ttl_branches + 1:  # todo: calc for different entrances
+                if best_lack is None or ttl_lack < best_lack:
+                    best_lack = ttl_lack
+                    official_cand = [cand]
+                elif ttl_lack == best_lack:
+                    official_cand.append(cand)
+
+    # choose from among those that use less
+    best_len = None
+    cand_len = []
+    for cand in official_cand:
         size = len(cand)
-        if size < best_len:
+        if best_len is None or size < best_len:
             best_len = size
-            official_cand = [cand]
+            cand_len = [cand]
         elif size == best_len:
-            official_cand.append(cand)
-    return official_cand
+            cand_len.append(cand)
+    return cand_len
 
 
 def find_branching_candidates(builder, neutral_choices):
@@ -1673,7 +1880,7 @@ def neutralize_the_rest(sector_pool):
     return neutral_choices
 
 
-def valid_polarized_assignment(builder, sector_list):
+def valid_connected_assignment(builder, sector_list):
     full_list = sector_list + builder.sectors
     for sector in full_list:
         others = [x for x in full_list if x != sector]
@@ -1685,6 +1892,12 @@ def valid_polarized_assignment(builder, sector_list):
                 hookable = True
         if not hookable:
             return False
+    return True
+
+
+def valid_polarized_assignment(builder, sector_list):
+    if not valid_connected_assignment(builder, sector_list):
+        return False
     # dead_ends = 0
     # branches = 0
     # for sector in sector_list:
@@ -1801,7 +2014,9 @@ def stonewall_dungeon_builder(builder, stonewall, entrance_region_names):
             return balance_split(candidate_sectors, dungeon_map)
         except NeutralizingException:
             tries += 1
-            candidate_sectors = retry_candidates
+            candidate_sectors = retry_candidates.copy()
+            candidate_sectors[stonewall_start] = None
+            candidate_sectors[stonewall_connector] = None
             stone_builder = create_stone_builder(builder, dungeon_map, region, stonewall_start, candidate_sectors)
             origin_builder = create_origin_builder(builder, dungeon_map, entrance_region_names, stonewall_connector, candidate_sectors)
 
@@ -1891,6 +2106,7 @@ def split_sector(sector):
 
 class NeutralizingException(Exception):
     pass
+
 
 # common functions - todo: move to a common place
 def kth_combination(k, l, r):

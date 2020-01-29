@@ -1240,6 +1240,9 @@ class Sector(object):
         self.blue_barrier = False
         self.bk_required = False
         self.bk_provided = False
+        self.conn_balance = None
+        self.branch_factor = None
+        self.entrance_sector = None
 
     def region_set(self):
         if self.r_name_set is None:
@@ -1273,6 +1276,26 @@ class Sector(object):
             if not door.blocked and not door.dead:
                 outflow = outflow + 1
         return outflow
+
+    def branching_factor(self):
+        if self.branch_factor is None:
+            self.branch_factor = len(self.outstanding_doors)
+            for region in self.regions:
+                for ent in region.entrances:
+                    if ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld]:
+                        # same sector as another entrance
+                        if region.name not in ['Skull Pot Circle', 'Skull Back Drop', 'Desert East Lobby', 'Desert West Lobby']:
+                            self.branch_factor += 1
+        return self.branch_factor
+
+    def is_entrance_sector(self):
+        if self.entrance_sector is None:
+            self.entrance_sector = False
+            for region in self.regions:
+                for ent in region.entrances:
+                    if ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] or ent.parent_region.name == 'Sewer Drop':
+                        self.entrance_sector = True
+        return self.entrance_sector
 
     def __str__(self):
         return str(self.__unicode__())
