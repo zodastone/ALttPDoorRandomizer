@@ -131,12 +131,12 @@ def global_rules(world, player):
 
 
     set_rule(world.get_location('Spike Cave', player), lambda state:
-             state.has('Hammer', player) and state.can_lift_rocks(player) and
-             ((state.has('Cape', player) and state.can_extend_magic(player, 16, True)) or
-                 (state.has('Cane of Byrna', player) and
-                     (state.can_extend_magic(player, 12, True) or
-                     (state.world.can_take_damage and (state.has_Boots(player) or state.has_hearts(player, 4))))))
-            )
+    state.has('Hammer', player) and state.can_lift_rocks(player) and
+    ((state.has('Cape', player) and state.can_extend_magic(player, 16, True)) or
+     (state.has('Cane of Byrna', player) and
+      (state.can_extend_magic(player, 12, True) or
+       (state.world.can_take_damage and (state.has_Boots(player) or state.has_hearts(player, 4))))))
+             )
 
     set_rule(world.get_location('Hookshot Cave - Top Right', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_location('Hookshot Cave - Top Left', player), lambda state: state.has('Hookshot', player))
@@ -225,7 +225,6 @@ def global_rules(world, player):
     forbid_item(world.get_location('Thieves\' Town - Blind\'s Cell', player), 'Big Key (Thieves Town)', player)
     for location in ['Suspicious Maiden', 'Thieves\' Town - Blind\'s Cell']:
         set_rule(world.get_location(location, player), lambda state: state.has('Big Key (Thieves Town)', player))
-    set_rule(world.get_location('Thieves\' Town - Big Chest'), lambda state: state.has('Hammer', player))
     set_rule(world.get_location('Revealing Light', player), lambda state: state.has('Shining Light', player) and state.has('Maiden Rescued', player))
     set_rule(world.get_location('Thieves\' Town - Boss', player), lambda state: state.has('Maiden Unmasked', player) and world.get_location('Thieves\' Town - Boss', player).parent_region.dungeon.boss.can_defeat(state))
     set_rule(world.get_location('Thieves\' Town - Prize', player), lambda state: state.has('Maiden Unmasked', player) and world.get_location('Thieves\' Town - Prize', player).parent_region.dungeon.boss.can_defeat(state))
@@ -365,7 +364,7 @@ def global_rules(world, player):
 
     add_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
     set_rule(world.get_location('Ganon', player), lambda state: state.has_beam_sword(player) and state.has_fire_source(player) and state.has_crystals(world.crystals_needed_for_ganon[player], player)
-                                                        and (state.has('Tempered Sword', player) or state.has('Golden Sword', player) or (state.has('Silver Arrows', player) and state.can_shoot_arrows(player)) or state.has('Lamp', player) or state.can_extend_magic(player, 12)))  # need to light torch a sufficient amount of times
+                                                                and (state.has('Tempered Sword', player) or state.has('Golden Sword', player) or (state.has('Silver Arrows', player) and state.can_shoot_arrows(player)) or state.has('Lamp', player) or state.can_extend_magic(player, 12)))  # need to light torch a sufficient amount of times
     set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has_beam_sword(player))  # need to damage ganon to get tiles to drop
 
 
