@@ -1243,6 +1243,7 @@ class Sector(object):
         self.conn_balance = None
         self.branch_factor = None
         self.entrance_sector = None
+        self.equations = None
 
     def region_set(self):
         if self.r_name_set is None:
