@@ -1234,6 +1234,7 @@ class Sector(object):
         self.name = None
         self.r_name_set = None
         self.chest_locations = 0
+        self.big_chest_present = False
         self.key_only_locations = 0
         self.c_switch = False
         self.orange_barrier = False
@@ -1242,6 +1243,7 @@ class Sector(object):
         self.bk_provided = False
         self.conn_balance = None
         self.branch_factor = None
+        self.dead_end_cnt = None
         self.entrance_sector = None
         self.equations = None
 
@@ -1281,6 +1283,9 @@ class Sector(object):
     def branching_factor(self):
         if self.branch_factor is None:
             self.branch_factor = len(self.outstanding_doors)
+            cnt_dead = len([x for x in self.outstanding_doors if x.dead])
+            if cnt_dead > 1:
+                self.branch_factor -= cnt_dead - 1
             for region in self.regions:
                 for ent in region.entrances:
                     if ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld]:
@@ -1288,6 +1293,18 @@ class Sector(object):
                         if region.name not in ['Skull Pot Circle', 'Skull Back Drop', 'Desert East Lobby', 'Desert West Lobby']:
                             self.branch_factor += 1
         return self.branch_factor
+
+    def branches(self):
+        return max(0, self.branching_factor() - 2)
+
+    def dead_ends(self):
+        if self.dead_end_cnt is None:
+            if self.branching_factor() <= 1:
+                self.dead_end_cnt = 1
+            else:
+                dead_cnt = len([x for x in self.outstanding_doors if x.dead])
+                self.dead_end_cnt = dead_cnt - 1 if dead_cnt > 2 else 0
+        return self.dead_end_cnt
 
     def is_entrance_sector(self):
         if self.entrance_sector is None:

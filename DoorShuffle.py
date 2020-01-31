@@ -115,7 +115,7 @@ def vanilla_key_logic(world, player):
         sector = Sector()
         sector.name = dungeon.name
         sector.regions.extend(convert_regions(dungeon.regions, world, player))
-        builder = simple_dungeon_builder(sector.name, [sector], world, player)
+        builder = simple_dungeon_builder(sector.name, [sector])
         builder.master_sector = sector
         builders.append(builder)
 
@@ -298,7 +298,7 @@ def within_dungeon(world, player):
     dungeon_builders = {}
     for key in dungeon_regions.keys():
         sector_list = convert_to_sectors(dungeon_regions[key], world, player)
-        dungeon_builders[key] = simple_dungeon_builder(key, sector_list, world, player)
+        dungeon_builders[key] = simple_dungeon_builder(key, sector_list)
         dungeon_builders[key].entrance_list = list(entrances_map[key])
     recombinant_builders = {}
     handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map)
@@ -322,6 +322,7 @@ def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map)
         dungeon_builders.update(split_builders)
         for sub_name, split_entrances in split_list.items():
             sub_builder = dungeon_builders[name+' '+sub_name]
+            sub_builder.split_flag = True
             entrance_list = list(split_entrances)
             if name in flexible_starts.keys():
                 add_shuffled_entrances(sub_builder.sectors, flexible_starts[name], entrance_list)
