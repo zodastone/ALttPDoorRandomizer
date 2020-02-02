@@ -38,7 +38,10 @@ def guiMain(args=None):
     farBottomFrame = Frame(mainWindow)
 
     def open_output():
-        open_file(output_path(''))
+        if args.outputpath:
+            open_file(output_path(args.outputpath))
+        else:
+            open_file(output_path(''))
 
     openOutputButton = Button(farBottomFrame, text='Open Output Directory', command=open_output)
 
@@ -317,30 +320,6 @@ def guiMain(args=None):
     doorShuffleLabel = Label(doorShuffleFrame, text='Door shuffle algorithm')
     doorShuffleLabel.pack(side=LEFT)
 
-    heartbeepFrame = Frame(drowDownFrame)
-    heartbeepVar = StringVar()
-    heartbeepVar.set('normal')
-    heartbeepOptionMenu = OptionMenu(heartbeepFrame, heartbeepVar, 'double', 'normal', 'half', 'quarter', 'off')
-    heartbeepOptionMenu.pack(side=RIGHT)
-    heartbeepLabel = Label(heartbeepFrame, text='Heartbeep sound rate')
-    heartbeepLabel.pack(side=LEFT)
-
-    heartcolorFrame = Frame(drowDownFrame)
-    heartcolorVar = StringVar()
-    heartcolorVar.set('red')
-    heartcolorOptionMenu = OptionMenu(heartcolorFrame, heartcolorVar, 'red', 'blue', 'green', 'yellow', 'random')
-    heartcolorOptionMenu.pack(side=RIGHT)
-    heartcolorLabel = Label(heartcolorFrame, text='Heart color')
-    heartcolorLabel.pack(side=LEFT)
-
-    fastMenuFrame = Frame(drowDownFrame)
-    fastMenuVar = StringVar()
-    fastMenuVar.set('normal')
-    fastMenuOptionMenu = OptionMenu(fastMenuFrame, fastMenuVar, 'normal', 'instant', 'double', 'triple', 'quadruple', 'half')
-    fastMenuOptionMenu.pack(side=RIGHT)
-    fastMenuLabel = Label(fastMenuFrame, text='Menu speed')
-    fastMenuLabel.pack(side=LEFT)
-
     logicFrame.pack(expand=True, anchor=E)
     accessibilityFrame.pack(expand=True, anchor=E)
 
@@ -491,6 +470,7 @@ def guiMain(args=None):
                                    int(triforcecountVar.get()), int(triforceVar.get()),  int(rupoorcostVar.get()), int(universalkeyVar.get())]
         guiargs.rom = romVar.get()
         guiargs.sprite = sprite
+        guiargs.outputpath = args.outputpath
         # get default values for missing parameters
         for k,v in vars(parse_arguments(['--multi', str(guiargs.multi)])).items():
             if k not in vars(guiargs):
@@ -1250,8 +1230,11 @@ def guiMain(args=None):
         keyshuffleVar.set(args.keyshuffle)
         bigkeyshuffleVar.set(args.bigkeyshuffle)
         retroVar.set(args.retro)
+        openpyramidVar.set(args.openpyramid)
         quickSwapVar.set(int(args.quickswap))
         disableMusicVar.set(int(args.disablemusic))
+        if args.multi:
+            worldVar.set(str(args.multi))
         if args.count:
             countVar.set(str(args.count))
         if args.seed:
@@ -1269,12 +1252,21 @@ def guiMain(args=None):
         algorithmVar.set(args.algorithm)
         shuffleVar.set(args.shuffle)
         doorShuffleVar.set(args.door_shuffle)
+        heartcolorVar.set(args.heartcolor)
         heartbeepVar.set(args.heartbeep)
         fastMenuVar.set(args.fastmenu)
         logicVar.set(args.logic)
         romVar.set(args.rom)
         shuffleGanonVar.set(args.shuffleganon)
         hintsVar.set(args.hints)
+        enemizerCLIpathVar.set(args.enemizercli)
+        potShuffleVar.set(args.shufflepots)
+        enemyShuffleVar.set(args.shuffleenemies)
+        enemizerBossVar.set(args.shufflebosses)
+        enemizerDamageVar.set(args.enemy_damage)
+        enemizerHealthVar.set(args.enemy_health)
+        owPalettesVar.set(args.ow_palettes)
+        uwPalettesVar.set(args.uw_palettes)
         if args.sprite is not None:
             set_sprite(Sprite(args.sprite))
 
