@@ -1599,7 +1599,10 @@ def write_strings(rom, world, player, team):
         entrances_to_hint = {}
         entrances_to_hint.update(InconvenientDungeonEntrances)
         if world.shuffle_ganon:
-            entrances_to_hint.update({'Ganons Tower': 'Ganon\'s Tower'})
+            if world.mode[player] == 'inverted':
+                entrances_to_hint.update({'Inverted Ganons Tower': 'The sealed castle door'})
+            else:
+                entrances_to_hint.update({'Ganons Tower': 'Ganon\'s Tower'})
         if world.shuffle[player] in ['simple', 'restricted', 'restricted_legacy']:
             for entrance in all_entrances:
                 if entrance.name in entrances_to_hint:
