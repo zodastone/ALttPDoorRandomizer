@@ -241,9 +241,9 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, r
             'IcePalace': world.get_dungeon("Ice Palace", player).boss.enemizer_name,
             'MiseryMire': world.get_dungeon("Misery Mire", player).boss.enemizer_name,
             'TurtleRock': world.get_dungeon("Turtle Rock", player).boss.enemizer_name,
-            'GanonsTower1': world.get_dungeon('Ganons Tower' if world.mode[player] != 'inverted' else 'Inverted Ganons Tower', player).bosses['bottom'].enemizer_name,
-            'GanonsTower2': world.get_dungeon('Ganons Tower' if world.mode[player] != 'inverted' else 'Inverted Ganons Tower', player).bosses['middle'].enemizer_name,
-            'GanonsTower3': world.get_dungeon('Ganons Tower' if world.mode[player] != 'inverted' else 'Inverted Ganons Tower', player).bosses['top'].enemizer_name,
+            'GanonsTower1': world.get_dungeon('Ganons Tower', player).bosses['bottom'].enemizer_name,
+            'GanonsTower2': world.get_dungeon('Ganons Tower', player).bosses['middle'].enemizer_name,
+            'GanonsTower3': world.get_dungeon('Ganons Tower', player).bosses['top'].enemizer_name,
             'GanonsTower4': 'Agahnim2',
             'Ganon': 'Ganon',
         }
@@ -1735,6 +1735,15 @@ def write_strings(rom, world, player, team):
                 this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
                 tt[hint_locations.pop(0)] = this_hint
                 hint_count -= 1
+
+        # Adding a hint for the Thieves' Town Attic location in Crossed Doorshufle.
+        if world.doorShuffle[player] in ['crossed']:
+            attic_hint = world.get_location("Thieves' Town - Attic", player).parent_region.dungeon.name
+            this_hint = 'A cracked floor can be found in ' + attic_hint + '.'
+            if hint_locations[0] == 'telepathic_tile_thieves_town_upstairs':
+                tt[hint_locations.pop(1)] = this_hint
+            else:
+                tt[hint_locations.pop(0)] = this_hint
 
         # All remaining hint slots are filled with junk hints. It is done this way to ensure the same junk hint isn't selected twice.
         junk_hints = junk_texts.copy()
