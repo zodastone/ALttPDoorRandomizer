@@ -1736,6 +1736,11 @@ def write_strings(rom, world, player, team):
                 tt[hint_locations.pop(0)] = this_hint
                 hint_count -= 1
 
+        if world.doorShuffle[player] in ['crossed']:
+            attic_hint = world.get_location("Thieves' Town - Attic", player).parent_region.dungeon.name
+            this_hint = 'A cracked floor can be found in ' + attic_hint + '.'
+            tt[hint_locations.pop(0)] = this_hint
+
         # All remaining hint slots are filled with junk hints. It is done this way to ensure the same junk hint isn't selected twice.
         junk_hints = junk_texts.copy()
         random.shuffle(junk_hints)
