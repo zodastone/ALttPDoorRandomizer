@@ -38,7 +38,7 @@ def guiMain(args=None):
     farBottomFrame = Frame(mainWindow)
 
     def open_output():
-        if args.outputpath:
+        if args and args.outputpath:
             open_file(output_path(args.outputpath))
         else:
             open_file(output_path(''))
@@ -470,7 +470,7 @@ def guiMain(args=None):
                                    int(triforcecountVar.get()), int(triforceVar.get()),  int(rupoorcostVar.get()), int(universalkeyVar.get())]
         guiargs.rom = romVar.get()
         guiargs.sprite = sprite
-        guiargs.outputpath = args.outputpath
+        guiargs.outputpath = args.outputpath if args else None
         # get default values for missing parameters
         for k,v in vars(parse_arguments(['--multi', str(guiargs.multi)])).items():
             if k not in vars(guiargs):
