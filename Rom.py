@@ -1740,7 +1740,7 @@ def write_strings(rom, world, player, team):
         if world.doorShuffle[player] in ['crossed']:
             attic_hint = world.get_location("Thieves' Town - Attic", player).parent_region.dungeon.name
             this_hint = 'A cracked floor can be found in ' + attic_hint + '.'
-            if hint_locations[0] == 'telepathic_tile_turtle_rock':
+            if hint_locations[0] == 'telepathic_tile_thieves_town_upstairs':
                 tt[hint_locations.pop(1)] = this_hint
             else:
                 tt[hint_locations.pop(0)] = this_hint
