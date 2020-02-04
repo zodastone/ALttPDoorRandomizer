@@ -1736,6 +1736,7 @@ def write_strings(rom, world, player, team):
                 tt[hint_locations.pop(0)] = this_hint
                 hint_count -= 1
 
+        # Adding a hint for the Thieves' Town Attic location in Crossed Doorshufle.
         if world.doorShuffle[player] in ['crossed']:
             attic_hint = world.get_location("Thieves' Town - Attic", player).parent_region.dungeon.name
             this_hint = 'A cracked floor can be found in ' + attic_hint + '.'
