@@ -1725,7 +1725,7 @@ def write_strings(rom, world, player, team):
         hint_count = 5 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 8
         while hint_count > 0:
             this_item = items_to_hint.pop(0)
-            this_location = world.find_items(this_item, player)
+            this_location = world.find_items_not_key_only(this_item, player)
             random.shuffle(this_location)
             #This looks dumb but prevents hints for Skull Woods Pinball Room's key safely with any item pool.
             if this_location:

@@ -279,6 +279,7 @@ class Room(object):
 
     def delete(self, list_idx):
         self.doorList[list_idx] = (Position.FF, DoorKind.FF)
+        self.modified = True
 
     def address(self):
         return self.doorListAddress

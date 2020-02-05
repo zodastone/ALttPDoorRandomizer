@@ -815,10 +815,10 @@ def validate_key_layout(key_layout, world, player):
     for region in key_layout.start_regions:
         state.visit_region(region, key_checks=True)
         state.add_all_doors_check_keys(region, flat_proposal, world, player)
-    return validate_key_layout_sub_loop(key_layout, state, {}, flat_proposal, world, player)
+    return validate_key_layout_sub_loop(key_layout, state, {}, flat_proposal, None, None, world, player)
 
 
-def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposal, world, player):
+def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposal, prev_state, prev_avail, world, player):
     expand_key_state(state, flat_proposal, world, player)
     smalls_avail = len(state.small_doors) > 0   # de-dup crystal repeats
     num_bigs = 1 if len(state.big_doors) > 0 else 0  # all or nothing
@@ -829,7 +829,9 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     ttl_key_only = count_key_only_locations(state)
     available_small_locations = cnt_avail_small_locations(ttl_locations, ttl_key_only, state, world, player)
     available_big_locations = cnt_avail_big_locations(ttl_locations, state, world, player)
-    if (not smalls_avail or available_small_locations == 0) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
+    if invalid_self_locking_key(state, prev_state, prev_avail, world, player):
+        return False
+    if (not smalls_avail or not enough_small_locations(state, available_small_locations)) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
         return False
     else:
         if smalls_avail and available_small_locations > 0:
@@ -841,7 +843,8 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
                     state_copy.used_locations += 1
                 code = state_id(state_copy, flat_proposal)
                 if code not in checked_states.keys():
-                    valid = validate_key_layout_sub_loop(key_layout, state_copy, checked_states, flat_proposal, world, player)
+                    valid = validate_key_layout_sub_loop(key_layout, state_copy, checked_states, flat_proposal,
+                                                         state, available_small_locations, world, player)
                     checked_states[code] = valid
                 else:
                     valid = checked_states[code]
@@ -853,13 +856,48 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
             state_copy.used_locations += 1
             code = state_id(state_copy, flat_proposal)
             if code not in checked_states.keys():
-                valid = validate_key_layout_sub_loop(key_layout, state_copy, checked_states, flat_proposal, world, player)
+                valid = validate_key_layout_sub_loop(key_layout, state_copy, checked_states, flat_proposal,
+                                                     state, available_small_locations, world, player)
                 checked_states[code] = valid
             else:
                 valid = checked_states[code]
             if not valid:
                 return False
     return True
+
+
+def invalid_self_locking_key(state, prev_state, prev_avail, world, player):
+    if prev_state is None or state.used_smalls == prev_state.used_smalls:
+        return False
+    new_locations = set(state.found_locations).difference(set(prev_state.found_locations))
+    important_found = False
+    for loc in new_locations:
+        important_found |= important_location(loc, world, player)
+    if not important_found:
+        return False
+    new_small_doors = set(state.small_doors).difference(set(prev_state.small_doors))
+    new_bk_doors = set(state.big_doors).difference(set(prev_state.big_doors))
+    if len(new_small_doors) > 0 or len(new_bk_doors) > 0:
+        return False
+    return prev_avail - 1 == 0
+
+
+# does not allow dest doors
+def count_unique_sm_doors(doors):
+    unique_d_set = set()
+    for d in doors:
+        if d not in unique_d_set and d.dest not in unique_d_set and not d.bigKey:
+            unique_d_set.add(d)
+    return len(unique_d_set)
+
+
+def enough_small_locations(state, avail_small_loc):
+    unique_d_set = set()
+    for exp_door in state.small_doors:
+        door = exp_door.door
+        if door not in unique_d_set and door.dest not in unique_d_set:
+            unique_d_set.add(door)
+    return avail_small_loc >= len(unique_d_set)
 
 
 def cnt_avail_small_locations(free_locations, key_only, state, world, player):

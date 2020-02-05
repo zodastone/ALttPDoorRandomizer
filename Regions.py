@@ -740,10 +740,11 @@ def _create_region(player, name, type, hint='Hyrule', locations=None, exits=None
         ret.exits.append(Entrance(player, exit, ret))
     for location in locations:
         if location in key_only_locations:
-          ret.locations.append(Location(player, location, None, False, None, ret, key_only_locations[location]))
+            ko_hint = 'in a pot' if 'Pot' in location else 'with an enemy'
+            ret.locations.append(Location(player, location, None, False, ko_hint, ret, key_only_locations[location]))
         else:
-          address, player_address, crystal, hint_text = location_table[location]
-          ret.locations.append(Location(player, location, address, crystal, hint_text, ret, None, player_address))
+            address, player_address, crystal, hint_text = location_table[location]
+            ret.locations.append(Location(player, location, address, crystal, hint_text, ret, None, player_address))
     return ret
 
 def mark_light_world_regions(world, player):

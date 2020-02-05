@@ -287,6 +287,9 @@ class World(object):
     def find_items(self, item, player):
         return [location for location in self.get_locations() if location.item is not None and location.item.name == item and location.item.player == player]
 
+    def find_items_not_key_only(self, item, player):
+        return [location for location in self.get_locations() if location.item is not None and location.item.name == item and location.item.player == player and location.forced_item is None]
+
     def push_precollected(self, item):
         item.world = self
         if (item.smallkey and self.keyshuffle[item.player]) or (item.bigkey and self.bigkeyshuffle[item.player]):
