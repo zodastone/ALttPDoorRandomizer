@@ -143,7 +143,7 @@ def vanilla_key_logic(world, player):
             key_layout = build_key_layout(builder, start_regions, doors, world, player)
             valid = validate_key_layout(key_layout, world, player)
             if not valid:
-                raise Exception('Vanilla key layout not valid %s' % builder.name)
+                logging.getLogger('').warning('Vanilla key layout not valid %s', builder.name)
             if player not in world.key_logic.keys():
                 world.key_logic[player] = {}
             analyze_dungeon(key_layout, world, player)
