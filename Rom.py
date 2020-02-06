@@ -9,8 +9,8 @@ import struct
 import sys
 import subprocess
 
-from BaseClasses import CollectionState, ShopType, Region, Location, Item, DoorType
-from DoorShuffle import compass_data
+from BaseClasses import CollectionState, ShopType, Region, Location, DoorType
+from DoorShuffle import compass_data, DROptions
 from Dungeons import dungeon_music_addresses
 from Regions import location_table
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'c1361fcf13239f8677bacc6f9bc5e9dd'
+RANDOMIZERBASEHASH = 'c06e14396839bc443a6918e736f1e5a7'
 
 
 class JsonRom(object):
@@ -591,7 +591,9 @@ def patch_rom(world, rom, player, team, enemized):
         patch_shuffled_dark_sanc(world, rom, player)
 
     # patch doors
+    dr_flags = DROptions.Eternal_Mini_Bosses
     if world.doorShuffle[player] == 'crossed':
+        rom.write_byte(0x139004, 2)
         rom.write_byte(0x151f1, 2)
         rom.write_byte(0x15270, 2)
         rom.write_byte(0x1597b, 2)
@@ -599,6 +601,8 @@ def patch_rom(world, rom, player, team, enemized):
             update_compasses(rom, world, player)
         else:
             logging.getLogger('').warning('Randomizer rom update! Compasses in crossed are borken')
+    if world.doorShuffle[player] == 'basic':
+        rom.write_byte(0x139004, 1)
     for door in world.doors:
         if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door.toggle))
@@ -608,6 +612,11 @@ def patch_rom(world, rom, player, team, enemized):
     for paired_door in world.paired_doors[player]:
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
         rom.write_bytes(paired_door.address_b(world, player), paired_door.rom_data_b(world, player))
+    for builder in world.dungeon_layouts[player].values():
+        if builder.pre_open_stonewall:
+            if builder.pre_open_stonewall.name == 'Desert Wall Slide NW':
+                dr_flags |= DROptions.Open_Desert_Wall
+    rom.write_byte(0x139006, dr_flags.value)
 
     # fix skull woods exit, if not fixed during exit patching
     if world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla':

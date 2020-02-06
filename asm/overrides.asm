@@ -21,3 +21,20 @@ LampCheckOverride:
 	.done
 	;BNE + : STZ $1D : + ; remember to turn cone off after a torch
 RTL
+
+GtBossHeartCheckOverride:
+    lda $a0 : cmp #$1c : beq ++
+    cmp #$6c : beq ++
+    cmp #$4d : bne +
+    ++ lda DRFlags : and #$01 : bne ++ ;skip if flag on
+        lda $403 : ora #$80 : sta $403
+    ++ clc
+rtl
+    + sec
+rtl
+
+OnFileLoadOverride:
+    jsl OnFileLoad ; what I wrote over
+    lda DRFlags : and #$80 : beq +  ;flag is off
+        lda $7ef086 : ora #$80 : sta $7ef086
++ rtl

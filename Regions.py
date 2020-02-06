@@ -715,6 +715,37 @@ def create_dungeon_regions(world, player):
     ]
 
     world.initialize_regions()
+    world.get_region('Hera Lobby', player).crystal_switch = True
+    world.get_region('Hera Basement Cage', player).crystal_switch = True
+    world.get_region('Hera Tile Room', player).crystal_switch = True  # INTERIOR not accessible (maybe with cane)
+    world.get_region('Hera Tridorm', player).crystal_switch = True
+    world.get_region('Hera Startile Wide', player).crystal_switch = True
+    world.get_region('PoD Arena Main', player).crystal_switch = True
+    world.get_region('PoD Arena Bridge', player).crystal_switch = True
+    world.get_region('PoD Sexy Statue', player).crystal_switch = True
+    world.get_region('PoD Bow Statue', player).crystal_switch = True  # LADDER not accessible (maybe with cane)
+    world.get_region('PoD Dark Pegs', player).crystal_switch = True
+    world.get_region('Swamp Crystal Switch', player).crystal_switch = True
+    world.get_region('Thieves Spike Switch', player).crystal_switch = True
+    world.get_region('Ice Bomb Drop', player).crystal_switch = True
+    world.get_region('Ice Conveyor', player).crystal_switch = True
+    world.get_region('Ice Refill', player).crystal_switch = True
+    world.get_region('Mire Fishbone', player).crystal_switch = True
+    world.get_region('Mire Conveyor Crystal', player).crystal_switch = True
+    world.get_region('Mire Tall Dark and Roomy', player).crystal_switch = True
+    world.get_region('Mire Crystal Top', player).crystal_switch = True
+    world.get_region('Mire Falling Foes', player).crystal_switch = True
+    world.get_region('TR Chain Chomps', player).crystal_switch = True
+    world.get_region('TR Pokey 2', player).crystal_switch = True
+    world.get_region('TR Crystaroller', player).crystal_switch = True
+    world.get_region('TR Crystal Maze', player).crystal_switch = True
+    world.get_region('GT Crystal Conveyor', player).crystal_switch = True   # INTERIOR not accessible
+    world.get_region('GT Hookshot South Platform', player).crystal_switch = True
+    # world.get_region('GT Double Switch Switches', player).crystal_switch = True # this is not very relevant
+    world.get_region('GT Spike Crystals', player).crystal_switch = True
+    world.get_region('GT Crystal Paths', player).crystal_switch = True
+    world.get_region('GT Hidden Spikes', player).crystal_switch = True
+    world.get_region('GT Crystal Circles', player).crystal_switch = True
 
 
 def create_lw_region(player, name, locations=None, exits=None):

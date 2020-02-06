@@ -870,6 +870,7 @@ class Region(object):
         self.hint_text = hint
         self.recursion_count = 0
         self.player = player
+        self.crystal_switch = False
 
     def can_reach(self, state):
         if state.stale[self.player]:

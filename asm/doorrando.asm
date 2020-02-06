@@ -23,6 +23,10 @@ warnpc $279000
 org $279000
 OffsetTable:
 dw -8, 8
+DRMode:
+dw 0
+DRFlags:
+dw 0
 
 ; Vert 0,6,0 Horz 2,0,8
 org $279010

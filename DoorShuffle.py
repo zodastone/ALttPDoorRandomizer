@@ -4,6 +4,7 @@ from collections import defaultdict
 import logging
 import operator as op
 import time
+from enum import unique, Flag
 
 from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier
@@ -1297,6 +1298,11 @@ def check_for_pinball_fix(state, bad_region, world, player):
             return True
     return False
 
+
+@unique
+class DROptions(Flag):
+    Eternal_Mini_Bosses = 0x01  # If on, GT minibosses marked as defeated when they try to spawn a heart
+    Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
 
 # DATA GOES DOWN HERE
 
