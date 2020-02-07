@@ -1123,7 +1123,7 @@ def val_tower(key_logic, world, player):
     val_rule(key_logic.door_rules['Tower Room 03 Up Stairs'], 1)
     val_rule(key_logic.door_rules['Tower Dark Maze ES'], 2)
     val_rule(key_logic.door_rules['Tower Dark Archers Up Stairs'], 3)
-    val_rule(key_logic.door_rules['Tower Circle of Pots WS'], 4)
+    val_rule(key_logic.door_rules['Tower Circle of Pots ES'], 4)
 
 
 def val_pod(key_logic, world, player):

@@ -1642,7 +1642,7 @@ interior_doors = [
     ('Tower Dark Pits EN', 'Tower Dark Archers WN'),
     ('Tower Red Spears WN', 'Tower Red Guards EN'),
     ('Tower Red Guards SW', 'Tower Circle of Pots NW'),
-    ('Tower Circle of Pots WS', 'Tower Pacifist Run ES'),
+    ('Tower Circle of Pots ES', 'Tower Pacifist Run WS'),
     ('Tower Push Statue WS', 'Tower Catwalk ES'),
     ('Tower Antechamber NW', 'Tower Altar SW'),
     ('PoD Lobby N', 'PoD Middle Cage S'),
@@ -1812,7 +1812,7 @@ default_small_key_doors = {
         'Tower Room 03 Up Stairs',
         ('Tower Dark Maze ES', 'Tower Dark Chargers WS'),
         'Tower Dark Archers Up Stairs',
-        ('Tower Circle of Pots WS', 'Tower Pacifist Run ES'),
+        ('Tower Circle of Pots ES', 'Tower Pacifist Run WS'),
     ],
     'Palace of Darkness': [
         ('PoD Middle Cage N', 'PoD Pit Room S'),
