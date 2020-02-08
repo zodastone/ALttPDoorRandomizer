@@ -14,6 +14,7 @@ from AdjusterMain import adjust
 from DungeonRandomizer import parse_arguments
 from gui.randomize.item import item_page
 from gui.randomize.entrando import entrando_page
+from gui.randomize.enemizer import enemizer_page
 from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
 from Main import main, __version__ as ESVersion
 from Rom import Sprite
@@ -79,7 +80,7 @@ def guiMain(args=None):
     randomizerNotebook.add(entrandoWindow, text="Entrances")
 
     # Enemizer
-    enemizerWindow = ttk.Frame(randomizerNotebook)
+    enemizerWindow = enemizer_page(randomizerNotebook)
     randomizerNotebook.add(enemizerWindow, text="Enemizer")
 
     # Dungeon Shuffle
@@ -252,66 +253,6 @@ def guiMain(args=None):
     doorShuffleLabel = Label(doorShuffleFrame, text='Door shuffle algorithm')
     doorShuffleLabel.pack(side=LEFT)
 
-    enemizerFrame = LabelFrame(sortWindow, text="Enemizer", padx=5, pady=2)
-    enemizerFrame.columnconfigure(0, weight=1)
-    enemizerFrame.columnconfigure(1, weight=1)
-    enemizerFrame.columnconfigure(2, weight=1)
-    enemizerFrame.columnconfigure(3, weight=1)
-
-    enemizerPathFrame = Frame(enemizerFrame)
-    enemizerPathFrame.grid(row=0, column=0, columnspan=3, sticky=W+E, padx=3)
-    enemizerCLIlabel = Label(enemizerPathFrame, text="EnemizerCLI path: ")
-    enemizerCLIlabel.pack(side=LEFT)
-    enemizerCLIpathVar = StringVar(value="EnemizerCLI/EnemizerCLI.Core")
-    enemizerCLIpathEntry = Entry(enemizerPathFrame, textvariable=enemizerCLIpathVar)
-    enemizerCLIpathEntry.pack(side=LEFT, expand=True, fill=X)
-    def EnemizerSelectPath():
-        path = filedialog.askopenfilename(filetypes=[("EnemizerCLI executable", "*EnemizerCLI*")])
-        if path:
-            enemizerCLIpathVar.set(path)
-    enemizerCLIbrowseButton = Button(enemizerPathFrame, text='...', command=EnemizerSelectPath)
-    enemizerCLIbrowseButton.pack(side=LEFT)
-
-    potShuffleVar = IntVar()
-    potShuffleButton = Checkbutton(enemizerFrame, text="Pot shuffle", variable=potShuffleVar)
-    potShuffleButton.grid(row=0, column=3)
-
-    enemizerEnemyFrame = Frame(enemizerFrame)
-    enemizerEnemyFrame.grid(row=1, column=0, pady=5)
-    enemizerEnemyLabel = Label(enemizerEnemyFrame, text='Enemy shuffle')
-    enemizerEnemyLabel.pack(side=LEFT)
-    enemyShuffleVar = StringVar()
-    enemyShuffleVar.set('none')
-    enemizerEnemyOption = OptionMenu(enemizerEnemyFrame, enemyShuffleVar, 'none', 'shuffled', 'chaos')
-    enemizerEnemyOption.pack(side=LEFT)
-
-    enemizerBossFrame = Frame(enemizerFrame)
-    enemizerBossFrame.grid(row=1, column=1)
-    enemizerBossLabel = Label(enemizerBossFrame, text='Boss shuffle')
-    enemizerBossLabel.pack(side=LEFT)
-    enemizerBossVar = StringVar()
-    enemizerBossVar.set('none')
-    enemizerBossOption = OptionMenu(enemizerBossFrame, enemizerBossVar, 'none', 'basic', 'normal', 'chaos')
-    enemizerBossOption.pack(side=LEFT)
-
-    enemizerDamageFrame = Frame(enemizerFrame)
-    enemizerDamageFrame.grid(row=1, column=2)
-    enemizerDamageLabel = Label(enemizerDamageFrame, text='Enemy damage')
-    enemizerDamageLabel.pack(side=LEFT)
-    enemizerDamageVar = StringVar()
-    enemizerDamageVar.set('default')
-    enemizerDamageOption = OptionMenu(enemizerDamageFrame, enemizerDamageVar, 'default', 'shuffled', 'chaos')
-    enemizerDamageOption.pack(side=LEFT)
-
-    enemizerHealthFrame = Frame(enemizerFrame)
-    enemizerHealthFrame.grid(row=1, column=3)
-    enemizerHealthLabel = Label(enemizerHealthFrame, text='Enemy health')
-    enemizerHealthLabel.pack(side=LEFT)
-    enemizerHealthVar = StringVar()
-    enemizerHealthVar.set('default')
-    enemizerHealthOption = OptionMenu(enemizerHealthFrame, enemizerHealthVar, 'default', 'easy', 'normal', 'hard', 'expert')
-    enemizerHealthOption.pack(side=LEFT)
-
     bottomFrame = Frame(randomizerWindow, pady=5)
 
     worldLabel = Label(sortWindow, text='Worlds')
@@ -366,12 +307,12 @@ def guiMain(args=None):
         guiargs.uw_palettes = uwPalettesVar.get()
         guiargs.shuffleganon = bool(entrandoWindow.shuffleGanonVar.get())
         guiargs.hints = bool(hintsVar.get())
-        guiargs.enemizercli = enemizerCLIpathVar.get()
-        guiargs.shufflebosses = enemizerBossVar.get()
-        guiargs.shuffleenemies = enemyShuffleVar.get()
-        guiargs.enemy_health = enemizerHealthVar.get()
-        guiargs.enemy_damage = enemizerDamageVar.get()
-        guiargs.shufflepots = bool(potShuffleVar.get())
+        guiargs.enemizercli = enemizerWindow.enemizerCLIpathVar.get()
+        guiargs.shufflebosses = enemizerWindow.enemizerBossVar.get()
+        guiargs.shuffleenemies = enemizerWindow.enemyShuffleVar.get()
+        guiargs.enemy_health = enemizerWindow.enemizerHealthVar.get()
+        guiargs.enemy_damage = enemizerWindow.enemizerDamageVar.get()
+        guiargs.shufflepots = bool(enemizerWindow.potShuffleVar.get())
         guiargs.custom = bool(customVar.get())
         guiargs.customitemarray = [int(bowVar.get()), int(silverarrowVar.get()), int(boomerangVar.get()), int(magicboomerangVar.get()), int(hookshotVar.get()), int(mushroomVar.get()), int(magicpowderVar.get()), int(firerodVar.get()),
                                    int(icerodVar.get()), int(bombosVar.get()), int(etherVar.get()), int(quakeVar.get()), int(lampVar.get()), int(hammerVar.get()), int(shovelVar.get()), int(fluteVar.get()), int(bugnetVar.get()),
@@ -423,7 +364,6 @@ def guiMain(args=None):
     rightHalfFrame.pack(side=RIGHT)
     topFrame.pack(side=TOP)
     bottomFrame.pack(side=BOTTOM)
-    enemizerFrame.pack(side=BOTTOM, fill=BOTH)
 
     # Adjuster Controls
 
@@ -1173,12 +1113,12 @@ def guiMain(args=None):
         romVar.set(args.rom)
         entrandoWindow.shuffleGanonVar.set(args.shuffleganon)
         hintsVar.set(args.hints)
-        enemizerCLIpathVar.set(args.enemizercli)
-        potShuffleVar.set(args.shufflepots)
-        enemyShuffleVar.set(args.shuffleenemies)
-        enemizerBossVar.set(args.shufflebosses)
-        enemizerDamageVar.set(args.enemy_damage)
-        enemizerHealthVar.set(args.enemy_health)
+        enemizerWindow.enemizerCLIpathVar.set(args.enemizercli)
+        enemizerWindow.potShuffleVar.set(args.shufflepots)
+        enemizerWindow.enemyShuffleVar.set(args.shuffleenemies)
+        enemizerWindow.enemizerBossVar.set(args.shufflebosses)
+        enemizerWindow.enemizerDamageVar.set(args.enemy_damage)
+        enemizerWindow.enemizerHealthVar.set(args.enemy_health)
         owPalettesVar.set(args.ow_palettes)
         uwPalettesVar.set(args.uw_palettes)
         if args.sprite is not None:
