@@ -15,6 +15,7 @@ from DungeonRandomizer import parse_arguments
 from gui.randomize.item import item_page
 from gui.randomize.entrando import entrando_page
 from gui.randomize.enemizer import enemizer_page
+from gui.randomize.dungeon import dungeon_page
 from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
 from Main import main, __version__ as ESVersion
 from Rom import Sprite
@@ -84,7 +85,7 @@ def guiMain(args=None):
     randomizerNotebook.add(enemizerWindow, text="Enemizer")
 
     # Dungeon Shuffle
-    dungeonRandoWindow = ttk.Frame(randomizerNotebook)
+    dungeonRandoWindow = dungeon_page(randomizerNotebook)
     randomizerNotebook.add(dungeonRandoWindow, text="Dungeon Shuffle")
 
     # Multiworld
@@ -110,16 +111,6 @@ def guiMain(args=None):
     createSpoilerCheckbutton = Checkbutton(checkBoxFrame, text="Create Spoiler Log", variable=createSpoilerVar)
     suppressRomVar = IntVar()
     suppressRomCheckbutton = Checkbutton(checkBoxFrame, text="Do not create patched Rom", variable=suppressRomVar)
-    mcsbshuffleFrame = Frame(checkBoxFrame)
-    mcsbLabel = Label(mcsbshuffleFrame, text="Shuffle: ")
-    mapshuffleVar = IntVar()
-    mapshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="Maps", variable=mapshuffleVar)
-    compassshuffleVar = IntVar()
-    compassshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="Compasses", variable=compassshuffleVar)
-    keyshuffleVar = IntVar()
-    keyshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="Keys", variable=keyshuffleVar)
-    bigkeyshuffleVar = IntVar()
-    bigkeyshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="BigKeys", variable=bigkeyshuffleVar)
     hintsVar = IntVar()
     hintsVar.set(1) #set default
     hintsCheckbutton = Checkbutton(checkBoxFrame, text="Include Helpful Hints", variable=hintsVar)
@@ -128,12 +119,6 @@ def guiMain(args=None):
 
     createSpoilerCheckbutton.pack(expand=True, anchor=W)
     suppressRomCheckbutton.pack(expand=True, anchor=W)
-    mcsbshuffleFrame.pack(expand=True, anchor=W)
-    mcsbLabel.grid(row=0, column=0)
-    mapshuffleCheckbutton.grid(row=0, column=1)
-    compassshuffleCheckbutton.grid(row=0, column=2)
-    keyshuffleCheckbutton.grid(row=0, column=3)
-    bigkeyshuffleCheckbutton.grid(row=0, column=4)
     hintsCheckbutton.pack(expand=True, anchor=W)
     customCheckbutton.pack(expand=True, anchor=W)
 
@@ -296,10 +281,10 @@ def guiMain(args=None):
         guiargs.skip_playthrough = not bool(createSpoilerVar.get())
         guiargs.suppress_rom = bool(suppressRomVar.get())
         guiargs.openpyramid = bool(entrandoWindow.openpyramidVar.get())
-        guiargs.mapshuffle = bool(mapshuffleVar.get())
-        guiargs.compassshuffle = bool(compassshuffleVar.get())
-        guiargs.keyshuffle = bool(keyshuffleVar.get())
-        guiargs.bigkeyshuffle = bool(bigkeyshuffleVar.get())
+        guiargs.mapshuffle = bool(dungeonRandoWindow.mapshuffleVar.get())
+        guiargs.compassshuffle = bool(dungeonRandoWindow.compassshuffleVar.get())
+        guiargs.keyshuffle = bool(dungeonRandoWindow.keyshuffleVar.get())
+        guiargs.bigkeyshuffle = bool(dungeonRandoWindow.bigkeyshuffleVar.get())
         guiargs.retro = bool(itemWindow.retroVar.get())
         guiargs.quickswap = bool(quickSwapVar.get())
         guiargs.disablemusic = bool(disableMusicVar.get())
@@ -1079,10 +1064,10 @@ def guiMain(args=None):
         # load values from commandline args
         createSpoilerVar.set(int(args.create_spoiler))
         suppressRomVar.set(int(args.suppress_rom))
-        mapshuffleVar.set(args.mapshuffle)
-        compassshuffleVar.set(args.compassshuffle)
-        keyshuffleVar.set(args.keyshuffle)
-        bigkeyshuffleVar.set(args.bigkeyshuffle)
+        dungeonRandoWindow.mapshuffleVar.set(args.mapshuffle)
+        dungeonRandoWindow.compassshuffleVar.set(args.compassshuffle)
+        dungeonRandoWindow.keyshuffleVar.set(args.keyshuffle)
+        dungeonRandoWindow.bigkeyshuffleVar.set(args.bigkeyshuffle)
         itemWindow.retroVar.set(args.retro)
         entrandoWindow.openpyramidVar.set(args.openpyramid)
         quickSwapVar.set(int(args.quickswap))
