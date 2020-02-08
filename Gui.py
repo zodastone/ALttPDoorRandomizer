@@ -18,6 +18,7 @@ from gui.randomize.enemizer import enemizer_page
 from gui.randomize.dungeon import dungeon_page
 from gui.randomize.multiworld import multiworld_page
 from gui.randomize.gameoptions import gameoptions_page
+from gui.randomize.generation import generation_page
 from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
 from Main import main, __version__ as ESVersion
 from Rom import Sprite
@@ -34,11 +35,9 @@ def guiMain(args=None):
     randomizerWindow = ttk.Frame(notebook)
     adjustWindow = ttk.Frame(notebook)
     customWindow = ttk.Frame(notebook)
-    sortWindow = ttk.Frame(notebook)
     notebook.add(randomizerWindow, text='Randomize')
     notebook.add(adjustWindow, text='Adjust')
     notebook.add(customWindow, text='Custom')
-    notebook.add(sortWindow, text='SORT')
     notebook.pack()
 
     # Shared Controls
@@ -99,61 +98,11 @@ def guiMain(args=None):
     randomizerNotebook.add(gameOptionsWindow, text="Game Options")
 
     # Generation Setup
-    generationSetupWindow = ttk.Frame(randomizerNotebook)
+    generationSetupWindow = generation_page(randomizerNotebook)
     randomizerNotebook.add(generationSetupWindow, text="Generation Setup")
 
     # add randomizer notebook to main window
     randomizerNotebook.pack()
-
-    topFrame = Frame(sortWindow)
-    rightHalfFrame = Frame(topFrame)
-    checkBoxFrame = Frame(rightHalfFrame)
-
-    createSpoilerVar = IntVar()
-    createSpoilerCheckbutton = Checkbutton(checkBoxFrame, text="Create Spoiler Log", variable=createSpoilerVar)
-    suppressRomVar = IntVar()
-    suppressRomCheckbutton = Checkbutton(checkBoxFrame, text="Do not create patched Rom", variable=suppressRomVar)
-    customVar = IntVar()
-    customCheckbutton = Checkbutton(checkBoxFrame, text="Use custom item pool", variable=customVar)
-
-    createSpoilerCheckbutton.pack(expand=True, anchor=W)
-    suppressRomCheckbutton.pack(expand=True, anchor=W)
-    customCheckbutton.pack(expand=True, anchor=W)
-
-    romOptionsFrame = LabelFrame(rightHalfFrame, text="Rom options")
-    romOptionsFrame.columnconfigure(0, weight=1)
-    romOptionsFrame.columnconfigure(1, weight=1)
-    for i in range(5):
-        romOptionsFrame.rowconfigure(i, weight=1)
-
-    romDialogFrame = Frame(romOptionsFrame)
-    romDialogFrame.grid(row=4, column=0, columnspan=2, sticky=W+E)
-
-    baseRomLabel = Label(romDialogFrame, text='Base Rom: ')
-    romVar = StringVar(value="Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
-    romEntry = Entry(romDialogFrame, textvariable=romVar)
-
-    def RomSelect():
-        rom = filedialog.askopenfilename(filetypes=[("Rom Files", (".sfc", ".smc")), ("All Files", "*")])
-        romVar.set(rom)
-    romSelectButton = Button(romDialogFrame, text='Select Rom', command=RomSelect)
-
-    baseRomLabel.pack(side=LEFT)
-    romEntry.pack(side=LEFT, expand=True, fill=X)
-    romSelectButton.pack(side=LEFT)
-
-    checkBoxFrame.pack(side=TOP, anchor=W, padx=5, pady=10)
-    romOptionsFrame.pack(expand=True, fill=BOTH, padx=3)
-
-    drowDownFrame = Frame(topFrame)
-
-    doorShuffleFrame = Frame(drowDownFrame)
-    doorShuffleVar = StringVar()
-    doorShuffleVar.set('basic')
-    doorShuffleOptionMenu = OptionMenu(doorShuffleFrame, doorShuffleVar, 'vanilla', 'basic', 'crossed', 'experimental')
-    doorShuffleOptionMenu.pack(side=RIGHT)
-    doorShuffleLabel = Label(doorShuffleFrame, text='Door shuffle algorithm')
-    doorShuffleLabel.pack(side=LEFT)
 
     bottomFrame = Frame(randomizerWindow, pady=5)
 
@@ -184,13 +133,13 @@ def guiMain(args=None):
         guiargs.accessibility = itemWindow.accessibilityVar.get()
         guiargs.algorithm = itemWindow.algorithmVar.get()
         guiargs.shuffle = entrandoWindow.shuffleVar.get()
-        guiargs.door_shuffle = doorShuffleVar.get()
+        guiargs.door_shuffle = dungeonRandoWindow.doorShuffleVar.get()
         guiargs.heartbeep = gameOptionsWindow.heartbeepVar.get()
         guiargs.heartcolor = gameOptionsWindow.heartcolorVar.get()
         guiargs.fastmenu = gameOptionsWindow.fastMenuVar.get()
-        guiargs.create_spoiler = bool(createSpoilerVar.get())
-        guiargs.skip_playthrough = not bool(createSpoilerVar.get())
-        guiargs.suppress_rom = bool(suppressRomVar.get())
+        guiargs.create_spoiler = bool(generationSetupWindow.createSpoilerVar.get())
+        guiargs.skip_playthrough = not bool(generationSetupWindow.createSpoilerVar.get())
+        guiargs.suppress_rom = bool(generationSetupWindow.suppressRomVar.get())
         guiargs.openpyramid = bool(entrandoWindow.openpyramidVar.get())
         guiargs.mapshuffle = bool(dungeonRandoWindow.mapshuffleVar.get())
         guiargs.compassshuffle = bool(dungeonRandoWindow.compassshuffleVar.get())
@@ -209,7 +158,7 @@ def guiMain(args=None):
         guiargs.enemy_health = enemizerWindow.enemizerHealthVar.get()
         guiargs.enemy_damage = enemizerWindow.enemizerDamageVar.get()
         guiargs.shufflepots = bool(enemizerWindow.potShuffleVar.get())
-        guiargs.custom = bool(customVar.get())
+        guiargs.custom = bool(generationSetupWindow.customVar.get())
         guiargs.customitemarray = [int(bowVar.get()), int(silverarrowVar.get()), int(boomerangVar.get()), int(magicboomerangVar.get()), int(hookshotVar.get()), int(mushroomVar.get()), int(magicpowderVar.get()), int(firerodVar.get()),
                                    int(icerodVar.get()), int(bombosVar.get()), int(etherVar.get()), int(quakeVar.get()), int(lampVar.get()), int(hammerVar.get()), int(shovelVar.get()), int(fluteVar.get()), int(bugnetVar.get()),
                                    int(bookVar.get()), int(bottleVar.get()), int(somariaVar.get()), int(byrnaVar.get()), int(capeVar.get()), int(mirrorVar.get()), int(bootsVar.get()), int(powergloveVar.get()), int(titansmittVar.get()),
@@ -219,7 +168,7 @@ def guiMain(args=None):
                                    int(arrow1Var.get()), int(arrow10Var.get()), int(bomb1Var.get()), int(bomb3Var.get()), int(rupee1Var.get()), int(rupee5Var.get()), int(rupee20Var.get()), int(rupee50Var.get()), int(rupee100Var.get()),
                                    int(rupee300Var.get()), int(rupoorVar.get()), int(blueclockVar.get()), int(greenclockVar.get()), int(redclockVar.get()), int(progbowVar.get()), int(bomb10Var.get()), int(triforcepieceVar.get()),
                                    int(triforcecountVar.get()), int(triforceVar.get()),  int(rupoorcostVar.get()), int(universalkeyVar.get())]
-        guiargs.rom = romVar.get()
+        guiargs.rom = generationSetupWindow.romVar.get()
 #        guiargs.sprite = gameOptionsWindow.sprite
         guiargs.outputpath = args.outputpath if args else None
         # get default values for missing parameters
@@ -252,9 +201,6 @@ def guiMain(args=None):
 
     openOutputButton.pack(side=RIGHT)
 
-    drowDownFrame.pack(side=LEFT)
-    rightHalfFrame.pack(side=RIGHT)
-    topFrame.pack(side=TOP)
     bottomFrame.pack(side=BOTTOM)
 
     # Adjuster Controls
@@ -354,7 +300,7 @@ def guiMain(args=None):
         guiargs.quickswap = bool(gameOptionsWindow.quickSwapVar.get())
         guiargs.disablemusic = bool(gameOptionsWindow.disableMusicVar.get())
         guiargs.rom = romVar2.get()
-        guiargs.baserom = romVar.get()
+        guiargs.baserom = generationSetupWindow.romVar.get()
 #        guiargs.sprite = sprite
         try:
             adjust(args=guiargs)
@@ -970,8 +916,8 @@ def guiMain(args=None):
             if type(v) is dict:
                 setattr(args, k, v[1]) # only get values for player 1 for now
         # load values from commandline args
-        createSpoilerVar.set(int(args.create_spoiler))
-        suppressRomVar.set(int(args.suppress_rom))
+        generationSetupWindow.createSpoilerVar.set(int(args.create_spoiler))
+        generationSetupWindow.suppressRomVar.set(int(args.suppress_rom))
         dungeonRandoWindow.mapshuffleVar.set(args.mapshuffle)
         dungeonRandoWindow.compassshuffleVar.set(args.compassshuffle)
         dungeonRandoWindow.keyshuffleVar.set(args.keyshuffle)
@@ -998,12 +944,12 @@ def guiMain(args=None):
         itemWindow.crystalsGanonVar.set(args.crystals_ganon)
         itemWindow.algorithmVar.set(args.algorithm)
         entrandoWindow.shuffleVar.set(args.shuffle)
-        doorShuffleVar.set(args.door_shuffle)
+        dungeonRandoWindow.doorShuffleVar.set(args.door_shuffle)
         gameOptionsWindow.heartcolorVar.set(args.heartcolor)
         gameOptionsWindow.heartbeepVar.set(args.heartbeep)
         gameOptionsWindow.fastMenuVar.set(args.fastmenu)
         itemWindow.logicVar.set(args.logic)
-        romVar.set(args.rom)
+        generationSetupWindow.romVar.set(args.rom)
         entrandoWindow.shuffleGanonVar.set(args.shuffleganon)
         gameOptionsWindow.hintsVar.set(args.hints)
         enemizerWindow.enemizerCLIpathVar.set(args.enemizercli)
