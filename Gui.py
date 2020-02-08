@@ -17,6 +17,7 @@ from gui.randomize.entrando import entrando_page
 from gui.randomize.enemizer import enemizer_page
 from gui.randomize.dungeon import dungeon_page
 from gui.randomize.multiworld import multiworld_page
+from gui.randomize.gameoptions import gameoptions_page
 from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
 from Main import main, __version__ as ESVersion
 from Rom import Sprite
@@ -94,7 +95,7 @@ def guiMain(args=None):
     randomizerNotebook.add(multiworldWindow, text="Multiworld")
 
     # Game Options
-    gameOptionsWindow = ttk.Frame(randomizerNotebook)
+    gameOptionsWindow = gameoptions_page(randomizerNotebook)
     randomizerNotebook.add(gameOptionsWindow, text="Game Options")
 
     # Generation Setup
@@ -112,15 +113,11 @@ def guiMain(args=None):
     createSpoilerCheckbutton = Checkbutton(checkBoxFrame, text="Create Spoiler Log", variable=createSpoilerVar)
     suppressRomVar = IntVar()
     suppressRomCheckbutton = Checkbutton(checkBoxFrame, text="Do not create patched Rom", variable=suppressRomVar)
-    hintsVar = IntVar()
-    hintsVar.set(1) #set default
-    hintsCheckbutton = Checkbutton(checkBoxFrame, text="Include Helpful Hints", variable=hintsVar)
     customVar = IntVar()
     customCheckbutton = Checkbutton(checkBoxFrame, text="Use custom item pool", variable=customVar)
 
     createSpoilerCheckbutton.pack(expand=True, anchor=W)
     suppressRomCheckbutton.pack(expand=True, anchor=W)
-    hintsCheckbutton.pack(expand=True, anchor=W)
     customCheckbutton.pack(expand=True, anchor=W)
 
     romOptionsFrame = LabelFrame(rightHalfFrame, text="Rom options")
@@ -128,87 +125,6 @@ def guiMain(args=None):
     romOptionsFrame.columnconfigure(1, weight=1)
     for i in range(5):
         romOptionsFrame.rowconfigure(i, weight=1)
-
-    disableMusicVar = IntVar()
-    disableMusicCheckbutton = Checkbutton(romOptionsFrame, text="Disable music", variable=disableMusicVar)
-    disableMusicCheckbutton.grid(row=0, column=0, sticky=E)
-
-    spriteDialogFrame = Frame(romOptionsFrame)
-    spriteDialogFrame.grid(row=0, column=1)
-    baseSpriteLabel = Label(spriteDialogFrame, text='Sprite:')
-
-    spriteNameVar = StringVar()
-    sprite = None
-    def set_sprite(sprite_param):
-        nonlocal sprite
-        if sprite_param is None or not sprite_param.valid:
-            sprite = None
-            spriteNameVar.set('(unchanged)')
-        else:
-            sprite = sprite_param
-            spriteNameVar.set(sprite.name)
-
-    set_sprite(None)
-    spriteNameVar.set('(unchanged)')
-    spriteEntry = Label(spriteDialogFrame, textvariable=spriteNameVar)
-
-    def SpriteSelect():
-        SpriteSelector(mainWindow, set_sprite)
-
-    spriteSelectButton = Button(spriteDialogFrame, text='...', command=SpriteSelect)
-
-    baseSpriteLabel.pack(side=LEFT)
-    spriteEntry.pack(side=LEFT)
-    spriteSelectButton.pack(side=LEFT)
-
-    quickSwapVar = IntVar()
-    quickSwapCheckbutton = Checkbutton(romOptionsFrame, text="L/R Quickswapping", variable=quickSwapVar)
-    quickSwapCheckbutton.grid(row=1, column=0, sticky=E)
-
-    fastMenuFrame = Frame(romOptionsFrame)
-    fastMenuFrame.grid(row=1, column=1, sticky=E)
-    fastMenuLabel = Label(fastMenuFrame, text='Menu speed')
-    fastMenuLabel.pack(side=LEFT)
-    fastMenuVar = StringVar()
-    fastMenuVar.set('normal')
-    fastMenuOptionMenu = OptionMenu(fastMenuFrame, fastMenuVar, 'normal', 'instant', 'double', 'triple', 'quadruple', 'half')
-    fastMenuOptionMenu.pack(side=LEFT)
-
-    heartcolorFrame = Frame(romOptionsFrame)
-    heartcolorFrame.grid(row=2, column=0, sticky=E)
-    heartcolorLabel = Label(heartcolorFrame, text='Heart color')
-    heartcolorLabel.pack(side=LEFT)
-    heartcolorVar = StringVar()
-    heartcolorVar.set('red')
-    heartcolorOptionMenu = OptionMenu(heartcolorFrame, heartcolorVar, 'red', 'blue', 'green', 'yellow', 'random')
-    heartcolorOptionMenu.pack(side=LEFT)
-
-    heartbeepFrame = Frame(romOptionsFrame)
-    heartbeepFrame.grid(row=2, column=1, sticky=E)
-    heartbeepLabel = Label(heartbeepFrame, text='Heartbeep')
-    heartbeepLabel.pack(side=LEFT)
-    heartbeepVar = StringVar()
-    heartbeepVar.set('normal')
-    heartbeepOptionMenu = OptionMenu(heartbeepFrame, heartbeepVar, 'double', 'normal', 'half', 'quarter', 'off')
-    heartbeepOptionMenu.pack(side=LEFT)
-
-    owPalettesFrame = Frame(romOptionsFrame)
-    owPalettesFrame.grid(row=3, column=0, sticky=E)
-    owPalettesLabel = Label(owPalettesFrame, text='Overworld palettes')
-    owPalettesLabel.pack(side=LEFT)
-    owPalettesVar = StringVar()
-    owPalettesVar.set('default')
-    owPalettesOptionMenu = OptionMenu(owPalettesFrame, owPalettesVar, 'default', 'random', 'blackout')
-    owPalettesOptionMenu.pack(side=LEFT)
-
-    uwPalettesFrame = Frame(romOptionsFrame)
-    uwPalettesFrame.grid(row=3, column=1, sticky=E)
-    uwPalettesLabel = Label(uwPalettesFrame, text='Dungeon palettes')
-    uwPalettesLabel.pack(side=LEFT)
-    uwPalettesVar = StringVar()
-    uwPalettesVar.set('default')
-    uwPalettesOptionMenu = OptionMenu(uwPalettesFrame, uwPalettesVar, 'default', 'random', 'blackout')
-    uwPalettesOptionMenu.pack(side=LEFT)
 
     romDialogFrame = Frame(romOptionsFrame)
     romDialogFrame.grid(row=4, column=0, columnspan=2, sticky=W+E)
@@ -269,9 +185,9 @@ def guiMain(args=None):
         guiargs.algorithm = itemWindow.algorithmVar.get()
         guiargs.shuffle = entrandoWindow.shuffleVar.get()
         guiargs.door_shuffle = doorShuffleVar.get()
-        guiargs.heartbeep = heartbeepVar.get()
-        guiargs.heartcolor = heartcolorVar.get()
-        guiargs.fastmenu = fastMenuVar.get()
+        guiargs.heartbeep = gameOptionsWindow.heartbeepVar.get()
+        guiargs.heartcolor = gameOptionsWindow.heartcolorVar.get()
+        guiargs.fastmenu = gameOptionsWindow.fastMenuVar.get()
         guiargs.create_spoiler = bool(createSpoilerVar.get())
         guiargs.skip_playthrough = not bool(createSpoilerVar.get())
         guiargs.suppress_rom = bool(suppressRomVar.get())
@@ -281,12 +197,12 @@ def guiMain(args=None):
         guiargs.keyshuffle = bool(dungeonRandoWindow.keyshuffleVar.get())
         guiargs.bigkeyshuffle = bool(dungeonRandoWindow.bigkeyshuffleVar.get())
         guiargs.retro = bool(itemWindow.retroVar.get())
-        guiargs.quickswap = bool(quickSwapVar.get())
-        guiargs.disablemusic = bool(disableMusicVar.get())
-        guiargs.ow_palettes = owPalettesVar.get()
-        guiargs.uw_palettes = uwPalettesVar.get()
+        guiargs.quickswap = bool(gameOptionsWindow.quickSwapVar.get())
+        guiargs.disablemusic = bool(gameOptionsWindow.disableMusicVar.get())
+        guiargs.ow_palettes = gameOptionsWindow.owPalettesVar.get()
+        guiargs.uw_palettes = gameOptionsWindow.uwPalettesVar.get()
         guiargs.shuffleganon = bool(entrandoWindow.shuffleGanonVar.get())
-        guiargs.hints = bool(hintsVar.get())
+        guiargs.hints = bool(gameOptionsWindow.hintsVar.get())
         guiargs.enemizercli = enemizerWindow.enemizerCLIpathVar.get()
         guiargs.shufflebosses = enemizerWindow.enemizerBossVar.get()
         guiargs.shuffleenemies = enemizerWindow.enemyShuffleVar.get()
@@ -304,7 +220,7 @@ def guiMain(args=None):
                                    int(rupee300Var.get()), int(rupoorVar.get()), int(blueclockVar.get()), int(greenclockVar.get()), int(redclockVar.get()), int(progbowVar.get()), int(bomb10Var.get()), int(triforcepieceVar.get()),
                                    int(triforcecountVar.get()), int(triforceVar.get()),  int(rupoorcostVar.get()), int(universalkeyVar.get())]
         guiargs.rom = romVar.get()
-        guiargs.sprite = sprite
+#        guiargs.sprite = gameOptionsWindow.sprite
         guiargs.outputpath = args.outputpath if args else None
         # get default values for missing parameters
         for k,v in vars(parse_arguments(['--multi', str(guiargs.multi)])).items():
@@ -347,8 +263,8 @@ def guiMain(args=None):
     rightHalfFrame2 = Frame(topFrame2)
     checkBoxFrame2 = Frame(rightHalfFrame2)
 
-    quickSwapCheckbutton2 = Checkbutton(checkBoxFrame2, text="Enabled L/R Item quickswapping", variable=quickSwapVar)
-    disableMusicCheckbutton2 = Checkbutton(checkBoxFrame2, text="Disable game music", variable=disableMusicVar)
+    quickSwapCheckbutton2 = Checkbutton(checkBoxFrame2, text="Enabled L/R Item quickswapping", variable=gameOptionsWindow.quickSwapVar)
+    disableMusicCheckbutton2 = Checkbutton(checkBoxFrame2, text="Disable game music", variable=gameOptionsWindow.disableMusicVar)
 
     quickSwapCheckbutton2.pack(expand=True, anchor=W)
     disableMusicCheckbutton2.pack(expand=True, anchor=W)
@@ -371,10 +287,11 @@ def guiMain(args=None):
 
     spriteDialogFrame2 = Frame(fileDialogFrame2)
     baseSpriteLabel2 = Label(spriteDialogFrame2, text='Link Sprite')
-    spriteEntry2 = Label(spriteDialogFrame2, textvariable=spriteNameVar)
+    spriteEntry2 = Label(spriteDialogFrame2, textvariable=gameOptionsWindow.spriteNameVar)
 
     def SpriteSelectAdjuster():
-        SpriteSelector(mainWindow, set_sprite, adjuster=True)
+        pass
+#        SpriteSelector(mainWindow, gameOptionsWindow.set_sprite, adjuster=True)
 
     spriteSelectButton2 = Button(spriteDialogFrame2, text='Select Sprite', command=SpriteSelectAdjuster)
 
@@ -390,31 +307,31 @@ def guiMain(args=None):
 
     drowDownFrame2 = Frame(topFrame2)
     heartbeepFrame2 = Frame(drowDownFrame2)
-    heartbeepOptionMenu2 = OptionMenu(heartbeepFrame2, heartbeepVar, 'double', 'normal', 'half', 'quarter', 'off')
+    heartbeepOptionMenu2 = OptionMenu(heartbeepFrame2, gameOptionsWindow.heartbeepVar, 'double', 'normal', 'half', 'quarter', 'off')
     heartbeepOptionMenu2.pack(side=RIGHT)
     heartbeepLabel2 = Label(heartbeepFrame2, text='Heartbeep sound rate')
     heartbeepLabel2.pack(side=LEFT)
 
     heartcolorFrame2 = Frame(drowDownFrame2)
-    heartcolorOptionMenu2 = OptionMenu(heartcolorFrame2, heartcolorVar, 'red', 'blue', 'green', 'yellow', 'random')
+    heartcolorOptionMenu2 = OptionMenu(heartcolorFrame2, gameOptionsWindow.heartcolorVar, 'red', 'blue', 'green', 'yellow', 'random')
     heartcolorOptionMenu2.pack(side=RIGHT)
     heartcolorLabel2 = Label(heartcolorFrame2, text='Heart color')
     heartcolorLabel2.pack(side=LEFT)
 
     fastMenuFrame2 = Frame(drowDownFrame2)
-    fastMenuOptionMenu2 = OptionMenu(fastMenuFrame2, fastMenuVar, 'normal', 'instant', 'double', 'triple', 'quadruple', 'half')
+    fastMenuOptionMenu2 = OptionMenu(fastMenuFrame2, gameOptionsWindow.fastMenuVar, 'normal', 'instant', 'double', 'triple', 'quadruple', 'half')
     fastMenuOptionMenu2.pack(side=RIGHT)
     fastMenuLabel2 = Label(fastMenuFrame2, text='Menu speed')
     fastMenuLabel2.pack(side=LEFT)
 
     owPalettesFrame2 = Frame(drowDownFrame2)
-    owPalettesOptionMenu2 = OptionMenu(owPalettesFrame2, owPalettesVar, 'default', 'random', 'blackout')
+    owPalettesOptionMenu2 = OptionMenu(owPalettesFrame2, gameOptionsWindow.owPalettesVar, 'default', 'random', 'blackout')
     owPalettesOptionMenu2.pack(side=RIGHT)
     owPalettesLabel2 = Label(owPalettesFrame2, text='Overworld palettes')
     owPalettesLabel2.pack(side=LEFT)
 
     uwPalettesFrame2 = Frame(drowDownFrame2)
-    uwPalettesOptionMenu2 = OptionMenu(uwPalettesFrame2, uwPalettesVar, 'default', 'random', 'blackout')
+    uwPalettesOptionMenu2 = OptionMenu(uwPalettesFrame2, gameOptionsWindow.uwPalettesVar, 'default', 'random', 'blackout')
     uwPalettesOptionMenu2.pack(side=RIGHT)
     uwPalettesLabel2 = Label(uwPalettesFrame2, text='Dungeon palettes')
     uwPalettesLabel2.pack(side=LEFT)
@@ -429,16 +346,16 @@ def guiMain(args=None):
 
     def adjustRom():
         guiargs = Namespace()
-        guiargs.heartbeep = heartbeepVar.get()
-        guiargs.heartcolor = heartcolorVar.get()
-        guiargs.fastmenu = fastMenuVar.get()
-        guiargs.ow_palettes = owPalettesVar.get()
-        guiargs.uw_palettes = uwPalettesVar.get()
-        guiargs.quickswap = bool(quickSwapVar.get())
-        guiargs.disablemusic = bool(disableMusicVar.get())
+        guiargs.heartbeep = gameOptionsWindow.heartbeepVar.get()
+        guiargs.heartcolor = gameOptionsWindow.heartcolorVar.get()
+        guiargs.fastmenu = gameOptionsWindow.fastMenuVar.get()
+        guiargs.ow_palettes = gameOptionsWindow.owPalettesVar.get()
+        guiargs.uw_palettes = gameOptionsWindow.uwPalettesVar.get()
+        guiargs.quickswap = bool(gameOptionsWindow.quickSwapVar.get())
+        guiargs.disablemusic = bool(gameOptionsWindow.disableMusicVar.get())
         guiargs.rom = romVar2.get()
         guiargs.baserom = romVar.get()
-        guiargs.sprite = sprite
+#        guiargs.sprite = sprite
         try:
             adjust(args=guiargs)
         except Exception as e:
@@ -1061,8 +978,8 @@ def guiMain(args=None):
         dungeonRandoWindow.bigkeyshuffleVar.set(args.bigkeyshuffle)
         itemWindow.retroVar.set(args.retro)
         entrandoWindow.openpyramidVar.set(args.openpyramid)
-        quickSwapVar.set(int(args.quickswap))
-        disableMusicVar.set(int(args.disablemusic))
+        gameOptionsWindow.quickSwapVar.set(int(args.quickswap))
+        gameOptionsWindow.disableMusicVar.set(int(args.disablemusic))
         if args.multi:
             multiworldWindow.worldVar.set(str(args.multi))
         if args.count:
@@ -1082,23 +999,23 @@ def guiMain(args=None):
         itemWindow.algorithmVar.set(args.algorithm)
         entrandoWindow.shuffleVar.set(args.shuffle)
         doorShuffleVar.set(args.door_shuffle)
-        heartcolorVar.set(args.heartcolor)
-        heartbeepVar.set(args.heartbeep)
-        fastMenuVar.set(args.fastmenu)
+        gameOptionsWindow.heartcolorVar.set(args.heartcolor)
+        gameOptionsWindow.heartbeepVar.set(args.heartbeep)
+        gameOptionsWindow.fastMenuVar.set(args.fastmenu)
         itemWindow.logicVar.set(args.logic)
         romVar.set(args.rom)
         entrandoWindow.shuffleGanonVar.set(args.shuffleganon)
-        hintsVar.set(args.hints)
+        gameOptionsWindow.hintsVar.set(args.hints)
         enemizerWindow.enemizerCLIpathVar.set(args.enemizercli)
         enemizerWindow.potShuffleVar.set(args.shufflepots)
         enemizerWindow.enemyShuffleVar.set(args.shuffleenemies)
         enemizerWindow.enemizerBossVar.set(args.shufflebosses)
         enemizerWindow.enemizerDamageVar.set(args.enemy_damage)
         enemizerWindow.enemizerHealthVar.set(args.enemy_health)
-        owPalettesVar.set(args.ow_palettes)
-        uwPalettesVar.set(args.uw_palettes)
-        if args.sprite is not None:
-            set_sprite(Sprite(args.sprite))
+        gameOptionsWindow.owPalettesVar.set(args.ow_palettes)
+        gameOptionsWindow.uwPalettesVar.set(args.uw_palettes)
+#        if args.sprite is not None:
+#            gameOptionsWindow.set_sprite(Sprite(args.sprite))
 
     mainWindow.mainloop()
 
