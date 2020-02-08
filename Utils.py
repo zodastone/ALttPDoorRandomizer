@@ -134,7 +134,7 @@ entrance_offsets = {
     'HC South': 0x4,
     'HC East': 0x5,
     'Eastern': 0x8,
-    'Desert West': 0x0,
+    'Desert West': 0x9,
     'Desert South': 0xa,
     'Desert East': 0xb,
     'Desert Back': 0xc,
@@ -187,14 +187,17 @@ def read_entrance_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan)
         old_rom_data = bytearray(stream.read())
 
     for ent, offset in entrance_offsets.items():
-        print(ent)
+        # print(ent)
+        str = ent
         for dp, data in entrance_data.items():
             byte_array = []
             address, size = data
             for i in range(0, size):
                 byte_array.append(old_rom_data[address+(offset*size)+i])
             bytes = ', '.join('0x{:02x}'.format(x) for x in byte_array)
-            print("%s: %s" % (dp, bytes))
+            str += '\t'+bytes
+            # print("%s: %s" % (dp, bytes))
+        print(str)
 
 
 def print_wiki_doors(d_regions, world, player):
@@ -239,4 +242,4 @@ def print_wiki_doors(d_regions, world, player):
 if __name__ == '__main__':
     pass
     # make_new_base2current()
-    # read_entrance_data(old_rom='')
+    read_entrance_data(old_rom='C:\\Users\\Randall\\Documents\\kwyn\\orig\\z3.sfc')
