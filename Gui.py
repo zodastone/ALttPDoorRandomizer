@@ -57,6 +57,48 @@ def guiMain(args=None):
 
     # randomizer controls
 
+    # Randomize notebook page:
+    #  make notebook pages: Item, Entrances, Enemizer, Dungeon Shuffle, Multiworld, Game Options, Generation Setup
+    #   Item:             Item Randomizer settings
+    #   Entrances:        Entrance Randomizer settings
+    #   Enemizer:         Enemy Randomizer settings
+    #   Dungeon Shuffle:  Dungeon Door Randomizer settings
+    #   Multiworld:       Multiworld settings
+    #   Game Options:     Cosmetic settings that don't affect logic/placement
+    #   Generation Setup: Primarily one&done settings
+    randomizerNotebook = ttk.Notebook(randomizerWindow)
+
+    # Item Randomizer
+    itemWindow = ttk.Frame(randomizerNotebook)
+    randomizerNotebook.add(itemWindow, text="Items")
+
+    # Entrance Randomizer
+    entrandoWindow = ttk.Frame(randomizerNotebook)
+    randomizerNotebook.add(entrandoWindow, text="Entrances")
+
+    # Enemizer
+    enemizerWindow = ttk.Frame(randomizerNotebook)
+    randomizerNotebook.add(enemizerWindow, text="Enemizer")
+
+    # Dungeon Shuffle
+    dungeonRandoWindow = ttk.Frame(randomizerNotebook)
+    randomizerNotebook.add(dungeonRandoWindow, text="Dungeon Shuffle")
+
+    # Multiworld
+    multiworldWindow = ttk.Frame(randomizerNotebook)
+    randomizerNotebook.add(multiworldWindow, text="Multiworld")
+
+    # Game Options
+    gameOptionsWindow = ttk.Frame(randomizerNotebook)
+    randomizerNotebook.add(gameOptionsWindow, text="Game Options")
+
+    # Generation Setup
+    generationSetupWindow = ttk.Frame(randomizerNotebook)
+    randomizerNotebook.add(generationSetupWindow, text="Generation Setup")
+
+    # add randomizer notebook to main window
+    randomizerNotebook.pack()
+
     topFrame = Frame(sortWindow)
     rightHalfFrame = Frame(topFrame)
     checkBoxFrame = Frame(rightHalfFrame)
