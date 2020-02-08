@@ -16,6 +16,7 @@ from gui.randomize.item import item_page
 from gui.randomize.entrando import entrando_page
 from gui.randomize.enemizer import enemizer_page
 from gui.randomize.dungeon import dungeon_page
+from gui.randomize.multiworld import multiworld_page
 from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
 from Main import main, __version__ as ESVersion
 from Rom import Sprite
@@ -89,7 +90,7 @@ def guiMain(args=None):
     randomizerNotebook.add(dungeonRandoWindow, text="Dungeon Shuffle")
 
     # Multiworld
-    multiworldWindow = ttk.Frame(randomizerNotebook)
+    multiworldWindow = multiworld_page(randomizerNotebook)
     randomizerNotebook.add(multiworldWindow, text="Multiworld")
 
     # Game Options
@@ -240,12 +241,6 @@ def guiMain(args=None):
 
     bottomFrame = Frame(randomizerWindow, pady=5)
 
-    worldLabel = Label(sortWindow, text='Worlds')
-    worldVar = StringVar()
-    worldSpinbox = Spinbox(sortWindow, from_=1, to=100, width=5, textvariable=worldVar)
-    namesLabel = Label(sortWindow, text='Player names')
-    namesVar = StringVar()
-    namesEntry = Entry(sortWindow, textvariable=namesVar)
     seedLabel = Label(farBottomFrame, text='Seed #')
     seedVar = StringVar()
     seedEntry = Entry(farBottomFrame, width=15, textvariable=seedVar)
@@ -255,8 +250,8 @@ def guiMain(args=None):
 
     def generateRom():
         guiargs = Namespace()
-        guiargs.multi = int(worldVar.get())
-        guiargs.names = namesVar.get()
+        guiargs.multi = int(multiworldWindow.worldVar.get())
+        guiargs.names = multiworldWindow.namesVar.get()
         guiargs.seed = int(seedVar.get()) if seedVar.get() else None
         guiargs.count = int(countVar.get()) if countVar.get() != '1' else None
         guiargs.mode = itemWindow.modeVar.get()
@@ -333,10 +328,6 @@ def guiMain(args=None):
 
     generateButton = Button(farBottomFrame, text='Generate Patched Rom', command=generateRom)
 
-    worldLabel.pack(side=LEFT)
-    worldSpinbox.pack(side=LEFT)
-    namesLabel.pack(side=LEFT)
-    namesEntry.pack(side=LEFT)
     seedLabel.pack(side=LEFT,  padx=(5, 0))
     seedEntry.pack(side=LEFT)
     countLabel.pack(side=LEFT, padx=(5, 0))
@@ -1073,7 +1064,7 @@ def guiMain(args=None):
         quickSwapVar.set(int(args.quickswap))
         disableMusicVar.set(int(args.disablemusic))
         if args.multi:
-            worldVar.set(str(args.multi))
+            multiworldWindow.worldVar.set(str(args.multi))
         if args.count:
             countVar.set(str(args.count))
         if args.seed:
