@@ -13,6 +13,7 @@ from urllib.request import urlopen
 from AdjusterMain import adjust
 from DungeonRandomizer import parse_arguments
 from gui.randomize.item import item_page
+from gui.randomize.entrando import entrando_page
 from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
 from Main import main, __version__ as ESVersion
 from Rom import Sprite
@@ -74,7 +75,7 @@ def guiMain(args=None):
     randomizerNotebook.add(itemWindow, text="Items")
 
     # Entrance Randomizer
-    entrandoWindow = ttk.Frame(randomizerNotebook)
+    entrandoWindow = entrando_page(randomizerNotebook)
     randomizerNotebook.add(entrandoWindow, text="Entrances")
 
     # Enemizer
@@ -108,8 +109,6 @@ def guiMain(args=None):
     createSpoilerCheckbutton = Checkbutton(checkBoxFrame, text="Create Spoiler Log", variable=createSpoilerVar)
     suppressRomVar = IntVar()
     suppressRomCheckbutton = Checkbutton(checkBoxFrame, text="Do not create patched Rom", variable=suppressRomVar)
-    openpyramidVar = IntVar()
-    openpyramidCheckbutton = Checkbutton(checkBoxFrame, text="Pre-open Pyramid Hole", variable=openpyramidVar)
     mcsbshuffleFrame = Frame(checkBoxFrame)
     mcsbLabel = Label(mcsbshuffleFrame, text="Shuffle: ")
     mapshuffleVar = IntVar()
@@ -120,9 +119,6 @@ def guiMain(args=None):
     keyshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="Keys", variable=keyshuffleVar)
     bigkeyshuffleVar = IntVar()
     bigkeyshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="BigKeys", variable=bigkeyshuffleVar)
-    shuffleGanonVar = IntVar()
-    shuffleGanonVar.set(1) #set default
-    shuffleGanonCheckbutton = Checkbutton(checkBoxFrame, text="Include Ganon's Tower and Pyramid Hole in shuffle pool", variable=shuffleGanonVar)
     hintsVar = IntVar()
     hintsVar.set(1) #set default
     hintsCheckbutton = Checkbutton(checkBoxFrame, text="Include Helpful Hints", variable=hintsVar)
@@ -131,14 +127,12 @@ def guiMain(args=None):
 
     createSpoilerCheckbutton.pack(expand=True, anchor=W)
     suppressRomCheckbutton.pack(expand=True, anchor=W)
-    openpyramidCheckbutton.pack(expand=True, anchor=W)
     mcsbshuffleFrame.pack(expand=True, anchor=W)
     mcsbLabel.grid(row=0, column=0)
     mapshuffleCheckbutton.grid(row=0, column=1)
     compassshuffleCheckbutton.grid(row=0, column=2)
     keyshuffleCheckbutton.grid(row=0, column=3)
     bigkeyshuffleCheckbutton.grid(row=0, column=4)
-    shuffleGanonCheckbutton.pack(expand=True, anchor=W)
     hintsCheckbutton.pack(expand=True, anchor=W)
     customCheckbutton.pack(expand=True, anchor=W)
 
@@ -250,14 +244,6 @@ def guiMain(args=None):
 
     drowDownFrame = Frame(topFrame)
 
-    shuffleFrame = Frame(drowDownFrame)
-    shuffleVar = StringVar()
-    shuffleVar.set('vanilla')
-    shuffleOptionMenu = OptionMenu(shuffleFrame, shuffleVar, 'vanilla', 'simple', 'restricted', 'full', 'crossed', 'insanity', 'restricted_legacy', 'full_legacy', 'madness_legacy', 'insanity_legacy', 'dungeonsfull', 'dungeonssimple')
-    shuffleOptionMenu.pack(side=RIGHT)
-    shuffleLabel = Label(shuffleFrame, text='Entrance shuffle algorithm')
-    shuffleLabel.pack(side=LEFT)
-
     doorShuffleFrame = Frame(drowDownFrame)
     doorShuffleVar = StringVar()
     doorShuffleVar.set('basic')
@@ -360,7 +346,7 @@ def guiMain(args=None):
         guiargs.progressive = itemWindow.progressiveVar.get()
         guiargs.accessibility = itemWindow.accessibilityVar.get()
         guiargs.algorithm = itemWindow.algorithmVar.get()
-        guiargs.shuffle = shuffleVar.get()
+        guiargs.shuffle = entrandoWindow.shuffleVar.get()
         guiargs.door_shuffle = doorShuffleVar.get()
         guiargs.heartbeep = heartbeepVar.get()
         guiargs.heartcolor = heartcolorVar.get()
@@ -368,7 +354,7 @@ def guiMain(args=None):
         guiargs.create_spoiler = bool(createSpoilerVar.get())
         guiargs.skip_playthrough = not bool(createSpoilerVar.get())
         guiargs.suppress_rom = bool(suppressRomVar.get())
-        guiargs.openpyramid = bool(openpyramidVar.get())
+        guiargs.openpyramid = bool(entrandoWindow.openpyramidVar.get())
         guiargs.mapshuffle = bool(mapshuffleVar.get())
         guiargs.compassshuffle = bool(compassshuffleVar.get())
         guiargs.keyshuffle = bool(keyshuffleVar.get())
@@ -378,7 +364,7 @@ def guiMain(args=None):
         guiargs.disablemusic = bool(disableMusicVar.get())
         guiargs.ow_palettes = owPalettesVar.get()
         guiargs.uw_palettes = uwPalettesVar.get()
-        guiargs.shuffleganon = bool(shuffleGanonVar.get())
+        guiargs.shuffleganon = bool(entrandoWindow.shuffleGanonVar.get())
         guiargs.hints = bool(hintsVar.get())
         guiargs.enemizercli = enemizerCLIpathVar.get()
         guiargs.shufflebosses = enemizerBossVar.get()
@@ -1158,7 +1144,7 @@ def guiMain(args=None):
         keyshuffleVar.set(args.keyshuffle)
         bigkeyshuffleVar.set(args.bigkeyshuffle)
         itemWindow.retroVar.set(args.retro)
-        openpyramidVar.set(args.openpyramid)
+        entrandoWindow.openpyramidVar.set(args.openpyramid)
         quickSwapVar.set(int(args.quickswap))
         disableMusicVar.set(int(args.disablemusic))
         if args.multi:
@@ -1178,14 +1164,14 @@ def guiMain(args=None):
         itemWindow.crystalsGTVar.set(args.crystals_gt)
         itemWindow.crystalsGanonVar.set(args.crystals_ganon)
         itemWindow.algorithmVar.set(args.algorithm)
-        shuffleVar.set(args.shuffle)
+        entrandoWindow.shuffleVar.set(args.shuffle)
         doorShuffleVar.set(args.door_shuffle)
         heartcolorVar.set(args.heartcolor)
         heartbeepVar.set(args.heartbeep)
         fastMenuVar.set(args.fastmenu)
         itemWindow.logicVar.set(args.logic)
         romVar.set(args.rom)
-        shuffleGanonVar.set(args.shuffleganon)
+        entrandoWindow.shuffleGanonVar.set(args.shuffleganon)
         hintsVar.set(args.hints)
         enemizerCLIpathVar.set(args.enemizercli)
         potShuffleVar.set(args.shufflepots)
