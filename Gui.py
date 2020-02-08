@@ -28,9 +28,11 @@ def guiMain(args=None):
     randomizerWindow = ttk.Frame(notebook)
     adjustWindow = ttk.Frame(notebook)
     customWindow = ttk.Frame(notebook)
+    sortWindow = ttk.Frame(notebook)
     notebook.add(randomizerWindow, text='Randomize')
     notebook.add(adjustWindow, text='Adjust')
     notebook.add(customWindow, text='Custom')
+    notebook.add(sortWindow, text='SORT')
     notebook.pack()
 
     # Shared Controls
@@ -55,7 +57,7 @@ def guiMain(args=None):
 
     # randomizer controls
 
-    topFrame = Frame(randomizerWindow)
+    topFrame = Frame(sortWindow)
     rightHalfFrame = Frame(topFrame)
     checkBoxFrame = Frame(rightHalfFrame)
 
@@ -338,7 +340,7 @@ def guiMain(args=None):
     accessibilityFrame.pack(expand=True, anchor=E)
     algorithmFrame.pack(expand=True, anchor=E)
 
-    enemizerFrame = LabelFrame(randomizerWindow, text="Enemizer", padx=5, pady=2)
+    enemizerFrame = LabelFrame(sortWindow, text="Enemizer", padx=5, pady=2)
     enemizerFrame.columnconfigure(0, weight=1)
     enemizerFrame.columnconfigure(1, weight=1)
     enemizerFrame.columnconfigure(2, weight=1)
@@ -400,18 +402,18 @@ def guiMain(args=None):
 
     bottomFrame = Frame(randomizerWindow, pady=5)
 
-    worldLabel = Label(bottomFrame, text='Worlds')
+    worldLabel = Label(sortWindow, text='Worlds')
     worldVar = StringVar()
-    worldSpinbox = Spinbox(bottomFrame, from_=1, to=100, width=5, textvariable=worldVar)
-    namesLabel = Label(bottomFrame, text='Player names')
+    worldSpinbox = Spinbox(sortWindow, from_=1, to=100, width=5, textvariable=worldVar)
+    namesLabel = Label(sortWindow, text='Player names')
     namesVar = StringVar()
-    namesEntry = Entry(bottomFrame, textvariable=namesVar)
-    seedLabel = Label(bottomFrame, text='Seed #')
+    namesEntry = Entry(sortWindow, textvariable=namesVar)
+    seedLabel = Label(farBottomFrame, text='Seed #')
     seedVar = StringVar()
-    seedEntry = Entry(bottomFrame, width=15, textvariable=seedVar)
-    countLabel = Label(bottomFrame, text='Count')
+    seedEntry = Entry(farBottomFrame, width=15, textvariable=seedVar)
+    countLabel = Label(farBottomFrame, text='Count')
     countVar = StringVar()
-    countSpinbox = Spinbox(bottomFrame, from_=1, to=100, width=5, textvariable=countVar)
+    countSpinbox = Spinbox(farBottomFrame, from_=1, to=100, width=5, textvariable=countVar)
 
     def generateRom():
         guiargs = Namespace()
@@ -491,7 +493,7 @@ def guiMain(args=None):
         else:
             messagebox.showinfo(title="Success", message="Rom patched successfully")
 
-    generateButton = Button(bottomFrame, text='Generate Patched Rom', command=generateRom)
+    generateButton = Button(farBottomFrame, text='Generate Patched Rom', command=generateRom)
 
     worldLabel.pack(side=LEFT)
     worldSpinbox.pack(side=LEFT)
