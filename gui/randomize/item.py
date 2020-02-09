@@ -6,17 +6,18 @@ def item_page(parent):
     self = ttk.Frame(parent)
 
     # Item Randomizer options
-    ## Retro (eventually needs to become a World State)
     self.itemWidgets = {}
 
-    self.itemWidgets["retro"] = widgets.make_widget(
+    ## Retro (eventually needs to become a World State)
+    key = "retro"
+    self.itemWidgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Retro mode (universal keys)",
       None
     )
-    self.itemWidgets["retro"].pack(anchor=W)
+    self.itemWidgets[key].pack(anchor=W)
 
     leftItemFrame = Frame(self)
     rightItemFrame = Frame(self)
@@ -24,7 +25,7 @@ def item_page(parent):
     rightItemFrame.pack(side=RIGHT)
 
     ## World State
-    key = "worldState"
+    key = "worldstate"
     self.itemWidgets[key] = widgets.make_widget(
       self,
       "selectbox",
@@ -41,7 +42,7 @@ def item_page(parent):
     self.itemWidgets[key].pack(anchor=E)
 
     ## Logic Level
-    key = "logicLevel"
+    key = "logiclevel"
     self.itemWidgets[key] = widgets.make_widget(
       self,
       "selectbox",
