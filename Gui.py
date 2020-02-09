@@ -164,4 +164,5 @@ def guiMain(args=None):
     mainWindow.mainloop()
 
 if __name__ == '__main__':
-    guiMain()
+    args = parse_arguments(None)
+    guiMain(args)
