@@ -14,6 +14,7 @@ from AdjusterMain import adjust
 from DungeonRandomizer import parse_arguments
 from gui.adjust.overview import adjust_page
 from gui.custom.overview import custom_page
+from gui.loadcliargs import loadcliargs
 from gui.randomize.item import item_page
 from gui.randomize.entrando import entrando_page
 from gui.randomize.enemizer import enemizer_page
@@ -109,57 +110,8 @@ def guiMain(args=None):
             return False
     vcmd=(self.customContent.register(validation), '%P')
 
-    if args is not None:
-        for k,v in vars(args).items():
-            if type(v) is dict:
-                setattr(args, k, v[1]) # only get values for player 1 for now
-        # load values from commandline args
-        self.generationSetupWindow.createSpoilerVar.set(int(args.create_spoiler))
-        self.generationSetupWindow.suppressRomVar.set(int(args.suppress_rom))
-        self.dungeonRandoWindow.mapshuffleVar.set(args.mapshuffle)
-        self.dungeonRandoWindow.compassshuffleVar.set(args.compassshuffle)
-        self.dungeonRandoWindow.keyshuffleVar.set(args.keyshuffle)
-        self.dungeonRandoWindow.bigkeyshuffleVar.set(args.bigkeyshuffle)
-        self.itemWindow.retroVar.set(args.retro)
-        self.entrandoWindow.openpyramidVar.set(args.openpyramid)
-        self.gameOptionsWindow.quickSwapVar.set(int(args.quickswap))
-        self.gameOptionsWindow.disableMusicVar.set(int(args.disablemusic))
-        if args.multi:
-            self.multiworldWindow.worldVar.set(str(args.multi))
-        if args.count:
-            self.farBottomFrame.countVar.set(str(args.count))
-        if args.seed:
-            self.farBottomFrame.seedVar.set(str(args.seed))
-        self.itemWindow.modeVar.set(args.mode)
-        self.itemWindow.swordVar.set(args.swords)
-        self.itemWindow.difficultyVar.set(args.difficulty)
-        self.itemWindow.itemfunctionVar.set(args.item_functionality)
-        self.itemWindow.timerVar.set(args.timer)
-        self.itemWindow.progressiveVar.set(args.progressive)
-        self.itemWindow.accessibilityVar.set(args.accessibility)
-        self.itemWindow.goalVar.set(args.goal)
-        self.itemWindow.crystalsGTVar.set(args.crystals_gt)
-        self.itemWindow.crystalsGanonVar.set(args.crystals_ganon)
-        self.itemWindow.algorithmVar.set(args.algorithm)
-        self.entrandoWindow.shuffleVar.set(args.shuffle)
-        self.dungeonRandoWindow.doorShuffleVar.set(args.door_shuffle)
-        self.gameOptionsWindow.heartcolorVar.set(args.heartcolor)
-        self.gameOptionsWindow.heartbeepVar.set(args.heartbeep)
-        self.gameOptionsWindow.fastMenuVar.set(args.fastmenu)
-        self.itemWindow.logicVar.set(args.logic)
-        self.generationSetupWindow.romVar.set(args.rom)
-        self.entrandoWindow.shuffleGanonVar.set(args.shuffleganon)
-        self.gameOptionsWindow.hintsVar.set(args.hints)
-        self.enemizerWindow.enemizerCLIpathVar.set(args.enemizercli)
-        self.enemizerWindow.potShuffleVar.set(args.shufflepots)
-        self.enemizerWindow.enemyShuffleVar.set(args.shuffleenemies)
-        self.enemizerWindow.enemizerBossVar.set(args.shufflebosses)
-        self.enemizerWindow.enemizerDamageVar.set(args.enemy_damage)
-        self.enemizerWindow.enemizerHealthVar.set(args.enemy_health)
-        self.gameOptionsWindow.owPalettesVar.set(args.ow_palettes)
-        self.gameOptionsWindow.uwPalettesVar.set(args.uw_palettes)
-#        if args.sprite is not None:
-#            self.gameOptionsWindow.set_sprite(Sprite(args.sprite))
+    # load args from CLI into options
+    loadcliargs(self,args)
 
     mainWindow.mainloop()
 
