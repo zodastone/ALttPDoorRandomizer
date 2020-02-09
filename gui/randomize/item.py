@@ -1,4 +1,5 @@
 from tkinter import ttk, IntVar, StringVar, Checkbutton, Frame, Label, OptionMenu, E, W, LEFT, RIGHT
+import gui.widgets as widgets
 
 def item_page(parent):
     # Item Randomizer
@@ -6,9 +7,16 @@ def item_page(parent):
 
     # Item Randomizer options
     ## Retro (eventually needs to become a World State)
-    self.retroVar = IntVar()
-    retroCheckbutton = Checkbutton(self, text="Retro mode (universal keys)", variable=self.retroVar)
-    retroCheckbutton.pack(anchor=W)
+    self.itemWidgets = {}
+
+    self.itemWidgets["retro"] = widgets.make_widget(
+      self,
+      "checkbox",
+      self,
+      "Retro mode (universal keys)",
+      None
+    )
+    self.itemWidgets["retro"].pack(anchor=W)
 
     leftItemFrame = Frame(self)
     rightItemFrame = Frame(self)
@@ -16,124 +24,215 @@ def item_page(parent):
     rightItemFrame.pack(side=RIGHT)
 
     ## World State
-    modeFrame = Frame(leftItemFrame)
-    self.modeVar = StringVar()
-    self.modeVar.set('open')
-    modeOptionMenu = OptionMenu(modeFrame, self.modeVar, 'standard', 'open', 'inverted')
-    modeOptionMenu.pack(side=RIGHT)
-    modeLabel = Label(modeFrame, text='World State')
-    modeLabel.pack(side=LEFT)
-    modeFrame.pack(anchor=E)
+    key = "worldState"
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      leftItemFrame,
+      "World State",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Open"},
+      {
+        "Standard": "standard",
+        "Open": "open",
+        "Inverted": "inverted"
+      }
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Logic Level
-    logicFrame = Frame(leftItemFrame)
-    self.logicVar = StringVar()
-    self.logicVar.set('noglitches')
-    logicOptionMenu = OptionMenu(logicFrame, self.logicVar, 'noglitches', 'minorglitches', 'nologic')
-    logicOptionMenu.pack(side=RIGHT)
-    logicLabel = Label(logicFrame, text='Game Logic')
-    logicLabel.pack(side=LEFT)
-    logicFrame.pack(anchor=E)
+    key = "logicLevel"
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      leftItemFrame,
+      "Logic Level",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "No Glitches": "noglitches",
+        "Minor Glitches": "minorglitches",
+        "No Logic": "nologic"
+      }
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Goal
-    goalFrame = Frame(leftItemFrame)
-    self.goalVar = StringVar()
-    self.goalVar.set('ganon')
-    goalOptionMenu = OptionMenu(goalFrame, self.goalVar, 'ganon', 'pedestal', 'dungeons', 'triforcehunt', 'crystals')
-    goalOptionMenu.pack(side=RIGHT)
-    goalLabel = Label(goalFrame, text='Goal')
-    goalLabel.pack(side=LEFT)
-    goalFrame.pack(anchor=E)
+    key = "goal"
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      leftItemFrame,
+      "Goal",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Defeat Ganon": "ganon",
+        "Master Sword Pedestal": "pedestal",
+        "All Dungeons": "dungeons",
+        "Triforce Hunt": "triforcehunt",
+        "Crystals": "crystals"
+      }
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Number of crystals to open GT
-    crystalsGTFrame = Frame(leftItemFrame)
-    self.crystalsGTVar = StringVar()
-    self.crystalsGTVar.set('7')
-    crystalsGTOptionMenu = OptionMenu(crystalsGTFrame, self.crystalsGTVar, '0', '1', '2', '3', '4', '5', '6', '7', 'random')
-    crystalsGTOptionMenu.pack(side=RIGHT)
-    crystalsGTLabel = Label(crystalsGTFrame, text='Crystals to open Ganon\'s Tower')
-    crystalsGTLabel.pack(side=LEFT)
-    crystalsGTFrame.pack(anchor=E)
+    key = "crystals_gt"
+    keys = [*map(str,range(0,7+1)),"Random"]
+    vals = [*map(str,range(0,7+1)),"random"]
+    options = {keys[i]: vals[i] for i in range(len(keys))}
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      leftItemFrame,
+      "Crystals to open GT",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      options
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Number of crystals to damage Ganon
-    crystalsGanonFrame = Frame(leftItemFrame)
-    self.crystalsGanonVar = StringVar()
-    self.crystalsGanonVar.set('7')
-    crystalsGanonOptionMenu = OptionMenu(crystalsGanonFrame, self.crystalsGanonVar, '0', '1', '2', '3', '4', '5', '6', '7', 'random')
-    crystalsGanonOptionMenu.pack(side=RIGHT)
-    crystalsGanonLabel = Label(crystalsGanonFrame, text='Crystals to fight Ganon')
-    crystalsGanonLabel.pack(side=LEFT)
-    crystalsGanonFrame.pack(anchor=E)
+    key = "crystals_ganon"
+    keys = [*map(str,range(0,7+1)),"Random"]
+    vals = [*map(str,range(0,7+1)),"random"]
+    options = {keys[i]: vals[i] for i in range(len(keys))}
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      leftItemFrame,
+      "Crystals to harm Ganon",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      options
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Weapons
-    swordFrame = Frame(leftItemFrame)
-    self.swordVar = StringVar()
-    self.swordVar.set('random')
-    swordOptionMenu = OptionMenu(swordFrame, self.swordVar, 'random', 'assured', 'swordless', 'vanilla')
-    swordOptionMenu.pack(side=RIGHT)
-    swordLabel = Label(swordFrame, text='Sword availability')
-    swordLabel.pack(side=LEFT)
-    swordFrame.pack(anchor=E)
+    key = "weapons"
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      leftItemFrame,
+      "Weapons",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Randomized": "random",
+        "Assured": "assured",
+        "Swordless": "swordless",
+        "Vanilla": "vanilla"
+      }
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Item Pool
-    difficultyFrame = Frame(rightItemFrame)
-    self.difficultyVar = StringVar()
-    self.difficultyVar.set('normal')
-    difficultyOptionMenu = OptionMenu(difficultyFrame, self.difficultyVar, 'normal', 'hard', 'expert')
-    difficultyOptionMenu.pack(side=RIGHT)
-    difficultyLabel = Label(difficultyFrame, text='Difficulty: item pool')
-    difficultyLabel.pack(side=LEFT)
-    difficultyFrame.pack(anchor=E)
+    key = "itempool"
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightItemFrame,
+      "Item Pool",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Normal": "normal",
+        "Hard": "hard",
+        "Expert": "expert"
+      }
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Item Functionality
-    itemfunctionFrame = Frame(rightItemFrame)
-    self.itemfunctionVar = StringVar()
-    self.itemfunctionVar.set('normal')
-    itemfunctionOptionMenu = OptionMenu(itemfunctionFrame, self.itemfunctionVar, 'normal', 'hard', 'expert')
-    itemfunctionOptionMenu.pack(side=RIGHT)
-    itemfunctionLabel = Label(itemfunctionFrame, text='Difficulty: item functionality')
-    itemfunctionLabel.pack(side=LEFT)
-    itemfunctionFrame.pack(anchor=E)
+    key = "itemfunction"
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightItemFrame,
+      "Item Functionality",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Normal": "normal",
+        "Hard": "hard",
+        "Expert": "expert"
+      }
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Timer setting
-    timerFrame = Frame(rightItemFrame)
-    self.timerVar = StringVar()
-    self.timerVar.set('none')
-    timerOptionMenu = OptionMenu(timerFrame, self.timerVar, 'none', 'display', 'timed', 'timed-ohko', 'ohko', 'timed-countdown')
-    timerOptionMenu.pack(side=RIGHT)
-    timerLabel = Label(timerFrame, text='Timer setting')
-    timerLabel.pack(side=LEFT)
-    timerFrame.pack(anchor=E)
+    key = "timer"
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightItemFrame,
+      "Timer Setting",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "No Timer": "none",
+        "Stopwatch": "display",
+        "Timed": "timed",
+        "Timed OHKO": "timed-ohko",
+        "OHKO": "ohko",
+        "Timed Countdown": "timed-countdown"
+      }
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Progressives: On/Off
-    progressiveFrame = Frame(rightItemFrame)
-    self.progressiveVar = StringVar()
-    self.progressiveVar.set('on')
-    progressiveOptionMenu = OptionMenu(progressiveFrame, self.progressiveVar, 'on', 'off', 'random')
-    progressiveOptionMenu.pack(side=RIGHT)
-    progressiveLabel = Label(progressiveFrame, text='Progressive equipment')
-    progressiveLabel.pack(side=LEFT)
-    progressiveFrame.pack(anchor=E)
+    key = "progressives"
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightItemFrame,
+      "Progressive Items",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "On": "on",
+        "Off": "off",
+        "Random": "random"
+      }
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Accessibilty
-    accessibilityFrame = Frame(rightItemFrame)
-    self.accessibilityVar = StringVar()
-    self.accessibilityVar.set('items')
-    accessibilityOptionMenu = OptionMenu(accessibilityFrame, self.accessibilityVar, 'items', 'locations', 'none')
-    accessibilityOptionMenu.pack(side=RIGHT)
-    accessibilityLabel = Label(accessibilityFrame, text='Item accessibility')
-    accessibilityLabel.pack(side=LEFT)
-    accessibilityFrame.pack(anchor=E)
-    accessibilityFrame.pack(anchor=E)
+    key = "accessibility"
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightItemFrame,
+      "Accessibility",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "100% Inventory": "items",
+        "100% Locations": "locations",
+        "Beatable": "none"
+      }
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     ## Item Sorting Algorithm
-    algorithmFrame = Frame(rightItemFrame)
-    self.algorithmVar = StringVar()
-    self.algorithmVar.set('balanced')
-    algorithmOptionMenu = OptionMenu(algorithmFrame, self.algorithmVar, 'freshness', 'flood', 'vt21', 'vt22', 'vt25', 'vt26', 'balanced')
-    algorithmOptionMenu.pack(side=RIGHT)
-    algorithmLabel = Label(algorithmFrame, text='Item distribution algorithm')
-    algorithmLabel.pack(side=LEFT)
-    algorithmFrame.pack(anchor=E)
+    key = "sortingalgo"
+    self.itemWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightItemFrame,
+      "Item Sorting",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Balanced"},
+      {
+        "Freshness": "freshness",
+        "Flood": "flood",
+        "VT8.21": "vt21",
+        "VT8.22": "vt22",
+        "VT8.25": "vt25",
+        "VT8.26": "vt26",
+        "Balanced": "balanced"
+      }
+    )
+    self.itemWidgets[key].pack(anchor=E)
 
     return self
