@@ -12,6 +12,7 @@ from urllib.request import urlopen
 
 from AdjusterMain import adjust
 from DungeonRandomizer import parse_arguments
+from gui.adjust.overview import adjust_page
 from gui.randomize.item import item_page
 from gui.randomize.entrando import entrando_page
 from gui.randomize.enemizer import enemizer_page
@@ -92,120 +93,9 @@ def guiMain(args=None):
     self.farBottomFrame.pack(side=BOTTOM, fill=X, padx=5, pady=5)
 
     # Adjuster Controls
-
-    topFrame2 = Frame(self.adjustWindow)
-    rightHalfFrame2 = Frame(topFrame2)
-    checkBoxFrame2 = Frame(rightHalfFrame2)
-
-    quickSwapCheckbutton2 = Checkbutton(checkBoxFrame2, text="Enabled L/R Item quickswapping", variable=self.gameOptionsWindow.quickSwapVar)
-    disableMusicCheckbutton2 = Checkbutton(checkBoxFrame2, text="Disable game music", variable=self.gameOptionsWindow.disableMusicVar)
-
-    quickSwapCheckbutton2.pack(expand=True, anchor=W)
-    disableMusicCheckbutton2.pack(expand=True, anchor=W)
-
-    fileDialogFrame2 = Frame(rightHalfFrame2)
-
-    romDialogFrame2 = Frame(fileDialogFrame2)
-    baseRomLabel2 = Label(romDialogFrame2, text='Rom to adjust')
-    romVar2 = StringVar()
-    romEntry2 = Entry(romDialogFrame2, textvariable=romVar2)
-
-    def RomSelect2():
-        rom = filedialog.askopenfilename(filetypes=[("Rom Files", (".sfc", ".smc")), ("All Files", "*")])
-        romVar2.set(rom)
-    romSelectButton2 = Button(romDialogFrame2, text='Select Rom', command=RomSelect2)
-
-    baseRomLabel2.pack(side=LEFT)
-    romEntry2.pack(side=LEFT)
-    romSelectButton2.pack(side=LEFT)
-
-    spriteDialogFrame2 = Frame(fileDialogFrame2)
-    baseSpriteLabel2 = Label(spriteDialogFrame2, text='Link Sprite')
-    spriteEntry2 = Label(spriteDialogFrame2, textvariable=self.gameOptionsWindow.spriteNameVar)
-
-    def SpriteSelectAdjuster():
-        pass
-#        SpriteSelector(mainWindow, gameOptionsWindow.set_sprite, adjuster=True)
-
-    spriteSelectButton2 = Button(spriteDialogFrame2, text='Select Sprite', command=SpriteSelectAdjuster)
-
-    baseSpriteLabel2.pack(side=LEFT)
-    spriteEntry2.pack(side=LEFT)
-    spriteSelectButton2.pack(side=LEFT)
-
-    romDialogFrame2.pack()
-    spriteDialogFrame2.pack()
-
-    checkBoxFrame2.pack()
-    fileDialogFrame2.pack()
-
-    drowDownFrame2 = Frame(topFrame2)
-    heartbeepFrame2 = Frame(drowDownFrame2)
-    heartbeepOptionMenu2 = OptionMenu(heartbeepFrame2, self.gameOptionsWindow.heartbeepVar, 'double', 'normal', 'half', 'quarter', 'off')
-    heartbeepOptionMenu2.pack(side=RIGHT)
-    heartbeepLabel2 = Label(heartbeepFrame2, text='Heartbeep sound rate')
-    heartbeepLabel2.pack(side=LEFT)
-
-    heartcolorFrame2 = Frame(drowDownFrame2)
-    heartcolorOptionMenu2 = OptionMenu(heartcolorFrame2, self.gameOptionsWindow.heartcolorVar, 'red', 'blue', 'green', 'yellow', 'random')
-    heartcolorOptionMenu2.pack(side=RIGHT)
-    heartcolorLabel2 = Label(heartcolorFrame2, text='Heart color')
-    heartcolorLabel2.pack(side=LEFT)
-
-    fastMenuFrame2 = Frame(drowDownFrame2)
-    fastMenuOptionMenu2 = OptionMenu(fastMenuFrame2, self.gameOptionsWindow.fastMenuVar, 'normal', 'instant', 'double', 'triple', 'quadruple', 'half')
-    fastMenuOptionMenu2.pack(side=RIGHT)
-    fastMenuLabel2 = Label(fastMenuFrame2, text='Menu speed')
-    fastMenuLabel2.pack(side=LEFT)
-
-    owPalettesFrame2 = Frame(drowDownFrame2)
-    owPalettesOptionMenu2 = OptionMenu(owPalettesFrame2, self.gameOptionsWindow.owPalettesVar, 'default', 'random', 'blackout')
-    owPalettesOptionMenu2.pack(side=RIGHT)
-    owPalettesLabel2 = Label(owPalettesFrame2, text='Overworld palettes')
-    owPalettesLabel2.pack(side=LEFT)
-
-    uwPalettesFrame2 = Frame(drowDownFrame2)
-    uwPalettesOptionMenu2 = OptionMenu(uwPalettesFrame2, self.gameOptionsWindow.uwPalettesVar, 'default', 'random', 'blackout')
-    uwPalettesOptionMenu2.pack(side=RIGHT)
-    uwPalettesLabel2 = Label(uwPalettesFrame2, text='Dungeon palettes')
-    uwPalettesLabel2.pack(side=LEFT)
-
-    heartbeepFrame2.pack(expand=True, anchor=E)
-    heartcolorFrame2.pack(expand=True, anchor=E)
-    fastMenuFrame2.pack(expand=True, anchor=E)
-    owPalettesFrame2.pack(expand=True, anchor=E)
-    uwPalettesFrame2.pack(expand=True, anchor=E)
-
-    bottomFrame2 = Frame(topFrame2)
-
-    def adjustRom():
-        guiargs = Namespace()
-        guiargs.heartbeep = self.gameOptionsWindow.heartbeepVar.get()
-        guiargs.heartcolor = self.gameOptionsWindow.heartcolorVar.get()
-        guiargs.fastmenu = self.gameOptionsWindow.fastMenuVar.get()
-        guiargs.ow_palettes = self.gameOptionsWindow.owPalettesVar.get()
-        guiargs.uw_palettes = self.gameOptionsWindow.uwPalettesVar.get()
-        guiargs.quickswap = bool(self.gameOptionsWindow.quickSwapVar.get())
-        guiargs.disablemusic = bool(self.gameOptionsWindow.disableMusicVar.get())
-        guiargs.rom = romVar2.get()
-        guiargs.baserom = self.generationSetupWindow.romVar.get()
-#        guiargs.sprite = sprite
-        try:
-            adjust(args=guiargs)
-        except Exception as e:
-            logging.exception(e)
-            messagebox.showerror(title="Error while creating seed", message=str(e))
-        else:
-            messagebox.showinfo(title="Success", message="Rom patched successfully")
-
-    adjustButton = Button(bottomFrame2, text='Adjust Rom', command=adjustRom)
-
-    adjustButton.pack(side=LEFT, padx=(5, 0))
-
-    drowDownFrame2.pack(side=LEFT, pady=(0, 40))
-    rightHalfFrame2.pack(side=RIGHT)
-    topFrame2.pack(side=TOP, pady=70)
-    bottomFrame2.pack(side=BOTTOM, pady=(180, 0))
+    self.adjustContent = adjust_page(self,self.adjustWindow)
+#    self.adjustContent,self.working_dirs = adjust_page(self,self.adjustWindow,self.working_dirs)
+    self.adjustContent.pack(side=TOP, fill=BOTH, expand=True)
 
     # Custom Controls
 
