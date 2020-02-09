@@ -1,7 +1,7 @@
 import os
 from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, LabelFrame, OptionMenu, E, W, LEFT, RIGHT, X
 
-def enemizer_page(parent):#,working_dirs):
+def enemizer_page(parent,working_dirs):
     self = ttk.Frame(parent)
 
     # Enemizer
@@ -16,10 +16,9 @@ def enemizer_page(parent):#,working_dirs):
     enemizerPathFrame.grid(row=0, column=0, columnspan=3, sticky=W+E)
     enemizerCLIlabel = Label(enemizerPathFrame, text="EnemizerCLI path: ")
     enemizerCLIlabel.pack(side=LEFT)
-    self.enemizerCLIpathVar = StringVar()
+    self.enemizerCLIpathVar = StringVar(value=working_dirs["enemizer.cli"])
     def saveEnemizerPath(caller,_,mode):
-        pass
-        #working_dirs["enemizer.cli"] = self.enemizerCLIpathVar.get()
+        working_dirs["enemizer.cli"] = self.enemizerCLIpathVar.get()
     self.enemizerCLIpathVar.trace_add("write",saveEnemizerPath)
     enemizerCLIpathEntry = Entry(enemizerPathFrame, textvariable=self.enemizerCLIpathVar)
     enemizerCLIpathEntry.pack(side=LEFT, fill=X, expand=True)
@@ -27,7 +26,7 @@ def enemizer_page(parent):#,working_dirs):
         path = filedialog.askopenfilename(filetypes=[("EnemizerCLI executable", "*EnemizerCLI*")], initialdir=os.path.join("."))
         if path:
             self.enemizerCLIpathVar.set(path)
-            #working_dirs["enemizer.cli"] = path
+            working_dirs["enemizer.cli"] = path
     enemizerCLIbrowseButton = Button(enemizerPathFrame, text='...', command=EnemizerSelectPath)
     enemizerCLIbrowseButton.pack(side=LEFT)
 
@@ -76,4 +75,4 @@ def enemizer_page(parent):#,working_dirs):
     enemizerHealthOption = OptionMenu(enemizerHealthFrame, self.enemizerHealthVar, 'default', 'easy', 'normal', 'hard', 'expert')
     enemizerHealthOption.pack(side=LEFT)
 
-    return self#,working_dirs
+    return self,working_dirs

@@ -1,7 +1,7 @@
 import os
 from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, E, W, LEFT, RIGHT, X
 
-def generation_page(parent):#,working_dirs):
+def generation_page(parent,working_dirs):
     self = ttk.Frame(parent)
 
     # Generation Setup options
@@ -22,11 +22,10 @@ def generation_page(parent):#,working_dirs):
     baseRomLabel = Label(baseRomFrame, text='Base Rom: ')
     self.romVar = StringVar()
     def saveBaseRom(caller,_,mode):
-        pass
-#        working_dirs["rom.base"] = self.romVar.get()
+        working_dirs["rom.base"] = self.romVar.get()
     self.romVar.trace_add("write",saveBaseRom)
     romEntry = Entry(baseRomFrame, textvariable=self.romVar)
-#    self.romVar.set(working_dirs["rom.base"])
+    self.romVar.set(working_dirs["rom.base"])
 
     def RomSelect():
         rom = filedialog.askopenfilename(filetypes=[("Rom Files", (".sfc", ".smc")), ("All Files", "*")], initialdir=os.path.join("."))
@@ -38,4 +37,4 @@ def generation_page(parent):#,working_dirs):
     romSelectButton.pack(side=LEFT)
     baseRomFrame.pack(fill=X, expand=True)
 
-    return self#,working_dirs
+    return self,working_dirs

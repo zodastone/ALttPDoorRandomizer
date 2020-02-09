@@ -23,6 +23,9 @@ def parse_arguments(argv, no_defaults=False):
     def defval(value):
         return value if not no_defaults else None
 
+    # get working dirs
+    working_dirs = get_working_dirs()
+
     # we need to know how many players we have first
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--multi', default=defval(1), type=lambda value: min(max(int(value), 1), 255))
@@ -203,10 +206,10 @@ def parse_arguments(argv, no_defaults=False):
     parser.add_argument('--openpyramid', default=defval(False), help='''\
                             Pre-opens the pyramid hole, this removes the Agahnim 2 requirement for it
                              ''', action='store_true')
-    parser.add_argument('--rom', default=defval('Zelda no Densetsu - Kamigami no Triforce (Japan).sfc'), help='Path to an ALttP JAP(1.0) rom to use as a base.')
+    parser.add_argument('--rom', default=defval(working_dirs["rom.base"]), help='Path to an ALttP JAP(1.0) rom to use as a base.')
     parser.add_argument('--loglevel', default=defval('info'), const='info', nargs='?', choices=['error', 'info', 'warning', 'debug'], help='Select level of logging for output.')
-    parser.add_argument('--seed', help='Define seed number to generate.', type=int)
-    parser.add_argument('--count', help='''\
+    parser.add_argument('--seed', default=defval(int(working_dirs["gen.seed"]) if working_dirs["gen.seed"] is not "" and working_dirs["gen.seed"] is not None else None), help='Define seed number to generate.', type=int)
+    parser.add_argument('--count', default=defval(int(working_dirs["gen.count"])), help='''\
                              Use to batch generate multiple seeds with same settings.
                              If --seed is provided, it will be used for the first seed, then
                              used to derive the next seed (i.e. generating 10 seeds with
@@ -271,7 +274,7 @@ def parse_arguments(argv, no_defaults=False):
                             for VT site integration, do not use otherwise.
                             ''')
     parser.add_argument('--skip_playthrough', action='store_true', default=defval(False))
-    parser.add_argument('--enemizercli', default=defval('EnemizerCLI/EnemizerCLI.Core'))
+    parser.add_argument('--enemizercli', default=defval(working_dirs["enemizer.cli"]))
     parser.add_argument('--shufflebosses', default=defval('none'), choices=['none', 'basic', 'normal', 'chaos'])
     parser.add_argument('--shuffleenemies', default=defval('none'), choices=['none', 'shuffled', 'chaos'])
     parser.add_argument('--enemy_health', default=defval('default'), choices=['default', 'easy', 'normal', 'hard', 'expert'])
@@ -279,10 +282,10 @@ def parse_arguments(argv, no_defaults=False):
     parser.add_argument('--shufflepots', default=defval(False), action='store_true')
     parser.add_argument('--beemizer', default=defval(0), type=lambda value: min(max(int(value), 0), 4))
     parser.add_argument('--remote_items', default=defval(False), action='store_true')
-    parser.add_argument('--multi', default=defval(1), type=lambda value: min(max(int(value), 1), 255))
-    parser.add_argument('--names', default=defval(''))
+    parser.add_argument('--multi', default=defval(working_dirs["multi.worlds"]), type=lambda value: min(max(int(value), 1), 255))
+    parser.add_argument('--names', default=defval(working_dirs["multi.names"]))
     parser.add_argument('--teams', default=defval(1), type=lambda value: max(int(value), 1))
-    parser.add_argument('--outputpath')
+    parser.add_argument('--outputpath', default=defval(working_dirs["outputpath"]))
     parser.add_argument('--race', default=defval(False), action='store_true')
     parser.add_argument('--outputname')
 

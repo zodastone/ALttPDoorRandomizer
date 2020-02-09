@@ -6,11 +6,13 @@ import logging
 import random
 import os
 import shutil
+import sys
 from tkinter import Checkbutton, OptionMenu, Toplevel, LabelFrame, PhotoImage, Tk, LEFT, RIGHT, BOTTOM, TOP, StringVar, IntVar, Frame, Label, W, E, X, BOTH, Entry, Spinbox, Button, filedialog, messagebox, ttk
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from AdjusterMain import adjust
+from CLI import get_working_dirs
 from DungeonRandomizer import parse_arguments
 from gui.adjust.overview import adjust_page
 from gui.custom.overview import custom_page
@@ -30,11 +32,33 @@ from Utils import is_bundled, local_path, output_path, open_file
 
 
 def guiMain(args=None):
+    # save working dirs
+    def save_working_dirs():
+        user_resources_path = os.path.join(".","resources","user")
+        working_dirs_path = os.path.join(user_resources_path)
+        if not os.path.exists(working_dirs_path):
+            os.makedirs(working_dirs_path)
+        with open(os.path.join(working_dirs_path,"working_dirs.json"),"w+") as f:
+            f.write(json.dumps(self.working_dirs,indent=2))
+        os.chmod(os.path.join(working_dirs_path,"working_dirs.json"),0o755)
+
+    # routine for exiting the app
+    def guiExit():
+        save_working_dirs()
+        sys.exit(0)
+
+    # make main window
+    # add program title & version number
     mainWindow = Tk()
     self = mainWindow
     mainWindow.wm_title("Door Shuffle %s" % ESVersion)
+    mainWindow.protocol("WM_DELETE_WINDOW",guiExit) # intercept when user clicks the X
 
+    # set program icon
     set_icon(mainWindow)
+
+    # get working dirs
+    self.working_dirs = get_working_dirs()
 
     notebook = ttk.Notebook(self)
     self.randomizerWindow = ttk.Frame(notebook)
@@ -67,7 +91,7 @@ def guiMain(args=None):
     self.randomizerNotebook.add(self.entrandoWindow, text="Entrances")
 
     # Enemizer
-    self.enemizerWindow = enemizer_page(self.randomizerNotebook)
+    self.enemizerWindow,self.working_dirs = enemizer_page(self.randomizerNotebook,self.working_dirs)
     self.randomizerNotebook.add(self.enemizerWindow, text="Enemizer")
 
     # Dungeon Shuffle
@@ -75,7 +99,7 @@ def guiMain(args=None):
     self.randomizerNotebook.add(self.dungeonRandoWindow, text="Dungeon Shuffle")
 
     # Multiworld
-    self.multiworldWindow = multiworld_page(self.randomizerNotebook)
+    self.multiworldWindow,self.working_dirs = multiworld_page(self.randomizerNotebook,self.working_dirs)
     self.randomizerNotebook.add(self.multiworldWindow, text="Multiworld")
 
     # Game Options
@@ -83,7 +107,7 @@ def guiMain(args=None):
     self.randomizerNotebook.add(self.gameOptionsWindow, text="Game Options")
 
     # Generation Setup
-    self.generationSetupWindow = generation_page(self.randomizerNotebook)
+    self.generationSetupWindow,self.working_dirs = generation_page(self.randomizerNotebook,self.working_dirs)
     self.randomizerNotebook.add(self.generationSetupWindow, text="Generation Setup")
 
     # add randomizer notebook to main window
@@ -95,7 +119,7 @@ def guiMain(args=None):
     self.farBottomFrame.pack(side=BOTTOM, fill=X, padx=5, pady=5)
 
     # Adjuster Controls
-    self.adjustContent = adjust_page(self,self.adjustWindow)
+    self.adjustContent,self.working_dirs = adjust_page(self,self.adjustWindow,self.working_dirs)
 #    self.adjustContent,self.working_dirs = adjust_page(self,self.adjustWindow,self.working_dirs)
     self.adjustContent.pack(side=TOP, fill=BOTH, expand=True)
 

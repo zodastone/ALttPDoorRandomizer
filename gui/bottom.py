@@ -8,26 +8,23 @@ from Main import main
 from Utils import local_path, output_path, open_file
 
 def bottom_frame(self,parent,args=None):
-#    working_dirs = get_working_dirs()
-
     self = ttk.Frame(parent)
     seedCountFrame = Frame(self)
     seedCountFrame.pack()
     ## Seed #
     seedLabel = Label(self, text='Seed #')
-#    self.seedVar = StringVar(value=parent.working_dirs["gen.seed"])
-    self.seedVar = StringVar()
+    savedSeed = parent.working_dirs["gen.seed"]
+    self.seedVar = StringVar(value=savedSeed)
     def saveSeed(caller,_,mode):
-        pass
-#        parent.working_dirs["gen.seed"] = self.seedVar.get()
+        savedSeed = self.seedVar.get()
+        parent.working_dirs["gen.seed"] = int(savedSeed) if savedSeed.isdigit() else None
     self.seedVar.trace_add("write",saveSeed)
     seedEntry = Entry(self, width=15, textvariable=self.seedVar)
     seedLabel.pack(side=LEFT)
     seedEntry.pack(side=LEFT)
     ## Number of Generation attempts
     countLabel = Label(self, text='Count')
-#    self.countVar = StringVar(value=working_dirs["gen.count"])
-    self.countVar = StringVar()
+    self.countVar = StringVar(value=parent.working_dirs["gen.count"])
     countSpinbox = Spinbox(self, from_=1, to=100, width=5, textvariable=self.countVar)
     countLabel.pack(side=LEFT)
     countSpinbox.pack(side=LEFT)
@@ -118,8 +115,7 @@ def bottom_frame(self,parent,args=None):
         if args and args.outputpath:
             open_file(output_path(args.outputpath))
         else:
-            open_file(output_path("."))
-#            open_file(output_path(working_dirs["outputpath"]))
+            open_file(output_path(parent.working_dirs["outputpath"]))
 
     openOutputButton = Button(self, text='Open Output Directory', command=open_output)
     openOutputButton.pack(side=RIGHT)
