@@ -1,19 +1,27 @@
 import os
-from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, LabelFrame, OptionMenu, E, W, LEFT, RIGHT, X
+from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, LabelFrame, OptionMenu, N, E, W, LEFT, RIGHT, X
+import gui.widgets as widgets
 
 def enemizer_page(parent,working_dirs):
+    # Enemizer
     self = ttk.Frame(parent)
 
-    # Enemizer
-    enemizerFrame = LabelFrame(self, text="Enemizer")
-    enemizerFrame.columnconfigure(0, weight=1)
-    enemizerFrame.columnconfigure(1, weight=1)
-    enemizerFrame.columnconfigure(2, weight=1)
-    enemizerFrame.columnconfigure(3, weight=1)
+    # Enemizer options
+    self.enemizerWidgets = {}
+
+    # Pot Shuffle
+    key = "potshuffle"
+    self.enemizerWidgets[key] = widgets.make_widget(
+      self,
+      "checkbox",
+      self,
+      "Pot Shuffle",
+      None
+    )
+    self.enemizerWidgets[key].pack(anchor=W)
 
     ## Enemizer CLI Path
     enemizerPathFrame = Frame(self)
-    enemizerPathFrame.grid(row=0, column=0, columnspan=3, sticky=W+E)
     enemizerCLIlabel = Label(enemizerPathFrame, text="EnemizerCLI path: ")
     enemizerCLIlabel.pack(side=LEFT)
     self.enemizerCLIpathVar = StringVar(value=working_dirs["enemizer.cli"])
@@ -29,50 +37,82 @@ def enemizer_page(parent,working_dirs):
             working_dirs["enemizer.cli"] = path
     enemizerCLIbrowseButton = Button(enemizerPathFrame, text='...', command=EnemizerSelectPath)
     enemizerCLIbrowseButton.pack(side=LEFT)
+    enemizerPathFrame.pack(fill=X, expand=True)
 
-    ## Pot Shuffle
-    self.potShuffleVar = IntVar()
-    potShuffleButton = Checkbutton(self, text="Pot shuffle", variable=self.potShuffleVar)
-    potShuffleButton.grid(row=0, column=3)
+    leftEnemizerFrame = Frame(self)
+    rightEnemizerFrame = Frame(self)
+    leftEnemizerFrame.pack(side=LEFT, anchor=N)
+    rightEnemizerFrame.pack(side=RIGHT, anchor=N)
 
     ## Randomize Enemies
-    enemizerEnemyFrame = Frame(self)
-    enemizerEnemyFrame.grid(row=1, column=0)
-    enemizerEnemyLabel = Label(enemizerEnemyFrame, text='Enemy shuffle')
-    enemizerEnemyLabel.pack(side=LEFT)
-    self.enemyShuffleVar = StringVar()
-    self.enemyShuffleVar.set('none')
-    enemizerEnemyOption = OptionMenu(enemizerEnemyFrame, self.enemyShuffleVar, 'none', 'shuffled', 'chaos')
-    enemizerEnemyOption.pack(side=LEFT)
+    key = "enemyshuffle"
+    self.enemizerWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      leftEnemizerFrame,
+      "Enemy Shuffle",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Vanilla": "none",
+        "Shuffled": "shuffled",
+        "Chaos": "chaos"
+      }
+    )
+    self.enemizerWidgets[key].pack(anchor=W)
 
     ## Randomize Bosses
-    enemizerBossFrame = Frame(self)
-    enemizerBossFrame.grid(row=1, column=1)
-    enemizerBossLabel = Label(enemizerBossFrame, text='Boss shuffle')
-    enemizerBossLabel.pack(side=LEFT)
-    self.enemizerBossVar = StringVar()
-    self.enemizerBossVar.set('none')
-    enemizerBossOption = OptionMenu(enemizerBossFrame, self.enemizerBossVar, 'none', 'basic', 'normal', 'chaos')
-    enemizerBossOption.pack(side=LEFT)
+    key = "bossshuffle"
+    self.enemizerWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      leftEnemizerFrame,
+      "Boss Shuffle",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Vanilla": "none",
+        "Basic": "basic",
+        "Normal": "normal",
+        "Chaos": "chaos"
+      }
+    )
+    self.enemizerWidgets[key].pack(anchor=W)
 
     ## Enemy Damage
-    enemizerDamageFrame = Frame(self)
-    enemizerDamageFrame.grid(row=1, column=2)
-    enemizerDamageLabel = Label(enemizerDamageFrame, text='Enemy damage')
-    enemizerDamageLabel.pack(side=LEFT)
-    self.enemizerDamageVar = StringVar()
-    self.enemizerDamageVar.set('default')
-    enemizerDamageOption = OptionMenu(enemizerDamageFrame, self.enemizerDamageVar, 'default', 'shuffled', 'chaos')
-    enemizerDamageOption.pack(side=LEFT)
+    key = "enemydamage"
+    self.enemizerWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightEnemizerFrame,
+      "Enemy Damage",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Vanilla": "default",
+        "Shuffled": "shuffled",
+        "Chaos": "chaos"
+      }
+    )
+    self.enemizerWidgets[key].pack(anchor=E)
 
     ## Enemy Health
-    enemizerHealthFrame = Frame(self)
-    enemizerHealthFrame.grid(row=1, column=3)
-    enemizerHealthLabel = Label(enemizerHealthFrame, text='Enemy health')
-    enemizerHealthLabel.pack(side=LEFT)
-    self.enemizerHealthVar = StringVar()
-    self.enemizerHealthVar.set('default')
-    enemizerHealthOption = OptionMenu(enemizerHealthFrame, self.enemizerHealthVar, 'default', 'easy', 'normal', 'hard', 'expert')
-    enemizerHealthOption.pack(side=LEFT)
+    key = "enemyhealth"
+    self.enemizerWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightEnemizerFrame,
+      "Enemy Health",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Vanilla": "default",
+        "Easy": "easy",
+        "Normal": "normal",
+        "Hard": "hard",
+        "Expert": "expert"
+      }
+    )
+    self.enemizerWidgets[key].pack(anchor=E)
 
     return self,working_dirs

@@ -69,11 +69,11 @@ def bottom_frame(self,parent,args=None):
         guiargs.shuffleganon = bool(parent.entrandoWindow.entrandoWidgets["shuffleganon"].storageVar.get())
         guiargs.hints = bool(parent.gameOptionsWindow.hintsVar.get())
         guiargs.enemizercli = parent.enemizerWindow.enemizerCLIpathVar.get()
-        guiargs.shufflebosses = parent.enemizerWindow.enemizerBossVar.get()
-        guiargs.shuffleenemies = parent.enemizerWindow.enemyShuffleVar.get()
-        guiargs.enemy_health = parent.enemizerWindow.enemizerHealthVar.get()
-        guiargs.enemy_damage = parent.enemizerWindow.enemizerDamageVar.get()
-        guiargs.shufflepots = bool(parent.enemizerWindow.potShuffleVar.get())
+        guiargs.shufflebosses = parent.enemizerWindow.enemizerWidgets["bossshuffle"].storageVar.get()
+        guiargs.shuffleenemies = parent.enemizerWindow.enemizerWidgets["enemyshuffle"].storageVar.get()
+        guiargs.enemy_health = parent.enemizerWindow.enemizerWidgets["enemyhealth"].storageVar.get()
+        guiargs.enemy_damage = parent.enemizerWindow.enemizerWidgets["enemydamage"].storageVar.get()
+        guiargs.shufflepots = bool(parent.enemizerWindow.enemizerWidgets["potshuffle"].storageVar.get())
         guiargs.custom = bool(parent.generationSetupWindow.customVar.get())
         guiargs.customitemarray = [int(parent.customContent.bowVar.get()), int(parent.customContent.silverarrowVar.get()), int(parent.customContent.boomerangVar.get()), int(parent.customContent.magicboomerangVar.get()), int(parent.customContent.hookshotVar.get()), int(parent.customContent.mushroomVar.get()), int(parent.customContent.magicpowderVar.get()), int(parent.customContent.firerodVar.get()),
                                    int(parent.customContent.icerodVar.get()), int(parent.customContent.bombosVar.get()), int(parent.customContent.etherVar.get()), int(parent.customContent.quakeVar.get()), int(parent.customContent.lampVar.get()), int(parent.customContent.hammerVar.get()), int(parent.customContent.shovelVar.get()), int(parent.customContent.fluteVar.get()), int(parent.customContent.bugnetVar.get()),
