@@ -380,3 +380,19 @@ dungeon_bigs = {
     'Ganons Tower': 'Big Key (Ganons Tower)'
 }
 
+dungeon_hints = {
+    'Hyrule Castle': 'in Hyrule Castle',
+    'Eastern Palace': 'in Eastern Palace',
+    'Desert Palace': 'in Desert Palace',
+    'Tower of Hera': 'in Tower of Hera',
+    'Agahnims Tower': 'in Castle Tower',
+    'Palace of Darkness': 'in Palace of Darkness',
+    'Swamp Palace': 'in Swamp Palace)',
+    'Skull Woods': 'in Skull Woods',
+    'Thieves Town': 'in Thieves\' Town)',
+    'Ice Palace': 'in Ice Palace',
+    'Misery Mire': 'in Misery Mire',
+    'Turtle Rock': 'in Turtle Rock',
+    'Ganons Tower': 'in Ganon\'s Tower'
+}
+

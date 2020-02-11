@@ -1,7 +1,7 @@
-import collections
 import logging
-from BaseClasses import CollectionState
+from BaseClasses import CollectionState, RegionType
 from Regions import key_only_locations
+from collections import deque
 
 
 def set_rules(world, player):
@@ -168,6 +168,7 @@ def global_rules(world, player):
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Prize', player))
 
     set_rule(world.get_entrance('Tower Altar NW', player), lambda state: state.has_sword(player))
+    set_defeat_dungeon_boss_rule(world.get_location('Agahnim 1', player))
 
     set_rule(world.get_entrance('PoD Arena Bonk Path', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('PoD Mimics 1 NW', player), lambda state: state.can_shoot_arrows(player))
@@ -302,7 +303,18 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Mimics 2 WS', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('GT Mimics 2 NE', player), lambda state: state.can_shoot_arrows(player))
     # consider access to refill room
-    # consider can_kill_most_things to gauntlet
+    set_rule(world.get_entrance('GT Gauntlet 1 WN', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Gauntlet 2 EN', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Gauntlet 2 SW', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Gauntlet 3 NW', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Gauntlet 3 SW', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Gauntlet 4 NW', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Gauntlet 4 SW', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Gauntlet 5 NW', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Gauntlet 5 WS', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Wizzrobes 1 SW', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Wizzrobes 2 SE', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('GT Wizzrobes 2 NE', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_entrance('GT Lanmolas 2 ES', player), lambda state: world.get_region('GT Lanmolas 2', player).dungeon.bosses['middle'].can_defeat(state))
     set_rule(world.get_entrance('GT Lanmolas 2 NW', player), lambda state: world.get_region('GT Lanmolas 2', player).dungeon.bosses['middle'].can_defeat(state))
     set_rule(world.get_entrance('GT Torch Cross ES', player), lambda state: state.has_fire_source(player))
@@ -688,82 +700,65 @@ def no_glitches_rules(world, player):
         if (not world.dark_world_light_cone and check_is_dark_world(world.get_region(region, player))) or (not world.light_world_light_cone and not check_is_dark_world(world.get_region(region, player))):
             add_lamp_requirement(spot, player)
 
-    add_conditional_lamp('TR Dark Ride Up Stairs', 'TR Dark Ride', 'Entrance')
-    add_conditional_lamp('TR Dark Ride SW', 'TR Dark Ride', 'Entrance')
-    add_conditional_lamp('Mire Dark Shooters Up Stairs', 'Mire Dark Shooters', 'Entrance')
-    add_conditional_lamp('Mire Dark Shooters SW', 'Mire Dark Shooters', 'Entrance')
-    add_conditional_lamp('Mire Dark Shooters SE', 'Mire Dark Shooters', 'Entrance')
-    add_conditional_lamp('Mire Key Rupees NE', 'Mire Key Rupees', 'Entrance')
-    add_conditional_lamp('Mire Block X NW', 'Mire Block X', 'Entrance')
-    add_conditional_lamp('Mire Block X WS', 'Mire Block X', 'Entrance')
-    add_conditional_lamp('Mire Tall Dark and Roomy ES', 'Mire Tall Dark and Roomy', 'Entrance')
-    add_conditional_lamp('Mire Tall Dark and Roomy WS', 'Mire Tall Dark and Roomy', 'Entrance')
-    add_conditional_lamp('Mire Tall Dark and Roomy WN', 'Mire Tall Dark and Roomy', 'Entrance')
-    add_conditional_lamp('Mire Crystal Right ES', 'Mire Crystal Right', 'Entrance')
-    add_conditional_lamp('Mire Crystal Mid NW', 'Mire Crystal Mid', 'Entrance')
-    add_conditional_lamp('Mire Crystal Left WS', 'Mire Crystal Left', 'Entrance')
-    add_conditional_lamp('Mire Crystal Top SW', 'Mire Crystal Top', 'Entrance')
-    add_conditional_lamp('Mire Shooter Rupees EN', 'Mire Shooter Rupees', 'Entrance')
-    add_conditional_lamp('PoD Dark Alley NE', 'PoD Dark Alley', 'Entrance')
-    add_conditional_lamp('PoD Callback WS', 'PoD Callback', 'Entrance')
-    add_conditional_lamp('PoD Callback Warp', 'PoD Callback', 'Entrance')
-    add_conditional_lamp('PoD Turtle Party ES', 'PoD Turtle Party', 'Entrance')
-    add_conditional_lamp('PoD Turtle Party NW', 'PoD Turtle Party', 'Entrance')
-    add_conditional_lamp('PoD Lonely Turtle SW', 'PoD Lonely Turtle', 'Entrance')
-    add_conditional_lamp('PoD Lonely Turtle EN', 'PoD Lonely Turtle', 'Entrance')
-    add_conditional_lamp('PoD Dark Pegs Up Ladder', 'PoD Dark Pegs', 'Entrance')
-    add_conditional_lamp('PoD Dark Pegs WN', 'PoD Dark Pegs', 'Entrance')
-    add_conditional_lamp('PoD Dark Basement W Up Stairs', 'PoD Dark Basement', 'Entrance')
-    add_conditional_lamp('PoD Dark Basement E Up Stairs', 'PoD Dark Basement', 'Entrance')
-    add_conditional_lamp('PoD Dark Maze EN', 'PoD Dark Maze', 'Entrance')
-    add_conditional_lamp('PoD Dark Maze E', 'PoD Dark Maze', 'Entrance')
-    add_conditional_lamp('Palace of Darkness - Dark Basement - Left', 'PoD Dark Basement', 'Location')
-    add_conditional_lamp('Palace of Darkness - Dark Basement - Right', 'PoD Dark Basement', 'Location')
-    add_conditional_lamp('Palace of Darkness - Dark Maze - Top', 'PoD Dark Maze', 'Location')
-    add_conditional_lamp('Palace of Darkness - Dark Maze - Bottom', 'PoD Dark Maze', 'Location')
-    add_conditional_lamp('Eastern Dark Square NW', 'Eastern Dark Square', 'Entrance')
-    add_conditional_lamp('Eastern Dark Square Key Door WN', 'Eastern Dark Square', 'Entrance')
-    add_conditional_lamp('Eastern Dark Square EN', 'Eastern Dark Square', 'Entrance')
-    add_conditional_lamp('Eastern Dark Pots WN', 'Eastern Dark Pots', 'Entrance')
-    add_conditional_lamp('Eastern Darkness S', 'Eastern Darkness', 'Entrance')
-    add_conditional_lamp('Eastern Darkness Up Stairs', 'Eastern Darkness', 'Entrance')
-    add_conditional_lamp('Eastern Darkness NE', 'Eastern Darkness', 'Entrance')
-    add_conditional_lamp('Eastern Rupees SE', 'Eastern Rupees', 'Entrance')
-    add_conditional_lamp('Eastern Palace - Dark Square Pot Key', 'Eastern Dark Square', 'Location')
-    add_conditional_lamp('Eastern Palace - Dark Eyegore Key Drop', 'Eastern Darkness', 'Location')
-    add_conditional_lamp('Tower Lone Statue Down Stairs', 'Tower Lone Statue', 'Entrance')
-    add_conditional_lamp('Tower Lone Statue WN', 'Tower Lone Statue', 'Entrance')
-    add_conditional_lamp('Tower Dark Maze EN', 'Tower Dark Maze', 'Entrance')
-    add_conditional_lamp('Tower Dark Maze ES', 'Tower Dark Maze', 'Entrance')
-    add_conditional_lamp('Tower Dark Chargers WS', 'Tower Dark Chargers', 'Entrance')
-    add_conditional_lamp('Tower Dark Chargers Up Stairs', 'Tower Dark Chargers', 'Entrance')
-    add_conditional_lamp('Tower Dual Statues Down Stairs', 'Tower Dual Statues', 'Entrance')
-    add_conditional_lamp('Tower Dual Statues WS', 'Tower Dual Statues', 'Entrance')
-    add_conditional_lamp('Tower Dark Pits ES', 'Tower Dark Pits', 'Entrance')
-    add_conditional_lamp('Tower Dark Pits EN', 'Tower Dark Pits', 'Entrance')
-    add_conditional_lamp('Tower Dark Archers WN', 'Tower Dark Archers', 'Entrance')
-    add_conditional_lamp('Tower Dark Archers Up Stairs', 'Tower Dark Archers', 'Entrance')
-    add_conditional_lamp('Castle Tower - Dark Maze', 'Tower Dark Maze', 'Location')
-    add_conditional_lamp('Castle Tower - Dark Archer Key Drop', 'Tower Dark Archers', 'Location')
+    dark_rooms = {
+        'TR Dark Ride': {'sewer': False, 'entrances': ['TR Dark Ride Up Stairs', 'TR Dark Ride SW'], 'locations': []},
+        'Mire Dark Shooters': {'sewer': False, 'entrances': ['Mire Dark Shooters Up Stairs', 'Mire Dark Shooters SW', 'Mire Dark Shooters SE'], 'locations': []},
+        'Mire Key Rupees': {'sewer': False, 'entrances': ['Mire Key Rupees NE'], 'locations': []},
+        'Mire Block X': {'sewer': False, 'entrances': ['Mire Block X NW', 'Mire Block X WS'], 'locations': []},
+        'Mire Tall Dark and Roomy': {'sewer': False, 'entrances': ['Mire Tall Dark and Roomy ES', 'Mire Tall Dark and Roomy WS', 'Mire Tall Dark and Roomy WN'], 'locations': []},
+        'Mire Crystal Right': {'sewer': False, 'entrances': ['Mire Crystal Right ES'], 'locations': []},
+        'Mire Crystal Mid': {'sewer': False, 'entrances': ['Mire Crystal Mid NW'], 'locations': []},
+        'Mire Crystal Left': {'sewer': False, 'entrances': ['Mire Crystal Left WS'], 'locations': []},
+        'Mire Crystal Top': {'sewer': False, 'entrances': ['Mire Crystal Top SW'], 'locations': []},
+        'Mire Shooter Rupees': {'sewer': False, 'entrances': ['Mire Shooter Rupees EN'], 'locations': []},
+        'PoD Dark Alley': {'sewer': False, 'entrances': ['PoD Dark Alley NE'], 'locations': []},
+        'PoD Callback': {'sewer': False, 'entrances': ['PoD Callback WS', 'PoD Callback Warp'], 'locations': []},
+        'PoD Turtle Party': {'sewer': False, 'entrances': ['PoD Turtle Party ES', 'PoD Turtle Party NW'], 'locations': []},
+        'PoD Lonely Turtle': {'sewer': False, 'entrances': ['PoD Lonely Turtle SW', 'PoD Lonely Turtle EN'], 'locations': []},
+        'PoD Dark Pegs': {'sewer': False, 'entrances': ['PoD Dark Pegs Up Ladder', 'PoD Dark Pegs WN'], 'locations': []},
+        'PoD Dark Basement': {'sewer': False, 'entrances': ['PoD Dark Basement W Up Stairs', 'PoD Dark Basement E Up Stairs'], 'locations': ['Palace of Darkness - Dark Basement - Left', 'Palace of Darkness - Dark Basement - Right']},
+        'PoD Dark Maze': {'sewer': False, 'entrances': ['PoD Dark Maze EN', 'PoD Dark Maze E'], 'locations': ['Palace of Darkness - Dark Maze - Top', 'Palace of Darkness - Dark Maze - Bottom']},
+        'Eastern Dark Square': {'sewer': False, 'entrances': ['Eastern Dark Square NW', 'Eastern Dark Square Key Door WN', 'Eastern Dark Square EN'], 'locations': []},
+        'Eastern Dark Pots': {'sewer': False, 'entrances': ['Eastern Dark Pots WN'], 'locations': ['Eastern Palace - Dark Square Pot Key']},
+        'Eastern Darkness': {'sewer': False, 'entrances': ['Eastern Darkness S', 'Eastern Darkness Up Stairs', 'Eastern Darkness NE'], 'locations': ['Eastern Palace - Dark Eyegore Key Drop']},
+        'Eastern Rupees': {'sewer': False, 'entrances': ['Eastern Rupees SE'], 'locations': []},
+        'Tower Lone Statue': {'sewer': False, 'entrances': ['Tower Lone Statue Down Stairs', 'Tower Lone Statue WN'], 'locations': []},
+        'Tower Dark Maze': {'sewer': False, 'entrances': ['Tower Dark Maze EN', 'Tower Dark Maze ES'], 'locations': ['Castle Tower - Dark Maze']},
+        'Tower Dark Chargers': {'sewer': False, 'entrances': ['Tower Dark Chargers WS', 'Tower Dark Chargers Up Stairs'], 'locations': []},
+        'Tower Dual Statues': {'sewer': False, 'entrances': ['Tower Dual Statues Down Stairs', 'Tower Dual Statues WS'], 'locations': []},
+        'Tower Dark Pits': {'sewer': False, 'entrances': ['Tower Dark Pits ES', 'Tower Dark Pits EN'], 'locations': []},
+        'Tower Dark Archers': {'sewer': False, 'entrances': ['Tower Dark Archers WN', 'Tower Dark Archers Up Stairs'], 'locations': ['Castle Tower - Dark Archer Key Drop']},
+        'Sewers Dark Cross': {'sewer': True, 'entrances': ['Sewers Dark Cross Key Door N', 'Sewers Dark Cross South Stairs'], 'locations': ['Sewers - Dark Cross']},
+        'Sewers Behind Tapestry': {'sewer': True, 'entrances': ['Sewers Behind Tapestry S', 'Sewers Behind Tapestry Down Stairs'], 'locations': []},
+        'Sewers Rope Room': {'sewer': True, 'entrances': ['Sewers Rope Room Up Stairs', 'Sewers Rope Room North Stairs'], 'locations': []},
+        'Sewers Water': {'sewer': True, 'entrances': ['Sewers Dark Cross Key Door S', 'Sewers Water W'], 'locations': []},
+        'Sewers Key Rat': {'sewer': True, 'entrances': ['Sewers Key Rat E', 'Sewers Key Rat Key Door N'], 'locations': ['Hyrule Castle - Key Rat Key Drop']},
+    }
+
+    dark_debug_set = set()
+    for region, info in dark_rooms.items():
+        is_dark = False
+        if not world.sewer_light_cone[player]:
+            is_dark = True
+        elif world.doorShuffle[player] != 'crossed' and not info['sewer']:
+            is_dark = True
+        elif world.doorShuffle[player] == 'crossed':
+            sewer_builder = world.dungeon_layouts[player]['Hyrule Castle']
+            is_dark = region not in sewer_builder.master_sector.region_set()
+        if is_dark:
+            dark_debug_set.add(region)
+            for ent in info['entrances']:
+                add_conditional_lamp(ent, region, 'Entrance')
+            for loc in info['locations']:
+                add_conditional_lamp(loc, region, 'Location')
+    logging.getLogger('').debug('Non Dark Regions: ' + ', '.join(set(dark_rooms.keys()).difference(dark_debug_set)))
+
     add_conditional_lamp('Old Man', 'Old Man Cave', 'Location')
     add_conditional_lamp('Old Man Cave Exit (East)', 'Old Man Cave', 'Entrance')
     add_conditional_lamp('Death Mountain Return Cave Exit (East)', 'Death Mountain Return Cave', 'Entrance')
     add_conditional_lamp('Death Mountain Return Cave Exit (West)', 'Death Mountain Return Cave', 'Entrance')
     add_conditional_lamp('Old Man House Front to Back', 'Old Man House', 'Entrance')
     add_conditional_lamp('Old Man House Back to Front', 'Old Man House', 'Entrance')
-
-    if not world.sewer_light_cone[player]:
-        add_lamp_requirement(world.get_location('Sewers - Dark Cross', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Behind Tapestry S', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Behind Tapestry Down Stairs', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Rope Room Up Stairs', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Rope Room North Stairs', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Dark Cross South Stairs', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Dark Cross Key Door N', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Dark Cross Key Door S', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Water W', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Key Rat E', player), player)
-        add_lamp_requirement(world.get_entrance('Sewers Key Rat Key Door N', player), player)
 
 
 def open_rules(world, player):
@@ -795,10 +790,42 @@ def swordless_rules(world, player):
         set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has('Hammer', player))
 
 
+std_kill_rooms = {
+    'Hyrule Dungeon Armory Main': ['Hyrule Dungeon Armory S'],
+    'Hyrule Dungeon Armory Boomerang': ['Hyrule Dungeon Armory Boomerang WS'],
+    'Eastern Stalfos Spawn': ['Eastern Stalfos Spawn ES', 'Eastern Stalfos Spawn NW'],
+    'Desert Compass Room': ['Desert Compass NW'],
+    'Desert Four Statues': ['Desert Four Statues NW', 'Desert Four Statues ES'],
+    'Hera Beetles': ['Hera Beetles WS'],
+    'Tower Gold Knights': ['Tower Gold Knights SW', 'Tower Gold Knights EN'],
+    'Tower Dark Archers': ['Tower Dark Archers WN'],
+    'Tower Red Spears': ['Tower Red Spears WN'],
+    'Tower Red Guards': ['Tower Red Guards EN', 'Tower Red Guards SW'],
+    'Tower Circle of Pots': ['Tower Circle of Pots NW'],
+    'PoD Turtle Party': ['PoD Turtle Party ES', 'PoD Turtle Party NW'],  # todo: hammer req. in main rules
+    'Thieves Basement Block': ['Thieves Basement Block WN'],
+    'Ice Stalfos Hint': ['Ice Stalfos Hint SE'],
+    'Ice Pengator Trap': ['Ice Pengator Trap NE'],
+    'Mire 2': ['Mire 2 NE'],
+    'Mire Cross': ['Mire Cross ES'],
+    'TR Twin Pokeys': ['TR Twin Pokeys EN', 'TR Twin Pokeys SW'],
+    'GT Petting Zoo': ['GT Petting Zoo SE'],
+    'GT DMs Room': ['GT DMs Room SW'],
+    'GT Gauntlet 1': ['GT Gauntlet 1 WN'],
+    'GT Gauntlet 2': ['GT Gauntlet 2 EN', 'GT Gauntlet 2 SW'],
+    'GT Gauntlet 3': ['GT Gauntlet 3 NW', 'GT Gauntlet 3 SW'],
+    'GT Gauntlet 4': ['GT Gauntlet 4 NW', 'GT Gauntlet 4 SW'],
+    'GT Gauntlet 5': ['GT Gauntlet 5 NW', 'GT Gauntlet 5 WS'],
+    'GT Wizzrobes 1': ['GT Wizzrobes 1 SW'],
+    'GT Wizzrobes 2': ['GT Wizzrobes 2 SE', 'GT Wizzrobes 2 NE']
+}  # all trap rooms?
+
+
 def standard_rules(world, player):
     # these are because of rails
-    set_rule(world.get_entrance('Hyrule Castle Exit (East)', player), lambda state: state.has('Zelda Delivered', player))
-    set_rule(world.get_entrance('Hyrule Castle Exit (West)', player), lambda state: state.has('Zelda Delivered', player))
+    if world.shuffle[player] != 'vanilla':
+        set_rule(world.get_entrance('Hyrule Castle Exit (East)', player), lambda state: state.has('Zelda Delivered', player))
+        set_rule(world.get_entrance('Hyrule Castle Exit (West)', player), lambda state: state.has('Zelda Delivered', player))
 
     # too restrictive for crossed?
     def uncle_item_rule(item):
@@ -815,21 +842,21 @@ def standard_rules(world, player):
         add_rule(world.get_location(location, player), lambda state: state.can_kill_most_things(player))
     add_rule(world.get_location('Secret Passage', player), lambda state: state.can_kill_most_things(player))
 
-    # todo: in crossed these chest/key drops are not necessarily present
-    add_rule(world.get_location('Hyrule Castle - Map Chest', player), lambda state: state.can_kill_most_things(player))
-    set_rule(world.get_location('Sewers - Dark Cross', player), lambda state: state.can_kill_most_things(player))
-    set_rule(world.get_location('Hyrule Castle - Boomerang Chest', player), lambda state: state.can_kill_most_things(player))
-    set_rule(world.get_location('Hyrule Castle - Zelda\'s Chest', player), lambda state: state.can_kill_most_things(player))
+    escape_builder = world.dungeon_layouts[player]['Hyrule Castle']
+    for region in escape_builder.master_sector.regions:
+        for loc in region.locations:
+            add_rule(loc, lambda state: state.can_kill_most_things(player))
+        if region.name in std_kill_rooms:
+            for ent in std_kill_rooms[region.name]:
+                add_rule(world.get_entrance(ent, player), lambda state: state.can_kill_most_things(player))
 
-    set_rule(world.get_location('Hyrule Castle - Map Guard Key Drop', player), lambda state: state.can_kill_most_things(player))
-    set_rule(world.get_location('Hyrule Castle - Boomerang Guard Key Drop', player), lambda state: state.can_kill_most_things(player))
-    set_rule(world.get_location('Hyrule Castle - Key Rat Key Drop', player), lambda state: state.can_kill_most_things(player))
-    set_rule(world.get_entrance('Hyrule Dungeon Armory S', player), lambda state: state.can_kill_most_things(player))
-
-    set_rule(world.get_location('Hyrule Castle - Big Key Drop', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_location('Zelda Pickup', player), lambda state: state.has('Big Key (Escape)', player))
     set_rule(world.get_entrance('Hyrule Castle Throne Room N', player), lambda state: state.has('Zelda Herself', player))
-    set_rule(world.get_location('Zelda Drop Off', player), lambda state: state.has('Zelda Herself', player))
+
+    def check_rule_list(state, r_list):
+        return True if len(r_list) <= 0 else r_list[0](state) and check_rule_list(state, r_list[1:])
+    rule_list, debug_path = find_rules_for_zelda_delivery(world, player)
+    set_rule(world.get_location('Zelda Drop Off', player), lambda state: state.has('Zelda Herself', player) and check_rule_list(state, rule_list))
 
     for location in ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'Purple Chest']:
         add_rule(world.get_location(location, player), lambda state: state.has('Zelda Delivered', player))
@@ -851,6 +878,31 @@ def standard_rules(world, player):
                      'Fortune Teller (Light)', 'Lake Hylia Fairy', 'Light Hype Fairy', 'Desert Fairy',
                      'Lumberjack House', 'Lake Hylia Fortune Teller', 'Kakariko Gamble Game', 'Top of Pyramid']:
         add_rule(world.get_entrance(entrance, player), lambda state: state.has('Zelda Delivered', player))
+
+
+def find_rules_for_zelda_delivery(world, player):
+    # path rules for backtracking
+    start_region = world.get_region('Hyrule Dungeon Cellblock', player)
+    queue = deque([(start_region, [], [])])
+    visited = {start_region}
+    blank_state = CollectionState(world)
+    while len(queue) > 0:
+        region, path_rules, path = queue.popleft()
+        for ext in region.exits:
+            connect = ext.connected_region
+            if connect and connect.type == RegionType.Dungeon and connect not in visited:
+                rule = ext.access_rule
+                rule_list = list(path_rules)
+                next_path = list(path)
+                if not rule(blank_state):
+                    rule_list.append(rule)
+                    next_path.append(ext.name)
+                if connect.name == 'Sanctuary':
+                    return rule_list, next_path
+                else:
+                    visited.add(connect)
+                    queue.append((connect, rule_list, next_path))
+    raise Exception('No path to Sanctuary found')
 
 
 def set_big_bomb_rules(world, player):
@@ -1291,7 +1343,7 @@ def set_bunny_rules(world, player):
         #    a) being able to reach it, and
         #    b) being able to access all entrances from there to `region`
         seen = set([region])
-        queue = collections.deque([(region, [])])
+        queue = deque([(region, [])])
         while queue:
             (current, path) = queue.popleft()
             for entrance in current.entrances:
@@ -1367,7 +1419,7 @@ def set_inverted_bunny_rules(world, player):
         #    a) being able to reach it, and
         #    b) being able to access all entrances from there to `region`
         seen = set([region])
-        queue = collections.deque([(region, [])])
+        queue = deque([(region, [])])
         while queue:
             (current, path) = queue.popleft()
             for entrance in current.entrances:

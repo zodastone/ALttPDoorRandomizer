@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'c06e14396839bc443a6918e736f1e5a7'
+RANDOMIZERBASEHASH = '818b2c659a610cb4112804cf612ffd37'
 
 
 class JsonRom(object):
@@ -591,7 +591,7 @@ def patch_rom(world, rom, player, team, enemized):
         patch_shuffled_dark_sanc(world, rom, player)
 
     # patch doors
-    dr_flags = DROptions.Eternal_Mini_Bosses
+    dr_flags = DROptions.Eternal_Mini_Bosses if not world.experimental[player] else DROptions.Town_Portal
     if world.doorShuffle[player] == 'crossed':
         rom.write_byte(0x139004, 2)
         rom.write_byte(0x151f1, 2)
@@ -1676,10 +1676,13 @@ def write_strings(rom, world, player, team):
 
         # Next we write a few hints for specific inconvenient locations. We don't make many because in entrance this is highly unpredictable.
         locations_to_hint = InconvenientLocations.copy()
+        if world.doorShuffle[player] != 'crossed':
+            locations_to_hint.extend(InconvenientDungeonLocations)
         if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
             locations_to_hint.extend(InconvenientVanillaLocations)
         random.shuffle(locations_to_hint)
         hint_count = 3 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 5
+        hint_count -= 2 if world.doorShuffle[player] == 'crossed' else 0
         del locations_to_hint[hint_count:]
         for location in locations_to_hint:
             if location == 'Swamp Left':
@@ -1733,20 +1736,17 @@ def write_strings(rom, world, player, team):
             items_to_hint.extend(BigKeys)
         random.shuffle(items_to_hint)
         hint_count = 5 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 8
+        hint_count += 2 if world.doorShuffle[player] == 'crossed' else 0
         while hint_count > 0:
             this_item = items_to_hint.pop(0)
             this_location = world.find_items_not_key_only(this_item, player)
             random.shuffle(this_location)
-            #This looks dumb but prevents hints for Skull Woods Pinball Room's key safely with any item pool.
-            if this_location:
-                if this_location[0].name == 'Skull Woods - Pinball Room':
-                    this_location.pop(0)
             if this_location:
                 this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
                 tt[hint_locations.pop(0)] = this_hint
                 hint_count -= 1
 
-        # Adding a hint for the Thieves' Town Attic location in Crossed Doorshufle.
+        # Adding a hint for the Thieves' Town Attic location in Crossed door shuffle.
         if world.doorShuffle[player] in ['crossed']:
             attic_hint = world.get_location("Thieves' Town - Attic", player).parent_region.dungeon.name
             this_hint = 'A cracked floor can be found in ' + attic_hint + '.'
@@ -2300,7 +2300,7 @@ HintLocations = ['telepathic_tile_eastern_palace',
                  'telepathic_tile_castle_tower',
                  'telepathic_tile_ice_large_room',
                  'telepathic_tile_turtle_rock',
-                 'telepathic_tile_ice_entrace',
+                 'telepathic_tile_ice_entrance',
                  'telepathic_tile_ice_stalfos_knights_room',
                  'telepathic_tile_tower_of_hera_entrance',
                  'telepathic_tile_south_east_darkworld_cave',
@@ -2313,14 +2313,15 @@ HintLocations = ['telepathic_tile_eastern_palace',
 InconvenientLocations = ['Spike Cave',
                          'Sahasrahla',
                          'Purple Chest',
-                         'Swamp Left',
-                         'Mire Left',
                          'Tower of Hera - Big Key Chest',
-                         'Eastern Palace - Big Key Chest',
-                         'Thieves\' Town - Big Chest',
-                         'Ice Palace - Big Chest',
-                         'Ganons Tower - Big Chest',
                          'Magic Bat']
+
+InconvenientDungeonLocations = ['Swamp Left',
+                                'Mire Left',
+                                'Eastern Palace - Big Key Chest',
+                                'Thieves\' Town - Big Chest',
+                                'Ice Palace - Big Chest',
+                                'Ganons Tower - Big Chest']
 
 InconvenientVanillaLocations = ['Graveyard Cave',
                                 'Mimic Cave']

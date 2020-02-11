@@ -315,7 +315,7 @@ def guiMain(args=None):
     doorShuffleFrame = Frame(drowDownFrame)
     doorShuffleVar = StringVar()
     doorShuffleVar.set('basic')
-    doorShuffleOptionMenu = OptionMenu(doorShuffleFrame, doorShuffleVar, 'vanilla', 'basic', 'crossed', 'experimental')
+    doorShuffleOptionMenu = OptionMenu(doorShuffleFrame, doorShuffleVar, 'vanilla', 'basic', 'crossed')
     doorShuffleOptionMenu.pack(side=RIGHT)
     doorShuffleLabel = Label(doorShuffleFrame, text='Door shuffle algorithm')
     doorShuffleLabel.pack(side=LEFT)

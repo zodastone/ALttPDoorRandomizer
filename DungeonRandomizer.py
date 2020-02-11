@@ -173,7 +173,7 @@ def parse_arguments(argv, no_defaults=False):
                              The dungeon variants only mix up dungeons and keep the rest of
                              the overworld vanilla.
                              ''')
-    parser.add_argument('--door_shuffle', default=defval('basic'), const='vanilla', nargs='?', choices=['vanilla', 'basic', 'crossed', 'experimental'],
+    parser.add_argument('--door_shuffle', default=defval('basic'), const='vanilla', nargs='?', choices=['vanilla', 'basic', 'crossed'],
                         help='''\
                             Select Door Shuffling Algorithm. (default: %(default)s)
                             Basic:      Doors are mixed within a single dungeon.
@@ -181,9 +181,9 @@ def parse_arguments(argv, no_defaults=False):
                             Crossed:    Doors are mixed between all dungeons.
                                         (Not yet implemented)
                             Vanilla:    All doors are connected the same way they were in the
-                                        base game.
-                            Experimental: Experimental mixes live here. Use at your own risk.                        
+                                        base game.                        
                         ''')
+    parser.add_argument('--experimental', default=defval(False), help='Enable experimental features', action='store_true')
     parser.add_argument('--crystals_ganon', default=defval('7'), const='7', nargs='?', choices=['random', '0', '1', '2', '3', '4', '5', '6', '7'],
                         help='''\
                              How many crystals are needed to defeat ganon. Any other 
@@ -302,7 +302,7 @@ def parse_arguments(argv, no_defaults=False):
             for name in ['logic', 'mode', 'swords', 'goal', 'difficulty', 'item_functionality',
                          'shuffle', 'door_shuffle', 'crystals_ganon', 'crystals_gt', 'openpyramid',
                          'mapshuffle', 'compassshuffle', 'keyshuffle', 'bigkeyshuffle', 'startinventory',
-                         'retro', 'accessibility', 'hints', 'beemizer',
+                         'retro', 'accessibility', 'hints', 'beemizer', 'experimental',
                          'shufflebosses', 'shuffleenemies', 'enemy_health', 'enemy_damage', 'shufflepots',
                          'ow_palettes', 'uw_palettes', 'sprite', 'disablemusic', 'quickswap', 'fastmenu', 'heartcolor', 'heartbeep',
                          'remote_items']:
