@@ -59,7 +59,7 @@ def enemizer_page(parent,working_dirs):
         "Chaos": "chaos"
       }
     )
-    self.enemizerWidgets[key].pack(anchor=W)
+    self.enemizerWidgets[key].pack(anchor=E)
 
     ## Randomize Bosses
     key = "bossshuffle"
@@ -77,7 +77,7 @@ def enemizer_page(parent,working_dirs):
         "Chaos": "chaos"
       }
     )
-    self.enemizerWidgets[key].pack(anchor=W)
+    self.enemizerWidgets[key].pack(anchor=E)
 
     ## Enemy Damage
     key = "enemydamage"
