@@ -867,7 +867,7 @@ def forbid_overworld_glitches(world, player):
         set_rule(world.get_entrance(exit, player), lambda state: False)
     for exit in OWGSets.get_glitched_speed_drops_dw():
         set_rule(world.get_entrance(exit, player), lambda state: False)
-    if world.mode[player] != 'inverted':
+    if world.mode != 'inverted':
         for exit in OWGSets.get_mirror_clip_spots_dw():
             set_rule(world.get_entrance(exit, player), lambda state: False)
 
