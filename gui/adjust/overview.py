@@ -2,20 +2,37 @@ from tkinter import ttk, filedialog, messagebox, IntVar, StringVar, Button, Chec
 from AdjusterMain import adjust
 from argparse import Namespace
 from classes.SpriteSelector import SpriteSelector
+import gui.widgets as widgets
 import logging
 
 def adjust_page(top,parent,working_dirs):
+    # Adjust page
     self = ttk.Frame(parent)
 
-    # Disable BGM
-    self.disableMusicVar2 = IntVar()
-    disableMusicCheckbutton2 = Checkbutton(self, text="Disable music", variable=self.disableMusicVar2)
-    disableMusicCheckbutton2.pack(anchor=W)
+    # Adjust options
+    self.adjustWidgets = {}
 
-    # L/R Quickswap
-    self.quickSwapVar2 = IntVar()
-    quickSwapCheckbutton2 = Checkbutton(self, text="L/R Quickswapping", variable=self.quickSwapVar2)
-    quickSwapCheckbutton2.pack(anchor=W)
+    ## Disable BGM
+    key = "nobgm"
+    self.adjustWidgets[key] = widgets.make_widget(
+      self,
+      "checkbox",
+      self,
+      "Disable Music & MSU-1",
+      None
+    )
+    self.adjustWidgets[key].pack(anchor=W)
+
+    ## L/R Quickswap
+    key = "quickswap"
+    self.adjustWidgets[key] = widgets.make_widget(
+      self,
+      "checkbox",
+      self,
+      "L/R Quickswapping",
+      None
+    )
+    self.adjustWidgets[key].pack(anchor=W)
 
     selectOptionsFrame = Frame(self)
     leftAdjustFrame = Frame(selectOptionsFrame)
@@ -26,25 +43,43 @@ def adjust_page(top,parent,working_dirs):
     rightAdjustFrame.pack(side=RIGHT)
     bottomAdjustFrame.pack(fill=X, expand=True)
 
-    # Heart Color
-    heartcolorFrame2 = Frame(leftAdjustFrame)
-    heartcolorLabel2 = Label(heartcolorFrame2, text='Heart color')
-    heartcolorLabel2.pack(side=LEFT)
-    self.heartcolorVar2 = StringVar()
-    self.heartcolorVar2.set('red')
-    heartcolorOptionMenu2 = OptionMenu(heartcolorFrame2, self.heartcolorVar2, 'red', 'blue', 'green', 'yellow', 'random')
-    heartcolorOptionMenu2.pack(side=RIGHT)
-    heartcolorFrame2.pack(anchor=E)
+    ## Heart Color
+    key = "heartcolor"
+    self.adjustWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      leftAdjustFrame,
+      "Heart Color",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Red": "red",
+        "Blue": "blue",
+        "Green": "green",
+        "Yellow": "yellow",
+        "Random": "random"
+      }
+    )
+    self.adjustWidgets[key].pack(anchor=E)
 
-    # Heart Beep Speed
-    heartbeepFrame2 = Frame(leftAdjustFrame)
-    heartbeepLabel2 = Label(heartbeepFrame2, text='Heart Beep sound rate')
-    heartbeepLabel2.pack(side=LEFT)
-    self.heartbeepVar2 = StringVar()
-    self.heartbeepVar2.set('normal')
-    heartbeepOptionMenu2 = OptionMenu(heartbeepFrame2, self.heartbeepVar2, 'double', 'normal', 'half', 'quarter', 'off')
-    heartbeepOptionMenu2.pack(side=RIGHT)
-    heartbeepFrame2.pack(anchor=E)
+    ## Heart Beep Speed
+    key = "heartbeep"
+    self.adjustWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      leftAdjustFrame,
+      "Heart Beep sound rate",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Normal"},
+      {
+        "Double": "double",
+        "Normal": "normal",
+        "Half": "half",
+        "Quarter": "quarter",
+        "Off": "off"
+      }
+    )
+    self.adjustWidgets[key].pack(anchor=W)
 
     # Sprite Selection
     self.spriteNameVar2 = StringVar()
@@ -71,33 +106,59 @@ def adjust_page(top,parent,working_dirs):
     spriteSelectButton2.pack(side=LEFT)
     spriteDialogFrame2.pack(anchor=E)
 
-    # Menu Speed
-    fastMenuFrame2 = Frame(rightAdjustFrame)
-    fastMenuLabel2 = Label(fastMenuFrame2, text='Menu speed')
-    fastMenuLabel2.pack(side=LEFT)
-    self.fastMenuVar2 = StringVar()
-    self.fastMenuVar2.set("normal")
-    fastMenuOptionMenu2 = OptionMenu(fastMenuFrame2, self.fastMenuVar2, 'normal', 'instant', 'double', 'triple', 'quadruple', 'half')
-    fastMenuOptionMenu2.pack(side=RIGHT)
-    fastMenuFrame2.pack(anchor=E)
+    ## Menu Speed
+    key = "menuspeed"
+    self.adjustWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightAdjustFrame,
+      "Menu Speed",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Normal"},
+      {
+        "Instant": "instant",
+        "Quadruple": "quadruple",
+        "Triple": "triple",
+        "Double": "double",
+        "Normal": "normal",
+        "Half": "half"
+      }
+    )
+    self.adjustWidgets[key].pack(anchor=E)
 
-    owPalettesFrame2 = Frame(rightAdjustFrame)
-    owPalettesLabel2 = Label(owPalettesFrame2, text='Overworld palettes')
-    owPalettesLabel2.pack(side=LEFT)
-    self.owPalettesVar2 = StringVar()
-    self.owPalettesVar2.set("default")
-    owPalettesOptionMenu2 = OptionMenu(owPalettesFrame2, self.owPalettesVar2, 'default', 'random', 'blackout')
-    owPalettesOptionMenu2.pack(side=RIGHT)
-    owPalettesFrame2.pack(anchor=E)
+    ## Overworld Palettes (not Enemizer)
+    key = "owpalettes"
+    self.adjustWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightAdjustFrame,
+      "Overworld Palettes",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Default": "default",
+        "Random": "random",
+        "Blackout": "blackout"
+      }
+    )
+    self.adjustWidgets[key].pack(anchor=E)
 
-    uwPalettesFrame2 = Frame(rightAdjustFrame)
-    uwPalettesLabel2 = Label(uwPalettesFrame2, text='Dungeon palettes')
-    uwPalettesLabel2.pack(side=LEFT)
-    self.uwPalettesVar2 = StringVar()
-    self.uwPalettesVar2.set("default")
-    uwPalettesOptionMenu2 = OptionMenu(uwPalettesFrame2, self.uwPalettesVar2, 'default', 'random', 'blackout')
-    uwPalettesOptionMenu2.pack(side=RIGHT)
-    uwPalettesFrame2.pack(anchor=E)
+    ## Underworld Palettes (not Enemizer)
+    key = "uwpalettes"
+    self.adjustWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      rightAdjustFrame,
+      "Underworld Palettes",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
+      {
+        "Default": "default",
+        "Random": "random",
+        "Blackout": "blackout"
+      }
+    )
+    self.adjustWidgets[key].pack(anchor=E)
 
     adjustRomFrame = Frame(bottomAdjustFrame)
     adjustRomLabel = Label(adjustRomFrame, text='Rom to adjust: ')
@@ -118,13 +179,13 @@ def adjust_page(top,parent,working_dirs):
 
     def adjustRom():
         guiargs = Namespace()
-        guiargs.heartbeep = self.heartbeepVar2.get()
-        guiargs.heartcolor = self.heartcolorVar2.get()
-        guiargs.fastmenu = self.fastMenuVar2.get()
-        guiargs.ow_palettes = self.owPalettesVar2.get()
-        guiargs.uw_palettes = self.uwPalettesVar2.get()
-        guiargs.quickswap = bool(self.quickSwapVar2.get())
-        guiargs.disablemusic = bool(self.disableMusicVar2.get())
+        guiargs.heartbeep = self.adjustWidgets["heartbeep"].get()
+        guiargs.heartcolor = self.adjustWidgets["heartcolor"].get()
+        guiargs.fastmenu = self.adjustWidgets["menuspeed"].get()
+        guiargs.ow_palettes = self.adjustWidgets["owpalettes"].get()
+        guiargs.uw_palettes = self.adjustWidgets["uwpalettes"].get()
+        guiargs.quickswap = bool(self.adjustWidgets["quickswap"].get())
+        guiargs.disablemusic = bool(self.adjustWidgets["nobgm"].get())
         guiargs.rom = self.romVar2.get()
         guiargs.baserom = top.generationSetupWindow.romVar.get()
 #        guiargs.sprite = sprite
