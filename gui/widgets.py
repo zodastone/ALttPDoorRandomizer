@@ -1,5 +1,18 @@
 from tkinter import Checkbutton, Entry, Frame, IntVar, Label, OptionMenu, Spinbox, StringVar, RIGHT
 
+class mySpinbox(Spinbox):
+    def __init__(self, *args, **kwargs):
+        Spinbox.__init__(self, *args, **kwargs)
+        self.bind('<MouseWheel>', self.mouseWheel)
+        self.bind('<Button-4>', self.mouseWheel)
+        self.bind('<Button-5>', self.mouseWheel)
+
+    def mouseWheel(self, event):
+        if event.num == 5 or event.delta == -120:
+            self.invoke('buttondown')
+        elif event.num == 4 or event.delta == 120:
+            self.invoke('buttonup')
+
 def make_checkbox(self, parent, label, storageVar, packAttrs):
     self = Frame(parent)
     self.storageVar = storageVar
@@ -41,7 +54,7 @@ def make_spinbox(self, parent, label, storageVar, packAttrs):
             fromNum = packAttrs["spinbox"]["from"]
         if "to" in packAttrs:
             toNum = packAttrs["spinbox"]["to"]
-    self.spinbox = Spinbox(self, from_=fromNum, to=toNum, width=5, textvariable=self.storageVar)
+    self.spinbox = mySpinbox(self, from_=fromNum, to=toNum, width=5, textvariable=self.storageVar)
     self.spinbox.pack(packAttrs["spinbox"])
     return self
 

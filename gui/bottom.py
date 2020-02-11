@@ -6,9 +6,15 @@ import random
 from CLI import parse_arguments, get_working_dirs
 from Main import main
 from Utils import local_path, output_path, open_file
+import gui.widgets as widgets
 
 def bottom_frame(self,parent,args=None):
+    # Bottom Frame
     self = ttk.Frame(parent)
+
+    # Bottom Frame options
+    self.bottomWidgets = {}
+
     seedCountFrame = Frame(self)
     seedCountFrame.pack()
     ## Seed #
@@ -22,19 +28,25 @@ def bottom_frame(self,parent,args=None):
     seedEntry = Entry(self, width=15, textvariable=self.seedVar)
     seedLabel.pack(side=LEFT)
     seedEntry.pack(side=LEFT)
+
     ## Number of Generation attempts
-    countLabel = Label(self, text='Count')
-    self.countVar = StringVar(value=parent.working_dirs["gen.count"])
-    countSpinbox = Spinbox(self, from_=1, to=100, width=5, textvariable=self.countVar)
-    countLabel.pack(side=LEFT)
-    countSpinbox.pack(side=LEFT)
+    key = "generationcount"
+    self.bottomWidgets[key] = widgets.make_widget(
+      self,
+      "spinbox",
+      self,
+      "Count",
+      None,
+      {"label": {"side": LEFT}, "spinbox": {"side": RIGHT}}
+    )
+    self.bottomWidgets[key].pack(side=LEFT)
 
     def generateRom():
         guiargs = Namespace()
         guiargs.multi = int(parent.multiworldWindow.multiworldWidgets["worlds"].storageVar.get())
         guiargs.names = parent.multiworldWindow.namesVar.get()
         guiargs.seed = int(parent.farBottomFrame.seedVar.get()) if parent.farBottomFrame.seedVar.get() else None
-        guiargs.count = int(parent.farBottomFrame.countVar.get()) if parent.farBottomFrame.countVar.get() != '1' else None
+        guiargs.count = int(parent.farBottomFrame.bottomWidgets["generationcount"].storageVar.get()) if parent.farBottomFrame.bottomWidgets["generationcount"].storageVar.get() != '1' else None
         guiargs.mode = parent.itemWindow.itemWidgets["worldstate"].storageVar.get()
         guiargs.logic = parent.itemWindow.itemWidgets["logiclevel"].storageVar.get()
 
