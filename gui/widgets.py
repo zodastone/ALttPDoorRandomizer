@@ -1,4 +1,4 @@
-from tkinter import Checkbutton, Entry, Frame, IntVar, Label, OptionMenu, StringVar
+from tkinter import Checkbutton, Entry, Frame, IntVar, Label, OptionMenu, Spinbox, StringVar
 
 def make_checkbox(self, parent, label, storageVar, packAttrs):
     self = Frame(parent)
@@ -28,6 +28,22 @@ def make_selectbox(self, parent, label, options, storageVar, packAttrs):
     self.selectbox.pack(packAttrs["selectbox"])
     return self
 
+def make_spinbox(self, parent, label, storageVar, packAttrs):
+    self = Frame(parent)
+    self.storageVar = storageVar
+    self.label = Label(self, text=label)
+    self.label.pack(packAttrs["label"])
+    fromNum = 1
+    toNum = 100
+    if "spinbox" in packAttrs:
+        if "from" in packAttrs:
+            fromNum = packAttrs["spinbox"]["from"]
+        if "to" in packAttrs:
+            toNum = packAttrs["spinbox"]["to"]
+    self.spinbox = Spinbox(self, from_=fromNum, to=toNum, width=5, textvariable=self.storageVar)
+    self.spinbox.pack(packAttrs["spinbox"])
+    return self
+
 def make_textbox(self, parent, label, storageVar, packAttrs):
     self = Frame(parent)
     self.storageVar = storageVar
@@ -54,6 +70,10 @@ def make_widget(self, type, parent, label, storageVar=None, packAttrs=dict(), op
         if thisStorageVar is None:
             thisStorageVar = StringVar()
         widget = make_selectbox(self, parent, label, options, thisStorageVar, packAttrs)
+    elif type == "spinbox":
+        if thisStorageVar is None:
+            thisStorageVar = StringVar()
+        widget = make_spinbox(self, parent, label, thisStorageVar, packAttrs)
     elif type == "textbox":
         if thisStorageVar is None:
             thisStorageVar = StringVar()

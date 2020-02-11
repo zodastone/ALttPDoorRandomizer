@@ -31,7 +31,7 @@ def bottom_frame(self,parent,args=None):
 
     def generateRom():
         guiargs = Namespace()
-        guiargs.multi = int(parent.multiworldWindow.worldVar.get())
+        guiargs.multi = int(parent.multiworldWindow.multiworldWidgets["worlds"].storageVar.get())
         guiargs.names = parent.multiworldWindow.namesVar.get()
         guiargs.seed = int(parent.farBottomFrame.seedVar.get()) if parent.farBottomFrame.seedVar.get() else None
         guiargs.count = int(parent.farBottomFrame.countVar.get()) if parent.farBottomFrame.countVar.get() != '1' else None

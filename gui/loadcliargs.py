@@ -15,7 +15,7 @@ def loadcliargs(gui,args):
       gui.gameOptionsWindow.quickSwapVar.set(int(args.quickswap))
       gui.gameOptionsWindow.disableMusicVar.set(int(args.disablemusic))
       if args.multi:
-          gui.multiworldWindow.worldVar.set(str(args.multi))
+          gui.multiworldWindow.multiworldWidgets["worlds"].storageVar.set(str(args.multi))
       if args.count:
           gui.farBottomFrame.countVar.set(str(args.count))
       if args.seed:
