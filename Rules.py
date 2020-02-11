@@ -995,7 +995,8 @@ def overworld_glitches_rules(world, player):
 
     # Regions that require the boots and some other stuff.
     if world.mode != 'inverted':
-        set_rule(world.get_entrance('Dark Desert Teleporter', player), lambda state: state.has('Ocarina', player) or (state.can_boots_clip_dw(player) and state.can_lift_heavy_rocks(player)))        set_rule(world.get_entrance('Turtle Rock Teleporter', player), lambda state: (state.can_boots_clip_dw(player) or state.can_lift_heavy_rocks(player)) and state.has('Hammer', player))
+        set_rule(world.get_entrance('Dark Desert Teleporter', player), lambda state: state.has('Ocarina', player) or (state.can_boots_clip_dw(player) and state.can_lift_heavy_rocks(player)))
+        set_rule(world.get_entrance('Turtle Rock Teleporter', player), lambda state: (state.can_boots_clip_dw(player) or state.can_lift_heavy_rocks(player)) and state.has('Hammer', player))
         add_rule(world.get_entrance('Catfish Exit Rock', player), lambda state: state.can_boots_clip_dw(player), 'or')
         add_rule(world.get_entrance('East Dark World Broken Bridge Pass', player), lambda state: state.can_boots_clip_dw(player), 'or')
         add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_reach('Dark Death Mountain (West Bottom)', 'Region', player) and state.has_Mirror(player))
