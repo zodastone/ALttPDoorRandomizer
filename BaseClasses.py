@@ -508,7 +508,7 @@ class CollectionState(object):
     def has_turtle_rock_medallion(self, player):
         return self.has(self.world.required_medallions[player][1], player)
 
-        def can_boots_clip_lw(self, player):
+    def can_boots_clip_lw(self, player):
         if self.world.mode == 'inverted':
             return self.has_Boots(player) and self.has_Pearl(player)
         return self.has_Boots(player)
