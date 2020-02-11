@@ -1,38 +1,79 @@
 from tkinter import ttk, IntVar, StringVar, Checkbutton, Frame, Label, OptionMenu, E, W, LEFT, RIGHT
+import gui.widgets as widgets
 
 def dungeon_page(parent):
+    # Dungeon Shuffle
     self = ttk.Frame(parent)
 
     # Dungeon Shuffle options
+    self.dungeonWidgets = {}
+
     ## Dungeon Item Shuffle
     mcsbshuffleFrame = Frame(self)
     mcsbshuffleFrame.pack(anchor=W)
-    mcsbLabel = Label(mcsbshuffleFrame, text="Shuffle: ")
-    mcsbLabel.grid(row=0, column=0)
+    mscbLabel = Label(mcsbshuffleFrame, text="Shuffle: ")
+    mscbLabel.pack(side=LEFT)
+
     ## Map Shuffle
-    self.mapshuffleVar = IntVar()
-    mapshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="Maps", variable=self.mapshuffleVar)
-    mapshuffleCheckbutton.grid(row=0, column=1)
+    key = "mapshuffle"
+    self.dungeonWidgets[key] = widgets.make_widget(
+      self,
+      "checkbox",
+      mcsbshuffleFrame,
+      "Maps",
+      None
+    )
+    self.dungeonWidgets[key].pack(side=LEFT)
+
     ## Compass Shuffle
-    self.compassshuffleVar = IntVar()
-    compassshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="Compasses", variable=self.compassshuffleVar)
-    compassshuffleCheckbutton.grid(row=0, column=2)
+    key = "compassshuffle"
+    self.dungeonWidgets[key] = widgets.make_widget(
+      self,
+      "checkbox",
+      mcsbshuffleFrame,
+      "Compasses",
+      None
+    )
+    self.dungeonWidgets[key].pack(side=LEFT)
+
     ## Small Key Shuffle
-    self.keyshuffleVar = IntVar()
-    keyshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="Keys", variable=self.keyshuffleVar)
-    keyshuffleCheckbutton.grid(row=0, column=3)
+    key = "smallkeyshuffle"
+    self.dungeonWidgets[key] = widgets.make_widget(
+      self,
+      "checkbox",
+      mcsbshuffleFrame,
+      "Small Keys",
+      None
+    )
+    self.dungeonWidgets[key].pack(side=LEFT)
+
     ## Big Key Shuffle
-    self.bigkeyshuffleVar = IntVar()
-    bigkeyshuffleCheckbutton = Checkbutton(mcsbshuffleFrame, text="BigKeys", variable=self.bigkeyshuffleVar)
-    bigkeyshuffleCheckbutton.grid(row=0, column=4)
+    key = "bigkeyshuffle"
+    self.dungeonWidgets[key] = widgets.make_widget(
+      self,
+      "checkbox",
+      mcsbshuffleFrame,
+      "Big Keys",
+      None
+    )
+    self.dungeonWidgets[key].pack(side=LEFT)
+
     ## Dungeon Door Shuffle
-    doorShuffleFrame = Frame(self)
-    self.doorShuffleVar = StringVar()
-    self.doorShuffleVar.set('basic')
-    doorShuffleOptionMenu = OptionMenu(doorShuffleFrame, self.doorShuffleVar, 'vanilla', 'basic', 'crossed', 'experimental')
-    doorShuffleOptionMenu.pack(side=RIGHT)
-    doorShuffleLabel = Label(doorShuffleFrame, text='Door shuffle algorithm')
-    doorShuffleLabel.pack(side=LEFT)
-    doorShuffleFrame.pack(anchor=W)
+    key = "dungeondoorshuffle"
+    self.dungeonWidgets[key] = widgets.make_widget(
+      self,
+      "selectbox",
+      self,
+      "Dungeon Door Shuffle",
+      None,
+      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Basic"},
+      {
+        "Vanilla": "vanilla",
+        "Basic": "basic",
+        "Crossed": "crossed",
+        "Experimental": "experimental"
+      }
+    )
+    self.dungeonWidgets[key].pack(anchor=W)
 
     return self
