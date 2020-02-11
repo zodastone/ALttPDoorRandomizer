@@ -4,8 +4,8 @@ def loadcliargs(gui,args):
           if type(v) is dict:
               setattr(args, k, v[1]) # only get values for player 1 for now
       # load values from commandline args
-      gui.generationSetupWindow.createSpoilerVar.set(int(args.create_spoiler))
-      gui.generationSetupWindow.suppressRomVar.set(int(args.suppress_rom))
+      gui.generationSetupWindow.generationWidgets["spoiler"].storageVar.set(int(args.create_spoiler))
+      gui.generationSetupWindow.generationWidgets["suppressrom"].storageVar.set(int(args.suppress_rom))
       gui.dungeonRandoWindow.dungeonWidgets["mapshuffle"].storageVar.set(args.mapshuffle)
       gui.dungeonRandoWindow.dungeonWidgets["compassshuffle"].storageVar.set(args.compassshuffle)
       gui.dungeonRandoWindow.dungeonWidgets["smallkeyshuffle"].storageVar.set(args.keyshuffle)

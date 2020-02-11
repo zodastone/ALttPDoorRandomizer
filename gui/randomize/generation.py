@@ -1,22 +1,47 @@
 import os
 from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, E, W, LEFT, RIGHT, X
+import gui.widgets as widgets
 
 def generation_page(parent,working_dirs):
+    # Generation Setup
     self = ttk.Frame(parent)
 
     # Generation Setup options
+    self.generationWidgets = {}
+
     ## Generate Spoiler
-    self.createSpoilerVar = IntVar()
-    createSpoilerCheckbutton = Checkbutton(self, text="Create Spoiler Log", variable=self.createSpoilerVar)
-    createSpoilerCheckbutton.pack(anchor=W)
+    key = "spoiler"
+    self.generationWidgets[key] = widgets.make_widget(
+      self,
+      "checkbox",
+      self,
+      "Create Spoiler Log",
+      None
+    )
+    self.generationWidgets[key].pack(anchor=W)
+
     ## Don't make ROM
-    self.suppressRomVar = IntVar()
-    suppressRomCheckbutton = Checkbutton(self, text="Do not create patched Rom", variable=self.suppressRomVar)
-    suppressRomCheckbutton.pack(anchor=W)
+    key = "suppressrom"
+    self.generationWidgets[key] = widgets.make_widget(
+      self,
+      "checkbox",
+      self,
+      "Do not create patched ROM",
+      None
+    )
+    self.generationWidgets[key].pack(anchor=W)
+
     ## Use Custom Item Pool as defined in Custom tab
-    self.customVar = IntVar()
-    customCheckbutton = Checkbutton(self, text="Use custom item pool", variable=self.customVar)
-    customCheckbutton.pack(anchor=W)
+    key = "usecustompool"
+    self.generationWidgets[key] = widgets.make_widget(
+      self,
+      "checkbox",
+      self,
+      "Use custom item pool",
+      None
+    )
+    self.generationWidgets[key].pack(anchor=W)
+
     ## Locate base ROM
     baseRomFrame = Frame(self)
     baseRomLabel = Label(baseRomFrame, text='Base Rom: ')
