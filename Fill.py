@@ -221,7 +221,7 @@ def distribute_items_restrictive(world, gftower_trash_count=0, fill_locations=No
 
     # fill in gtower locations with trash first
     for player in range(1, world.players + 1):
-        if world.ganonstower_vanilla[player]:
+        if world.ganonstower_vanilla[player] and world.logic[player] not in ['owglitches']:
             gtower_locations = [location for location in fill_locations if 'Ganons Tower' in location.name and location.player == player]
             random.shuffle(gtower_locations)
             trashcnt = 0
