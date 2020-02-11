@@ -24,6 +24,7 @@ def make_selectbox(self, parent, label, options, storageVar, packAttrs):
     self.label = Label(self, text=label)
     self.label.pack(packAttrs["label"])
     self.selectbox = OptionMenu(self, self.labelVar, *options.keys())
+    self.selectbox.config(width=15)
     self.labelVar.set(packAttrs["default"] if "default" in packAttrs else list(options.keys())[0])
     self.selectbox.pack(packAttrs["selectbox"])
     return self
