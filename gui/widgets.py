@@ -1,4 +1,4 @@
-from tkinter import Checkbutton, Entry, Frame, IntVar, Label, OptionMenu, Spinbox, StringVar
+from tkinter import Checkbutton, Entry, Frame, IntVar, Label, OptionMenu, Spinbox, StringVar, RIGHT
 
 def make_checkbox(self, parent, label, storageVar, packAttrs):
     self = Frame(parent)
@@ -24,7 +24,7 @@ def make_selectbox(self, parent, label, options, storageVar, packAttrs):
     self.label = Label(self, text=label)
     self.label.pack(packAttrs["label"])
     self.selectbox = OptionMenu(self, self.labelVar, *options.keys())
-    self.selectbox.config(width=15)
+    self.selectbox.config(width=20)
     self.labelVar.set(packAttrs["default"] if "default" in packAttrs else list(options.keys())[0])
     self.selectbox.pack(packAttrs["selectbox"])
     return self
@@ -50,7 +50,9 @@ def make_textbox(self, parent, label, storageVar, packAttrs):
     self.storageVar = storageVar
     self.label = Label(self, text=label)
     self.label.pack(packAttrs["label"])
-    self.textbox = Entry(self)
+    self.textbox = Entry(self, justify=RIGHT, textvariable=self.storageVar, width=3)
+    if "default" in packAttrs:
+        self.storageVar.set(packAttrs["default"])
     self.textbox.pack(packAttrs["textbox"])
     return self
 
