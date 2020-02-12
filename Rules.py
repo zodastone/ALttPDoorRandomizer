@@ -1670,12 +1670,12 @@ def set_inverted_bunny_rules(world, player):
         # In OWG, a location can potentially be superbunny-mirror accessible or
         # bunny revival accessible.
         if world.logic == 'owglitches':
-            if region.name == 'Tower of Hera (Bottom)' and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw():
+            if region.name == 'Tower of Hera (Bottom)' and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_lw():
                 return lambda state: state.can_superbunny_mirror_with_sword(player) or state.has_Pearl(player)
-            if region.name == 'Turtle Rock (Entrance)' and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw():
+            if region.name == 'Turtle Rock (Entrance)' and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_lw():
                 return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
             if not any([
-                location in OWGSets.get_superbunny_accessible_locations() and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw(),
+                location in OWGSets.get_superbunny_accessible_locations() and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_lw(),
                 region.type == RegionType.Dungeon and region.name != 'Swamp Palace (Entrance)',
                 not region.is_dark_world]):
                 return lambda state: state.has_Pearl(player)
