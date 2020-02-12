@@ -83,6 +83,8 @@ def guiMain(args=None):
     hintsVar = IntVar()
     hintsVar.set(1) #set default
     hintsCheckbutton = Checkbutton(checkBoxFrame, text="Include Helpful Hints", variable=hintsVar)
+    experimentVar = IntVar()
+    experimentCheckbutton = Checkbutton(checkBoxFrame, text="Enable Experimental Features", variable=experimentVar)
     customVar = IntVar()
     customCheckbutton = Checkbutton(checkBoxFrame, text="Use custom item pool", variable=customVar)
 
@@ -98,6 +100,7 @@ def guiMain(args=None):
     retroCheckbutton.pack(expand=True, anchor=W)
     shuffleGanonCheckbutton.pack(expand=True, anchor=W)
     hintsCheckbutton.pack(expand=True, anchor=W)
+    experimentCheckbutton.pack(expand=True, anchor=W)
     customCheckbutton.pack(expand=True, anchor=W)
 
     romOptionsFrame = LabelFrame(rightHalfFrame, text="Rom options")
@@ -452,6 +455,7 @@ def guiMain(args=None):
         guiargs.uw_palettes = uwPalettesVar.get()
         guiargs.shuffleganon = bool(shuffleGanonVar.get())
         guiargs.hints = bool(hintsVar.get())
+        guiargs.experimental = bool(experimentVar.get())
         guiargs.enemizercli = enemizerCLIpathVar.get()
         guiargs.shufflebosses = enemizerBossVar.get()
         guiargs.shuffleenemies = enemyShuffleVar.get()
@@ -1259,6 +1263,7 @@ def guiMain(args=None):
         romVar.set(args.rom)
         shuffleGanonVar.set(args.shuffleganon)
         hintsVar.set(args.hints)
+        experimentVar.set(args.experimental)
         enemizerCLIpathVar.set(args.enemizercli)
         potShuffleVar.set(args.shufflepots)
         enemyShuffleVar.set(args.shuffleenemies)
