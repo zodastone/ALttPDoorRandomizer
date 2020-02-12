@@ -251,6 +251,9 @@ class Room(object):
         self.doorList = []
         self.modified = False
 
+    def kind(self, door):
+        return self.doorList[door.doorListPos][1]
+
     def door(self, pos, kind):
         self.doorList.append((pos, kind))
         return self
@@ -299,10 +302,11 @@ class Room(object):
 
 
 class PairedDoor(object):
-    def __init__(self, door_a, door_b):
+    def __init__(self, door_a, door_b, original=False):
         self.door_a = door_a
         self.door_b = door_b
         self.pair = True
+        self.original = original
 
     def address_a(self, world, player):
         d = world.check_for_door(self.door_a, player)

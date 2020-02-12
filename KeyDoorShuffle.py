@@ -806,7 +806,8 @@ def reduce_rules(small_rules, collected, collected_alt):
 
 # Soft lock stuff
 def validate_key_layout(key_layout, world, player):
-    if world.retro[player]:  # retro is all good - don't care how the doors are laid out
+    # retro is all good - except for hyrule castle in standard mode
+    if world.retro[player] and (world.mode[player] != 'standard' or key_layout.sector.name != 'Hyrule Castle'):
         return True
     flat_proposal = key_layout.flat_prop
     state = ExplorationState(dungeon=key_layout.sector.name)
@@ -815,7 +816,7 @@ def validate_key_layout(key_layout, world, player):
     for region in key_layout.start_regions:
         state.visit_region(region, key_checks=True)
         state.add_all_doors_check_keys(region, flat_proposal, world, player)
-    return validate_key_layout_sub_loop(key_layout, state, {}, flat_proposal, None, None, world, player)
+    return validate_key_layout_sub_loop(key_layout, state, {}, flat_proposal, None, 0, world, player)
 
 
 def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposal, prev_state, prev_avail, world, player):

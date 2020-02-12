@@ -188,16 +188,16 @@ def read_entrance_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan)
 
     for ent, offset in entrance_offsets.items():
         # print(ent)
-        str = ent
+        string = ent
         for dp, data in entrance_data.items():
             byte_array = []
             address, size = data
             for i in range(0, size):
                 byte_array.append(old_rom_data[address+(offset*size)+i])
-            bytes = ', '.join('0x{:02x}'.format(x) for x in byte_array)
-            str += '\t'+bytes
+            some_bytes = ', '.join('0x{:02x}'.format(x) for x in byte_array)
+            string += '\t'+some_bytes
             # print("%s: %s" % (dp, bytes))
-        print(str)
+        print(string)
 
 
 def print_wiki_doors(d_regions, world, player):

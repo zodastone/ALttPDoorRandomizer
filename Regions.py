@@ -826,15 +826,15 @@ def create_shops(world, player):
 _basic_shop_defaults = [('Red Potion', 150), ('Small Heart', 10), ('Bombs (10)', 50)]
 _dark_world_shop_defaults = [('Red Potion', 150), ('Blue Shield', 50), ('Bombs (10)', 50)]
 shop_table = {
-    'Cave Shop (Dark Death Mountain)': (0x0112, ShopType.Shop, 0xC1, True, False, _basic_shop_defaults),
-    'Red Shield Shop': (0x0110, ShopType.Shop, 0xC1, True, False, [('Red Shield', 500), ('Bee', 10), ('Arrows (10)', 30)]),
-    'Dark Lake Hylia Shop': (0x010F, ShopType.Shop, 0xC1, True, False, _dark_world_shop_defaults),
-    'Dark World Lumberjack Shop': (0x010F, ShopType.Shop, 0xC1, True, False, _dark_world_shop_defaults),
-    'Village of Outcasts Shop': (0x010F, ShopType.Shop, 0xC1, True, False, _dark_world_shop_defaults),
-    'Dark World Potion Shop': (0x010F, ShopType.Shop, 0xC1, True, False, _dark_world_shop_defaults),
-    'Light World Death Mountain Shop': (0x00FF, ShopType.Shop, 0xA0, True, False, _basic_shop_defaults),
-    'Kakariko Shop': (0x011F, ShopType.Shop, 0xA0, True, False, _basic_shop_defaults),
-    'Cave Shop (Lake Hylia)': (0x0112, ShopType.Shop, 0xA0, True, False, _basic_shop_defaults),
+    'Cave Shop (Dark Death Mountain)': (0x0112, ShopType.Shop, 0xC1, False, False, _basic_shop_defaults),
+    'Red Shield Shop': (0x0110, ShopType.Shop, 0xC1, False, False, [('Red Shield', 500), ('Bee', 10), ('Arrows (10)', 30)]),
+    'Dark Lake Hylia Shop': (0x010F, ShopType.Shop, 0xC1, False, False, _dark_world_shop_defaults),
+    'Dark World Lumberjack Shop': (0x010F, ShopType.Shop, 0xC1, False, False, _dark_world_shop_defaults),
+    'Village of Outcasts Shop': (0x010F, ShopType.Shop, 0xC1, False, False, _dark_world_shop_defaults),
+    'Dark World Potion Shop': (0x010F, ShopType.Shop, 0xC1, False, False, _dark_world_shop_defaults),
+    'Light World Death Mountain Shop': (0x00FF, ShopType.Shop, 0xA0, False, False, _basic_shop_defaults),
+    'Kakariko Shop': (0x011F, ShopType.Shop, 0xA0, False, False, _basic_shop_defaults),
+    'Cave Shop (Lake Hylia)': (0x0112, ShopType.Shop, 0xA0, False, False, _basic_shop_defaults),
     'Potion Shop': (0x0109, ShopType.Shop, 0xFF, False, True, [('Red Potion', 120), ('Green Potion', 60), ('Blue Potion', 160)]),
     'Capacity Upgrade': (0x0115, ShopType.UpgradeShop, 0x04, True, True, [('Bomb Upgrade (+5)', 100, 7), ('Arrow Upgrade (+5)', 100, 7)])
 }

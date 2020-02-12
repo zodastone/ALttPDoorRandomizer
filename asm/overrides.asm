@@ -37,4 +37,15 @@ OnFileLoadOverride:
     jsl OnFileLoad ; what I wrote over
     lda DRFlags : and #$80 : beq +  ;flag is off
         lda $7ef086 : ora #$80 : sta $7ef086
+    + lda DRFlags : and #$02 : beq +
+        lda $7ef353 : bne +
+            lda #$01 : sta $7ef353
++ rtl
+
+MirrorCheckOverride:
+    lda $8A : and #$40 ; what I wrote over
+    beq +
+    lda DRFlags : and #$02 : beq ++
+        lda $7ef353 : cmp #$01 : beq +
+    ++ lda #$01
 + rtl

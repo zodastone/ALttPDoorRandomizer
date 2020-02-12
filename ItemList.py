@@ -58,7 +58,7 @@ difficulties = {
         timedother = ['Green Clock'] * 20 + ['Blue Clock'] * 10 + ['Red Clock'] * 10,
         triforcehunt = ['Triforce Piece'] * 30,
         triforce_pieces_required = 20,
-        retro = ['Small Key (Universal)'] * 17 + ['Rupees (20)'] * 10,
+        retro = ['Small Key (Universal)'] * 18 + ['Rupees (20)'] * 10,
         extras = [normalfirst15extra, normalsecond15extra, normalthird10extra, normalfourth5extra, normalfinal25extra],
         progressive_sword_limit = 4,
         progressive_shield_limit = 3,
@@ -85,7 +85,7 @@ difficulties = {
         timedother = ['Green Clock'] * 20 + ['Blue Clock'] * 10 + ['Red Clock'] * 10,
         triforcehunt = ['Triforce Piece'] * 30,
         triforce_pieces_required = 20,
-        retro = ['Small Key (Universal)'] * 12 + ['Rupees (5)'] * 15,
+        retro = ['Small Key (Universal)'] * 13 + ['Rupees (5)'] * 15,
         extras = [normalfirst15extra, normalsecond15extra, normalthird10extra, normalfourth5extra, normalfinal25extra],
         progressive_sword_limit = 3,
         progressive_shield_limit = 2,
@@ -112,7 +112,7 @@ difficulties = {
         timedother = ['Green Clock'] * 20 + ['Blue Clock'] * 10 + ['Red Clock'] * 10,
         triforcehunt = ['Triforce Piece'] * 30,
         triforce_pieces_required = 20,
-        retro = ['Small Key (Universal)'] * 12 + ['Rupees (5)'] * 15,
+        retro = ['Small Key (Universal)'] * 13 + ['Rupees (5)'] * 15,
         extras = [normalfirst15extra, normalsecond15extra, normalthird10extra, normalfourth5extra, normalfinal25extra],
         progressive_sword_limit = 2,
         progressive_shield_limit = 1,
@@ -206,7 +206,16 @@ def generate_itempool(world, player):
         (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = make_custom_item_pool(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.customitemarray)
         world.rupoor_cost = min(world.customitemarray[69], 9999)
     else:
-        (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = get_pool_core(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player])
+        (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = get_pool_core(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.doorShuffle[player])
+
+    if player in world.pool_adjustment.keys():
+        amt = world.pool_adjustment[player]
+        if amt < 0:
+            for i in range(0, amt):
+                pool.remove('Rupees (20)')
+        elif amt > 0:
+            for i in range(0, amt):
+                pool.append('Rupees (20)')
 
     for item in precollected_items:
         world.push_precollected(ItemFactory(item, player))
@@ -397,8 +406,10 @@ def set_up_shops(world, player):
     if world.retro[player]:
         rss = world.get_region('Red Shield Shop', player).shop
         if not rss.locked:
+            rss.custom = True
             rss.add_inventory(2, 'Single Arrow', 80)
-        for shop in random.sample([s for s in world.shops if s.custom and not s.locked and s.region.player == player], 5):
+        for shop in random.sample([s for s in world.shops if not s.locked and s.region.player == player], 5):
+            shop.custom = True
             shop.locked = True
             shop.add_inventory(0, 'Single Arrow', 80)
             shop.add_inventory(1, 'Small Key (Universal)', 100)
@@ -406,7 +417,7 @@ def set_up_shops(world, player):
         rss.locked = True
 
 
-def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro):
+def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, door_shuffle):
     pool = []
     placed_items = {}
     precollected_items = []
@@ -525,8 +536,11 @@ def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, r
         pool = [item.replace('Arrow Upgrade (+10)','Rupees (5)') for item in pool]
         pool.extend(diff.retro)
         if mode == 'standard':
-            key_location = random.choice(['Secret Passage', 'Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Map Chest', 'Hyrule Castle - Zelda\'s Chest', 'Sewers - Dark Cross'])
-            place_item(key_location, 'Small Key (Universal)')
+            if door_shuffle == 'vanilla':
+                key_location = random.choice(['Secret Passage', 'Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Map Chest', 'Hyrule Castle - Zelda\'s Chest', 'Sewers - Dark Cross'])
+                place_item(key_location, 'Small Key (Universal)')
+            else:
+                pool.extend(['Small Key (Universal)'])
         else:
             pool.extend(['Small Key (Universal)'])
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms)
