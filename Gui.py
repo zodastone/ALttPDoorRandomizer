@@ -120,7 +120,6 @@ def guiMain(args=None):
 
     # Adjuster Controls
     self.adjustContent,self.working_dirs = adjust_page(self,self.adjustWindow,self.working_dirs)
-#    self.adjustContent,self.working_dirs = adjust_page(self,self.adjustWindow,self.working_dirs)
     self.adjustContent.pack(side=TOP, fill=BOTH, expand=True)
 
     # Custom Controls

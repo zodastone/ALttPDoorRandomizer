@@ -70,8 +70,7 @@ def dungeon_page(parent):
       {
         "Vanilla": "vanilla",
         "Basic": "basic",
-        "Crossed": "crossed",
-        "Experimental": "experimental"
+        "Crossed": "crossed"
       }
     )
     self.dungeonWidgets[key].pack(anchor=W)
