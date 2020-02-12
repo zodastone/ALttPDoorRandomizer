@@ -1,5 +1,6 @@
 from tkinter import ttk, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, OptionMenu, E, W, LEFT, RIGHT
-from classes.SpriteSelector import SpriteSelector
+from functools import partial
+import classes.SpriteSelector as spriteSelector
 import gui.widgets as widgets
 
 def gameoptions_page(parent):
@@ -89,23 +90,16 @@ def gameoptions_page(parent):
     spriteDialogFrame = Frame(leftRomOptionsFrame)
     baseSpriteLabel = Label(spriteDialogFrame, text='Sprite:')
 
-    self.spriteNameVar = StringVar()
-    sprite = None
-    def set_sprite(sprite_param):
-        nonlocal sprite
-        if sprite_param is None or not sprite_param.valid:
-            sprite = None
-            self.spriteNameVar.set('(unchanged)')
-        else:
-            sprite = sprite_param
-            self.spriteNameVar.set(sprite.name)
+    self.gameOptionsWidgets["sprite"] = {}
+    self.gameOptionsWidgets["sprite"]["spriteObject"] = None
+    self.gameOptionsWidgets["sprite"]["spriteNameVar"] = StringVar()
 
-    set_sprite(None)
-    self.spriteNameVar.set('(unchanged)')
-    spriteEntry = Label(spriteDialogFrame, textvariable=self.spriteNameVar)
+    set_sprite(None,self.gameOptionsWidgets["sprite"]["spriteObject"],self.gameOptionsWidgets["sprite"]["spriteNameVar"])
+    self.gameOptionsWidgets["sprite"]["spriteNameVar"].set('(unchanged)')
+    spriteEntry = Label(spriteDialogFrame, textvariable=self.gameOptionsWidgets["sprite"]["spriteNameVar"])
 
     def SpriteSelect():
-        SpriteSelector(parent, set_sprite)
+        spriteSelector.SpriteSelector(parent, partial(set_sprite,spriteObject=self.gameOptionsWidgets["sprite"]["spriteObject"],spriteNameVar=self.gameOptionsWidgets["sprite"]["spriteNameVar"]))
 
     spriteSelectButton = Button(spriteDialogFrame, text='...', command=SpriteSelect)
 
@@ -169,3 +163,14 @@ def gameoptions_page(parent):
     self.gameOptionsWidgets[key].pack(anchor=E)
 
     return self
+
+def set_sprite(sprite_param,spriteObject=None,spriteNameVar=None):
+    print(sprite_param,spriteObject,spriteNameVar)
+    if sprite_param is None or not sprite_param.valid:
+        spriteObject = None
+        if spriteNameVar is not None:
+            spriteNameVar.set('(unchanged)')
+    else:
+        spriteObject = sprite_param
+        if spriteNameVar is not None:
+            spriteNameVar.set(spriteObject.name)

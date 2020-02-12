@@ -1,3 +1,7 @@
+from classes.SpriteSelector import SpriteSelector as spriteSelector
+from gui.randomize.gameoptions import set_sprite
+from Rom import Sprite
+
 def loadcliargs(gui,args):
   if args is not None:
       for k,v in vars(args).items():
@@ -48,5 +52,5 @@ def loadcliargs(gui,args):
       gui.enemizerWindow.enemizerWidgets["enemyhealth"].storageVar.set(args.enemy_health)
       gui.gameOptionsWindow.gameOptionsWidgets["owpalettes"].storageVar.set(args.ow_palettes)
       gui.gameOptionsWindow.gameOptionsWidgets["uwpalettes"].storageVar.set(args.uw_palettes)
-#        if args.sprite is not None:
-#            gui.gameOptionsWindow.set_sprite(Sprite(args.sprite))
+      if args.sprite is not None:
+          set_sprite(Sprite(args.sprite),spriteObject=gui.gameOptionsWindow.gameOptionsWidgets["sprite"]["spriteObject"],spriteNameVar=gui.gameOptionsWindow.gameOptionsWidgets["sprite"]["spriteNameVar"])

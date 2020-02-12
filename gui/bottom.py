@@ -97,7 +97,7 @@ def bottom_frame(self,parent,args=None):
                                    int(parent.customContent.customWidgets["rupee300"].storageVar.get()), int(parent.customContent.customWidgets["rupoor"].storageVar.get()), int(parent.customContent.customWidgets["blueclock"].storageVar.get()), int(parent.customContent.customWidgets["greenclock"].storageVar.get()), int(parent.customContent.customWidgets["redclock"].storageVar.get()), int(parent.customContent.customWidgets["progressivebow"].storageVar.get()), int(parent.customContent.customWidgets["bomb10"].storageVar.get()), int(parent.customContent.customWidgets["triforcepieces"].storageVar.get()),int(parent.customContent.customWidgets["triforcepiecesgoal"].storageVar.get()),
                                    int(parent.customContent.customWidgets["triforce"].storageVar.get()),int(parent.customContent.customWidgets["rupoorcost"].storageVar.get()),int(parent.customContent.customWidgets["generickeys"].storageVar.get())]
         guiargs.rom = parent.generationSetupWindow.romVar.get()
-#        guiargs.sprite = parent.gameOptionsWindow.sprite
+        guiargs.sprite = parent.gameOptionsWindow.gameOptionsWidgets["sprite"]["spriteObject"]
         guiargs.outputpath = args.outputpath if args else None
         # get default values for missing parameters
         for k,v in vars(parse_arguments(['--multi', str(guiargs.multi)])).items():
