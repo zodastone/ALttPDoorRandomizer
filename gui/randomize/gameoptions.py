@@ -165,7 +165,6 @@ def gameoptions_page(parent):
     return self
 
 def set_sprite(sprite_param,spriteObject=None,spriteNameVar=None):
-    print(sprite_param,spriteObject,spriteNameVar)
     if sprite_param is None or not sprite_param.valid:
         spriteObject = None
         if spriteNameVar is not None:
