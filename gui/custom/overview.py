@@ -634,6 +634,15 @@ def custom_page(top,parent):
     )
     self.customWidgets[key].pack()
 
+    # Triforce Pieces Required
+    key = "triforcepiecesgoal"
+    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
+      "Triforce Pieces Required",
+      None,
+      {"label": {"anchor": W, "side": LEFT, "padx": (0,40)}, "textbox": {"side": RIGHT}, "default": 0}
+    )
+    self.customWidgets[key].pack()
+
     # Triforce (win game)
     key = "triforce"
     self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
