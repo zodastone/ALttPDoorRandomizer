@@ -530,6 +530,9 @@ class CollectionState(object):
             rules.append(self.has_Pearl(player))
         return all(rules)
 
+    def can_superbunny_mirror_with_sword(self, player):
+        return self.has_Mirror(player) and self.has_sword(player)
+
     def collect(self, item, event=False, location=None):
         if location:
             self.locations_checked.add(location)

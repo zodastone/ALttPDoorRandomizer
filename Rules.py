@@ -985,13 +985,12 @@ def overworld_glitches_rules(world, player):
             set_rule(world.get_entrance(clip_spot, player), lambda state: state.has_Mirror(player))
 
     # Locations that you can superbunny mirror into, but need a sword to clear.
-    superbunny_mirror_weapon = lambda state: state.has_Mirror(player) and state.has_sword(player)
     mini_moldorm_cave = world.get_region('Mini Moldorm Cave', player)
     for superbunny_mirror_weapon_region in OWGSets.get_sword_required_superbunny_mirror_regions():
         region = world.get_region(superbunny_mirror_weapon_region, player)
         if check_is_dark_world(region):
             for spot in region.locations:
-                add_rule(world.get_location(spot, player), superbunny_mirror_weapon, 'or')
+                add_rule(world.get_location(spot, player), lambda state: state.can_superbunny_mirror_with_sword(player), 'or')
 
     # Regions that require the boots and some other stuff.
     if world.mode != 'inverted':
@@ -1576,13 +1575,19 @@ def set_bunny_rules(world, player):
     def get_rule_to_add(region, location = None):
         # In OWG, a location can potentially be superbunny-mirror accessible or
         # bunny revival accessible.
-        if world.logic == 'owglitches' and not any([
-            location in OWGSets.get_superbunny_accessible_locations() and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw(),
-            region.type == RegionType.Dungeon and region.name != 'Swamp Palace (Entrance)',
-            not region.is_light_world]):
-            return lambda state: state.has_Pearl(player)
-        elif world.logic != 'owglitches' and not region.is_light_world:
-            return lambda state: state.has_Pearl(player)
+        if world.logic == 'owglitches':
+            if region.name == 'Tower of Hera (Bottom)' and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw():
+                return lambda state: state.can_superbunny_mirror_with_sword(player) or state.has_Pearl(player)
+            if region.name == 'Turtle Rock (Entrance)' and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw():
+                return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
+            if not any([
+                location in OWGSets.get_superbunny_accessible_locations() and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw(),
+                region.type == RegionType.Dungeon and region.name != 'Swamp Palace (Entrance)',
+                not region.is_dark_world]):
+                return lambda state: state.has_Pearl(player)
+        else:
+            if not region.is_dark_world:
+                return lambda state: state.has_Pearl(player)
         # in this case we are mixed region.
         # we collect possible options.
 
@@ -1664,13 +1669,19 @@ def set_inverted_bunny_rules(world, player):
     def get_rule_to_add(region, location = None):
         # In OWG, a location can potentially be superbunny-mirror accessible or
         # bunny revival accessible.
-        if world.logic == 'owglitches' and not any([
-            location in OWGSets.get_superbunny_accessible_locations() and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw(),
-            region.type == RegionType.Dungeon and region.name != 'Swamp Palace (Entrance)',
-            not region.is_dark_world]):
-            return lambda state: state.has_Pearl(player)
-        elif world.logic != 'owglitches' and not region.is_dark_world:
-            return lambda state: state.has_Pearl(player)
+        if world.logic == 'owglitches':
+            if region.name == 'Tower of Hera (Bottom)' and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw():
+                return lambda state: state.can_superbunny_mirror_with_sword(player) or state.has_Pearl(player)
+            if region.name == 'Turtle Rock (Entrance)' and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw():
+                return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
+            if not any([
+                location in OWGSets.get_superbunny_accessible_locations() and region.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw(),
+                region.type == RegionType.Dungeon and region.name != 'Swamp Palace (Entrance)',
+                not region.is_dark_world]):
+                return lambda state: state.has_Pearl(player)
+        else:
+            if not region.is_dark_world:
+                return lambda state: state.has_Pearl(player)
         # in this case we are mixed region.
         # we collect possible options.
 
