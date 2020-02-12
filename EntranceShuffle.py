@@ -276,6 +276,8 @@ def link_entrances(world, player):
         if world.mode[player] == 'standard':
             # must connect front of hyrule castle to do escape
             connect_two_way(world, 'Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)', player)
+        elif world.doorShuffle[player] != 'vanilla':
+            lw_entrances.append('Hyrule Castle Entrance (South)')
         else:
             caves.append(tuple(random.sample(['Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)'],3)))
             lw_entrances.append('Hyrule Castle Entrance (South)')
@@ -312,6 +314,10 @@ def link_entrances(world, player):
         if world.mode[player] == 'standard':
             # rest of hyrule castle must be in light world
             connect_caves(world, lw_entrances, [], [('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)')], player)
+        # in full, Sanc must be in light world, so must all of HC if door shuffle is on
+        elif world.doorShuffle[player] != 'vanilla':
+            connect_caves(world, lw_entrances, [], [('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)', 'Hyrule Castle Exit (South)')], player)
+
 
         # place old man, has limited options
         # exit has to come from specific set of doors, the entrance is free to move about
