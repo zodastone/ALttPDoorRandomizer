@@ -26,7 +26,7 @@ def entrando_page(parent):
       "checkbox",
       self,
       "Include Ganon's Tower and Pyramid Hole in shuffle pool",
-      {"default": 1}
+      None
     )
     self.entrandoWidgets[key].pack(anchor=W)
 

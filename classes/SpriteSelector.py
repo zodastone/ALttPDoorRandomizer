@@ -10,13 +10,14 @@ from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
 from Rom import Sprite
 from Utils import is_bundled, local_path, output_path, open_file
 
+
 class SpriteSelector(object):
     def __init__(self, parent, callback, adjuster=False):
         if is_bundled():
             self.deploy_icons()
         self.parent = parent
         self.window = Toplevel(parent)
-        self.window.geometry("900x768")
+        self.window.geometry("800x650")
         self.sections = []
         self.callback = callback
         self.adjuster = adjuster
@@ -64,27 +65,21 @@ class SpriteSelector(object):
         self.window.focus()
 
     def icon_section(self, frame_label, path, no_results_label):
-        self.frame = LabelFrame(self.window, labelwidget=frame_label, padx=5, pady=5)
-#        self.canvas = Canvas(self.frame)
+        frame = LabelFrame(self.window, labelwidget=frame_label, padx=5, pady=5)
+        canvas = Canvas(frame, borderwidth=0)
+        y_scrollbar = Scrollbar(frame, orient="vertical", command=canvas.yview)
+        y_scrollbar.pack(side="right", fill="y")
+        content_frame = Frame(canvas)
+        canvas.pack(side="left", fill="both", expand=True)
+        canvas.create_window((4, 4), window=content_frame, anchor="nw")
+        canvas.configure(yscrollcommand=y_scrollbar.set)
 
-        """
-        self.frame.grid_rowconfigure(0, weight=1)
-        self.frame.grid_columnconfigure(0, weight=1)
+        def onFrameConfigure(canvas):
+            """Reset the scroll region to encompass the inner frame"""
+            canvas.configure(scrollregion=canvas.bbox("all"))
 
-        xscrollbar = Scrollbar(self.frame, orient=HORIZONTAL)
-        xscrollbar.grid(row=1, column=0, sticky=EW)
-
-        yscrollbar = Scrollbar(self.frame)
-        yscrollbar.grid(row=0, column=1, sticky=NS)
-
-        self.canvas.configure(scrollregion=self.canvas.bbox(ALL),xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
-        self.canvas.grid(row=0, column=0, sticky=NSEW)
-
-        xscrollbar.config(command=self.canvas.xview)
-        yscrollbar.config(command=self.canvas.yview)
-        """
-
-        self.frame.pack(side=TOP, fill=X)
+        content_frame.bind("<Configure>", lambda event, canvas=canvas: onFrameConfigure(canvas))
+        frame.pack(side=TOP, fill=X)
 
         sprites = []
 
@@ -99,16 +94,15 @@ class SpriteSelector(object):
             if image is None:
                 continue
             self.all_sprites.append(sprite)
-            button = Button(self.frame, image=image, command=lambda spr=sprite: self.select_sprite(spr))
+            button = Button(content_frame, image=image, command=lambda spr=sprite: self.select_sprite(spr))
             ToolTips.register(button, sprite.name + ("\nBy: %s" % sprite.author_name if sprite.author_name else ""))
             button.image = image
             button.grid(row=i // 16, column=i % 16)
             i += 1
 
         if i == 0:
-            label = Label(self.frame, text=no_results_label)
+            label = Label(content_frame, text=no_results_label)
             label.pack()
-
 
     def update_official_sprites(self):
         # need to wrap in try catch. We don't want errors getting the json or downloading the files to break us.
@@ -181,7 +175,6 @@ class SpriteSelector(object):
 
         BackgroundTaskProgress(self.parent, work, "Updating Sprites")
 
-
     def browse_for_sprite(self):
         sprite = filedialog.askopenfilename(
             filetypes=[("All Sprite Sources", (".zspr", ".spr", ".sfc", ".smc")),
@@ -195,23 +188,21 @@ class SpriteSelector(object):
             self.callback(None)
         self.window.destroy()
 
-
     def use_default_sprite(self):
-        self.callback(None)
+        self.callback(None, False)
         self.window.destroy()
 
     def use_default_link_sprite(self):
-        self.callback(Sprite.default_link_sprite())
+        self.callback(Sprite.default_link_sprite(), False)
         self.window.destroy()
 
     def use_random_sprite(self):
-        self.callback(random.choice(self.all_sprites) if self.all_sprites else None)
+        self.callback(random.choice(self.all_sprites) if self.all_sprites else None, True)
         self.window.destroy()
 
     def select_sprite(self, spritename):
-        self.callback(spritename)
+        self.callback(spritename, False)
         self.window.destroy()
-
 
     def deploy_icons(self):
         if not os.path.exists(self.unofficial_sprite_dir):

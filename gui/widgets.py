@@ -69,9 +69,10 @@ def make_textbox(self, parent, label, storageVar, packAttrs):
     self.textbox.pack(packAttrs["textbox"])
     return self
 
+
 def make_widget(self, type, parent, label, storageVar=None, packAttrs=dict(), options=None):
     widget = None
-    thisStorageVar = None
+    thisStorageVar = storageVar
     if isinstance(storageVar,str):
         if storageVar == "int" or storageVar == "integer":
             thisStorageVar = IntVar()

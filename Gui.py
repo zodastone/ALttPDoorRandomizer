@@ -1,17 +1,10 @@
 #!/usr/bin/env python3
-from argparse import Namespace
-from glob import glob
 import json
-import logging
-import random
 import os
-import shutil
 import sys
-from tkinter import Checkbutton, OptionMenu, Toplevel, LabelFrame, PhotoImage, Tk, LEFT, RIGHT, BOTTOM, TOP, StringVar, IntVar, Frame, Label, W, E, X, BOTH, Entry, Spinbox, Button, filedialog, messagebox, ttk
-from urllib.parse import urlparse
-from urllib.request import urlopen
+from tkinter import Tk, BOTTOM, TOP, StringVar, BooleanVar, X, BOTH, ttk
 
-from AdjusterMain import adjust
+from argparse import Namespace
 from CLI import get_working_dirs
 from DungeonRandomizer import parse_arguments
 from gui.adjust.overview import adjust_page
@@ -24,11 +17,10 @@ from gui.randomize.dungeon import dungeon_page
 from gui.randomize.multiworld import multiworld_page
 from gui.randomize.gameoptions import gameoptions_page
 from gui.randomize.generation import generation_page
-from gui.bottom import bottom_frame
-from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
-from Main import main, __version__ as ESVersion
-from Rom import Sprite
-from Utils import is_bundled, local_path, output_path, open_file
+from gui.bottom import bottom_frame, create_guiargs
+from GuiUtils import set_icon
+from Main import __version__ as ESVersion
+from Rom import get_sprite_from_name
 
 
 def guiMain(args=None):
@@ -38,13 +30,27 @@ def guiMain(args=None):
         working_dirs_path = os.path.join(user_resources_path)
         if not os.path.exists(working_dirs_path):
             os.makedirs(working_dirs_path)
-        with open(os.path.join(working_dirs_path,"working_dirs.json"),"w+") as f:
-            f.write(json.dumps(self.working_dirs,indent=2))
-        os.chmod(os.path.join(working_dirs_path,"working_dirs.json"),0o755)
+        with open(os.path.join(working_dirs_path, "working_dirs.json"),"w+") as f:
+            f.write(json.dumps(self.working_dirs, indent=2))
+        os.chmod(os.path.join(working_dirs_path, "working_dirs.json"),0o755)
+
+    def save_settings(args):
+        user_resources_path = os.path.join(".", "resources", "user")
+        settings_path = os.path.join(user_resources_path)
+        if not os.path.exists(settings_path):
+            os.makedirs(settings_path)
+        with open(os.path.join(settings_path, "settings.json"), "w+") as f:
+            f.write(json.dumps(args, indent=2))
 
     # routine for exiting the app
     def guiExit():
         save_working_dirs()
+        gui_args = vars(create_guiargs(self))
+        if self.randomSprite.get():
+            gui_args['sprite'] = 'random'
+        elif gui_args['sprite']:
+            gui_args['sprite'] = gui_args['sprite'].name
+        save_settings(gui_args)
         sys.exit(0)
 
     # make main window
@@ -52,7 +58,7 @@ def guiMain(args=None):
     mainWindow = Tk()
     self = mainWindow
     mainWindow.wm_title("Door Shuffle %s" % ESVersion)
-    mainWindow.protocol("WM_DELETE_WINDOW",guiExit) # intercept when user clicks the X
+    mainWindow.protocol("WM_DELETE_WINDOW", guiExit)  # intercept when user clicks the X
 
     # set program icon
     set_icon(mainWindow)
@@ -103,7 +109,7 @@ def guiMain(args=None):
     self.randomizerNotebook.add(self.multiworldWindow, text="Multiworld")
 
     # Game Options
-    self.gameOptionsWindow = gameoptions_page(self.randomizerNotebook)
+    self.gameOptionsWindow = gameoptions_page(self, self.randomizerNotebook)
     self.randomizerNotebook.add(self.gameOptionsWindow, text="Game Options")
 
     # Generation Setup
@@ -114,12 +120,15 @@ def guiMain(args=None):
     self.randomizerNotebook.pack()
 
     # bottom of window: Open Output Directory, Open Documentation (if exists)
-    self.farBottomFrame = bottom_frame(self,self,None)
+    self.farBottomFrame = bottom_frame(self, self, None)
     # set bottom frame to main window
     self.farBottomFrame.pack(side=BOTTOM, fill=X, padx=5, pady=5)
 
+    self.outputPath = StringVar()
+    self.randomSprite = BooleanVar()
+
     # Adjuster Controls
-    self.adjustContent,self.working_dirs = adjust_page(self,self.adjustWindow,self.working_dirs)
+    self.adjustContent,self.working_dirs = adjust_page(self, self.adjustWindow, self.working_dirs)
     self.adjustContent.pack(side=TOP, fill=BOTH, expand=True)
 
     # Custom Controls
@@ -134,9 +143,20 @@ def guiMain(args=None):
     vcmd=(self.customContent.register(validation), '%P')
 
     # load args from CLI into options
-    loadcliargs(self,args)
+    loadcliargs(self, args)
+
+    # load settings second
+    settings_path = os.path.join(".", "resources", "user", "settings.json")
+    if os.path.exists(settings_path):
+        with(open(settings_path)) as json_file:
+            data = json.load(json_file)
+            if 'sprite' in data.keys() and data['sprite']:
+                data['sprite'] = get_sprite_from_name(data['sprite'])
+            settings_args = Namespace(**data)
+            loadcliargs(self, settings_args)
 
     mainWindow.mainloop()
+
 
 if __name__ == '__main__':
     args = parse_arguments(None)

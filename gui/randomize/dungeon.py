@@ -75,4 +75,15 @@ def dungeon_page(parent):
     )
     self.dungeonWidgets[key].pack(anchor=W)
 
+    # Experimental features
+    key = "experimental"
+    self.dungeonWidgets[key] = widgets.make_widget(
+        self,
+        "checkbox",
+        self,
+        "Enable Experimental Features",
+        None
+    )
+    self.dungeonWidgets[key].pack(anchor=W)
+
     return self

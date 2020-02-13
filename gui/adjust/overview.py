@@ -5,32 +5,33 @@ from classes.SpriteSelector import SpriteSelector
 import gui.widgets as widgets
 import logging
 
-def adjust_page(top,parent,working_dirs):
+
+def adjust_page(top, parent, working_dirs):
     # Adjust page
     self = ttk.Frame(parent)
 
     # Adjust options
     self.adjustWidgets = {}
 
-    ## Disable BGM
+    # Disable BGM
     key = "nobgm"
     self.adjustWidgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Disable Music & MSU-1",
-      None
+      top.gameOptionsWindow.gameOptionsWidgets["nobgm"].storageVar
     )
     self.adjustWidgets[key].pack(anchor=W)
 
-    ## L/R Quickswap
+    # L/R Quickswap
     key = "quickswap"
     self.adjustWidgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "L/R Quickswapping",
-      None
+      top.gameOptionsWindow.gameOptionsWidgets["quickswap"].storageVar
     )
     self.adjustWidgets[key].pack(anchor=W)
 
@@ -50,7 +51,7 @@ def adjust_page(top,parent,working_dirs):
       "selectbox",
       leftAdjustFrame,
       "Heart Color",
-      None,
+      top.gameOptionsWindow.gameOptionsWidgets["heartcolor"].storageVar,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       {
         "Red": "red",
@@ -69,7 +70,7 @@ def adjust_page(top,parent,working_dirs):
       "selectbox",
       leftAdjustFrame,
       "Heart Beep sound rate",
-      None,
+      top.gameOptionsWindow.gameOptionsWidgets["heartbeep"].storageVar,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Normal"},
       {
         "Double": "double",
@@ -85,16 +86,17 @@ def adjust_page(top,parent,working_dirs):
     self.spriteNameVar2 = StringVar()
     spriteDialogFrame2 = Frame(leftAdjustFrame)
     baseSpriteLabel2 = Label(spriteDialogFrame2, text='Sprite:')
-    self.spriteNameVar2.set('(unchanged)')
     spriteEntry2 = Label(spriteDialogFrame2, textvariable=self.spriteNameVar2)
+    self.sprite = None
 
-    def set_sprite(sprite_param):
+    def set_sprite(sprite_param, random_sprite):
         if sprite_param is None or not sprite_param.valid:
-            sprite = None
+            self.sprite = None
             self.spriteNameVar2.set('(unchanged)')
         else:
-            sprite = sprite_param
-            self.spriteNameVar2.set(sprite.name)
+            self.sprite = sprite_param
+            self.spriteNameVar2.set(self.sprite.name)
+        top.randomSprite.set(random_sprite)
 
     def SpriteSelectAdjuster():
         SpriteSelector(parent, set_sprite, adjuster=True)
@@ -106,14 +108,14 @@ def adjust_page(top,parent,working_dirs):
     spriteSelectButton2.pack(side=LEFT)
     spriteDialogFrame2.pack(anchor=E)
 
-    ## Menu Speed
+    # Menu Speed
     key = "menuspeed"
     self.adjustWidgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightAdjustFrame,
       "Menu Speed",
-      None,
+      top.gameOptionsWindow.gameOptionsWidgets["menuspeed"].storageVar,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Normal"},
       {
         "Instant": "instant",
@@ -126,14 +128,14 @@ def adjust_page(top,parent,working_dirs):
     )
     self.adjustWidgets[key].pack(anchor=E)
 
-    ## Overworld Palettes (not Enemizer)
+    # Overworld Palettes (not Enemizer)
     key = "owpalettes"
     self.adjustWidgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightAdjustFrame,
       "Overworld Palettes",
-      None,
+      top.gameOptionsWindow.gameOptionsWidgets["owpalettes"].storageVar,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       {
         "Default": "default",
@@ -143,14 +145,14 @@ def adjust_page(top,parent,working_dirs):
     )
     self.adjustWidgets[key].pack(anchor=E)
 
-    ## Underworld Palettes (not Enemizer)
+    # Underworld Palettes (not Enemizer)
     key = "uwpalettes"
     self.adjustWidgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightAdjustFrame,
       "Underworld Palettes",
-      None,
+      top.gameOptionsWindow.gameOptionsWidgets["uwpalettes"].storageVar,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       {
         "Default": "default",
@@ -179,16 +181,16 @@ def adjust_page(top,parent,working_dirs):
 
     def adjustRom():
         guiargs = Namespace()
-        guiargs.heartbeep = self.adjustWidgets["heartbeep"].get()
-        guiargs.heartcolor = self.adjustWidgets["heartcolor"].get()
-        guiargs.fastmenu = self.adjustWidgets["menuspeed"].get()
-        guiargs.ow_palettes = self.adjustWidgets["owpalettes"].get()
-        guiargs.uw_palettes = self.adjustWidgets["uwpalettes"].get()
-        guiargs.quickswap = bool(self.adjustWidgets["quickswap"].get())
-        guiargs.disablemusic = bool(self.adjustWidgets["nobgm"].get())
+        guiargs.heartbeep = self.adjustWidgets["heartbeep"].storageVar.get()
+        guiargs.heartcolor = self.adjustWidgets["heartcolor"].storageVar.get()
+        guiargs.fastmenu = self.adjustWidgets["menuspeed"].storageVar.get()
+        guiargs.ow_palettes = self.adjustWidgets["owpalettes"].storageVar.get()
+        guiargs.uw_palettes = self.adjustWidgets["uwpalettes"].storageVar.get()
+        guiargs.quickswap = bool(self.adjustWidgets["quickswap"].storageVar.get())
+        guiargs.disablemusic = bool(self.adjustWidgets["nobgm"].storageVar.get())
         guiargs.rom = self.romVar2.get()
         guiargs.baserom = top.generationSetupWindow.romVar.get()
-#        guiargs.sprite = sprite
+        guiargs.sprite = self.sprite
         try:
             adjust(args=guiargs)
         except Exception as e:
