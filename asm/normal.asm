@@ -1,4 +1,5 @@
 WarpLeft:
+    lda DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
@@ -9,6 +10,7 @@ WarpLeft:
 	rtl
 
 WarpRight:
+    lda DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
@@ -19,6 +21,7 @@ WarpRight:
 	rtl
 
 WarpUp:
+    lda DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
@@ -29,6 +32,7 @@ WarpUp:
 	rtl
 
 WarpDown:
+    lda DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
@@ -39,11 +43,11 @@ WarpDown:
 	rtl
 
 TrapDoorFixer:
-    lda $ab : and #$0038 : beq .end
+    lda $fe : and #$0038 : beq .end
     xba : asl #2 : sta $00
     stz $0468 : lda $068c : ora $00 : sta $068c
     .end
-    stz $ab ; clear our ab here because we don't need it anymore
+    stz $fe ; clear our ab here because we don't need it anymore
     rts
 
 Cleanup:
@@ -72,7 +76,8 @@ LoadRoomHorz:
 	sty $06 : sta $07 : lda $a0 : pha ; Store normal room on stack
 	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00
 	lda $01 : and.b #$80 : cmp #$80 : bne .gtg
-	pla : sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
+	jsr HorzEdge : pla : bcs .end
+	sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
 
 	.gtg ;Good to Go!
 	pla ; Throw away normal room (don't fill up the stack)
@@ -84,7 +89,7 @@ LoadRoomHorz:
 	jsr ShiftQuad
 	jsr ShiftCameraBounds
 	ldy #$01 : jsr ShiftVariablesSubDir ; flip direction
-	lda $01 : sta $ab : and #$04 : lsr #2
+	lda $01 : sta $fe : and #$04 : lsr #2
 	sta $ee
 	lda $01 : and #$10 : beq .end : stz $0468
 	.end
@@ -100,8 +105,8 @@ LoadRoomVert:
 	sty $06 : sta $07 : lda $a0 : pha ; Store normal room on stack
 	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00
 	lda $01 : and.b #$80 : cmp #$80 : bne .gtg
-	pla : sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
-
+	jsr VertEdge : pla : bcs .end
+	sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
 	.gtg ;Good to Go!
 	pla ; Throw away normal room (don't fill up the stack)
 	lda $a0 : and.b #$F0 : lsr #3 : !sub $21 : !add $06 : sta $02
@@ -111,7 +116,7 @@ LoadRoomVert:
 	jsr ShiftQuad
 	jsr ShiftCameraBounds
 	ldy #$00 : jsr ShiftVariablesSubDir ; flip direction
-	lda $01 : sta $ab : and #$04 : lsr #2
+	lda $01 : sta $fe : and #$04 : lsr #2
 	sta $ee
 	.end
 	plb ; restore db register
@@ -132,7 +137,7 @@ LookupNewRoom: ; expects data offset to be in A
 	rts
 }
 
-; INPUTS-- X: Direction Index , $02:  Shift Value
+; INPUTS-- Y: Direction Index , $02:  Shift Value
 ; Sets high bytes of various registers
 ShiftVariablesMainDir:
 {
@@ -249,7 +254,7 @@ AdjustTransition:
 	lda $fe : and #$0001 : asl : tax
 	lda.l OffsetTable,x : adc $00E2,y : and.w #$FFFE : sta $00E2,y : sta $00E0,y
 	ply : bra .done
-	.reset ; clear the 0127 variable so to not disturb intra-tile doors
+	.reset ; clear the $ab variable so to not disturb intra-tile doors
 	stz $fe
 	.done
 	rep #$20 : lda $00 : and #$01fc

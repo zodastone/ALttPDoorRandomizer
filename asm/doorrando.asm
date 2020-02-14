@@ -1,5 +1,7 @@
 !add = "clc : adc"
 !sub = "sec : sbc"
+!bge = "bcs"
+!blt = "bcc"
 
 ; Free RAM notes
 ; Normal doors use $FE for scrolling indicator
@@ -17,6 +19,7 @@ incsrc spiral.asm
 incsrc gfx.asm
 incsrc keydoors.asm
 incsrc overrides.asm
+incsrc edges.asm
 warnpc $279000
 
 ; Data Section
