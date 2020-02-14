@@ -56,6 +56,7 @@ def main(args, seed=None):
     world.enemy_health = args.enemy_health.copy()
     world.enemy_damage = args.enemy_damage.copy()
     world.beemizer = args.beemizer.copy()
+    world.dungeon_counters = args.dungeon_counters.copy()
     world.experimental = args.experimental.copy()
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}

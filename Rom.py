@@ -1157,7 +1157,7 @@ def patch_rom(world, rom, player, team, enemized):
     # compasses showing dungeon count
     if world.clock_mode != 'off':
         rom.write_byte(0x18003C, 0x00)  # Currently must be off if timer is on, because they use same HUD location
-    elif world.doorShuffle[player] == 'crossed':
+    elif world.dungeon_counters[player]:
         rom.write_byte(0x18003C, 0x02)  # show always
     elif world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla':
         rom.write_byte(0x18003C, 0x01)  # show on pickup
