@@ -9,8 +9,8 @@ def loadcliargs(gui, args):
             if type(v) is dict:
                 setattr(args, k, v[1])  # only get values for player 1 for now
         # load values from commandline args
-        gui.generationSetupWindow.generationWidgets["spoiler"].storageVar.set(int(args.create_spoiler))
-        gui.generationSetupWindow.generationWidgets["suppressrom"].storageVar.set(int(args.suppress_rom))
+        gui.pages["randomizer"].pages["generation"].generationWidgets["spoiler"].storageVar.set(int(args.create_spoiler))
+        gui.pages["randomizer"].pages["generation"].generationWidgets["suppressrom"].storageVar.set(int(args.suppress_rom))
         gui.pages["randomizer"].pages["dungeon"].dungeonWidgets["mapshuffle"].storageVar.set(args.mapshuffle)
         gui.pages["randomizer"].pages["dungeon"].dungeonWidgets["compassshuffle"].storageVar.set(args.compassshuffle)
         gui.pages["randomizer"].pages["dungeon"].dungeonWidgets["smallkeyshuffle"].storageVar.set(args.keyshuffle)
@@ -43,7 +43,7 @@ def loadcliargs(gui, args):
         gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["heartbeep"].storageVar.set(args.heartbeep)
         gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["menuspeed"].storageVar.set(args.fastmenu)
         gui.pages["randomizer"].pages["item"].itemWidgets["logiclevel"].storageVar.set(args.logic)
-        gui.generationSetupWindow.romVar.set(args.rom)
+        gui.pages["randomizer"].pages["generation"].romVar.set(args.rom)
         gui.pages["randomizer"].pages["entrance"].entrandoWidgets["shuffleganon"].storageVar.set(args.shuffleganon)
         gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["hints"].storageVar.set(args.hints)
         gui.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.set(args.enemizercli)

@@ -189,7 +189,7 @@ def adjust_page(top, parent, settings):
         guiargs.quickswap = bool(self.adjustWidgets["quickswap"].storageVar.get())
         guiargs.disablemusic = bool(self.adjustWidgets["nobgm"].storageVar.get())
         guiargs.rom = self.romVar2.get()
-        guiargs.baserom = top.generationSetupWindow.romVar.get()
+        guiargs.baserom = top.pages["randomizer"].pages["generation"].romVar.get()
         guiargs.sprite = self.sprite
         try:
             adjust(args=guiargs)
