@@ -9,8 +9,8 @@ def loadcliargs(gui, args):
             if type(v) is dict:
                 setattr(args, k, v[1])  # only get values for player 1 for now
         # load values from commandline args
-        gui.pages["randomizer"].pages["generation"].generationWidgets["spoiler"].storageVar.set(int(args.create_spoiler))
-        gui.pages["randomizer"].pages["generation"].generationWidgets["suppressrom"].storageVar.set(int(args.suppress_rom))
+        gui.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.set(int(args.create_spoiler))
+        gui.pages["randomizer"].pages["generation"].widgets["suppressrom"].storageVar.set(int(args.suppress_rom))
         gui.pages["randomizer"].pages["dungeon"].widgets["mapshuffle"].storageVar.set(args.mapshuffle)
         gui.pages["randomizer"].pages["dungeon"].widgets["compassshuffle"].storageVar.set(args.compassshuffle)
         gui.pages["randomizer"].pages["dungeon"].widgets["smallkeyshuffle"].storageVar.set(args.keyshuffle)

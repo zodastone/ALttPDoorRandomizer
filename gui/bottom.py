@@ -111,9 +111,9 @@ def create_guiargs(parent):
     guiargs.heartbeep = parent.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.get()
     guiargs.heartcolor = parent.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.get()
     guiargs.fastmenu = parent.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.get()
-    guiargs.create_spoiler = bool(parent.pages["randomizer"].pages["generation"].generationWidgets["spoiler"].storageVar.get())
-    guiargs.skip_playthrough = not bool(parent.pages["randomizer"].pages["generation"].generationWidgets["spoiler"].storageVar.get())
-    guiargs.suppress_rom = bool(parent.pages["randomizer"].pages["generation"].generationWidgets["suppressrom"].storageVar.get())
+    guiargs.create_spoiler = bool(parent.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.get())
+    guiargs.skip_playthrough = not bool(parent.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.get())
+    guiargs.suppress_rom = bool(parent.pages["randomizer"].pages["generation"].widgets["suppressrom"].storageVar.get())
     guiargs.openpyramid = bool(parent.pages["randomizer"].pages["entrance"].widgets["openpyramid"].storageVar.get())
     guiargs.mapshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["mapshuffle"].storageVar.get())
     guiargs.compassshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["compassshuffle"].storageVar.get())
@@ -132,7 +132,7 @@ def create_guiargs(parent):
     guiargs.enemy_health = parent.pages["randomizer"].pages["enemizer"].widgets["enemyhealth"].storageVar.get()
     guiargs.enemy_damage = parent.pages["randomizer"].pages["enemizer"].widgets["enemydamage"].storageVar.get()
     guiargs.shufflepots = bool(parent.pages["randomizer"].pages["enemizer"].widgets["potshuffle"].storageVar.get())
-    guiargs.custom = bool(parent.pages["randomizer"].pages["generation"].generationWidgets["usecustompool"].storageVar.get())
+    guiargs.custom = bool(parent.pages["randomizer"].pages["generation"].widgets["usecustompool"].storageVar.get())
     guiargs.customitemarray = [int(parent.pages["custom"].content.customWidgets["bow"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["silversupgrade"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["boomerang"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["redmerang"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["hookshot"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["mushroom"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["powder"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["firerod"].storageVar.get()),
                                int(parent.pages["custom"].content.customWidgets["icerod"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bombos"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["ether"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["quake"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["lamp"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["hammer"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["shovel"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["flute"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bugnet"].storageVar.get()),
                                int(parent.pages["custom"].content.customWidgets["book"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bottle"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["somaria"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["byrna"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["cape"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["mirror"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["boots"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["powerglove"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["titansmitt"].storageVar.get()),

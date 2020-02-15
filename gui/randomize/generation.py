@@ -7,40 +7,40 @@ def generation_page(parent,settings):
     self = ttk.Frame(parent)
 
     # Generation Setup options
-    self.generationWidgets = {}
+    self.widgets = {}
 
     ## Generate Spoiler
     key = "spoiler"
-    self.generationWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Create Spoiler Log",
       None
     )
-    self.generationWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     ## Don't make ROM
     key = "suppressrom"
-    self.generationWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Do not create patched ROM",
       None
     )
-    self.generationWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     ## Use Custom Item Pool as defined in Custom tab
     key = "usecustompool"
-    self.generationWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Use custom item pool",
       None
     )
-    self.generationWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     ## Locate base ROM
     baseRomFrame = Frame(self)
