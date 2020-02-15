@@ -56,10 +56,10 @@ def loadcliargs(gui, args):
 
         if args.multi:
             gui.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.set(str(args.multi))
-        if args.count:
-            gui.frames["bottom"].widgets["generationcount"].storageVar.set(str(args.count))
         if args.seed:
             gui.frames["bottom"].seedVar.set(str(args.seed))
+        if args.count:
+            gui.frames["bottom"].widgets["generationcount"].storageVar.set(str(args.count))
         gui.outputPath.set(args.outputpath)
 
         def sprite_setter(spriteObject):
