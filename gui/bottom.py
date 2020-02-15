@@ -102,12 +102,15 @@ def create_guiargs(parent):
     guiargs.accessibility = parent.pages["randomizer"].pages["item"].widgets["accessibility"].storageVar.get()
     guiargs.algorithm = parent.pages["randomizer"].pages["item"].widgets["sortingalgo"].storageVar.get()
 
+    guiargs.openpyramid = bool(parent.pages["randomizer"].pages["entrance"].widgets["openpyramid"].storageVar.get())
+    guiargs.shuffleganon = bool(parent.pages["randomizer"].pages["entrance"].widgets["shuffleganon"].storageVar.get())
+    guiargs.shuffle = parent.pages["randomizer"].pages["entrance"].widgets["entranceshuffle"].storageVar.get()
+
     guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.get())
     guiargs.names = parent.pages["randomizer"].pages["multiworld"].namesVar.get()
     guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
     guiargs.count = int(parent.frames["bottom"].widgets["generationcount"].storageVar.get()) if parent.frames["bottom"].widgets["generationcount"].storageVar.get() != '1' else None
 
-    guiargs.shuffle = parent.pages["randomizer"].pages["entrance"].widgets["entranceshuffle"].storageVar.get()
     guiargs.door_shuffle = parent.pages["randomizer"].pages["dungeon"].widgets["dungeondoorshuffle"].storageVar.get()
     guiargs.experimental = parent.pages["randomizer"].pages["dungeon"].widgets["experimental"].storageVar.get()
     guiargs.heartbeep = parent.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.get()
@@ -116,7 +119,6 @@ def create_guiargs(parent):
     guiargs.create_spoiler = bool(parent.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.get())
     guiargs.skip_playthrough = not bool(parent.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.get())
     guiargs.suppress_rom = bool(parent.pages["randomizer"].pages["generation"].widgets["suppressrom"].storageVar.get())
-    guiargs.openpyramid = bool(parent.pages["randomizer"].pages["entrance"].widgets["openpyramid"].storageVar.get())
     guiargs.mapshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["mapshuffle"].storageVar.get())
     guiargs.compassshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["compassshuffle"].storageVar.get())
     guiargs.keyshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["smallkeyshuffle"].storageVar.get())
@@ -125,7 +127,6 @@ def create_guiargs(parent):
     guiargs.disablemusic = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.get())
     guiargs.ow_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.get()
     guiargs.uw_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar.get()
-    guiargs.shuffleganon = bool(parent.pages["randomizer"].pages["entrance"].widgets["shuffleganon"].storageVar.get())
     guiargs.hints = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.get())
     guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.get()
     guiargs.shufflebosses = parent.pages["randomizer"].pages["enemizer"].widgets["bossshuffle"].storageVar.get()

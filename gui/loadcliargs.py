@@ -23,13 +23,16 @@ def loadcliargs(gui, args):
         gui.pages["randomizer"].pages["item"].widgets["accessibility"].storageVar.set(args.accessibility)
         gui.pages["randomizer"].pages["item"].widgets["sortingalgo"].storageVar.set(args.algorithm)
 
+        gui.pages["randomizer"].pages["entrance"].widgets["openpyramid"].storageVar.set(args.openpyramid)
+        gui.pages["randomizer"].pages["entrance"].widgets["shuffleganon"].storageVar.set(args.shuffleganon)
+        gui.pages["randomizer"].pages["entrance"].widgets["entranceshuffle"].storageVar.set(args.shuffle)
+
         gui.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.set(int(args.create_spoiler))
         gui.pages["randomizer"].pages["generation"].widgets["suppressrom"].storageVar.set(int(args.suppress_rom))
         gui.pages["randomizer"].pages["dungeon"].widgets["mapshuffle"].storageVar.set(args.mapshuffle)
         gui.pages["randomizer"].pages["dungeon"].widgets["compassshuffle"].storageVar.set(args.compassshuffle)
         gui.pages["randomizer"].pages["dungeon"].widgets["smallkeyshuffle"].storageVar.set(args.keyshuffle)
         gui.pages["randomizer"].pages["dungeon"].widgets["bigkeyshuffle"].storageVar.set(args.bigkeyshuffle)
-        gui.pages["randomizer"].pages["entrance"].widgets["openpyramid"].storageVar.set(args.openpyramid)
         gui.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar.set(int(args.quickswap))
         gui.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.set(int(args.disablemusic))
         if args.multi:
@@ -38,14 +41,12 @@ def loadcliargs(gui, args):
             gui.frames["bottom"].widgets["generationcount"].storageVar.set(str(args.count))
         if args.seed:
             gui.frames["bottom"].seedVar.set(str(args.seed))
-        gui.pages["randomizer"].pages["entrance"].widgets["entranceshuffle"].storageVar.set(args.shuffle)
         gui.pages["randomizer"].pages["dungeon"].widgets["dungeondoorshuffle"].storageVar.set(args.door_shuffle)
         gui.pages["randomizer"].pages["dungeon"].widgets["experimental"].storageVar.set(args.experimental)
         gui.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.set(args.heartcolor)
         gui.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.set(args.heartbeep)
         gui.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.set(args.fastmenu)
         gui.pages["randomizer"].pages["generation"].romVar.set(args.rom)
-        gui.pages["randomizer"].pages["entrance"].widgets["shuffleganon"].storageVar.set(args.shuffleganon)
         gui.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.set(args.hints)
         gui.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.set(args.enemizercli)
         gui.pages["randomizer"].pages["enemizer"].widgets["potshuffle"].storageVar.set(args.shufflepots)
