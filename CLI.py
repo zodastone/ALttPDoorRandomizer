@@ -455,4 +455,4 @@ def get_settings():
               data['sprite'] = get_sprite_from_name(data['sprite'])
           for k,v in data.items():
               settings[k] = v
-  return settings_args
+  return settings
