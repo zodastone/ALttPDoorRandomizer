@@ -19,6 +19,8 @@ def make_checkbox(self, parent, label, storageVar, packAttrs):
     self.checkbox = Checkbutton(self, text=label, variable=self.storageVar, name="checkbox-" + label.lower())
     if packAttrs is not None:
         self.checkbox.pack(packAttrs)
+    else:
+        self.checkbox.pack()
     return self
 
 def make_selectbox(self, parent, label, options, storageVar, packAttrs):
@@ -38,11 +40,15 @@ def make_selectbox(self, parent, label, options, storageVar, packAttrs):
     self.label = Label(self, text=label)
     if packAttrs is not None and "label" in packAttrs:
         self.label.pack(packAttrs["label"])
+    else:
+        self.label.pack()
     self.selectbox = OptionMenu(self, self.labelVar, *options.keys())
     self.selectbox.config(width=20)
     self.labelVar.set(packAttrs["default"] if "default" in packAttrs else list(options.keys())[0])
     if packAttrs is not None and "selectbox" in packAttrs:
         self.selectbox.pack(packAttrs["selectbox"])
+    else:
+        self.selectbox.pack()
     return self
 
 def make_spinbox(self, parent, label, storageVar, packAttrs):
@@ -51,6 +57,8 @@ def make_spinbox(self, parent, label, storageVar, packAttrs):
     self.label = Label(self, text=label)
     if packAttrs is not None and "label" in packAttrs:
         self.label.pack(packAttrs["label"])
+    else:
+        self.label.pack()
     fromNum = 1
     toNum = 100
     if "spinbox" in packAttrs:
@@ -61,6 +69,8 @@ def make_spinbox(self, parent, label, storageVar, packAttrs):
     self.spinbox = mySpinbox(self, from_=fromNum, to=toNum, width=5, textvariable=self.storageVar, name="spinbox-" + label.lower())
     if packAttrs is not None and "spinbox" in packAttrs:
         self.spinbox.pack(packAttrs["spinbox"])
+    else:
+        self.spinbox.pack()
     return self
 
 def make_textbox(self, parent, label, storageVar, packAttrs):
@@ -69,11 +79,15 @@ def make_textbox(self, parent, label, storageVar, packAttrs):
     self.label = Label(self, text=label)
     if packAttrs is not None and "label" in packAttrs:
         self.label.pack(packAttrs["label"])
+    else:
+        self.label.pack()
     self.textbox = Entry(self, justify=RIGHT, textvariable=self.storageVar, width=3)
     if "default" in packAttrs:
         self.storageVar.set(packAttrs["default"])
     if packAttrs is not None and "textbox" in packAttrs:
         self.textbox.pack(packAttrs["textbox"])
+    else:
+        self.textbox.pack()
     return self
 
 
