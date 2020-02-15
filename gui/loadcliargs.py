@@ -22,7 +22,7 @@ def loadcliargs(gui, args):
         if args.multi:
             gui.pages["randomizer"].pages["multiworld"].multiworldWidgets["worlds"].storageVar.set(str(args.multi))
         if args.count:
-            gui.frames["bottom"].bottomWidgets["generationcount"].storageVar.set(str(args.count))
+            gui.frames["bottom"].widgets["generationcount"].storageVar.set(str(args.count))
         if args.seed:
             gui.frames["bottom"].seedVar.set(str(args.seed))
         gui.pages["randomizer"].pages["item"].itemWidgets["worldstate"].storageVar.set(args.mode)

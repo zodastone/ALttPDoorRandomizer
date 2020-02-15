@@ -14,7 +14,7 @@ def bottom_frame(self, parent, args=None):
     self = ttk.Frame(parent)
 
     # Bottom Frame options
-    self.bottomWidgets = {}
+    self.widgets = {}
 
     seedCountFrame = Frame(self)
     seedCountFrame.pack()
@@ -32,7 +32,7 @@ def bottom_frame(self, parent, args=None):
 
     ## Number of Generation attempts
     key = "generationcount"
-    self.bottomWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "spinbox",
       self,
@@ -40,7 +40,7 @@ def bottom_frame(self, parent, args=None):
       None,
       {"label": {"side": LEFT}, "spinbox": {"side": RIGHT}}
     )
-    self.bottomWidgets[key].pack(side=LEFT)
+    self.widgets[key].pack(side=LEFT)
 
     def generateRom():
         guiargs = create_guiargs(parent)
@@ -91,7 +91,7 @@ def create_guiargs(parent):
     guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].multiworldWidgets["worlds"].storageVar.get())
     guiargs.names = parent.pages["randomizer"].pages["multiworld"].namesVar.get()
     guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
-    guiargs.count = int(parent.frames["bottom"].bottomWidgets["generationcount"].storageVar.get()) if parent.frames["bottom"].bottomWidgets["generationcount"].storageVar.get() != '1' else None
+    guiargs.count = int(parent.frames["bottom"].widgets["generationcount"].storageVar.get()) if parent.frames["bottom"].widgets["generationcount"].storageVar.get() != '1' else None
     guiargs.mode = parent.pages["randomizer"].pages["item"].itemWidgets["worldstate"].storageVar.get()
     guiargs.logic = parent.pages["randomizer"].pages["item"].itemWidgets["logiclevel"].storageVar.get()
 
