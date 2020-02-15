@@ -126,12 +126,12 @@ def create_guiargs(parent):
     guiargs.uw_palettes = parent.gameOptionsWindow.gameOptionsWidgets["uwpalettes"].storageVar.get()
     guiargs.shuffleganon = bool(parent.pages["randomizer"].pages["entrance"].entrandoWidgets["shuffleganon"].storageVar.get())
     guiargs.hints = bool(parent.gameOptionsWindow.gameOptionsWidgets["hints"].storageVar.get())
-    guiargs.enemizercli = parent.enemizerWindow.enemizerCLIpathVar.get()
-    guiargs.shufflebosses = parent.enemizerWindow.enemizerWidgets["bossshuffle"].storageVar.get()
-    guiargs.shuffleenemies = parent.enemizerWindow.enemizerWidgets["enemyshuffle"].storageVar.get()
-    guiargs.enemy_health = parent.enemizerWindow.enemizerWidgets["enemyhealth"].storageVar.get()
-    guiargs.enemy_damage = parent.enemizerWindow.enemizerWidgets["enemydamage"].storageVar.get()
-    guiargs.shufflepots = bool(parent.enemizerWindow.enemizerWidgets["potshuffle"].storageVar.get())
+    guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.get()
+    guiargs.shufflebosses = parent.pages["randomizer"].pages["enemizer"].enemizerWidgets["bossshuffle"].storageVar.get()
+    guiargs.shuffleenemies = parent.pages["randomizer"].pages["enemizer"].enemizerWidgets["enemyshuffle"].storageVar.get()
+    guiargs.enemy_health = parent.pages["randomizer"].pages["enemizer"].enemizerWidgets["enemyhealth"].storageVar.get()
+    guiargs.enemy_damage = parent.pages["randomizer"].pages["enemizer"].enemizerWidgets["enemydamage"].storageVar.get()
+    guiargs.shufflepots = bool(parent.pages["randomizer"].pages["enemizer"].enemizerWidgets["potshuffle"].storageVar.get())
     guiargs.custom = bool(parent.generationSetupWindow.generationWidgets["usecustompool"].storageVar.get())
     guiargs.customitemarray = [int(parent.customContent.customWidgets["bow"].storageVar.get()), int(parent.customContent.customWidgets["silversupgrade"].storageVar.get()), int(parent.customContent.customWidgets["boomerang"].storageVar.get()), int(parent.customContent.customWidgets["redmerang"].storageVar.get()), int(parent.customContent.customWidgets["hookshot"].storageVar.get()), int(parent.customContent.customWidgets["mushroom"].storageVar.get()), int(parent.customContent.customWidgets["powder"].storageVar.get()), int(parent.customContent.customWidgets["firerod"].storageVar.get()),
                                int(parent.customContent.customWidgets["icerod"].storageVar.get()), int(parent.customContent.customWidgets["bombos"].storageVar.get()), int(parent.customContent.customWidgets["ether"].storageVar.get()), int(parent.customContent.customWidgets["quake"].storageVar.get()), int(parent.customContent.customWidgets["lamp"].storageVar.get()), int(parent.customContent.customWidgets["hammer"].storageVar.get()), int(parent.customContent.customWidgets["shovel"].storageVar.get()), int(parent.customContent.customWidgets["flute"].storageVar.get()), int(parent.customContent.customWidgets["bugnet"].storageVar.get()),
