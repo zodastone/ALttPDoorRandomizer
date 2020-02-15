@@ -56,14 +56,14 @@ def guiMain(args=None):
     # get saved settings
     self.settings = get_settings()
 
-    notebook = ttk.Notebook(self)
-    self.pages["randomizer"] = ttk.Frame(notebook)
-    self.pages["adjust"] = ttk.Frame(notebook)
-    self.pages["custom"] = ttk.Frame(notebook)
-    notebook.add(self.pages["randomizer"], text='Randomize')
-    notebook.add(self.pages["adjust"], text='Adjust')
-    notebook.add(self.pages["custom"], text='Custom')
-    notebook.pack()
+    self.notebook = ttk.Notebook(self)
+    self.pages["randomizer"] = ttk.Frame(self.notebook)
+    self.pages["adjust"] = ttk.Frame(self.notebook)
+    self.pages["custom"] = ttk.Frame(self.notebook)
+    self.notebook.add(self.pages["randomizer"], text='Randomize')
+    self.notebook.add(self.pages["adjust"], text='Adjust')
+    self.notebook.add(self.pages["custom"], text='Custom')
+    self.notebook.pack()
 
     # randomizer controls
 
@@ -76,38 +76,38 @@ def guiMain(args=None):
     #   Multiworld:       Multiworld settings
     #   Game Options:     Cosmetic settings that don't affect logic/placement
     #   Generation Setup: Primarily one&done settings
-    self.randomizerNotebook = ttk.Notebook(self.pages["randomizer"])
+    self.pages["randomizer"].notebook = ttk.Notebook(self.pages["randomizer"])
 
     # Item Randomizer
-    self.itemWindow = item_page(self.randomizerNotebook)
-    self.randomizerNotebook.add(self.itemWindow, text="Items")
+    self.pages["randomizer"].pages["item"] = item_page(self.pages["randomizer"].notebook)
+    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["item"], text="Items")
 
     # Entrance Randomizer
-    self.entrandoWindow = entrando_page(self.randomizerNotebook)
-    self.randomizerNotebook.add(self.entrandoWindow, text="Entrances")
+    self.pages["randomizer"].pages["entrance"] = entrando_page(self.pages["randomizer"].notebook)
+    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["entrance"], text="Entrances")
 
     # Enemizer
-    self.enemizerWindow,self.settings = enemizer_page(self.randomizerNotebook,self.settings)
-    self.randomizerNotebook.add(self.enemizerWindow, text="Enemizer")
+    self.pages["randomizer"].pages["enemizer"],self.settings = enemizer_page(self.pages["randomizer"].notebook,self.settings)
+    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["enemizer"], text="Enemizer")
 
     # Dungeon Shuffle
-    self.dungeonRandoWindow = dungeon_page(self.randomizerNotebook)
-    self.randomizerNotebook.add(self.dungeonRandoWindow, text="Dungeon Shuffle")
+    self.pages["randomizer"].pages["dungeon"] = dungeon_page(self.pages["randomizer"].notebook)
+    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["dungeon"], text="Dungeon Shuffle")
 
     # Multiworld
-    self.multiworldWindow,self.settings = multiworld_page(self.randomizerNotebook,self.settings)
-    self.randomizerNotebook.add(self.multiworldWindow, text="Multiworld")
+    self.pages["randomizer"].pages["multiworld"],self.settings = multiworld_page(self.pages["randomizer"].notebook,self.settings)
+    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["multiworld"], text="Multiworld")
 
     # Game Options
-    self.gameOptionsWindow = gameoptions_page(self, self.randomizerNotebook)
-    self.randomizerNotebook.add(self.gameOptionsWindow, text="Game Options")
+    self.pages["randomizer"].pages["gameoptions"] = gameoptions_page(self, self.pages["randomizer"].notebook)
+    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["gameoptions"], text="Game Options")
 
     # Generation Setup
-    self.generationSetupWindow,self.settings = generation_page(self.randomizerNotebook,self.settings)
-    self.randomizerNotebook.add(self.generationSetupWindow, text="Generation Setup")
+    self.pages["randomizer"].pages["generation"],self.settings = generation_page(self.pages["randomizer"].notebook,self.settings)
+    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["generation"], text="Generation Setup")
 
     # add randomizer notebook to main window
-    self.randomizerNotebook.pack()
+    self.pages["randomizer"].notebook.pack()
 
     # bottom of window: Open Output Directory, Open Documentation (if exists)
     self.frames["bottom"] = bottom_frame(self, self, None)
