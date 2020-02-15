@@ -13,57 +13,57 @@ def loadcliargs(gui, args, settings=None):
         # set up options to get
         # Page::Subpage::GUI-id::param-id
         options = {
-            "randomizer": {
-                "item": {
-                    "retro": "retro",
-                    "worldstate": "mode",
-                    "logiclevel": "logic",
-                    "goal": "goal",
-                    "crystals_gt": "crystals_gt",
-                    "crystals_ganon": "crystals_ganon",
-                    "weapons": "swords",
-                    "itempool": "difficulty",
-                    "itemfunction": "item_functionality",
-                    "timer": "timer",
-                    "progressives": "progressive",
-                    "accessibility": "accessibility",
-                    "sortingalgo": "algorithm"
-                },
-                "entrance": {
-                    "openpyramid": "openpyramid",
-                    "shuffleganon": "shuffleganon",
-                    "entranceshuffle": "shuffle"
-                },
-                "enemizer": {
-                    "potshuffle": "shufflepots",
-                    "enemyshuffle": "shuffleenemies",
-                    "bossshuffle": "shufflebosses",
-                    "enemydamage": "enemy_damage",
-                    "enemyhealth": "enemy_health"
-                },
-                "dungeon": {
-                    "mapshuffle": "mapshuffle",
-                    "compassshuffle": "compassshuffle",
-                    "smallkeyshuffle": "keyshuffle",
-                    "bigkeyshuffle": "bigkeyshuffle",
-                    "dungeondoorshuffle": "door_shuffle",
-                    "experimental": "experimental"
-                },
-                "gameoptions": {
-                    "hints": "hints",
-                    "nobgm": "disablemusic",
-                    "quickswap": "quickswap",
-                    "heartcolor": "heartcolor",
-                    "heartbeep": "heartbeep",
-                    "menuspeed": "fastmenu",
-                    "owpalettes": "ow_palettes",
-                    "uwpalettes": "uw_palettes"
-                },
-                "generation": {
-                    "spoiler": "create_spoiler",
-                    "suppressrom": "suppress_rom"
-                } 
-            }
+          "randomizer": {
+            "item": {
+              "retro": "retro",
+              "worldstate": "mode",
+              "logiclevel": "logic",
+              "goal": "goal",
+              "crystals_gt": "crystals_gt",
+              "crystals_ganon": "crystals_ganon",
+              "weapons": "swords",
+              "itempool": "difficulty",
+              "itemfunction": "item_functionality",
+              "timer": "timer",
+              "progressives": "progressive",
+              "accessibility": "accessibility",
+              "sortingalgo": "algorithm"
+            },
+            "entrance": {
+              "openpyramid": "openpyramid",
+              "shuffleganon": "shuffleganon",
+              "entranceshuffle": "shuffle"
+            },
+            "enemizer": {
+              "potshuffle": "shufflepots",
+              "enemyshuffle": "shuffleenemies",
+              "bossshuffle": "shufflebosses",
+              "enemydamage": "enemy_damage",
+              "enemyhealth": "enemy_health"
+            },
+            "dungeon": {
+              "mapshuffle": "mapshuffle",
+              "compassshuffle": "compassshuffle",
+              "smallkeyshuffle": "keyshuffle",
+              "bigkeyshuffle": "bigkeyshuffle",
+              "dungeondoorshuffle": "door_shuffle",
+              "experimental": "experimental"
+            },
+            "gameoptions": {
+              "hints": "hints",
+              "nobgm": "disablemusic",
+              "quickswap": "quickswap",
+              "heartcolor": "heartcolor",
+              "heartbeep": "heartbeep",
+              "menuspeed": "fastmenu",
+              "owpalettes": "ow_palettes",
+              "uwpalettes": "uw_palettes"
+            },
+            "generation": {
+              "spoiler": "create_spoiler",
+              "suppressrom": "suppress_rom"
+            } 
+          }
         }
         for mainpage in options:
             for subpage in options[mainpage]:

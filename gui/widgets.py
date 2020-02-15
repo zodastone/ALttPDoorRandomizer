@@ -14,10 +14,11 @@ class mySpinbox(Spinbox):
             self.invoke('buttonup')
 
 def make_checkbox(self, parent, label, storageVar, packAttrs):
-    self = Frame(parent)
+    self = Frame(parent, name="checkframe-" + label.lower())
     self.storageVar = storageVar
-    self.checkbox = Checkbutton(self, text=label, variable=self.storageVar)
-    self.checkbox.pack(packAttrs)
+    self.checkbox = Checkbutton(self, text=label, variable=self.storageVar, name="checkbox-" + label.lower())
+    if packAttrs is not None:
+        self.checkbox.pack(packAttrs)
     return self
 
 def make_selectbox(self, parent, label, options, storageVar, packAttrs):
@@ -29,24 +30,27 @@ def make_selectbox(self, parent, label, options, storageVar, packAttrs):
         keysList = list(keys)
         valsList = list(vals)
         self.labelVar.set(keysList[valsList.index(str(self.storageVar.get()))])
-    self = Frame(parent)
+    self = Frame(parent, name="selectframe-" + label.lower())
     self.storageVar = storageVar
     self.storageVar.trace_add("write",change_selected)
     self.labelVar = StringVar()
     self.labelVar.trace_add("write",change_storage)
     self.label = Label(self, text=label)
-    self.label.pack(packAttrs["label"])
+    if packAttrs is not None and "label" in packAttrs:
+        self.label.pack(packAttrs["label"])
     self.selectbox = OptionMenu(self, self.labelVar, *options.keys())
     self.selectbox.config(width=20)
     self.labelVar.set(packAttrs["default"] if "default" in packAttrs else list(options.keys())[0])
-    self.selectbox.pack(packAttrs["selectbox"])
+    if packAttrs is not None and "selectbox" in packAttrs:
+        self.selectbox.pack(packAttrs["selectbox"])
     return self
 
 def make_spinbox(self, parent, label, storageVar, packAttrs):
-    self = Frame(parent)
+    self = Frame(parent, name="spinframe-" + label.lower())
     self.storageVar = storageVar
     self.label = Label(self, text=label)
-    self.label.pack(packAttrs["label"])
+    if packAttrs is not None and "label" in packAttrs:
+        self.label.pack(packAttrs["label"])
     fromNum = 1
     toNum = 100
     if "spinbox" in packAttrs:
@@ -54,19 +58,22 @@ def make_spinbox(self, parent, label, storageVar, packAttrs):
             fromNum = packAttrs["spinbox"]["from"]
         if "to" in packAttrs:
             toNum = packAttrs["spinbox"]["to"]
-    self.spinbox = mySpinbox(self, from_=fromNum, to=toNum, width=5, textvariable=self.storageVar)
-    self.spinbox.pack(packAttrs["spinbox"])
+    self.spinbox = mySpinbox(self, from_=fromNum, to=toNum, width=5, textvariable=self.storageVar, name="spinbox-" + label.lower())
+    if packAttrs is not None and "spinbox" in packAttrs:
+        self.spinbox.pack(packAttrs["spinbox"])
     return self
 
 def make_textbox(self, parent, label, storageVar, packAttrs):
     self = Frame(parent)
     self.storageVar = storageVar
     self.label = Label(self, text=label)
-    self.label.pack(packAttrs["label"])
+    if packAttrs is not None and "label" in packAttrs:
+        self.label.pack(packAttrs["label"])
     self.textbox = Entry(self, justify=RIGHT, textvariable=self.storageVar, width=3)
     if "default" in packAttrs:
         self.storageVar.set(packAttrs["default"])
-    self.textbox.pack(packAttrs["textbox"])
+    if packAttrs is not None and "textbox" in packAttrs:
+        self.textbox.pack(packAttrs["textbox"])
     return self
 
 

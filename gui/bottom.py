@@ -88,68 +88,94 @@ def bottom_frame(self, parent, args=None):
 
 def create_guiargs(parent):
     guiargs = Namespace()
-    guiargs.retro = bool(parent.pages["randomizer"].pages["item"].widgets["retro"].storageVar.get())
-    guiargs.mode = parent.pages["randomizer"].pages["item"].widgets["worldstate"].storageVar.get()
-    guiargs.logic = parent.pages["randomizer"].pages["item"].widgets["logiclevel"].storageVar.get()
-    guiargs.goal = parent.pages["randomizer"].pages["item"].widgets["goal"].storageVar.get()
-    guiargs.crystals_gt = parent.pages["randomizer"].pages["item"].widgets["crystals_gt"].storageVar.get()
-    guiargs.crystals_ganon = parent.pages["randomizer"].pages["item"].widgets["crystals_ganon"].storageVar.get()
-    guiargs.swords = parent.pages["randomizer"].pages["item"].widgets["weapons"].storageVar.get()
-    guiargs.difficulty = parent.pages["randomizer"].pages["item"].widgets["itempool"].storageVar.get()
-    guiargs.item_functionality = parent.pages["randomizer"].pages["item"].widgets["itemfunction"].storageVar.get()
-    guiargs.timer = parent.pages["randomizer"].pages["item"].widgets["timer"].storageVar.get()
-    guiargs.progressive = parent.pages["randomizer"].pages["item"].widgets["progressives"].storageVar.get()
-    guiargs.accessibility = parent.pages["randomizer"].pages["item"].widgets["accessibility"].storageVar.get()
-    guiargs.algorithm = parent.pages["randomizer"].pages["item"].widgets["sortingalgo"].storageVar.get()
 
-    guiargs.openpyramid = bool(parent.pages["randomizer"].pages["entrance"].widgets["openpyramid"].storageVar.get())
-    guiargs.shuffleganon = bool(parent.pages["randomizer"].pages["entrance"].widgets["shuffleganon"].storageVar.get())
-    guiargs.shuffle = parent.pages["randomizer"].pages["entrance"].widgets["entranceshuffle"].storageVar.get()
-
-    guiargs.shufflepots = bool(parent.pages["randomizer"].pages["enemizer"].widgets["potshuffle"].storageVar.get())
-    guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.get()
-    guiargs.shuffleenemies = parent.pages["randomizer"].pages["enemizer"].widgets["enemyshuffle"].storageVar.get()
-    guiargs.shufflebosses = parent.pages["randomizer"].pages["enemizer"].widgets["bossshuffle"].storageVar.get()
-    guiargs.enemy_damage = parent.pages["randomizer"].pages["enemizer"].widgets["enemydamage"].storageVar.get()
-    guiargs.enemy_health = parent.pages["randomizer"].pages["enemizer"].widgets["enemyhealth"].storageVar.get()
-
-    guiargs.mapshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["mapshuffle"].storageVar.get())
-    guiargs.compassshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["compassshuffle"].storageVar.get())
-    guiargs.keyshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["smallkeyshuffle"].storageVar.get())
-    guiargs.bigkeyshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["bigkeyshuffle"].storageVar.get())
-    guiargs.door_shuffle = parent.pages["randomizer"].pages["dungeon"].widgets["dungeondoorshuffle"].storageVar.get()
-    guiargs.experimental = parent.pages["randomizer"].pages["dungeon"].widgets["experimental"].storageVar.get()
+    # set up settings to gather
+    # Page::Subpage::GUI-id::param-id
+    options = {
+      "randomizer": {
+        "item": {
+          "retro": "retro",
+          "worldstate": "mode",
+          "logiclevel": "logic",
+          "goal": "goal",
+          "crystals_gt": "crystals_gt",
+          "crystals_ganon": "crystals_ganon",
+          "weapons": "swords",
+          "itempool": "difficulty",
+          "itemfunction": "item_functionality",
+          "timer": "timer",
+          "progressives": "progressive",
+          "accessibility": "accessibility",
+          "sortingalgo": "algorithm"
+        },
+        "entrance": {
+          "openpyramid": "openpyramid",
+          "shuffleganon": "shuffleganon",
+          "entranceshuffle": "shuffle"
+        },
+        "enemizer": {
+          "potshuffle": "shufflepots",
+          "enemyshuffle": "shuffleenemies",
+          "bossshuffle": "shufflebosses",
+          "enemydamage": "enemy_damage",
+          "enemyhealth": "enemy_health"
+        },
+        "dungeon": {
+          "mapshuffle": "mapshuffle",
+          "compassshuffle": "compassshuffle",
+          "smallkeyshuffle": "keyshuffle",
+          "bigkeyshuffle": "bigkeyshuffle",
+          "dungeondoorshuffle": "door_shuffle",
+          "experimental": "experimental"
+        },
+        "multiworld": {
+          "names": "names"
+        },
+        "gameoptions": {
+          "hints": "hints",
+          "nobgm": "disablemusic",
+          "quickswap": "quickswap",
+          "heartcolor": "heartcolor",
+          "heartbeep": "heartbeep",
+          "menuspeed": "fastmenu",
+          "owpalettes": "ow_palettes",
+          "uwpalettes": "uw_palettes"
+        },
+        "generation": {
+          "spoiler": "create_spoiler",
+          "suppressrom": "suppress_rom"
+        } 
+      }
+    }
+    for mainpage in options:
+        for subpage in options[mainpage]:
+            for widget in options[mainpage][subpage]:
+                arg = options[mainpage][subpage][widget]
+                setattr(guiargs, arg, parent.pages[mainpage].pages[subpage].widgets[widget].storageVar.get())
 
     guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.get())
-    guiargs.names = parent.pages["randomizer"].pages["multiworld"].namesVar.get()
 
-    guiargs.hints = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.get())
-    guiargs.disablemusic = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.get())
-    guiargs.quickswap = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar.get())
-    guiargs.heartcolor = parent.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.get()
-    guiargs.heartbeep = parent.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.get()
-    guiargs.fastmenu = parent.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.get()
-    guiargs.ow_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.get()
-    guiargs.uw_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar.get()
-
-    guiargs.create_spoiler = bool(parent.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.get())
-    guiargs.skip_playthrough = not bool(parent.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.get())
-    guiargs.suppress_rom = bool(parent.pages["randomizer"].pages["generation"].widgets["suppressrom"].storageVar.get())
     guiargs.rom = parent.pages["randomizer"].pages["generation"].romVar.get()
     guiargs.custom = bool(parent.pages["randomizer"].pages["generation"].widgets["usecustompool"].storageVar.get())
 
     guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
     guiargs.count = int(parent.frames["bottom"].widgets["generationcount"].storageVar.get()) if parent.frames["bottom"].widgets["generationcount"].storageVar.get() != '1' else None
 
-    guiargs.customitemarray = [int(parent.pages["custom"].content.customWidgets["bow"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["silversupgrade"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["boomerang"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["redmerang"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["hookshot"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["mushroom"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["powder"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["firerod"].storageVar.get()),
-                               int(parent.pages["custom"].content.customWidgets["icerod"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bombos"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["ether"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["quake"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["lamp"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["hammer"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["shovel"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["flute"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bugnet"].storageVar.get()),
-                               int(parent.pages["custom"].content.customWidgets["book"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bottle"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["somaria"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["byrna"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["cape"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["mirror"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["boots"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["powerglove"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["titansmitt"].storageVar.get()),
-                               int(parent.pages["custom"].content.customWidgets["progressiveglove"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["flippers"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["pearl"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["heartpiece"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["heartcontainer"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["sancheart"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["sword1"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["sword2"].storageVar.get()),
-                               int(parent.pages["custom"].content.customWidgets["sword3"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["sword4"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["progressivesword"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["shield1"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["shield2"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["shield3"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["progressiveshield"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["mail2"].storageVar.get()),
-                               int(parent.pages["custom"].content.customWidgets["mail3"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["progressivemail"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["halfmagic"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["quartermagic"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bombsplus5"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bombsplus10"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["arrowsplus5"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["arrowsplus10"].storageVar.get()),
-                               int(parent.pages["custom"].content.customWidgets["arrow1"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["arrow10"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bomb1"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bomb3"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["rupee1"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["rupee5"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["rupee20"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["rupee50"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["rupee100"].storageVar.get()),
-                               int(parent.pages["custom"].content.customWidgets["rupee300"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["rupoor"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["blueclock"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["greenclock"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["redclock"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["progressivebow"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bomb10"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["triforcepieces"].storageVar.get()),int(parent.pages["custom"].content.customWidgets["triforcepiecesgoal"].storageVar.get()),
-                               int(parent.pages["custom"].content.customWidgets["triforce"].storageVar.get()),int(parent.pages["custom"].content.customWidgets["rupoorcost"].storageVar.get()),int(parent.pages["custom"].content.customWidgets["generickeys"].storageVar.get())]
+    customitems = [
+      "bow", "silversupgrade", "boomerang", "redmerang", "hookshot", "mushroom", "powder", "firerod",
+      "icerod", "bombos", "ether", "quake", "lamp", "hammer", "shovel", "flute", "bugnet",
+      "book", "bottle", "somaria", "byrna", "cape", "mirror", "boots", "powerglove", "titansmitt",
+      "progressiveglove", "flippers", "pearl", "heartpiece", "heartcontainer", "sancheart", "sword1", "sword2",
+      "sword3", "sword4", "progressivesword", "shield1", "shield2", "shield3", "progressiveshield", "mail2",
+      "mail3", "progressivemail", "halfmagic", "quartermagic", "bombsplus5", "bombsplus10", "arrowsplus5", "arrowsplus10",
+      "arrow1", "arrow10", "bomb1", "bomb3", "rupee1", "rupee5", "rupee20", "rupee50", "rupee100",
+      "rupee300", "rupoor", "blueclock", "greenclock", "redclock", "progressivebow", "bomb10", "triforcepieces", "triforcepiecesgoal",
+      "triforce", "rupoorcost", "generickeys"
+    ]
+    guiargs.customitemarray = []
+    for customitem in customitems:
+        guiargs.customitemarray.append(int(parent.pages["custom"].content.customWidgets[customitem].storageVar.get()))
+
     guiargs.sprite = parent.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteObject"]
     guiargs.randomSprite = parent.randomSprite.get()
     guiargs.outputpath = parent.outputPath.get()
