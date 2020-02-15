@@ -22,9 +22,9 @@ def loadcliargs(gui, args):
         if args.multi:
             gui.multiworldWindow.multiworldWidgets["worlds"].storageVar.set(str(args.multi))
         if args.count:
-            gui.farBottomFrame.bottomWidgets["generationcount"].storageVar.set(str(args.count))
+            gui.frames["bottom"].bottomWidgets["generationcount"].storageVar.set(str(args.count))
         if args.seed:
-            gui.farBottomFrame.seedVar.set(str(args.seed))
+            gui.frames["bottom"].seedVar.set(str(args.seed))
         gui.itemWindow.itemWidgets["worldstate"].storageVar.set(args.mode)
         gui.itemWindow.itemWidgets["weapons"].storageVar.set(args.swords)
         gui.itemWindow.itemWidgets["itempool"].storageVar.set(args.difficulty)

@@ -23,8 +23,8 @@ def parse_arguments(argv, no_defaults=False):
     def defval(value):
         return value if not no_defaults else None
 
-    # get working dirs
-    working_dirs = get_working_dirs()
+    # get settings
+    settings = get_settings()
 
     # we need to know how many players we have first
     parser = argparse.ArgumentParser(add_help=False)
@@ -206,10 +206,10 @@ def parse_arguments(argv, no_defaults=False):
     parser.add_argument('--openpyramid', default=defval(False), help='''\
                             Pre-opens the pyramid hole, this removes the Agahnim 2 requirement for it
                              ''', action='store_true')
-    parser.add_argument('--rom', default=defval(working_dirs["rom.base"]), help='Path to an ALttP JAP(1.0) rom to use as a base.')
+    parser.add_argument('--rom', default=defval(settings["rom"]), help='Path to an ALttP JAP(1.0) rom to use as a base.')
     parser.add_argument('--loglevel', default=defval('info'), const='info', nargs='?', choices=['error', 'info', 'warning', 'debug'], help='Select level of logging for output.')
-    parser.add_argument('--seed', default=defval(int(working_dirs["gen.seed"]) if working_dirs["gen.seed"] is not "" and working_dirs["gen.seed"] is not None else None), help='Define seed number to generate.', type=int)
-    parser.add_argument('--count', default=defval(int(working_dirs["gen.count"])), help='''\
+    parser.add_argument('--seed', default=defval(int(settings["seed"]) if settings["seed"] is not "" and settings["seed"] is not None else None), help='Define seed number to generate.', type=int)
+    parser.add_argument('--count', default=defval(int(settings["count"])), help='''\
                              Use to batch generate multiple seeds with same settings.
                              If --seed is provided, it will be used for the first seed, then
                              used to derive the next seed (i.e. generating 10 seeds with
@@ -274,7 +274,7 @@ def parse_arguments(argv, no_defaults=False):
                             for VT site integration, do not use otherwise.
                             ''')
     parser.add_argument('--skip_playthrough', action='store_true', default=defval(False))
-    parser.add_argument('--enemizercli', default=defval(working_dirs["enemizer.cli"]))
+    parser.add_argument('--enemizercli', default=defval(settings["enemizercli"]))
     parser.add_argument('--shufflebosses', default=defval('none'), choices=['none', 'basic', 'normal', 'chaos'])
     parser.add_argument('--shuffleenemies', default=defval('none'), choices=['none', 'shuffled', 'chaos'])
     parser.add_argument('--enemy_health', default=defval('default'), choices=['default', 'easy', 'normal', 'hard', 'expert'])
@@ -282,10 +282,10 @@ def parse_arguments(argv, no_defaults=False):
     parser.add_argument('--shufflepots', default=defval(False), action='store_true')
     parser.add_argument('--beemizer', default=defval(0), type=lambda value: min(max(int(value), 0), 4))
     parser.add_argument('--remote_items', default=defval(False), action='store_true')
-    parser.add_argument('--multi', default=defval(working_dirs["multi.worlds"]), type=lambda value: min(max(int(value), 1), 255))
-    parser.add_argument('--names', default=defval(working_dirs["multi.names"]))
+    parser.add_argument('--multi', default=defval(settings["multi"]), type=lambda value: min(max(int(value), 1), 255))
+    parser.add_argument('--names', default=defval(settings["names"]))
     parser.add_argument('--teams', default=defval(1), type=lambda value: max(int(value), 1))
-    parser.add_argument('--outputpath', default=defval(working_dirs["outputpath"]))
+    parser.add_argument('--outputpath', default=defval(settings["outputpath"]))
     parser.add_argument('--race', default=defval(False), action='store_true')
     parser.add_argument('--outputname')
 
@@ -294,6 +294,7 @@ def parse_arguments(argv, no_defaults=False):
             parser.add_argument(f'--p{player}', default=defval(''), help=argparse.SUPPRESS)
 
     ret = parser.parse_args(argv)
+    print(ret)
     if ret.keysanity:
         ret.mapshuffle, ret.compassshuffle, ret.keyshuffle, ret.bigkeyshuffle = [True] * 4
 
@@ -317,26 +318,141 @@ def parse_arguments(argv, no_defaults=False):
 
     return ret
 
-def get_working_dirs():
-  # set default working dirs to same dir as script
-  working_dirs = {
-      "adjust.rom":   os.path.join("."),
-      "enemizer.cli": os.path.join(".","EnemizerCLI","EnemizerCLI.Core"),
-      "multi.worlds": 1,
-      "multi.names":  "",
-      "rom.base":     os.path.join(".","Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
-      "gen.seed":     "",
-      "gen.count":    1,
-      "outputpath":   os.path.join("."),
+def get_settings():
+  # set default settings
+  settings = {
+    "multi": 1,
+    "names": "",
+    "seed": null,
+    "count": null,
+    "mode": "open",
+    "logic": "noglitches",
+    "goal": "ganon",
+    "crystals_gt": "7",
+    "crystals_ganon": "7",
+    "swords": "random",
+    "difficulty": "normal",
+    "item_functionality": "normal",
+    "timer": "none",
+    "progressive": "on",
+    "accessibility": "items",
+    "algorithm": "balanced",
+    "shuffle": "vanilla",
+    "door_shuffle": "basic",
+    "experimental": 0,
+    "heartbeep": "normal",
+    "heartcolor": "red",
+    "fastmenu": "normal",
+    "create_spoiler": false,
+    "skip_playthrough": true,
+    "suppress_rom": false,
+    "openpyramid": false,
+    "mapshuffle": false,
+    "compassshuffle": false,
+    "keyshuffle": false,
+    "bigkeyshuffle": false,
+    "retro": false,
+    "quickswap": false,
+    "disablemusic": false,
+    "ow_palettes": "default",
+    "uw_palettes": "default",
+    "shuffleganon": true,
+    "hints": false,
+    "enemizercli": os.path.join(".","EnemizerCLI","EnemizerCLI.Core"),
+    "shufflebosses": "none",
+    "shuffleenemies": "none",
+    "enemy_health": "default",
+    "enemy_damage": "default",
+    "shufflepots": false,
+    "custom": false,
+    "customitemarray": [
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      4,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      2,
+      1,
+      1,
+      24,
+      10,
+      1,
+      0,
+      0,
+      0,
+      0,
+      4,
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      12,
+      0,
+      13,
+      2,
+      4,
+      28,
+      7,
+      1,
+      5,
+      0,
+      0,
+      0,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0,
+      10,
+      0
+    ],
+    "rom": os.path.join(".","Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
+    "sprite": null,
+    "randomSprite": false,
+    "outputpath": os.path.join(".")
   }
   if sys.platform.lower().find("windows"):
-      working_dirs["enemizer.cli"] += ".exe"
+      settings["enemizercli"] += ".exe"
 
-  # read saved working dirs file if it exists and set these
-  working_dirs_path = os.path.join(".","resources","user","working_dirs.json")
-  if os.path.exists(working_dirs_path):
-      with(open(working_dirs_path)) as json_file:
+  # read saved settings file if it exists and set these
+  settings_path = os.path.join(".", "resources", "user", "settings.json")
+  if os.path.exists(settings_path):
+      with(open(settings_path)) as json_file:
           data = json.load(json_file)
+          if 'sprite' in data.keys() and data['sprite']:
+              data['sprite'] = get_sprite_from_name(data['sprite'])
           for k,v in data.items():
-              working_dirs[k] = v
-  return working_dirs
+              settings[k] = v
+  return settings_args

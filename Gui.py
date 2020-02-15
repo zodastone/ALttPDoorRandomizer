@@ -5,7 +5,7 @@ import sys
 from tkinter import Tk, BOTTOM, TOP, StringVar, BooleanVar, X, BOTH, ttk
 
 from argparse import Namespace
-from CLI import get_working_dirs
+from CLI import get_settings
 from DungeonRandomizer import parse_arguments
 from gui.adjust.overview import adjust_page
 from gui.custom.overview import custom_page
@@ -24,16 +24,6 @@ from Rom import get_sprite_from_name
 
 
 def guiMain(args=None):
-    # save working dirs
-    def save_working_dirs():
-        user_resources_path = os.path.join(".","resources","user")
-        working_dirs_path = os.path.join(user_resources_path)
-        if not os.path.exists(working_dirs_path):
-            os.makedirs(working_dirs_path)
-        with open(os.path.join(working_dirs_path, "working_dirs.json"),"w+") as f:
-            f.write(json.dumps(self.working_dirs, indent=2))
-        os.chmod(os.path.join(working_dirs_path, "working_dirs.json"),0o755)
-
     def save_settings(args):
         user_resources_path = os.path.join(".", "resources", "user")
         settings_path = os.path.join(user_resources_path)
@@ -41,10 +31,10 @@ def guiMain(args=None):
             os.makedirs(settings_path)
         with open(os.path.join(settings_path, "settings.json"), "w+") as f:
             f.write(json.dumps(args, indent=2))
+        os.chmod(os.path.join(settings_path, "settings.json"),0o755)
 
     # routine for exiting the app
     def guiExit():
-        save_working_dirs()
         gui_args = vars(create_guiargs(self))
         if self.randomSprite.get():
             gui_args['sprite'] = 'random'
@@ -63,16 +53,16 @@ def guiMain(args=None):
     # set program icon
     set_icon(mainWindow)
 
-    # get working dirs
-    self.working_dirs = get_working_dirs()
+    # get saved settings
+    self.settings = get_settings()
 
     notebook = ttk.Notebook(self)
-    self.randomizerWindow = ttk.Frame(notebook)
-    self.adjustWindow = ttk.Frame(notebook)
-    self.customWindow = ttk.Frame(notebook)
-    notebook.add(self.randomizerWindow, text='Randomize')
-    notebook.add(self.adjustWindow, text='Adjust')
-    notebook.add(self.customWindow, text='Custom')
+    self.pages["randomizer"] = ttk.Frame(notebook)
+    self.pages["adjust"] = ttk.Frame(notebook)
+    self.pages["custom"] = ttk.Frame(notebook)
+    notebook.add(self.pages["randomizer"], text='Randomize')
+    notebook.add(self.pages["adjust"], text='Adjust')
+    notebook.add(self.pages["custom"], text='Custom')
     notebook.pack()
 
     # randomizer controls
@@ -86,7 +76,7 @@ def guiMain(args=None):
     #   Multiworld:       Multiworld settings
     #   Game Options:     Cosmetic settings that don't affect logic/placement
     #   Generation Setup: Primarily one&done settings
-    self.randomizerNotebook = ttk.Notebook(self.randomizerWindow)
+    self.randomizerNotebook = ttk.Notebook(self.pages["randomizer"])
 
     # Item Randomizer
     self.itemWindow = item_page(self.randomizerNotebook)
@@ -97,7 +87,7 @@ def guiMain(args=None):
     self.randomizerNotebook.add(self.entrandoWindow, text="Entrances")
 
     # Enemizer
-    self.enemizerWindow,self.working_dirs = enemizer_page(self.randomizerNotebook,self.working_dirs)
+    self.enemizerWindow,self.settings = enemizer_page(self.randomizerNotebook,self.settings)
     self.randomizerNotebook.add(self.enemizerWindow, text="Enemizer")
 
     # Dungeon Shuffle
@@ -105,7 +95,7 @@ def guiMain(args=None):
     self.randomizerNotebook.add(self.dungeonRandoWindow, text="Dungeon Shuffle")
 
     # Multiworld
-    self.multiworldWindow,self.working_dirs = multiworld_page(self.randomizerNotebook,self.working_dirs)
+    self.multiworldWindow,self.settings = multiworld_page(self.randomizerNotebook,self.settings)
     self.randomizerNotebook.add(self.multiworldWindow, text="Multiworld")
 
     # Game Options
@@ -113,26 +103,26 @@ def guiMain(args=None):
     self.randomizerNotebook.add(self.gameOptionsWindow, text="Game Options")
 
     # Generation Setup
-    self.generationSetupWindow,self.working_dirs = generation_page(self.randomizerNotebook,self.working_dirs)
+    self.generationSetupWindow,self.settings = generation_page(self.randomizerNotebook,self.settings)
     self.randomizerNotebook.add(self.generationSetupWindow, text="Generation Setup")
 
     # add randomizer notebook to main window
     self.randomizerNotebook.pack()
 
     # bottom of window: Open Output Directory, Open Documentation (if exists)
-    self.farBottomFrame = bottom_frame(self, self, None)
+    self.frames["bottom"] = bottom_frame(self, self, None)
     # set bottom frame to main window
-    self.farBottomFrame.pack(side=BOTTOM, fill=X, padx=5, pady=5)
+    self.frames["bottom"].pack(side=BOTTOM, fill=X, padx=5, pady=5)
 
     self.outputPath = StringVar()
     self.randomSprite = BooleanVar()
 
     # Adjuster Controls
-    self.adjustContent,self.working_dirs = adjust_page(self, self.adjustWindow, self.working_dirs)
+    self.adjustContent,self.settings = adjust_page(self, self.pages["adjust"], self.settings)
     self.adjustContent.pack(side=TOP, fill=BOTH, expand=True)
 
     # Custom Controls
-    self.customContent = custom_page(self,self.customWindow)
+    self.customContent = custom_page(self,self.pages["custom"])
     self.customContent.pack(side=TOP, pady=(17,0))
 
     def validation(P):
@@ -144,16 +134,6 @@ def guiMain(args=None):
 
     # load args from CLI into options
     loadcliargs(self, args)
-
-    # load settings second
-    settings_path = os.path.join(".", "resources", "user", "settings.json")
-    if os.path.exists(settings_path):
-        with(open(settings_path)) as json_file:
-            data = json.load(json_file)
-            if 'sprite' in data.keys() and data['sprite']:
-                data['sprite'] = get_sprite_from_name(data['sprite'])
-            settings_args = Namespace(**data)
-            loadcliargs(self, settings_args)
 
     mainWindow.mainloop()
 

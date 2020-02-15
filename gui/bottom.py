@@ -3,7 +3,7 @@ from argparse import Namespace
 import logging
 import os
 import random
-from CLI import parse_arguments, get_working_dirs
+from CLI import parse_arguments, get_settings
 from Main import main
 from Utils import local_path, output_path, open_file
 import gui.widgets as widgets
@@ -20,11 +20,11 @@ def bottom_frame(self, parent, args=None):
     seedCountFrame.pack()
     ## Seed #
     seedLabel = Label(self, text='Seed #')
-    savedSeed = parent.working_dirs["gen.seed"]
+    savedSeed = parent.settings["seed"]
     self.seedVar = StringVar(value=savedSeed)
     def saveSeed(caller,_,mode):
         savedSeed = self.seedVar.get()
-        parent.working_dirs["gen.seed"] = int(savedSeed) if savedSeed.isdigit() else None
+        parent.settings["seed"] = int(savedSeed) if savedSeed.isdigit() else None
     self.seedVar.trace_add("write",saveSeed)
     seedEntry = Entry(self, width=15, textvariable=self.seedVar)
     seedLabel.pack(side=LEFT)
@@ -72,7 +72,7 @@ def bottom_frame(self, parent, args=None):
         if args and args.outputpath:
             open_file(output_path(args.outputpath))
         else:
-            open_file(output_path(parent.working_dirs["outputpath"]))
+            open_file(output_path(parent.settings["outputpath"]))
 
     openOutputButton = Button(self, text='Open Output Directory', command=open_output)
     openOutputButton.pack(side=RIGHT)
@@ -90,8 +90,8 @@ def create_guiargs(parent):
     guiargs = Namespace()
     guiargs.multi = int(parent.multiworldWindow.multiworldWidgets["worlds"].storageVar.get())
     guiargs.names = parent.multiworldWindow.namesVar.get()
-    guiargs.seed = int(parent.farBottomFrame.seedVar.get()) if parent.farBottomFrame.seedVar.get() else None
-    guiargs.count = int(parent.farBottomFrame.bottomWidgets["generationcount"].storageVar.get()) if parent.farBottomFrame.bottomWidgets["generationcount"].storageVar.get() != '1' else None
+    guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
+    guiargs.count = int(parent.frames["bottom"].bottomWidgets["generationcount"].storageVar.get()) if parent.frames["bottom"].bottomWidgets["generationcount"].storageVar.get() != '1' else None
     guiargs.mode = parent.itemWindow.itemWidgets["worldstate"].storageVar.get()
     guiargs.logic = parent.itemWindow.itemWidgets["logiclevel"].storageVar.get()
 

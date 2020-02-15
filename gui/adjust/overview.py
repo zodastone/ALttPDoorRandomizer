@@ -6,7 +6,7 @@ import gui.widgets as widgets
 import logging
 
 
-def adjust_page(top, parent, working_dirs):
+def adjust_page(top, parent, settings):
     # Adjust page
     self = ttk.Frame(parent)
 
@@ -164,13 +164,13 @@ def adjust_page(top, parent, working_dirs):
 
     adjustRomFrame = Frame(bottomAdjustFrame)
     adjustRomLabel = Label(adjustRomFrame, text='Rom to adjust: ')
-    self.romVar2 = StringVar(value=working_dirs["adjust.rom"])
+    self.romVar2 = StringVar(value=settings["rom"])
     romEntry2 = Entry(adjustRomFrame, textvariable=self.romVar2)
 
     def RomSelect2():
         rom = filedialog.askopenfilename(filetypes=[("Rom Files", (".sfc", ".smc")), ("All Files", "*")])
         if rom:
-            working_dirs["adjust.rom"] = rom
+            settings["rom"] = rom
             self.romVar2.set(rom)
     romSelectButton2 = Button(adjustRomFrame, text='Select Rom', command=RomSelect2)
 
@@ -202,4 +202,4 @@ def adjust_page(top, parent, working_dirs):
     adjustButton = Button(bottomAdjustFrame, text='Adjust Rom', command=adjustRom)
     adjustButton.pack(side=BOTTOM, padx=(5, 0))
 
-    return self,working_dirs
+    return self,settings

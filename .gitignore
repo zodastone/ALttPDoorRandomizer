@@ -18,6 +18,7 @@ EnemizerCLI/
 RaceRom.py
 weights/
 
+settings.json
 working_dirs.json
 
 venv
