@@ -14,76 +14,73 @@ def dungeon_page(parent):
     mscbLabel = Label(mcsbshuffleFrame, text="Shuffle: ")
     mscbLabel.pack(side=LEFT)
 
-    ## Map Shuffle
-    key = "mapshuffle"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      mcsbshuffleFrame,
-      "Maps",
-      None
-    )
-    self.widgets[key].pack(side=LEFT)
-
-    ## Compass Shuffle
-    key = "compassshuffle"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      mcsbshuffleFrame,
-      "Compasses",
-      None
-    )
-    self.widgets[key].pack(side=LEFT)
-
-    ## Small Key Shuffle
-    key = "smallkeyshuffle"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      mcsbshuffleFrame,
-      "Small Keys",
-      None
-    )
-    self.widgets[key].pack(side=LEFT)
-
-    ## Big Key Shuffle
-    key = "bigkeyshuffle"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      mcsbshuffleFrame,
-      "Big Keys",
-      None
-    )
-    self.widgets[key].pack(side=LEFT)
-
-    ## Dungeon Door Shuffle
-    key = "dungeondoorshuffle"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      self,
-      "Dungeon Door Shuffle",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Basic"},
-      {
-        "Vanilla": "vanilla",
-        "Basic": "basic",
-        "Crossed": "crossed"
+    myDict = {
+      ## Map Shuffle
+      "mapshuffle": {
+        "type": "checkbox",
+        "label": {
+          "text": "Maps"
+        }
+      },
+      ## Compass Shuffle
+      "compassshuffle": {
+        "type": "checkbox",
+        "label": {
+          "text": "Compasses"
+        }
+      },
+      ## Small Key Shuffle
+      "smallkeyshuffle": {
+        "type": "checkbox",
+        "label": {
+          "text": "Small Keys"
+        }
+      },
+      ## Big Key Shuffle
+      "bigkeyshuffle": {
+        "type": "checkbox",
+        "label": {
+          "text": "Small Keys"
+        }
       }
-    )
-    self.widgets[key].pack(anchor=W)
+    }
 
-    # Experimental features
-    key = "experimental"
-    self.widgets[key] = widgets.make_widget(
-        self,
-        "checkbox",
-        self,
-        "Enable Experimental Features",
-        None
-    )
-    self.widgets[key].pack(anchor=W)
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, mcsbshuffleFrame)
+
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(side=LEFT)
+
+    myDict = {
+      "dungeondoorshuffle": {
+        "type": "selectbox",
+        "label": {
+          "text": "Dungeon Door Shuffle"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": {"side": RIGHT},
+          "default": "Basic"
+        },
+        "options": {
+          "Vanilla": "vanilla",
+          "Basic": "basic",
+          "Crossed": "crossed"
+        }
+      },
+      ## Experiemental features
+      "experimental": {
+        "type": "checkbox",
+        "label": {
+          "text": "Enable Experimental Features"
+        }
+      }
+    }
+
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(anchor=W)
 
     return self

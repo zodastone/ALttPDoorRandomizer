@@ -117,3 +117,17 @@ def make_widget(self, type, parent, label, storageVar=None, packAttrs=dict(), op
             thisStorageVar = StringVar()
         widget = make_textbox(self, parent, label, thisStorageVar, packAttrs)
     return widget
+
+def make_widget_from_dict(self, defn, parent):
+    type = defn["type"] if "type" in defn else None
+    label = defn["label"]["text"] if "label" in defn and "text" in defn["label"] else ""
+    packAttrs = defn["packAttrs"] if "packAttrs" in defn else None
+    options = defn["options"] if "options" in defn else None
+    widget = make_widget(self, type, parent, label, None, packAttrs, options)
+    return widget
+
+def make_widgets_from_dict(self, defns, parent):
+    widgets = {}
+    for key,defn in defns.items():
+        widgets[key] = make_widget_from_dict(self, defn, parent)
+    return widgets   
