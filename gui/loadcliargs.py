@@ -52,13 +52,14 @@ def loadcliargs(gui, args):
 
         gui.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.set(int(args.create_spoiler))
         gui.pages["randomizer"].pages["generation"].widgets["suppressrom"].storageVar.set(int(args.suppress_rom))
+        gui.pages["randomizer"].pages["generation"].romVar.set(args.rom)
+
         if args.multi:
             gui.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.set(str(args.multi))
         if args.count:
             gui.frames["bottom"].widgets["generationcount"].storageVar.set(str(args.count))
         if args.seed:
             gui.frames["bottom"].seedVar.set(str(args.seed))
-        gui.pages["randomizer"].pages["generation"].romVar.set(args.rom)
         gui.outputPath.set(args.outputpath)
 
         def sprite_setter(spriteObject):
