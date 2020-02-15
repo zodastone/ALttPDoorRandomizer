@@ -9,49 +9,69 @@ def loadcliargs(gui, args):
             if type(v) is dict:
                 setattr(args, k, v[1])  # only get values for player 1 for now
         # load values from commandline args
-        gui.pages["randomizer"].pages["item"].widgets["retro"].storageVar.set(args.retro)
-        gui.pages["randomizer"].pages["item"].widgets["worldstate"].storageVar.set(args.mode)
-        gui.pages["randomizer"].pages["item"].widgets["logiclevel"].storageVar.set(args.logic)
-        gui.pages["randomizer"].pages["item"].widgets["goal"].storageVar.set(args.goal)
-        gui.pages["randomizer"].pages["item"].widgets["crystals_gt"].storageVar.set(args.crystals_gt)
-        gui.pages["randomizer"].pages["item"].widgets["crystals_ganon"].storageVar.set(args.crystals_ganon)
-        gui.pages["randomizer"].pages["item"].widgets["weapons"].storageVar.set(args.swords)
-        gui.pages["randomizer"].pages["item"].widgets["itempool"].storageVar.set(args.difficulty)
-        gui.pages["randomizer"].pages["item"].widgets["itemfunction"].storageVar.set(args.item_functionality)
-        gui.pages["randomizer"].pages["item"].widgets["timer"].storageVar.set(args.timer)
-        gui.pages["randomizer"].pages["item"].widgets["progressives"].storageVar.set(args.progressive)
-        gui.pages["randomizer"].pages["item"].widgets["accessibility"].storageVar.set(args.accessibility)
-        gui.pages["randomizer"].pages["item"].widgets["sortingalgo"].storageVar.set(args.algorithm)
 
-        gui.pages["randomizer"].pages["entrance"].widgets["openpyramid"].storageVar.set(args.openpyramid)
-        gui.pages["randomizer"].pages["entrance"].widgets["shuffleganon"].storageVar.set(args.shuffleganon)
-        gui.pages["randomizer"].pages["entrance"].widgets["entranceshuffle"].storageVar.set(args.shuffle)
+        # set up options to get
+        # Page::Subpage::GUI-id::param-id
+        options = {
+          "randomizer": {
+            "item": {
+              "retro": "retro",
+              "worldstate": "mode",
+              "logiclevel": "logic",
+              "goal": "goal",
+              "crystals_gt": "crystals_gt",
+              "crystals_ganon": "crystals_ganon",
+              "weapons": "swords",
+              "itempool": "difficulty",
+              "itemfunction": "item_functionality",
+              "timer": "timer",
+              "progressives": "progressive",
+              "accessibility": "accessibility",
+              "sortingalgo": "algorithm"
+            },
+            "entrance": {
+              "openpyramid": "openpyramid",
+              "shuffleganon": "shuffleganon",
+              "entranceshuffle": "shuffle"
+            },
+            "enemizer": {
+              "potshuffle": "shufflepots",
+              "enemyshuffle": "shuffleenemies",
+              "bossshuffle": "shufflebosses",
+              "enemydamage": "enemy_damage",
+              "enemyhealth": "enemy_health"
+            },
+            "dungeon": {
+              "mapshuffle": "mapshuffle",
+              "compassshuffle": "compassshuffle",
+              "smallkeyshuffle": "keyshuffle",
+              "bigkeyshuffle": "bigkeyshuffle",
+              "dungeondoorshuffle": "door_shuffle",
+              "experimental": "experimental"
+            },
+            "gameoptions": {
+              "hints": "hints",
+              "nobgm": "disablemusic",
+              "quickswap": "quickswap",
+              "heartcolor": "heartcolor",
+              "heartbeep": "heartbeep",
+              "menuspeed": "fastmenu",
+              "owpalettes": "ow_palettes",
+              "uwpalettes": "uw_palettes"
+            },
+            "generation": {
+              "spoiler": "create_spoiler",
+              "suppressrom": "suppress_rom"
+            } 
+          }
+        }
+        for mainpage in options:
+            for subpage in options[mainpage]:
+                for widget in options[mainpage][subpage]:
+                    arg = options[mainpage][subpage][widget]
+                    gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(getattr(args, arg))
 
-        gui.pages["randomizer"].pages["enemizer"].widgets["potshuffle"].storageVar.set(args.shufflepots)
         gui.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.set(args.enemizercli)
-        gui.pages["randomizer"].pages["enemizer"].widgets["enemyshuffle"].storageVar.set(args.shuffleenemies)
-        gui.pages["randomizer"].pages["enemizer"].widgets["bossshuffle"].storageVar.set(args.shufflebosses)
-        gui.pages["randomizer"].pages["enemizer"].widgets["enemydamage"].storageVar.set(args.enemy_damage)
-        gui.pages["randomizer"].pages["enemizer"].widgets["enemyhealth"].storageVar.set(args.enemy_health)
-
-        gui.pages["randomizer"].pages["dungeon"].widgets["mapshuffle"].storageVar.set(args.mapshuffle)
-        gui.pages["randomizer"].pages["dungeon"].widgets["compassshuffle"].storageVar.set(args.compassshuffle)
-        gui.pages["randomizer"].pages["dungeon"].widgets["smallkeyshuffle"].storageVar.set(args.keyshuffle)
-        gui.pages["randomizer"].pages["dungeon"].widgets["bigkeyshuffle"].storageVar.set(args.bigkeyshuffle)
-        gui.pages["randomizer"].pages["dungeon"].widgets["dungeondoorshuffle"].storageVar.set(args.door_shuffle)
-        gui.pages["randomizer"].pages["dungeon"].widgets["experimental"].storageVar.set(args.experimental)
-
-        gui.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.set(args.hints)
-        gui.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.set(int(args.disablemusic))
-        gui.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar.set(int(args.quickswap))
-        gui.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.set(args.heartcolor)
-        gui.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.set(args.heartbeep)
-        gui.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.set(args.fastmenu)
-        gui.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.set(args.ow_palettes)
-        gui.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar.set(args.uw_palettes)
-
-        gui.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.set(int(args.create_spoiler))
-        gui.pages["randomizer"].pages["generation"].widgets["suppressrom"].storageVar.set(int(args.suppress_rom))
         gui.pages["randomizer"].pages["generation"].romVar.set(args.rom)
 
         if args.multi:
