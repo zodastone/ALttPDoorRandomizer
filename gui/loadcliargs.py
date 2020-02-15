@@ -65,19 +65,19 @@ def loadcliargs(gui, args):
                        spriteNameVar=gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["sprite"]["spriteNameVar"],
                        randomSpriteVar=gui.randomSprite)
 
-        gui.adjustContent.adjustWidgets["nobgm"].storageVar.set(int(args.disablemusic))
-        gui.adjustContent.adjustWidgets['quickswap'].storageVar.set(args.quickswap)
-        gui.adjustContent.adjustWidgets["heartcolor"].storageVar.set(args.heartcolor)
-        gui.adjustContent.adjustWidgets["heartbeep"].storageVar.set(args.heartbeep)
-        gui.adjustContent.adjustWidgets["menuspeed"].storageVar.set(args.fastmenu)
-        gui.adjustContent.adjustWidgets["owpalettes"].storageVar.set(args.ow_palettes)
-        gui.adjustContent.adjustWidgets["uwpalettes"].storageVar.set(args.uw_palettes)
+        gui.pages["adjust"].content.adjustWidgets["nobgm"].storageVar.set(int(args.disablemusic))
+        gui.pages["adjust"].content.adjustWidgets['quickswap'].storageVar.set(args.quickswap)
+        gui.pages["adjust"].content.adjustWidgets["heartcolor"].storageVar.set(args.heartcolor)
+        gui.pages["adjust"].content.adjustWidgets["heartbeep"].storageVar.set(args.heartbeep)
+        gui.pages["adjust"].content.adjustWidgets["menuspeed"].storageVar.set(args.fastmenu)
+        gui.pages["adjust"].content.adjustWidgets["owpalettes"].storageVar.set(args.ow_palettes)
+        gui.pages["adjust"].content.adjustWidgets["uwpalettes"].storageVar.set(args.uw_palettes)
 
         def sprite_setter_adj(spriteObject):
-            gui.adjustContent.sprite = spriteObject
+            gui.pages["adjust"].content.sprite = spriteObject
         if args.sprite is not None:
             sprite_obj = args.sprite if isinstance(args.sprite, Sprite) else Sprite(args.sprite)
             r_sprite_flag = args.randomSprite if hasattr(args, 'randomSprite') else False
             set_sprite(sprite_obj, r_sprite_flag, spriteSetter=sprite_setter_adj,
-                       spriteNameVar=gui.adjustContent.spriteNameVar2,
+                       spriteNameVar=gui.pages["adjust"].content.spriteNameVar2,
                        randomSpriteVar=gui.randomSprite)

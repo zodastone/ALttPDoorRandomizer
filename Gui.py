@@ -118,8 +118,8 @@ def guiMain(args=None):
     self.randomSprite = BooleanVar()
 
     # Adjuster Controls
-    self.adjustContent,self.settings = adjust_page(self, self.pages["adjust"], self.settings)
-    self.adjustContent.pack(side=TOP, fill=BOTH, expand=True)
+    self.pages["adjust"].content,self.settings = adjust_page(self, self.pages["adjust"], self.settings)
+    self.pages["adjust"].content.pack(side=TOP, fill=BOTH, expand=True)
 
     # Custom Controls
     self.customContent = custom_page(self,self.pages["custom"])
