@@ -8,52 +8,50 @@ def entrando_page(parent):
     # Entrance Randomizer options
     self.widgets = {}
 
-    ## Pyramid pre-opened
-    key = "openpyramid"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      self,
-      "Pre-open Pyramid Hole",
-      None
-    )
-    self.widgets[key].pack(anchor=W)
-
-    ## Shuffle Ganon
-    key = "shuffleganon"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      self,
-      "Include Ganon's Tower and Pyramid Hole in shuffle pool",
-      None
-    )
-    self.widgets[key].pack(anchor=W)
-
-    ## Entrance Shuffle
-    key = "entranceshuffle"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      self,
-      "Entrance Shuffle",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
-      {
-        "Vanilla": "vanilla",
-        "Simple": "simple",
-        "Restricted": "restricted",
-        "Full": "full",
-        "Crossed": "crossed",
-        "Insanity": "insanity",
-        "Restricted (Legacy)": "restricted_legacy",
-        "Full (Legacy)": "full_legacy",
-        "Madness (Legacy)": "madness_legacy",
-        "Insanity (Legacy)": "insanity_legacy",
-        "Dungeons + Full": "dungeonsfull",
-        "Dungeons + Simple": "dungeonssimple"
+    myDict = {
+      ## Pyramid pre-opened
+      "openpyramid": {
+        "type": "checkbox",
+        "label": {
+          "text": "Pre-open Pyramid Hole"
+        }
+      },
+      ## Shuffle Ganon
+      "shuffleganon": {
+        "type": "checkbox",
+        "label": {
+          "text": "Include Ganon's Tower and Pyramid Hole in shuffle pool"
+        }
+      },
+      ## Entrance Shuffle
+      "entranceshuffle": {
+        "type": "selectbox",
+        "label": {
+          "text": "Entrance Shuffle"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": { "side": RIGHT }
+        },
+        "options": {
+          "Vanilla": "vanilla",
+          "Simple": "simple",
+          "Restricted": "restricted",
+          "Full": "full",
+          "Crossed": "crossed",
+          "Insanity": "insanity",
+          "Restricted (Legacy)": "restricted_legacy",
+          "Full (Legacy)": "full_legacy",
+          "Madness (Legacy)": "madness_legacy",
+          "Insanity (Legacy)": "insanity_legacy",
+          "Dungeons + Full": "dungeonsfull",
+          "Dungeons + Simple": "dungeonssimple"
+        }
       }
-    )
-    self.widgets[key].pack(anchor=W)
+    }
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(anchor=W)
 
     return self

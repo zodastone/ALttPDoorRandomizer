@@ -123,4 +123,5 @@ def loadadjustargs(gui, settings):
         for subpage in options[mainpage]:
             for widget in options[mainpage][subpage]:
                 key = options[mainpage][subpage][widget]
-                gui.pages[mainpage].content.widgets[widget].storageVar.set(settings[key])
+                if key in settings:
+                    gui.pages[mainpage].content.widgets[widget].storageVar.set(settings[key])
