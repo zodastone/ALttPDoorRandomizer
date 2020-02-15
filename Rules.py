@@ -1,6 +1,7 @@
 import logging
-from BaseClasses import CollectionState, RegionType
+from BaseClasses import CollectionState, RegionType, DoorType
 from Regions import key_only_locations
+from RoomData import DoorKind
 from collections import deque
 
 
@@ -1252,7 +1253,7 @@ def set_inverted_big_bomb_rules(world, player):
     
     set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_reach('East Dark World', 'Region', player) and state.can_reach('Inverted Big Bomb Shop', 'Region', player) and state.has('Crystal 5', player) and state.has('Crystal 6', player))
 
-    #crossing peg bridge starting from the southern dark world
+    # crossing peg bridge starting from the southern dark world
     def cross_peg_bridge(state):
         return state.has('Hammer', player)
 
@@ -1313,23 +1314,18 @@ def set_bunny_rules(world, player):
     # Note spiral cave may be technically passible, but it would be too absurd to require since OHKO mode is a thing.
     bunny_impassable_caves = ['Bumper Cave', 'Two Brothers House', 'Hookshot Cave',
                               'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)']
-    # todo: bunny impassable caves
-    #  sewers drop may or may not be - maybe just new terminology
-    #  desert pots are impassible by bunny - need rules for those transitions
-    #  skull woods drops tend to soft lock bunny
-    #  tr too - dark ride, chest gap, entrance gap, pots in lazy eyes, etc
-
-    bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree', 'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid', 'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins']
-
+    bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree',
+                                  'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid',
+                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins']
 
     def path_to_access_rule(path, entrance):
-        return lambda state: state.can_reach(entrance) and all(rule(state) for rule in path)
+        return lambda state: state.can_reach(entrance) and all(rule_func(state) for rule_func in path)
 
     def options_to_access_rule(options):
-        return lambda state: any(rule(state) for rule in options)
+        return lambda state: any(rule_func(state) for rule_func in options)
 
-    def get_rule_to_add(region):
-        if not region.is_light_world:
+    def get_rule_to_add(start_region):
+        if not start_region.is_light_world:
             return lambda state: state.has_Pearl(player)
         # in this case we are mixed region.
         # we collect possible options.
@@ -1342,8 +1338,8 @@ def set_bunny_rules(world, player):
         # for each such entrance a new option is added that consist of:
         #    a) being able to reach it, and
         #    b) being able to access all entrances from there to `region`
-        seen = set([region])
-        queue = deque([(region, [])])
+        seen = {start_region}
+        queue = deque([(start_region, [])])
         while queue:
             (current, path) = queue.popleft()
             for entrance in current.entrances:
@@ -1353,7 +1349,7 @@ def set_bunny_rules(world, player):
                 new_path = path + [entrance.access_rule]
                 seen.add(new_region)
                 if not new_region.is_light_world:
-                    continue # we don't care about pure dark world entrances
+                    continue  # we don't care about pure dark world entrances
                 if new_region.is_dark_world:
                     queue.append((new_region, new_path))
                 else:
@@ -1367,12 +1363,24 @@ def set_bunny_rules(world, player):
         if not region.is_dark_world:
             continue
         rule = get_rule_to_add(region)
-        for exit in region.exits:
-            add_rule(exit, rule)
+        for ext in region.exits:
+            add_rule(ext, rule)
 
     paradox_shop = world.get_region('Light World Death Mountain Shop', player)
     if paradox_shop.is_dark_world:
         add_rule(paradox_shop.entrances[0], get_rule_to_add(paradox_shop))
+
+    for ent_name in bunny_impassible_doors:
+        bunny_exit = world.get_entrance(ent_name, player)
+        if bunny_exit.parent_region.is_dark_world:
+            add_rule(bunny_exit, get_rule_to_add(bunny_exit.parent_region))
+
+    doors_to_check = [x for x in world.doors if x.player == player and x not in bunny_impassible_doors]
+    doors_to_check = [x for x in doors_to_check if x.type in [DoorType.Normal, DoorType.Interior] and not x.blocked]
+    for door in doors_to_check:
+        room = world.get_room(door.roomIndex, player)
+        if door.entrance.parent_region.is_dark_world and room.kind(door) in [DoorKind.Dashable, DoorKind.Bombable, DoorKind.Hidden]:
+            add_rule(door.entrance, get_rule_to_add(door.entrance.parent_region))
 
     # Add requirements for all locations that are actually in the dark world, except those available to the bunny
     for location in world.get_locations():
@@ -1383,29 +1391,26 @@ def set_bunny_rules(world, player):
 
             add_rule(location, get_rule_to_add(location.parent_region))
 
+
 def set_inverted_bunny_rules(world, player):
 
     # regions for the exits of multi-entrace caves/drops that bunny cannot pass
     # Note spiral cave may be technically passible, but it would be too absurd to require since OHKO mode is a thing.
     bunny_impassable_caves = ['Bumper Cave', 'Two Brothers House', 'Hookshot Cave',
                               'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)', 'The Sky']
-    # todo: bunny impassable caves
-    #  sewers drop may or may not be - maybe just new terminology
-    #  desert pots are impassible by bunny - need rules for those transitions
-    #  skull woods drops tend to soft lock bunny
-    #  tr too - dark ride, chest gap, entrance gap, pots in lazy eyes, etc
-
-    bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree', 'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid', 'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins', 'Bombos Tablet', 'Ether Tablet', 'Purple Chest']
-
+    bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree',
+                                  'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid',
+                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins',
+                                  'Bombos Tablet', 'Ether Tablet', 'Purple Chest']
 
     def path_to_access_rule(path, entrance):
-        return lambda state: state.can_reach(entrance) and all(rule(state) for rule in path)
+        return lambda state: state.can_reach(entrance) and all(rule_func(state) for rule_func in path)
 
     def options_to_access_rule(options):
-        return lambda state: any(rule(state) for rule in options)
+        return lambda state: any(rule_func(state) for rule_func in options)
 
-    def get_rule_to_add(region):
-        if not region.is_dark_world:
+    def get_rule_to_add(start_region):
+        if not start_region.is_dark_world:
             return lambda state: state.has_Pearl(player)
         # in this case we are mixed region.
         # we collect possible options.
@@ -1418,8 +1423,8 @@ def set_inverted_bunny_rules(world, player):
         # for each such entrance a new option is added that consist of:
         #    a) being able to reach it, and
         #    b) being able to access all entrances from there to `region`
-        seen = set([region])
-        queue = deque([(region, [])])
+        seen = {start_region}
+        queue = deque([(start_region, [])])
         while queue:
             (current, path) = queue.popleft()
             for entrance in current.entrances:
@@ -1429,7 +1434,7 @@ def set_inverted_bunny_rules(world, player):
                 new_path = path + [entrance.access_rule]
                 seen.add(new_region)
                 if not new_region.is_dark_world:
-                    continue # we don't care about pure light world entrances
+                    continue  # we don't care about pure light world entrances
                 if new_region.is_light_world:
                     queue.append((new_region, new_path))
                 else:
@@ -1443,12 +1448,24 @@ def set_inverted_bunny_rules(world, player):
         if not region.is_light_world:
             continue
         rule = get_rule_to_add(region)
-        for exit in region.exits:
-            add_rule(exit, rule)
+        for ext in region.exits:
+            add_rule(ext, rule)
 
     paradox_shop = world.get_region('Light World Death Mountain Shop', player)
     if paradox_shop.is_light_world:
         add_rule(paradox_shop.entrances[0], get_rule_to_add(paradox_shop))
+
+    for ent_name in bunny_impassible_doors:
+        bunny_exit = world.get_entrance(ent_name, player)
+        if bunny_exit.parent_region.is_light_world:
+            add_rule(bunny_exit, get_rule_to_add(bunny_exit.parent_region))
+
+    doors_to_check = [x for x in world.doors if x.player == player and x not in bunny_impassible_doors]
+    doors_to_check = [x for x in doors_to_check if x.type in [DoorType.Normal, DoorType.Interior] and not x.blocked]
+    for door in doors_to_check:
+        room = world.get_room(door.roomIndex, player)
+        if door.entrance.parent_region.is_light_world and room.kind(door) in [DoorKind.Dashable, DoorKind.Bombable, DoorKind.Hidden]:
+            add_rule(door.entrance, get_rule_to_add(door.entrance.parent_region))
 
     # Add requirements for all locations that are actually in the light world, except those available to the bunny
     for location in world.get_locations():
@@ -1458,6 +1475,72 @@ def set_inverted_bunny_rules(world, player):
                 continue
 
             add_rule(location, get_rule_to_add(location.parent_region))
+
+
+bunny_impassible_doors = {
+    'Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory ES', 'Sewers Secret Room Push Block', 'Sewers Pull Switch S',
+    'Eastern Lobby N', 'Eastern Courtyard Ledge W', 'Eastern Courtyard Ledge E', 'Eastern Pot Switch SE',
+    'Eastern Map Balcony Hook Path',     'Eastern Stalfos Spawn ES', 'Eastern Stalfos Spawn NW',
+    'Eastern Hint Tile Push Block', 'Eastern Darkness S', 'Eastern Darkness NE', 'Eastern Darkness Up Stairs',
+    'Eastern Attic Start WS', 'Eastern Single Eyegore NE', 'Eastern Duo Eyegores NE', 'Desert Main Lobby Left Path',
+    'Desert Main Lobby Right Path', 'Desert Left Alcove Path', 'Desert Right Alcove Path', 'Desert Compass NW',
+    'Desert West Lobby NW', 'Desert Back Lobby NW', 'Desert Four Statues NW',  'Desert Four Statues ES',
+    'Desert Beamos Hall WS', 'Desert Beamos Hall NE', 'Desert Wall Slide NW', 'Hera Lobby Down Stairs',
+    'Hera Lobby Key Stairs', 'Hera Lobby Up Stairs', 'Hera Tile Room EN', 'Hera Tridorm SE', 'Hera Beetles WS',
+    'Hera 4F Down Stairs', 'Tower Gold Knights SW', 'Tower Dark Maze EN', 'Tower Dark Pits ES', 'Tower Dark Archers WN',
+    'Tower Red Spears WN', 'Tower Red Guards EN', 'Tower Red Guards SW', 'Tower Circle of Pots NW', 'Tower Altar NW',
+    'PoD Left Cage SW', 'PoD Middle Cage SE', 'PoD Pit Room Bomb Hole', 'PoD Pit Room Block Path N',
+    'PoD Pit Room Block Path S', 'PoD Stalfos Basement Warp', 'PoD Arena Main SW', 'PoD Arena Main Crystal Path',
+    'PoD Arena Bonk Path', 'PoD Arena Crystal Path', 'PoD Sexy Statue NW', 'PoD Map Balcony Drop Down',
+    'PoD Mimics 1 NW', 'PoD Warp Hint Warp', 'PoD Falling Bridge Path N', 'PoD Falling Bridge Path S',
+    'PoD Mimics 2 NW', 'PoD Bow Statue Down Ladder', 'PoD Dark Pegs Up Ladder', 'PoD Dark Pegs WN',
+    'PoD Turtle Party ES', 'PoD Turtle Party NW', 'PoD Callback Warp', 'Swamp Lobby Moat', 'Swamp Entrance Moat',
+    'Swamp Trench 1 Approach Swim Depart', 'Swamp Trench 1 Approach Key', 'Swamp Trench 1 Key Approach',
+    'Swamp Trench 1 Key Ledge Depart', 'Swamp Trench 1 Departure Approach', 'Swamp Trench 1 Departure Key',
+    'Swamp Hub Hook Path', 'Swamp Compass Donut Push Block',
+    'Swamp Shortcut Blue Barrier', 'Swamp Trench 2 Pots Blue Barrier', 'Swamp Trench 2 Pots Wet',
+    'Swamp Trench 2 Departure Wet', 'Swamp West Shallows Push Blocks', 'Swamp West Ledge Hook Path',
+    'Swamp Barrier Ledge Hook Path', 'Swamp Attic Left Pit', 'Swamp Attic Right Pit', 'Swamp Push Statue NW',
+    'Swamp Push Statue NE', 'Swamp Drain Right Switch', 'Swamp Waterway NE', 'Swamp Waterway N', 'Swamp Waterway NW',
+    'Skull Pot Circle WN', 'Skull Pot Circle Star Path', 'Skull Pull Switch S', 'Skull Big Chest N',
+    'Skull Big Chest Hookpath', 'Skull 2 East Lobby NW', 'Skull Back Drop Star Path', 'Skull 2 West Lobby NW',
+    'Skull 3 Lobby EN', 'Skull Star Pits SW', 'Skull Star Pits ES', 'Skull Torch Room WN', 'Skull Vines NW',
+    'Thieves Conveyor Maze EN', 'Thieves Triple Bypass EN', 'Thieves Triple Bypass SE', 'Thieves Triple Bypass WN',
+    'Thieves Hellway Blue Barrier', 'Thieves Hellway Crystal Blue Barrier', 'Thieves Attic ES',
+    'Thieves Basement Block Path', 'Thieves Blocked Entry Path', 'Thieves Conveyor Bridge Block Path',
+    'Thieves Conveyor Block Path', 'Ice Lobby WS', 'Ice Cross Left Push Block', 'Ice Cross Bottom Push Block Left',
+    'Ice Cross Bottom Push Block Right', 'Ice Cross Right Push Block Top', 'Ice Cross Right Push Block Bottom',
+    'Ice Cross Top Push Block Bottom', 'Ice Cross Top Push Block Right', 'Ice Bomb Drop Hole', 'Ice Pengator Switch WS',
+    'Ice Pengator Switch ES', 'Ice Big Key Push Block',  'Ice Stalfos Hint SE', 'Ice Bomb Jump EN',
+    'Ice Pengator Trap NE', 'Ice Hammer Block ES', 'Ice Tongue Pull WS', 'Ice Freezors Bomb Hole', 'Ice Tall Hint WS',
+    'Ice Hookshot Ledge Path', 'Ice Hookshot Balcony Path', 'Ice Many Pots SW', 'Ice Many Pots WS',
+    'Ice Crystal Right Blue Hole', 'Ice Crystal Left Blue Barrier', 'Ice Big Chest Landing Push Blocks',
+    'Ice Backwards Room Hole', 'Ice Switch Room SE', 'Ice Antechamber NE', 'Ice Antechamber Hole', 'Mire Lobby Gap',
+    'Mire Post-Gap Gap', 'Mire 2 NE', 'Mire Hub Upper Blue Barrier', 'Mire Hub Lower Blue Barrier',
+    'Mire Hub Right Blue Barrier', 'Mire Hub Top Blue Barrier', 'Mire Falling Bridge WN',
+    'Mire Map Spike Side Blue Barrier', 'Mire Map Spot Blue Barrier', 'Mire Crystal Dead End Left Barrier',
+    'Mire Crystal Dead End Right Barrier', 'Mire Cross ES', 'Mire Hidden Shooters Block Path S',
+    'Mire Hidden Shooters Block Path N', 'Mire Left Bridge Hook Path', 'Mire Fishbone Blue Barrier',
+    'Mire South Fish Blue Barrier', 'Mire Tile Room NW', 'Mire Compass Blue Barrier', 'Mire Attic Hint Hole',
+    'Mire Dark Shooters SW', 'Mire Crystal Mid Blue Barrier', 'Mire Crystal Left Blue Barrier', 'TR Main Lobby Gap',
+    'TR Lobby Ledge Gap', 'TR Hub SW', 'TR Hub SE', 'TR Hub ES', 'TR Hub EN', 'TR Hub NW', 'TR Hub NE', 'TR Torches NW',
+    'TR Pokey 2 EN', 'TR Pokey 2 ES', 'TR Twin Pokeys SW', 'TR Twin Pokeys EN', 'TR Big Chest Gap',
+    'TR Big Chest Entrance Gap', 'TR Lazy Eyes ES', 'TR Tongue Pull WS', 'TR Tongue Pull NE', 'TR Dark Ride Up Stairs',
+    'TR Dark Ride SW', 'TR Crystal Maze Forwards Path', 'TR Crystal Maze Blue Path', 'TR Crystal Maze Cane Path',
+    'TR Final Abyss South Stairs', 'TR Final Abyss NW', 'GT Hope Room EN', 'GT Blocked Stairs Block Path',
+    'GT Bob\'s Room Hole', 'GT Speed Torch SE', 'GT Speed Torch South Path', 'GT Speed Torch North Path',
+    'GT Crystal Conveyor NE', 'GT Crystal Conveyor WN', 'GT Conveyor Cross EN', 'GT Conveyor Cross WN',
+    'GT Hookshot East-North Path', 'GT Hookshot East-South Path', 'GT Hookshot North-East Path',
+    'GT Hookshot North-South Path', 'GT Hookshot South-East Path', 'GT Hookshot South-North Path',
+    'GT Hookshot Platform Blue Barrier', 'GT Hookshot Entry Blue Barrier', 'GT Double Switch Blue Path',
+    'GT Double Switch Key Blue Path', 'GT Double Switch Blue Barrier', 'GT Double Switch Transition Blue',
+    'GT Firesnake Room Hook Path', 'GT Falling Bridge WN', 'GT Falling Bridge WS', 'GT Ice Armos NE', 'GT Ice Armos WS',
+    'GT Crystal Paths SW', 'GT Mimics 1 NW', 'GT Mimics 1 ES', 'GT Mimics 2 WS', 'GT Mimics 2 NE',
+    'GT Hidden Spikes EN', 'GT Cannonball Bridge SE', 'GT Gauntlet 1 WN', 'GT Gauntlet 2 EN', 'GT Gauntlet 2 SW',
+    'GT Gauntlet 3 NW',  'GT Gauntlet 3 SW', 'GT Gauntlet 4 NW', 'GT Gauntlet 4 SW', 'GT Gauntlet 5 NW',
+    'GT Gauntlet 5 WS', 'GT Lanmolas 2 ES', 'GT Lanmolas 2 NW', 'GT Wizzrobes 1 SW', 'GT Wizzrobes 2 SE',
+    'GT Wizzrobes 2 NE', 'GT Torch Cross ES', 'GT Falling Torches NE', 'GT Moldorm Gap', 'GT Validation Block Path'
+}
 
 
 def add_key_logic_rules(world, player):

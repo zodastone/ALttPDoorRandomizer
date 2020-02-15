@@ -182,11 +182,12 @@ eastern_regions = [
 ]
 
 desert_regions = [
-    'Desert Main Lobby', 'Desert Dead End', 'Desert East Lobby', 'Desert East Wing', 'Desert Compass Room',
-    'Desert Cannonball', 'Desert Arrow Pot Corner', 'Desert Trap Room', 'Desert North Hall', 'Desert Map Room',
-    'Desert Sandworm Corner', 'Desert Bonk Torch', 'Desert Circle of Pots', 'Desert Big Chest Room', 'Desert West Wing',
-    'Desert West Lobby', 'Desert Fairy Fountain', 'Desert Back Lobby', 'Desert Tiles 1',
-    'Desert Bridge', 'Desert Four Statues', 'Desert Beamos Hall', 'Desert Tiles 2', 'Desert Wall Slide', 'Desert Boss',
+    'Desert Main Lobby', 'Desert Left Alcove', 'Desert Right Alcove', 'Desert Dead End', 'Desert East Lobby',
+    'Desert East Wing', 'Desert Compass Room', 'Desert Cannonball', 'Desert Arrow Pot Corner', 'Desert Trap Room',
+    'Desert North Hall', 'Desert Map Room', 'Desert Sandworm Corner', 'Desert Bonk Torch', 'Desert Circle of Pots',
+    'Desert Big Chest Room', 'Desert West Wing', 'Desert West Lobby', 'Desert Fairy Fountain', 'Desert Back Lobby',
+    'Desert Tiles 1', 'Desert Bridge', 'Desert Four Statues', 'Desert Beamos Hall', 'Desert Tiles 2',
+    'Desert Wall Slide', 'Desert Boss'
 ]
 
 hera_regions = [
@@ -203,12 +204,13 @@ tower_regions = [
 ]
 
 pod_regions = [
-    'PoD Lobby', 'PoD Left Cage', 'PoD Middle Cage', 'PoD Shooter Room', 'PoD Pit Room', 'PoD Arena Main',
-    'PoD Arena North', 'PoD Arena Crystal', 'PoD Arena Bridge', 'PoD Arena Ledge', 'PoD Sexy Statue', 'PoD Map Balcony',
-    'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room', 'PoD Stalfos Basement',
-    'PoD Basement Ledge', 'PoD Big Key Landing', 'PoD Falling Bridge', 'PoD Dark Maze', 'PoD Big Chest Balcony',
-    'PoD Compass Room', 'PoD Dark Basement', 'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue', 'PoD Dark Pegs',
-    'PoD Lonely Turtle', 'PoD Turtle Party', 'PoD Dark Alley', 'PoD Callback', 'PoD Boss'
+    'PoD Lobby', 'PoD Left Cage', 'PoD Middle Cage', 'PoD Shooter Room', 'PoD Pit Room', 'PoD Pit Room Blocked',
+    'PoD Arena Main', 'PoD Arena North', 'PoD Arena Crystal', 'PoD Arena Bridge', 'PoD Arena Ledge', 'PoD Sexy Statue',
+    'PoD Map Balcony', 'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room',
+    'PoD Stalfos Basement', 'PoD Basement Ledge', 'PoD Big Key Landing', 'PoD Falling Bridge',
+    'PoD Falling Bridge Ledge', 'PoD Dark Maze', 'PoD Big Chest Balcony', 'PoD Compass Room', 'PoD Dark Basement',
+    'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue', 'PoD Dark Pegs', 'PoD Lonely Turtle', 'PoD Turtle Party',
+    'PoD Dark Alley', 'PoD Callback', 'PoD Boss'
 ]
 
 swamp_regions = [
@@ -255,14 +257,15 @@ ice_regions = [
 mire_regions = [
     'Mire Lobby', 'Mire Post-Gap', 'Mire 2', 'Mire Hub', 'Mire Hub Right', 'Mire Hub Top', 'Mire Lone Shooter',
     'Mire Failure Bridge', 'Mire Falling Bridge', 'Mire Map Spike Side', 'Mire Map Spot', 'Mire Crystal Dead End',
-    'Mire Hidden Shooters', 'Mire Cross', 'Mire Minibridge', 'Mire BK Door Room', 'Mire Spikes', 'Mire Ledgehop',
-    'Mire Bent Bridge', 'Mire Over Bridge', 'Mire Right Bridge', 'Mire Left Bridge', 'Mire Fishbone', 'Mire South Fish',
-    'Mire Spike Barrier', 'Mire Square Rail', 'Mire Lone Warp', 'Mire Wizzrobe Bypass', 'Mire Conveyor Crystal',
-    'Mire Tile Room', 'Mire Compass Room', 'Mire Compass Chest', 'Mire Neglected Room', 'Mire Chest View',
-    'Mire Conveyor Barrier', 'Mire BK Chest Ledge', 'Mire Warping Pool', 'Mire Torches Top', 'Mire Torches Bottom',
-    'Mire Attic Hint', 'Mire Dark Shooters', 'Mire Key Rupees', 'Mire Block X', 'Mire Tall Dark and Roomy',
-    'Mire Crystal Right', 'Mire Crystal Mid', 'Mire Crystal Left', 'Mire Crystal Top', 'Mire Shooter Rupees',
-    'Mire Falling Foes', 'Mire Firesnake Skip', 'Mire Antechamber', 'Mire Boss'
+    'Mire Hidden Shooters', 'Mire Hidden Shooters Blocked', 'Mire Cross', 'Mire Minibridge', 'Mire BK Door Room',
+    'Mire Spikes', 'Mire Ledgehop', 'Mire Bent Bridge', 'Mire Over Bridge', 'Mire Right Bridge', 'Mire Left Bridge',
+    'Mire Fishbone', 'Mire South Fish', 'Mire Spike Barrier', 'Mire Square Rail', 'Mire Lone Warp',
+    'Mire Wizzrobe Bypass', 'Mire Conveyor Crystal', 'Mire Tile Room', 'Mire Compass Room', 'Mire Compass Chest',
+    'Mire Neglected Room', 'Mire Chest View', 'Mire Conveyor Barrier', 'Mire BK Chest Ledge', 'Mire Warping Pool',
+    'Mire Torches Top', 'Mire Torches Bottom', 'Mire Attic Hint', 'Mire Dark Shooters', 'Mire Key Rupees',
+    'Mire Block X', 'Mire Tall Dark and Roomy', 'Mire Crystal Right', 'Mire Crystal Mid', 'Mire Crystal Left',
+    'Mire Crystal Top', 'Mire Shooter Rupees', 'Mire Falling Foes', 'Mire Firesnake Skip', 'Mire Antechamber',
+    'Mire Boss'
 ]
 
 tr_regions = [
@@ -276,8 +279,8 @@ tr_regions = [
 
 gt_regions = [
     'GT Lobby', 'GT Bob\'s Torch', 'GT Hope Room', 'GT Big Chest', 'GT Blocked Stairs', 'GT Bob\'s Room',
-    'GT Tile Room', 'GT Speed Torch', 'GT Pots n Blocks', 'GT Crystal Conveyor', 'GT Compass Room',
-    'GT Invisible Bridges', 'GT Invisible Catwalk', 'GT Conveyor Cross', 'GT Hookshot East Platform',
+    'GT Tile Room', 'GT Speed Torch', 'GT Speed Torch Upper', 'GT Pots n Blocks', 'GT Crystal Conveyor',
+    'GT Compass Room', 'GT Invisible Bridges', 'GT Invisible Catwalk', 'GT Conveyor Cross', 'GT Hookshot East Platform',
     'GT Hookshot North Platform', 'GT Hookshot South Platform', 'GT Hookshot South Entry', 'GT Map Room',
     'GT Double Switch Entry', 'GT Double Switch Switches', 'GT Double Switch Transition', 'GT Double Switch Key Spot',
     'GT Double Switch Exit', 'GT Spike Crystals', 'GT Warp Maze - Left Section', 'GT Warp Maze - Mid Section',
