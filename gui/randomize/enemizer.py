@@ -7,18 +7,18 @@ def enemizer_page(parent,settings):
     self = ttk.Frame(parent)
 
     # Enemizer options
-    self.enemizerWidgets = {}
+    self.widgets = {}
 
     # Pot Shuffle
     key = "potshuffle"
-    self.enemizerWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Pot Shuffle",
       None
     )
-    self.enemizerWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     ## Enemizer CLI Path
     enemizerPathFrame = Frame(self)
@@ -46,7 +46,7 @@ def enemizer_page(parent,settings):
 
     ## Randomize Enemies
     key = "enemyshuffle"
-    self.enemizerWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftEnemizerFrame,
@@ -59,11 +59,11 @@ def enemizer_page(parent,settings):
         "Chaos": "chaos"
       }
     )
-    self.enemizerWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Randomize Bosses
     key = "bossshuffle"
-    self.enemizerWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftEnemizerFrame,
@@ -77,11 +77,11 @@ def enemizer_page(parent,settings):
         "Chaos": "chaos"
       }
     )
-    self.enemizerWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Enemy Damage
     key = "enemydamage"
-    self.enemizerWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightEnemizerFrame,
@@ -94,11 +94,11 @@ def enemizer_page(parent,settings):
         "Chaos": "chaos"
       }
     )
-    self.enemizerWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Enemy Health
     key = "enemyhealth"
-    self.enemizerWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightEnemizerFrame,
@@ -113,6 +113,6 @@ def enemizer_page(parent,settings):
         "Expert": "expert"
       }
     )
-    self.enemizerWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     return self,settings
