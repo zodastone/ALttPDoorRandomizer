@@ -6,7 +6,7 @@ def dungeon_page(parent):
     self = ttk.Frame(parent)
 
     # Dungeon Shuffle options
-    self.dungeonWidgets = {}
+    self.widgets = {}
 
     ## Dungeon Item Shuffle
     mcsbshuffleFrame = Frame(self)
@@ -16,51 +16,51 @@ def dungeon_page(parent):
 
     ## Map Shuffle
     key = "mapshuffle"
-    self.dungeonWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       mcsbshuffleFrame,
       "Maps",
       None
     )
-    self.dungeonWidgets[key].pack(side=LEFT)
+    self.widgets[key].pack(side=LEFT)
 
     ## Compass Shuffle
     key = "compassshuffle"
-    self.dungeonWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       mcsbshuffleFrame,
       "Compasses",
       None
     )
-    self.dungeonWidgets[key].pack(side=LEFT)
+    self.widgets[key].pack(side=LEFT)
 
     ## Small Key Shuffle
     key = "smallkeyshuffle"
-    self.dungeonWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       mcsbshuffleFrame,
       "Small Keys",
       None
     )
-    self.dungeonWidgets[key].pack(side=LEFT)
+    self.widgets[key].pack(side=LEFT)
 
     ## Big Key Shuffle
     key = "bigkeyshuffle"
-    self.dungeonWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       mcsbshuffleFrame,
       "Big Keys",
       None
     )
-    self.dungeonWidgets[key].pack(side=LEFT)
+    self.widgets[key].pack(side=LEFT)
 
     ## Dungeon Door Shuffle
     key = "dungeondoorshuffle"
-    self.dungeonWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       self,
@@ -73,17 +73,17 @@ def dungeon_page(parent):
         "Crossed": "crossed"
       }
     )
-    self.dungeonWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     # Experimental features
     key = "experimental"
-    self.dungeonWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
         self,
         "checkbox",
         self,
         "Enable Experimental Features",
         None
     )
-    self.dungeonWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     return self
