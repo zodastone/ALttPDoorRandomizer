@@ -9,7 +9,7 @@ from CLI import get_settings
 from DungeonRandomizer import parse_arguments
 from gui.adjust.overview import adjust_page
 from gui.custom.overview import custom_page
-from gui.loadcliargs import loadcliargs
+from gui.loadcliargs import loadcliargs, loadadjustargs
 from gui.randomize.item import item_page
 from gui.randomize.entrando import entrando_page
 from gui.randomize.enemizer import enemizer_page
@@ -29,6 +29,8 @@ def guiMain(args=None):
         settings_path = os.path.join(user_resources_path)
         if not os.path.exists(settings_path):
             os.makedirs(settings_path)
+        for widget in self.pages["adjust"].content.widgets:
+            args["adjust." + widget] = self.pages["adjust"].content.widgets[widget].storageVar.get()
         with open(os.path.join(settings_path, "settings.json"), "w+") as f:
             f.write(json.dumps(args, indent=2))
         os.chmod(os.path.join(settings_path, "settings.json"),0o755)
@@ -141,8 +143,11 @@ def guiMain(args=None):
             return False
     vcmd=(self.pages["custom"].content.register(validation), '%P')
 
+    # load adjust settings into options
+    loadadjustargs(self, self.settings)
+
     # load args from CLI into options
-    loadcliargs(self, args)
+    loadcliargs(self, args, self.settings)
 
     mainWindow.mainloop()
 

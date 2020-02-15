@@ -180,14 +180,19 @@ def adjust_page(top, parent, settings):
     adjustRomFrame.pack(fill=X, expand=True)
 
     def adjustRom():
+        options = {
+          "heartbeep": "heartbeep",
+          "heartcolor": "heartcolor",
+          "menuspeed": "fastmenu",
+          "owpalettes": "ow_palettes",
+          "uwpalettes": "uw_palettes",
+          "quickswap": "quickswap",
+          "nobgm": "disablemusic"
+        }
         guiargs = Namespace()
-        guiargs.heartbeep = self.widgets["heartbeep"].storageVar.get()
-        guiargs.heartcolor = self.widgets["heartcolor"].storageVar.get()
-        guiargs.fastmenu = self.widgets["menuspeed"].storageVar.get()
-        guiargs.ow_palettes = self.widgets["owpalettes"].storageVar.get()
-        guiargs.uw_palettes = self.widgets["uwpalettes"].storageVar.get()
-        guiargs.quickswap = bool(self.widgets["quickswap"].storageVar.get())
-        guiargs.disablemusic = bool(self.widgets["nobgm"].storageVar.get())
+        for option in options:
+            arg = options[option]
+            setattr(guiargs, arg, self.widgets[option].storageVar.get())
         guiargs.rom = self.romVar2.get()
         guiargs.baserom = top.pages["randomizer"].pages["generation"].romVar.get()
         guiargs.sprite = self.sprite
