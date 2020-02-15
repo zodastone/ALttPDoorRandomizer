@@ -20,7 +20,7 @@ def loadcliargs(gui, args):
         gui.gameOptionsWindow.gameOptionsWidgets["quickswap"].storageVar.set(int(args.quickswap))
         gui.gameOptionsWindow.gameOptionsWidgets["nobgm"].storageVar.set(int(args.disablemusic))
         if args.multi:
-            gui.multiworldWindow.multiworldWidgets["worlds"].storageVar.set(str(args.multi))
+            gui.pages["randomizer"].pages["multiworld"].multiworldWidgets["worlds"].storageVar.set(str(args.multi))
         if args.count:
             gui.frames["bottom"].bottomWidgets["generationcount"].storageVar.set(str(args.count))
         if args.seed:

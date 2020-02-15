@@ -88,8 +88,8 @@ def bottom_frame(self, parent, args=None):
 
 def create_guiargs(parent):
     guiargs = Namespace()
-    guiargs.multi = int(parent.multiworldWindow.multiworldWidgets["worlds"].storageVar.get())
-    guiargs.names = parent.multiworldWindow.namesVar.get()
+    guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].multiworldWidgets["worlds"].storageVar.get())
+    guiargs.names = parent.pages["randomizer"].pages["multiworld"].namesVar.get()
     guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
     guiargs.count = int(parent.frames["bottom"].bottomWidgets["generationcount"].storageVar.get()) if parent.frames["bottom"].bottomWidgets["generationcount"].storageVar.get() != '1' else None
     guiargs.mode = parent.pages["randomizer"].pages["item"].itemWidgets["worldstate"].storageVar.get()
