@@ -113,23 +113,24 @@ def create_guiargs(parent):
     guiargs.enemy_damage = parent.pages["randomizer"].pages["enemizer"].widgets["enemydamage"].storageVar.get()
     guiargs.enemy_health = parent.pages["randomizer"].pages["enemizer"].widgets["enemyhealth"].storageVar.get()
 
+    guiargs.mapshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["mapshuffle"].storageVar.get())
+    guiargs.compassshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["compassshuffle"].storageVar.get())
+    guiargs.keyshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["smallkeyshuffle"].storageVar.get())
+    guiargs.bigkeyshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["bigkeyshuffle"].storageVar.get())
+    guiargs.door_shuffle = parent.pages["randomizer"].pages["dungeon"].widgets["dungeondoorshuffle"].storageVar.get()
+    guiargs.experimental = parent.pages["randomizer"].pages["dungeon"].widgets["experimental"].storageVar.get()
+
     guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.get())
     guiargs.names = parent.pages["randomizer"].pages["multiworld"].namesVar.get()
     guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
     guiargs.count = int(parent.frames["bottom"].widgets["generationcount"].storageVar.get()) if parent.frames["bottom"].widgets["generationcount"].storageVar.get() != '1' else None
 
-    guiargs.door_shuffle = parent.pages["randomizer"].pages["dungeon"].widgets["dungeondoorshuffle"].storageVar.get()
-    guiargs.experimental = parent.pages["randomizer"].pages["dungeon"].widgets["experimental"].storageVar.get()
     guiargs.heartbeep = parent.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.get()
     guiargs.heartcolor = parent.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.get()
     guiargs.fastmenu = parent.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.get()
     guiargs.create_spoiler = bool(parent.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.get())
     guiargs.skip_playthrough = not bool(parent.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.get())
     guiargs.suppress_rom = bool(parent.pages["randomizer"].pages["generation"].widgets["suppressrom"].storageVar.get())
-    guiargs.mapshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["mapshuffle"].storageVar.get())
-    guiargs.compassshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["compassshuffle"].storageVar.get())
-    guiargs.keyshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["smallkeyshuffle"].storageVar.get())
-    guiargs.bigkeyshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["bigkeyshuffle"].storageVar.get())
     guiargs.quickswap = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar.get())
     guiargs.disablemusic = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.get())
     guiargs.ow_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.get()
