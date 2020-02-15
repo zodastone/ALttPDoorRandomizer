@@ -56,6 +56,12 @@ def guiMain(args=None):
     # get saved settings
     self.settings = get_settings()
 
+    # make array for pages
+    self.pages = {}
+
+    # make array for frames
+    self.frames = {}
+
     self.notebook = ttk.Notebook(self)
     self.pages["randomizer"] = ttk.Frame(self.notebook)
     self.pages["adjust"] = ttk.Frame(self.notebook)
@@ -77,6 +83,9 @@ def guiMain(args=None):
     #   Game Options:     Cosmetic settings that don't affect logic/placement
     #   Generation Setup: Primarily one&done settings
     self.pages["randomizer"].notebook = ttk.Notebook(self.pages["randomizer"])
+
+    # make array for pages
+    self.pages["randomizer"].pages = {}
 
     # Item Randomizer
     self.pages["randomizer"].pages["item"] = item_page(self.pages["randomizer"].notebook)
