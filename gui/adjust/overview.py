@@ -31,7 +31,7 @@ def adjust_page(top, parent, settings):
       "checkbox",
       self,
       "L/R Quickswapping",
-      top.gameOptipages["randomizer"].pages["gameoptions"]onsWindow.gameOptionsWidgets["quickswap"].storageVar
+      top.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["quickswap"].storageVar
     )
     self.adjustWidgets[key].pack(anchor=W)
 
