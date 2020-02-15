@@ -106,6 +106,13 @@ def create_guiargs(parent):
     guiargs.shuffleganon = bool(parent.pages["randomizer"].pages["entrance"].widgets["shuffleganon"].storageVar.get())
     guiargs.shuffle = parent.pages["randomizer"].pages["entrance"].widgets["entranceshuffle"].storageVar.get()
 
+    guiargs.shufflepots = bool(parent.pages["randomizer"].pages["enemizer"].widgets["potshuffle"].storageVar.get())
+    guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.get()
+    guiargs.shuffleenemies = parent.pages["randomizer"].pages["enemizer"].widgets["enemyshuffle"].storageVar.get()
+    guiargs.shufflebosses = parent.pages["randomizer"].pages["enemizer"].widgets["bossshuffle"].storageVar.get()
+    guiargs.enemy_damage = parent.pages["randomizer"].pages["enemizer"].widgets["enemydamage"].storageVar.get()
+    guiargs.enemy_health = parent.pages["randomizer"].pages["enemizer"].widgets["enemyhealth"].storageVar.get()
+
     guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.get())
     guiargs.names = parent.pages["randomizer"].pages["multiworld"].namesVar.get()
     guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
@@ -128,12 +135,6 @@ def create_guiargs(parent):
     guiargs.ow_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.get()
     guiargs.uw_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar.get()
     guiargs.hints = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.get())
-    guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.get()
-    guiargs.shufflebosses = parent.pages["randomizer"].pages["enemizer"].widgets["bossshuffle"].storageVar.get()
-    guiargs.shuffleenemies = parent.pages["randomizer"].pages["enemizer"].widgets["enemyshuffle"].storageVar.get()
-    guiargs.enemy_health = parent.pages["randomizer"].pages["enemizer"].widgets["enemyhealth"].storageVar.get()
-    guiargs.enemy_damage = parent.pages["randomizer"].pages["enemizer"].widgets["enemydamage"].storageVar.get()
-    guiargs.shufflepots = bool(parent.pages["randomizer"].pages["enemizer"].widgets["potshuffle"].storageVar.get())
     guiargs.custom = bool(parent.pages["randomizer"].pages["generation"].widgets["usecustompool"].storageVar.get())
     guiargs.customitemarray = [int(parent.pages["custom"].content.customWidgets["bow"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["silversupgrade"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["boomerang"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["redmerang"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["hookshot"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["mushroom"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["powder"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["firerod"].storageVar.get()),
                                int(parent.pages["custom"].content.customWidgets["icerod"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bombos"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["ether"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["quake"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["lamp"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["hammer"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["shovel"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["flute"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bugnet"].storageVar.get()),
