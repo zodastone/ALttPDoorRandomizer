@@ -6,11 +6,11 @@ def multiworld_page(parent,settings):
     self = ttk.Frame(parent)
 
     # Multiworld options
-    self.multiworldWidgets = {}
+    self.widgets = {}
 
     ## Number of Worlds
     key = "worlds"
-    self.multiworldWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "spinbox",
       self,
@@ -18,7 +18,7 @@ def multiworld_page(parent,settings):
       None,
       {"label": {"side": LEFT}, "spinbox": {"side": RIGHT}}
     )
-    self.multiworldWidgets[key].pack(side=LEFT, anchor=N)
+    self.widgets[key].pack(side=LEFT, anchor=N)
 
     ## List of Player Names
     namesFrame = Frame(self)
