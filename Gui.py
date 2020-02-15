@@ -122,15 +122,15 @@ def guiMain(args=None):
     self.pages["adjust"].content.pack(side=TOP, fill=BOTH, expand=True)
 
     # Custom Controls
-    self.customContent = custom_page(self,self.pages["custom"])
-    self.customContent.pack(side=TOP, pady=(17,0))
+    self.pages["custom"].content = custom_page(self,self.pages["custom"])
+    self.pages["custom"].content.pack(side=TOP, pady=(17,0))
 
     def validation(P):
         if str.isdigit(P) or P == "":
             return True
         else:
             return False
-    vcmd=(self.customContent.register(validation), '%P')
+    vcmd=(self.pages["custom"].content.register(validation), '%P')
 
     # load args from CLI into options
     loadcliargs(self, args)
