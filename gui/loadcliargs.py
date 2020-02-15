@@ -41,23 +41,24 @@ def loadcliargs(gui, args):
         gui.pages["randomizer"].pages["dungeon"].widgets["dungeondoorshuffle"].storageVar.set(args.door_shuffle)
         gui.pages["randomizer"].pages["dungeon"].widgets["experimental"].storageVar.set(args.experimental)
 
+        gui.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.set(args.hints)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.set(int(args.disablemusic))
+        gui.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar.set(int(args.quickswap))
+        gui.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.set(args.heartcolor)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.set(args.heartbeep)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.set(args.fastmenu)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.set(args.ow_palettes)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar.set(args.uw_palettes)
+
         gui.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.set(int(args.create_spoiler))
         gui.pages["randomizer"].pages["generation"].widgets["suppressrom"].storageVar.set(int(args.suppress_rom))
-        gui.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar.set(int(args.quickswap))
-        gui.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.set(int(args.disablemusic))
         if args.multi:
             gui.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.set(str(args.multi))
         if args.count:
             gui.frames["bottom"].widgets["generationcount"].storageVar.set(str(args.count))
         if args.seed:
             gui.frames["bottom"].seedVar.set(str(args.seed))
-        gui.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.set(args.heartcolor)
-        gui.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.set(args.heartbeep)
-        gui.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.set(args.fastmenu)
         gui.pages["randomizer"].pages["generation"].romVar.set(args.rom)
-        gui.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.set(args.hints)
-        gui.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.set(args.ow_palettes)
-        gui.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar.set(args.uw_palettes)
         gui.outputPath.set(args.outputpath)
 
         def sprite_setter(spriteObject):

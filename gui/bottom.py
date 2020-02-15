@@ -123,20 +123,21 @@ def create_guiargs(parent):
     guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.get())
     guiargs.names = parent.pages["randomizer"].pages["multiworld"].namesVar.get()
 
+    guiargs.hints = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.get())
+    guiargs.disablemusic = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.get())
+    guiargs.quickswap = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar.get())
+    guiargs.heartcolor = parent.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.get()
+    guiargs.heartbeep = parent.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.get()
+    guiargs.fastmenu = parent.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.get()
+    guiargs.ow_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.get()
+    guiargs.uw_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar.get()
+
     guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
     guiargs.count = int(parent.frames["bottom"].widgets["generationcount"].storageVar.get()) if parent.frames["bottom"].widgets["generationcount"].storageVar.get() != '1' else None
 
-    guiargs.heartbeep = parent.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.get()
-    guiargs.heartcolor = parent.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.get()
-    guiargs.fastmenu = parent.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.get()
     guiargs.create_spoiler = bool(parent.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.get())
     guiargs.skip_playthrough = not bool(parent.pages["randomizer"].pages["generation"].widgets["spoiler"].storageVar.get())
     guiargs.suppress_rom = bool(parent.pages["randomizer"].pages["generation"].widgets["suppressrom"].storageVar.get())
-    guiargs.quickswap = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar.get())
-    guiargs.disablemusic = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.get())
-    guiargs.ow_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.get()
-    guiargs.uw_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar.get()
-    guiargs.hints = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.get())
     guiargs.custom = bool(parent.pages["randomizer"].pages["generation"].widgets["usecustompool"].storageVar.get())
     guiargs.customitemarray = [int(parent.pages["custom"].content.customWidgets["bow"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["silversupgrade"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["boomerang"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["redmerang"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["hookshot"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["mushroom"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["powder"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["firerod"].storageVar.get()),
                                int(parent.pages["custom"].content.customWidgets["icerod"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bombos"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["ether"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["quake"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["lamp"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["hammer"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["shovel"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["flute"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bugnet"].storageVar.get()),
