@@ -324,7 +324,7 @@ def get_settings():
     "multi": 1,
     "names": "",
     "seed": None,
-    "count": None,
+    "count": 1,
     "mode": "open",
     "logic": "noglitches",
     "goal": "ganon",
