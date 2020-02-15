@@ -20,7 +20,7 @@ def adjust_page(top, parent, settings):
       "checkbox",
       self,
       "Disable Music & MSU-1",
-      top.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["nobgm"].storageVar
+      top.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar
     )
     self.adjustWidgets[key].pack(anchor=W)
 
@@ -31,7 +31,7 @@ def adjust_page(top, parent, settings):
       "checkbox",
       self,
       "L/R Quickswapping",
-      top.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["quickswap"].storageVar
+      top.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar
     )
     self.adjustWidgets[key].pack(anchor=W)
 
@@ -51,7 +51,7 @@ def adjust_page(top, parent, settings):
       "selectbox",
       leftAdjustFrame,
       "Heart Color",
-      top.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["heartcolor"].storageVar,
+      top.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       {
         "Red": "red",
@@ -70,7 +70,7 @@ def adjust_page(top, parent, settings):
       "selectbox",
       leftAdjustFrame,
       "Heart Beep sound rate",
-      top.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["heartbeep"].storageVar,
+      top.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Normal"},
       {
         "Double": "double",
@@ -115,7 +115,7 @@ def adjust_page(top, parent, settings):
       "selectbox",
       rightAdjustFrame,
       "Menu Speed",
-      top.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["menuspeed"].storageVar,
+      top.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Normal"},
       {
         "Instant": "instant",
@@ -135,7 +135,7 @@ def adjust_page(top, parent, settings):
       "selectbox",
       rightAdjustFrame,
       "Overworld Palettes",
-      top.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["owpalettes"].storageVar,
+      top.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       {
         "Default": "default",
@@ -152,7 +152,7 @@ def adjust_page(top, parent, settings):
       "selectbox",
       rightAdjustFrame,
       "Underworld Palettes",
-      top.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["uwpalettes"].storageVar,
+      top.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       {
         "Default": "default",

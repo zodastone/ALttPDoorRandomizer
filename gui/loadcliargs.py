@@ -17,8 +17,8 @@ def loadcliargs(gui, args):
         gui.pages["randomizer"].pages["dungeon"].widgets["bigkeyshuffle"].storageVar.set(args.bigkeyshuffle)
         gui.pages["randomizer"].pages["item"].widgets["retro"].storageVar.set(args.retro)
         gui.pages["randomizer"].pages["entrance"].widgets["openpyramid"].storageVar.set(args.openpyramid)
-        gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["quickswap"].storageVar.set(int(args.quickswap))
-        gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["nobgm"].storageVar.set(int(args.disablemusic))
+        gui.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar.set(int(args.quickswap))
+        gui.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.set(int(args.disablemusic))
         if args.multi:
             gui.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.set(str(args.multi))
         if args.count:
@@ -39,30 +39,30 @@ def loadcliargs(gui, args):
         gui.pages["randomizer"].pages["entrance"].widgets["entranceshuffle"].storageVar.set(args.shuffle)
         gui.pages["randomizer"].pages["dungeon"].widgets["dungeondoorshuffle"].storageVar.set(args.door_shuffle)
         gui.pages["randomizer"].pages["dungeon"].widgets["experimental"].storageVar.set(args.experimental)
-        gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["heartcolor"].storageVar.set(args.heartcolor)
-        gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["heartbeep"].storageVar.set(args.heartbeep)
-        gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["menuspeed"].storageVar.set(args.fastmenu)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.set(args.heartcolor)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.set(args.heartbeep)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.set(args.fastmenu)
         gui.pages["randomizer"].pages["item"].widgets["logiclevel"].storageVar.set(args.logic)
         gui.pages["randomizer"].pages["generation"].romVar.set(args.rom)
         gui.pages["randomizer"].pages["entrance"].widgets["shuffleganon"].storageVar.set(args.shuffleganon)
-        gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["hints"].storageVar.set(args.hints)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.set(args.hints)
         gui.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.set(args.enemizercli)
         gui.pages["randomizer"].pages["enemizer"].widgets["potshuffle"].storageVar.set(args.shufflepots)
         gui.pages["randomizer"].pages["enemizer"].widgets["enemyshuffle"].storageVar.set(args.shuffleenemies)
         gui.pages["randomizer"].pages["enemizer"].widgets["bossshuffle"].storageVar.set(args.shufflebosses)
         gui.pages["randomizer"].pages["enemizer"].widgets["enemydamage"].storageVar.set(args.enemy_damage)
         gui.pages["randomizer"].pages["enemizer"].widgets["enemyhealth"].storageVar.set(args.enemy_health)
-        gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["owpalettes"].storageVar.set(args.ow_palettes)
-        gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["uwpalettes"].storageVar.set(args.uw_palettes)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.set(args.ow_palettes)
+        gui.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar.set(args.uw_palettes)
         gui.outputPath.set(args.outputpath)
 
         def sprite_setter(spriteObject):
-            gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["sprite"]["spriteObject"] = spriteObject
+            gui.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteObject"] = spriteObject
         if args.sprite is not None:
             sprite_obj = args.sprite if isinstance(args.sprite, Sprite) else Sprite(args.sprite)
             r_sprite_flag = args.randomSprite if hasattr(args, 'randomSprite') else False
             set_sprite(sprite_obj, r_sprite_flag, spriteSetter=sprite_setter,
-                       spriteNameVar=gui.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["sprite"]["spriteNameVar"],
+                       spriteNameVar=gui.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteNameVar"],
                        randomSpriteVar=gui.randomSprite)
 
         gui.pages["adjust"].content.adjustWidgets["nobgm"].storageVar.set(int(args.disablemusic))

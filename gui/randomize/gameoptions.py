@@ -9,40 +9,40 @@ def gameoptions_page(top, parent):
     self = ttk.Frame(parent)
 
     # Game Options options
-    self.gameOptionsWidgets = {}
+    self.widgets = {}
 
     ## Hints: Useful/Not useful
     key = "hints"
-    self.gameOptionsWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Include Helpful Hints",
       None
     )
-    self.gameOptionsWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     ## Disable BGM
     key = "nobgm"
-    self.gameOptionsWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Disable Music & MSU-1",
       None
     )
-    self.gameOptionsWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     ## L/R Quickswap
     key = "quickswap"
-    self.gameOptionsWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "L/R Quickswapping",
       None
     )
-    self.gameOptionsWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     leftRomOptionsFrame = Frame(self)
     rightRomOptionsFrame = Frame(self)
@@ -51,7 +51,7 @@ def gameoptions_page(top, parent):
 
     ## Heart Color
     key = "heartcolor"
-    self.gameOptionsWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftRomOptionsFrame,
@@ -66,11 +66,11 @@ def gameoptions_page(top, parent):
         "Random": "random"
       }
     )
-    self.gameOptionsWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Heart Beep Speed
     key = "heartbeep"
-    self.gameOptionsWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftRomOptionsFrame,
@@ -85,25 +85,25 @@ def gameoptions_page(top, parent):
         "Off": "off"
       }
     )
-    self.gameOptionsWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     ## Sprite selection
     spriteDialogFrame = Frame(leftRomOptionsFrame)
     baseSpriteLabel = Label(spriteDialogFrame, text='Sprite:')
 
-    self.gameOptionsWidgets["sprite"] = {}
-    self.gameOptionsWidgets["sprite"]["spriteObject"] = None
-    self.gameOptionsWidgets["sprite"]["spriteNameVar"] = StringVar()
+    self.widgets["sprite"] = {}
+    self.widgets["sprite"]["spriteObject"] = None
+    self.widgets["sprite"]["spriteNameVar"] = StringVar()
 
-    self.gameOptionsWidgets["sprite"]["spriteNameVar"].set('(unchanged)')
-    spriteEntry = Label(spriteDialogFrame, textvariable=self.gameOptionsWidgets["sprite"]["spriteNameVar"])
+    self.widgets["sprite"]["spriteNameVar"].set('(unchanged)')
+    spriteEntry = Label(spriteDialogFrame, textvariable=self.widgets["sprite"]["spriteNameVar"])
 
     def sprite_setter(spriteObject):
-        self.gameOptionsWidgets["sprite"]["spriteObject"] = spriteObject
+        self.widgets["sprite"]["spriteObject"] = spriteObject
 
     def sprite_select():
         spriteSelector.SpriteSelector(parent, partial(set_sprite, spriteSetter=sprite_setter,
-                                                      spriteNameVar=self.gameOptionsWidgets["sprite"]["spriteNameVar"],
+                                                      spriteNameVar=self.widgets["sprite"]["spriteNameVar"],
                                                       randomSpriteVar=top.randomSprite))
 
     spriteSelectButton = Button(spriteDialogFrame, text='...', command=sprite_select)
@@ -115,7 +115,7 @@ def gameoptions_page(top, parent):
 
     ## Menu Speed
     key = "menuspeed"
-    self.gameOptionsWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightRomOptionsFrame,
@@ -131,11 +131,11 @@ def gameoptions_page(top, parent):
         "Half": "half"
       }
     )
-    self.gameOptionsWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Overworld Palettes (not Enemizer)
     key = "owpalettes"
-    self.gameOptionsWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightRomOptionsFrame,
@@ -148,11 +148,11 @@ def gameoptions_page(top, parent):
         "Blackout": "blackout"
       }
     )
-    self.gameOptionsWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Underworld Palettes (not Enemizer)
     key = "uwpalettes"
-    self.gameOptionsWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightRomOptionsFrame,
@@ -165,7 +165,7 @@ def gameoptions_page(top, parent):
         "Blackout": "blackout"
       }
     )
-    self.gameOptionsWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     return self
 

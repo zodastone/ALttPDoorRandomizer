@@ -108,9 +108,9 @@ def create_guiargs(parent):
     guiargs.shuffle = parent.pages["randomizer"].pages["entrance"].widgets["entranceshuffle"].storageVar.get()
     guiargs.door_shuffle = parent.pages["randomizer"].pages["dungeon"].widgets["dungeondoorshuffle"].storageVar.get()
     guiargs.experimental = parent.pages["randomizer"].pages["dungeon"].widgets["experimental"].storageVar.get()
-    guiargs.heartbeep = parent.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["heartbeep"].storageVar.get()
-    guiargs.heartcolor = parent.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["heartcolor"].storageVar.get()
-    guiargs.fastmenu = parent.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["menuspeed"].storageVar.get()
+    guiargs.heartbeep = parent.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar.get()
+    guiargs.heartcolor = parent.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar.get()
+    guiargs.fastmenu = parent.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar.get()
     guiargs.create_spoiler = bool(parent.pages["randomizer"].pages["generation"].generationWidgets["spoiler"].storageVar.get())
     guiargs.skip_playthrough = not bool(parent.pages["randomizer"].pages["generation"].generationWidgets["spoiler"].storageVar.get())
     guiargs.suppress_rom = bool(parent.pages["randomizer"].pages["generation"].generationWidgets["suppressrom"].storageVar.get())
@@ -120,12 +120,12 @@ def create_guiargs(parent):
     guiargs.keyshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["smallkeyshuffle"].storageVar.get())
     guiargs.bigkeyshuffle = bool(parent.pages["randomizer"].pages["dungeon"].widgets["bigkeyshuffle"].storageVar.get())
     guiargs.retro = bool(parent.pages["randomizer"].pages["item"].widgets["retro"].storageVar.get())
-    guiargs.quickswap = bool(parent.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["quickswap"].storageVar.get())
-    guiargs.disablemusic = bool(parent.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["nobgm"].storageVar.get())
-    guiargs.ow_palettes = parent.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["owpalettes"].storageVar.get()
-    guiargs.uw_palettes = parent.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["uwpalettes"].storageVar.get()
+    guiargs.quickswap = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar.get())
+    guiargs.disablemusic = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar.get())
+    guiargs.ow_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar.get()
+    guiargs.uw_palettes = parent.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar.get()
     guiargs.shuffleganon = bool(parent.pages["randomizer"].pages["entrance"].widgets["shuffleganon"].storageVar.get())
-    guiargs.hints = bool(parent.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["hints"].storageVar.get())
+    guiargs.hints = bool(parent.pages["randomizer"].pages["gameoptions"].widgets["hints"].storageVar.get())
     guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.get()
     guiargs.shufflebosses = parent.pages["randomizer"].pages["enemizer"].widgets["bossshuffle"].storageVar.get()
     guiargs.shuffleenemies = parent.pages["randomizer"].pages["enemizer"].widgets["enemyshuffle"].storageVar.get()
@@ -143,7 +143,7 @@ def create_guiargs(parent):
                                int(parent.pages["custom"].content.customWidgets["rupee300"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["rupoor"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["blueclock"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["greenclock"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["redclock"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["progressivebow"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["bomb10"].storageVar.get()), int(parent.pages["custom"].content.customWidgets["triforcepieces"].storageVar.get()),int(parent.pages["custom"].content.customWidgets["triforcepiecesgoal"].storageVar.get()),
                                int(parent.pages["custom"].content.customWidgets["triforce"].storageVar.get()),int(parent.pages["custom"].content.customWidgets["rupoorcost"].storageVar.get()),int(parent.pages["custom"].content.customWidgets["generickeys"].storageVar.get())]
     guiargs.rom = parent.pages["randomizer"].pages["generation"].romVar.get()
-    guiargs.sprite = parent.pages["randomizer"].pages["gameoptions"].gameOptionsWidgets["sprite"]["spriteObject"]
+    guiargs.sprite = parent.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteObject"]
     guiargs.randomSprite = parent.randomSprite.get()
     guiargs.outputpath = parent.outputPath.get()
     return guiargs
