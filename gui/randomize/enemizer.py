@@ -9,16 +9,19 @@ def enemizer_page(parent,settings):
     # Enemizer options
     self.widgets = {}
 
-    # Pot Shuffle
-    key = "potshuffle"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      self,
-      "Pot Shuffle",
-      None
-    )
-    self.widgets[key].pack(anchor=W)
+    myDict = {
+      ## Pot Shuffle
+      "potshuffle": {
+        "type": "checkbox",
+        "label": {
+          "text": "Pot Shuffle"
+        }
+      }
+    }
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(anchor=W)
 
     ## Enemizer CLI Path
     enemizerPathFrame = Frame(self)
@@ -44,75 +47,85 @@ def enemizer_page(parent,settings):
     leftEnemizerFrame.pack(side=LEFT, anchor=N)
     rightEnemizerFrame.pack(side=RIGHT, anchor=N)
 
-    ## Randomize Enemies
-    key = "enemyshuffle"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      leftEnemizerFrame,
-      "Enemy Shuffle",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
-      {
-        "Vanilla": "none",
-        "Shuffled": "shuffled",
-        "Chaos": "chaos"
+    myDict = {
+      ## Randomize Enemies
+      "enemyshuffle": {
+        "type": "selectbox",
+        "label": {
+          "text": "Enemy Shuffle"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": { "side": RIGHT }
+        },
+        "options": {
+          "Vanilla": "none",
+          "Shuffled": "shuffled",
+          "Chaos": "chaos"
+        }
+      },
+      ## Randomize Bosses
+      "bossshuffle": {
+        "type": "selectbox",
+        "label": {
+          "text": "Boss Shuffle"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": { "side": RIGHT }
+        },
+        "options": {
+          "Vanilla": "none",
+          "Basic": "basic",
+          "Shuffled": "shuffled",
+          "Chaos": "chaos"
+        }
       }
-    )
-    self.widgets[key].pack(anchor=E)
+    }
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, leftEnemizerFrame)
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(anchor=E)
 
-    ## Randomize Bosses
-    key = "bossshuffle"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      leftEnemizerFrame,
-      "Boss Shuffle",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
-      {
-        "Vanilla": "none",
-        "Basic": "basic",
-        "Normal": "normal",
-        "Chaos": "chaos"
+    myDict = {
+      ## Enemy Damage
+      "enemydamage": {
+        "type": "selectbox",
+        "label": {
+          "text": "Enemy Damage"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": { "side": RIGHT }
+        },
+        "options": {
+          "Vanilla": "default",
+          "Shuffled": "shuffled",
+          "Chaos": "chaos"
+        }
+      },
+      ## Enemy Health
+      "enemyhealth": {
+        "type": "selectbox",
+        "label": {
+          "text": "Enemy Health"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": { "side": RIGHT }
+        },
+        "options": {
+          "Vanilla": "default",
+          "Easy": "easy",
+          "Normal": "normal",
+          "Hard": "hard",
+          "Expert": "expert"
+        }
       }
-    )
-    self.widgets[key].pack(anchor=E)
-
-    ## Enemy Damage
-    key = "enemydamage"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      rightEnemizerFrame,
-      "Enemy Damage",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
-      {
-        "Vanilla": "default",
-        "Shuffled": "shuffled",
-        "Chaos": "chaos"
-      }
-    )
-    self.widgets[key].pack(anchor=E)
-
-    ## Enemy Health
-    key = "enemyhealth"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      rightEnemizerFrame,
-      "Enemy Health",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
-      {
-        "Vanilla": "default",
-        "Easy": "easy",
-        "Normal": "normal",
-        "Hard": "hard",
-        "Expert": "expert"
-      }
-    )
-    self.widgets[key].pack(anchor=E)
+    }
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, rightEnemizerFrame)
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(anchor=E)
 
     return self,settings
