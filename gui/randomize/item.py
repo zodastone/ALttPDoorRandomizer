@@ -6,18 +6,18 @@ def item_page(parent):
     self = ttk.Frame(parent)
 
     # Item Randomizer options
-    self.itemWidgets = {}
+    self.widgets = {}
 
     ## Retro (eventually needs to become a World State)
     key = "retro"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Retro mode (universal keys)",
       None
     )
-    self.itemWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     leftItemFrame = Frame(self)
     rightItemFrame = Frame(self)
@@ -26,7 +26,7 @@ def item_page(parent):
 
     ## World State
     key = "worldstate"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftItemFrame,
@@ -39,11 +39,11 @@ def item_page(parent):
         "Inverted": "inverted"
       }
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Logic Level
     key = "logiclevel"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftItemFrame,
@@ -56,11 +56,11 @@ def item_page(parent):
         "No Logic": "nologic"
       }
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Goal
     key = "goal"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftItemFrame,
@@ -75,14 +75,14 @@ def item_page(parent):
         "Crystals": "crystals"
       }
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Number of crystals to open GT
     key = "crystals_gt"
     keys = [*map(str,range(0,7+1)),"Random"]
     vals = [*map(str,range(0,7+1)),"random"]
     options = {keys[i]: vals[i] for i in range(len(keys))}
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftItemFrame,
@@ -91,14 +91,14 @@ def item_page(parent):
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       options
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Number of crystals to damage Ganon
     key = "crystals_ganon"
     keys = [*map(str,range(0,7+1)),"Random"]
     vals = [*map(str,range(0,7+1)),"random"]
     options = {keys[i]: vals[i] for i in range(len(keys))}
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftItemFrame,
@@ -107,11 +107,11 @@ def item_page(parent):
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       options
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Weapons
     key = "weapons"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftItemFrame,
@@ -125,11 +125,11 @@ def item_page(parent):
         "Vanilla": "vanilla"
       }
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Item Pool
     key = "itempool"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightItemFrame,
@@ -142,11 +142,11 @@ def item_page(parent):
         "Expert": "expert"
       }
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Item Functionality
     key = "itemfunction"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightItemFrame,
@@ -159,11 +159,11 @@ def item_page(parent):
         "Expert": "expert"
       }
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Timer setting
     key = "timer"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightItemFrame,
@@ -179,11 +179,11 @@ def item_page(parent):
         "Timed Countdown": "timed-countdown"
       }
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Progressives: On/Off
     key = "progressives"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightItemFrame,
@@ -196,11 +196,11 @@ def item_page(parent):
         "Random": "random"
       }
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Accessibilty
     key = "accessibility"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightItemFrame,
@@ -213,11 +213,11 @@ def item_page(parent):
         "Beatable": "none"
       }
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Item Sorting Algorithm
     key = "sortingalgo"
-    self.itemWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightItemFrame,
@@ -234,6 +234,6 @@ def item_page(parent):
         "Balanced": "balanced"
       }
     )
-    self.itemWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     return self
