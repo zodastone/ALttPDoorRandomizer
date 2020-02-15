@@ -6,33 +6,33 @@ def entrando_page(parent):
     self = ttk.Frame(parent)
 
     # Entrance Randomizer options
-    self.entrandoWidgets = {}
+    self.widgets = {}
 
     ## Pyramid pre-opened
     key = "openpyramid"
-    self.entrandoWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Pre-open Pyramid Hole",
       None
     )
-    self.entrandoWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     ## Shuffle Ganon
     key = "shuffleganon"
-    self.entrandoWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Include Ganon's Tower and Pyramid Hole in shuffle pool",
       None
     )
-    self.entrandoWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     ## Entrance Shuffle
     key = "entranceshuffle"
-    self.entrandoWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       self,
@@ -54,6 +54,6 @@ def entrando_page(parent):
         "Dungeons + Simple": "dungeonssimple"
       }
     )
-    self.entrandoWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     return self
