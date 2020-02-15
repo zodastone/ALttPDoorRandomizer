@@ -70,6 +70,8 @@ def loadcliargs(gui, args):
                 for widget in options[mainpage][subpage]:
                     arg = options[mainpage][subpage][widget]
                     gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(getattr(args, arg))
+                    if subpage == "gameoptions" and not widget == "hints":
+                        gui.pages["adjust"].content.widgets[widget].storageVar.set(getattr(args, arg))
 
         gui.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.set(args.enemizercli)
         gui.pages["randomizer"].pages["generation"].romVar.set(args.rom)
@@ -90,14 +92,6 @@ def loadcliargs(gui, args):
             set_sprite(sprite_obj, r_sprite_flag, spriteSetter=sprite_setter,
                        spriteNameVar=gui.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteNameVar"],
                        randomSpriteVar=gui.randomSprite)
-
-        gui.pages["adjust"].content.adjustWidgets["nobgm"].storageVar.set(int(args.disablemusic))
-        gui.pages["adjust"].content.adjustWidgets['quickswap'].storageVar.set(args.quickswap)
-        gui.pages["adjust"].content.adjustWidgets["heartcolor"].storageVar.set(args.heartcolor)
-        gui.pages["adjust"].content.adjustWidgets["heartbeep"].storageVar.set(args.heartbeep)
-        gui.pages["adjust"].content.adjustWidgets["menuspeed"].storageVar.set(args.fastmenu)
-        gui.pages["adjust"].content.adjustWidgets["owpalettes"].storageVar.set(args.ow_palettes)
-        gui.pages["adjust"].content.adjustWidgets["uwpalettes"].storageVar.set(args.uw_palettes)
 
         def sprite_setter_adj(spriteObject):
             gui.pages["adjust"].content.sprite = spriteObject

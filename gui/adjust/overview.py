@@ -11,29 +11,29 @@ def adjust_page(top, parent, settings):
     self = ttk.Frame(parent)
 
     # Adjust options
-    self.adjustWidgets = {}
+    self.widgets = {}
 
     # Disable BGM
     key = "nobgm"
-    self.adjustWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "Disable Music & MSU-1",
-      top.pages["randomizer"].pages["gameoptions"].widgets["nobgm"].storageVar
+      None
     )
-    self.adjustWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     # L/R Quickswap
     key = "quickswap"
-    self.adjustWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "checkbox",
       self,
       "L/R Quickswapping",
-      top.pages["randomizer"].pages["gameoptions"].widgets["quickswap"].storageVar
+      None
     )
-    self.adjustWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     selectOptionsFrame = Frame(self)
     leftAdjustFrame = Frame(selectOptionsFrame)
@@ -46,12 +46,12 @@ def adjust_page(top, parent, settings):
 
     ## Heart Color
     key = "heartcolor"
-    self.adjustWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftAdjustFrame,
       "Heart Color",
-      top.pages["randomizer"].pages["gameoptions"].widgets["heartcolor"].storageVar,
+      None,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       {
         "Red": "red",
@@ -61,16 +61,16 @@ def adjust_page(top, parent, settings):
         "Random": "random"
       }
     )
-    self.adjustWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     ## Heart Beep Speed
     key = "heartbeep"
-    self.adjustWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       leftAdjustFrame,
       "Heart Beep sound rate",
-      top.pages["randomizer"].pages["gameoptions"].widgets["heartbeep"].storageVar,
+      None,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Normal"},
       {
         "Double": "double",
@@ -80,7 +80,7 @@ def adjust_page(top, parent, settings):
         "Off": "off"
       }
     )
-    self.adjustWidgets[key].pack(anchor=W)
+    self.widgets[key].pack(anchor=W)
 
     # Sprite Selection
     self.spriteNameVar2 = StringVar()
@@ -110,12 +110,12 @@ def adjust_page(top, parent, settings):
 
     # Menu Speed
     key = "menuspeed"
-    self.adjustWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightAdjustFrame,
       "Menu Speed",
-      top.pages["randomizer"].pages["gameoptions"].widgets["menuspeed"].storageVar,
+      None,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Normal"},
       {
         "Instant": "instant",
@@ -126,16 +126,16 @@ def adjust_page(top, parent, settings):
         "Half": "half"
       }
     )
-    self.adjustWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     # Overworld Palettes (not Enemizer)
     key = "owpalettes"
-    self.adjustWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightAdjustFrame,
       "Overworld Palettes",
-      top.pages["randomizer"].pages["gameoptions"].widgets["owpalettes"].storageVar,
+      None,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       {
         "Default": "default",
@@ -143,16 +143,16 @@ def adjust_page(top, parent, settings):
         "Blackout": "blackout"
       }
     )
-    self.adjustWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     # Underworld Palettes (not Enemizer)
     key = "uwpalettes"
-    self.adjustWidgets[key] = widgets.make_widget(
+    self.widgets[key] = widgets.make_widget(
       self,
       "selectbox",
       rightAdjustFrame,
       "Underworld Palettes",
-      top.pages["randomizer"].pages["gameoptions"].widgets["uwpalettes"].storageVar,
+      None,
       {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
       {
         "Default": "default",
@@ -160,7 +160,7 @@ def adjust_page(top, parent, settings):
         "Blackout": "blackout"
       }
     )
-    self.adjustWidgets[key].pack(anchor=E)
+    self.widgets[key].pack(anchor=E)
 
     adjustRomFrame = Frame(bottomAdjustFrame)
     adjustRomLabel = Label(adjustRomFrame, text='Rom to adjust: ')
@@ -181,13 +181,13 @@ def adjust_page(top, parent, settings):
 
     def adjustRom():
         guiargs = Namespace()
-        guiargs.heartbeep = self.adjustWidgets["heartbeep"].storageVar.get()
-        guiargs.heartcolor = self.adjustWidgets["heartcolor"].storageVar.get()
-        guiargs.fastmenu = self.adjustWidgets["menuspeed"].storageVar.get()
-        guiargs.ow_palettes = self.adjustWidgets["owpalettes"].storageVar.get()
-        guiargs.uw_palettes = self.adjustWidgets["uwpalettes"].storageVar.get()
-        guiargs.quickswap = bool(self.adjustWidgets["quickswap"].storageVar.get())
-        guiargs.disablemusic = bool(self.adjustWidgets["nobgm"].storageVar.get())
+        guiargs.heartbeep = self.widgets["heartbeep"].storageVar.get()
+        guiargs.heartcolor = self.widgets["heartcolor"].storageVar.get()
+        guiargs.fastmenu = self.widgets["menuspeed"].storageVar.get()
+        guiargs.ow_palettes = self.widgets["owpalettes"].storageVar.get()
+        guiargs.uw_palettes = self.widgets["uwpalettes"].storageVar.get()
+        guiargs.quickswap = bool(self.widgets["quickswap"].storageVar.get())
+        guiargs.disablemusic = bool(self.widgets["nobgm"].storageVar.get())
         guiargs.rom = self.romVar2.get()
         guiargs.baserom = top.pages["randomizer"].pages["generation"].romVar.get()
         guiargs.sprite = self.sprite
