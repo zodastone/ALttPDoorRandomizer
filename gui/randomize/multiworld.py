@@ -8,17 +8,23 @@ def multiworld_page(parent,settings):
     # Multiworld options
     self.widgets = {}
 
-    ## Number of Worlds
-    key = "worlds"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "spinbox",
-      self,
-      "Worlds",
-      None,
-      {"label": {"side": LEFT}, "spinbox": {"side": RIGHT}}
-    )
-    self.widgets[key].pack(side=LEFT, anchor=N)
+    myDict = {
+      ## Number of worlds
+      "worlds": {
+        "type": "spinbox",
+        "label": {
+          "text": "Worlds"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "spinbox": { "side": RIGHT }
+        }
+      }
+    }
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(side=LEFT, anchor=N)
 
     ## List of Player Names
     key = "names"
