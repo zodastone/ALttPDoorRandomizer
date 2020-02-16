@@ -13,27 +13,26 @@ def adjust_page(top, parent, settings):
     # Adjust options
     self.widgets = {}
 
-    # Disable BGM
-    key = "nobgm"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      self,
-      "Disable Music & MSU-1",
-      None
-    )
-    self.widgets[key].pack(anchor=W)
-
-    # L/R Quickswap
-    key = "quickswap"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      self,
-      "L/R Quickswapping",
-      None
-    )
-    self.widgets[key].pack(anchor=W)
+    myDict = {
+      ## Disable BGM
+      "nobgm": {
+        "type": "checkbox",
+        "label": {
+          "text": "Disable Music & MSU-1"
+        }
+      },
+      ## L/R Quickswap
+      "quickswap": {
+        "type": "checkbox",
+        "label": {
+          "text": "L/R Quickswapping"
+        }
+      }
+    }
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(anchor=W)
 
     selectOptionsFrame = Frame(self)
     leftAdjustFrame = Frame(selectOptionsFrame)
@@ -44,43 +43,49 @@ def adjust_page(top, parent, settings):
     rightAdjustFrame.pack(side=RIGHT)
     bottomAdjustFrame.pack(fill=X, expand=True)
 
-    ## Heart Color
-    key = "heartcolor"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      leftAdjustFrame,
-      "Heart Color",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
-      {
-        "Red": "red",
-        "Blue": "blue",
-        "Green": "green",
-        "Yellow": "yellow",
-        "Random": "random"
+    myDict = {
+      ## Heart Color
+      "heartcolor": {
+        "type": "selectbox",
+        "label": {
+          "text": "Heart Color"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": { "side": RIGHT }
+        },
+        "options": {
+          "Red": "red",
+          "Blue": "blue",
+          "Green": "green",
+          "Yellow": "yellow",
+          "Random": "random"
+        }
+      },
+      ## Heart Beep speed
+      "heartbeep": {
+        "type": "selectbox",
+        "label": {
+          "text": "Heart Beep sound rate"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": { "side": RIGHT},
+          "default": "Normal"
+        },
+        "options": {
+          "Double": "double",
+          "Normal": "normal",
+          "Half": "half",
+          "Quarter": "quarter",
+          "Off": "off"
+        }
       }
-    )
-    self.widgets[key].pack(anchor=E)
-
-    ## Heart Beep Speed
-    key = "heartbeep"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      leftAdjustFrame,
-      "Heart Beep sound rate",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Normal"},
-      {
-        "Double": "double",
-        "Normal": "normal",
-        "Half": "half",
-        "Quarter": "quarter",
-        "Off": "off"
-      }
-    )
-    self.widgets[key].pack(anchor=W)
+    }
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, leftAdjustFrame)
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(anchor=E)
 
     # Sprite Selection
     self.spriteNameVar2 = StringVar()
@@ -108,59 +113,64 @@ def adjust_page(top, parent, settings):
     spriteSelectButton2.pack(side=LEFT)
     spriteDialogFrame2.pack(anchor=E)
 
-    # Menu Speed
-    key = "menuspeed"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      rightAdjustFrame,
-      "Menu Speed",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}, "default": "Normal"},
-      {
-        "Instant": "instant",
-        "Quadruple": "quadruple",
-        "Triple": "triple",
-        "Double": "double",
-        "Normal": "normal",
-        "Half": "half"
+    myDict = {
+      ## Menu Speed
+      "menuspeed": {
+        "type": "selectbox",
+        "label": {
+          "text": "Menu Speed"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": { "side": RIGHT },
+          "default": "Normal"
+        },
+        "options": {
+          "Instant": "instant",
+          "Quadruple": "quadruple",
+          "Triple": "triple",
+          "Double": "double",
+          "Normal": "normal",
+          "Half": "half"
+        }
+      },
+      ## Overworld Palettes (not Enemizer)
+      "owpalettes": {
+        "type": "selectbox",
+        "label": {
+          "text": "Overworld Palettes"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": { "side": RIGHT }
+        },
+        "options": {
+          "Default": "default",
+          "Random": "random",
+          "Blackout": "blackout"
+        }
+      },
+      ## Underworld Palettes (not Enemizer)
+      "uwpalettes": {
+        "type": "selectbox",
+        "label": {
+          "text": "Underworld Palettes"
+        },
+        "packAttrs": {
+          "label": { "side": LEFT },
+          "selectbox": { "side": RIGHT }
+        },
+        "options": {
+          "Default": "default",
+          "Random": "random",
+          "Blackout": "blackout"
+        }
       }
-    )
-    self.widgets[key].pack(anchor=E)
-
-    # Overworld Palettes (not Enemizer)
-    key = "owpalettes"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      rightAdjustFrame,
-      "Overworld Palettes",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
-      {
-        "Default": "default",
-        "Random": "random",
-        "Blackout": "blackout"
-      }
-    )
-    self.widgets[key].pack(anchor=E)
-
-    # Underworld Palettes (not Enemizer)
-    key = "uwpalettes"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "selectbox",
-      rightAdjustFrame,
-      "Underworld Palettes",
-      None,
-      {"label": {"side": LEFT}, "selectbox": {"side": RIGHT}},
-      {
-        "Default": "default",
-        "Random": "random",
-        "Blackout": "blackout"
-      }
-    )
-    self.widgets[key].pack(anchor=E)
+    }
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, rightAdjustFrame)
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(anchor=E)
 
     adjustRomFrame = Frame(bottomAdjustFrame)
     adjustRomLabel = Label(adjustRomFrame, text='Rom to adjust: ')
