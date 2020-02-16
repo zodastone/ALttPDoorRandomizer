@@ -9,38 +9,33 @@ def generation_page(parent,settings):
     # Generation Setup options
     self.widgets = {}
 
-    ## Generate Spoiler
-    key = "spoiler"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      self,
-      "Create Spoiler Log",
-      None
-    )
-    self.widgets[key].pack(anchor=W)
-
-    ## Don't make ROM
-    key = "suppressrom"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      self,
-      "Do not create patched ROM",
-      None
-    )
-    self.widgets[key].pack(anchor=W)
-
-    ## Use Custom Item Pool as defined in Custom tab
-    key = "usecustompool"
-    self.widgets[key] = widgets.make_widget(
-      self,
-      "checkbox",
-      self,
-      "Use custom item pool",
-      None
-    )
-    self.widgets[key].pack(anchor=W)
+    myDict = {
+      ## Generate Spoiler
+      "spoiler": {
+        "type": "checkbox",
+        "label": {
+          "text": "Create Spoiler Log"
+        }
+      },
+      ## Don't make ROM
+      "suppressrom": {
+        "type": "checkbox",
+        "label": {
+          "text": "Do not create patched ROM"
+        }
+      },
+      ## Use Custom Item Pool as defined in Custom tab
+      "usecustompool": {
+        "type": "checkbox",
+        "label": {
+          "text": "Use custom item pool"
+        }
+      }
+    }
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+    for key in dictWidgets:
+        self.widgets[key] = dictWidgets[key]
+        self.widgets[key].pack(anchor=W)
 
     ## Locate base ROM
     baseRomFrame = Frame(self)
