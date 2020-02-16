@@ -23,140 +23,192 @@ def custom_page(top,parent):
 
     currentList = itemList1
 
-    # Bow
-    key = "bow"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Bow",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,53)}, "textbox": {"side": RIGHT}, "default": 0}
-    )
-    self.customWidgets[key].pack()
-
-    # Progressive Bow
-    key = "progressivebow"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Prog.Bow",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,25)}, "textbox": {"side": RIGHT}, "default": 2}
-    )
-    self.customWidgets[key].pack()
-
-    # Boomerang
-    key = "boomerang"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "B.Boomerang",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,4)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Redmerang
-    key = "redmerang"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "M.Boomerang",
-      None,
-      {"label": {"anchor": W, "side": LEFT}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Hookshot
-    key = "hookshot"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Hookshot",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,24)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Mushroom
-    key = "mushroom"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Mushroom",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,17)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Powder
-    key = "powder"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Magic Powder",
-      None,
-      {"label": {"anchor": W, "side": LEFT}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Fire Rod
-    key = "firerod"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Fire Rod",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,33)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Ice Rod
-    key = "icerod"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Ice Rod",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,37)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Bombos
-    key = "bombos"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Bombos",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,32)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Ether
-    key = "ether"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Ether",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,49)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Quake
-    key = "quake"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Quake",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,42)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Lamp
-    key = "lamp"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Lamp",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,46)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Hammer
-    key = "hammer"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Hammer",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,29)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
-
-    # Shovel
-    key = "shovel"
-    self.customWidgets[key] = widgets.make_widget(self,"textbox",currentList,
-      "Shovel",
-      None,
-      {"label": {"anchor": W, "side": LEFT, "padx": (0,41)}, "textbox": {"side": RIGHT}, "default": 1}
-    )
-    self.customWidgets[key].pack()
+    myDict = {
+      # Bow
+      "bow": {
+        "type": "textbox",
+        "label": {
+          "text": "Bow"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,53) },
+          "textbox": { "side": RIGHT },
+          "default": 0
+        }
+      },
+      # Progressive Bow
+      "progressivebow": {
+        "type": "textbox",
+        "label": {
+          "text": "Prog.Bow"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,25) },
+          "textbox": { "side": RIGHT },
+          "default": 2
+        }
+      },
+      # Boomerang
+      "boomerang": {
+        "type": "textbox",
+        "label": {
+          "text": "B.Boomerang"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,4) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Boomerang
+      "redmerang": {
+        "type": "textbox",
+        "label": {
+          "text": "M.Boomerang"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Hookshot
+      "hookshot": {
+        "type": "textbox",
+        "label": {
+          "text": "Hookshot"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,24) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Mushroom
+      "mushroom": {
+        "type": "textbox",
+        "label": {
+          "text": "Mushroom"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,17) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Powder
+      "powder": {
+        "type": "textbox",
+        "label": {
+          "text": "Magic Powder"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Fire Rod
+      "firerod": {
+        "type": "textbox",
+        "label": {
+          "text": "Fire Rod"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,33) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Ice Rod
+      "icerod": {
+        "type": "textbox",
+        "label": {
+          "text": "Ice Rod"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,37) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Bombos
+      "bombos": {
+        "type": "textbox",
+        "label": {
+          "text": "Bombos"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,32) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Ether
+      "ether": {
+        "type": "textbox",
+        "label": {
+          "text": "Ether"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,49) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Quake
+      "quake": {
+        "type": "textbox",
+        "label": {
+          "text": "Quake"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,42) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Lamp
+      "lamp": {
+        "type": "textbox",
+        "label": {
+          "text": "Lamp"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,46) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Hammer
+      "hammer": {
+        "type": "textbox",
+        "label": {
+          "text": "Hammer"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,29) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      },
+      # Shovel
+      "shovel": {
+        "type": "textbox",
+        "label": {
+          "text": "Shovel"
+        },
+        "packAttrs": {
+          "label": { "anchor": W, "side": LEFT, "padx": (0,41) },
+          "textbox": { "side": RIGHT },
+          "default": 1
+        }
+      }
+    }
+    dictWidgets = widgets.make_widgets_from_dict(self, myDict, currentList)
+    for key in dictWidgets:
+        self.customWidgets[key] = dictWidgets[key]
+        self.customWidgets[key].pack()
 
     currentList = itemList2
 
