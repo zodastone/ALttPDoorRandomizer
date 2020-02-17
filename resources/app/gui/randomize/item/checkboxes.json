@@ -1,0 +1,8 @@
+{
+  "retro": {
+    "type": "checkbox",
+    "label": {
+      "text": "Retro mode (universal keys)"
+    }
+  }
+}

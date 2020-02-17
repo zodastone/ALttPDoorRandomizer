@@ -1,0 +1,132 @@
+{
+  "worldstate": {
+    "type": "selectbox",
+    "label": {
+      "text": "World State"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      },
+      "default": "Open"
+    },
+    "options": {
+      "Standard": "standard",
+      "Open": "open",
+      "Inverted": "inverted"
+    }
+  },
+  "logiclevel": {
+    "type": "selectbox",
+    "label": {
+      "text": "Logic Level"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "No Glitches": "noglitches",
+      "Minor Glitches": "minorglitches",
+      "No Logic": "nologic"
+    }
+  },
+  "goal": {
+    "type": "selectbox",
+    "label": {
+      "text": "Goal"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Defeat Ganon": "ganon",
+      "Master Sword Pedestal": "pedestal",
+      "All Dungeons": "dungeons",
+      "Triforce Hunt": "triforcehunt",
+      "Crystals": "crystals"
+    }
+  },
+  "crystals_gt": {
+    "type": "selectbox",
+    "label": {
+      "text": "Crystals to open GT"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "Random": "random"
+    }
+  },
+  "crystals_ganon": {
+    "type": "selectbox",
+    "label": {
+      "text": "Crystals to harm Ganon"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "Random": "random"
+    }
+  },
+  "weapons": {
+    "type": "selectbox",
+    "label": {
+      "text": "Weapons"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Randomized": "random",
+      "Assured": "assured",
+      "Swordless": "swordless",
+      "Vanilla": "vanilla"
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "itempool": {
+    "type": "selectbox",
+    "label": {
+      "text": "Item Pool"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Normal": "normal",
+      "Hard": "hard",
+      "Expert": "expert"
+    }
+  },
+  "itemfunction": {
+    "type": "selectbox",
+    "label": {
+      "text": "Item Functionality"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Normal": "normal",
+      "Hard": "hard",
+      "Expert": "expert"
+    }
+  },
+  "timer": {
+    "type": "selectbox",
+    "label": {
+      "text": "Timer Setting"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "No Timer": "none",
+      "Stopwatch": "display",
+      "Timed": "timed",
+      "Timed OHKO": "timed-ohko",
+      "OHKO": "ohko",
+      "Timed Countdown": "timed-countdown"
+    }
+  },
+  "progressives": {
+    "type": "selectbox",
+    "label": {
+      "text": "Progressive Items"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "On": "on",
+      "Off": "off",
+      "Random": "random"
+    }
+  },
+  "accessibility": {
+    "type": "selectbox",
+    "label": {
+      "text": "Accessibility"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "100% Inventory": "items",
+      "100% Locations": "locations",
+      "Beatable": "none"
+    }
+  },
+  "sortingalgo": {
+    "type": "selectbox",
+    "label": {
+      "text": "Item Sorting"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      },
+      "default": "Balanced"
+    },
+    "options": {
+      "Freshness": "freshness",
+      "Flood": "flood",
+      "VT8.21": "vt21",
+      "VT8.22": "vt22",
+      "VT8.25": "vt25",
+      "VT8.26": "vt26",
+      "Balanced": "balanced"
+    }
+  }
+}
