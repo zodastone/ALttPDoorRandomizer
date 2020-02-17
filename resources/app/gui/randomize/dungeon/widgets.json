@@ -1,0 +1,28 @@
+{
+  "dungeondoorshuffle": {
+    "type": "selectbox",
+    "label": {
+      "text": "Dungeon Door Shuffle"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      },
+      "default": "Basic"
+    },
+    "options": {
+      "Vanilla": "vanilla",
+      "Basic": "basic",
+      "Crossed": "crossed"
+    }
+  },
+  "experimental": {
+    "type": "checkbox",
+    "label": {
+      "text": "Enable Experimental Features"
+    }
+  }
+}

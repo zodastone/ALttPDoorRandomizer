@@ -1,5 +1,7 @@
 from tkinter import ttk, IntVar, StringVar, Checkbutton, Frame, Label, OptionMenu, E, W, LEFT, RIGHT
 import gui.widgets as widgets
+import json
+import os
 
 def dungeon_page(parent):
     # Dungeon Shuffle
@@ -14,73 +16,18 @@ def dungeon_page(parent):
     mscbLabel = Label(mcsbshuffleFrame, text="Shuffle: ")
     mscbLabel.pack(side=LEFT)
 
-    myDict = {
-      ## Map Shuffle
-      "mapshuffle": {
-        "type": "checkbox",
-        "label": {
-          "text": "Maps"
-        }
-      },
-      ## Compass Shuffle
-      "compassshuffle": {
-        "type": "checkbox",
-        "label": {
-          "text": "Compasses"
-        }
-      },
-      ## Small Key Shuffle
-      "smallkeyshuffle": {
-        "type": "checkbox",
-        "label": {
-          "text": "Small Keys"
-        }
-      },
-      ## Big Key Shuffle
-      "bigkeyshuffle": {
-        "type": "checkbox",
-        "label": {
-          "text": "Small Keys"
-        }
-      }
-    }
+    with open(os.path.join("resources","app","gui","randomize","dungeon","keysanity.json")) as keysanityItems:
+        myDict = json.load(keysanityItems)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, mcsbshuffleFrame)
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(side=LEFT)
 
-    dictWidgets = widgets.make_widgets_from_dict(self, myDict, mcsbshuffleFrame)
-
-    for key in dictWidgets:
-        self.widgets[key] = dictWidgets[key]
-        self.widgets[key].pack(side=LEFT)
-
-    myDict = {
-      "dungeondoorshuffle": {
-        "type": "selectbox",
-        "label": {
-          "text": "Dungeon Door Shuffle"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "selectbox": {"side": RIGHT},
-          "default": "Basic"
-        },
-        "options": {
-          "Vanilla": "vanilla",
-          "Basic": "basic",
-          "Crossed": "crossed"
-        }
-      },
-      ## Experiemental features
-      "experimental": {
-        "type": "checkbox",
-        "label": {
-          "text": "Enable Experimental Features"
-        }
-      }
-    }
-
-    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
-
-    for key in dictWidgets:
-        self.widgets[key] = dictWidgets[key]
-        self.widgets[key].pack(anchor=W)
+    with open(os.path.join("resources","app","gui","randomize","dungeon","widgets.json")) as dungeonWidgets:
+        myDict = json.load(dungeonWidgets)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(anchor=W)
 
     return self
