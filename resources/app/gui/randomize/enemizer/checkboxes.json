@@ -1,0 +1,8 @@
+{
+  "potshuffle": {
+    "type": "checkbox",
+    "label": {
+      "text": "Pot Shuffle"
+    }
+  }
+}

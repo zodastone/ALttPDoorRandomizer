@@ -176,7 +176,7 @@ def gameoptions_page(top, parent):
     return self
 
 
-def set_sprite(sprite_param, random_sprite, spriteSetter=None, spriteNameVar=None, randomSpriteVar=None):
+def set_sprite(sprite_param, random_sprite=False, spriteSetter=None, spriteNameVar=None, randomSpriteVar=None):
     if sprite_param is None or not sprite_param.valid:
         if spriteSetter:
             spriteSetter(None)

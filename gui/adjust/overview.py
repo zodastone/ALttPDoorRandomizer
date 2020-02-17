@@ -94,7 +94,7 @@ def adjust_page(top, parent, settings):
     spriteEntry2 = Label(spriteDialogFrame2, textvariable=self.spriteNameVar2)
     self.sprite = None
 
-    def set_sprite(sprite_param, random_sprite):
+    def set_sprite(sprite_param, random_sprite=False):
         if sprite_param is None or not sprite_param.valid:
             self.sprite = None
             self.spriteNameVar2.set('(unchanged)')

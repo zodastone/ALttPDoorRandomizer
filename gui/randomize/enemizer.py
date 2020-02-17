@@ -1,6 +1,8 @@
 import os
 from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, LabelFrame, OptionMenu, N, E, W, LEFT, RIGHT, X
 import gui.widgets as widgets
+import json
+import os
 
 def enemizer_page(parent,settings):
     # Enemizer
@@ -9,19 +11,12 @@ def enemizer_page(parent,settings):
     # Enemizer options
     self.widgets = {}
 
-    myDict = {
-      ## Pot Shuffle
-      "potshuffle": {
-        "type": "checkbox",
-        "label": {
-          "text": "Pot Shuffle"
-        }
-      }
-    }
-    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
-    for key in dictWidgets:
-        self.widgets[key] = dictWidgets[key]
-        self.widgets[key].pack(anchor=W)
+    with open(os.path.join("resources","app","gui","randomize","enemizer","checkboxes.json")) as checkboxes:
+        myDict = json.load(checkboxes)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(anchor=W)
 
     ## Enemizer CLI Path
     enemizerPathFrame = Frame(self)
@@ -47,85 +42,18 @@ def enemizer_page(parent,settings):
     leftEnemizerFrame.pack(side=LEFT, anchor=N)
     rightEnemizerFrame.pack(side=RIGHT, anchor=N)
 
-    myDict = {
-      ## Randomize Enemies
-      "enemyshuffle": {
-        "type": "selectbox",
-        "label": {
-          "text": "Enemy Shuffle"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "selectbox": { "side": RIGHT }
-        },
-        "options": {
-          "Vanilla": "none",
-          "Shuffled": "shuffled",
-          "Chaos": "chaos"
-        }
-      },
-      ## Randomize Bosses
-      "bossshuffle": {
-        "type": "selectbox",
-        "label": {
-          "text": "Boss Shuffle"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "selectbox": { "side": RIGHT }
-        },
-        "options": {
-          "Vanilla": "none",
-          "Basic": "basic",
-          "Shuffled": "shuffled",
-          "Chaos": "chaos"
-        }
-      }
-    }
-    dictWidgets = widgets.make_widgets_from_dict(self, myDict, leftEnemizerFrame)
-    for key in dictWidgets:
-        self.widgets[key] = dictWidgets[key]
-        self.widgets[key].pack(anchor=E)
+    with open(os.path.join("resources","app","gui","randomize","enemizer","leftEnemizerFrame.json")) as leftEnemizerFrameItems:
+        myDict = json.load(leftEnemizerFrameItems)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, leftEnemizerFrame)
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(anchor=E)
 
-    myDict = {
-      ## Enemy Damage
-      "enemydamage": {
-        "type": "selectbox",
-        "label": {
-          "text": "Enemy Damage"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "selectbox": { "side": RIGHT }
-        },
-        "options": {
-          "Vanilla": "default",
-          "Shuffled": "shuffled",
-          "Chaos": "chaos"
-        }
-      },
-      ## Enemy Health
-      "enemyhealth": {
-        "type": "selectbox",
-        "label": {
-          "text": "Enemy Health"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "selectbox": { "side": RIGHT }
-        },
-        "options": {
-          "Vanilla": "default",
-          "Easy": "easy",
-          "Normal": "normal",
-          "Hard": "hard",
-          "Expert": "expert"
-        }
-      }
-    }
-    dictWidgets = widgets.make_widgets_from_dict(self, myDict, rightEnemizerFrame)
-    for key in dictWidgets:
-        self.widgets[key] = dictWidgets[key]
-        self.widgets[key].pack(anchor=E)
+    with open(os.path.join("resources","app","gui","randomize","enemizer","rightEnemizerFrame.json")) as rightEnemizerFrameItems:
+        myDict = json.load(rightEnemizerFrameItems)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, rightEnemizerFrame)
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(anchor=E)
 
     return self,settings

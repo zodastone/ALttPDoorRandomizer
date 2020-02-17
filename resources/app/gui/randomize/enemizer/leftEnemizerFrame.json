@@ -1,0 +1,41 @@
+{
+  "enemyshuffle": {
+    "type": "selectbox",
+    "label": {
+      "text": "Enemy Shuffle"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Vanilla": "none",
+      "Shuffled": "shuffled",
+      "Chaos": "chaos"
+    }
+  },
+  "bossshuffle": {
+    "type": "selectbox",
+    "label": {
+      "text": "Boss Shuffle"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Vanilla": "none",
+      "Basic": "basic",
+      "Shuffled": "shuffled",
+      "Chaos": "chaos"
+    }
+  }
+}

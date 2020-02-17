@@ -1,0 +1,42 @@
+{
+  "enemydamage": {
+    "type": "selectbox",
+    "label": {
+      "text": "Enemy Damage"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Vanilla": "default",
+      "Shuffled": "shuffled",
+      "Chaos": "chaos"
+    }
+  },
+  "enemyhealth": {
+    "type": "selectbox",
+    "label": {
+      "text": "Enemy Health"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Vanilla": "default",
+      "Easy": "easy",
+      "Normal": "normal",
+      "Hard": "hard",
+      "Expert": "expert"
+    }
+  }
+}
