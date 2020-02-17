@@ -22,10 +22,6 @@ def item_page(parent):
     leftItemFrame.pack(side=LEFT)
     rightItemFrame.pack(side=RIGHT)
 
-    keys = [*map(str,range(0,7+1)),"Random"]
-    vals = [*map(str,range(0,7+1)),"random"]
-    crystalsOptions = {keys[i]: vals[i] for i in range(len(keys))}
-
     with open(os.path.join("resources","app","gui","randomize","item","leftItemFrame.json")) as leftItemFrameItems:
         myDict = json.load(leftItemFrameItems)
         dictWidgets = widgets.make_widgets_from_dict(self, myDict, leftItemFrame)
