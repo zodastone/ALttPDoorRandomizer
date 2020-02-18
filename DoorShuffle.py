@@ -779,6 +779,8 @@ def assign_cross_keys(dungeon_builders, world, player):
     # Last Step: Adjust Small Key Dungeon Pool
     if not world.retro[player]:
         for name, builder in dungeon_builders.items():
+            reassign_key_doors(builder, world, player)
+            log_key_logic(builder.name, world.key_logic[player][builder.name])
             actual_chest_keys = max(builder.key_doors_num - builder.key_drop_cnt, 0)
             dungeon = world.get_dungeon(name, player)
             if actual_chest_keys == 0:
@@ -893,9 +895,11 @@ def shuffle_key_doors(builder, world, player):
     builder.key_doors_num = num_key_doors
     find_small_key_door_candidates(builder, start_regions, world, player)
     find_valid_combination(builder, start_regions, world, player)
+    reassign_key_doors(builder, world, player)
+    log_key_logic(builder.name, world.key_logic[player][builder.name])
 
 
-def find_current_key_doors(builder, world, player):
+def find_current_key_doors(builder):
     current_doors = []
     for region in builder.master_sector.regions:
         for ext in region.exits:
@@ -982,8 +986,7 @@ def find_valid_combination(builder, start_regions, world, player, drop_keys=True
     if player not in world.key_logic.keys():
         world.key_logic[player] = {}
     analyze_dungeon(key_layout, world, player)
-    reassign_key_doors(builder, proposal, world, player)
-    log_key_logic(builder.name, key_layout.key_logic)
+    builder.key_door_proposal = proposal
     world.key_logic[player][builder.name] = key_layout.key_logic
     return True
 
@@ -1040,7 +1043,9 @@ def find_key_door_candidates(region, checked, world, player):
     while len(queue) > 0:
         current, last_door, last_region = queue.pop()
         for ext in current.exits:
-            d = world.check_for_door(ext.name, player)
+            d = ext.door
+            if d and d.controller:
+                d = d.controller
             if d is not None and not d.blocked and d.dest is not last_door and d.dest is not last_region and d not in checked_doors:
                 valid = False
                 if 0 <= d.doorListPos < 4 and d.type in [DoorType.Interior, DoorType.Normal, DoorType.SpiralStairs]:
@@ -1059,6 +1064,8 @@ def find_key_door_candidates(region, checked, world, player):
                             okay_normals = [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable,
                                             DoorKind.Dashable, DoorKind.DungeonChanger]
                             valid = kind in okay_normals and kind_b in okay_normals
+                            if valid and 0 <= d2.doorListPos < 4:
+                                candidates.append(d2)
                         else:
                             valid = True
                 if valid:
@@ -1092,10 +1099,11 @@ def ncr(n, r):
     return numerator / denominator
 
 
-def reassign_key_doors(builder, proposal, world, player):
+def reassign_key_doors(builder, world, player):
     logger = logging.getLogger('')
+    proposal = builder.key_door_proposal
     flat_proposal = flatten_pair_list(proposal)
-    queue = deque(find_current_key_doors(builder, world, player))
+    queue = deque(find_current_key_doors(builder))
     while len(queue) > 0:
         d = queue.pop()
         if d.type is DoorType.SpiralStairs and d not in proposal:

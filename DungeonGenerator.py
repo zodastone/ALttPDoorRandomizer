@@ -447,9 +447,12 @@ def stonewall_valid(stonewall):
     if bad_door.blocked:
         return True  # great we're done with this one
     loop_region = stonewall.entrance.parent_region
-    start_region = bad_door.entrance.parent_region
-    queue = deque([start_region])
-    visited = {start_region}
+    start_regions = [bad_door.entrance.parent_region]
+    if bad_door.dependents:
+        for dep in bad_door.dependents:
+            start_regions.append(dep.entrance.parent_region)
+    queue = deque(start_regions)
+    visited = set(start_regions)
     while len(queue) > 0:
         region = queue.popleft()
         if region == loop_region:
@@ -1027,6 +1030,7 @@ class DungeonBuilder(object):
         self.key_doors_num = None
         self.combo_size = None
         self.flex = 0
+        self.key_door_proposal = None
 
         if name in dungeon_dead_end_allowance.keys():
             self.allowance = dungeon_dead_end_allowance[name]

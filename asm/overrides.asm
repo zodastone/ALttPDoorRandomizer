@@ -43,9 +43,13 @@ OnFileLoadOverride:
 + rtl
 
 MirrorCheckOverride:
-    lda $8A : and #$40 ; what I wrote over
-    beq +
     lda DRFlags : and #$02 : beq ++
         lda $7ef353 : cmp #$01 : beq +
-    ++ lda #$01
-+ rtl
+    ++ lda $8A : and #$40 ; what I wrote over
+    rtl
+    + lda DRScroll : rtl
+
+MirrorCheckOverride2:
+    lda $7ef353 : cmp #$02 : beq +
+        sep #$02 ; clear zero flag, I think
+    + rtl
