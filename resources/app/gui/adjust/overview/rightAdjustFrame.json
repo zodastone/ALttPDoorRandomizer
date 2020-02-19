@@ -1,0 +1,63 @@
+{
+  "menuspeed": {
+    "type": "selectbox",
+    "label": {
+      "text": "Menu Speed"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      },
+      "default": "Normal"
+    },
+    "options": {
+      "Instant": "instant",
+      "Quadruple": "quadruple",
+      "Triple": "triple",
+      "Double": "double",
+      "Normal": "normal",
+      "Half": "half"
+    }
+  },
+  "owpalettes": {
+    "type": "selectbox",
+    "label": {
+      "text": "Overworld Palettes"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Default": "default",
+      "Random": "random",
+      "Blackout": "blackout"
+    }
+  },
+  "uwpalettes": {
+    "type": "selectbox",
+    "label": {
+      "text": "Underworld Palettes"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Default": "default",
+      "Random": "random",
+      "Blackout": "blackout"
+    }
+  }
+}

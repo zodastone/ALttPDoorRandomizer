@@ -1,0 +1,14 @@
+{
+  "nobgm": {
+    "type": "checkbox",
+    "label": {
+      "text": "Disable Music & MSU-1"
+    }
+  },
+  "quickswap": {
+    "type": "checkbox",
+    "label": {
+      "text": "L/R Quickswapping"
+    }
+  }
+}

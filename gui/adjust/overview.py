@@ -3,8 +3,9 @@ from AdjusterMain import adjust
 from argparse import Namespace
 from classes.SpriteSelector import SpriteSelector
 import gui.widgets as widgets
+import json
 import logging
-
+import os
 
 def adjust_page(top, parent, settings):
     # Adjust page
@@ -13,26 +14,12 @@ def adjust_page(top, parent, settings):
     # Adjust options
     self.widgets = {}
 
-    myDict = {
-      ## Disable BGM
-      "nobgm": {
-        "type": "checkbox",
-        "label": {
-          "text": "Disable Music & MSU-1"
-        }
-      },
-      ## L/R Quickswap
-      "quickswap": {
-        "type": "checkbox",
-        "label": {
-          "text": "L/R Quickswapping"
-        }
-      }
-    }
-    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
-    for key in dictWidgets:
-        self.widgets[key] = dictWidgets[key]
-        self.widgets[key].pack(anchor=W)
+    with open(os.path.join("resources","app","gui","adjust","overview","checkboxes.json")) as checkboxes:
+        myDict = json.load(checkboxes)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(anchor=W)
 
     selectOptionsFrame = Frame(self)
     leftAdjustFrame = Frame(selectOptionsFrame)
@@ -43,49 +30,12 @@ def adjust_page(top, parent, settings):
     rightAdjustFrame.pack(side=RIGHT)
     bottomAdjustFrame.pack(fill=X, expand=True)
 
-    myDict = {
-      ## Heart Color
-      "heartcolor": {
-        "type": "selectbox",
-        "label": {
-          "text": "Heart Color"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "selectbox": { "side": RIGHT }
-        },
-        "options": {
-          "Red": "red",
-          "Blue": "blue",
-          "Green": "green",
-          "Yellow": "yellow",
-          "Random": "random"
-        }
-      },
-      ## Heart Beep speed
-      "heartbeep": {
-        "type": "selectbox",
-        "label": {
-          "text": "Heart Beep sound rate"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "selectbox": { "side": RIGHT},
-          "default": "Normal"
-        },
-        "options": {
-          "Double": "double",
-          "Normal": "normal",
-          "Half": "half",
-          "Quarter": "quarter",
-          "Off": "off"
-        }
-      }
-    }
-    dictWidgets = widgets.make_widgets_from_dict(self, myDict, leftAdjustFrame)
-    for key in dictWidgets:
-        self.widgets[key] = dictWidgets[key]
-        self.widgets[key].pack(anchor=E)
+    with open(os.path.join("resources","app","gui","adjust","overview","leftAdjustFrame.json")) as leftAdjustFrameItems:
+        myDict = json.load(leftAdjustFrameItems)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, leftAdjustFrame)
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(anchor=E)
 
     # Sprite Selection
     self.spriteNameVar2 = StringVar()
@@ -113,64 +63,12 @@ def adjust_page(top, parent, settings):
     spriteSelectButton2.pack(side=LEFT)
     spriteDialogFrame2.pack(anchor=E)
 
-    myDict = {
-      ## Menu Speed
-      "menuspeed": {
-        "type": "selectbox",
-        "label": {
-          "text": "Menu Speed"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "selectbox": { "side": RIGHT },
-          "default": "Normal"
-        },
-        "options": {
-          "Instant": "instant",
-          "Quadruple": "quadruple",
-          "Triple": "triple",
-          "Double": "double",
-          "Normal": "normal",
-          "Half": "half"
-        }
-      },
-      ## Overworld Palettes (not Enemizer)
-      "owpalettes": {
-        "type": "selectbox",
-        "label": {
-          "text": "Overworld Palettes"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "selectbox": { "side": RIGHT }
-        },
-        "options": {
-          "Default": "default",
-          "Random": "random",
-          "Blackout": "blackout"
-        }
-      },
-      ## Underworld Palettes (not Enemizer)
-      "uwpalettes": {
-        "type": "selectbox",
-        "label": {
-          "text": "Underworld Palettes"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "selectbox": { "side": RIGHT }
-        },
-        "options": {
-          "Default": "default",
-          "Random": "random",
-          "Blackout": "blackout"
-        }
-      }
-    }
-    dictWidgets = widgets.make_widgets_from_dict(self, myDict, rightAdjustFrame)
-    for key in dictWidgets:
-        self.widgets[key] = dictWidgets[key]
-        self.widgets[key].pack(anchor=E)
+    with open(os.path.join("resources","app","gui","adjust","overview","rightAdjustFrame.json")) as rightAdjustFrameItems:
+        myDict = json.load(rightAdjustFrameItems)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, rightAdjustFrame)
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(anchor=E)
 
     adjustRomFrame = Frame(bottomAdjustFrame)
     adjustRomLabel = Label(adjustRomFrame, text='Rom to adjust: ')

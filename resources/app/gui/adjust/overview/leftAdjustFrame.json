@@ -1,0 +1,45 @@
+{
+  "heartcolor": {
+    "type": "selectbox",
+    "label": {
+      "text": "Heart Color"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Red": "red",
+      "Blue": "blue",
+      "Green": "green",
+      "Yellow": "yellow",
+      "Random": "random"
+    }
+  },
+  "heartbeep": {
+    "type": "selectbox",
+    "label": {
+      "text": "Heart Beep sound rate"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      },
+      "default": "Normal"
+    },
+    "options": {
+      "Double": "double",
+      "Normal": "normal",
+      "Half": "half",
+      "Quarter": "quarter",
+      "Off": "off"
+    }
+  }
+}
