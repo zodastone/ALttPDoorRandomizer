@@ -861,8 +861,11 @@ def combine_layouts(recombinant_builders, dungeon_builders, entrances_map):
                 if recombine.master_sector is None:
                     recombine.master_sector = builder.master_sector
                     recombine.master_sector.name = recombine.name
+                    recombine.pre_open_stonewall = builder.pre_open_stonewall
                 else:
                     recombine.master_sector.regions.extend(builder.master_sector.regions)
+                    if builder.pre_open_stonewall:
+                        recombine.pre_open_stonewall = builder.pre_open_stonewall
         recombine.layout_starts = list(entrances_map[recombine.name])
         dungeon_builders[recombine.name] = recombine
 
@@ -1068,7 +1071,7 @@ def find_key_door_candidates(region, checked, world, player):
                                 candidates.append(d2)
                         else:
                             valid = True
-                if valid:
+                if valid and d not in candidates:
                     candidates.append(d)
                 if ext.connected_region.type != RegionType.Dungeon or ext.connected_region.dungeon == dungeon:
                     queue.append((ext.connected_region, d, current))
