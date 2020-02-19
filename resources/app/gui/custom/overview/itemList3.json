@@ -1,0 +1,255 @@
+{
+  "heartcontainer": {
+    "type": "textbox",
+    "label": {
+      "text": "Heart Container"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left"
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 10
+    }
+  },
+  "sancheart": {
+    "type": "textbox",
+    "label": {
+      "text": "Sanctuary Heart"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left"
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "sword1": {
+    "type": "textbox",
+    "label": {
+      "text": "Sword 1"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,42]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "sword2": {
+    "type": "textbox",
+    "label": {
+      "text": "Sword 2"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,42]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "sword3": {
+    "type": "textbox",
+    "label": {
+      "text": "Sword 3"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,42]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "sword4": {
+    "type": "textbox",
+    "label": {
+      "text": "Sword 4"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,42]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "progressivesword": {
+    "type": "textbox",
+    "label": {
+      "text": "Prog.Sword"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,23]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 4
+    }
+  },
+  "shield1": {
+    "type": "textbox",
+    "label": {
+      "text": "Shield 1"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,43]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "shield2": {
+    "type": "textbox",
+    "label": {
+      "text": "Shield 2"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,43]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "shield3": {
+    "type": "textbox",
+    "label": {
+      "text": "Shield 3"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,43]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "progressiveshield": {
+    "type": "textbox",
+    "label": {
+      "text": "Prog.Shield"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,24]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 3
+    }
+  },
+  "mail2": {
+    "type": "textbox",
+    "label": {
+      "text": "Blue Mail"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,35]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "mail3": {
+    "type": "textbox",
+    "label": {
+      "text": "Red Mail"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,38]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "progressivemail": {
+    "type": "textbox",
+    "label": {
+      "text": "Prog.Mail"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,33]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 2
+    }
+  },
+  "halfmagic": {
+    "type": "textbox",
+    "label": {
+      "text": "Half Magic"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,26]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "quartermagic": {
+    "type": "textbox",
+    "label": {
+      "text": "Quarter Magic"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left"
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "bombsplus5": {
+    "type": "textbox",
+    "label": {
+      "text": "Bomb C.+5"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [1,15]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "bombsplus10": {
+    "type": "textbox",
+    "label": {
+      "text": "Bomb C.+10"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,10]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "arrowsplus5": {
+    "type": "textbox",
+    "label": {
+      "text": "Arrow C.+5"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,16]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "arrowsplus10": {
+    "type": "textbox",
+    "label": {
+      "text": "Arrow C.+10"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,10]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "arrow1": {
+    "type": "textbox",
+    "label": {
+      "text": "Arrow (1)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,27]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "arrow10": {
+    "type": "textbox",
+    "label": {
+      "text": "Arrow (10)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,21]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 12
+    }
+  },
+  "bomb1": {
+    "type": "textbox",
+    "label": {
+      "text": "Bomb (1)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,27]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "bomb3": {
+    "type": "textbox",
+    "label": {
+      "text": "Bomb (3)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,27]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 13
+    }
+  },
+  "bomb10": {
+    "type": "textbox",
+    "label": {
+      "text": "Bomb (10)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,21]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "rupee1": {
+    "type": "textbox",
+    "label": {
+      "text": "Rupee (1)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,25]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 2
+    }
+  },
+  "rupee5": {
+    "type": "textbox",
+    "label": {
+      "text": "Rupee (5)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,25]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 4
+    }
+  },
+  "rupee20": {
+    "type": "textbox",
+    "label": {
+      "text": "Rupee (20)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,19]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 28
+    }
+  },
+  "rupee50": {
+    "type": "textbox",
+    "label": {
+      "text": "Rupee (50)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,19]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 7
+    }
+  },
+  "rupee100": {
+    "type": "textbox",
+    "label": {
+      "text": "Rupee (100)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,13]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  }
+}

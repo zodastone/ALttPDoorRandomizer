@@ -1,0 +1,257 @@
+{
+  "flute": {
+    "type": "textbox",
+    "label": {
+      "text": "Flute"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,58]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "bugnet": {
+    "type": "textbox",
+    "label": {
+      "text": "Bug Net"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,41]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "book": {
+    "type": "textbox",
+    "label": {
+      "text": "Book"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,57]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "bottle": {
+    "type": "textbox",
+    "label": {
+      "text": "Bottle"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,53]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 4
+    }
+  },
+  "somaria": {
+    "type": "textbox",
+    "label": {
+      "text": "C.Somaria"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,30]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "byrna": {
+    "type": "textbox",
+    "label": {
+      "text": "C.Byrna"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,43]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "cape": {
+    "type": "textbox",
+    "label": {
+      "text": "Magic Cape"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,21]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "mirror": {
+    "type": "textbox",
+    "label": {
+      "text": "Magic Mirror"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,15]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "boots": {
+    "type": "textbox",
+    "label": {
+      "text": "Pegasus Boots"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,8]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "powerglove": {
+    "type": "textbox",
+    "label": {
+      "text": "Power Glove"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,18]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "titansmitt": {
+    "type": "textbox",
+    "label": {
+      "text": "Titan's Mitt"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,25]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "progressiveglove": {
+    "type": "textbox",
+    "label": {
+      "text": "Prog.Glove"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,26]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 2
+    }
+  },
+  "flippers": {
+    "type": "textbox",
+    "label": {
+      "text": "Flippers"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,43]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "pearl": {
+    "type": "textbox",
+    "label": {
+      "text": "Moon Pearl"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,23]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "heartpiece": {
+    "type": "textbox",
+    "label": {
+      "text": "Piece of Heart"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,10]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 24
+    }
+  }
+}

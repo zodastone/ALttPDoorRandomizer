@@ -1,0 +1,255 @@
+{
+  "bow": {
+    "type": "textbox",
+    "label": {
+      "text": "Bow"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,53]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "progressivebow": {
+    "type": "textbox",
+    "label": {
+      "text": "Prog.Bow"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,25]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 2
+    }
+  },
+  "boomerang": {
+    "type": "textbox",
+    "label": {
+      "text": "B.Boomerang"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,4]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "redmerang": {
+    "type": "textbox",
+    "label": {
+      "text": "M.Boomerang"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left"
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "hookshot": {
+    "type": "textbox",
+    "label": {
+      "text": "Hookshot"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,24]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "mushroom": {
+    "type": "textbox",
+    "label": {
+      "text": "Mushroom"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,17]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "powder": {
+    "type": "textbox",
+    "label": {
+      "text": "Magic Powder"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left"
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "firerod": {
+    "type": "textbox",
+    "label": {
+      "text": "Fire Rod"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,33]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "icerod": {
+    "type": "textbox",
+    "label": {
+      "text": "Ice Rod"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,37]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "bombos": {
+    "type": "textbox",
+    "label": {
+      "text": "Bombos"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,32]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "ether": {
+    "type": "textbox",
+    "label": {
+      "text": "Ether"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,49]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "quake": {
+    "type": "textbox",
+    "label": {
+      "text": "Quake"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,42]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "lamp": {
+    "type": "textbox",
+    "label": {
+      "text": "Lamp"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,46]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "hammer": {
+    "type": "textbox",
+    "label": {
+      "text": "Hammer"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,29]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  },
+  "shovel": {
+    "type": "textbox",
+    "label": {
+      "text": "Shovel"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,41]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 1
+    }
+  }
+}

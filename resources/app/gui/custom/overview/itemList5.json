@@ -1,0 +1,188 @@
+{
+  "rupee300": {
+    "type": "textbox",
+    "label": {
+      "text": "Rupee (300)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,54]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 5
+    }
+  },
+  "blueclock": {
+    "type": "textbox",
+    "label": {
+      "text": "Blue Clock"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,60]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "greenclock": {
+    "type": "textbox",
+    "label": {
+      "text": "Green Clock"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,52]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "redclock": {
+    "type": "textbox",
+    "label": {
+      "text": "Red Clock"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,63]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "silversupgrade": {
+    "type": "textbox",
+    "label": {
+      "text": "Silver Arrows Upgrade"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left"
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "generickeys": {
+    "type": "textbox",
+    "label": {
+      "text": "Generic Keys"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,49]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "triforcepieces": {
+    "type": "textbox",
+    "label": {
+      "text": "Triforce Pieces"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,40]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "triforcepiecesgoal": {
+    "type": "textbox",
+    "label": {
+      "text": "Triforce Pieces Goal"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,13]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "triforce": {
+    "type": "textbox",
+    "label": {
+      "text": "Triforce (win game)"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,13]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "rupoor": {
+    "type": "textbox",
+    "label": {
+      "text": "Rupoor"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,77]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 0
+    }
+  },
+  "rupoorcost": {
+    "type": "textbox",
+    "label": {
+      "text": "Rupoor Cost"
+    },
+    "packAttrs": {
+      "label": {
+        "anchor": "w",
+        "side": "left",
+        "padx": [0,50]
+      },
+      "textbox": {
+        "side": "right"
+      },
+      "default": 10
+    }
+  }
+}
