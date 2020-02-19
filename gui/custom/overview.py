@@ -17,56 +17,52 @@ def custom_page(top,parent):
     # Custom Item Pool options
     self.customWidgets = {}
 
-    itemList1 = Frame(self)
-    itemList2 = Frame(self)
-    itemList3 = Frame(self)
-    itemList4 = Frame(self)
-    itemList5 = Frame(self)
+    # Custom Item Pool option sections
+    self.frames = {}
+    self.frames["itemList1"] = Frame(self)
+    self.frames["itemList1"].pack(side=LEFT, padx=(0,0), anchor=N)
+    self.frames["itemList2"] = Frame(self)
+    self.frames["itemList2"].pack(side=LEFT, padx=(0,0), anchor=N)
+    self.frames["itemList3"] = Frame(self)
+    self.frames["itemList3"].pack(side=LEFT, padx=(0,0), anchor=N)
+    self.frames["itemList4"] = Frame(self)
+    self.frames["itemList4"].pack(side=LEFT, padx=(0,0), anchor=N)
+    self.frames["itemList5"] = Frame(self)
+    self.frames["itemList5"].pack(side=LEFT, padx=(0,0), anchor=N)
 
-    currentList = itemList1
     with open(os.path.join("resources","app","gui","custom","overview","itemList1.json")) as items:
         myDict = json.load(items)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, currentList)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["itemList1"])
         for key in dictWidgets:
             self.customWidgets[key] = dictWidgets[key]
             self.customWidgets[key].pack()
 
-    currentList = itemList2
     with open(os.path.join("resources","app","gui","custom","overview","itemList2.json")) as items:
         myDict = json.load(items)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, currentList)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["itemList2"])
         for key in dictWidgets:
             self.customWidgets[key] = dictWidgets[key]
             self.customWidgets[key].pack()
 
-    currentList = itemList3
     with open(os.path.join("resources","app","gui","custom","overview","itemList3.json")) as items:
         myDict = json.load(items)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, currentList)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["itemList3"])
         for key in dictWidgets:
             self.customWidgets[key] = dictWidgets[key]
             self.customWidgets[key].pack()
 
-    currentList = itemList4
     with open(os.path.join("resources","app","gui","custom","overview","itemList4.json")) as items:
         myDict = json.load(items)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, currentList)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["itemList4"])
         for key in dictWidgets:
             self.customWidgets[key] = dictWidgets[key]
             self.customWidgets[key].pack()
 
-    currentList = itemList5
     with open(os.path.join("resources","app","gui","custom","overview","itemList5.json")) as items:
         myDict = json.load(items)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, currentList)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["itemList5"])
         for key in dictWidgets:
             self.customWidgets[key] = dictWidgets[key]
             self.customWidgets[key].pack()
-
-    itemList1.pack(side=LEFT, padx=(0,0))
-    itemList2.pack(side=LEFT, padx=(0,0))
-    itemList3.pack(side=LEFT, padx=(0,0))
-    itemList4.pack(side=LEFT, padx=(0,0))
-    itemList5.pack(side=LEFT, padx=(0,0), anchor=N)
 
     return self

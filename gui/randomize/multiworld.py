@@ -10,16 +10,21 @@ def multiworld_page(parent,settings):
     # Multiworld options
     self.widgets = {}
 
+    # Multiworld option sections
+    self.frames = {}
+    self.frames["widgets"] = Frame(self)
+    self.frames["widgets"].pack(anchor=W, fill=X)
+
     with open(os.path.join("resources","app","gui","randomize","multiworld","widgets.json")) as multiworldItems:
         myDict = json.load(multiworldItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["widgets"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
             self.widgets[key].pack(side=LEFT, anchor=N)
 
     ## List of Player Names
     key = "names"
-    self.widgets[key] = Frame(self)
+    self.widgets[key] = Frame(self.frames["widgets"])
     self.widgets[key].label = Label(self.widgets[key], text='Player names')
     self.widgets[key].storageVar = StringVar(value=settings["names"])
     def saveMultiNames(caller,_,mode):

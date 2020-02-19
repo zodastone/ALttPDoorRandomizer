@@ -11,9 +11,15 @@ def enemizer_page(parent,settings):
     # Enemizer options
     self.widgets = {}
 
+    # Enemizer option sections
+    self.frames = {}
+
+    self.frames["checkboxes"] = Frame(self)
+    self.frames["checkboxes"].pack(anchor=W)
+
     with open(os.path.join("resources","app","gui","randomize","enemizer","checkboxes.json")) as checkboxes:
         myDict = json.load(checkboxes)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["checkboxes"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
             self.widgets[key].pack(anchor=W)
@@ -35,23 +41,23 @@ def enemizer_page(parent,settings):
             settings["enemizercli"] = path
     enemizerCLIbrowseButton = Button(enemizerPathFrame, text='...', command=EnemizerSelectPath)
     enemizerCLIbrowseButton.pack(side=LEFT)
-    enemizerPathFrame.pack(fill=X, expand=True)
+    enemizerPathFrame.pack(fill=X)
 
-    leftEnemizerFrame = Frame(self)
-    rightEnemizerFrame = Frame(self)
-    leftEnemizerFrame.pack(side=LEFT, anchor=N)
-    rightEnemizerFrame.pack(side=RIGHT, anchor=N)
+    self.frames["leftEnemizerFrame"] = Frame(self)
+    self.frames["rightEnemizerFrame"] = Frame(self)
+    self.frames["leftEnemizerFrame"].pack(side=LEFT, anchor=N)
+    self.frames["rightEnemizerFrame"].pack(side=RIGHT, anchor=N)
 
     with open(os.path.join("resources","app","gui","randomize","enemizer","leftEnemizerFrame.json")) as leftEnemizerFrameItems:
         myDict = json.load(leftEnemizerFrameItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, leftEnemizerFrame)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["leftEnemizerFrame"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
             self.widgets[key].pack(anchor=E)
 
     with open(os.path.join("resources","app","gui","randomize","enemizer","rightEnemizerFrame.json")) as rightEnemizerFrameItems:
         myDict = json.load(rightEnemizerFrameItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, rightEnemizerFrame)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["rightEnemizerFrame"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
             self.widgets[key].pack(anchor=E)

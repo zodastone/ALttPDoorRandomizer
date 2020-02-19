@@ -11,15 +11,22 @@ def generation_page(parent,settings):
     # Generation Setup options
     self.widgets = {}
 
+    # Generation Setup option sections
+    self.frames = {}
+    self.frames["checkboxes"] = Frame(self)
+    self.frames["checkboxes"].pack(anchor=W)
+
     with open(os.path.join("resources","app","gui","randomize","generation","checkboxes.json")) as checkboxes:
         myDict = json.load(checkboxes)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["checkboxes"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
             self.widgets[key].pack(anchor=W)
 
+    self.frames["baserom"] = Frame(self)
+    self.frames["baserom"].pack(anchor=W, fill=X)
     ## Locate base ROM
-    baseRomFrame = Frame(self)
+    baseRomFrame = Frame(self.frames["baserom"])
     baseRomLabel = Label(baseRomFrame, text='Base Rom: ')
     self.romVar = StringVar()
     def saveBaseRom(caller,_,mode):
@@ -36,6 +43,6 @@ def generation_page(parent,settings):
     baseRomLabel.pack(side=LEFT)
     romEntry.pack(side=LEFT, fill=X, expand=True)
     romSelectButton.pack(side=LEFT)
-    baseRomFrame.pack(fill=X, expand=True)
+    baseRomFrame.pack(fill=X)
 
     return self,settings

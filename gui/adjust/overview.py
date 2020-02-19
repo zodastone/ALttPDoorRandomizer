@@ -14,32 +14,37 @@ def adjust_page(top, parent, settings):
     # Adjust options
     self.widgets = {}
 
+    # Adjust option sections
+    self.frames = {}
+    self.frames["checkboxes"] = Frame(self)
+    self.frames["checkboxes"].pack(anchor=W)
+
     with open(os.path.join("resources","app","gui","adjust","overview","checkboxes.json")) as checkboxes:
         myDict = json.load(checkboxes)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["checkboxes"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
             self.widgets[key].pack(anchor=W)
 
-    selectOptionsFrame = Frame(self)
-    leftAdjustFrame = Frame(selectOptionsFrame)
-    rightAdjustFrame = Frame(selectOptionsFrame)
-    bottomAdjustFrame = Frame(self)
-    selectOptionsFrame.pack(fill=X, expand=True)
-    leftAdjustFrame.pack(side=LEFT)
-    rightAdjustFrame.pack(side=RIGHT)
-    bottomAdjustFrame.pack(fill=X, expand=True)
+    self.frames["selectOptionsFrame"] = Frame(self)
+    self.frames["leftAdjustFrame"] = Frame(self.frames["selectOptionsFrame"])
+    self.frames["rightAdjustFrame"] = Frame(self.frames["selectOptionsFrame"])
+    self.frames["bottomAdjustFrame"] = Frame(self)
+    self.frames["selectOptionsFrame"].pack(fill=X)
+    self.frames["leftAdjustFrame"].pack(side=LEFT)
+    self.frames["rightAdjustFrame"].pack(side=RIGHT)
+    self.frames["bottomAdjustFrame"].pack(fill=X)
 
     with open(os.path.join("resources","app","gui","adjust","overview","leftAdjustFrame.json")) as leftAdjustFrameItems:
         myDict = json.load(leftAdjustFrameItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, leftAdjustFrame)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["leftAdjustFrame"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
             self.widgets[key].pack(anchor=E)
 
     # Sprite Selection
     self.spriteNameVar2 = StringVar()
-    spriteDialogFrame2 = Frame(leftAdjustFrame)
+    spriteDialogFrame2 = Frame(self.frames["leftAdjustFrame"])
     baseSpriteLabel2 = Label(spriteDialogFrame2, text='Sprite:')
     spriteEntry2 = Label(spriteDialogFrame2, textvariable=self.spriteNameVar2)
     self.sprite = None
@@ -65,12 +70,12 @@ def adjust_page(top, parent, settings):
 
     with open(os.path.join("resources","app","gui","adjust","overview","rightAdjustFrame.json")) as rightAdjustFrameItems:
         myDict = json.load(rightAdjustFrameItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, rightAdjustFrame)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["rightAdjustFrame"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
             self.widgets[key].pack(anchor=E)
 
-    adjustRomFrame = Frame(bottomAdjustFrame)
+    adjustRomFrame = Frame(self.frames["bottomAdjustFrame"])
     adjustRomLabel = Label(adjustRomFrame, text='Rom to adjust: ')
     self.romVar2 = StringVar(value=settings["rom"])
     romEntry2 = Entry(adjustRomFrame, textvariable=self.romVar2)
@@ -85,7 +90,7 @@ def adjust_page(top, parent, settings):
     adjustRomLabel.pack(side=LEFT)
     romEntry2.pack(side=LEFT, fill=X, expand=True)
     romSelectButton2.pack(side=LEFT)
-    adjustRomFrame.pack(fill=X, expand=True)
+    adjustRomFrame.pack(fill=X)
 
     def adjustRom():
         options = {
@@ -112,7 +117,7 @@ def adjust_page(top, parent, settings):
         else:
             messagebox.showinfo(title="Success", message="Rom patched successfully")
 
-    adjustButton = Button(bottomAdjustFrame, text='Adjust Rom', command=adjustRom)
+    adjustButton = Button(self.frames["bottomAdjustFrame"], text='Adjust Rom', command=adjustRom)
     adjustButton.pack(side=BOTTOM, padx=(5, 0))
 
     return self,settings
