@@ -991,6 +991,7 @@ def find_valid_combination(builder, start_regions, world, player, drop_keys=True
     analyze_dungeon(key_layout, world, player)
     builder.key_door_proposal = proposal
     world.key_logic[player][builder.name] = key_layout.key_logic
+    world.key_layout[player][builder.name] = key_layout
     return True
 
 
