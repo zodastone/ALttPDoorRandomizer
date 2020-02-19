@@ -187,6 +187,7 @@ def parse_arguments(argv, no_defaults=False):
                                         base game.                        
                         ''')
     parser.add_argument('--experimental', default=defval(False), help='Enable experimental features', action='store_true')
+    parser.add_argument('--dungeon_counters', default=defval('off'), help='Enable dungeon chest counters', action='store_true')
     parser.add_argument('--crystals_ganon', default=defval('7'), const='7', nargs='?', choices=['random', '0', '1', '2', '3', '4', '5', '6', '7'],
                         help='''\
                              How many crystals are needed to defeat ganon. Any other
@@ -306,7 +307,7 @@ def parse_arguments(argv, no_defaults=False):
             for name in ['logic', 'mode', 'swords', 'goal', 'difficulty', 'item_functionality',
                          'shuffle', 'door_shuffle', 'crystals_ganon', 'crystals_gt', 'openpyramid',
                          'mapshuffle', 'compassshuffle', 'keyshuffle', 'bigkeyshuffle', 'startinventory',
-                         'retro', 'accessibility', 'hints', 'beemizer', 'experimental',
+                         'retro', 'accessibility', 'hints', 'beemizer', 'experimental', 'dungeon_counters',
                          'shufflebosses', 'shuffleenemies', 'enemy_health', 'enemy_damage', 'shufflepots',
                          'ow_palettes', 'uw_palettes', 'sprite', 'disablemusic', 'quickswap', 'fastmenu', 'heartcolor', 'heartbeep',
                          'remote_items']:
@@ -340,6 +341,7 @@ def get_settings():
     "shuffle": "vanilla",
     "door_shuffle": "basic",
     "experimental": 0,
+    "dungeon_counters": "off",
     "heartbeep": "normal",
     "heartcolor": "red",
     "fastmenu": "normal",

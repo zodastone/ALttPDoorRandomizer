@@ -126,7 +126,8 @@ def create_guiargs(parent):
           "smallkeyshuffle": "keyshuffle",
           "bigkeyshuffle": "bigkeyshuffle",
           "dungeondoorshuffle": "door_shuffle",
-          "experimental": "experimental"
+          "experimental": "experimental",
+          "dungeon_counters": "dungeon_counters"
         },
         "multiworld": {
           "names": "names"

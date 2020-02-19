@@ -24,5 +24,25 @@
     "label": {
       "text": "Enable Experimental Features"
     }
+  },
+  "dungeon_counters": {
+    "type": "selectbox",
+    "label": {
+      "text": "Dungeon Chest Counters"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      },
+      "default": "Off"
+    },
+    "options": {
+      "Off": "off",
+      "On": "on",
+      "On Compass Pickup": "pickup"
+    }
   }
 }
