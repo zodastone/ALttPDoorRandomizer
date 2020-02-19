@@ -23,7 +23,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes
 from Utils import output_path, parse_player_names
 
-__version__ = '0.0.14pre'
+__version__ = '0.0.15pre'
 
 
 def main(args, seed=None):
@@ -56,6 +56,7 @@ def main(args, seed=None):
     world.enemy_health = args.enemy_health.copy()
     world.enemy_damage = args.enemy_damage.copy()
     world.beemizer = args.beemizer.copy()
+    world.dungeon_counters = args.dungeon_counters.copy()
     world.experimental = args.experimental.copy()
     world.dungeon_counters = args.dungeon_counters.copy()
 

@@ -27,6 +27,8 @@ DRMode:
 dw 0
 DRFlags:
 dw 0
+DRScroll:
+db 0
 
 ; Vert 0,6,0 Horz 2,0,8
 org $279010
