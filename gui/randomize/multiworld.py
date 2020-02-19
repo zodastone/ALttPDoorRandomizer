@@ -1,5 +1,7 @@
 from tkinter import ttk, StringVar, Entry, Frame, Label, Spinbox, N, E, W, X, LEFT, RIGHT
 import gui.widgets as widgets
+import json
+import os
 
 def multiworld_page(parent,settings):
     # Multiworld
@@ -8,23 +10,12 @@ def multiworld_page(parent,settings):
     # Multiworld options
     self.widgets = {}
 
-    myDict = {
-      ## Number of worlds
-      "worlds": {
-        "type": "spinbox",
-        "label": {
-          "text": "Worlds"
-        },
-        "packAttrs": {
-          "label": { "side": LEFT },
-          "spinbox": { "side": RIGHT }
-        }
-      }
-    }
-    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
-    for key in dictWidgets:
-        self.widgets[key] = dictWidgets[key]
-        self.widgets[key].pack(side=LEFT, anchor=N)
+    with open(os.path.join("resources","app","gui","randomize","multiworld","widgets.json")) as multiworldItems:
+        myDict = json.load(multiworldItems)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(side=LEFT, anchor=N)
 
     ## List of Player Names
     key = "names"

@@ -1,0 +1,16 @@
+{
+  "worlds": {
+    "type": "spinbox",
+    "label": {
+      "text": "Worlds"
+    },
+    "packAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "spinbox": {
+        "side": "right"
+      }
+    }
+  }
+}
