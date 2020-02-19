@@ -20,7 +20,7 @@
   "bigkeyshuffle": {
     "type": "checkbox",
     "label": {
-      "text": "Small Keys"
+      "text": "Big Keys"
     }
   }
 }

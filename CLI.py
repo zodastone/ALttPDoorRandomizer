@@ -209,8 +209,8 @@ def parse_arguments(argv, no_defaults=False):
                              ''', action='store_true')
     parser.add_argument('--rom', default=defval(settings["rom"]), help='Path to an ALttP JAP(1.0) rom to use as a base.')
     parser.add_argument('--loglevel', default=defval('info'), const='info', nargs='?', choices=['error', 'info', 'warning', 'debug'], help='Select level of logging for output.')
-    parser.add_argument('--seed', default=defval(int(settings["seed"]) if settings["seed"] is not "" and settings["seed"] is not None else None), help='Define seed number to generate.', type=int)
-    parser.add_argument('--count', default=defval(int(settings["count"]) if settings["count"] is not "" and settings["count"] is not None else 1), help='''\
+    parser.add_argument('--seed', default=defval(int(settings["seed"]) if settings["seed"] != "" and settings["seed"] is not None else None), help='Define seed number to generate.', type=int)
+    parser.add_argument('--count', default=defval(int(settings["count"]) if settings["count"] != "" and settings["count"] is not None else 1), help='''\
                              Use to batch generate multiple seeds with same settings.
                              If --seed is provided, it will be used for the first seed, then
                              used to derive the next seed (i.e. generating 10 seeds with
