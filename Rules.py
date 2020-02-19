@@ -1575,13 +1575,11 @@ def set_bunny_rules(world, player):
     def get_rule_to_add(region, location = None, connecting_entrance = None):
         # In OWG, a location can potentially be superbunny-mirror accessible or
         # bunny revival accessible.
-        if world.logic == 'owglitches' and connecting_entrance != None:
-            if region.name == 'Tower of Hera (Bottom)' and connecting_entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw():
-                return lambda state: state.can_superbunny_mirror_with_sword(player) or state.has_Pearl(player)
-            if region.name == 'Turtle Rock (Entrance)' and connecting_entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw():
+        if world.logic == 'owglitches':
+            if region.name in OWGSets.get_invalid_bunny_revival_dungeons():
                 return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
             if not any([
-                location != None and location.name in OWGSets.get_superbunny_accessible_locations() and connecting_entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw(),
+                None not in [location, connecting_entrance] and location.name in OWGSets.get_superbunny_accessible_locations() and connecting_entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw(),
                 not region.is_light_world]):
                 return lambda state: state.has_Pearl(player)
         else:
@@ -1675,13 +1673,11 @@ def set_inverted_bunny_rules(world, player):
     def get_rule_to_add(region, location = None, connecting_entrance = None):
         # In OWG, a location can potentially be superbunny-mirror accessible or
         # bunny revival accessible.
-        if world.logic == 'owglitches' and connecting_entrance != None:
-            if region.name == 'Tower of Hera (Bottom)' and connecting_entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_lw():
-                return lambda state: state.can_superbunny_mirror_with_sword(player) or state.has_Pearl(player)
-            if region.name == 'Turtle Rock (Entrance)' and connecting_entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_lw():
+        if world.logic == 'owglitches':
+            if region.name in OWGSets.get_invalid_bunny_revival_dungeons():
                 return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
             if not any([
-                location != None and location.name in OWGSets.get_superbunny_accessible_locations() and connecting_entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw(),
+                None not in [location, connecting_entrance] and location.name in OWGSets.get_superbunny_accessible_locations() and connecting_entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_lw(),
                 not region.is_dark_world]):
                 return lambda state: state.has_Pearl(player)
         else:
