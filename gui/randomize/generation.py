@@ -1,6 +1,8 @@
 import os
 from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, E, W, LEFT, RIGHT, X
 import gui.widgets as widgets
+import json
+import os
 
 def generation_page(parent,settings):
     # Generation Setup
@@ -9,33 +11,12 @@ def generation_page(parent,settings):
     # Generation Setup options
     self.widgets = {}
 
-    myDict = {
-      ## Generate Spoiler
-      "spoiler": {
-        "type": "checkbox",
-        "label": {
-          "text": "Create Spoiler Log"
-        }
-      },
-      ## Don't make ROM
-      "suppressrom": {
-        "type": "checkbox",
-        "label": {
-          "text": "Do not create patched ROM"
-        }
-      },
-      ## Use Custom Item Pool as defined in Custom tab
-      "usecustompool": {
-        "type": "checkbox",
-        "label": {
-          "text": "Use custom item pool"
-        }
-      }
-    }
-    dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
-    for key in dictWidgets:
-        self.widgets[key] = dictWidgets[key]
-        self.widgets[key].pack(anchor=W)
+    with open(os.path.join("resources","app","gui","randomize","generation","checkboxes.json")) as checkboxes:
+        myDict = json.load(checkboxes)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self)
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(anchor=W)
 
     ## Locate base ROM
     baseRomFrame = Frame(self)

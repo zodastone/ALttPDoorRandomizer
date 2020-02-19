@@ -1,0 +1,20 @@
+{
+  "spoiler": {
+    "type": "checkbox",
+    "label": {
+      "text": "Create Spoiler Log"
+    }
+  },
+  "suppressrom": {
+    "type": "checkbox",
+    "label": {
+      "text": "Do not create patched ROM"
+    }
+  },
+  "usecustompool": {
+    "type": "checkbox",
+    "label": {
+      "text": "Use custom item pool"
+    }
+  }
+}
