@@ -3,7 +3,7 @@ HorzEdge:
         jsr DetectWestEdge : bra ++
     + jsr DetectEastEdge
     ++ cmp #$ff : beq +
-        sta $00 : asl : !add $00: tax
+        sta $00 : asl : !add $00 : tax
         cpy #$ff : beq ++
             jsr LoadWestData : bra .main
         ++ jsr LoadEastData
@@ -22,13 +22,9 @@ VertEdge:
             jsr LoadNorthData : bra .main
         ++ jsr LoadSouthData
         .main
-        ; todo: work to do
+        jsr LoadEdgeRoomVert
         sec : rts
     + clc : rts
-
-; todo: LoadVert
-; todo: FixAdjustTrans
-; todo: Fix ab fe swap in normal
 
 LoadEdgeRoomHorz:
     lda $03 : sta $a0
@@ -44,11 +40,12 @@ LoadEdgeRoomHorz:
     ++
     lda $00 : sta $21 : sta $0601 : sta $0605
     lda $01 : sta $aa : lsr : sta $01 : stz $00
+    lda $0a : sta $20
 
     stz $0e
     rep #$30
-    lda $e8 : sta $02
-    lda $06 : and #$00ff : !add $00 : sta $00
+    lda $e8 : and #$01ff : sta $02
+    lda $0a : and #$00ff : !add $00 : sta $00
 
     cmp #$006c : !bge +
         lda #$0077 : bra ++
@@ -68,51 +65,116 @@ LoadEdgeRoomHorz:
     cmp $02 : bne +
         lda #$0000 : bra .done
     + !blt +
-        !sub $02 : bra .done
-    + lda $02 : !sub $00 : inc $0e
+        !sub $02 : inc $0e : bra .done
+    + lda $02 : !sub $00
 
     .done sta $ab : sep #$30
     lda $0e : asl : ora $ac : sta $ac
-    lda $0601 : sta $e9
+    lda $0603 : sta $e9
 
     lda $04 : and #$80 : lsr #4 : sta $ee ; layer stuff
     rts
 
+LoadEdgeRoomVert:
+    lda $03 : sta $a0
+    sty $09
+    and.b #$f0 : lsr #3 : !sub $21 : !add $09 : sta $02
+    ldy #$01 : jsr ShiftVariablesMainDir
+    lda $a0 : and.b #$0f : asl : sta $060b : inc : sta $060f
+
+
+    lda $04 : and #$20 : bne +
+        lda $60b : sta $00 : stz $01 : bra ++
+    +   lda $60f : sta $00 : lda #$01 : sta $01
+    ++ ; $01 now contains 0 or 1
+    lda $00 : sta $23 : sta $0609 : sta $060d
+    lda $01 : sta $a9 : stz $00 ; setup for 16 bit ops
+    lda $0a : sta $22
+
+    stz $0e ; pos/neg indicator
+    rep #$30
+    lda $e2 : and #$01ff : sta $02
+    lda $0a : and #$00ff : !add $00 : sta $00
+
+    cmp #$0078 : !bge +
+        lda #$007f : bra ++
+    + cmp #$0178 : !blt +
+        lda #$017f : bra ++
+    + !add #$0007
+    ++ sta $061c : inc #2 : sta $061e
+
+    lda $00 : cmp #$0078 : !bge +
+        lda #$0000 : bra ++
+    + cmp #$0178 : !blt +
+        lda #$0100 : bra ++
+    + !sub #$0078
+    ++ sta $00
+
+    ; figures out scroll amt
+    cmp $02 : bne +
+        lda #$0000 : bra .done
+    + !blt +
+        !sub $02 : inc $0e : bra .done
+    + lda $02 : !sub $00
+
+    .done sta $ab : sep #$30
+    lda $0e : asl : ora $ac : sta $ac
+    lda $060b : sta $e3
+
+    lda $04 : and #$10 : lsr #4 : sta $ee ; layer stuff
+    rts
+
 
 LoadNorthData:
-    lda NorthEdgeInfo x, sta $06
-    lda NorthEdgeInfo x+1, sta $07
-    lda NorthEdgeInfo x+2, sta $08
-    lda NorthOpenEdge x, sta $03
-    lda NorthOpenEdge x+1, sta $04
-    lda NorthOpenEdge x+2, sta $05
+    lda NorthEdgeInfo, x : sta $06 ; not needed I think
+    lda NorthOpenEdge, x : sta $03 : inx
+    lda NorthEdgeInfo, x : sta $07 ;probably needed for maths - unsure
+    lda NorthOpenEdge, x : sta $04 : inx
+    lda NorthEdgeInfo, x : sta $08 ; needed for maths
+    lda NorthOpenEdge, x : sta $05
+    lda $04 : and #$0f : sta $00 : asl : !add $00 : tax
+    lda SouthEdgeInfo, x : sta $0a : inx ; needed now, and for nrml transition
+    lda SouthEdgeInfo, x : sta $0b : inx ; probably not needed - unsure
+    lda SouthEdgeInfo, x : sta $0c ; needed for maths
     rts
 
 LoadSouthData:
-    lda SouthEdgeInfo x, sta $06
-    lda SouthEdgeInfo x+1, sta $07
-    lda SouthEdgeInfo x+2, sta $08
-    lda SouthOpenEdge x, sta $03
-    lda SouthOpenEdge x+1, sta $04
-    lda SouthOpenEdge x+2, sta $05
+    lda SouthEdgeInfo, x : sta $06
+    lda SouthOpenEdge, x : sta $03 : inx
+    lda SouthEdgeInfo, x : sta $07
+    lda SouthOpenEdge, x : sta $04 : inx
+    lda SouthEdgeInfo, x : sta $08
+    lda SouthOpenEdge, x : sta $05
+    lda $04 : and #$0f : sta $00 : asl : !add $00 : tax
+    lda NorthEdgeInfo, x : sta $0a : inx
+    lda NorthEdgeInfo, x : sta $0b : inx
+    lda NorthEdgeInfo, x : sta $0c
     rts
 
 LoadWestData:
-    lda WestEdgeInfo x, sta $06
-    lda WestEdgeInfo x+1, sta $07
-    lda WestEdgeInfo x+2, sta $08
-    lda WestOpenEdge x, sta $03
-    lda WestOpenEdge x+1, sta $04
-    lda WestOpenEdge x+2, sta $05
+    lda WestEdgeInfo, x : sta $06
+    lda WestOpenEdge, x : sta $03 : inx
+    lda WestEdgeInfo, x : sta $07
+    lda WestOpenEdge, x : sta $04 : inx
+    lda WestEdgeInfo, x : sta $08
+    lda WestOpenEdge, x : sta $05
+    lda $04 : and #$0f : sta $00 : asl : !add $00 : tax
+    lda EastEdgeInfo, x : sta $0a : inx
+    lda EastEdgeInfo, x : sta $0b : inx
+    lda EastEdgeInfo, x : sta $0c
     rts
 
 LoadEastData:
-    lda EastEdgeInfo x, sta $06
-    lda EastEdgeInfo x+1, sta $07
-    lda EastEdgeInfo x+2, sta $08
-    lda EastOpenEdge x, sta $03
-    lda EastOpenEdge x+1, sta $04
-    lda EastOpenEdge x+2, sta $05
+    lda EastEdgeInfo, x : sta $06
+    lda EastOpenEdge, x : sta $03 : inx
+    lda EastEdgeInfo, x : sta $07
+    lda EastOpenEdge, x : sta $04 : inx
+    lda EastEdgeInfo, x : sta $08
+    lda EastOpenEdge, x : sta $05
+    lda $04 : and #$0f : sta $00 : asl : !add $00 : tax
+    lda WestEdgeInfo, x : sta $0a : inx
+    lda WestEdgeInfo, x : sta $0b : inx
+    lda WestEdgeInfo, x : sta $0c
     rts
 
 
@@ -142,7 +204,7 @@ DetectNorthEdge:
         ++ ldx #$07 : bra .end
     + cmp #$dc : bne .end
         lda $a9 : bne ++
-            lda $22 : bcs #$b0 : bcs ++
+            lda $22 : cmp #$b0 : bcs ++
                 ldx #$09 : bra .end
         ++ ldx #$0a
     .end txa : rts
@@ -173,7 +235,7 @@ DetectSouthEdge:
         ++ ldx #$07 : bra .end
     + cmp #$cc : bne .end
         lda $a9 : bne ++
-            lda $22 : bcs #$b0 : bcs ++
+            lda $22 : cmp #$b0 : bcs ++
                 ldx #$09 : bra .end
         ++ ldx #$0a
     .end txa : rts

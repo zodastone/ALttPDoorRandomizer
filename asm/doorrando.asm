@@ -4,8 +4,8 @@
 !blt = "bcc"
 
 ; Free RAM notes
-; Normal doors use $FE for scrolling indicator
-; Normal doors use $AB to store the trap door indicator
+; Normal doors use $AB-AC for scrolling indicator
+; Normal doors use $FE to store the trap door indicator
 ; Spiral doors use $045e to store stair type
 ; Gfx uses $b1 to for sub-sub-sub-module thing
 
@@ -20,6 +20,7 @@ incsrc gfx.asm
 incsrc keydoors.asm
 incsrc overrides.asm
 incsrc edges.asm
+incsrc math.asm
 warnpc $279000
 
 ; Data Section
