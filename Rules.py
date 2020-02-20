@@ -985,7 +985,6 @@ def overworld_glitches_rules(world, player):
             set_rule(world.get_entrance(clip_spot, player), lambda state: state.has_Mirror(player))
 
     # Locations that you can superbunny mirror into, but need a sword to clear.
-    mini_moldorm_cave = world.get_region('Mini Moldorm Cave', player)
     for superbunny_mirror_weapon_region in OWGSets.get_sword_required_superbunny_mirror_regions():
         region = world.get_region(superbunny_mirror_weapon_region, player)
         if check_is_dark_world(region):
