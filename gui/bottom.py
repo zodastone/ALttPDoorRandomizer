@@ -154,6 +154,8 @@ def create_guiargs(parent):
                 arg = options[mainpage][subpage][widget]
                 setattr(guiargs, arg, parent.pages[mainpage].pages[subpage].widgets[widget].storageVar.get())
 
+    guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.get()
+
     guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.get())
 
     guiargs.rom = parent.pages["randomizer"].pages["generation"].romVar.get()
@@ -161,6 +163,19 @@ def create_guiargs(parent):
 
     guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
     guiargs.count = int(parent.frames["bottom"].widgets["generationcount"].storageVar.get()) if parent.frames["bottom"].widgets["generationcount"].storageVar.get() != '1' else None
+
+    adjustargs = {
+      "nobgm": "disablemusic",
+      "quickswap": "quickswap",
+      "heartcolor": "heartcolor",
+      "heartbeep": "heartbeep",
+      "menuspeed": "fastmenu",
+      "owpalettes": "ow_palettes",
+      "uwpalettes": "uw_palettes"
+    }
+    for adjustarg in adjustargs:
+      internal = adjustargs[adjustarg]
+      setattr(guiargs,"adjust." + internal, parent.pages["adjust"].content.widgets[adjustarg].storageVar.get())
 
     customitems = [
       "bow", "silversupgrade", "boomerang", "redmerang", "hookshot", "mushroom", "powder", "firerod",

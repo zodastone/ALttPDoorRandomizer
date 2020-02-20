@@ -180,9 +180,13 @@ def main(args, seed=None):
                 patch_rom(world, rom, player, team, use_enemizer)
 
                 if use_enemizer and (args.enemizercli or not args.jsonout):
-                    patch_enemizer(world, player, rom, args.rom, args.enemizercli, args.shufflepots[player], sprite_random_on_hit)
-                    if not args.jsonout:
-                        rom = LocalRom.fromJsonRom(rom, args.rom, 0x400000)
+                    if os.path.exists(args.enemizercli):
+                        patch_enemizer(world, player, rom, args.rom, args.enemizercli, args.shufflepots[player], sprite_random_on_hit)
+                        if not args.jsonout:
+                            rom = LocalRom.fromJsonRom(rom, args.rom, 0x400000)
+                    else:
+                        logging.warning("EnemizerCLI not found at:" + args.enemizercli)
+                        logging.warning("No Enemizer options will be applied until this is resolved.")
 
                 if args.race:
                     patch_race_rom(rom)

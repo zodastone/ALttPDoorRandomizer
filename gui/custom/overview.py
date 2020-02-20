@@ -65,4 +65,8 @@ def custom_page(top,parent):
             self.customWidgets[key] = dictWidgets[key]
             self.customWidgets[key].pack()
 
+    keys = list(self.customWidgets.keys())
+    for i in range(0, len(keys)):
+        self.customWidgets[keys[i]].storageVar.set(top.settings["customitemarray"][i])
+
     return self

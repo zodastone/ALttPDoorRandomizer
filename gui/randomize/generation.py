@@ -29,9 +29,6 @@ def generation_page(parent,settings):
     baseRomFrame = Frame(self.frames["baserom"])
     baseRomLabel = Label(baseRomFrame, text='Base Rom: ')
     self.romVar = StringVar()
-    def saveBaseRom(caller,_,mode):
-        settings["rom"] = self.romVar.get()
-    self.romVar.trace_add("write",saveBaseRom)
     romEntry = Entry(baseRomFrame, textvariable=self.romVar)
     self.romVar.set(settings["rom"])
 

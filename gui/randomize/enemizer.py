@@ -29,9 +29,6 @@ def enemizer_page(parent,settings):
     enemizerCLIlabel = Label(enemizerPathFrame, text="EnemizerCLI path: ")
     enemizerCLIlabel.pack(side=LEFT)
     self.enemizerCLIpathVar = StringVar(value=settings["enemizercli"])
-    def saveEnemizerPath(caller,_,mode):
-        settings["enemizercli"] = self.enemizerCLIpathVar.get()
-    self.enemizerCLIpathVar.trace_add("write",saveEnemizerPath)
     enemizerCLIpathEntry = Entry(enemizerPathFrame, textvariable=self.enemizerCLIpathVar)
     enemizerCLIpathEntry.pack(side=LEFT, fill=X, expand=True)
     def EnemizerSelectPath():
