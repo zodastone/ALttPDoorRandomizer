@@ -201,7 +201,8 @@ def fill_restrictive(world, base_state, locations, itempool, single_player_place
                     else:
                         test_state = maximum_exploration_state
                     if (not single_player_placement or location.player == item_to_place.player)\
-                            and location.can_fill(test_state, item_to_place, perform_access_check):
+                            and location.can_fill(test_state, item_to_place, perform_access_check)\
+                            and valid_key_placement(item_to_place, location, itempool, world):
                         spot_to_fill = location
                         break
                     elif item_to_place.smallkey or item_to_place.bigkey:
@@ -217,10 +218,41 @@ def fill_restrictive(world, base_state, locations, itempool, single_player_place
                     raise FillError('No more spots to place %s' % item_to_place)
 
                 world.push_item(spot_to_fill, item_to_place, False)
+                track_outside_keys(item_to_place, spot_to_fill, world)
                 locations.remove(spot_to_fill)
                 spot_to_fill.event = True
 
     itempool.extend(unplaced_items)
+
+
+def valid_key_placement(item, location, itempool,  world):
+    if (not item.smallkey and not item.bigkey) or item.player != location.player or world.retro[item.player]:
+        return True
+    dungeon = location.parent_region.dungeon
+    if dungeon:
+        if dungeon.name not in item.name and (dungeon.name != 'Hyrule Castle' or 'Escape' not in item.name):
+            return True
+        key_logic = world.key_logic[item.player][dungeon.name]
+        unplaced_keys = len([x for x in itempool if x.name == key_logic.small_key_name])
+        return key_logic.check_placement(unplaced_keys)
+    else:
+        inside_dungeon_item = ((item.smallkey and not world.keyshuffle[item.player])
+                               or (item.bigkey and not world.bigkeyshuffle[item.player]))
+        return not inside_dungeon_item
+
+
+def track_outside_keys(item, location, world):
+    if not item.smallkey:
+        return
+    item_dungeon = item.name.split('(')[1][:-1]
+    if item_dungeon == 'Escape':
+        item_dungeon = 'Hyrule Castle'
+    if location.player == item.player:
+        loc_dungeon = location.parent_region.dungeon
+        if loc_dungeon and loc_dungeon.name == item_dungeon:
+            return  # this is an inside key
+    world.key_logic[item.player][item_dungeon].outside_keys += 1
+
 
 def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None):
     # If not passed in, then get a shuffled list of locations to fill in

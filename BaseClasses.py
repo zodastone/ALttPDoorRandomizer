@@ -2,7 +2,7 @@ import copy
 from enum import Enum, unique, Flag
 import logging
 import json
-from collections import OrderedDict, deque
+from collections import OrderedDict, deque, defaultdict
 
 from EntranceShuffle import door_addresses
 from _vendor.collections_extended import bag
@@ -70,6 +70,7 @@ class World(object):
         self.inaccessible_regions = {}
         self.key_logic = {}
         self.pool_adjustment = {}
+        self.key_layout = defaultdict(dict)
 
         for player in range(1, players + 1):
             def set_player_attr(attr, val):

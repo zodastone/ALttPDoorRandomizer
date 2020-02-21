@@ -72,6 +72,13 @@ jsl GtBossHeartCheckOverride : bcs .not_in_ganons_tower
 nop : stz $0dd0, X : rts
 .not_in_ganons_tower
 
+
+org $2081f2
+jsl MirrorCheckOverride2
+org $20825c
+jsl MirrorCheckOverride2
+
+
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes
 ; Hera BK door back can be seen with Pot clipping - likely useful for no logic seeds

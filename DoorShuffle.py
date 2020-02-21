@@ -163,6 +163,7 @@ def vanilla_key_logic(world, player):
                 world.key_logic[player] = {}
             analyze_dungeon(key_layout, world, player)
             world.key_logic[player][builder.name] = key_layout.key_logic
+            log_key_logic(builder.name, key_layout.key_logic)
             last_key = None
     if world.shuffle[player] == 'vanilla':
         validate_vanilla_key_logic(world, player)
@@ -784,6 +785,8 @@ def assign_cross_keys(dungeon_builders, world, player):
     # Last Step: Adjust Small Key Dungeon Pool
     if not world.retro[player]:
         for name, builder in dungeon_builders.items():
+            reassign_key_doors(builder, world, player)
+            log_key_logic(builder.name, world.key_logic[player][builder.name])
             actual_chest_keys = max(builder.key_doors_num - builder.key_drop_cnt, 0)
             dungeon = world.get_dungeon(name, player)
             if actual_chest_keys == 0:
@@ -864,8 +867,11 @@ def combine_layouts(recombinant_builders, dungeon_builders, entrances_map):
                 if recombine.master_sector is None:
                     recombine.master_sector = builder.master_sector
                     recombine.master_sector.name = recombine.name
+                    recombine.pre_open_stonewall = builder.pre_open_stonewall
                 else:
                     recombine.master_sector.regions.extend(builder.master_sector.regions)
+                    if builder.pre_open_stonewall:
+                        recombine.pre_open_stonewall = builder.pre_open_stonewall
         recombine.layout_starts = list(entrances_map[recombine.name])
         dungeon_builders[recombine.name] = recombine
 
@@ -898,9 +904,11 @@ def shuffle_key_doors(builder, world, player):
     builder.key_doors_num = num_key_doors
     find_small_key_door_candidates(builder, start_regions, world, player)
     find_valid_combination(builder, start_regions, world, player)
+    reassign_key_doors(builder, world, player)
+    log_key_logic(builder.name, world.key_logic[player][builder.name])
 
 
-def find_current_key_doors(builder, world, player):
+def find_current_key_doors(builder):
     current_doors = []
     for region in builder.master_sector.regions:
         for ext in region.exits:
@@ -987,9 +995,9 @@ def find_valid_combination(builder, start_regions, world, player, drop_keys=True
     if player not in world.key_logic.keys():
         world.key_logic[player] = {}
     analyze_dungeon(key_layout, world, player)
-    reassign_key_doors(builder, proposal, world, player)
-    log_key_logic(builder.name, key_layout.key_logic)
+    builder.key_door_proposal = proposal
     world.key_logic[player][builder.name] = key_layout.key_logic
+    world.key_layout[player][builder.name] = key_layout
     return True
 
 
@@ -1011,6 +1019,13 @@ def log_key_logic(d_name, key_logic):
             if rule.alternate_small_key is not None:
                 for loc in rule.alternate_big_key_loc:
                     logger.debug('---BK Loc %s', loc.name)
+        logger.debug('Placement rules for %s', d_name)
+        for rule in key_logic.placement_rules:
+            logger.debug('*Rule for %s:', rule.door_reference)
+            if rule.bk_conditional_set:
+                logger.debug('**BK Checks %s', ','.join([x.name for x in rule.bk_conditional_set]))
+                logger.debug('**BK Blocked By Door (%s) : %s', rule.needed_keys_wo_bk, ','.join([x.name for x in rule.check_locations_wo_bk]))
+            logger.debug('**BK Elsewhere (%s) : %s', rule.needed_keys_w_bk, ','.join([x.name for x in rule.check_locations_w_bk]))
 
 
 def build_pair_list(flat_list):
@@ -1045,7 +1060,9 @@ def find_key_door_candidates(region, checked, world, player):
     while len(queue) > 0:
         current, last_door, last_region = queue.pop()
         for ext in current.exits:
-            d = world.check_for_door(ext.name, player)
+            d = ext.door
+            if d and d.controller:
+                d = d.controller
             if d is not None and not d.blocked and d.dest is not last_door and d.dest is not last_region and d not in checked_doors:
                 valid = False
                 if 0 <= d.doorListPos < 4 and d.type in [DoorType.Interior, DoorType.Normal, DoorType.SpiralStairs]:
@@ -1064,9 +1081,11 @@ def find_key_door_candidates(region, checked, world, player):
                             okay_normals = [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable,
                                             DoorKind.Dashable, DoorKind.DungeonChanger]
                             valid = kind in okay_normals and kind_b in okay_normals
+                            if valid and 0 <= d2.doorListPos < 4:
+                                candidates.append(d2)
                         else:
                             valid = True
-                if valid:
+                if valid and d not in candidates:
                     candidates.append(d)
                 if ext.connected_region.type != RegionType.Dungeon or ext.connected_region.dungeon == dungeon:
                     queue.append((ext.connected_region, d, current))
@@ -1097,10 +1116,12 @@ def ncr(n, r):
     return numerator / denominator
 
 
-def reassign_key_doors(builder, proposal, world, player):
+def reassign_key_doors(builder, world, player):
     logger = logging.getLogger('')
+    logger.debug('Key doors for %s', builder.name)
+    proposal = builder.key_door_proposal
     flat_proposal = flatten_pair_list(proposal)
-    queue = deque(find_current_key_doors(builder, world, player))
+    queue = deque(find_current_key_doors(builder))
     while len(queue) > 0:
         d = queue.pop()
         if d.type is DoorType.SpiralStairs and d not in proposal:
