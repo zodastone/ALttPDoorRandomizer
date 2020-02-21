@@ -34,10 +34,11 @@ LoadEdgeRoomHorz:
     lda $a0 : and.b #$F0 : lsr #3 : sta $0603 : inc : sta $0607
 
 
+    lda $aa : asl : tax ; current quad as 0/4
     lda $04 : and #$40 : bne +
         lda $603 : sta $00 : stz $01 : bra ++
     +   lda $607 : sta $00 : lda #$02 : sta $01
-    ++
+    ++ ; $01 now contains 0 or 2
     lda $00 : sta $21 : sta $0601 : sta $0605
     lda $01 : sta $aa : lsr : sta $01 : stz $00
     lda $0a : sta $20
@@ -70,7 +71,7 @@ LoadEdgeRoomHorz:
 
     .done sta $ab : sep #$30
     lda $0e : asl : ora $ac : sta $ac
-    lda $0603 : sta $e9
+    lda $0603, x : sta $e9
 
     lda $04 : and #$80 : lsr #4 : sta $ee ; layer stuff
     rts
@@ -82,7 +83,7 @@ LoadEdgeRoomVert:
     ldy #$01 : jsr ShiftVariablesMainDir
     lda $a0 : and.b #$0f : asl : sta $060b : inc : sta $060f
 
-
+    lda $a9 : asl #2 : tax ; current quad as 0/4
     lda $04 : and #$20 : bne +
         lda $60b : sta $00 : stz $01 : bra ++
     +   lda $60f : sta $00 : lda #$01 : sta $01
@@ -119,7 +120,7 @@ LoadEdgeRoomVert:
 
     .done sta $ab : sep #$30
     lda $0e : asl : ora $ac : sta $ac
-    lda $060b : sta $e3
+    lda $060b, x : sta $e3
 
     lda $04 : and #$10 : lsr #4 : sta $ee ; layer stuff
     rts
