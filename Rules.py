@@ -1577,6 +1577,8 @@ def set_bunny_rules(world, player):
         if world.logic == 'owglitches':
             if region.name in OWGSets.get_invalid_bunny_revival_dungeons():
                 return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
+            if region.type == RegionType.Dungeon:
+                return lambda state: True
             if not any([
                 None not in [location, connecting_entrance] and location.name in OWGSets.get_superbunny_accessible_locations() and connecting_entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw(),
                 not region.is_light_world]):
@@ -1608,6 +1610,8 @@ def set_bunny_rules(world, player):
                 if not new_region.is_light_world:
                     # For OWG, establish superbunny and revival rules.
                     if world.logic == 'owglitches' and entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw():
+                        if new_region.name == 'Two Brothers House':
+                            possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player) and state.has_Boots(player))
                         for location in entrance.connected_region.locations:
                             if location.name in OWGSets.get_superbunny_accessible_locations():
                                 possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player))
@@ -1675,6 +1679,8 @@ def set_inverted_bunny_rules(world, player):
         if world.logic == 'owglitches':
             if region.name in OWGSets.get_invalid_bunny_revival_dungeons():
                 return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
+            if region.type == RegionType.Dungeon:
+                return lambda state: True
             if not any([
                 None not in [location, connecting_entrance] and location.name in OWGSets.get_superbunny_accessible_locations() and connecting_entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_lw(),
                 not region.is_dark_world]):
@@ -1706,6 +1712,8 @@ def set_inverted_bunny_rules(world, player):
                 if not new_region.is_dark_world:
                     # For OWG, establish superbunny and revival rules.
                     if world.logic == 'owglitches' and entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_lw():
+                        if new_region.name == 'Two Brothers House':
+                            possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player) and state.has_Boots(player))
                         for location in entrance.connected_region.locations:
                             if location.name in OWGSets.get_superbunny_accessible_locations():
                                 possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player))
