@@ -3,8 +3,12 @@ from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Ent
 import gui.widgets as widgets
 import json
 import os
+import webbrowser
 
 def enemizer_page(parent,settings):
+    def open_enemizer_download(_evt):
+        webbrowser.open("https://github.com/Bonta0/Enemizer/releases")
+
     # Enemizer
     self = ttk.Frame(parent)
 
@@ -41,6 +45,9 @@ def enemizer_page(parent,settings):
     enemizerPathFrame = Frame(self.frames["bottomEnemizerFrame"])
     enemizerCLIlabel = Label(enemizerPathFrame, text="EnemizerCLI path: ")
     enemizerCLIlabel.pack(side=LEFT)
+    enemizerURL = Label(enemizerPathFrame, text="(get online)", fg="blue", cursor="hand2")
+    enemizerURL.pack(side=LEFT)
+    enemizerURL.bind("<Button-1>", open_enemizer_download)
     self.enemizerCLIpathVar = StringVar(value=settings["enemizercli"])
     enemizerCLIpathEntry = Entry(enemizerPathFrame, textvariable=self.enemizerCLIpathVar)
     enemizerCLIpathEntry.pack(side=LEFT, fill=X, expand=True)
