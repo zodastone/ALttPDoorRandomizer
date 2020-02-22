@@ -187,7 +187,7 @@ def parse_arguments(argv, no_defaults=False):
                                         base game.                        
                         ''')
     parser.add_argument('--experimental', default=defval(settings["experimental"] != 0), help='Enable experimental features', action='store_true')
-    parser.add_argument('--dungeon_counters', default=defval(settings["dungeon_counters"]), help='Enable dungeon chest counters', action='store_true')
+    parser.add_argument('--dungeon_counters', default=defval(settings["dungeon_counters"]), help='Enable dungeon chest counters', const='off', nargs='?', choices=['off', 'on', 'pickup'])
     parser.add_argument('--crystals_ganon', default=defval(settings["crystals_ganon"]), const='7', nargs='?', choices=['random', '0', '1', '2', '3', '4', '5', '6', '7'],
                         help='''\
                              How many crystals are needed to defeat ganon. Any other
@@ -247,7 +247,7 @@ def parse_arguments(argv, no_defaults=False):
                              Make telepathic tiles and storytellers give helpful hints.
                              ''', action='store_true')
     # included for backwards compatibility
-    parser.add_argument('--shuffleganon', help=argparse.SUPPRESS, action='store_true', default=defval(True))
+    parser.add_argument('--shuffleganon', help=argparse.SUPPRESS, action='store_true', default=defval(settings["shuffleganon"] != 0))
     parser.add_argument('--no-shuffleganon', help='''\
                              If set, the Pyramid Hole and Ganon's Tower are not
                              included entrance shuffle pool.
