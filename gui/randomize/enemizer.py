@@ -1,5 +1,5 @@
 import os
-from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, LabelFrame, OptionMenu, N, E, W, LEFT, RIGHT, X
+from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, LabelFrame, OptionMenu, N, E, W, LEFT, RIGHT, BOTTOM, X
 import gui.widgets as widgets
 import json
 import os
@@ -17,15 +17,28 @@ def enemizer_page(parent,settings):
     self.frames["checkboxes"] = Frame(self)
     self.frames["checkboxes"].pack(anchor=W)
 
-    with open(os.path.join("resources","app","gui","randomize","enemizer","checkboxes.json")) as checkboxes:
-        myDict = json.load(checkboxes)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["checkboxes"])
-        for key in dictWidgets:
-            self.widgets[key] = dictWidgets[key]
-            self.widgets[key].pack(anchor=W)
+    self.frames["selectOptionsFrame"] = Frame(self)
+    self.frames["leftEnemizerFrame"] = Frame(self.frames["selectOptionsFrame"])
+    self.frames["rightEnemizerFrame"] = Frame(self.frames["selectOptionsFrame"])
+    self.frames["bottomEnemizerFrame"] = Frame(self)
+    self.frames["selectOptionsFrame"].pack(fill=X)
+    self.frames["leftEnemizerFrame"].pack(side=LEFT)
+    self.frames["rightEnemizerFrame"].pack(side=RIGHT)
+    self.frames["bottomEnemizerFrame"].pack(fill=X)
+
+    with open(os.path.join("resources","app","gui","randomize","enemizer","widgets.json")) as widgetDefns:
+        myDict = json.load(widgetDefns)
+        for framename,theseWidgets in myDict.items():
+            dictWidgets = widgets.make_widgets_from_dict(self, theseWidgets, self.frames[framename])
+            for key in dictWidgets:
+                self.widgets[key] = dictWidgets[key]
+                packAttrs = {"anchor":E}
+                if self.widgets[key].type == "checkbox":
+                    packAttrs["anchor"] = W
+                self.widgets[key].pack(packAttrs)
 
     ## Enemizer CLI Path
-    enemizerPathFrame = Frame(self)
+    enemizerPathFrame = Frame(self.frames["bottomEnemizerFrame"])
     enemizerCLIlabel = Label(enemizerPathFrame, text="EnemizerCLI path: ")
     enemizerCLIlabel.pack(side=LEFT)
     self.enemizerCLIpathVar = StringVar(value=settings["enemizercli"])
@@ -39,24 +52,5 @@ def enemizer_page(parent,settings):
     enemizerCLIbrowseButton = Button(enemizerPathFrame, text='...', command=EnemizerSelectPath)
     enemizerCLIbrowseButton.pack(side=LEFT)
     enemizerPathFrame.pack(fill=X)
-
-    self.frames["leftEnemizerFrame"] = Frame(self)
-    self.frames["rightEnemizerFrame"] = Frame(self)
-    self.frames["leftEnemizerFrame"].pack(side=LEFT, anchor=N)
-    self.frames["rightEnemizerFrame"].pack(side=RIGHT, anchor=N)
-
-    with open(os.path.join("resources","app","gui","randomize","enemizer","leftEnemizerFrame.json")) as leftEnemizerFrameItems:
-        myDict = json.load(leftEnemizerFrameItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["leftEnemizerFrame"])
-        for key in dictWidgets:
-            self.widgets[key] = dictWidgets[key]
-            self.widgets[key].pack(anchor=E)
-
-    with open(os.path.join("resources","app","gui","randomize","enemizer","rightEnemizerFrame.json")) as rightEnemizerFrameItems:
-        myDict = json.load(rightEnemizerFrameItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["rightEnemizerFrame"])
-        for key in dictWidgets:
-            self.widgets[key] = dictWidgets[key]
-            self.widgets[key].pack(anchor=E)
 
     return self,settings
