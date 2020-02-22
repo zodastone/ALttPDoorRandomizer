@@ -39,35 +39,12 @@ def custom_page(top,parent):
     create_vertical_rule(2)
     create_list_frame(self,"itemList5")
 
-    with open(os.path.join("resources","app","gui","custom","overview","itemList1.json")) as items:
-        myDict = json.load(items)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["itemList1"])
-        for key in dictWidgets:
-            self.customWidgets[key] = dictWidgets[key]
-
-    with open(os.path.join("resources","app","gui","custom","overview","itemList2.json")) as items:
-        myDict = json.load(items)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["itemList2"])
-        for key in dictWidgets:
-            self.customWidgets[key] = dictWidgets[key]
-
-    with open(os.path.join("resources","app","gui","custom","overview","itemList3.json")) as items:
-        myDict = json.load(items)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["itemList3"])
-        for key in dictWidgets:
-            self.customWidgets[key] = dictWidgets[key]
-
-    with open(os.path.join("resources","app","gui","custom","overview","itemList4.json")) as items:
-        myDict = json.load(items)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["itemList4"])
-        for key in dictWidgets:
-            self.customWidgets[key] = dictWidgets[key]
-
-    with open(os.path.join("resources","app","gui","custom","overview","itemList5.json")) as items:
-        myDict = json.load(items)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["itemList5"])
-        for key in dictWidgets:
-            self.customWidgets[key] = dictWidgets[key]
+    with open(os.path.join("resources","app","gui","custom","overview","widgets.json")) as widgetDefns:
+        myDict = json.load(widgetDefns)
+        for framename,theseWidgets in myDict.items():
+            dictWidgets = widgets.make_widgets_from_dict(self, theseWidgets, self.frames[framename])
+            for key in dictWidgets:
+                self.customWidgets[key] = dictWidgets[key]
 
     keys = list(self.customWidgets.keys())
     for i in range(0, len(keys)):
