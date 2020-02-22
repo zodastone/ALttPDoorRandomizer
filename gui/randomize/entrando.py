@@ -15,11 +15,15 @@ def entrando_page(parent):
     self.frames["widgets"] = Frame(self)
     self.frames["widgets"].pack(anchor=W)
 
-    with open(os.path.join("resources","app","gui","randomize","entrando","widgets.json")) as myWidgets:
-        myDict = json.load(myWidgets)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["widgets"])
-        for key in dictWidgets:
-            self.widgets[key] = dictWidgets[key]
-            self.widgets[key].pack(anchor=W)
+    with open(os.path.join("resources","app","gui","randomize","entrando","widgets.json")) as widgetDefns:
+        myDict = json.load(widgetDefns)
+        for framename,theseWidgets in myDict.items():
+            dictWidgets = widgets.make_widgets_from_dict(self, theseWidgets, self.frames[framename])
+            for key in dictWidgets:
+                self.widgets[key] = dictWidgets[key]
+                packAttrs = {"anchor":E}
+                if self.widgets[key].type == "checkbox":
+                    packAttrs["anchor"] = W
+                self.widgets[key].pack(packAttrs)
 
     return self
