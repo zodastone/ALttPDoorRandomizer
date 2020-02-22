@@ -50,6 +50,4 @@ MirrorCheckOverride:
     + lda DRScroll : rtl
 
 MirrorCheckOverride2:
-    lda $7ef353 : cmp #$02 : beq +
-        sep #$02 ; clear zero flag, I think
-    + rtl
+    lda $7ef353 : and #$02 : rtl

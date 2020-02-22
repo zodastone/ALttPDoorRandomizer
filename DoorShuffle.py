@@ -158,6 +158,7 @@ def vanilla_key_logic(world, player):
                 world.key_logic[player] = {}
             analyze_dungeon(key_layout, world, player)
             world.key_logic[player][builder.name] = key_layout.key_logic
+            log_key_logic(builder.name, key_layout.key_logic)
             last_key = None
     if world.shuffle[player] == 'vanilla':
         validate_vanilla_key_logic(world, player)
@@ -861,8 +862,11 @@ def combine_layouts(recombinant_builders, dungeon_builders, entrances_map):
                 if recombine.master_sector is None:
                     recombine.master_sector = builder.master_sector
                     recombine.master_sector.name = recombine.name
+                    recombine.pre_open_stonewall = builder.pre_open_stonewall
                 else:
                     recombine.master_sector.regions.extend(builder.master_sector.regions)
+                    if builder.pre_open_stonewall:
+                        recombine.pre_open_stonewall = builder.pre_open_stonewall
         recombine.layout_starts = list(entrances_map[recombine.name])
         dungeon_builders[recombine.name] = recombine
 
@@ -988,6 +992,7 @@ def find_valid_combination(builder, start_regions, world, player, drop_keys=True
     analyze_dungeon(key_layout, world, player)
     builder.key_door_proposal = proposal
     world.key_logic[player][builder.name] = key_layout.key_logic
+    world.key_layout[player][builder.name] = key_layout
     return True
 
 
@@ -1009,6 +1014,13 @@ def log_key_logic(d_name, key_logic):
             if rule.alternate_small_key is not None:
                 for loc in rule.alternate_big_key_loc:
                     logger.debug('---BK Loc %s', loc.name)
+        logger.debug('Placement rules for %s', d_name)
+        for rule in key_logic.placement_rules:
+            logger.debug('*Rule for %s:', rule.door_reference)
+            if rule.bk_conditional_set:
+                logger.debug('**BK Checks %s', ','.join([x.name for x in rule.bk_conditional_set]))
+                logger.debug('**BK Blocked By Door (%s) : %s', rule.needed_keys_wo_bk, ','.join([x.name for x in rule.check_locations_wo_bk]))
+            logger.debug('**BK Elsewhere (%s) : %s', rule.needed_keys_w_bk, ','.join([x.name for x in rule.check_locations_w_bk]))
 
 
 def build_pair_list(flat_list):
@@ -1068,7 +1080,7 @@ def find_key_door_candidates(region, checked, world, player):
                                 candidates.append(d2)
                         else:
                             valid = True
-                if valid:
+                if valid and d not in candidates:
                     candidates.append(d)
                 if ext.connected_region.type != RegionType.Dungeon or ext.connected_region.dungeon == dungeon:
                     queue.append((ext.connected_region, d, current))
@@ -1101,6 +1113,7 @@ def ncr(n, r):
 
 def reassign_key_doors(builder, world, player):
     logger = logging.getLogger('')
+    logger.debug('Key doors for %s', builder.name)
     proposal = builder.key_door_proposal
     flat_proposal = flatten_pair_list(proposal)
     queue = deque(find_current_key_doors(builder))
