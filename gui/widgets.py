@@ -126,6 +126,7 @@ def make_widget(self, type, parent, label, storageVar=None, manager=None, manage
         if thisStorageVar is None:
             thisStorageVar = StringVar()
         widget = make_textbox(self, parent, label, thisStorageVar, manager, managerAttrs)
+    widget.type = type
     return widget
 
 def make_widget_from_dict(self, defn, parent):

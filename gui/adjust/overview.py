@@ -19,13 +19,6 @@ def adjust_page(top, parent, settings):
     self.frames["checkboxes"] = Frame(self)
     self.frames["checkboxes"].pack(anchor=W)
 
-    with open(os.path.join("resources","app","gui","adjust","overview","checkboxes.json")) as checkboxes:
-        myDict = json.load(checkboxes)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["checkboxes"])
-        for key in dictWidgets:
-            self.widgets[key] = dictWidgets[key]
-            self.widgets[key].pack(anchor=W)
-
     self.frames["selectOptionsFrame"] = Frame(self)
     self.frames["leftAdjustFrame"] = Frame(self.frames["selectOptionsFrame"])
     self.frames["rightAdjustFrame"] = Frame(self.frames["selectOptionsFrame"])
@@ -35,12 +28,16 @@ def adjust_page(top, parent, settings):
     self.frames["rightAdjustFrame"].pack(side=RIGHT)
     self.frames["bottomAdjustFrame"].pack(fill=X)
 
-    with open(os.path.join("resources","app","gui","adjust","overview","leftAdjustFrame.json")) as leftAdjustFrameItems:
-        myDict = json.load(leftAdjustFrameItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["leftAdjustFrame"])
-        for key in dictWidgets:
-            self.widgets[key] = dictWidgets[key]
-            self.widgets[key].pack(anchor=E)
+    with open(os.path.join("resources","app","gui","adjust","overview","widgets.json")) as widgetDefns:
+        myDict = json.load(widgetDefns)
+        for framename,theseWidgets in myDict.items():
+            dictWidgets = widgets.make_widgets_from_dict(self, theseWidgets, self.frames[framename])
+            for key in dictWidgets:
+                self.widgets[key] = dictWidgets[key]
+                packAttrs = {"anchor":E}
+                if self.widgets[key].type == "checkbox":
+                    packAttrs["anchor"] = W
+                self.widgets[key].pack(packAttrs)
 
     # Sprite Selection
     self.spriteNameVar2 = StringVar()
@@ -67,13 +64,6 @@ def adjust_page(top, parent, settings):
     spriteEntry2.pack(side=LEFT)
     spriteSelectButton2.pack(side=LEFT)
     spriteDialogFrame2.pack(anchor=E)
-
-    with open(os.path.join("resources","app","gui","adjust","overview","rightAdjustFrame.json")) as rightAdjustFrameItems:
-        myDict = json.load(rightAdjustFrameItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["rightAdjustFrame"])
-        for key in dictWidgets:
-            self.widgets[key] = dictWidgets[key]
-            self.widgets[key].pack(anchor=E)
 
     adjustRomFrame = Frame(self.frames["bottomAdjustFrame"])
     adjustRomLabel = Label(adjustRomFrame, text='Rom to adjust: ')

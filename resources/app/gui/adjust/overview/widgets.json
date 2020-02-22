@@ -1,0 +1,124 @@
+{
+  "checkboxes": {
+    "nobgm": {
+      "type": "checkbox",
+      "label": {
+        "text": "Disable Music & MSU-1"
+      }
+    },
+    "quickswap": {
+      "type": "checkbox",
+      "label": {
+        "text": "L/R Quickswapping"
+      }
+    }
+  },
+  "leftAdjustFrame": {
+    "heartcolor": {
+      "type": "selectbox",
+      "label": {
+        "text": "Heart Color"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "Red": "red",
+        "Blue": "blue",
+        "Green": "green",
+        "Yellow": "yellow",
+        "Random": "random"
+      }
+    },
+    "heartbeep": {
+      "type": "selectbox",
+      "label": {
+        "text": "Heart Beep sound rate"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        },
+        "default": "Normal"
+      },
+      "options": {
+        "Double": "double",
+        "Normal": "normal",
+        "Half": "half",
+        "Quarter": "quarter",
+        "Off": "off"
+      }
+    }
+  },
+  "rightAdjustFrame": {
+    "menuspeed": {
+      "type": "selectbox",
+      "label": {
+        "text": "Menu Speed"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        },
+        "default": "Normal"
+      },
+      "options": {
+        "Instant": "instant",
+        "Quadruple": "quadruple",
+        "Triple": "triple",
+        "Double": "double",
+        "Normal": "normal",
+        "Half": "half"
+      }
+    },
+    "owpalettes": {
+      "type": "selectbox",
+      "label": {
+        "text": "Overworld Palettes"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "Default": "default",
+        "Random": "random",
+        "Blackout": "blackout"
+      }
+    },
+    "uwpalettes": {
+      "type": "selectbox",
+      "label": {
+        "text": "Underworld Palettes"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "Default": "default",
+        "Random": "random",
+        "Blackout": "blackout"
+      }
+    }
+  }
+}
