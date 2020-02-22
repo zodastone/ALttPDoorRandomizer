@@ -6,6 +6,7 @@ import random
 import shutil
 from urllib.parse import urlparse
 from urllib.request import urlopen
+import webbrowser
 from GuiUtils import ToolTips, set_icon, BackgroundTaskProgress
 from Rom import Sprite
 from Utils import is_bundled, local_path, output_path, open_file
@@ -27,17 +28,31 @@ class SpriteSelector(object):
         self.window['pady'] = 5
         self.all_sprites = []
 
+        def open_official_sprite_listing(_evt):
+            webbrowser.open("http://alttpr.com/sprite_preview")
+
         def open_unofficial_sprite_dir(_evt):
             open_file(self.unofficial_sprite_dir)
 
-        official_frametitle = Label(self.window, text='Official Sprites')
+        def open_spritesomething_listing(_evt):
+            webbrowser.open("https://artheau.github.io/SpriteSomething/?mode=zelda3/link")
+
+        official_frametitle = Frame(self.window)
+        official_title_text = Label(official_frametitle, text="Official Sprites")
+        official_title_link = Label(official_frametitle, text="(open)", fg="blue", cursor="hand2")
+        official_title_text.pack(side=LEFT)
+        official_title_link.pack(side=LEFT)
+        official_title_link.bind("<Button-1>", open_official_sprite_listing)
 
         unofficial_frametitle = Frame(self.window)
-        title_text = Label(unofficial_frametitle, text="Unofficial Sprites")
-        title_link = Label(unofficial_frametitle, text="(open)", fg="blue", cursor="hand2")
-        title_text.pack(side=LEFT)
-        title_link.pack(side=LEFT)
-        title_link.bind("<Button-1>", open_unofficial_sprite_dir)
+        unofficial_title_text = Label(unofficial_frametitle, text="Unofficial Sprites")
+        unofficial_title_link = Label(unofficial_frametitle, text="(open)", fg="blue", cursor="hand2")
+        unofficial_title_text.pack(side=LEFT)
+        unofficial_title_link.pack(side=LEFT)
+        unofficial_title_link.bind("<Button-1>", open_unofficial_sprite_dir)
+        spritesomething_title_link = Label(unofficial_frametitle, text="(SpriteSomething)", fg="blue", cursor="hand2")
+        spritesomething_title_link.pack(side=LEFT)
+        spritesomething_title_link.bind("<Button-1>", open_spritesomething_listing)
 
         self.icon_section(official_frametitle, self.official_sprite_dir+'/*', 'Official sprites not found. Click "Update official sprites" to download them.')
         self.icon_section(unofficial_frametitle, self.unofficial_sprite_dir+'/*', 'Put sprites in the unofficial sprites folder (see open link above) to have them appear here.')
