@@ -373,77 +373,77 @@ def get_settings():
     "race": False,
     "custom": False,
     "customitemarray": [
-      0,
-      0,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      4,
-      1,
-      1,
-      1,
-      1,
-      1,
-      0,
-      0,
-      2,
-      1,
-      1,
-      24,
-      10,
-      1,
-      0,
-      0,
-      0,
-      0,
-      4,
-      0,
-      0,
-      0,
-      3,
-      0,
-      0,
-      2,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      12,
-      0,
-      16,
-      1,
-      2,
-      4,
-      28,
-      7,
-      1,
-      5,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      10
+      0,  # Bow
+      2,  # Progessive Bow
+      1,  # Blue Boomerang
+      1,  # Red Boomerang
+      1,  # Hookshot
+      1,  # Mushroom
+      1,  # Magic Powder
+      1,  # Fire Rod
+      1,  # Ice Rod
+      1,  # Bombos
+      1,  # Ether
+      1,  # Quake
+      1,  # Lamp
+      1,  # Hammer
+      1,  # Shovel
+      1,  # Flute
+      1,  # Bug Net
+      1,  # Book
+      4,  # Bottle
+      1,  # Cane of Somaria
+      1,  # Cane of Byrna
+      1,  # Magic Cape
+      1,  # Magic Mirror
+      1,  # Pegasus Boots
+      0,  # Power Glove
+      0,  # Titan's Mitt
+      2,  # Progressive Glove
+      1,  # Flippers
+      1,  # Moon Pearl
+      24, # Piece of Heart
+      10, # Heart Container
+      1,  # Sanctuary Heart
+      0,  # FS
+      0,  # MS
+      0,  # TS
+      0,  # GS
+      4,  # Progressive Sword
+      0,  # Fighters' Shield
+      0,  # Fire Shield
+      0,  # Mirror Shield
+      3,  # Progressive Shield
+      0,  # Blue Mail
+      0,  # Red Mail
+      2,  # Progressive Mail
+      1,  # Half Magic
+      0,  # Quarter Magic
+      0,  # Bombs  + 5
+      0,  # Bombs  +10
+      0,  # Arrows + 5
+      0,  # Arrows +10
+      1,  # Single Arrow
+      12, # 10 Arrows
+      0,  # Single Bomb
+      16, #   3 Bombs
+      1,  #  10 Bombs
+      2,  #   1 Rupee
+      4,  #   5 Rupees
+      28, #  20 Rupees
+      7,  #  50 Rupees
+      1,  # 100 Rupees
+      5,  # 300 Rupees
+      0,  # Blue Clock
+      0,  # Green Clock
+      0,  # Red Clock
+      0,  # Silver Arrows Upgrade
+      0,  # Generic Keys
+      0,  # Triforce Pieces
+      0,  # Triforce Pieces Goal
+      0,  # Triforce (win game)
+      0,  # Rupoors
+      10  # Rupoor Cost
     ],
     "rom": os.path.join(".","Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
     "sprite": None,
