@@ -361,7 +361,7 @@ def get_settings():
     "ow_palettes": "default",
     "uw_palettes": "default",
     "shuffleganon": True,
-    "hints": False,
+    "hints": True,
     "enemizercli": os.path.join(".","EnemizerCLI","EnemizerCLI.Core"),
     "shufflebosses": "none",
     "shuffleenemies": "none",

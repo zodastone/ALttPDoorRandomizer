@@ -4,7 +4,7 @@
     "label": {
       "text": "Dungeon Door Shuffle"
     },
-    "packAttrs": {
+    "managerAttrs": {
       "label": {
         "side": "left"
       },
@@ -30,7 +30,7 @@
     "label": {
       "text": "Dungeon Chest Counters"
     },
-    "packAttrs": {
+    "managerAttrs": {
       "label": {
         "side": "left"
       },

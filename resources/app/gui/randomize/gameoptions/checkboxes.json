@@ -3,7 +3,8 @@
     "type": "checkbox",
     "label": {
       "text": "Include Helpful Hints"
-    }
+    },
+    "default": "true"
   },
   "nobgm": {
     "type": "checkbox",

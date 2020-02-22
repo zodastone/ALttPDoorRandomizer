@@ -16,7 +16,7 @@
     "label": {
       "text": "Entrance Shuffle"
     },
-    "packAttrs": {
+    "managerAttrs": {
       "label": { "side": "left" },
       "selectbox": { "side": "right" }
     },

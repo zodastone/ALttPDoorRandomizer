@@ -4,13 +4,10 @@
     "label": {
       "text": "Quarter Magic"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left"
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -18,16 +15,12 @@
   "bombsplus5": {
     "type": "textbox",
     "label": {
-      "text": "Bomb C.+5"
+      "text": "Bomb Cap +5"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [1,15]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -35,16 +28,12 @@
   "bombsplus10": {
     "type": "textbox",
     "label": {
-      "text": "Bomb C.+10"
+      "text": "Bomb Cap +10"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,10]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -52,16 +41,12 @@
   "arrowsplus5": {
     "type": "textbox",
     "label": {
-      "text": "Arrow C.+5"
+      "text": "Arrow Cap +5"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,16]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -69,16 +54,12 @@
   "arrowsplus10": {
     "type": "textbox",
     "label": {
-      "text": "Arrow C.+10"
+      "text": "Arrow Cap +10"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,10]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -88,14 +69,10 @@
     "label": {
       "text": "Arrow (1)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,27]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -105,14 +82,10 @@
     "label": {
       "text": "Arrow (10)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,21]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 12
     }
@@ -122,14 +95,10 @@
     "label": {
       "text": "Bomb (1)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,27]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -139,14 +108,10 @@
     "label": {
       "text": "Bomb (3)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,27]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 13
     }
@@ -156,14 +121,10 @@
     "label": {
       "text": "Bomb (10)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,21]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -173,14 +134,10 @@
     "label": {
       "text": "Rupee (1)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,25]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 2
     }
@@ -190,14 +147,10 @@
     "label": {
       "text": "Rupee (5)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,25]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 4
     }
@@ -207,14 +160,10 @@
     "label": {
       "text": "Rupee (20)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,19]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 28
     }
@@ -224,14 +173,10 @@
     "label": {
       "text": "Rupee (50)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,19]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 7
     }
@@ -241,14 +186,10 @@
     "label": {
       "text": "Rupee (100)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,13]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }

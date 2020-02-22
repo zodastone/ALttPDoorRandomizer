@@ -4,14 +4,10 @@
     "label": {
       "text": "Flute"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,58]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -21,14 +17,10 @@
     "label": {
       "text": "Bug Net"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,41]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -38,14 +30,10 @@
     "label": {
       "text": "Book"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,57]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -55,14 +43,10 @@
     "label": {
       "text": "Bottle"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,53]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 4
     }
@@ -70,16 +54,12 @@
   "somaria": {
     "type": "textbox",
     "label": {
-      "text": "C.Somaria"
+      "text": "Cane of Somaria"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,30]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -87,16 +67,12 @@
   "byrna": {
     "type": "textbox",
     "label": {
-      "text": "C.Byrna"
+      "text": "Cane of Byrna"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,43]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -106,14 +82,10 @@
     "label": {
       "text": "Magic Cape"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,21]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -123,14 +95,10 @@
     "label": {
       "text": "Magic Mirror"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,15]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -140,14 +108,10 @@
     "label": {
       "text": "Pegasus Boots"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,8]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -157,14 +121,10 @@
     "label": {
       "text": "Power Glove"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,18]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -174,14 +134,10 @@
     "label": {
       "text": "Titan's Mitt"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,25]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -189,16 +145,12 @@
   "progressiveglove": {
     "type": "textbox",
     "label": {
-      "text": "Prog.Glove"
+      "text": "Progressive Glove"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,26]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 2
     }
@@ -208,14 +160,10 @@
     "label": {
       "text": "Flippers"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,43]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -225,14 +173,10 @@
     "label": {
       "text": "Moon Pearl"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,23]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -242,14 +186,10 @@
     "label": {
       "text": "Piece of Heart"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,10]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 24
     }

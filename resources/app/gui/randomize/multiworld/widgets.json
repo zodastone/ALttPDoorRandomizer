@@ -4,7 +4,7 @@
     "label": {
       "text": "Worlds"
     },
-    "packAttrs": {
+    "managerAttrs": {
       "label": {
         "side": "left"
       },

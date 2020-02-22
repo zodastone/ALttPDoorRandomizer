@@ -4,14 +4,10 @@
     "label": {
       "text": "Bow"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,53]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -19,16 +15,12 @@
   "progressivebow": {
     "type": "textbox",
     "label": {
-      "text": "Prog.Bow"
+      "text": "Progressive Bow"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,25]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 2
     }
@@ -36,16 +28,12 @@
   "boomerang": {
     "type": "textbox",
     "label": {
-      "text": "B.Boomerang"
+      "text": "Blue Boomerang"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,4]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -53,15 +41,12 @@
   "redmerang": {
     "type": "textbox",
     "label": {
-      "text": "M.Boomerang"
+      "text": "Red Boomerang"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left"
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -71,14 +56,10 @@
     "label": {
       "text": "Hookshot"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,24]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -88,14 +69,10 @@
     "label": {
       "text": "Mushroom"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,17]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -105,13 +82,10 @@
     "label": {
       "text": "Magic Powder"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left"
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -121,14 +95,10 @@
     "label": {
       "text": "Fire Rod"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,33]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -138,14 +108,10 @@
     "label": {
       "text": "Ice Rod"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,37]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -155,14 +121,10 @@
     "label": {
       "text": "Bombos"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,32]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -172,14 +134,10 @@
     "label": {
       "text": "Ether"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,49]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -189,14 +147,10 @@
     "label": {
       "text": "Quake"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,42]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -206,14 +160,10 @@
     "label": {
       "text": "Lamp"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,46]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -223,14 +173,10 @@
     "label": {
       "text": "Hammer"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,29]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -240,14 +186,10 @@
     "label": {
       "text": "Shovel"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,41]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }

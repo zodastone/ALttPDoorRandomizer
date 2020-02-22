@@ -38,6 +38,7 @@ def bottom_frame(self, parent, args=None):
       self,
       "Count",
       None,
+      None,
       {"label": {"side": LEFT}, "spinbox": {"side": RIGHT}}
     )
     self.widgets[key].pack(side=LEFT)

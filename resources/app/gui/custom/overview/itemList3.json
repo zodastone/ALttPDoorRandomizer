@@ -4,13 +4,10 @@
     "label": {
       "text": "Heart Container"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left"
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 10
     }
@@ -20,13 +17,10 @@
     "label": {
       "text": "Sanctuary Heart"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left"
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }
@@ -34,16 +28,12 @@
   "sword1": {
     "type": "textbox",
     "label": {
-      "text": "Sword 1"
+      "text": "Fighters' Sword"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,42]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -51,16 +41,12 @@
   "sword2": {
     "type": "textbox",
     "label": {
-      "text": "Sword 2"
+      "text": "Master Sword"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,42]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -68,16 +54,12 @@
   "sword3": {
     "type": "textbox",
     "label": {
-      "text": "Sword 3"
+      "text": "Tempered Sword"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,42]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -85,16 +67,12 @@
   "sword4": {
     "type": "textbox",
     "label": {
-      "text": "Sword 4"
+      "text": "Golden Sword"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,42]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -102,16 +80,12 @@
   "progressivesword": {
     "type": "textbox",
     "label": {
-      "text": "Prog.Sword"
+      "text": "Progressive Sword"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,23]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 4
     }
@@ -119,16 +93,12 @@
   "shield1": {
     "type": "textbox",
     "label": {
-      "text": "Shield 1"
+      "text": "Fighters' Shield"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,43]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -136,16 +106,12 @@
   "shield2": {
     "type": "textbox",
     "label": {
-      "text": "Shield 2"
+      "text": "Fire Shield"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,43]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -153,16 +119,12 @@
   "shield3": {
     "type": "textbox",
     "label": {
-      "text": "Shield 3"
+      "text": "Mirror Shield"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,43]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -170,16 +132,12 @@
   "progressiveshield": {
     "type": "textbox",
     "label": {
-      "text": "Prog.Shield"
+      "text": "Progressive Shield"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,24]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 3
     }
@@ -189,14 +147,10 @@
     "label": {
       "text": "Blue Mail"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,35]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -206,14 +160,10 @@
     "label": {
       "text": "Red Mail"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,38]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -221,16 +171,12 @@
   "progressivemail": {
     "type": "textbox",
     "label": {
-      "text": "Prog.Mail"
+      "text": "Progressive Mail"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,33]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 2
     }
@@ -240,14 +186,10 @@
     "label": {
       "text": "Half Magic"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,26]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 1
     }

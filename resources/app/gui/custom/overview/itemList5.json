@@ -4,14 +4,10 @@
     "label": {
       "text": "Rupee (300)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,54]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 5
     }
@@ -21,14 +17,10 @@
     "label": {
       "text": "Blue Clock"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,60]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -38,14 +30,10 @@
     "label": {
       "text": "Green Clock"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,52]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -55,14 +43,10 @@
     "label": {
       "text": "Red Clock"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,63]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -72,13 +56,10 @@
     "label": {
       "text": "Silver Arrows Upgrade"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left"
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -88,14 +69,10 @@
     "label": {
       "text": "Generic Keys"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,49]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -105,14 +82,10 @@
     "label": {
       "text": "Triforce Pieces"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,40]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -122,14 +95,10 @@
     "label": {
       "text": "Triforce Pieces Goal"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,13]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -139,14 +108,10 @@
     "label": {
       "text": "Triforce (win game)"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,13]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -156,14 +121,10 @@
     "label": {
       "text": "Rupoor"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,77]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 0
     }
@@ -173,14 +134,10 @@
     "label": {
       "text": "Rupoor Cost"
     },
-    "packAttrs": {
+    "manager": "grid",
+    "managerAttrs": {
       "label": {
-        "anchor": "w",
-        "side": "left",
-        "padx": [0,50]
-      },
-      "textbox": {
-        "side": "right"
+        "sticky": "w"
       },
       "default": 10
     }
