@@ -17,24 +17,21 @@ def gameoptions_page(top, parent):
     self.frames["checkboxes"] = Frame(self)
     self.frames["checkboxes"].pack(anchor=W)
 
-    with open(os.path.join("resources","app","gui","randomize","gameoptions","checkboxes.json")) as checkboxes:
-        myDict = json.load(checkboxes)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["checkboxes"])
-        for key in dictWidgets:
-            self.widgets[key] = dictWidgets[key]
-            self.widgets[key].pack(anchor=W)
-
     self.frames["leftRomOptionsFrame"] = Frame(self)
     self.frames["rightRomOptionsFrame"] = Frame(self)
     self.frames["leftRomOptionsFrame"].pack(side=LEFT)
     self.frames["rightRomOptionsFrame"].pack(side=RIGHT)
 
-    with open(os.path.join("resources","app","gui","randomize","gameoptions","leftRomOptionsFrame.json")) as leftRomOptionsFrameItems:
-        myDict = json.load(leftRomOptionsFrameItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["leftRomOptionsFrame"])
-        for key in dictWidgets:
-            self.widgets[key] = dictWidgets[key]
-            self.widgets[key].pack(anchor=E)
+    with open(os.path.join("resources","app","gui","randomize","gameoptions","widgets.json")) as widgetDefns:
+        myDict = json.load(widgetDefns)
+        for framename,theseWidgets in myDict.items():
+            dictWidgets = widgets.make_widgets_from_dict(self, theseWidgets, self.frames[framename])
+            for key in dictWidgets:
+                self.widgets[key] = dictWidgets[key]
+                packAttrs = {"anchor":E}
+                if self.widgets[key].type == "checkbox":
+                    packAttrs["anchor"] = W
+                self.widgets[key].pack(packAttrs)
 
     ## Sprite selection
     spriteDialogFrame = Frame(self.frames["leftRomOptionsFrame"])
@@ -61,13 +58,6 @@ def gameoptions_page(top, parent):
     spriteEntry.pack(side=LEFT)
     spriteSelectButton.pack(side=LEFT)
     spriteDialogFrame.pack(anchor=E)
-
-    with open(os.path.join("resources","app","gui","randomize","gameoptions","rightRomOptionsFrame.json")) as rightRomOptionsFrameItems:
-        myDict = json.load(rightRomOptionsFrameItems)
-        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["rightRomOptionsFrame"])
-        for key in dictWidgets:
-            self.widgets[key] = dictWidgets[key]
-            self.widgets[key].pack(anchor=E)
 
     return self
 
