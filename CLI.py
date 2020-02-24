@@ -238,6 +238,7 @@ def parse_arguments(argv, no_defaults=False):
     parser.add_argument('--startinventory', default=defval(settings["startinventory"]), help='Specifies a list of items that will be in your starting inventory (separated by commas)')
     parser.add_argument('--usestartinventory', default=defval(settings["usestartinventory"] != 0), help='Not supported.')
     parser.add_argument('--custom', default=defval(settings["custom"] != 0), help='Not supported.')
+    parser.add_argument('--customitemarray', default=defval(settings["custom"] != 0), help='Not supported.')
     parser.add_argument('--accessibility', default=defval(settings["accessibility"]), const='items', nargs='?', choices=['items', 'locations', 'none'], help='''\
                              Select Item/Location Accessibility. (default: %(default)s)
                              Items:     You can reach all unique inventory items. No guarantees about
