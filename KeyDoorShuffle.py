@@ -147,7 +147,7 @@ def analyze_dungeon(key_layout, world, player):
     key_layout.key_counters = create_key_counters(key_layout, world, player)
     key_logic = key_layout.key_logic
 
-    find_bk_locked_sections(key_layout, world)
+    find_bk_locked_sections(key_layout, world, player)
     key_logic.bk_chests.update(find_big_chest_locations(key_layout.all_chest_locations))
     if world.retro[player] and world.mode[player] != 'standard':
         return
@@ -304,14 +304,14 @@ def queue_sorter_2(queue_item):
     return 1 if door.bigKey else 0
 
 
-def find_bk_locked_sections(key_layout, world):
+def find_bk_locked_sections(key_layout, world, player):
     if key_layout.big_key_special:
         return
     key_counters = key_layout.key_counters
     key_logic = key_layout.key_logic
 
     bk_key_not_required = set()
-    big_chest_allowed_big_key = world.accessibility != 'locations'
+    big_chest_allowed_big_key = world.accessibility[player] != 'locations'
     for counter in key_counters.values():
         key_layout.all_chest_locations.update(counter.free_locations)
         key_layout.all_locations.update(counter.free_locations)
@@ -1450,8 +1450,8 @@ def validate_key_placement(key_layout, world, player):
         if not can_progress:
             missing_locations = set(max_counter.free_locations.keys()).difference(found_locations)
             missing_items = [l for l in missing_locations if l.item is None or (l.item.name != smallkey_name and l.item != dungeon.big_key) or "- Boss" in l.name]
-            #missing_key_only = set(max_counter.key_only_locations.keys()).difference(counter.key_only_locations.keys()) # do freestanding keys matter for locations?
-            if len(missing_items) > 0: #world.accessibility[player]=='locations' and (len(missing_locations)>0 or len(missing_key_only) > 0):
+            # missing_key_only = set(max_counter.key_only_locations.keys()).difference(counter.key_only_locations.keys()) # do freestanding keys matter for locations?
+            if len(missing_items) > 0:  # world.accessibility[player]=='locations' and (len(missing_locations)>0 or len(missing_key_only) > 0):
                 logging.getLogger('').error("Keylock - can't open locations: ")
                 for i in missing_locations:
                     logging.getLogger('').error(i)
