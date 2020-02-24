@@ -374,6 +374,7 @@ def get_settings():
     "remote_items": False,
     "race": False,
     "custom": False,
+    "usestartinventory": False,
     "customitemarray": {
       "bow": 0,
       "progressivebow": 2,
@@ -452,6 +453,7 @@ def get_settings():
     "randomSprite": False,
     "outputpath": os.path.join(".")
   }
+  settings["startinventoryarray"] = {}
   if sys.platform.lower().find("windows"):
       settings["enemizercli"] += ".exe"
 

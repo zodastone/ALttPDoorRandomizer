@@ -11,6 +11,12 @@
       "text": "Do not create patched ROM"
     }
   },
+  "usestartinventory": {
+    "type": "checkbox",
+    "label": {
+      "text": "Use starting inventory"
+    }
+  },
   "usecustompool": {
     "type": "checkbox",
     "label": {

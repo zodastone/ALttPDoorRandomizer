@@ -19,3 +19,25 @@ CUSTOMITEMS = [
   "generickeys",        "triforcepieces",   "triforcepiecesgoal", "triforce",         "rupoor",
   "rupoorcost"
 ]
+
+CUSTOMITEMLABELS = [
+  "Bow", "Progressive Bow", "Blue Boomerang", "Red Boomerang", "Hookshot",
+  "Mushroom", "Magic Powder", "Fire Rod", "Ice Rod", "Bombos",
+  "Ether", "Quake", "Lamp", "Hammer", "Shovel",
+
+  "Ocarina", "Bug Catching Net", "Book of Mudora", "Bottle", "Cane of Somaria",
+  "Cane of Byrna", "Magic Cape", "Magic Mirror", "Pegasus Boots", "Power Glove",
+  "Titans Mitts", "Progressive Glove", "Flippers", "Moon Pearl", "Piece of Heart",
+  
+  "Boss Heart Container", "Sanctuary Heart Container", "Fighter Sword", "Master Sword", "Tempered Sword",
+  "Golden Sword", "Progressive Sword", "Blue Shield", "Red Shield", "Mirror Shield",
+  "Progressive Shield", "Blue Mail", "Red Mail", "Progressive Armor", "Magic Upgrade (1/2)",
+
+  "Magic Upgrade (1/4)", "Bomb Upgrade (+5)", "Bomb Upgrade (+10)", "Arrow Upgrade (+5)", "Arrow Upgrade (+10)",
+  "Single Arrow", "Arrows (10)", "Single Bomb", "Bombs (3)", "Bombs (10)",
+  "Rupee (1)", "Rupees (5)", "Rupees (20)", "Rupees (50)", "Rupees (100)",
+
+  "Rupees (300)", "Blue Clock", "Green Clock", "Red Clock", "Silver Arrows",
+  "Small Key (Universal)", "Triforce Piece", "Triforce Piece Goal", "Triforce", "Rupoor",
+  "Rupoor Cost"
+]

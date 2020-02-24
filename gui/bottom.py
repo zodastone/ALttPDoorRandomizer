@@ -180,9 +180,19 @@ def create_guiargs(parent):
       setattr(guiargs,"adjust." + internal, parent.pages["adjust"].content.widgets[adjustarg].storageVar.get())
 
     customitems = CONST.CUSTOMITEMS
+    guiargs.startinventory = []
     guiargs.customitemarray = {}
+    guiargs.startinventoryarray = {}
     for customitem in customitems:
+        if customitem not in ["triforcepiecesgoal", "rupoorcost"]:
+            amount = int(parent.pages["startinventory"].content.startingWidgets[customitem].storageVar.get())
+            guiargs.startinventoryarray[customitem] = amount
+            for i in range(0, amount):
+                label = CONST.CUSTOMITEMLABELS[customitems.index(customitem)]
+                guiargs.startinventory.append(label)
         guiargs.customitemarray[customitem] = int(parent.pages["custom"].content.customWidgets[customitem].storageVar.get())
+
+    guiargs.startinventory = ','.join(guiargs.startinventory)
 
     guiargs.sprite = parent.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteObject"]
     guiargs.randomSprite = parent.randomSprite.get()

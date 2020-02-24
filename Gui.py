@@ -8,6 +8,7 @@ from argparse import Namespace
 from CLI import get_settings
 from DungeonRandomizer import parse_arguments
 from gui.adjust.overview import adjust_page
+from gui.startinventory.overview import startinventory_page
 from gui.custom.overview import custom_page
 from gui.loadcliargs import loadcliargs, loadadjustargs
 from gui.randomize.item import item_page
@@ -67,9 +68,11 @@ def guiMain(args=None):
     self.notebook = ttk.Notebook(self)
     self.pages["randomizer"] = ttk.Frame(self.notebook)
     self.pages["adjust"] = ttk.Frame(self.notebook)
+    self.pages["startinventory"] = ttk.Frame(self.notebook)
     self.pages["custom"] = ttk.Frame(self.notebook)
     self.notebook.add(self.pages["randomizer"], text='Randomize')
     self.notebook.add(self.pages["adjust"], text='Adjust')
+    self.notebook.add(self.pages["startinventory"], text='Starting Inventory')
     self.notebook.add(self.pages["custom"], text='Custom')
     self.notebook.pack()
 
@@ -131,6 +134,10 @@ def guiMain(args=None):
     # Adjuster Controls
     self.pages["adjust"].content,self.settings = adjust_page(self, self.pages["adjust"], self.settings)
     self.pages["adjust"].content.pack(side=TOP, fill=BOTH, expand=True)
+
+    # Starting Inventory Controls
+    self.pages["startinventory"].content = startinventory_page(self, self.pages["startinventory"])
+    self.pages["startinventory"].content.pack(side=TOP, fill=BOTH, expand=True)
 
     # Custom Controls
     self.pages["custom"].content = custom_page(self,self.pages["custom"])
