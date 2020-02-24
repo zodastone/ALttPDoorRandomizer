@@ -59,7 +59,8 @@ def start():
             seed = random.randint(0, 999999999)
         for fail in failures:
             logger.info('%s seed failed with: %s', fail[1], fail[0])
-        logger.info('Generation fail rate: %f%%', 100*len(failures)/args.count)
+        logger.info('Generation fail    rate: %f%%', 100 * len(failures) / args.count)
+        logger.info('Generation success rate: %f%%', 100 * (args.count - len(failures)) / args.count)
     else:
         main(seed=args.seed, args=args)
 

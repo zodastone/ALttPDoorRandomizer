@@ -34,7 +34,7 @@ def parse_arguments(argv, no_defaults=False):
     multiargs, _ = parser.parse_known_args(argv)
 
     parser = argparse.ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--create_spoiler', help='Output a Spoiler File', action='store_true')
+    parser.add_argument('--create_spoiler', default=defval(settings["create_spoiler"] != 0), help='Output a Spoiler File', action='store_true')
     parser.add_argument('--logic', default=defval(settings["logic"]), const='noglitches', nargs='?', choices=['noglitches', 'minorglitches', 'nologic'],
                         help='''\
                              Select Enforcement of Item Requirements. (default: %(default)s)
@@ -236,8 +236,8 @@ def parse_arguments(argv, no_defaults=False):
                              and a few other little things make this more like Zelda-1.
                              ''', action='store_true')
     parser.add_argument('--startinventory', default=defval(settings["startinventory"]), help='Specifies a list of items that will be in your starting inventory (separated by commas)')
+    parser.add_argument('--usestartinventory', default=defval(settings["usestartinventory"] != 0), help='Not supported.')
     parser.add_argument('--custom', default=defval(settings["custom"] != 0), help='Not supported.')
-    parser.add_argument('--customitemarray', default=defval(settings["customitemarray"] != 0), help='Not supported.')
     parser.add_argument('--accessibility', default=defval(settings["accessibility"]), const='items', nargs='?', choices=['items', 'locations', 'none'], help='''\
                              Select Item/Location Accessibility. (default: %(default)s)
                              Items:     You can reach all unique inventory items. No guarantees about
@@ -270,7 +270,7 @@ def parse_arguments(argv, no_defaults=False):
                              Alternatively, can be a ALttP Rom patched with a Link
                              sprite that will be extracted.
                              ''')
-    parser.add_argument('--suppress_rom', help='Do not create an output rom file.', action='store_true')
+    parser.add_argument('--suppress_rom', default=defval(settings["suppress_rom"] != 0), help='Do not create an output rom file.', action='store_true')
     parser.add_argument('--gui', help='Launch the GUI', action='store_true')
     parser.add_argument('--jsonout', action='store_true', help='''\
                             Output .json patch to stdout instead of a patched rom. Used
@@ -324,10 +324,7 @@ def parse_arguments(argv, no_defaults=False):
 def get_settings():
   # set default settings
   settings = {
-    "multi": 1,
-    "names": "",
-    "seed": None,
-    "count": 1,
+    "retro": False,
     "mode": "open",
     "logic": "noglitches",
     "goal": "ganon",
@@ -340,41 +337,53 @@ def get_settings():
     "progressive": "on",
     "accessibility": "items",
     "algorithm": "balanced",
-    "shuffle": "vanilla",
-    "door_shuffle": "basic",
-    "experimental": 0,
-    "dungeon_counters": "off",
-    "heartbeep": "normal",
-    "heartcolor": "red",
-    "fastmenu": "normal",
-    "create_spoiler": False,
-    "skip_playthrough": True,
-    "suppress_rom": False,
+
     "openpyramid": False,
+    "shuffleganon": False,
+    "shuffle": "vanilla",
+
+    "shufflepots": False,
+    "shuffleenemies": "none",
+    "shufflebosses": "none",
+    "enemy_damage": "default",
+    "enemy_health": "default",
+    "enemizercli": os.path.join(".","EnemizerCLI","EnemizerCLI.Core"),
+
     "mapshuffle": False,
     "compassshuffle": False,
     "keyshuffle": False,
     "bigkeyshuffle": False,
     "keysanity": False,
-    "retro": False,
-    "startinventory": "",
-    "quickswap": False,
+    "door_shuffle": "basic",
+    "experimental": 0,
+    "dungeon_counters": "off",
+
+    "multi": 1,
+    "names": "",
+
+    "hints": True,
     "disablemusic": False,
+    "quickswap": False,
+    "heartcolor": "red",
+    "heartbeep": "normal",
+    "sprite": None,
+    "fastmenu": "normal",
     "ow_palettes": "default",
     "uw_palettes": "default",
-    "shuffleganon": True,
-    "hints": True,
-    "enemizercli": os.path.join(".","EnemizerCLI","EnemizerCLI.Core"),
-    "shufflebosses": "none",
-    "shuffleenemies": "none",
-    "enemy_health": "default",
-    "enemy_damage": "default",
-    "shufflepots": False,
+
+    "create_spoiler": False,
+    "skip_playthrough": True,
+    "suppress_rom": False,
+    "usestartinventory": False,
+    "custom": False,
+    "rom": os.path.join(".","Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
+
+    "seed": None,
+    "count": 1,
+    "startinventory": "",
     "beemizer": 0,
     "remote_items": False,
     "race": False,
-    "custom": False,
-    "usestartinventory": False,
     "customitemarray": {
       "bow": 0,
       "progressivebow": 2,
@@ -448,8 +457,6 @@ def get_settings():
       "rupoor": 0,
       "rupoorcost": 10
     },
-    "rom": os.path.join(".","Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
-    "sprite": None,
     "randomSprite": False,
     "outputpath": os.path.join(".")
   }
@@ -467,3 +474,28 @@ def get_settings():
           for k,v in data.items():
               settings[k] = v
   return settings
+
+def get_args_priority(settings_args, gui_args, cli_args):
+  args = {}
+  args["settings"] = get_settings() if settings_args is None else settings_args
+  args["gui"] = {} if gui_args is None else gui_args
+  args["cli"] = cli_args
+
+  args["load"] = args["settings"]
+  if args["gui"] is not None:
+      for k in args["gui"]:
+          if k not in args["load"] or args["load"][k] != args["gui"]:
+              args["load"][k] = args["gui"][k]
+
+  if args["cli"] is None:
+      args["cli"] = {}
+      cli = vars(parse_arguments(None))
+      for k,v in cli.items():
+          if isinstance(v,dict):
+              args["cli"][k] = v[1]
+          else:
+              args["cli"][k] = v
+          if k not in args["load"] or args["load"][k] != args["cli"]:
+              args["load"][k] = args["cli"][k]
+
+  return args

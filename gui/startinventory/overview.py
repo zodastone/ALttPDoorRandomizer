@@ -43,15 +43,18 @@ def startinventory_page(top,parent):
 
     with open(os.path.join("resources","app","gui","custom","overview","widgets.json")) as widgetDefns:
         myDict = json.load(widgetDefns)
-        del myDict["itemList5"]["triforcepiecesgoal"]
-        del myDict["itemList5"]["rupoorcost"]
+        for key in CONST.CANTSTARTWITH:
+            for num in range(1, 5 + 1):
+                thisList = "itemList" + str(num)
+                if key in myDict[thisList]:
+                    del myDict[thisList][key]
         for framename,theseWidgets in myDict.items():
             dictWidgets = widgets.make_widgets_from_dict(self, theseWidgets, self.frames[framename])
             for key in dictWidgets:
                 self.startingWidgets[key] = dictWidgets[key]
 
     for key in CONST.CUSTOMITEMS:
-        if key not in ["triforcepiecesgoal", "rupoorcost"]:
+        if key not in CONST.CANTSTARTWITH:
             val = 0
             if key in top.settings["startinventoryarray"]:
                 val = top.settings["startinventoryarray"][key]

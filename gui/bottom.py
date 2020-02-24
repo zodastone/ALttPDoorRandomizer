@@ -1,5 +1,6 @@
 from tkinter import ttk, messagebox, StringVar, Button, Entry, Frame, Label, Spinbox, E, W, LEFT, RIGHT, X
 from argparse import Namespace
+from functools import partial
 import logging
 import os
 import random
@@ -79,11 +80,12 @@ def bottom_frame(self, parent, args=None):
     openOutputButton = Button(self, text='Open Output Directory', command=open_output)
     openOutputButton.pack(side=RIGHT)
 
+    ## Documentation Button
     if os.path.exists(local_path('README.html')):
         def open_readme():
             open_file(local_path('README.html'))
         openReadmeButton = Button(self, text='Open Documentation', command=open_readme)
-        openReadmeButton.pack()
+        openReadmeButton.pack(side=RIGHT)
 
     return self
 
@@ -93,63 +95,8 @@ def create_guiargs(parent):
 
     # set up settings to gather
     # Page::Subpage::GUI-id::param-id
-    options = {
-      "randomizer": {
-        "item": {
-          "retro": "retro",
-          "worldstate": "mode",
-          "logiclevel": "logic",
-          "goal": "goal",
-          "crystals_gt": "crystals_gt",
-          "crystals_ganon": "crystals_ganon",
-          "weapons": "swords",
-          "itempool": "difficulty",
-          "itemfunction": "item_functionality",
-          "timer": "timer",
-          "progressives": "progressive",
-          "accessibility": "accessibility",
-          "sortingalgo": "algorithm"
-        },
-        "entrance": {
-          "openpyramid": "openpyramid",
-          "shuffleganon": "shuffleganon",
-          "entranceshuffle": "shuffle"
-        },
-        "enemizer": {
-          "potshuffle": "shufflepots",
-          "enemyshuffle": "shuffleenemies",
-          "bossshuffle": "shufflebosses",
-          "enemydamage": "enemy_damage",
-          "enemyhealth": "enemy_health"
-        },
-        "dungeon": {
-          "mapshuffle": "mapshuffle",
-          "compassshuffle": "compassshuffle",
-          "smallkeyshuffle": "keyshuffle",
-          "bigkeyshuffle": "bigkeyshuffle",
-          "dungeondoorshuffle": "door_shuffle",
-          "experimental": "experimental",
-          "dungeon_counters": "dungeon_counters"
-        },
-        "multiworld": {
-          "names": "names"
-        },
-        "gameoptions": {
-          "hints": "hints",
-          "nobgm": "disablemusic",
-          "quickswap": "quickswap",
-          "heartcolor": "heartcolor",
-          "heartbeep": "heartbeep",
-          "menuspeed": "fastmenu",
-          "owpalettes": "ow_palettes",
-          "uwpalettes": "uw_palettes"
-        },
-        "generation": {
-          "spoiler": "create_spoiler",
-          "suppressrom": "suppress_rom"
-        } 
-      }
-    }
+    options = CONST.SETTINGSTOPROCESS
+
     for mainpage in options:
         for subpage in options[mainpage]:
             for widget in options[mainpage][subpage]:
@@ -184,7 +131,7 @@ def create_guiargs(parent):
     guiargs.customitemarray = {}
     guiargs.startinventoryarray = {}
     for customitem in customitems:
-        if customitem not in ["triforcepiecesgoal", "rupoorcost"]:
+        if customitem not in ["triforcepiecesgoal", "triforce", "rupoor", "rupoorcost"]:
             amount = int(parent.pages["startinventory"].content.startingWidgets[customitem].storageVar.get())
             guiargs.startinventoryarray[customitem] = amount
             for i in range(0, amount):

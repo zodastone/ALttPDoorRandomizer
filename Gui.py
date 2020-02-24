@@ -2,10 +2,10 @@
 import json
 import os
 import sys
-from tkinter import Tk, BOTTOM, TOP, StringVar, BooleanVar, X, BOTH, ttk
+from tkinter import Tk, Button, BOTTOM, TOP, StringVar, BooleanVar, X, BOTH, RIGHT, ttk, messagebox
 
 from argparse import Namespace
-from CLI import get_settings
+from CLI import get_settings, get_args_priority
 from DungeonRandomizer import parse_arguments
 from gui.adjust.overview import adjust_page
 from gui.startinventory.overview import startinventory_page
@@ -36,28 +36,39 @@ def guiMain(args=None):
             f.write(json.dumps(args, indent=2))
         os.chmod(os.path.join(settings_path, "settings.json"),0o755)
 
-    # routine for exiting the app
-    def guiExit():
+    def save_settings_from_gui():
         gui_args = vars(create_guiargs(self))
         if self.randomSprite.get():
             gui_args['sprite'] = 'random'
         elif gui_args['sprite']:
             gui_args['sprite'] = gui_args['sprite'].name
         save_settings(gui_args)
+        messagebox.showinfo("Door Shuffle " + ESVersion,"Settings saved from GUI.")
+
+    # routine for exiting the app
+    def guiExit():
+        dosave = messagebox.askyesno("Door Shuffle " + ESVersion, "Save settings before exit?")
+        if dosave:
+            save_settings_from_gui()
         sys.exit(0)
 
     # make main window
     # add program title & version number
     mainWindow = Tk()
     self = mainWindow
+
     mainWindow.wm_title("Door Shuffle %s" % ESVersion)
     mainWindow.protocol("WM_DELETE_WINDOW", guiExit)  # intercept when user clicks the X
 
     # set program icon
     set_icon(mainWindow)
 
+    # get args
+    # getting Settings & CLI (no GUI built yet)
+    self.args = get_args_priority(None, None, None)
+
     # get saved settings
-    self.settings = get_settings()
+    self.settings = self.args["settings"]
 
     # make array for pages
     self.pages = {}
@@ -73,7 +84,7 @@ def guiMain(args=None):
     self.notebook.add(self.pages["randomizer"], text='Randomize')
     self.notebook.add(self.pages["adjust"], text='Adjust')
     self.notebook.add(self.pages["startinventory"], text='Starting Inventory')
-    self.notebook.add(self.pages["custom"], text='Custom')
+    self.notebook.add(self.pages["custom"], text='Custom Item Pool')
     self.notebook.pack()
 
     # randomizer controls
@@ -125,6 +136,10 @@ def guiMain(args=None):
 
     # bottom of window: Open Output Directory, Open Documentation (if exists)
     self.frames["bottom"] = bottom_frame(self, self, None)
+    ## Save Settings Button
+    savesettingsButton = Button(self.frames["bottom"], text='Save Settings to File', command=save_settings_from_gui)
+    savesettingsButton.pack(side=RIGHT)
+
     # set bottom frame to main window
     self.frames["bottom"].pack(side=BOTTOM, fill=X, padx=5, pady=5)
 
@@ -141,7 +156,7 @@ def guiMain(args=None):
 
     # Custom Controls
     self.pages["custom"].content = custom_page(self,self.pages["custom"])
-    self.pages["custom"].content.pack(side=TOP, pady=(17,0))
+    self.pages["custom"].content.pack(side=TOP, fill=BOTH, expand=True)
 
     def validation(P):
         if str.isdigit(P) or P == "":
@@ -150,11 +165,11 @@ def guiMain(args=None):
             return False
     vcmd=(self.pages["custom"].content.register(validation), '%P')
 
+    # load args
+    loadcliargs(self, self.args["load"])
+
     # load adjust settings into options
     loadadjustargs(self, self.settings)
-
-    # load args from CLI into options
-    loadcliargs(self, args, self.settings)
 
     mainWindow.mainloop()
 

@@ -20,6 +20,11 @@ CUSTOMITEMS = [
   "rupoorcost"
 ]
 
+CANTSTARTWITH = [
+  "triforcepiecesgoal", "triforce", "rupoor",
+  "rupoorcost"
+]
+
 CUSTOMITEMLABELS = [
   "Bow", "Progressive Bow", "Blue Boomerang", "Red Boomerang", "Hookshot",
   "Mushroom", "Magic Powder", "Fire Rod", "Ice Rod", "Bombos",
@@ -41,3 +46,63 @@ CUSTOMITEMLABELS = [
   "Small Key (Universal)", "Triforce Piece", "Triforce Piece Goal", "Triforce", "Rupoor",
   "Rupoor Cost"
 ]
+
+SETTINGSTOPROCESS = {
+  "randomizer": {
+    "item": {
+      "retro": "retro",
+      "worldstate": "mode",
+      "logiclevel": "logic",
+      "goal": "goal",
+      "crystals_gt": "crystals_gt",
+      "crystals_ganon": "crystals_ganon",
+      "weapons": "swords",
+      "itempool": "difficulty",
+      "itemfunction": "item_functionality",
+      "timer": "timer",
+      "progressives": "progressive",
+      "accessibility": "accessibility",
+      "sortingalgo": "algorithm"
+    },
+    "entrance": {
+      "openpyramid": "openpyramid",
+      "shuffleganon": "shuffleganon",
+      "entranceshuffle": "shuffle"
+    },
+    "enemizer": {
+      "potshuffle": "shufflepots",
+      "enemyshuffle": "shuffleenemies",
+      "bossshuffle": "shufflebosses",
+      "enemydamage": "enemy_damage",
+      "enemyhealth": "enemy_health"
+    },
+    "dungeon": {
+      "mapshuffle": "mapshuffle",
+      "compassshuffle": "compassshuffle",
+      "smallkeyshuffle": "keyshuffle",
+      "bigkeyshuffle": "bigkeyshuffle",
+      "dungeondoorshuffle": "door_shuffle",
+      "experimental": "experimental",
+      "dungeon_counters": "dungeon_counters"
+    },
+    "multiworld": {
+      "names": "names"
+    },
+    "gameoptions": {
+      "hints": "hints",
+      "nobgm": "disablemusic",
+      "quickswap": "quickswap",
+      "heartcolor": "heartcolor",
+      "heartbeep": "heartbeep",
+      "menuspeed": "fastmenu",
+      "owpalettes": "ow_palettes",
+      "uwpalettes": "uw_palettes"
+    },
+    "generation": {
+      "spoiler": "create_spoiler",
+      "suppressrom": "suppress_rom",
+      "usestartinventory": "usestartinventory",
+      "usecustompool": "custom"
+    } 
+  }
+}
