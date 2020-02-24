@@ -16,10 +16,13 @@ README.html
 EnemizerCLI/
 .mypy_cache/
 RaceRom.py
+upx/
 weights/
 
 settings.json
 working_dirs.json
+
+*.exe
 
 venv
 test

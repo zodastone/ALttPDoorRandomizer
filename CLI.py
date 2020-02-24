@@ -238,7 +238,7 @@ def parse_arguments(argv, no_defaults=False):
     parser.add_argument('--startinventory', default=defval(settings["startinventory"]), help='Specifies a list of items that will be in your starting inventory (separated by commas)')
     parser.add_argument('--usestartinventory', default=defval(settings["usestartinventory"] != 0), help='Not supported.')
     parser.add_argument('--custom', default=defval(settings["custom"] != 0), help='Not supported.')
-    parser.add_argument('--customitemarray', default=defval(settings["custom"] != 0), help='Not supported.')
+    parser.add_argument('--customitemarray', default={}, help='Not supported.')
     parser.add_argument('--accessibility', default=defval(settings["accessibility"]), const='items', nargs='?', choices=['items', 'locations', 'none'], help='''\
                              Select Item/Location Accessibility. (default: %(default)s)
                              Items:     You can reach all unique inventory items. No guarantees about
@@ -492,11 +492,15 @@ def get_args_priority(settings_args, gui_args, cli_args):
       args["cli"] = {}
       cli = vars(parse_arguments(None))
       for k,v in cli.items():
-          if isinstance(v,dict):
+          if isinstance(v,dict) and 1 in v:
               args["cli"][k] = v[1]
           else:
               args["cli"][k] = v
-          if k not in args["load"] or args["load"][k] != args["cli"]:
-              args["load"][k] = args["cli"][k]
+          load_doesnt_have_key = k not in args["load"]
+          different_val = (k in args["load"] and k in args["cli"]) and (args["load"][k] != args["cli"][k])
+          cli_has_empty_dict = k in args["cli"] and isinstance(args["cli"][k],dict) and len(args["cli"][k]) == 0
+          if load_doesnt_have_key or different_val:
+              if not cli_has_empty_dict:
+                  args["load"][k] = args["cli"][k]
 
   return args
