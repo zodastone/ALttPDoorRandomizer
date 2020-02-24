@@ -3,6 +3,8 @@ import gui.widgets as widgets
 import json
 import os
 
+import classes.constants as CONST
+
 def custom_page(top,parent):
     # Custom Item Pool
     self = ttk.Frame(parent)
@@ -46,8 +48,7 @@ def custom_page(top,parent):
             for key in dictWidgets:
                 self.customWidgets[key] = dictWidgets[key]
 
-    keys = list(self.customWidgets.keys())
-    for i in range(0, len(keys)):
-        self.customWidgets[keys[i]].storageVar.set(top.settings["customitemarray"][i])
+    for key in CONST.CUSTOMITEMS:
+        self.customWidgets[key].storageVar.set(top.settings["customitemarray"][key])
 
     return self

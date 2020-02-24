@@ -6,6 +6,7 @@ import random
 from CLI import parse_arguments, get_settings
 from Main import main
 from Utils import local_path, output_path, open_file
+import classes.constants as CONST
 import gui.widgets as widgets
 
 
@@ -178,21 +179,10 @@ def create_guiargs(parent):
       internal = adjustargs[adjustarg]
       setattr(guiargs,"adjust." + internal, parent.pages["adjust"].content.widgets[adjustarg].storageVar.get())
 
-    customitems = [
-      "bow",            "progressivebow",   "boomerang",  "redmerang",          "hookshot",   "mushroom",     "powder",       "firerod",
-      "icerod",         "bombos",           "ether",      "quake",              "lamp",       "hammer",       "shovel",
-      "flute",          "bugnet",           "book",       "bottle",             "somaria",    "byrna",        "cape",         "mirror",
-      "boots",          "powerglove",       "titansmitt", "progressiveglove",   "flippers",   "pearl",        "heartpiece",
-      "heartcontainer", "sancheart",        "sword1",     "sword2",             "sword3",     "sword4",       "progressivesword",
-      "shield1",        "shield2",          "shield3",    "progressiveshield",  "mail2",
-      "mail3",          "progressivemail",  "halfmagic",  "quartermagic",       "bombsplus5", "bombsplus10",  "arrowsplus5",  "arrowsplus10",
-      "arrow1",         "arrow10",          "bomb1",      "bomb3",              "bomb10",     "rupee1",       "rupee5",       "rupee20",
-      "rupee50",        "rupee100",         "rupee300",   "blueclock",          "greenclock", "redclock",     "silversupgrade", "generickeys",
-      "triforcepieces", "triforcepiecesgoal", "triforce", "rupoor", "rupoorcost"
-    ]
-    guiargs.customitemarray = []
+    customitems = CONST.CUSTOMITEMS
+    guiargs.customitemarray = {}
     for customitem in customitems:
-        guiargs.customitemarray.append(int(parent.pages["custom"].content.customWidgets[customitem].storageVar.get()))
+        guiargs.customitemarray[customitem] = int(parent.pages["custom"].content.customWidgets[customitem].storageVar.get())
 
     guiargs.sprite = parent.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteObject"]
     guiargs.randomSprite = parent.randomSprite.get()

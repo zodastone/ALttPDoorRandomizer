@@ -13,6 +13,8 @@ from Rom import get_sprite_from_name
 from Utils import is_bundled, close_console
 from Fill import FillError
 
+import classes.constants as CONST
+
 
 class ArgumentDefaultsHelpFormatter(argparse.RawTextHelpFormatter):
 
@@ -372,79 +374,79 @@ def get_settings():
     "remote_items": False,
     "race": False,
     "custom": False,
-    "customitemarray": [
-      0,  # Bow
-      2,  # Progessive Bow
-      1,  # Blue Boomerang
-      1,  # Red Boomerang
-      1,  # Hookshot
-      1,  # Mushroom
-      1,  # Magic Powder
-      1,  # Fire Rod
-      1,  # Ice Rod
-      1,  # Bombos
-      1,  # Ether
-      1,  # Quake
-      1,  # Lamp
-      1,  # Hammer
-      1,  # Shovel
-      1,  # Flute
-      1,  # Bug Net
-      1,  # Book
-      4,  # Bottle
-      1,  # Cane of Somaria
-      1,  # Cane of Byrna
-      1,  # Magic Cape
-      1,  # Magic Mirror
-      1,  # Pegasus Boots
-      0,  # Power Glove
-      0,  # Titan's Mitt
-      2,  # Progressive Glove
-      1,  # Flippers
-      1,  # Moon Pearl
-      24, # Piece of Heart
-      10, # Heart Container
-      1,  # Sanctuary Heart
-      0,  # FS
-      0,  # MS
-      0,  # TS
-      0,  # GS
-      4,  # Progressive Sword
-      0,  # Fighters' Shield
-      0,  # Fire Shield
-      0,  # Mirror Shield
-      3,  # Progressive Shield
-      0,  # Blue Mail
-      0,  # Red Mail
-      2,  # Progressive Mail
-      1,  # Half Magic
-      0,  # Quarter Magic
-      0,  # Bombs  + 5
-      0,  # Bombs  +10
-      0,  # Arrows + 5
-      0,  # Arrows +10
-      1,  # Single Arrow
-      12, # 10 Arrows
-      0,  # Single Bomb
-      16, #   3 Bombs
-      1,  #  10 Bombs
-      2,  #   1 Rupee
-      4,  #   5 Rupees
-      28, #  20 Rupees
-      7,  #  50 Rupees
-      1,  # 100 Rupees
-      5,  # 300 Rupees
-      0,  # Blue Clock
-      0,  # Green Clock
-      0,  # Red Clock
-      0,  # Silver Arrows Upgrade
-      0,  # Generic Keys
-      0,  # Triforce Pieces
-      0,  # Triforce Pieces Goal
-      0,  # Triforce (win game)
-      0,  # Rupoors
-      10  # Rupoor Cost
-    ],
+    "customitemarray": {
+      "bow": 0,
+      "progressivebow": 2,
+      "boomerang": 1,
+      "redmerang": 1,
+      "hookshot": 1,
+      "mushroom": 1,
+      "powder": 1,
+      "firerod": 1,
+      "icerod": 1,
+      "bombos": 1,
+      "ether": 1,
+      "quake": 1,
+      "lamp": 1,
+      "hammer": 1,
+      "shovel": 1,
+      "flute": 1,
+      "bugnet": 1,
+      "book": 1,
+      "bottle": 4,
+      "somaria": 1,
+      "byrna": 1,
+      "cape": 1,
+      "mirror": 1,
+      "boots": 1,
+      "powerglove": 0,
+      "titansmitt": 0,
+      "progressiveglove": 2,
+      "flippers": 1,
+      "pearl": 1,
+      "heartpiece": 24,
+      "heartcontainer": 10,
+      "sancheart": 1,
+      "sword1": 0,
+      "sword2": 0,
+      "sword3": 0,
+      "sword4": 0,
+      "progressivesword": 4,
+      "shield1": 0,
+      "shield2": 0,
+      "shield3": 0,
+      "progressiveshield": 3,
+      "mail2": 0,
+      "mail3": 0,
+      "progressivemail": 2,
+      "halfmagic": 1,
+      "quartermagic": 0,
+      "bombsplus5": 0,
+      "bombsplus10": 0,
+      "arrowsplus5": 0,
+      "arrowsplus10": 0,
+      "arrow1": 1,
+      "arrow10": 12,
+      "bomb1": 0,
+      "bomb3": 16,
+      "bomb10": 1,
+      "rupee1": 2,
+      "rupee5": 4,
+      "rupee20": 28,
+      "rupee50": 7,
+      "rupee100": 1,
+      "rupee300": 5,
+      "blueclock": 0,
+      "greenclock": 0,
+      "redclock": 0,
+      "silversupgrade": 0,
+      "generickeys": 0,
+      "triforcepieces": 0,
+      "triforcepiecesgoal": 0,
+      "triforce": 0,
+      "rupoor": 0,
+      "rupoorcost": 10
+    },
     "rom": os.path.join(".","Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
     "sprite": None,
     "randomSprite": False,
