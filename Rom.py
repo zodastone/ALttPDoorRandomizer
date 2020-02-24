@@ -604,7 +604,7 @@ def patch_rom(world, rom, player, team, enemized):
     if world.doorShuffle[player] == 'basic':
         rom.write_byte(0x139004, 1)
     for door in world.doors:
-        if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs]:
+        if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs, DoorType.Open]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door))
     for room in world.rooms:
         if room.player == player and room.modified:

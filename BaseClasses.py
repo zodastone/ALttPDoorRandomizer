@@ -1152,9 +1152,9 @@ class Door(object):
         elif self.type == DoorType.Open:
             base_address = {
                 Direction.North: 0x13C500,
-                Direction.South: 0x13C533,
-                Direction.West: 0x13C566,
-                Direction.East: 0x13C581,
+                Direction.South: 0x13C521,
+                Direction.West: 0x13C542,
+                Direction.East: 0x13C55D,
             }
             return base_address[self.direction] + self.edge_id * 3
 

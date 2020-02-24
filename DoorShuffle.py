@@ -102,7 +102,7 @@ def create_door_spoiler(world, player):
             for ext in next.exits:
                 door_a = ext.door
                 connect = ext.connected_region
-                if door_a and door_a.type in [DoorType.Normal, DoorType.SpiralStairs] and door_a not in done:
+                if door_a and door_a.type in [DoorType.Normal, DoorType.SpiralStairs, DoorType.Open] and door_a not in done:
                     done.add(door_a)
                     door_b = door_a.dest
                     if door_b:
