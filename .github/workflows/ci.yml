@@ -1,0 +1,70 @@
+# workflow name
+name: Build
+
+# fire on
+on: [ push, pull_request ]
+
+# stuff to do
+jobs:
+  # Install & Build
+  #  Set up environment
+  # Build
+  #  Run build-gui.py
+  #  Run build-dr.py
+  install-build:
+    name: Install/Build
+    # cycle through os list
+    runs-on: ${{ matrix.os-name }}
+
+    # VM settings
+    #  os & python versions
+    strategy:
+      matrix:
+        os-name: [ ubuntu-latest, ubuntu-16.04, macOS-latest, windows-latest ]
+        python-version: [ 3.7 ]
+#    needs: [ install-test ]
+    steps:
+    # checkout commit
+    - name: Checkout commit
+      uses: actions/checkout@v1
+    # install python
+    - name: Install python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: "x64"
+    - run: |
+      python --version
+    # install dependencies via pip
+    - name: Install dependencies via pip
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/install.py
+    # try to get UPX
+    - name: Get UPX
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/get_upx.py
+    # run build-gui.py
+    - name: Build GUI
+      run: |
+        pip install pyinstaller
+        python ./build-gui.py
+    # run build-dr.py
+    - name: Build DungeonRandomizer
+      run: |
+        python ./build-dr.py
+    # prepare binary artifacts for later step
+    - name: Prepare Binary Artifacts
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/prepare_binary.py
+    # upload binary artifacts for later step
+    - name: Upload Binary Artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: binaries-${{ matrix.os-name }}
+        path: ../artifact
