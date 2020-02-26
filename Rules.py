@@ -996,6 +996,9 @@ def overworld_glitches_rules(world, player):
     else:
         add_rule(world.get_entrance('South Dark World Teleporter', player), lambda state: state.has_Boots(player) and state.can_lift_rocks(player), 'or')
 
+    # Zora's Ledge via waterwalk setup.
+    add_rule(world.get_location('Zora\'s Ledge', player), lambda state: state.has_Boots(player), 'or')
+
 def open_rules(world, player):
     # softlock protection as you can reach the sewers small key door with a guard drop key
     forbid_item(world.get_location('Hyrule Castle - Boomerang Chest', player), 'Small Key (Escape)', player)
