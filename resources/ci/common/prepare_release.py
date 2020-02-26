@@ -75,11 +75,12 @@ for BUILD_FILENAME in BUILD_FILENAMES:
 
   for BUILD_FILENAME in BUILD_FILENAMES:
     if not "artifact" in BUILD_FILENAME:
-    	# move the binary back
-    	move(
-        os.path.join("..","artifact",BUILD_FILENAME),
-    		os.path.join(".",BUILD_FILENAME)
-    	)
+      if os.path.isfile(os.path.join("..","artifact",BUILD_FILENAME)):
+      	# move the binary back
+      	move(
+          os.path.join("..","artifact",BUILD_FILENAME),
+      		os.path.join(".",BUILD_FILENAME)
+      	)
 
 	# .zip if windows
 	# .tar.gz otherwise

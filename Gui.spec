@@ -3,6 +3,9 @@
 block_cipher = None
 console = True
 
+if sys.platform.find("mac") or sys.platform.find("osx"):
+  console = False
+
 def recurse_for_py_files(names_so_far):
   returnvalue = []
   for name in os.listdir(os.path.join(*names_so_far)):
