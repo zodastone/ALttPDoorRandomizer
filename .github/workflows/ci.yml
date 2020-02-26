@@ -68,3 +68,64 @@ jobs:
       with:
         name: binaries-${{ matrix.os-name }}
         path: ../artifact
+
+  # Install & Preparing Release
+  #  Set up environment
+  # Local Prepare Release action
+  install-prepare-release:
+    name: Install/Prepare Release
+    # cycle through os list
+    runs-on: ${{ matrix.os-name }}
+
+    # VM settings
+    #  os & python versions
+    strategy:
+      matrix:
+        # install/release on not xenial
+        os-name: [ ubuntu-latest, macOS-latest, windows-latest ]
+        python-version: [ 3.7 ]
+
+    needs: [ install-build ]
+    steps:
+    # checkout commit
+    - name: Checkout commit
+      uses: actions/checkout@v1
+    # install python
+    - name: Install Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: "x64"
+    - run: |
+        python --version
+    # install dependencies via pip
+    - name: Install Dependencies via pip
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/install.py
+    # download binary artifact
+    - name: Download Binary Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: binary-${{ matrix.os-name }}
+        path: ./
+    # Prepare AppVersion & Release
+    - name: Prepare AppVersion & Release
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+#        python ./resources/ci/common/prepare_appversion.py
+        python ./resources/ci/common/prepare_release.py
+    # upload appversion artifact for later step
+#    - name: Upload AppVersion Artifact
+#      uses: actions/upload-artifact@v1
+#      with:
+#        name: appversion-${{ matrix.os-name }}
+#        path: ./resources/app/meta/manifests/app_version.txt
+    # upload archive artifact for later step
+    - name: Upload Archive Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: archive-${{ matrix.os-name }}
+        path: ../deploy
