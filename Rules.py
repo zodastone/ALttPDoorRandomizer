@@ -954,11 +954,6 @@ def add_conditional_lamps(world, player):
         add_lamp_requirement(world.get_entrance('Throne Room', player), player)
 
 def overworld_glitches_rules(world, player):
-    # @TODO: Waterfall fairy and Zora ledge could use some logic to determine
-    # if we can water walk and/or stored water walk in; currently it's omitted
-    # in case no interiors provide a water walk, but one could be kicking
-    # around. We could detect a path to determine if one can be stored.
-
     # Spots that are immediately accessible.
     for entrance in OWGSets.get_immediately_accessible_entrances(world, player):
         set_rule(world.get_entrance(entrance, player), lambda state: True)

@@ -3028,6 +3028,7 @@ mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia Central 
                          ('Dark Death Mountain Ledge Clip Spot', 'Dark Death Mountain Ledge'),
                          ('Zora Descent Clip Spot', 'Zoras River'),
                          ('Graveyard Ledge Clip Spot', 'Graveyard Ledge'),
+                         ('Graveyard Ledge Clip Spot', 'Kings Grave Area'),
                          ('Desert Northern Cliffs', 'Desert Ledge'),
                          ('Desert Northern Cliffs', 'Desert Ledge (Northeast)'),
                          ('Desert Northern Cliffs', 'Desert Palace Entrance (North) Spot'),
@@ -3056,6 +3057,7 @@ mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia Central 
 
 inverted_mandatory_connections = [('Lake Hylia Central Island Pier', 'Lake Hylia Central Island'), 
                                   ('Zoras River', 'Zoras River'), 
+                                  ('Graveyard Ledge Clip Spot', 'Kings Grave Area'),
                                   ('Kings Grave Outer Rocks', 'Kings Grave Area'),
                                   ('Kings Grave Inner Rocks', 'Light World'),
                                   ('Kakariko Well (top to bottom)', 'Kakariko Well (bottom)'),
