@@ -86,6 +86,7 @@ if len(BUILD_FILENAMES) > 0:
 	# .zip if windows
 	# .tar.gz otherwise
   ZIP_FILENAME = os.path.join("..","deploy",os.path.splitext(BUILD_FILENAME)[0])
+  ZIP_FILENAME = "ALttPDoorRandomizer"
   if env["OS_NAME"] == "windows":
     make_archive(ZIP_FILENAME,"zip")
     ZIP_FILENAME += ".zip"
