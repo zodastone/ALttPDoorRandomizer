@@ -118,12 +118,13 @@ def find_binary(listdir):
   executable = stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
   for filename in os.listdir(listdir):
     if os.path.isfile(filename):
-      st = os.stat(filename)
-      mode = st.st_mode
-      big = st.st_size > (10 * 1024 * 1024) # 10MB
-      if (mode & executable) or big:
-        if "GUI" in filename or "Gui" in filename or "DungeonRandomizer" in filename:
-          BUILD_FILENAMES.append(filename)
+      if os.path.splitext(filename)[1] != ".py":
+        st = os.stat(filename)
+        mode = st.st_mode
+        big = st.st_size > (10 * 1024 * 1024) # 10MB
+        if (mode & executable) or big:
+          if "GUI" in filename or "Gui" in filename or "DungeonRandomizer" in filename:
+            BUILD_FILENAMES.append(filename)
   return BUILD_FILENAMES
 
 if __name__ == "__main__":
