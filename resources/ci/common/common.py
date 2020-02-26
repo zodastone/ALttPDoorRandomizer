@@ -122,7 +122,7 @@ def find_binary(listdir):
       mode = st.st_mode
       big = st.st_size > (10 * 1024 * 1024) # 10MB
       if (mode & executable) or big:
-        if "GUI" in filename or "DungeonRandomizer" in filename:
+        if "GUI" in filename or "Gui" in filename or "DungeonRandomizer" in filename:
           BUILD_FILENAMES.append(filename)
   return BUILD_FILENAMES
 
