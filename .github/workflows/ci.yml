@@ -108,7 +108,7 @@ jobs:
     - name: Download Binary Artifact
       uses: actions/download-artifact@v1
       with:
-        name: binary-${{ matrix.os-name }}
+        name: binaries-${{ matrix.os-name }}
         path: ./
     # Prepare AppVersion & Release
     - name: Prepare AppVersion & Release
