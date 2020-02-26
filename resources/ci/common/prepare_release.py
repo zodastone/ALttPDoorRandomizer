@@ -50,6 +50,8 @@ if isinstance(BUILD_FILENAME,str):
 
 BUILD_FILENAMES = BUILD_FILENAME
 
+print(BUILD_FILENAMES)
+
 for BUILD_FILENAME in BUILD_FILENAMES:
   if not BUILD_FILENAME == "":
     if not "artifact" in BUILD_FILENAME:
