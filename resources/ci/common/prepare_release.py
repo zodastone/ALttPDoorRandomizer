@@ -52,14 +52,15 @@ BUILD_FILENAMES = BUILD_FILENAME
 
 print(BUILD_FILENAMES)
 
-for BUILD_FILENAME in BUILD_FILENAMES:
-  if not BUILD_FILENAME == "":
-    if not "artifact" in BUILD_FILENAME:
-      # move the binary to temp folder
-      move(
-        os.path.join(".",BUILD_FILENAME),
-        os.path.join("..","artifact",BUILD_FILENAME)
-      )
+if len(BUILD_FILENAMES) > 0:
+  for BUILD_FILENAME in BUILD_FILENAMES:
+    if not BUILD_FILENAME == "":
+      if not "artifact" in BUILD_FILENAME:
+        # move the binary to temp folder
+        move(
+          os.path.join(".",BUILD_FILENAME),
+          os.path.join("..","artifact",BUILD_FILENAME)
+        )
 
   # clean the git slate
   git_clean()
