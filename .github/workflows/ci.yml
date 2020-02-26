@@ -34,7 +34,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         architecture: "x64"
     - run: |
-      python --version
+        python --version
     # install dependencies via pip
     - name: Install dependencies via pip
       env:
