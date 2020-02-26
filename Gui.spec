@@ -1,5 +1,7 @@
 # -*- mode: python -*-
 
+import sys
+
 block_cipher = None
 console = True
 
