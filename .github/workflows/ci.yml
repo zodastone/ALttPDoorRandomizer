@@ -212,7 +212,6 @@ jobs:
         tag_name: v${{ steps.debug_info.outputs.github_tag }}
         release_name: ALttPDoorRandomizer v${{ steps.debug_info.outputs.github_tag }}
         body: ${{ steps.release_notes.outputs.body }}
-        draft: true
         prerelease: contains(steps.debug_info.outputs.github_tag,'p.') || contains(steps.debug_info.outputs.github_tag, 'pre.')
     # upload linux archive asset
     - name: Upload Linux Archive Asset
