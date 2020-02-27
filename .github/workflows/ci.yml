@@ -204,7 +204,7 @@ jobs:
         echo "::set-output name=body::$body"
     # create a prerelease
     - name: Create a PreRelease
-      id: create_prerelease
+      id: create_release
       uses: actions/create-release@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
