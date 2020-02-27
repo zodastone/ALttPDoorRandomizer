@@ -115,6 +115,7 @@ jobs:
       env:
         OS_NAME: ${{ matrix.os-name }}
       run: |
+        python ./build-app_version.py
         python ./resources/ci/common/prepare_appversion.py
         python ./resources/ci/common/prepare_release.py
     # upload appversion artifact for later step
