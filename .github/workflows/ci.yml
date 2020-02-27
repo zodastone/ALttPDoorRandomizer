@@ -41,6 +41,7 @@ jobs:
         OS_NAME: ${{ matrix.os-name }}
       run: |
         python ./resources/ci/common/install.py
+        pip install pyinstaller
     # try to get UPX
     - name: Get UPX
       env:
@@ -50,7 +51,6 @@ jobs:
     # run build-gui.py
     - name: Build GUI
       run: |
-        pip install pyinstaller
         python ./build-gui.py
     # run build-dr.py
     - name: Build DungeonRandomizer
@@ -130,3 +130,118 @@ jobs:
       with:
         name: archive-${{ matrix.os-name }}
         path: ../deploy
+
+  # Deploy to GitHub Releases
+  #  Release Name:  ALttPDoorRandomizer v${GITHUB_TAG}
+  #  Release Body:  Inline content of RELEASENOTES.md
+  #  Release Body:  Fallback to URL to RELEASENOTES.md
+  #  Release Files: ../deploy
+  deploy-release:
+    name: Deploy GHReleases
+    runs-on: ${{ matrix.os-name }}
+
+    # VM settings
+    #  os & python versions
+    strategy:
+      matrix:
+        # release only on bionic
+        os-name: [ ubuntu-latest ]
+        python-version: [ 3.7 ]
+
+    needs: [ install-prepare-release ]
+    steps:
+    # checkout commit
+    - name: Checkout commit
+      uses: actions/checkout@v1
+    - name: Install Dependencies via pip
+      run: |
+        python -m pip install pytz requests
+    # download appversion artifact
+    - name: Download AppVersion Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: appversion-${{ matrix.os-name }}
+        path: ../build
+    # download ubuntu archive artifact
+    - name: Download Ubuntu Archive Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: archive-ubuntu-latest
+        path: ../deploy/linux
+    # download macos archive artifact
+    - name: Download MacOS Archive Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: archive-macOS-latest
+        path: ../deploy/macos
+    # download windows archive artifact
+    - name: Download Windows Archive Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: archive-windows-latest
+        path: ../deploy/windows
+    # debug info
+    - name: Debug Info
+      id: debug_info
+#      shell: bash
+#        git tag ${GITHUB_TAG}
+#        git push origin ${GITHUB_TAG}
+      run: |
+        GITHUB_TAG="$(head -n 1 ../build/app_version.txt)"
+        echo "::set-output name=github_tag::$GITHUB_TAG"
+        GITHUB_TAG="v${GITHUB_TAG}"
+        RELEASE_NAME="ALttPDoorRandomizer ${GITHUB_TAG}"
+        echo "Release Name: ${RELEASE_NAME}"
+        echo "Git Tag:      ${GITHUB_TAG}"
+    # read releasenotes
+    - name: Read RELEASENOTES
+      id: release_notes
+      run: |
+        body="$(cat RELEASENOTES.md)"
+        body="${body//'%'/'%25'}"
+        body="${body//$'\n'/'%0A'}"
+        body="${body//$'\r'/'%0D'}"
+        echo "::set-output name=body::$body"
+    # create a release
+    - name: Create a Release
+      id: create_release
+      uses: actions/create-release@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.debug_info.outputs.github_tag }}
+        release_name: ALttPDoorRandomizer v${{ steps.debug_info.outputs.github_tag }}
+        body: ${{ steps.release_notes.outputs.body }}
+    # upload linux archive asset
+    - name: Upload Linux Archive Asset
+      id: upload-linux-asset
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ../deploy/linux/ALttPDoorRandomizer.tar.gz
+        asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-linux-bionic.tar.gz
+        asset_content_type: application/gzip
+    # upload macos archive asset
+    - name: Upload MacOS Archive Asset
+      id: upload-macos-asset
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ../deploy/macos/ALttPDoorRandomizer.tar.gz
+        asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-osx.tar.gz
+        asset_content_type: application/gzip
+    # upload windows archive asset
+    - name: Upload Windows Archive Asset
+      id: upload-windows-asset
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ../deploy/windows/ALttPDoorRandomizer.zip
+        asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-windows.zip
+        asset_content_type: application/zip
