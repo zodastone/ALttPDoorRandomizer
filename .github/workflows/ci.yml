@@ -213,7 +213,7 @@ jobs:
         release_name: ALttPDoorRandomizer v${{ steps.debug_info.outputs.github_tag }}
         body: ${{ steps.release_notes.outputs.body }}
         draft: true
-      if: false
+        prerelease: true
     # upload linux archive asset
     - name: Upload Linux Archive Asset
       id: upload-linux-asset
@@ -225,7 +225,6 @@ jobs:
         asset_path: ../deploy/linux/ALttPDoorRandomizer.tar.gz
         asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-linux-bionic.tar.gz
         asset_content_type: application/gzip
-      if: false
     # upload macos archive asset
     - name: Upload MacOS Archive Asset
       id: upload-macos-asset
@@ -237,7 +236,6 @@ jobs:
         asset_path: ../deploy/macos/ALttPDoorRandomizer.tar.gz
         asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-osx.tar.gz
         asset_content_type: application/gzip
-      if: false
     # upload windows archive asset
     - name: Upload Windows Archive Asset
       id: upload-windows-asset
@@ -249,4 +247,3 @@ jobs:
         asset_path: ../deploy/windows/ALttPDoorRandomizer.zip
         asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-windows.zip
         asset_content_type: application/zip
-      if: false
