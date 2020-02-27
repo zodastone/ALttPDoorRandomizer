@@ -202,8 +202,8 @@ jobs:
         body="${body//$'\n'/'%0A'}"
         body="${body//$'\r'/'%0D'}"
         echo "::set-output name=body::$body"
-    # create a prerelease
-    - name: Create a PreRelease
+    # create a pre/release
+    - name: Create a Pre/Release
       id: create_release
       uses: actions/create-release@master
       env:
@@ -213,21 +213,7 @@ jobs:
         release_name: ALttPDoorRandomizer v${{ steps.debug_info.outputs.github_tag }}
         body: ${{ steps.release_notes.outputs.body }}
         draft: true
-        prerelease: true
-      if: contains(steps.debug_info.outputs.github_tag,'p.') || contains(steps.debug_info.outputs.github_tag, 'pre.')
-    # create a release
-    - name: Create a Release
-      id: create_release
-      uses: actions/create-release@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ steps.debug_info.outputs.github_tag }}
-        release_name: ALttPDoorRandomizer v${{ steps.debug_info.outputs.github_tag }}
-        body: ${{ steps.release_notes.outputs.body }}
-        draft: true
-        prerelease: false
-      if: (! contains(steps.debug_info.outputs.github_tag,'p.') && ! contains(steps.debug_info.outputs.github_tag, 'pre.'))
+        prerelease: contains(steps.debug_info.outputs.github_tag,'p.') || contains(steps.debug_info.outputs.github_tag, 'pre.')
     # upload linux archive asset
     - name: Upload Linux Archive Asset
       id: upload-linux-asset
