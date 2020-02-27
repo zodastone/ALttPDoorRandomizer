@@ -655,7 +655,7 @@ def cross_dungeon(world, player):
     all_sectors = []
     for key in dungeon_regions.keys():
         all_sectors.extend(convert_to_sectors(dungeon_regions[key], world, player))
-    dungeon_builders = create_dungeon_builders(all_sectors, world, player)
+    dungeon_builders = create_dungeon_builders(all_sectors, connections_tuple, world, player)
     for builder in dungeon_builders.values():
         builder.entrance_list = list(entrances_map[builder.name])
         dungeon_obj = world.get_dungeon(builder.name, player)

@@ -1010,6 +1010,7 @@ class DungeonBuilder(object):
         self.bk_provided = False
         self.c_switch_required = False
         self.c_switch_present = False
+        self.c_locked = False
         self.dead_ends = 0
         self.branches = 0
         self.total_conn_lack = 0
@@ -1067,7 +1068,7 @@ def simple_dungeon_builder(name, sector_list):
     return builder
 
 
-def create_dungeon_builders(all_sectors, world, player, dungeon_entrances=None):
+def create_dungeon_builders(all_sectors, connections_tuple, world, player, dungeon_entrances=None):
     logger = logging.getLogger('')
     logger.info('Shuffling Dungeon Sectors')
     if dungeon_entrances is None:
@@ -1092,6 +1093,9 @@ def create_dungeon_builders(all_sectors, world, player, dungeon_entrances=None):
         for r_name in current_dungeon.all_entrances:
             assign_sector(find_sector(r_name, candidate_sectors), current_dungeon, candidate_sectors, global_pole)
     # categorize sectors
+
+    for name, builder in dungeon_map.items():
+        calc_allowance_and_dead_ends(builder, connections_tuple)
 
     free_location_sectors = {}
     crystal_switches = {}
@@ -1128,6 +1132,44 @@ def create_dungeon_builders(all_sectors, world, player, dungeon_entrances=None):
     # the rest
     assign_the_rest(dungeon_map, neutral_sectors, global_pole)
     return dungeon_map
+
+
+def calc_allowance_and_dead_ends(builder, connections_tuple):
+    entrances_map, potentials, connections = connections_tuple
+    needed_connections = [x for x in builder.all_entrances if x not in entrances_map[builder.name]]
+    starting_allowance = 0
+    used_sectors = set()
+    for entrance in entrances_map[builder.name]:
+        sector = find_sector(entrance, builder.sectors)
+        outflow_target = 0 if entrance not in drop_entrances_allowance else 1
+        if sector not in used_sectors and sector.adj_outflow() > outflow_target:
+            if entrance not in destination_entrances:
+                starting_allowance += 1
+            else:
+                builder.branches -= 1
+            used_sectors.add(sector)
+        elif sector not in used_sectors:
+            if entrance in destination_entrances and sector.branches() > 0:
+                builder.branches -= 1
+            if entrance not in drop_entrances_allowance:
+                needed_connections.append(entrance)
+    builder.allowance = starting_allowance
+    for entrance in needed_connections:
+        sector = find_sector(entrance, builder.sectors)
+        if sector not in used_sectors:  # ignore things on same sector
+            is_destination = entrance in destination_entrances
+            connect_able = False
+            if entrance in connections.keys():
+                enabling_region = connections[entrance]
+                connecting_entrances = [x for x in potentials[enabling_region] if x != entrance and x not in dead_entrances and x not in drop_entrances_allowance]
+                connect_able = len(connecting_entrances) > 0
+            if is_destination and sector.branches() == 0:  #
+                builder.dead_ends += 1
+            if is_destination and sector.branches() > 0:
+                builder.branches -= 1
+            if connect_able and not is_destination:
+                builder.allowance += 1
+            used_sectors.add(sector)
 
 
 def define_sector_features(sectors):
@@ -1256,9 +1298,9 @@ def assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole, as
     population = []
     some_c_switches_present = False
     for name, builder in dungeon_map.items():
-        if builder.c_switch_required and not builder.c_switch_present:
+        if builder.c_switch_required and not builder.c_switch_present and not builder.c_locked:
             population.append(name)
-        if builder.c_switch_present:
+        if builder.c_switch_present and not builder.c_locked:
             some_c_switches_present = True
     if len(population) == 0:  # nothing needs a switch
         if assign_one and not some_c_switches_present:  # something should have one
@@ -1266,7 +1308,7 @@ def assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole, as
             switch_candidates = list(crystal_switches)
             switch_choice = random.choice(switch_candidates)
             switch_candidates.remove(switch_choice)
-            builder_candidates = list(dungeon_map.keys())
+            builder_candidates = [name for name, builder in dungeon_map.items() if not builder.c_locked]
             while not valid:
                 if len(builder_candidates) == 0:
                     if len(switch_candidates) == 0:
@@ -1291,7 +1333,7 @@ def assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole, as
 def assign_crystal_barrier_sectors(dungeon_map, crystal_barriers, global_pole):
     population = []
     for name, builder in dungeon_map.items():
-        if builder.c_switch_present:
+        if builder.c_switch_present and not builder.c_locked:
             population.append(name)
     sector_list = list(crystal_barriers)
     random.shuffle(sector_list)
@@ -1503,14 +1545,19 @@ def polarity_step_3(dungeon_map, polarized_sectors, global_pole, logger):
     for builder in builder_order:
         logger.info('--Balancing %s', builder.name)
         while not builder.polarity().is_neutral():
-            candidates = find_neutralizing_candidates(builder, polarized_sectors)
+            rejects = []
+            candidates = find_neutralizing_candidates(builder, polarized_sectors, rejects)
             valid, sectors = False, None
             while not valid:
                 if len(candidates) == 0:
-                    raise NeutralizingException('Unable to find a globally valid neutralizer: %s' % builder.name)
+                    candidates = find_neutralizing_candidates(builder, polarized_sectors, rejects)
+                    if len(candidates) == 0:
+                        raise NeutralizingException('Unable to find a globally valid neutralizer: %s' % builder.name)
                 sectors = random.choice(candidates)
                 candidates.remove(sectors)
                 valid = global_pole.is_valid_choice(dungeon_map, builder, sectors)
+                if not valid:
+                    rejects.append(sectors)
             for sector in sectors:
                 assign_sector(sector, builder, polarized_sectors, global_pole)
 
@@ -1520,8 +1567,14 @@ class GlobalPolarity:
     def __init__(self, candidate_sectors):
         self.positives = [0, 0, 0]
         self.negatives = [0, 0, 0]
+        self.evens = 0
+        self.odds = 0
         for sector in candidate_sectors:
             pol = sector.polarity()
+            if pol.charge() % 2 == 0:
+                self.evens += 1
+            else:
+                self.odds += 1
             for slot in PolSlot:
                 if pol.vector[slot.value] < 0:
                     self.negatives[slot.value] += -pol.vector[slot.value]
@@ -1532,11 +1585,25 @@ class GlobalPolarity:
         gp = GlobalPolarity([])
         gp.positives = self.positives.copy()
         gp.negatives = self.negatives.copy()
+        gp.evens = self.evens
+        gp.odds = self.odds
         return gp
 
     def is_valid(self, dungeon_map):
         polarities = [x.polarity() for x in dungeon_map.values()]
-        return self._is_valid_polarities(polarities)
+        return self._check_parity(polarities) and self._is_valid_polarities(polarities)
+
+    def _check_parity(self, polarities):
+        local_evens = 0
+        local_odds = 0
+        for pol in polarities:
+            if pol.charge() % 2 == 0:
+                local_evens += 1
+            else:
+                local_odds += 1
+        if local_odds > self.odds:
+            return False
+        return True
 
     def _is_valid_polarities(self, polarities):
         positives = self.positives.copy()
@@ -1562,6 +1629,10 @@ class GlobalPolarity:
 
     def consume(self, sector):
         polarity = sector.polarity()
+        if polarity.charge() % 2 == 0:
+            self.evens -= 1
+        else:
+            self.odds -= 1
         for slot in PolSlot:
             if polarity[slot.value] > 0 and slot != PolSlot.Stairs:
                 if self.positives[slot.value] >= polarity[slot.value]:
@@ -1586,7 +1657,7 @@ class GlobalPolarity:
         non_neutral_polarities.append(current_polarity)
         for sector in sectors:
             proposal.consume(sector)
-        return proposal._is_valid_polarities(non_neutral_polarities)
+        return proposal._check_parity(non_neutral_polarities) and proposal._is_valid_polarities(non_neutral_polarities)
 
 
 def find_connection_candidates(mag_needed, sector_pool):
@@ -1644,31 +1715,43 @@ def calc_sector_balance(sector):  # todo: move to base class?
                 sector.conn_balance[hanger_from_door(door)] += 1
 
 
-def find_neutralizing_candidates(builder, sector_pool):
+# todo: refactor to return prioritized lists
+def find_neutralizing_candidates(builder, sector_pool, rejects):
     polarity = builder.polarity()
-    candidates = defaultdict(list)
+    candidates, official_candidates = defaultdict(list), []
     original_charge = polarity.charge()
     best_charge = original_charge
     main_pool = list(sector_pool)
     last_r = 0
-    while len(candidates) == 0:
-        r_range = range(last_r + 1, last_r + 3)
-        for r in r_range:
-            if r > len(main_pool):
-                if len(candidates) == 0:
-                    raise NeutralizingException('Cross Dungeon Builder: No possible neutralizers left %s' % builder.name)
-                else:
-                    continue
-            last_r = r
-            combinations = ncr(len(main_pool), r)
-            for i in range(0, combinations):
-                choice = kth_combination(i, main_pool, r)
-                p_charge = (polarity + sum_polarity(choice)).charge()
-                if p_charge < original_charge and p_charge <= best_charge:
-                    candidates[p_charge].append(choice)
-                    if p_charge < best_charge:
-                        best_charge = p_charge
+    scope = 2
+    while len(official_candidates) == 0:
+        while len(candidates) == 0:
+            r_range = range(last_r + 1, last_r + 1 + scope)
+            for r in r_range:
+                if r > len(main_pool):
+                    if len(candidates) == 0:
+                        raise NeutralizingException('Cross Dungeon Builder: No possible neutralizers left %s' % builder.name)
+                    else:
+                        continue
+                last_r = r
+                combinations = ncr(len(main_pool), r)
+                for i in range(0, combinations):
+                    choice = kth_combination(i, main_pool, r)
+                    p_charge = (polarity + sum_polarity(choice)).charge()
+                    if p_charge < original_charge and p_charge <= best_charge and choice not in rejects:
+                        candidates[p_charge].append(choice)
+                        if p_charge < best_charge:
+                            best_charge = p_charge
+            scope = 1
 
+        try:
+            official_candidates = weed_candidates(builder, candidates, best_charge)
+        except NeutralizingException:
+            official_candidates = []
+    return official_candidates
+
+
+def weed_candidates(builder, candidates, best_charge):
     official_cand = []
     while len(official_cand) == 0:
         if len(candidates.keys()) == 0:
@@ -1824,6 +1907,7 @@ def split_dungeon_builder(builder, split_list):
 def balance_split(candidate_sectors, dungeon_map, global_pole):
     logger = logging.getLogger('')
     # categorize sectors
+    check_for_forced_dead_ends(dungeon_map, candidate_sectors, global_pole)
     crystal_switches, crystal_barriers, neutral_sectors, polarized_sectors = categorize_sectors(candidate_sectors)
     leftover = assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole, len(crystal_barriers) > 0)
     for sector in leftover:
@@ -1839,6 +1923,49 @@ def balance_split(candidate_sectors, dungeon_map, global_pole):
     # the rest
     assign_the_rest(dungeon_map, neutral_sectors, global_pole)
     return dungeon_map
+
+
+def check_for_forced_dead_ends(dungeon_map, candidate_sectors, global_pole):
+    dead_end_sectors = [x for x in candidate_sectors if x.branching_factor() <= 1]
+    other_sectors = [x for x in candidate_sectors if x not in dead_end_sectors]
+    for name, builder in dungeon_map.items():
+        other_sectors += builder.sectors
+    other_magnitude = sum_magnitude(other_sectors)
+    dead_cnt = [0] * len(PolSlot)
+    for sector in dead_end_sectors:
+        pol = sector.polarity()
+        for slot in PolSlot:
+            if pol.vector[slot.value] != 0:
+                dead_cnt[slot.value] += 1
+    for slot in PolSlot:
+        if dead_cnt[slot.value] > other_magnitude[slot.value]:
+            raise Exception('Impossible to satisfy all these dead ends')
+        elif dead_cnt[slot.value] == other_magnitude[slot.value]:
+            candidates = [x for x in dead_end_sectors if x.magnitude()[slot.value] > 0]
+            for sector in other_sectors:
+                if sector.magnitude()[slot.value] > 0 and sector.is_entrance_sector() and sector.branching_factor() == 2:
+                    builder = None
+                    for b in dungeon_map.values():
+                        if sector in b.sectors:
+                            builder = b
+                            break
+                    valid, candidate_sector = False, None
+                    while not valid:
+                        if len(candidates) == 0:
+                            raise Exception('Split Dungeon Builder: Bad dead end %s' % builder.name)
+                        candidate_sector = random.choice(candidates)
+                        candidates.remove(candidate_sector)
+                        valid = global_pole.is_valid_choice(dungeon_map, builder, [candidate_sector]) and check_crystal(candidate_sector, sector)
+                    assign_sector(candidate_sector, builder, candidate_sectors, global_pole)
+                    builder.c_locked = True
+
+
+def check_crystal(dead_end, entrance):
+    if dead_end.blue_barrier and not entrance.c_switch and not dead_end.c_switch:
+        return False
+    if entrance.blue_barrier and not entrance.c_switch and not dead_end.c_switch:
+        return False
+    return True
 
 
 def categorize_sectors(candidate_sectors):
@@ -2275,7 +2402,23 @@ dungeon_dead_end_allowance = {
     'Ganons Tower': 1,
     'Desert Palace Back': 1,
     'Desert Palace Main': 1,
-    'Skull Woods 1': 2,
+    'Skull Woods 1': 0,
     'Skull Woods 2': 0,
     'Skull Woods 3': 1,
 }
+
+drop_entrances_allowance = [
+    'Sewers Rat Path', 'Skull Pinball', 'Skull Left Drop', 'Skull Pot Circle', 'Skull Back Drop'
+]
+
+dead_entrances = [
+    'TR Big Chest Entrance'
+]
+
+destination_entrances = [
+    'Sanctuary', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Rat Path', 'Desert East Lobby',
+    'Desert West Lobby', 'Skull Pinball', 'Skull Pot Circle', 'Skull Left Drop', 'Skull 2 West Lobby',
+    'Skull Back Drop', 'TR Big Chest Entrance', 'TR Eye Bridge', 'TR Lazy Eyes'
+]
+
+
