@@ -2,11 +2,6 @@ import common
 import os         # for env vars
 import subprocess # do stuff at the shell level
 
-from .... Main import __version__ as DRVersion
-
-with(open(os.path.join("resources","app","meta","manifests","app_version.txt"),"w+")) as f:
-  f.write(DRVersion)
-
 env = common.prepare_env()
 
 # get executables
