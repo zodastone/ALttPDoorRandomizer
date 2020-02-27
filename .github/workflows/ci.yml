@@ -214,7 +214,7 @@ jobs:
         body: ${{ steps.release_notes.outputs.body }}
         draft: true
         prerelease: true
-      if: contains(steps.debug_info.outputs.github_tag,'p.') or contains(steps.debug_info.outputs.github_tag, 'pre.')
+      if: contains(steps.debug_info.outputs.github_tag,'p.') || contains(steps.debug_info.outputs.github_tag, 'pre.')
     # create a release
     - name: Create a Release
       id: create_release
@@ -227,7 +227,7 @@ jobs:
         body: ${{ steps.release_notes.outputs.body }}
         draft: true
         prerelease: false
-      if: not contains(steps.debug_info.outputs.github_tag,'p.') and not contains(steps.debug_info.outputs.github_tag, 'pre.')
+      if: (! contains(steps.debug_info.outputs.github_tag,'p.') && ! contains(steps.debug_info.outputs.github_tag, 'pre.'))
     # upload linux archive asset
     - name: Upload Linux Archive Asset
       id: upload-linux-asset
