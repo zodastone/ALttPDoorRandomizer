@@ -40,7 +40,7 @@ excluded_binaries = [
         'VCRUNTIME140.dll',
         'msvcp140.dll',
         'mfc140u.dll',
-        'ucrtbase.dll]
+        'ucrtbase.dll']
 a.binaries = TOC([x for x in a.binaries if x[0] not in excluded_binaries])
 
 pyz = PYZ(a.pure, a.zipped_data,
