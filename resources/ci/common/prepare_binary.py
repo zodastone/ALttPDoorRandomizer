@@ -7,6 +7,9 @@ from shutil import copy, make_archive, move, rmtree	# file manipulation
 
 env = common.prepare_env()
 
+if "OS_NAME" in env and env["OS_NAME"] == "osx":
+  subprocess.check_call(["ls","-l"])
+
 # make dir to put the binary in
 if not os.path.isdir(os.path.join("..","artifact")):
 	os.mkdir(os.path.join("..","artifact"))

@@ -115,7 +115,14 @@ jobs:
       env:
         OS_NAME: ${{ matrix.os-name }}
       run: |
+        python ./resources/ci/common/prepare_appversion.py
         python ./resources/ci/common/prepare_release.py
+    # upload appversion artifact for later step
+    - name: Upload AppVersion Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: appversion-${{ matrix.os-name }}
+        path: ./resources/app/meta/manifests/app_version.txt
     # upload archive artifact for later step
     - name: Upload Archive Artifact
       uses: actions/upload-artifact@v1
