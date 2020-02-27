@@ -1,8 +1,8 @@
 from tkinter import ttk, filedialog, messagebox, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, OptionMenu, E, W, LEFT, RIGHT, X, BOTTOM
 from AdjusterMain import adjust
 from argparse import Namespace
-from classes.SpriteSelector import SpriteSelector
-import gui.widgets as widgets
+from source.classes.SpriteSelector import SpriteSelector
+import source.gui.widgets as widgets
 import json
 import logging
 import os

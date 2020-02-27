@@ -1,6 +1,6 @@
 import os
 from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, E, W, LEFT, RIGHT, X
-import gui.widgets as widgets
+import source.gui.widgets as widgets
 import json
 import os
 

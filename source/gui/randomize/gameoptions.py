@@ -1,7 +1,7 @@
 from tkinter import ttk, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, OptionMenu, E, W, LEFT, RIGHT
 from functools import partial
-import classes.SpriteSelector as spriteSelector
-import gui.widgets as widgets
+import source.classes.SpriteSelector as spriteSelector
+import source.gui.widgets as widgets
 import json
 import os
 

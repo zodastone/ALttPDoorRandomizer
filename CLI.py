@@ -13,7 +13,7 @@ from Rom import get_sprite_from_name
 from Utils import is_bundled, close_console
 from Fill import FillError
 
-import classes.constants as CONST
+import source.classes.constants as CONST
 
 
 class ArgumentDefaultsHelpFormatter(argparse.RawTextHelpFormatter):

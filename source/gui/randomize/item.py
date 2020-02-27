@@ -1,21 +1,27 @@
 from tkinter import ttk, IntVar, StringVar, Checkbutton, Frame, Label, OptionMenu, E, W, LEFT, RIGHT
-import gui.widgets as widgets
+import source.gui.widgets as widgets
 import json
 import os
-
-def entrando_page(parent):
-    # Entrance Randomizer
+ 
+def item_page(parent):
+    # Item Randomizer
     self = ttk.Frame(parent)
 
-    # Entrance Randomizer options
+    # Item Randomizer options
     self.widgets = {}
 
-    # Entrance Randomizer option sections
+    # Item Randomizer option sections
     self.frames = {}
-    self.frames["widgets"] = Frame(self)
-    self.frames["widgets"].pack(anchor=W)
 
-    with open(os.path.join("resources","app","gui","randomize","entrando","widgets.json")) as widgetDefns:
+    self.frames["checkboxes"] = Frame(self)
+    self.frames["checkboxes"].pack(anchor=W)
+
+    self.frames["leftItemFrame"] = Frame(self)
+    self.frames["rightItemFrame"] = Frame(self)
+    self.frames["leftItemFrame"].pack(side=LEFT)
+    self.frames["rightItemFrame"].pack(side=RIGHT)
+
+    with open(os.path.join("resources","app","gui","randomize","item","widgets.json")) as widgetDefns:
         myDict = json.load(widgetDefns)
         for framename,theseWidgets in myDict.items():
             dictWidgets = widgets.make_widgets_from_dict(self, theseWidgets, self.frames[framename])

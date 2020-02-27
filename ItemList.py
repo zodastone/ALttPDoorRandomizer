@@ -9,7 +9,7 @@ from EntranceShuffle import connect_entrance
 from Fill import FillError, fill_restrictive
 from Items import ItemFactory
 
-import classes.constants as CONST
+import source.classes.constants as CONST
 
 
 #This file sets the item pools for various modes. Timed modes and triforce hunt are enforced first, and then extra items are specified per mode to fill in the remaining space.

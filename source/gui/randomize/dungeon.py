@@ -1,5 +1,5 @@
 from tkinter import ttk, IntVar, StringVar, Checkbutton, Frame, Label, OptionMenu, E, W, LEFT, RIGHT
-import gui.widgets as widgets
+import source.gui.widgets as widgets
 import json
 import os
 

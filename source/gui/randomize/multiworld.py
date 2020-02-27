@@ -1,5 +1,5 @@
 from tkinter import ttk, StringVar, Entry, Frame, Label, Spinbox, N, E, W, X, LEFT, RIGHT
-import gui.widgets as widgets
+import source.gui.widgets as widgets
 import json
 import os
 

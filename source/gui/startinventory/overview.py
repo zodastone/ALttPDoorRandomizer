@@ -1,9 +1,9 @@
 from tkinter import ttk, StringVar, Entry, Frame, Label, N, E, W, LEFT, RIGHT, X, VERTICAL, Y
-import gui.widgets as widgets
+import source.gui.widgets as widgets
 import json
 import os
 
-import classes.constants as CONST
+import source.classes.constants as CONST
 
 def startinventory_page(top,parent):
     # Starting Inventory

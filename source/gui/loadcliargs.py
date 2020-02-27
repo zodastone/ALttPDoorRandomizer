@@ -1,7 +1,7 @@
-from classes.SpriteSelector import SpriteSelector as spriteSelector
-from gui.randomize.gameoptions import set_sprite
+from source.classes.SpriteSelector import SpriteSelector as spriteSelector
+from source.gui.randomize.gameoptions import set_sprite
 from Rom import Sprite
-import classes.constants as CONST
+import source.classes.constants as CONST
 
 def loadcliargs(gui, args, settings=None):
     if args is not None:

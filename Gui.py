@@ -7,18 +7,18 @@ from tkinter import Tk, Button, BOTTOM, TOP, StringVar, BooleanVar, X, BOTH, RIG
 from argparse import Namespace
 from CLI import get_settings, get_args_priority
 from DungeonRandomizer import parse_arguments
-from gui.adjust.overview import adjust_page
-from gui.startinventory.overview import startinventory_page
-from gui.custom.overview import custom_page
-from gui.loadcliargs import loadcliargs, loadadjustargs
-from gui.randomize.item import item_page
-from gui.randomize.entrando import entrando_page
-from gui.randomize.enemizer import enemizer_page
-from gui.randomize.dungeon import dungeon_page
-from gui.randomize.multiworld import multiworld_page
-from gui.randomize.gameoptions import gameoptions_page
-from gui.randomize.generation import generation_page
-from gui.bottom import bottom_frame, create_guiargs
+from source.gui.adjust.overview import adjust_page
+from source.gui.startinventory.overview import startinventory_page
+from source.gui.custom.overview import custom_page
+from source.gui.loadcliargs import loadcliargs, loadadjustargs
+from source.gui.randomize.item import item_page
+from source.gui.randomize.entrando import entrando_page
+from source.gui.randomize.enemizer import enemizer_page
+from source.gui.randomize.dungeon import dungeon_page
+from source.gui.randomize.multiworld import multiworld_page
+from source.gui.randomize.gameoptions import gameoptions_page
+from source.gui.randomize.generation import generation_page
+from source.gui.bottom import bottom_frame, create_guiargs
 from GuiUtils import set_icon
 from Main import __version__ as ESVersion
 from Rom import get_sprite_from_name

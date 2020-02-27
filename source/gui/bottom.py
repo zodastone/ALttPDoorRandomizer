@@ -7,8 +7,8 @@ import random
 from CLI import parse_arguments, get_settings
 from Main import main
 from Utils import local_path, output_path, open_file
-import classes.constants as CONST
-import gui.widgets as widgets
+import source.classes.constants as CONST
+import source.gui.widgets as widgets
 
 
 def bottom_frame(self, parent, args=None):
