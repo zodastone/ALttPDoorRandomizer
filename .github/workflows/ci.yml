@@ -6,7 +6,7 @@ on: [ push, pull_request ]
 
 # stuff to do
 jobs:
-  # Install & Build
+  # Install & Build (not MacOSX)
   #  Set up environment
   # Build
   #  Run build-gui.py
@@ -20,7 +20,7 @@ jobs:
     #  os & python versions
     strategy:
       matrix:
-        os-name: [ ubuntu-latest, ubuntu-16.04, macOS-latest, windows-latest ]
+        os-name: [ ubuntu-latest, ubuntu-16.04, windows-latest ]
         python-version: [ 3.7 ]
 #    needs: [ install-test ]
     steps:
@@ -69,6 +69,121 @@ jobs:
         name: binaries-${{ matrix.os-name }}
         path: ../artifact
 
+  # Install & Build GUI (MacOSX)
+  #  Set up environment
+  # Build
+  #  Run build-gui.py
+  mac-install-build-gui:
+    name: Mac Install/Build GUI
+    # cycle through os list
+    runs-on: ${{ matrix.os-name }}
+
+    # VM settings
+    #  os & python versions
+    strategy:
+      matrix:
+        os-name: [ macOS-latest ]
+        python-version: [ 3.7 ]
+#    needs: [ install-test ]
+    steps:
+    # checkout commit
+    - name: Checkout commit
+      uses: actions/checkout@v1
+    # install python
+    - name: Install python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: "x64"
+    - run: |
+        python --version
+    # install dependencies via pip
+    - name: Install dependencies via pip
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/install.py
+    # try to get UPX
+    - name: Get UPX
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/get_upx.py
+    # run build-gui.py
+    - name: Build GUI
+      run: |
+        pip install pyinstaller
+        python ./build-gui.py
+    # prepare binary artifacts for later step
+    - name: Prepare Binary Artifacts
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/prepare_binary.py
+    # upload binary artifacts for later step
+    - name: Upload Binary Artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: gui-macos
+        path: ../artifact
+
+  # Install & Build DungeonRandomizer (MacOSX)
+  #  Set up environment
+  # Build
+  #  Run build-dr.py
+  mac-install-build-dr:
+    name: Mac Install/Build GUI
+    # cycle through os list
+    runs-on: ${{ matrix.os-name }}
+
+    # VM settings
+    #  os & python versions
+    strategy:
+      matrix:
+        os-name: [ macOS-latest ]
+        python-version: [ 3.7 ]
+#    needs: [ install-test ]
+    steps:
+    # checkout commit
+    - name: Checkout commit
+      uses: actions/checkout@v1
+    # install python
+    - name: Install python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: "x64"
+    - run: |
+        python --version
+    # install dependencies via pip
+    - name: Install dependencies via pip
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/install.py
+    # try to get UPX
+    - name: Get UPX
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/get_upx.py
+    # run build-dr.py
+    - name: Build DungeonRandomizer
+      run: |
+        python ./build-dr.py
+    # prepare binary artifacts for later step
+    - name: Prepare Binary Artifacts
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/prepare_binary.py
+    # upload binary artifacts for later step
+    - name: Upload Binary Artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: dr-macos
+        path: ../artifact
+
   # Install & Preparing Release
   #  Set up environment
   # Local Prepare Release action
@@ -85,7 +200,7 @@ jobs:
         os-name: [ ubuntu-latest, macOS-latest, windows-latest ]
         python-version: [ 3.7 ]
 
-    needs: [ install-build ]
+    needs: [ install-build, mac-install-build-gui, mac-install-build-dr ]
     steps:
     # checkout commit
     - name: Checkout commit
@@ -110,6 +225,21 @@ jobs:
       with:
         name: binaries-${{ matrix.os-name }}
         path: ./
+        if: not contains(${{ matrix.os-name }},"macos")
+    # download binary artifact
+    - name: Download GUI Binary Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: gui-macos
+        path: ./
+        if: contains(${{ matrix.os-name }},"macos")
+    # download binary artifact
+    - name: Download DungeonRandomizer Binary Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: dr-macos
+        path: ./
+        if: contains(${{ matrix.os-name }},"macos")
     # Prepare AppVersion & Release
     - name: Prepare AppVersion & Release
       env:
