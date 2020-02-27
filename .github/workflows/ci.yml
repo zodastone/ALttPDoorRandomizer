@@ -148,7 +148,7 @@ jobs:
         os-name: [ ubuntu-latest ]
         python-version: [ 3.7 ]
 
-    needs: [ install-prepare-release ]
+    needs: [ install-prepare-release.off ]
     steps:
     # checkout commit
     - name: Checkout commit
