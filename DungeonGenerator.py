@@ -1540,9 +1540,30 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger
 
 
 def polarity_step_3(dungeon_map, polarized_sectors, global_pole, logger):
+    # step 3a: fix odd builders
+    odd_builders = [x for x in dungeon_map.values() if sum_polarity(x.sectors).charge() % 2 != 0]
+    random.shuffle(odd_builders)
+    for builder in odd_builders:
+        while sum_polarity(builder.sectors).charge() % 2 != 0:
+            odd_candidates = find_odd_sectors_ranked_by_charge(builder, polarized_sectors)
+            sub_candidates, valid, best_charge, candidate = [], False, min(list(odd_candidates.keys())), None
+            while not valid:
+                if len(sub_candidates) == 0:
+                    if len(odd_candidates) == 0:
+                        raise NeutralizingException('Unable to fix dungeon parity: %s' % builder.name)
+                    while best_charge not in odd_candidates.keys():
+                        best_charge += 2
+                    sub_candidates = odd_candidates.pop(best_charge)
+                candidate = random.choice(sub_candidates)
+                sub_candidates.remove(candidate)
+                valid = global_pole.is_valid_choice(dungeon_map, builder, [candidate])
+            assign_sector(candidate, builder, polarized_sectors, global_pole)
+
+    # step 3b: neutralize all builders
     builder_order = list(dungeon_map.values())
     random.shuffle(builder_order)
     for builder in builder_order:
+        # global_pole.check_odd_polarities(polarized_sectors, dungeon_map)
         logger.info('--Balancing %s', builder.name)
         while not builder.polarity().is_neutral():
             rejects = []
@@ -1659,6 +1680,12 @@ class GlobalPolarity:
             proposal.consume(sector)
         return proposal._check_parity(non_neutral_polarities) and proposal._is_valid_polarities(non_neutral_polarities)
 
+    # def check_odd_polarities(self, candidate_sectors, dungeon_map):
+    #     odd_candidates = [x for x in candidate_sectors if x.polarity().charge() % 2 != 0]
+    #     odd_map = {n: x for (n, x) in dungeon_map.items() if sum_polarity(x.sectors).charge() % 2 != 0}
+    #     gp = GlobalPolarity(odd_candidates)
+    #     return gp.is_valid(odd_map)
+
 
 def find_connection_candidates(mag_needed, sector_pool):
     candidates = []
@@ -1713,6 +1740,15 @@ def calc_sector_balance(sector):  # todo: move to base class?
                 sector.conn_balance[hook_from_door(door)] -= 1
             else:
                 sector.conn_balance[hanger_from_door(door)] += 1
+
+
+def find_odd_sectors_ranked_by_charge(builder, polarized_sectors):
+    polarity = builder.polarity()
+    candidates = defaultdict(list)
+    for candidate in [x for x in polarized_sectors if x.polarity().charge() % 2 != 0]:
+        p_charge = (polarity + candidate.polarity()).charge()
+        candidates[p_charge].append(candidate)
+    return candidates
 
 
 # todo: refactor to return prioritized lists
