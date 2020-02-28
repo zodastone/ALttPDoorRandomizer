@@ -373,7 +373,7 @@ def get_settings():
     "uw_palettes": "default",
 
     "create_spoiler": False,
-    "skip_playthrough": True,
+    "skip_playthrough": False,
     "suppress_rom": False,
     "usestartinventory": False,
     "custom": False,
