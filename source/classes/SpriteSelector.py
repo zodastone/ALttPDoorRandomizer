@@ -36,6 +36,7 @@ class SpriteSelector(object):
 
         def open_spritesomething_listing(_evt):
             webbrowser.open("https://artheau.github.io/SpriteSomething/?mode=zelda3/link")
+#            webbrowser.open("https://artheau.github.io/SpriteSomething/resources/app/snes/zelda3/link/sprites.html")
 
         official_frametitle = Frame(self.window)
         official_title_text = Label(official_frametitle, text="Official Sprites")
