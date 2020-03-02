@@ -9,7 +9,6 @@ import shlex
 import sys
 
 from Main import main
-from Rom import get_sprite_from_name
 from Utils import is_bundled, close_console
 from Fill import FillError
 
@@ -264,7 +263,7 @@ def parse_arguments(argv, no_defaults=False):
                         help='Select the color of Link\'s heart meter. (default: %(default)s)')
     parser.add_argument('--ow_palettes', default=defval(settings["ow_palettes"]), choices=['default', 'random', 'blackout'])
     parser.add_argument('--uw_palettes', default=defval(settings["uw_palettes"]), choices=['default', 'random', 'blackout'])
-    parser.add_argument('--sprite', help='''\
+    parser.add_argument('--sprite', default=defval(settings["sprite"]), help='''\
                              Path to a sprite sheet to use for Link. Needs to be in
                              binary format and have a length of 0x7000 (28672) bytes,
                              or 0x7078 (28792) bytes including palette data.
@@ -291,6 +290,7 @@ def parse_arguments(argv, no_defaults=False):
     parser.add_argument('--teams', default=defval(1), type=lambda value: max(int(value), 1))
     parser.add_argument('--outputpath', default=defval(settings["outputpath"]))
     parser.add_argument('--race', default=defval(settings["race"] != 0), action='store_true')
+    parser.add_argument('--saveonexit', default=defval(settings["saveonexit"]), choices=['never', 'ask', 'always'])
     parser.add_argument('--outputname')
 
     if multiargs.multi:
@@ -322,185 +322,187 @@ def parse_arguments(argv, no_defaults=False):
 
     return ret
 
+
 def get_settings():
-  # set default settings
-  settings = {
-    "retro": False,
-    "mode": "open",
-    "logic": "noglitches",
-    "goal": "ganon",
-    "crystals_gt": "7",
-    "crystals_ganon": "7",
-    "swords": "random",
-    "difficulty": "normal",
-    "item_functionality": "normal",
-    "timer": "none",
-    "progressive": "on",
-    "accessibility": "items",
-    "algorithm": "balanced",
+    # set default settings
+    settings = {
+        "retro": False,
+        "mode": "open",
+        "logic": "noglitches",
+        "goal": "ganon",
+        "crystals_gt": "7",
+        "crystals_ganon": "7",
+        "swords": "random",
+        "difficulty": "normal",
+        "item_functionality": "normal",
+        "timer": "none",
+        "progressive": "on",
+        "accessibility": "items",
+        "algorithm": "balanced",
 
-    "openpyramid": False,
-    "shuffleganon": False,
-    "shuffle": "vanilla",
+        "openpyramid": False,
+        "shuffleganon": False,
+        "shuffle": "vanilla",
 
-    "shufflepots": False,
-    "shuffleenemies": "none",
-    "shufflebosses": "none",
-    "enemy_damage": "default",
-    "enemy_health": "default",
-    "enemizercli": os.path.join(".","EnemizerCLI","EnemizerCLI.Core"),
+        "shufflepots": False,
+        "shuffleenemies": "none",
+        "shufflebosses": "none",
+        "enemy_damage": "default",
+        "enemy_health": "default",
+        "enemizercli": os.path.join(".", "EnemizerCLI", "EnemizerCLI.Core"),
 
-    "mapshuffle": False,
-    "compassshuffle": False,
-    "keyshuffle": False,
-    "bigkeyshuffle": False,
-    "keysanity": False,
-    "door_shuffle": "basic",
-    "experimental": 0,
-    "dungeon_counters": "off",
+        "mapshuffle": False,
+        "compassshuffle": False,
+        "keyshuffle": False,
+        "bigkeyshuffle": False,
+        "keysanity": False,
+        "door_shuffle": "basic",
+        "experimental": 0,
+        "dungeon_counters": "off",
 
-    "multi": 1,
-    "names": "",
+        "multi": 1,
+        "names": "",
 
-    "hints": True,
-    "disablemusic": False,
-    "quickswap": False,
-    "heartcolor": "red",
-    "heartbeep": "normal",
-    "sprite": None,
-    "fastmenu": "normal",
-    "ow_palettes": "default",
-    "uw_palettes": "default",
+        "hints": True,
+        "disablemusic": False,
+        "quickswap": False,
+        "heartcolor": "red",
+        "heartbeep": "normal",
+        "sprite": None,
+        "fastmenu": "normal",
+        "ow_palettes": "default",
+        "uw_palettes": "default",
 
-    "create_spoiler": False,
-    "skip_playthrough": False,
-    "suppress_rom": False,
-    "usestartinventory": False,
-    "custom": False,
-    "rom": os.path.join(".","Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
+        "create_spoiler": False,
+        "skip_playthrough": False,
+        "suppress_rom": False,
+        "usestartinventory": False,
+        "custom": False,
+        "rom": os.path.join(".", "Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
 
-    "seed": None,
-    "count": 1,
-    "startinventory": "",
-    "beemizer": 0,
-    "remote_items": False,
-    "race": False,
-    "customitemarray": {
-      "bow": 0,
-      "progressivebow": 2,
-      "boomerang": 1,
-      "redmerang": 1,
-      "hookshot": 1,
-      "mushroom": 1,
-      "powder": 1,
-      "firerod": 1,
-      "icerod": 1,
-      "bombos": 1,
-      "ether": 1,
-      "quake": 1,
-      "lamp": 1,
-      "hammer": 1,
-      "shovel": 1,
-      "flute": 1,
-      "bugnet": 1,
-      "book": 1,
-      "bottle": 4,
-      "somaria": 1,
-      "byrna": 1,
-      "cape": 1,
-      "mirror": 1,
-      "boots": 1,
-      "powerglove": 0,
-      "titansmitt": 0,
-      "progressiveglove": 2,
-      "flippers": 1,
-      "pearl": 1,
-      "heartpiece": 24,
-      "heartcontainer": 10,
-      "sancheart": 1,
-      "sword1": 0,
-      "sword2": 0,
-      "sword3": 0,
-      "sword4": 0,
-      "progressivesword": 4,
-      "shield1": 0,
-      "shield2": 0,
-      "shield3": 0,
-      "progressiveshield": 3,
-      "mail2": 0,
-      "mail3": 0,
-      "progressivemail": 2,
-      "halfmagic": 1,
-      "quartermagic": 0,
-      "bombsplus5": 0,
-      "bombsplus10": 0,
-      "arrowsplus5": 0,
-      "arrowsplus10": 0,
-      "arrow1": 1,
-      "arrow10": 12,
-      "bomb1": 0,
-      "bomb3": 16,
-      "bomb10": 1,
-      "rupee1": 2,
-      "rupee5": 4,
-      "rupee20": 28,
-      "rupee50": 7,
-      "rupee100": 1,
-      "rupee300": 5,
-      "blueclock": 0,
-      "greenclock": 0,
-      "redclock": 0,
-      "silversupgrade": 0,
-      "generickeys": 0,
-      "triforcepieces": 0,
-      "triforcepiecesgoal": 0,
-      "triforce": 0,
-      "rupoor": 0,
-      "rupoorcost": 10
-    },
-    "randomSprite": False,
-    "outputpath": os.path.join(".")
-  }
-  settings["startinventoryarray"] = {}
-  if sys.platform.lower().find("windows"):
-      settings["enemizercli"] += ".exe"
+        "seed": None,
+        "count": 1,
+        "startinventory": "",
+        "beemizer": 0,
+        "remote_items": False,
+        "race": False,
+        "customitemarray": {
+            "bow": 0,
+                "progressivebow": 2,
+                "boomerang": 1,
+                "redmerang": 1,
+                "hookshot": 1,
+                "mushroom": 1,
+                "powder": 1,
+                "firerod": 1,
+                "icerod": 1,
+                "bombos": 1,
+                "ether": 1,
+                "quake": 1,
+                "lamp": 1,
+                "hammer": 1,
+                "shovel": 1,
+                "flute": 1,
+                "bugnet": 1,
+                "book": 1,
+                "bottle": 4,
+                "somaria": 1,
+                "byrna": 1,
+                "cape": 1,
+                "mirror": 1,
+                "boots": 1,
+                "powerglove": 0,
+                "titansmitt": 0,
+                "progressiveglove": 2,
+                "flippers": 1,
+                "pearl": 1,
+                "heartpiece": 24,
+                "heartcontainer": 10,
+                "sancheart": 1,
+                "sword1": 0,
+                "sword2": 0,
+                "sword3": 0,
+                "sword4": 0,
+                "progressivesword": 4,
+                "shield1": 0,
+                "shield2": 0,
+                "shield3": 0,
+                "progressiveshield": 3,
+                "mail2": 0,
+                "mail3": 0,
+                "progressivemail": 2,
+                "halfmagic": 1,
+                "quartermagic": 0,
+                "bombsplus5": 0,
+                "bombsplus10": 0,
+                "arrowsplus5": 0,
+                "arrowsplus10": 0,
+                "arrow1": 1,
+                "arrow10": 12,
+                "bomb1": 0,
+                "bomb3": 16,
+                "bomb10": 1,
+                "rupee1": 2,
+                "rupee5": 4,
+                "rupee20": 28,
+                "rupee50": 7,
+                "rupee100": 1,
+                "rupee300": 5,
+                "blueclock": 0,
+                "greenclock": 0,
+                "redclock": 0,
+                "silversupgrade": 0,
+                "generickeys": 0,
+                "triforcepieces": 0,
+                "triforcepiecesgoal": 0,
+                "triforce": 0,
+                "rupoor": 0,
+                "rupoorcost": 10
+            },
+        "randomSprite": False,
+        "outputpath": os.path.join("."),
+        "saveonexit": "ask",
+        "startinventoryarray": {}
+    }
 
-  # read saved settings file if it exists and set these
-  settings_path = os.path.join(".", "resources", "user", "settings.json")
-  if os.path.exists(settings_path):
-      with(open(settings_path)) as json_file:
-          data = json.load(json_file)
-          if 'sprite' in data.keys() and data['sprite']:
-              data['sprite'] = get_sprite_from_name(data['sprite'])
-          for k,v in data.items():
-              settings[k] = v
-  return settings
+    if sys.platform.lower().find("windows"):
+        settings["enemizercli"] += ".exe"
+
+    # read saved settings file if it exists and set these
+    settings_path = os.path.join(".", "resources", "user", "settings.json")
+    if os.path.exists(settings_path):
+        with(open(settings_path)) as json_file:
+            data = json.load(json_file)
+            for k, v in data.items():
+                settings[k] = v
+    return settings
+
 
 def get_args_priority(settings_args, gui_args, cli_args):
-  args = {}
-  args["settings"] = get_settings() if settings_args is None else settings_args
-  args["gui"] = {} if gui_args is None else gui_args
-  args["cli"] = cli_args
+    args = {}
+    args["settings"] = get_settings() if settings_args is None else settings_args
+    args["gui"] = {} if gui_args is None else gui_args
+    args["cli"] = cli_args
 
-  args["load"] = args["settings"]
-  if args["gui"] is not None:
-      for k in args["gui"]:
-          if k not in args["load"] or args["load"][k] != args["gui"]:
-              args["load"][k] = args["gui"][k]
+    args["load"] = args["settings"]
+    if args["gui"] is not None:
+        for k in args["gui"]:
+            if k not in args["load"] or args["load"][k] != args["gui"]:
+                args["load"][k] = args["gui"][k]
 
-  if args["cli"] is None:
-      args["cli"] = {}
-      cli = vars(parse_arguments(None))
-      for k,v in cli.items():
-          if isinstance(v,dict) and 1 in v:
-              args["cli"][k] = v[1]
-          else:
-              args["cli"][k] = v
-          load_doesnt_have_key = k not in args["load"]
-          different_val = (k in args["load"] and k in args["cli"]) and (args["load"][k] != args["cli"][k])
-          cli_has_empty_dict = k in args["cli"] and isinstance(args["cli"][k],dict) and len(args["cli"][k]) == 0
-          if load_doesnt_have_key or different_val:
-              if not cli_has_empty_dict:
-                  args["load"][k] = args["cli"][k]
+    if args["cli"] is None:
+        args["cli"] = {}
+        cli = vars(parse_arguments(None))
+        for k, v in cli.items():
+            if isinstance(v, dict) and 1 in v:
+                args["cli"][k] = v[1]
+            else:
+                args["cli"][k] = v
+            load_doesnt_have_key = k not in args["load"]
+            different_val = (k in args["load"] and k in args["cli"]) and (args["load"][k] != args["cli"][k])
+            cli_has_empty_dict = k in args["cli"] and isinstance(args["cli"][k], dict) and len(args["cli"][k]) == 0
+            if load_doesnt_have_key or different_val:
+                if not cli_has_empty_dict:
+                    args["load"][k] = args["cli"][k]
 
-  return args
+    return args

@@ -102,7 +102,8 @@ SETTINGSTOPROCESS = {
       "spoiler": "create_spoiler",
       "suppressrom": "suppress_rom",
       "usestartinventory": "usestartinventory",
-      "usecustompool": "custom"
+      "usecustompool": "custom",
+      "saveonexit": "saveonexit"
     } 
   }
 }

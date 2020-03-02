@@ -21,7 +21,6 @@ from gui.randomize.generation import generation_page
 from gui.bottom import bottom_frame, create_guiargs
 from GuiUtils import set_icon
 from Main import __version__ as ESVersion
-from Rom import get_sprite_from_name
 
 
 def guiMain(args=None):
@@ -36,21 +35,29 @@ def guiMain(args=None):
             f.write(json.dumps(args, indent=2))
         os.chmod(os.path.join(settings_path, "settings.json"),0o755)
 
-    def save_settings_from_gui():
+    def save_settings_from_gui(confirm):
         gui_args = vars(create_guiargs(self))
         if self.randomSprite.get():
             gui_args['sprite'] = 'random'
         elif gui_args['sprite']:
             gui_args['sprite'] = gui_args['sprite'].name
         save_settings(gui_args)
-        messagebox.showinfo("Door Shuffle " + ESVersion,"Settings saved from GUI.")
+        if confirm:
+            messagebox.showinfo("Door Shuffle " + ESVersion, "Settings saved from GUI.")
 
     # routine for exiting the app
     def guiExit():
-        dosave = messagebox.askyesno("Door Shuffle " + ESVersion, "Save settings before exit?")
-        if dosave:
-            save_settings_from_gui()
-        sys.exit(0)
+        skip_exit = False
+        if self.settings['saveonexit'] == 'ask':
+            dosave = messagebox.askyesnocancel("Door Shuffle " + ESVersion, "Save settings before exit?")
+            if dosave:
+                save_settings_from_gui(True)
+            if dosave is None:
+                skip_exit = True
+        elif self.settings['saveonexit'] == 'always':
+            save_settings_from_gui(False)
+        if not skip_exit:
+            sys.exit(0)
 
     # make main window
     # add program title & version number
@@ -137,7 +144,7 @@ def guiMain(args=None):
     # bottom of window: Open Output Directory, Open Documentation (if exists)
     self.frames["bottom"] = bottom_frame(self, self, None)
     ## Save Settings Button
-    savesettingsButton = Button(self.frames["bottom"], text='Save Settings to File', command=save_settings_from_gui)
+    savesettingsButton = Button(self.frames["bottom"], text='Save Settings to File', command=lambda: save_settings_from_gui(True))
     savesettingsButton.pack(side=RIGHT)
 
     # set bottom frame to main window
