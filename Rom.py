@@ -981,8 +981,8 @@ def patch_rom(world, rom, player, team, enemized):
     startingstate = CollectionState(world)
 
     if startingstate.has('Bow', player):
-        equip[0x340] = 1
-        equip[0x38E] |= 0x20 # progressive flag to get the correct hint in all cases
+        equip[0x340] = 3 if startingstate.has('Silver Arrows', player) else 1
+        equip[0x38E] |= 0x20  # progressive flag to get the correct hint in all cases
         if not world.retro[player]:
             equip[0x38E] |= 0x80
     if startingstate.has('Silver Arrows', player):
@@ -1157,11 +1157,11 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_byte(0x18003B, 0x01 if world.mapshuffle[player] else 0x00)  # maps showing crystals on overworld
 
     # compasses showing dungeon count
-    if world.clock_mode != 'off':
+    if world.clock_mode != 'off' or world.dungeon_counters[player] == 'off':
         rom.write_byte(0x18003C, 0x00)  # Currently must be off if timer is on, because they use same HUD location
-    elif world.dungeon_counters[player]:
-        rom.write_byte(0x18003C, 0x02)  # show always
-    elif world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla':
+    elif world.dungeon_counters[player] == 'on':
+        rom.write_byte(0x18003C, 0x02)  # always on
+    elif world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla' or world.dungeon_counters[player] == 'pickup':
         rom.write_byte(0x18003C, 0x01)  # show on pickup
     else:
         rom.write_byte(0x18003C, 0x00)

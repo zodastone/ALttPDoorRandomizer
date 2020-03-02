@@ -1,0 +1,26 @@
+{
+  "mapshuffle": {
+    "type": "checkbox",
+    "label": {
+      "text": "Maps"
+    }
+  },
+  "compassshuffle": {
+    "type": "checkbox",
+    "label": {
+      "text": "Compasses"
+    }
+  },
+  "smallkeyshuffle": {
+    "type": "checkbox",
+    "label": {
+      "text": "Small Keys"
+    }
+  },
+  "bigkeyshuffle": {
+    "type": "checkbox",
+    "label": {
+      "text": "Big Keys"
+    }
+  }
+}

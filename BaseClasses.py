@@ -769,6 +769,16 @@ class CollectionState(object):
                 else:
                     self.prog_items.add(('Bow', item.player))
                     changed = True
+            elif 'Armor' in item.name:
+                if self.has('Red Mail', item.player):
+                    pass
+                elif self.has('Blue Mail', item.player):
+                    self.prog_items.add(('Red Mail', item.player))
+                    changed = True
+                else:
+                    self.prog_items.add(('Blue Mail', item.player))
+                    changed = True
+
         elif item.name.startswith('Bottle'):
             if self.bottle_count(item.player) < self.world.difficulty_requirements[item.player].progressive_bottle_limit:
                 self.prog_items.add((item.name, item.player))
