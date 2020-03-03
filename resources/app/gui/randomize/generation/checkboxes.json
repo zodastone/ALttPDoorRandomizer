@@ -22,5 +22,24 @@
     "label": {
       "text": "Use custom item pool"
     }
+  },
+  "saveonexit": {
+    "type": "selectbox",
+    "label": {
+      "text": "Save Settings on Exit"
+    },
+    "managerAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Ask Me": "ask",
+      "Always": "always",
+      "Never": "never"
+    }
   }
 }

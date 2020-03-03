@@ -981,8 +981,8 @@ def patch_rom(world, rom, player, team, enemized):
     startingstate = CollectionState(world)
 
     if startingstate.has('Bow', player):
-        equip[0x340] = 1
-        equip[0x38E] |= 0x20 # progressive flag to get the correct hint in all cases
+        equip[0x340] = 3 if startingstate.has('Silver Arrows', player) else 1
+        equip[0x38E] |= 0x20  # progressive flag to get the correct hint in all cases
         if not world.retro[player]:
             equip[0x38E] |= 0x80
     if startingstate.has('Silver Arrows', player):
