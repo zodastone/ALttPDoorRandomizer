@@ -1,11 +1,12 @@
-from tkinter import ttk, StringVar, Entry, Frame, Label, N, E, W, LEFT, RIGHT, X, VERTICAL, Y
+from tkinter import ttk, Frame, N, LEFT, VERTICAL, Y
 import gui.widgets as widgets
 import json
 import os
 
 import classes.constants as CONST
 
-def custom_page(top,parent):
+
+def custom_page(top, parent):
     # Custom Item Pool
     self = ttk.Frame(parent)
 
@@ -31,24 +32,24 @@ def custom_page(top,parent):
 
     # Custom Item Pool option sections
     self.frames = {}
-    create_list_frame(self,"itemList1")
+    create_list_frame(self, "itemList1")
     create_vertical_rule(2)
-    create_list_frame(self,"itemList2")
+    create_list_frame(self, "itemList2")
     create_vertical_rule(2)
-    create_list_frame(self,"itemList3")
+    create_list_frame(self, "itemList3")
     create_vertical_rule(2)
-    create_list_frame(self,"itemList4")
+    create_list_frame(self, "itemList4")
     create_vertical_rule(2)
-    create_list_frame(self,"itemList5")
+    create_list_frame(self, "itemList5")
 
-    with open(os.path.join("resources","app","gui","custom","overview","widgets.json")) as widgetDefns:
+    with open(os.path.join("resources", "app", "gui", "custom", "overview", "widgets.json")) as widgetDefns:
         myDict = json.load(widgetDefns)
         for framename,theseWidgets in myDict.items():
             dictWidgets = widgets.make_widgets_from_dict(self, theseWidgets, self.frames[framename])
             for key in dictWidgets:
                 self.customWidgets[key] = dictWidgets[key]
 
-    for key in CONST.CUSTOMITEMS:
-        self.customWidgets[key].storageVar.set(top.settings["customitemarray"][key])
+    for i, key in enumerate(CONST.CUSTOMITEMS):
+        self.customWidgets[key].storageVar.set(top.settings["customitemarray"][i])
 
     return self

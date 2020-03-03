@@ -177,6 +177,7 @@ def get_custom_array_key(item):
       key = label_switcher.get(key)
   return key
 
+
 def generate_itempool(world, player):
     if (world.difficulty[player] not in ['normal', 'hard', 'expert'] or world.goal[player] not in ['ganon', 'pedestal', 'dungeons', 'triforcehunt', 'crystals']
             or world.mode[player] not in ['open', 'standard', 'inverted'] or world.timer not in ['none', 'display', 'timed', 'timed-ohko', 'ohko', 'timed-countdown'] or world.progressive not in ['on', 'off', 'random']):
@@ -194,7 +195,7 @@ def generate_itempool(world, player):
         region = world.get_region('Light World',player)
 
         loc = Location(player, "Murahdahla", parent=region)
-        loc.access_rule = lambda state: state.item_count(get_custom_array_key('Triforce Piece'), player) + state.item_count(get_custom_array_key('Power Star'), player) > state.world.treasure_hunt_count[player]
+        loc.access_rule = lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) > state.world.treasure_hunt_count[player]
         region.locations.append(loc)
         world.dynamic_locations.append(loc)
 
@@ -253,7 +254,6 @@ def generate_itempool(world, player):
         world.get_location('Zelda Drop Off', player).event = True
         world.get_location('Zelda Drop Off', player).locked = True
 
-
     # set up item pool
     if world.custom:
         (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = make_custom_item_pool(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.customitemarray)
@@ -265,10 +265,10 @@ def generate_itempool(world, player):
         amt = world.pool_adjustment[player]
         if amt < 0:
             for i in range(0, amt):
-                pool.remove(get_custom_array_key('Rupees (20)'))
+                pool.remove('Rupees (20)')
         elif amt > 0:
             for i in range(0, amt):
-                pool.append(get_custom_array_key('Rupees (20)'))
+                pool.append('Rupees (20)')
 
     for item in precollected_items:
         world.push_precollected(ItemFactory(item, player))
@@ -406,6 +406,7 @@ def set_up_take_anys(world, player):
         take_any.shop.add_inventory(1, 'Boss Heart Container', 0, 0)
 
     world.initialize_regions()
+
 
 def create_dynamic_shop_locations(world, player):
     for shop in world.shops:

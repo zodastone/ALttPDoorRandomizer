@@ -591,7 +591,7 @@ def patch_rom(world, rom, player, team, enemized):
         patch_shuffled_dark_sanc(world, rom, player)
 
     # patch doors
-    dr_flags = DROptions.Eternal_Mini_Bosses if not world.experimental[player] else DROptions.Town_Portal
+    dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' or not world.experimental[player] else DROptions.Town_Portal
     if world.doorShuffle[player] == 'crossed':
         rom.write_byte(0x139004, 2)
         rom.write_byte(0x151f1, 2)

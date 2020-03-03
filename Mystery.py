@@ -148,6 +148,7 @@ def roll_settings(weights):
     ret.shuffle = entrance_shuffle if entrance_shuffle != 'none' else 'vanilla'
     door_shuffle = get_choice('door_shuffle')
     ret.door_shuffle = door_shuffle if door_shuffle != 'none' else 'vanilla'
+    ret.experimental = get_choice('experimental') == 'on'
 
     goal = get_choice('goals')
     ret.goal = {'ganon': 'ganon',
@@ -156,7 +157,7 @@ def roll_settings(weights):
                 'pedestal': 'pedestal',
                 'triforce-hunt': 'triforcehunt'
                 }[goal]
-    ret.openpyramid = goal == 'fast_ganon'
+    ret.openpyramid = goal == 'fast_ganon' if ret.shuffle in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
 
     ret.crystals_gt = get_choice('tower_open')
 
