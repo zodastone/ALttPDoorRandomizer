@@ -265,10 +265,10 @@ def generate_itempool(world, player):
         amt = world.pool_adjustment[player]
         if amt < 0:
             for i in range(0, amt):
-                pool.remove(get_custom_array_key('Rupees (20)'))
+                pool.remove('Rupees (20)')
         elif amt > 0:
             for i in range(0, amt):
-                pool.append(get_custom_array_key('Rupees (20)'))
+                pool.append('Rupees (20)')
 
     for item in precollected_items:
         world.push_precollected(ItemFactory(item, player))

@@ -2,24 +2,15 @@ import random
 import collections
 import itertools
 from collections import defaultdict, deque
-from enum import Enum, unique
 import logging
 from functools import reduce
 import operator as op
 from typing import List
 
-from BaseClasses import DoorType, Direction, CrystalBarrier, RegionType, Polarity, Sector, PolSlot, flooded_keys
+from BaseClasses import DoorType, Direction, CrystalBarrier, RegionType, Polarity, PolSlot, flooded_keys
+from BaseClasses import Hook, hook_from_door
 from Regions import key_only_locations, dungeon_events, flooded_keys_reverse
 from Dungeons import dungeon_regions
-
-
-@unique
-class Hook(Enum):
-    North = 0
-    West = 1
-    South = 2
-    East = 3
-    Stairs = 4
 
 
 class GraphPiece:
@@ -515,43 +506,32 @@ def filter_for_potential_bk_locations(locations):
             and x.name not in key_only_locations.keys() and x.name not in ['Agahnim 1', 'Agahnim 2']]
 
 
-def opposite_h_type(h_type):
-    type_map = {
-        Hook.Stairs: Hook.Stairs,
-        Hook.North: Hook.South,
-        Hook.South: Hook.North,
-        Hook.West: Hook.East,
-        Hook.East: Hook.West,
+type_map = {
+    Hook.Stairs: Hook.Stairs,
+    Hook.North: Hook.South,
+    Hook.South: Hook.North,
+    Hook.West: Hook.East,
+    Hook.East: Hook.West,
+}
 
-    }
+
+def opposite_h_type(h_type):
     return type_map[h_type]
 
 
-def hook_from_door(door):
-    if door.type == DoorType.SpiralStairs:
-        return Hook.Stairs
-    if door.type == DoorType.Normal:
-        dir = {
-            Direction.North: Hook.North,
-            Direction.South: Hook.South,
-            Direction.West: Hook.West,
-            Direction.East: Hook.East,
-        }
-        return dir[door.direction]
-    return None
+hang_dir_map = {
+    Direction.North: Hook.South,
+    Direction.South: Hook.North,
+    Direction.West: Hook.East,
+    Direction.East: Hook.West,
+}
 
 
 def hanger_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
     if door.type == DoorType.Normal:
-        dir = {
-            Direction.North: Hook.South,
-            Direction.South: Hook.North,
-            Direction.West: Hook.East,
-            Direction.East: Hook.West,
-        }
-        return dir[door.direction]
+        return hang_dir_map[door.direction]
     return None
 
 
@@ -1443,6 +1423,15 @@ def sum_magnitude(sector_list):
     return result
 
 
+def sum_hook_magnitude(sector_list):
+    result = [0] * len(Hook)
+    for sector in sector_list:
+        vector = sector.hook_magnitude()
+        for i in range(len(result)):
+            result[i] = result[i] + vector[i]
+    return result
+
+
 def sum_polarity(sector_list):
     pol = Polarity()
     for sector in sector_list:
@@ -1944,6 +1933,7 @@ def balance_split(candidate_sectors, dungeon_map, global_pole):
     logger = logging.getLogger('')
     # categorize sectors
     check_for_forced_dead_ends(dungeon_map, candidate_sectors, global_pole)
+    check_for_forced_assignments(dungeon_map, candidate_sectors, global_pole)
     crystal_switches, crystal_barriers, neutral_sectors, polarized_sectors = categorize_sectors(candidate_sectors)
     leftover = assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole, len(crystal_barriers) > 0)
     for sector in leftover:
@@ -1966,20 +1956,21 @@ def check_for_forced_dead_ends(dungeon_map, candidate_sectors, global_pole):
     other_sectors = [x for x in candidate_sectors if x not in dead_end_sectors]
     for name, builder in dungeon_map.items():
         other_sectors += builder.sectors
-    other_magnitude = sum_magnitude(other_sectors)
-    dead_cnt = [0] * len(PolSlot)
+    other_magnitude = sum_hook_magnitude(other_sectors)
+    dead_cnt = [0] * len(Hook)
     for sector in dead_end_sectors:
-        pol = sector.polarity()
-        for slot in PolSlot:
-            if pol.vector[slot.value] != 0:
-                dead_cnt[slot.value] += 1
-    for slot in PolSlot:
-        if dead_cnt[slot.value] > other_magnitude[slot.value]:
+        hook_mag = sector.hook_magnitude()
+        for hook in Hook:
+            if hook_mag[hook.value] != 0:
+                dead_cnt[hook.value] += 1
+    for hook in Hook:
+        opp = opposite_h_type(hook)
+        if dead_cnt[hook.value] > other_magnitude[opp.value]:
             raise Exception('Impossible to satisfy all these dead ends')
-        elif dead_cnt[slot.value] == other_magnitude[slot.value]:
-            candidates = [x for x in dead_end_sectors if x.magnitude()[slot.value] > 0]
+        elif dead_cnt[hook.value] == other_magnitude[opp.value]:
+            candidates = [x for x in dead_end_sectors if x.hook_magnitude()[hook.value] > 0]
             for sector in other_sectors:
-                if sector.magnitude()[slot.value] > 0 and sector.is_entrance_sector() and sector.branching_factor() == 2:
+                if sector.hook_magnitude()[opp.value] > 0 and sector.is_entrance_sector() and sector.branching_factor() == 2:
                     builder = None
                     for b in dungeon_map.values():
                         if sector in b.sectors:
@@ -1994,6 +1985,31 @@ def check_for_forced_dead_ends(dungeon_map, candidate_sectors, global_pole):
                         valid = global_pole.is_valid_choice(dungeon_map, builder, [candidate_sector]) and check_crystal(candidate_sector, sector)
                     assign_sector(candidate_sector, builder, candidate_sectors, global_pole)
                     builder.c_locked = True
+
+
+def check_for_forced_assignments(dungeon_map, candidate_sectors, global_pole):
+    done = False
+    while not done:
+        done = True
+        magnitude = sum_hook_magnitude(candidate_sectors)
+        dungeon_hooks = {}
+        for name, builder in dungeon_map.items():
+            dungeon_hooks[name] = sum_hook_magnitude(builder.sectors)
+        for val in Hook:
+            if magnitude[val.value] == 1:
+                found_hooks = []
+                opp = opposite_h_type(val)
+                for name, hooks in dungeon_hooks.items():
+                    if hooks[opp.value] > 0 and not dungeon_map[name].c_locked:
+                        found_hooks.append(name)
+                if len(found_hooks) == 1:
+                    done = False
+                    forced_sector = None
+                    for sec in candidate_sectors:
+                        if sec.hook_magnitude()[val.value] > 0:
+                            forced_sector = sec
+                            break
+                    assign_sector(forced_sector, dungeon_map[found_hooks[0]], candidate_sectors, global_pole)
 
 
 def check_crystal(dead_end, entrance):

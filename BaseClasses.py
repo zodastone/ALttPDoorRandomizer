@@ -1024,6 +1024,30 @@ class Direction(Enum):
     Up = 4
     Down = 5
 
+@unique
+class Hook(Enum):
+    North = 0
+    West = 1
+    South = 2
+    East = 3
+    Stairs = 4
+
+
+hook_dir_map = {
+    Direction.North: Hook.North,
+    Direction.South: Hook.South,
+    Direction.West: Hook.West,
+    Direction.East: Hook.East,
+}
+
+
+def hook_from_door(door):
+    if door.type == DoorType.SpiralStairs:
+        return Hook.Stairs
+    if door.type == DoorType.Normal:
+        return hook_dir_map[door.direction]
+    return None
+
 
 class Polarity:
     def __init__(self):
@@ -1279,6 +1303,13 @@ class Sector(object):
         magnitude = [0, 0, 0]
         for door in self.outstanding_doors:
             idx, inc = pol_idx[door.direction]
+            magnitude[idx] = magnitude[idx] + 1
+        return magnitude
+
+    def hook_magnitude(self):
+        magnitude = [0] * len(Hook)
+        for door in self.outstanding_doors:
+            idx = hook_from_door(door).value
             magnitude[idx] = magnitude[idx] + 1
         return magnitude
 
