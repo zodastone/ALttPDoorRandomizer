@@ -1,6 +1,6 @@
 from source.classes.SpriteSelector import SpriteSelector as spriteSelector
 from source.gui.randomize.gameoptions import set_sprite
-from Rom import Sprite
+from Rom import Sprite, get_sprite_from_name
 import source.classes.constants as CONST
 
 def loadcliargs(gui, args, settings=None):
@@ -39,18 +39,16 @@ def loadcliargs(gui, args, settings=None):
         def sprite_setter(spriteObject):
             gui.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteObject"] = spriteObject
         if args["sprite"] is not None:
-            sprite_obj = args.sprite if isinstance(args["sprite"], Sprite) else Sprite(args["sprite"])
-            r_sprite_flag = args.randomSprite if hasattr(args, 'randomSprite') else False
-            set_sprite(sprite_obj, r_sprite_flag, spriteSetter=sprite_setter,
+            sprite_obj = args.sprite if isinstance(args["sprite"], Sprite) else get_sprite_from_name(args["sprite"])
+            set_sprite(sprite_obj, False, spriteSetter=sprite_setter,
                        spriteNameVar=gui.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteNameVar"],
                        randomSpriteVar=gui.randomSprite)
 
         def sprite_setter_adj(spriteObject):
             gui.pages["adjust"].content.sprite = spriteObject
         if args["sprite"] is not None:
-            sprite_obj = args.sprite if isinstance(args.sprite, Sprite) else Sprite(args.sprite)
-            r_sprite_flag = args["randomSprite"] if hasattr(args, 'randomSprite') else False
-            set_sprite(sprite_obj, r_sprite_flag, spriteSetter=sprite_setter_adj,
+            sprite_obj = args.sprite if isinstance(args["sprite"], Sprite) else get_sprite_from_name(args["sprite"])
+            set_sprite(sprite_obj, False, spriteSetter=sprite_setter_adj,
                        spriteNameVar=gui.pages["adjust"].content.spriteNameVar2,
                        randomSpriteVar=gui.randomSprite)
 

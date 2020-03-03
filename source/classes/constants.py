@@ -33,7 +33,7 @@ CUSTOMITEMLABELS = [
   "Ocarina", "Bug Catching Net", "Book of Mudora", "Bottle", "Cane of Somaria",
   "Cane of Byrna", "Magic Cape", "Magic Mirror", "Pegasus Boots", "Power Glove",
   "Titans Mitts", "Progressive Glove", "Flippers", "Moon Pearl", "Piece of Heart",
-  
+
   "Boss Heart Container", "Sanctuary Heart Container", "Fighter Sword", "Master Sword", "Tempered Sword",
   "Golden Sword", "Progressive Sword", "Blue Shield", "Red Shield", "Mirror Shield",
   "Progressive Shield", "Blue Mail", "Red Mail", "Progressive Armor", "Magic Upgrade (1/2)",
@@ -102,7 +102,8 @@ SETTINGSTOPROCESS = {
       "spoiler": "create_spoiler",
       "suppressrom": "suppress_rom",
       "usestartinventory": "usestartinventory",
-      "usecustompool": "custom"
-    } 
+      "usecustompool": "custom",
+      "saveonexit": "saveonexit"
+    }
   }
 }
