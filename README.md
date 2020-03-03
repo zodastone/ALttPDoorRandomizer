@@ -36,10 +36,6 @@ Doors are shuffled between dungeons as well.
 
 Doors are not shuffled.
 
-### Experimental
-
-Used for development testing. This will be removed in a future version. Use at your own risk. Might play like a plando.
-
 ## Map/Compass/Small Key/Big Key shuffle (aka Keysanity)
 
 These settings allow dungeon specific items to be distributed anywhere in the world and not just in their native dungeon.
