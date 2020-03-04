@@ -84,7 +84,9 @@ def output_path(path):
 
         output_path.cached_path = os.path.join(documents, 'ALttPEntranceRandomizer')
         if not os.path.exists(output_path.cached_path):
-            os.mkdir(output_path.cached_path)
+            os.makedirs(output_path.cached_path)
+        if not os.path.join(output_path.cached_path, path):
+            os.makedirs(os.path.join(output_path.cached_path, path))
         return os.path.join(output_path.cached_path, path)
 
 output_path.cached_path = None
