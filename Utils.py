@@ -82,7 +82,7 @@ def output_path(path):
         else:
             raise NotImplementedError('Not supported yet')
 
-        output_path.cached_path = os.path.join(documents, 'ALttPEntranceRandomizer')
+        output_path.cached_path = os.path.join(documents, 'ALttPDoorRandomizer')
         if not os.path.exists(output_path.cached_path):
             os.makedirs(output_path.cached_path)
         if not os.path.join(output_path.cached_path, path):
