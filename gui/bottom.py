@@ -1,10 +1,9 @@
-from tkinter import ttk, messagebox, StringVar, Button, Entry, Frame, Label, Spinbox, E, W, LEFT, RIGHT, X
+from tkinter import ttk, messagebox, StringVar, Button, Entry, Frame, Label, E, W, LEFT, RIGHT, X
 from argparse import Namespace
-from functools import partial
 import logging
 import os
 import random
-from CLI import parse_arguments, get_settings
+from CLI import parse_arguments
 from Main import main
 from Utils import local_path, output_path, open_file
 import classes.constants as CONST
@@ -97,22 +96,35 @@ def create_guiargs(parent):
     # Page::Subpage::GUI-id::param-id
     options = CONST.SETTINGSTOPROCESS
 
+    # Cycle through each page
     for mainpage in options:
+        # Cycle through each subpage (in case of Item Randomizer)
         for subpage in options[mainpage]:
+            # Cycle through each widget
             for widget in options[mainpage][subpage]:
+                # Get the value and set it
                 arg = options[mainpage][subpage][widget]
                 setattr(guiargs, arg, parent.pages[mainpage].pages[subpage].widgets[widget].storageVar.get())
 
+    # Get EnemizerCLI setting
     guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.get()
 
+    # Get Multiworld Worlds count
     guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.get())
 
+    # Get baserom path
     guiargs.rom = parent.pages["randomizer"].pages["generation"].romVar.get()
+
+    # Get if we're using the Custom Item Pool
     guiargs.custom = bool(parent.pages["randomizer"].pages["generation"].widgets["usecustompool"].storageVar.get())
 
+    # Get Seed ID
     guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
+
+    # Get number of generations to run
     guiargs.count = int(parent.frames["bottom"].widgets["generationcount"].storageVar.get()) if parent.frames["bottom"].widgets["generationcount"].storageVar.get() != '1' else None
 
+    # Get Adjust settings
     adjustargs = {
       "nobgm": "disablemusic",
       "quickswap": "quickswap",
@@ -126,22 +138,29 @@ def create_guiargs(parent):
       internal = adjustargs[adjustarg]
       setattr(guiargs,"adjust." + internal, parent.pages["adjust"].content.widgets[adjustarg].storageVar.get())
 
+    # Get Custom Items and Starting Inventory Items
     customitems = CONST.CUSTOMITEMS
     guiargs.startinventory = []
     guiargs.customitemarray = {}
     guiargs.startinventoryarray = {}
     for customitem in customitems:
-        if customitem not in ["triforcepiecesgoal", "triforce", "rupoor", "rupoorcost"]:
+        if customitem not in CONST.CANTSTARTWITH:
+            # Starting Inventory is a CSV
             amount = int(parent.pages["startinventory"].content.startingWidgets[customitem].storageVar.get())
             guiargs.startinventoryarray[customitem] = amount
-            for i in range(0, amount):
+            for _ in range(0, amount):
                 label = CONST.CUSTOMITEMLABELS[customitems.index(customitem)]
                 guiargs.startinventory.append(label)
+        # Custom Item Pool is a dict of ints
         guiargs.customitemarray[customitem] = int(parent.pages["custom"].content.customWidgets[customitem].storageVar.get())
 
+    # Starting Inventory is a CSV
     guiargs.startinventory = ','.join(guiargs.startinventory)
 
+    # Get Sprite Selection (set or random)
     guiargs.sprite = parent.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteObject"]
     guiargs.randomSprite = parent.randomSprite.get()
+
+    # Get output path
     guiargs.outputpath = parent.outputPath.get()
     return guiargs

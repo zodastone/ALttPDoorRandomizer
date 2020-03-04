@@ -4,8 +4,7 @@ import os
 import sys
 from tkinter import Tk, Button, BOTTOM, TOP, StringVar, BooleanVar, X, BOTH, RIGHT, ttk, messagebox
 
-from argparse import Namespace
-from CLI import get_settings, get_args_priority
+from CLI import get_args_priority
 from DungeonRandomizer import parse_arguments
 from gui.adjust.overview import adjust_page
 from gui.startinventory.overview import startinventory_page
@@ -24,6 +23,7 @@ from Main import __version__ as ESVersion
 
 
 def guiMain(args=None):
+    # Save settings to file
     def save_settings(args):
         user_resources_path = os.path.join(".", "resources", "user")
         settings_path = os.path.join(user_resources_path)
@@ -35,6 +35,7 @@ def guiMain(args=None):
             f.write(json.dumps(args, indent=2))
         os.chmod(os.path.join(settings_path, "settings.json"),0o755)
 
+    # Save settings from GUI
     def save_settings_from_gui(confirm):
         gui_args = vars(create_guiargs(self))
         if self.randomSprite.get():
@@ -83,6 +84,7 @@ def guiMain(args=None):
     # make array for frames
     self.frames = {}
 
+    # make pages for each section
     self.notebook = ttk.Notebook(self)
     self.pages["randomizer"] = ttk.Frame(self.notebook)
     self.pages["adjust"] = ttk.Frame(self.notebook)
@@ -178,6 +180,7 @@ def guiMain(args=None):
     # load adjust settings into options
     loadadjustargs(self, self.settings)
 
+    # run main window
     mainWindow.mainloop()
 
 

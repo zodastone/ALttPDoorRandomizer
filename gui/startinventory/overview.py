@@ -1,4 +1,4 @@
-from tkinter import ttk, StringVar, Entry, Frame, Label, N, E, W, LEFT, RIGHT, X, VERTICAL, Y
+from tkinter import ttk, Frame, N, E, W, LEFT, X, VERTICAL, Y
 import gui.widgets as widgets
 import json
 import os
@@ -9,16 +9,19 @@ def startinventory_page(top,parent):
     # Starting Inventory
     self = ttk.Frame(parent)
 
+    # Create uniform list columns
     def create_list_frame(parent, framename):
         parent.frames[framename] = Frame(parent)
         parent.frames[framename].pack(side=LEFT, padx=(0,0), anchor=N)
         parent.frames[framename].thisRow = 0
         parent.frames[framename].thisCol = 0
 
+    # Create a vertical rule to help with splitting columns visually
     def create_vertical_rule(num=1):
-        for i in range(0,num):
+        for _ in range(0,num):
             ttk.Separator(self, orient=VERTICAL).pack(side=LEFT, anchor=N, fill=Y)
 
+    # This was in Custom Item Pool, I have no idea what it was but I left it just in case: MikeT
     def validation(P):
         if str.isdigit(P) or P == "":
             return True
@@ -31,6 +34,7 @@ def startinventory_page(top,parent):
 
     # Starting Inventory option sections
     self.frames = {}
+    # Create 5 columns with 2 vertical rules in between each
     create_list_frame(self,"itemList1")
     create_vertical_rule(2)
     create_list_frame(self,"itemList2")
@@ -41,6 +45,8 @@ def startinventory_page(top,parent):
     create_vertical_rule(2)
     create_list_frame(self,"itemList5")
 
+    # Load Starting Inventory option widgets as defined by JSON file, ignoring the ones to be excluded
+    # Defns include frame name, widget type, widget options, widget placement attributes
     with open(os.path.join("resources","app","gui","custom","overview","widgets.json")) as widgetDefns:
         myDict = json.load(widgetDefns)
         for key in CONST.CANTSTARTWITH:
@@ -53,6 +59,7 @@ def startinventory_page(top,parent):
             for key in dictWidgets:
                 self.startingWidgets[key] = dictWidgets[key]
 
+    # Load Custom Starting Inventory settings from settings file, ignoring ones to be excluded
     for key in CONST.CUSTOMITEMS:
         if key not in CONST.CANTSTARTWITH:
             val = 0

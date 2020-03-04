@@ -77,7 +77,8 @@ def main(args, seed=None):
         world.difficulty_requirements[player] = difficulties[world.difficulty[player]]
 
         if world.mode[player] == 'standard' and world.enemy_shuffle[player] != 'none':
-            world.escape_assist[player].append('bombs') # enemized escape assumes infinite bombs available and will likely be unbeatable without it
+            if hasattr(world,"escape_assist") and player in world.escape_assist:
+                world.escape_assist[player].append('bombs') # enemized escape assumes infinite bombs available and will likely be unbeatable without it
 
         for tok in filter(None, args.startinventory[player].split(',')):
             item = ItemFactory(tok.strip(), player)
@@ -383,7 +384,7 @@ def copy_dynamic_regions_and_locations(world, ret):
         new_loc.always_allow = location.always_allow
         new_loc.item_rule = location.item_rule
         new_reg.locations.append(new_loc)
-    
+
         ret.clear_location_cache()
 
 

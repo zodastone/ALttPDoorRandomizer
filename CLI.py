@@ -9,8 +9,6 @@ import shlex
 import sys
 
 from Main import main
-from Utils import is_bundled, close_console
-from Fill import FillError
 
 import classes.constants as CONST
 
@@ -185,7 +183,7 @@ def parse_arguments(argv, no_defaults=False):
                             Crossed:    Doors are mixed between all dungeons.
                                         (Not yet implemented)
                             Vanilla:    All doors are connected the same way they were in the
-                                        base game.                        
+                                        base game.
                         ''')
     parser.add_argument('--experimental', default=defval(settings["experimental"] != 0), help='Enable experimental features', action='store_true')
     parser.add_argument('--dungeon_counters', default=defval(settings["dungeon_counters"]), help='Enable dungeon chest counters', const='off', nargs='?', choices=['off', 'on', 'pickup'])
@@ -477,7 +475,10 @@ def get_settings():
                 settings[k] = v
     return settings
 
-
+# Priority fallback is:
+#  1: CLI
+#  2: Settings file
+#  3: Canned defaults
 def get_args_priority(settings_args, gui_args, cli_args):
     args = {}
     args["settings"] = get_settings() if settings_args is None else settings_args

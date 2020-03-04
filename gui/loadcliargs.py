@@ -3,6 +3,7 @@ from gui.randomize.gameoptions import set_sprite
 from Rom import Sprite, get_sprite_from_name
 import classes.constants as CONST
 
+# Load args/settings for most tabs
 def loadcliargs(gui, args, settings=None):
     if args is not None:
 #        for k, v in vars(args).items():
@@ -14,28 +15,47 @@ def loadcliargs(gui, args, settings=None):
         # Page::Subpage::GUI-id::param-id
         options = CONST.SETTINGSTOPROCESS
 
+        # Cycle through each page
         for mainpage in options:
+            # Cycle through each subpage (in case of Item Randomizer)
             for subpage in options[mainpage]:
+                # Cycle through each widget
                 for widget in options[mainpage][subpage]:
+                    # Get the value and set it
                     arg = options[mainpage][subpage][widget]
                     gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(args[arg])
+                    # If we're on the Game Options page and it's not about Hints
                     if subpage == "gameoptions" and not widget == "hints":
+                        # Check if we've got settings
+                        # Check if we've got the widget in Adjust settings
                         hasSettings = settings is not None
                         hasWidget = ("adjust." + widget) in settings if hasSettings else None
                         if hasWidget is None:
+                            # If we've got a Game Options val and we don't have an Adjust val, use the Game Options val
                             gui.pages["adjust"].content.widgets[widget].storageVar.set(args[arg])
 
+        # Get EnemizerCLI setting
         gui.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.set(args["enemizercli"])
+
+        # Get baserom path
         gui.pages["randomizer"].pages["generation"].romVar.set(args["rom"])
 
+        # Get Multiworld Worlds count
         if args["multi"]:
             gui.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.set(str(args["multi"]))
+
+        # Get Seed ID
         if args["seed"]:
             gui.frames["bottom"].seedVar.set(str(args["seed"]))
+
+        # Get number of generations to run
         if args["count"]:
             gui.frames["bottom"].widgets["generationcount"].storageVar.set(str(args["count"]))
+
+        # Get output path
         gui.outputPath.set(args["outputpath"])
 
+        # Figure out Sprite Selection
         def sprite_setter(spriteObject):
             gui.pages["randomizer"].pages["gameoptions"].widgets["sprite"]["spriteObject"] = spriteObject
         if args["sprite"] is not None:
@@ -52,6 +72,7 @@ def loadcliargs(gui, args, settings=None):
                        spriteNameVar=gui.pages["adjust"].content.spriteNameVar2,
                        randomSpriteVar=gui.randomSprite)
 
+# Load args/settings for Adjust tab
 def loadadjustargs(gui, settings):
     options = {
         "adjust": {

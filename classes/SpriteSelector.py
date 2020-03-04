@@ -1,4 +1,4 @@
-from tkinter import filedialog, messagebox, Button, Canvas, Label, LabelFrame, Frame, PhotoImage, Scrollbar, Toplevel, ALL, NSEW, LEFT, BOTTOM, X, RIGHT, TOP, HORIZONTAL, EW, NS
+from tkinter import filedialog, messagebox, Button, Canvas, Label, LabelFrame, Frame, PhotoImage, Scrollbar, Toplevel, ALL, LEFT, BOTTOM, X, RIGHT, TOP, EW, NS
 from glob import glob
 import json
 import os
@@ -34,6 +34,7 @@ class SpriteSelector(object):
         def open_unofficial_sprite_dir(_evt):
             open_file(self.unofficial_sprite_dir)
 
+        # Open SpriteSomething directory for Link sprites
         def open_spritesomething_listing(_evt):
             webbrowser.open("https://artheau.github.io/SpriteSomething/?mode=zelda3/link")
 
@@ -50,6 +51,7 @@ class SpriteSelector(object):
         unofficial_title_text.pack(side=LEFT)
         unofficial_title_link.pack(side=LEFT)
         unofficial_title_link.bind("<Button-1>", open_unofficial_sprite_dir)
+        # Include hyperlink to SpriteSomething directory for Link sprites
         spritesomething_title_link = Label(unofficial_frametitle, text="(SpriteSomething)", fg="blue", cursor="hand2")
         spritesomething_title_link.pack(side=LEFT)
         spritesomething_title_link.bind("<Button-1>", open_spritesomething_listing)

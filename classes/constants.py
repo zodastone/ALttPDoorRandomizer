@@ -1,3 +1,4 @@
+# Ordered list of items in Custom Item Pool page and Starting Inventory page
 CUSTOMITEMS = [
   "bow",                "progressivebow",   "boomerang",          "redmerang",        "hookshot",
   "mushroom",           "powder",           "firerod",            "icerod",           "bombos",
@@ -20,11 +21,13 @@ CUSTOMITEMS = [
   "rupoorcost"
 ]
 
+# These can't be in the Starting Inventory page
 CANTSTARTWITH = [
   "triforcepiecesgoal", "triforce", "rupoor",
   "rupoorcost"
 ]
 
+# In the same order as CUSTOMITEMS, these are Pretty Labels for each option
 CUSTOMITEMLABELS = [
   "Bow", "Progressive Bow", "Blue Boomerang", "Red Boomerang", "Hookshot",
   "Mushroom", "Magic Powder", "Fire Rod", "Ice Rod", "Bombos",
@@ -33,7 +36,7 @@ CUSTOMITEMLABELS = [
   "Ocarina", "Bug Catching Net", "Book of Mudora", "Bottle", "Cane of Somaria",
   "Cane of Byrna", "Magic Cape", "Magic Mirror", "Pegasus Boots", "Power Glove",
   "Titans Mitts", "Progressive Glove", "Flippers", "Moon Pearl", "Piece of Heart",
-  
+
   "Boss Heart Container", "Sanctuary Heart Container", "Fighter Sword", "Master Sword", "Tempered Sword",
   "Golden Sword", "Progressive Sword", "Blue Shield", "Red Shield", "Mirror Shield",
   "Progressive Shield", "Blue Mail", "Red Mail", "Progressive Armor", "Magic Upgrade (1/2)",
@@ -47,6 +50,8 @@ CUSTOMITEMLABELS = [
   "Rupoor Cost"
 ]
 
+# Stuff on each page to save, according to internal names as defined by the widgets definitions
+#  and how it eventually translates to YAML/JSON weight files
 SETTINGSTOPROCESS = {
   "randomizer": {
     "item": {
@@ -104,6 +109,6 @@ SETTINGSTOPROCESS = {
       "usestartinventory": "usestartinventory",
       "usecustompool": "custom",
       "saveonexit": "saveonexit"
-    } 
+    }
   }
 }

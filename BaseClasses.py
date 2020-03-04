@@ -73,6 +73,10 @@ class World(object):
         self.key_layout = defaultdict(dict)
 
         for player in range(1, players + 1):
+            # If World State is Retro, set to Open and set Retro flag
+            if self.mode[player] == "retro":
+                self.mode[player] = "open"
+                self.retro[player] = True
             def set_player_attr(attr, val):
                 self.__dict__.setdefault(attr, {})[player] = val
             set_player_attr('_region_cache', {})

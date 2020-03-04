@@ -126,6 +126,7 @@ difficulties = {
     ),
 }
 
+# Translate between Mike's label array and YAML/JSON keys
 def get_custom_array_key(item):
   label_switcher = {
     "silverarrow": "silversupgrade",
@@ -264,10 +265,10 @@ def generate_itempool(world, player):
     if player in world.pool_adjustment.keys():
         amt = world.pool_adjustment[player]
         if amt < 0:
-            for i in range(0, amt):
+            for _ in range(0, amt):
                 pool.remove('Rupees (20)')
         elif amt > 0:
-            for i in range(0, amt):
+            for _ in range(0, amt):
                 pool.append('Rupees (20)')
 
     for item in precollected_items:
@@ -707,24 +708,25 @@ def test():
     for difficulty in ['normal', 'hard', 'expert']:
         for goal in ['ganon', 'triforcehunt', 'pedestal']:
             for timer in ['none', 'display', 'timed', 'timed-ohko', 'ohko', 'timed-countdown']:
-                for mode in ['open', 'standard', 'inverted']:
+                for mode in ['open', 'standard', 'inverted', 'retro']:
                     for swords in ['random', 'assured', 'swordless', 'vanilla']:
                         for progressive in ['on', 'off']:
                             for shuffle in ['full', 'insanity_legacy']:
                                 for retro in [True, False]:
-                                    out = get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro)
-                                    count = len(out[0]) + len(out[1])
+                                    for door_shuffle in ['basic', 'crossed', 'vanilla']:
+                                        out = get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, door_shuffle)
+                                        count = len(out[0]) + len(out[1])
 
-                                    correct_count = total_items_to_place
-                                    if goal == 'pedestal' and swords != 'vanilla':
-                                        # pedestal goals generate one extra item
-                                        correct_count += 1
-                                    if retro:
-                                        correct_count += 28
-                                    try:
-                                        assert count == correct_count, "expected {0} items but found {1} items for {2}".format(correct_count, count, (progressive, shuffle, difficulty, timer, goal, mode, swords, retro))
-                                    except AssertionError as e:
-                                        print(e)
+                                        correct_count = total_items_to_place
+                                        if goal == 'pedestal' and swords != 'vanilla':
+                                            # pedestal goals generate one extra item
+                                            correct_count += 1
+                                        if retro:
+                                            correct_count += 28
+                                        try:
+                                            assert count == correct_count, "expected {0} items but found {1} items for {2}".format(correct_count, count, (progressive, shuffle, difficulty, timer, goal, mode, swords, retro))
+                                        except AssertionError as e:
+                                            print(e)
 
 if __name__ == '__main__':
     test()

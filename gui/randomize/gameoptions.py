@@ -1,4 +1,4 @@
-from tkinter import ttk, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, OptionMenu, E, W, LEFT, RIGHT
+from tkinter import ttk, StringVar, Button, Entry, Frame, Label, E, W, LEFT, RIGHT
 from functools import partial
 import classes.SpriteSelector as spriteSelector
 import gui.widgets as widgets
@@ -17,11 +17,17 @@ def gameoptions_page(top, parent):
     self.frames["checkboxes"] = Frame(self)
     self.frames["checkboxes"].pack(anchor=W)
 
+    # Game Options frames
     self.frames["leftRomOptionsFrame"] = Frame(self)
     self.frames["rightRomOptionsFrame"] = Frame(self)
     self.frames["leftRomOptionsFrame"].pack(side=LEFT)
     self.frames["rightRomOptionsFrame"].pack(side=RIGHT)
 
+    # Load Game Options widgets as defined by JSON file
+    # Defns include frame name, widget type, widget options, widget placement attributes
+    # Checkboxes go West
+    # Everything else goes East
+    # They also get split left & right
     with open(os.path.join("resources","app","gui","randomize","gameoptions","widgets.json")) as widgetDefns:
         myDict = json.load(widgetDefns)
         for framename,theseWidgets in myDict.items():
@@ -34,6 +40,7 @@ def gameoptions_page(top, parent):
                 self.widgets[key].pack(packAttrs)
 
     ## Sprite selection
+    # This one's more-complicated, build it and stuff it
     spriteDialogFrame = Frame(self.frames["leftRomOptionsFrame"])
     baseSpriteLabel = Label(spriteDialogFrame, text='Sprite:')
 
@@ -75,4 +82,3 @@ def set_sprite(sprite_param, random_sprite=False, spriteSetter=None, spriteNameV
             spriteNameVar.set(sprite_param.name)
     if randomSpriteVar:
         randomSpriteVar.set(random_sprite)
-
