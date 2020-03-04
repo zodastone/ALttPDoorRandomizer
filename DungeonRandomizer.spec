@@ -35,6 +35,9 @@ a = Analysis(['DungeonRandomizer.py'],
              cipher=block_cipher,
              noarchive=False)
 
+if sys.platform.find("windows"):
+  a.binaries.append("ucrtbase.dll")
+
 # https://stackoverflow.com/questions/17034434/how-to-remove-exclude-modules-and-files-from-pyinstaller
 excluded_binaries = [
         'VCRUNTIME140.dll',
