@@ -56,7 +56,7 @@ def prepare_env():
     env["GITHUB_SHA_SHORT"] = env["GITHUB_SHA"][:7]
 
   # ci data
-  env["BUILD_NUMBER"] = os.getenv("TRAVIS_BUILD_NUMBER",env["GITHUB_SHA_SHORT"])
+  env["BUILD_NUMBER"] = os.getenv("TRAVIS_BUILD_NUMBER",env["GITHUB_RUN_ID"])
 
   GITHUB_TAG = os.getenv("TRAVIS_TAG",os.getenv("GITHUB_TAG",""))
   OS_NAME = os.getenv("TRAVIS_OS_NAME",os.getenv("OS_NAME","")).replace("macOS","osx")
