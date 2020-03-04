@@ -1,8 +1,10 @@
 from tkinter import Checkbutton, Entry, Frame, IntVar, Label, OptionMenu, Spinbox, StringVar, RIGHT, X
 
+# Need a dummy class
 class Empty():
     pass
 
+# Override Spinbox to include mousewheel support for changing value
 class mySpinbox(Spinbox):
     def __init__(self, *args, **kwargs):
         Spinbox.__init__(self, *args, **kwargs)
@@ -16,6 +18,7 @@ class mySpinbox(Spinbox):
         elif event.num == 4 or event.delta == 120:
             self.invoke('buttonup')
 
+# Make a Checkbutton with a label
 def make_checkbox(self, parent, label, storageVar, manager, managerAttrs):
     self = Frame(parent, name="checkframe-" + label.lower())
     self.storageVar = storageVar
@@ -26,6 +29,7 @@ def make_checkbox(self, parent, label, storageVar, manager, managerAttrs):
         self.checkbox.pack()
     return self
 
+# Make an OptionMenu with a label and pretty option labels
 def make_selectbox(self, parent, label, options, storageVar, manager, managerAttrs):
     def change_storage(*args):
         self.storageVar.set(options[self.labelVar.get()])
@@ -54,6 +58,7 @@ def make_selectbox(self, parent, label, options, storageVar, manager, managerAtt
         self.selectbox.pack()
     return self
 
+# Make a Spinbox with a label, limit 1-100
 def make_spinbox(self, parent, label, storageVar, manager, managerAttrs):
     self = Frame(parent, name="spinframe-" + label.lower())
     self.storageVar = storageVar
@@ -76,6 +81,8 @@ def make_spinbox(self, parent, label, storageVar, manager, managerAttrs):
         self.spinbox.pack()
     return self
 
+# Make an Entry box with a label
+# Support for Grid or Pack so that the Custom Item Pool & Starting Inventory pages don't look ugly
 def make_textbox(self, parent, label, storageVar, manager, managerAttrs):
     widget = Empty()
     widget.storageVar = storageVar
@@ -98,7 +105,7 @@ def make_textbox(self, parent, label, storageVar, manager, managerAttrs):
         widget.textbox.pack(managerAttrs["textbox"] if managerAttrs is not None and "textbox" in managerAttrs else None)
     return widget
 
-
+# Make a generic widget
 def make_widget(self, type, parent, label, storageVar=None, manager=None, managerAttrs=dict(), options=None):
     widget = None
     if manager is None:
@@ -129,6 +136,7 @@ def make_widget(self, type, parent, label, storageVar=None, manager=None, manage
     widget.type = type
     return widget
 
+# Make a generic widget from a dict
 def make_widget_from_dict(self, defn, parent):
     type = defn["type"] if "type" in defn else None
     label = defn["label"]["text"] if "label" in defn and "text" in defn["label"] else ""
@@ -138,8 +146,9 @@ def make_widget_from_dict(self, defn, parent):
     widget = make_widget(self, type, parent, label, None, manager, managerAttrs, options)
     return widget
 
+# Make a set of generic widgets from a dict
 def make_widgets_from_dict(self, defns, parent):
     widgets = {}
     for key,defn in defns.items():
         widgets[key] = make_widget_from_dict(self, defn, parent)
-    return widgets   
+    return widgets

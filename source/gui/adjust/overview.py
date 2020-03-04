@@ -1,4 +1,4 @@
-from tkinter import ttk, filedialog, messagebox, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, OptionMenu, E, W, LEFT, RIGHT, X, BOTTOM
+from tkinter import ttk, filedialog, messagebox, StringVar, Button, Entry, Frame, Label, E, W, LEFT, RIGHT, X, BOTTOM
 from AdjusterMain import adjust
 from argparse import Namespace
 from source.classes.SpriteSelector import SpriteSelector
@@ -19,6 +19,7 @@ def adjust_page(top, parent, settings):
     self.frames["checkboxes"] = Frame(self)
     self.frames["checkboxes"].pack(anchor=W)
 
+    # Adjust option frames
     self.frames["selectOptionsFrame"] = Frame(self)
     self.frames["leftAdjustFrame"] = Frame(self.frames["selectOptionsFrame"])
     self.frames["rightAdjustFrame"] = Frame(self.frames["selectOptionsFrame"])
@@ -28,6 +29,8 @@ def adjust_page(top, parent, settings):
     self.frames["rightAdjustFrame"].pack(side=RIGHT)
     self.frames["bottomAdjustFrame"].pack(fill=X)
 
+    # Load Adjust option widgets as defined by JSON file
+    # Defns include frame name, widget type, widget options, widget placement attributes
     with open(os.path.join("resources","app","gui","adjust","overview","widgets.json")) as widgetDefns:
         myDict = json.load(widgetDefns)
         for framename,theseWidgets in myDict.items():
@@ -40,6 +43,7 @@ def adjust_page(top, parent, settings):
                 self.widgets[key].pack(packAttrs)
 
     # Sprite Selection
+    # This one's more-complicated, build it and stuff it
     self.spriteNameVar2 = StringVar()
     spriteDialogFrame2 = Frame(self.frames["leftAdjustFrame"])
     baseSpriteLabel2 = Label(spriteDialogFrame2, text='Sprite:')
@@ -65,6 +69,8 @@ def adjust_page(top, parent, settings):
     spriteSelectButton2.pack(side=LEFT)
     spriteDialogFrame2.pack(anchor=E)
 
+    # Path to game file to Adjust
+    # This one's more-complicated, build it and stuff it
     adjustRomFrame = Frame(self.frames["bottomAdjustFrame"])
     adjustRomLabel = Label(adjustRomFrame, text='Rom to adjust: ')
     self.romVar2 = StringVar(value=settings["rom"])
@@ -82,6 +88,7 @@ def adjust_page(top, parent, settings):
     romSelectButton2.pack(side=LEFT)
     adjustRomFrame.pack(fill=X)
 
+    # These are the options to Adjust
     def adjustRom():
         options = {
           "heartbeep": "heartbeep",

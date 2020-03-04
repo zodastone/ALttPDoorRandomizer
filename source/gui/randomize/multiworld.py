@@ -1,4 +1,4 @@
-from tkinter import ttk, StringVar, Entry, Frame, Label, Spinbox, N, E, W, X, LEFT, RIGHT
+from tkinter import ttk, StringVar, Entry, Frame, Label, N, E, W, X, LEFT
 import source.gui.widgets as widgets
 import json
 import os
@@ -15,6 +15,8 @@ def multiworld_page(parent,settings):
     self.frames["widgets"] = Frame(self)
     self.frames["widgets"].pack(anchor=W, fill=X)
 
+    # Load Multiworld option widgets as defined by JSON file
+    # Defns include frame name, widget type, widget options, widget placement attributes
     with open(os.path.join("resources","app","gui","randomize","multiworld","widgets.json")) as multiworldItems:
         myDict = json.load(multiworldItems)
         dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["widgets"])
@@ -23,6 +25,7 @@ def multiworld_page(parent,settings):
             self.widgets[key].pack(side=LEFT, anchor=N)
 
     ## List of Player Names
+    # This one's more-complicated, build it and stuff it
     key = "names"
     self.widgets[key] = Frame(self.frames["widgets"])
     self.widgets[key].label = Label(self.widgets[key], text='Player names')

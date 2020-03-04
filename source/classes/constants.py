@@ -1,3 +1,4 @@
+# Ordered list of items in Custom Item Pool page and Starting Inventory page
 CUSTOMITEMS = [
   "bow",                "progressivebow",   "boomerang",          "redmerang",        "hookshot",
   "mushroom",           "powder",           "firerod",            "icerod",           "bombos",
@@ -20,11 +21,13 @@ CUSTOMITEMS = [
   "rupoorcost"
 ]
 
+# These can't be in the Starting Inventory page
 CANTSTARTWITH = [
   "triforcepiecesgoal", "triforce", "rupoor",
   "rupoorcost"
 ]
 
+# In the same order as CUSTOMITEMS, these are Pretty Labels for each option
 CUSTOMITEMLABELS = [
   "Bow", "Progressive Bow", "Blue Boomerang", "Red Boomerang", "Hookshot",
   "Mushroom", "Magic Powder", "Fire Rod", "Ice Rod", "Bombos",
@@ -47,6 +50,8 @@ CUSTOMITEMLABELS = [
   "Rupoor Cost"
 ]
 
+# Stuff on each page to save, according to internal names as defined by the widgets definitions
+#  and how it eventually translates to YAML/JSON weight files
 SETTINGSTOPROCESS = {
   "randomizer": {
     "item": {

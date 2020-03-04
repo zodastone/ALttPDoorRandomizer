@@ -705,7 +705,7 @@ def unique_doors(doors):
 def count_unique_sm_doors(doors):
     unique_d_set = set()
     for d in doors:
-        if d not in unique_d_set and d.dest not in unique_d_set and not d.bigKey:
+        if d not in unique_d_set and (d.dest not in unique_d_set or d.type == DoorType.SpiralStairs) and not d.bigKey:
             unique_d_set.add(d)
     return len(unique_d_set)
 
@@ -718,7 +718,8 @@ def count_unique_small_doors(key_counter, proposal):
         if door in proposal and door not in counted:
             cnt += 1
             counted.add(door)
-            counted.add(door.dest)
+            if door.type != DoorType.SpiralStairs:
+                counted.add(door.dest)
     return cnt
 
 
@@ -1067,15 +1068,6 @@ def invalid_self_locking_key(state, prev_state, prev_avail, world, player):
     if len(new_small_doors) > 0 or len(new_bk_doors) > 0:
         return False
     return prev_avail - 1 == 0
-
-
-# does not allow dest doors
-def count_unique_sm_doors(doors):
-    unique_d_set = set()
-    for d in doors:
-        if d not in unique_d_set and d.dest not in unique_d_set and not d.bigKey:
-            unique_d_set.add(d)
-    return len(unique_d_set)
 
 
 def enough_small_locations(state, avail_small_loc):

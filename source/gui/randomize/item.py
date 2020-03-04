@@ -1,8 +1,8 @@
-from tkinter import ttk, IntVar, StringVar, Checkbutton, Frame, Label, OptionMenu, E, W, LEFT, RIGHT
+from tkinter import ttk, Frame, E, W, LEFT, RIGHT
 import source.gui.widgets as widgets
 import json
 import os
- 
+
 def item_page(parent):
     # Item Randomizer
     self = ttk.Frame(parent)
@@ -13,6 +13,7 @@ def item_page(parent):
     # Item Randomizer option sections
     self.frames = {}
 
+    # Item Randomizer option frames
     self.frames["checkboxes"] = Frame(self)
     self.frames["checkboxes"].pack(anchor=W)
 
@@ -21,6 +22,10 @@ def item_page(parent):
     self.frames["leftItemFrame"].pack(side=LEFT)
     self.frames["rightItemFrame"].pack(side=RIGHT)
 
+    # Load Item Randomizer option widgets as defined by JSON file
+    # Defns include frame name, widget type, widget options, widget placement attributes
+    # Checkboxes go West
+    # Everything else goes East
     with open(os.path.join("resources","app","gui","randomize","item","widgets.json")) as widgetDefns:
         myDict = json.load(widgetDefns)
         for framename,theseWidgets in myDict.items():

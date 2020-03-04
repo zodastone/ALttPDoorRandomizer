@@ -1,4 +1,4 @@
-from tkinter import ttk, IntVar, StringVar, Checkbutton, Frame, Label, OptionMenu, E, W, LEFT, RIGHT
+from tkinter import ttk, Frame, E, W, LEFT, RIGHT
 import source.gui.widgets as widgets
 import json
 import os
@@ -15,6 +15,11 @@ def entrando_page(parent):
     self.frames["widgets"] = Frame(self)
     self.frames["widgets"].pack(anchor=W)
 
+    # Load Entrance Randomizer option widgets as defined by JSON file
+    # Defns include frame name, widget type, widget options, widget placement attributes
+    # Checkboxes go West
+    # Everything else goes East
+    # They also get split left & right
     with open(os.path.join("resources","app","gui","randomize","entrando","widgets.json")) as widgetDefns:
         myDict = json.load(widgetDefns)
         for framename,theseWidgets in myDict.items():

@@ -25,7 +25,8 @@
       "options": {
         "Standard": "standard",
         "Open": "open",
-        "Inverted": "inverted"
+        "Inverted": "inverted",
+        "Retro": "retro"
       }
     },
     "logiclevel": {

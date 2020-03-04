@@ -1,5 +1,4 @@
-import os
-from tkinter import ttk, filedialog, IntVar, StringVar, Button, Checkbutton, Entry, Frame, Label, LabelFrame, OptionMenu, N, E, W, LEFT, RIGHT, BOTTOM, X
+from tkinter import ttk, filedialog, StringVar, Button, Entry, Frame, Label, N, E, W, LEFT, RIGHT, BOTTOM, X
 import source.gui.widgets as widgets
 import json
 import os
@@ -18,6 +17,7 @@ def enemizer_page(parent,settings):
     # Enemizer option sections
     self.frames = {}
 
+    # Enemizer option frames
     self.frames["checkboxes"] = Frame(self)
     self.frames["checkboxes"].pack(anchor=W)
 
@@ -30,6 +30,9 @@ def enemizer_page(parent,settings):
     self.frames["rightEnemizerFrame"].pack(side=RIGHT)
     self.frames["bottomEnemizerFrame"].pack(fill=X)
 
+    # Load Enemizer option widgets as defined by JSON file
+    # Defns include frame name, widget type, widget options, widget placement attributes
+    # These get split left & right
     with open(os.path.join("resources","app","gui","randomize","enemizer","widgets.json")) as widgetDefns:
         myDict = json.load(widgetDefns)
         for framename,theseWidgets in myDict.items():
@@ -42,6 +45,7 @@ def enemizer_page(parent,settings):
                 self.widgets[key].pack(packAttrs)
 
     ## Enemizer CLI Path
+    # This one's more-complicated, build it and stuff it
     enemizerPathFrame = Frame(self.frames["bottomEnemizerFrame"])
     enemizerCLIlabel = Label(enemizerPathFrame, text="EnemizerCLI path: ")
     enemizerCLIlabel.pack(side=LEFT)
