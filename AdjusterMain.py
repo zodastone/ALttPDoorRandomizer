@@ -21,6 +21,9 @@ def adjust(args):
     else:
         raise RuntimeError('Provided Rom is not a valid Link to the Past Randomizer Rom. Please provide one for adjusting.')
 
+    if not hasattr(args,"sprite"):
+        args.sprite = None
+
     apply_rom_settings(rom, args.heartbeep, args.heartcolor, args.quickswap, args.fastmenu, args.disablemusic, args.sprite, args.ow_palettes, args.uw_palettes)
 
     rom.write_to_file(output_path('%s.sfc' % outfilebase))

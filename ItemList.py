@@ -9,6 +9,8 @@ from EntranceShuffle import connect_entrance
 from Fill import FillError, fill_restrictive
 from Items import ItemFactory
 
+import classes.constants as CONST
+
 
 #This file sets the item pools for various modes. Timed modes and triforce hunt are enforced first, and then extra items are specified per mode to fill in the remaining space.
 #Some basic items that various modes require are placed here, including pendants and crystals. Medallion requirements for the two relevant entrances are also decided.
@@ -58,7 +60,7 @@ difficulties = {
         timedother = ['Green Clock'] * 20 + ['Blue Clock'] * 10 + ['Red Clock'] * 10,
         triforcehunt = ['Triforce Piece'] * 30,
         triforce_pieces_required = 20,
-        retro = ['Small Key (Universal)'] * 17 + ['Rupees (20)'] * 10,
+        retro = ['Small Key (Universal)'] * 18 + ['Rupees (20)'] * 10,
         extras = [normalfirst15extra, normalsecond15extra, normalthird10extra, normalfourth5extra, normalfinal25extra],
         progressive_sword_limit = 4,
         progressive_shield_limit = 3,
@@ -85,7 +87,7 @@ difficulties = {
         timedother = ['Green Clock'] * 20 + ['Blue Clock'] * 10 + ['Red Clock'] * 10,
         triforcehunt = ['Triforce Piece'] * 30,
         triforce_pieces_required = 20,
-        retro = ['Small Key (Universal)'] * 12 + ['Rupees (5)'] * 15,
+        retro = ['Small Key (Universal)'] * 13 + ['Rupees (5)'] * 15,
         extras = [normalfirst15extra, normalsecond15extra, normalthird10extra, normalfourth5extra, normalfinal25extra],
         progressive_sword_limit = 3,
         progressive_shield_limit = 2,
@@ -112,7 +114,7 @@ difficulties = {
         timedother = ['Green Clock'] * 20 + ['Blue Clock'] * 10 + ['Red Clock'] * 10,
         triforcehunt = ['Triforce Piece'] * 30,
         triforce_pieces_required = 20,
-        retro = ['Small Key (Universal)'] * 12 + ['Rupees (5)'] * 15,
+        retro = ['Small Key (Universal)'] * 13 + ['Rupees (5)'] * 15,
         extras = [normalfirst15extra, normalsecond15extra, normalthird10extra, normalfourth5extra, normalfinal25extra],
         progressive_sword_limit = 2,
         progressive_shield_limit = 1,
@@ -123,6 +125,58 @@ difficulties = {
         heart_piece_limit = 8,
     ),
 }
+
+def get_custom_array_key(item):
+  label_switcher = {
+    "silverarrow": "silversupgrade",
+    "blueboomerang": "boomerang",
+    "redboomerang": "redmerang",
+    "ocarina": "flute",
+    "bugcatchingnet": "bugnet",
+    "bookofmudora": "book",
+    "pegasusboots": "boots",
+    "titansmitts": "titansmitt",
+    "pieceofheart": "heartpiece",
+    "bossheartcontainer": "heartcontainer",
+    "sanctuaryheartcontainer": "sancheart",
+    "mastersword": "sword2",
+    "temperedsword": "sword3",
+    "goldensword": "sword4",
+    "blueshield": "shield1",
+    "redshield": "shield2",
+    "mirrorshield": "shield3",
+    "bluemail": "mail2",
+    "redmail": "mail3",
+    "progressivearmor": "progressivemail",
+    "splus12": "halfmagic",
+    "splus14": "quartermagic",
+    "singlearrow": "arrow1",
+    "singlebomb": "bomb1",
+    "triforcepiece": "triforcepieces"
+  }
+  key = item.lower()
+  trans = {
+    " ": "",
+    '(': "",
+    '/': "",
+    ')': "",
+    '+': "",
+    "magic": "",
+    "caneof": "",
+    "upgrade": "splus",
+    "arrows": "arrow",
+    "arrowplus": "arrowsplus",
+    "bombs": "bomb",
+    "bombplus": "bombsplus",
+    "rupees": "rupee"
+  }
+  for check in trans:
+      repl = trans[check]
+      key = key.replace(check,repl)
+  if key in label_switcher:
+      key = label_switcher.get(key)
+  return key
+
 
 def generate_itempool(world, player):
     if (world.difficulty[player] not in ['normal', 'hard', 'expert'] or world.goal[player] not in ['ganon', 'pedestal', 'dungeons', 'triforcehunt', 'crystals']
@@ -200,13 +254,21 @@ def generate_itempool(world, player):
         world.get_location('Zelda Drop Off', player).event = True
         world.get_location('Zelda Drop Off', player).locked = True
 
-
     # set up item pool
     if world.custom:
         (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = make_custom_item_pool(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.customitemarray)
-        world.rupoor_cost = min(world.customitemarray[69], 9999)
+        world.rupoor_cost = min(world.customitemarray["rupoorcost"], 9999)
     else:
-        (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = get_pool_core(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player])
+        (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = get_pool_core(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.doorShuffle[player])
+
+    if player in world.pool_adjustment.keys():
+        amt = world.pool_adjustment[player]
+        if amt < 0:
+            for i in range(0, amt):
+                pool.remove('Rupees (20)')
+        elif amt > 0:
+            for i in range(0, amt):
+                pool.append('Rupees (20)')
 
     for item in precollected_items:
         world.push_precollected(ItemFactory(item, player))
@@ -259,9 +321,9 @@ def generate_itempool(world, player):
     # logic has some branches where having 4 hearts is one possible requirement (of several alternatives)
     # rather than making all hearts/heart pieces progression items (which slows down generation considerably)
     # We mark one random heart container as an advancement item (or 4 heart pieces in expert mode)
-    if world.difficulty[player] in ['normal', 'hard'] and not (world.custom and world.customitemarray[30] == 0):
+    if world.difficulty[player] in ['normal', 'hard'] and not (world.custom and world.customitemarray["heartcontainer"] == 0):
         [item for item in items if item.name == 'Boss Heart Container'][0].advancement = True
-    elif world.difficulty[player] in ['expert'] and not (world.custom and world.customitemarray[29] < 4):
+    elif world.difficulty[player] in ['expert'] and not (world.custom and world.customitemarray["heartpiece"] < 4):
         adv_heart_pieces = [item for item in items if item.name == 'Piece of Heart'][0:4]
         for hp in adv_heart_pieces:
             hp.advancement = True
@@ -345,6 +407,7 @@ def set_up_take_anys(world, player):
 
     world.initialize_regions()
 
+
 def create_dynamic_shop_locations(world, player):
     for shop in world.shops:
         if shop.region.player == player:
@@ -397,8 +460,10 @@ def set_up_shops(world, player):
     if world.retro[player]:
         rss = world.get_region('Red Shield Shop', player).shop
         if not rss.locked:
+            rss.custom = True
             rss.add_inventory(2, 'Single Arrow', 80)
-        for shop in random.sample([s for s in world.shops if s.custom and not s.locked and s.region.player == player], 5):
+        for shop in random.sample([s for s in world.shops if not s.locked and s.region.player == player], 5):
+            shop.custom = True
             shop.locked = True
             shop.add_inventory(0, 'Single Arrow', 80)
             shop.add_inventory(1, 'Small Key (Universal)', 100)
@@ -406,7 +471,7 @@ def set_up_shops(world, player):
         rss.locked = True
 
 
-def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro):
+def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, door_shuffle):
     pool = []
     placed_items = {}
     precollected_items = []
@@ -525,8 +590,11 @@ def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, r
         pool = [item.replace('Arrow Upgrade (+10)','Rupees (5)') for item in pool]
         pool.extend(diff.retro)
         if mode == 'standard':
-            key_location = random.choice(['Secret Passage', 'Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Map Chest', 'Hyrule Castle - Zelda\'s Chest', 'Sewers - Dark Cross'])
-            place_item(key_location, 'Small Key (Universal)')
+            if door_shuffle == 'vanilla':
+                key_location = random.choice(['Secret Passage', 'Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Map Chest', 'Hyrule Castle - Zelda\'s Chest', 'Sewers - Dark Cross'])
+                place_item(key_location, 'Small Key (Universal)')
+            else:
+                pool.extend(['Small Key (Universal)'])
         else:
             pool.extend(['Small Key (Universal)'])
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms)
@@ -544,80 +612,31 @@ def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, s
         placed_items[loc] = item
 
     # Correct for insanely oversized item counts and take initial steps to handle undersized pools.
-    for x in range(0, 66):
-        if customitemarray[x] > total_items_to_place:
-            customitemarray[x] = total_items_to_place
-    if customitemarray[68] > total_items_to_place:
-        customitemarray[68] = total_items_to_place
-    itemtotal = 0
-    for x in range(0, 66):
-        itemtotal = itemtotal + customitemarray[x]
-    itemtotal = itemtotal + customitemarray[68]
-    itemtotal = itemtotal + customitemarray[70]
+    # Bow to Silver Arrows Upgrade, including Generic Keys & Rupoors
+    for x in [*range(0, 66 + 1), 68, 69]:
+        key = CONST.CUSTOMITEMS[x]
+        if customitemarray[key] > total_items_to_place:
+            customitemarray[key] = total_items_to_place
 
-    pool.extend(['Bow'] * customitemarray[0])
-    pool.extend(['Silver Arrows']* customitemarray[1])
-    pool.extend(['Blue Boomerang'] * customitemarray[2])
-    pool.extend(['Red Boomerang'] * customitemarray[3])
-    pool.extend(['Hookshot'] * customitemarray[4])
-    pool.extend(['Mushroom'] * customitemarray[5])
-    pool.extend(['Magic Powder'] * customitemarray[6])
-    pool.extend(['Fire Rod'] * customitemarray[7])
-    pool.extend(['Ice Rod'] * customitemarray[8])
-    pool.extend(['Bombos'] * customitemarray[9])
-    pool.extend(['Ether'] * customitemarray[10])
-    pool.extend(['Quake'] * customitemarray[11])
-    pool.extend(['Lamp'] * customitemarray[12])
-    pool.extend(['Hammer'] * customitemarray[13])
-    pool.extend(['Shovel'] * customitemarray[14])
-    pool.extend(['Ocarina'] * customitemarray[15])
-    pool.extend(['Bug Catching Net'] * customitemarray[16])
-    pool.extend(['Book of Mudora'] * customitemarray[17])
-    pool.extend(['Cane of Somaria'] * customitemarray[19])
-    pool.extend(['Cane of Byrna'] * customitemarray[20])
-    pool.extend(['Cape'] * customitemarray[21])
-    pool.extend(['Pegasus Boots'] * customitemarray[23])
-    pool.extend(['Power Glove'] * customitemarray[24])
-    pool.extend(['Titans Mitts'] * customitemarray[25])
-    pool.extend(['Progressive Glove'] * customitemarray[26])
-    pool.extend(['Flippers'] * customitemarray[27])
-    pool.extend(['Piece of Heart'] * customitemarray[29])
-    pool.extend(['Boss Heart Container'] * customitemarray[30])
-    pool.extend(['Sanctuary Heart Container'] * customitemarray[31])
-    pool.extend(['Master Sword'] * customitemarray[33])
-    pool.extend(['Tempered Sword'] * customitemarray[34])
-    pool.extend(['Golden Sword'] * customitemarray[35])
-    pool.extend(['Blue Shield'] * customitemarray[37])
-    pool.extend(['Red Shield'] * customitemarray[38])
-    pool.extend(['Mirror Shield'] * customitemarray[39])
-    pool.extend(['Progressive Shield'] * customitemarray[40])
-    pool.extend(['Blue Mail'] * customitemarray[41])
-    pool.extend(['Red Mail'] * customitemarray[42])
-    pool.extend(['Progressive Armor'] * customitemarray[43])
-    pool.extend(['Magic Upgrade (1/2)'] * customitemarray[44])
-    pool.extend(['Magic Upgrade (1/4)'] * customitemarray[45])
-    pool.extend(['Bomb Upgrade (+5)'] * customitemarray[46])
-    pool.extend(['Bomb Upgrade (+10)'] * customitemarray[47])
-    pool.extend(['Arrow Upgrade (+5)'] * customitemarray[48])
-    pool.extend(['Arrow Upgrade (+10)'] * customitemarray[49])
-    pool.extend(['Single Arrow'] * customitemarray[50])
-    pool.extend(['Arrows (10)'] * customitemarray[51])
-    pool.extend(['Single Bomb'] * customitemarray[52])
-    pool.extend(['Bombs (3)'] * customitemarray[53])
-    pool.extend(['Rupee (1)'] * customitemarray[54])
-    pool.extend(['Rupees (5)'] * customitemarray[55])
-    pool.extend(['Rupees (20)'] * customitemarray[56])
-    pool.extend(['Rupees (50)'] * customitemarray[57])
-    pool.extend(['Rupees (100)'] * customitemarray[58])
-    pool.extend(['Rupees (300)'] * customitemarray[59])
-    pool.extend(['Rupoor'] * customitemarray[60])
-    pool.extend(['Blue Clock'] * customitemarray[61])
-    pool.extend(['Green Clock'] * customitemarray[62])
-    pool.extend(['Red Clock'] * customitemarray[63])
-    pool.extend(['Progressive Bow'] * customitemarray[64])
-    pool.extend(['Bombs (10)'] * customitemarray[65])
-    pool.extend(['Triforce Piece'] * customitemarray[66])
-    pool.extend(['Triforce'] * customitemarray[68])
+    # Triforce
+    if customitemarray["triforce"] > total_items_to_place:
+        customitemarray["triforce"] = total_items_to_place
+
+    itemtotal = 0
+    # Bow to Silver Arrows Upgrade, including Generic Keys & Rupoors
+    for x in [*range(0, 66 + 1), 68, 69]:
+        key = CONST.CUSTOMITEMS[x]
+        itemtotal = itemtotal + customitemarray[key]
+    # Triforce
+    itemtotal = itemtotal + customitemarray["triforce"]
+    # Generic Keys
+    itemtotal = itemtotal + customitemarray["generickeys"]
+
+    customitems = [
+      "Bow", "Silver Arrows", "Blue Boomerang", "Red Boomerang", "Hookshot", "Mushroom", "Magic Powder", "Fire Rod", "Ice Rod", "Bombos", "Ether", "Quake", "Lamp", "Hammer", "Shovel", "Ocarina", "Bug Catching Net", "Book of Mudora", "Cane of Somaria", "Cane of Byrna", "Cape", "Pegasus Boots", "Power Glove", "Titans Mitts", "Progressive Glove", "Flippers", "Piece of Heart", "Boss Heart Container", "Sanctuary Heart Container", "Master Sword", "Tempered Sword", "Golden Sword", "Blue Shield", "Red Shield", "Mirror Shield", "Progressive Shield", "Blue Mail", "Red Mail", "Progressive Armor", "Magic Upgrade (1/2)", "Magic Upgrade (1/4)", "Bomb Upgrade (+5)", "Bomb Upgrade (+10)", "Arrow Upgrade (+5)", "Arrow Upgrade (+10)", "Single Arrow", "Arrows (10)", "Single Bomb", "Bombs (3)", "Rupee (1)", "Rupees (5)", "Rupees (20)", "Rupees (50)", "Rupees (100)", "Rupees (300)", "Rupoor", "Blue Clock", "Green Clock", "Red Clock", "Progressive Bow", "Bombs (10)", "Triforce Piece", "Triforce"
+    ]
+    for customitem in customitems:
+        pool.extend([customitem] * customitemarray[get_custom_array_key(customitem)])
 
     diff = difficulties[difficulty]
 
@@ -627,17 +646,17 @@ def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, s
     # all bottles, since only one bottle is available
     if diff.same_bottle:
         thisbottle = random.choice(diff.bottles)
-    for _ in range(customitemarray[18]):
+    for _ in range(customitemarray["bottle"]):
         if not diff.same_bottle:
             thisbottle = random.choice(diff.bottles)
         pool.append(thisbottle)
 
-    if customitemarray[66] > 0 or customitemarray[67] > 0:
-        treasure_hunt_count = max(min(customitemarray[67], 99), 1) #To display, count must be between 1 and 99.
+    if customitemarray["triforcepieces"] > 0 or customitemarray["triforcepiecesgoal"] > 0:
+        treasure_hunt_count = max(min(customitemarray["triforcepiecesgoal"], 99), 1) #To display, count must be between 1 and 99.
         treasure_hunt_icon = 'Triforce Piece'
         # Ensure game is always possible to complete here, force sufficient pieces if the player is unwilling.
-        if (customitemarray[66] < treasure_hunt_count) and (goal == 'triforcehunt') and (customitemarray[68] == 0):
-            extrapieces = treasure_hunt_count - customitemarray[66]
+        if (customitemarray["triforcepieces"] < treasure_hunt_count) and (goal == 'triforcehunt') and (customitemarray["triforce"] == 0):
+            extrapieces = treasure_hunt_count - customitemarray["triforcepieces"]
             pool.extend(['Triforce Piece'] * extrapieces)
             itemtotal = itemtotal + extrapieces
 
@@ -656,28 +675,30 @@ def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, s
         if retro:
             key_location = random.choice(['Secret Passage', 'Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Map Chest', 'Hyrule Castle - Zelda\'s Chest', 'Sewers - Dark Cross'])
             place_item(key_location, 'Small Key (Universal)')
-            pool.extend(['Small Key (Universal)'] * max((customitemarray[70] - 1), 0))
+            pool.extend(['Small Key (Universal)'] * max((customitemarray["generickeys"] - 1), 0))
         else:
-            pool.extend(['Small Key (Universal)'] * customitemarray[70])
+            pool.extend(['Small Key (Universal)'] * customitemarray["generickeys"])
     else:
-        pool.extend(['Small Key (Universal)'] * customitemarray[70])
+        pool.extend(['Small Key (Universal)'] * customitemarray["generickeys"])
 
-    pool.extend(['Fighter Sword'] * customitemarray[32])
-    pool.extend(['Progressive Sword'] * customitemarray[36])
+    pool.extend(['Fighter Sword'] * customitemarray["sword1"])
+    pool.extend(['Progressive Sword'] * customitemarray["progressivesword"])
 
     if shuffle == 'insanity_legacy':
         place_item('Link\'s House', 'Magic Mirror')
         place_item('Sanctuary', 'Moon Pearl')
-        pool.extend(['Magic Mirror'] * max((customitemarray[22] -1 ), 0))
-        pool.extend(['Moon Pearl'] * max((customitemarray[28] - 1), 0))
+        pool.extend(['Magic Mirror'] * max((customitemarray["mirror"] -1 ), 0))
+        pool.extend(['Moon Pearl'] * max((customitemarray["pearl"] - 1), 0))
     else:
-        pool.extend(['Magic Mirror'] * customitemarray[22])
-        pool.extend(['Moon Pearl'] * customitemarray[28])
+        pool.extend(['Magic Mirror'] * customitemarray["mirror"])
+        pool.extend(['Moon Pearl'] * customitemarray["pearl"])
 
     if retro:
         itemtotal = itemtotal - 28 # Corrects for small keys not being in item pool in Retro Mode
     if itemtotal < total_items_to_place:
-        pool.extend(['Nothing'] * (total_items_to_place - itemtotal))
+        nothings = total_items_to_place - itemtotal
+        print("Placing " + str(nothings) + " Nothings")
+        pool.extend(['Nothing'] * nothings)
 
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms)
 

@@ -63,12 +63,21 @@ org $0DFA53
 jsl.l LampCheckOverride
 org $028046 ; <- 10046 - Bank02.asm : 217 (JSL EnableForceBlank) (Start of Module_LoadFile)
 jsl.l OnFileLoadOverride
+org $07A93F  ; < 3A93F - Bank07.asm 6548 (LDA $8A : AND.b #$40 - Mirror checks)
+jsl.l MirrorCheckOverride
 
 org $05ef47
 Sprite_HeartContainer_Override: ;sprite_heart_upgrades.asm : 96-100 (LDA $040C : CMP.b #$1A : BNE .not_in_ganons_tower)
 jsl GtBossHeartCheckOverride : bcs .not_in_ganons_tower
 nop : stz $0dd0, X : rts
 .not_in_ganons_tower
+
+
+org $2081f2
+jsl MirrorCheckOverride2
+org $20825c
+jsl MirrorCheckOverride2
+
 
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes

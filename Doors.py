@@ -182,6 +182,10 @@ def create_doors(world, player):
         create_door(player, 'Desert Main Lobby N Edge', Open).dir(No, 0x84, None, High),
         create_door(player, 'Desert Main Lobby NE Edge', Open).dir(No, 0x84, None, High),
         create_door(player, 'Desert Main Lobby E Edge', Open).dir(Ea, 0x84, None, High),
+        create_door(player, 'Desert Main Lobby Left Path', Lgcl),
+        create_door(player, 'Desert Main Lobby Right Path', Lgcl),
+        create_door(player, 'Desert Left Alcove Path', Lgcl),
+        create_door(player, 'Desert Right Alcove Path', Lgcl),
         create_door(player, 'Desert Dead End Edge', Open).dir(So, 0x74, None, High),
         create_door(player, 'Desert East Wing W Edge', Open).dir(We, 0x85, None, High),
         create_door(player, 'Desert East Wing N Edge', Open).dir(No, 0x85, None, High),
@@ -321,6 +325,8 @@ def create_doors(world, player):
         create_door(player, 'PoD Pit Room NE', Nrml).dir(No, 0x3a, Right, High).pos(2),
         create_door(player, 'PoD Pit Room Freefall', Hole),
         create_door(player, 'PoD Pit Room Bomb Hole', Hole),
+        create_door(player, 'PoD Pit Room Block Path N', Lgcl),
+        create_door(player, 'PoD Pit Room Block Path S', Lgcl),
         create_door(player, 'PoD Big Key Landing Hole', Hole),
         create_door(player, 'PoD Big Key Landing Down Stairs', Sprl).dir(Dn, 0x3a, 0, HTH).ss(A, 0x11, 0x00).kill(),
         create_door(player, 'PoD Basement Ledge Up Stairs', Sprl).dir(Up, 0x0a, 0, HTH).ss(A, 0x1a, 0xec).small_key().pos(0),
@@ -354,6 +360,8 @@ def create_doors(world, player):
         create_door(player, 'PoD Falling Bridge SW', Nrml).dir(So, 0x1a, Left, High).small_key().pos(3),
         create_door(player, 'PoD Falling Bridge WN', Nrml).dir(We, 0x1a, Top, High).small_key().pos(1),
         create_door(player, 'PoD Falling Bridge EN', Intr).dir(Ea, 0x1a, Top, High).pos(4),
+        create_door(player, 'PoD Falling Bridge Path N', Lgcl),
+        create_door(player, 'PoD Falling Bridge Path S', Lgcl),
         create_door(player, 'PoD Big Chest Balcony W', Nrml).dir(We, 0x1a, Mid, High).pos(2),
         create_door(player, 'PoD Dark Maze EN', Nrml).dir(Ea, 0x19, Top, High).small_key().pos(1),
         create_door(player, 'PoD Dark Maze E', Nrml).dir(Ea, 0x19, Mid, High).pos(0),
@@ -658,7 +666,7 @@ def create_doors(world, player):
         create_door(player, 'Ice Freezors Bomb Hole', Hole), # combine these two? -- they have to lead to the same spot
         create_door(player, 'Ice Freezors Ledge Hole', Hole),
         create_door(player, 'Ice Freezors Ledge ES', Intr).dir(Ea, 0x7e, Bot, High).pos(2),
-        create_door(player, 'Ice Tall Hint WS', Intr).dir(We, 0x7e, Bot, High).pos(1),
+        create_door(player, 'Ice Tall Hint WS', Intr).dir(We, 0x7e, Bot, High).pos(2),
         create_door(player, 'Ice Tall Hint EN', Nrml).dir(Ea, 0x7e, Top, High).pos(1),
         create_door(player, 'Ice Tall Hint SE', Nrml).dir(So, 0x7e, Right, High).small_key().pos(0),
         create_door(player, 'Ice Hookshot Ledge WN', Nrml).dir(We, 0x7f, Top, High).no_exit().trap(0x4).pos(0).kill(),
@@ -735,6 +743,8 @@ def create_doors(world, player):
         create_door(player, 'Mire Hidden Shooters ES', Nrml).dir(Ea, 0xb2, Bot, High).pos(7),
         create_door(player, 'Mire Hidden Shooters WS', Intr).dir(We, 0xb2, Bot, High).pos(1),
         create_door(player, 'Mire Cross ES', Intr).dir(Ea, 0xb2, Bot, High).pos(1),
+        create_door(player, 'Mire Hidden Shooters Block Path S', Lgcl),
+        create_door(player, 'Mire Hidden Shooters Block Path N', Lgcl),
         create_door(player, 'Mire Hidden Shooters NE', Intr).dir(No, 0xb2, Right, High).pos(2),
         create_door(player, 'Mire Minibridge SE', Intr).dir(So, 0xb2, Right, High).pos(2),
         create_door(player, 'Mire Cross SW', Nrml).dir(So, 0xb2, Left, High).pos(5),
@@ -912,6 +922,8 @@ def create_doors(world, player):
         create_door(player, 'GT Tile Room EN', Intr).dir(Ea, 0x8d, Top, High).small_key().pos(1),
         create_door(player, 'GT Speed Torch WN', Intr).dir(We, 0x8d, Top, High).small_key().pos(1),
         create_door(player, 'GT Speed Torch NE', Nrml).dir(No, 0x8d, Right, High).pos(3),
+        create_door(player, 'GT Speed Torch South Path', Lgcl),
+        create_door(player, 'GT Speed Torch North Path', Lgcl),
         create_door(player, 'GT Speed Torch WS', Intr).dir(We, 0x8d, Bot, High).pos(4),
         create_door(player, 'GT Pots n Blocks ES', Intr).dir(Ea, 0x8d, Bot, High).pos(4),
         create_door(player, 'GT Speed Torch SE', Nrml).dir(So, 0x8d, Right, High).trap(0x4).pos(0),
@@ -1098,6 +1110,8 @@ def create_doors(world, player):
     world.get_door('PoD Arena Crystal Path', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Sexy Statue W', player).c_switch()
     world.get_door('PoD Sexy Statue NW', player).c_switch()
+    world.get_door('PoD Map Balcony WS', player).c_switch()
+    world.get_door('PoD Map Balcony South Stairs', player).c_switch()
     world.get_door('PoD Bow Statue SW', player).c_switch()
     world.get_door('PoD Bow Statue Down Ladder', player).c_switch()
     world.get_door('PoD Dark Pegs Up Ladder', player).c_switch()
@@ -1211,44 +1225,44 @@ def create_doors(world, player):
 
 def create_paired_doors(world, player):
     world.paired_doors[player] = [
-        PairedDoor('Sewers Secret Room Key Door S', 'Sewers Key Rat Key Door N'),
-        PairedDoor('TR Pokey 2 ES', 'TR Lava Island WS'),  # TR Pokey Key
-        PairedDoor('TR Dodgers NE', 'TR Lava Escape SE'),  # TR Big key door by pipes
-        PairedDoor('PoD Falling Bridge WN', 'PoD Dark Maze EN'),  # Pod Dark maze door
-        PairedDoor('PoD Dark Maze E', 'PoD Big Chest Balcony W'),  # PoD Bombable by Big Chest
-        PairedDoor('PoD Arena Main NW', 'PoD Falling Bridge SW'),  # Pod key door by bridge
-        PairedDoor('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
-        PairedDoor('Swamp Hub WN', 'Swamp Crystal Switch EN'),  # Swamp key door crystal switch
-        PairedDoor('Swamp Hub North Ledge N', 'Swamp Push Statue S'),  # Swamp key door above big chest
-        PairedDoor('PoD Map Balcony WS', 'PoD Arena Ledge ES'),  # Pod bombable by arena
-        PairedDoor('Swamp Hub Dead Ledge EN', 'Swamp Hammer Switch WN'),  # Swamp bombable to random pots
-        PairedDoor('Swamp Pot Row WN', 'Swamp Map Ledge EN'),  # Swamp bombable to map chest
-        PairedDoor('Swamp Pot Row WS', 'Swamp Trench 1 Approach ES'),  # Swamp key door early room $38
-        PairedDoor('PoD Middle Cage N', 'PoD Pit Room S'),
-        PairedDoor('GT Crystal Circles SW', 'GT Left Moldorm Ledge NW'),  # GT moldorm key door
-        PairedDoor('Ice Conveyor SW', 'Ice Bomb Jump NW'),  # Ice BJ key door
-        PairedDoor('Desert Tiles 2 SE', 'Desert Beamos Hall NE'),
-        PairedDoor('Skull 3 Lobby NW', 'Skull Star Pits SW'),  # Skull 3 key door
-        PairedDoor('Skull 1 Lobby WS', 'Skull Pot Prison ES'),  # Skull 1 key door - pot prison to big chest
-        PairedDoor('Skull Map Room SE', 'Skull Pinball NE'),  # Skull 1 - pinball key door
-        PairedDoor('GT Dash Hall NE', 'GT Hidden Spikes SE'),  # gt main big key door
-        PairedDoor('Ice Spike Cross ES', 'Ice Spike Room WS'),  # ice door to spike chest
-        PairedDoor('GT Conveyor Star Pits EN', 'GT Falling Bridge WN'),  # gt right side key door to cape bridge
-        PairedDoor('GT Warp Maze (Rails) WS', 'GT Randomizer Room ES'),  # gt bombable to rando room
-        PairedDoor('Ice Tall Hint SE', 'Ice Lonely Freezor NE'),  # ice's big icy room key door to lonely freezor
-        PairedDoor('Eastern Courtyard N', 'Eastern Darkness S'),
-        PairedDoor('Mire Fishbone SE', 'Mire Spike Barrier NE'),  # mire fishbone key door
-        PairedDoor('Mire BK Door Room N', 'Mire Left Bridge S'),  # mire big key door to bridges
-        PairedDoor('Eastern Big Key NE', 'Eastern Hint Tile Blocked Path SE'),
-        PairedDoor('TR Hub NW', 'TR Pokey 1 SW'),  # TR somaria hub to pokey
-        PairedDoor('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
-        PairedDoor('Thieves Rail Ledge NW', 'Thieves Pot Alcove Bottom SW'),  # TT random bomb to pots
-        PairedDoor('Thieves BK Corner NE', 'Thieves Hallway SE'),  # TT big key door
-        PairedDoor('Ice Switch Room ES', 'Ice Refill WS'),  # Ice last key door to crystal switch
-        PairedDoor('Mire Hub WS', 'Mire Conveyor Crystal ES'),  # mire hub key door to attic
-        PairedDoor('Mire Hub Right EN', 'Mire Map Spot WN'),  # mire hub key door to map
-        PairedDoor('TR Dash Bridge WS', 'TR Crystal Maze ES'),  # tr last key door to switch maze
-        PairedDoor('Thieves Ambush E', 'Thieves Rail Ledge W')  # TT dashable above
+        PairedDoor('Sewers Secret Room Key Door S', 'Sewers Key Rat Key Door N', True),
+        PairedDoor('TR Pokey 2 ES', 'TR Lava Island WS', True),  # TR Pokey Key
+        PairedDoor('TR Dodgers NE', 'TR Lava Escape SE', True),  # TR Big key door by pipes
+        PairedDoor('PoD Falling Bridge WN', 'PoD Dark Maze EN', True),  # Pod Dark maze door
+        PairedDoor('PoD Dark Maze E', 'PoD Big Chest Balcony W', True),  # PoD Bombable by Big Chest
+        PairedDoor('PoD Arena Main NW', 'PoD Falling Bridge SW', True),  # Pod key door by bridge
+        PairedDoor('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S', True),
+        PairedDoor('Swamp Hub WN', 'Swamp Crystal Switch EN', True),  # Swamp key door crystal switch
+        PairedDoor('Swamp Hub North Ledge N', 'Swamp Push Statue S', True),  # Swamp key door above big chest
+        PairedDoor('PoD Map Balcony WS', 'PoD Arena Ledge ES', True),  # Pod bombable by arena
+        PairedDoor('Swamp Hub Dead Ledge EN', 'Swamp Hammer Switch WN', True),  # Swamp bombable to random pots
+        PairedDoor('Swamp Pot Row WN', 'Swamp Map Ledge EN', True),  # Swamp bombable to map chest
+        PairedDoor('Swamp Pot Row WS', 'Swamp Trench 1 Approach ES', True),  # Swamp key door early room $38
+        PairedDoor('PoD Middle Cage N', 'PoD Pit Room S', True),
+        PairedDoor('GT Crystal Circles SW', 'GT Left Moldorm Ledge NW', True),  # GT moldorm key door
+        PairedDoor('Ice Conveyor SW', 'Ice Bomb Jump NW', True),  # Ice BJ key door
+        PairedDoor('Desert Tiles 2 SE', 'Desert Beamos Hall NE', True),
+        PairedDoor('Skull 3 Lobby NW', 'Skull Star Pits SW', True),  # Skull 3 key door
+        PairedDoor('Skull 1 Lobby WS', 'Skull Pot Prison ES', True),  # Skull 1 key door - pot prison to big chest
+        PairedDoor('Skull Map Room SE', 'Skull Pinball NE', True),  # Skull 1 - pinball key door
+        PairedDoor('GT Dash Hall NE', 'GT Hidden Spikes SE', True),  # gt main big key door
+        PairedDoor('Ice Spike Cross ES', 'Ice Spike Room WS', True),  # ice door to spike chest
+        PairedDoor('GT Conveyor Star Pits EN', 'GT Falling Bridge WN', True),  # gt right side key door to cape bridge
+        PairedDoor('GT Warp Maze (Rails) WS', 'GT Randomizer Room ES', True),  # gt bombable to rando room
+        PairedDoor('Ice Tall Hint SE', 'Ice Lonely Freezor NE', True),  # ice's big icy room key door to lonely freezor
+        PairedDoor('Eastern Courtyard N', 'Eastern Darkness S', True),
+        PairedDoor('Mire Fishbone SE', 'Mire Spike Barrier NE', True),  # mire fishbone key door
+        PairedDoor('Mire BK Door Room N', 'Mire Left Bridge S', True),  # mire big key door to bridges
+        PairedDoor('Eastern Big Key NE', 'Eastern Hint Tile Blocked Path SE', True),
+        PairedDoor('TR Hub NW', 'TR Pokey 1 SW', True),  # TR somaria hub to pokey
+        PairedDoor('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN', True),
+        PairedDoor('Thieves Rail Ledge NW', 'Thieves Pot Alcove Bottom SW', True),  # TT random bomb to pots
+        PairedDoor('Thieves BK Corner NE', 'Thieves Hallway SE', True),  # TT big key door
+        PairedDoor('Ice Switch Room ES', 'Ice Refill WS', True),  # Ice last key door to crystal switch
+        PairedDoor('Mire Hub WS', 'Mire Conveyor Crystal ES', True),  # mire hub key door to attic
+        PairedDoor('Mire Hub Right EN', 'Mire Map Spot WN', True),  # mire hub key door to map
+        PairedDoor('TR Dash Bridge WS', 'TR Crystal Maze ES', True),  # tr last key door to switch maze
+        PairedDoor('Thieves Ambush E', 'Thieves Rail Ledge W', True)  # TT dashable above
     ]
 
 
