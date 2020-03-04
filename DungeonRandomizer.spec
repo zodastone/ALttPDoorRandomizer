@@ -26,7 +26,7 @@ hiddenimports = []
 binaries = []
 
 if sys.platform.find("windows"):
-  binaries.append("ucrtbase.dll")
+  binaries.append("ucrtbase.dll",".")
 
 a = Analysis(['DungeonRandomizer.py'],
              pathex=[],
