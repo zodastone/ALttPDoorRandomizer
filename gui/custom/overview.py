@@ -49,7 +49,7 @@ def custom_page(top, parent):
             for key in dictWidgets:
                 self.customWidgets[key] = dictWidgets[key]
 
-    for i, key in enumerate(CONST.CUSTOMITEMS):
-        self.customWidgets[key].storageVar.set(top.settings["customitemarray"][i])
+    for key in CONST.CUSTOMITEMS:
+        self.customWidgets[key].storageVar.set(top.settings["customitemarray"][key])
 
     return self
