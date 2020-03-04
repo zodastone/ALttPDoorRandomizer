@@ -82,10 +82,9 @@ if len(BUILD_FILENAMES) > 0:
           os.path.join("..","artifact",BUILD_FILENAME),
       		os.path.join(".",BUILD_FILENAME)
       	)
-
-  # Make Linux/Mac binary executable
-  if "linux" in env["OS_NAME"] or "ubuntu" in env["OS_NAME"] or "mac" in env["OS_NAME"] or "osx" in env["OS_NAME"]:
-    os.chmod(BUILD_FILENAME,0o755)
+      	# Make Linux/Mac binary executable
+      	if "linux" in env["OS_NAME"] or "ubuntu" in env["OS_NAME"] or "mac" in env["OS_NAME"] or "osx" in env["OS_NAME"]:
+      		os.chmod(os.path.join(".",BUILD_FILENAME),0o755)
 
 	# .zip if windows
 	# .tar.gz otherwise
