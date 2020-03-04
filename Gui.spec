@@ -26,10 +26,14 @@ def recurse_for_py_files(names_so_far):
   return returnvalue
 
 hiddenimports = []
+binaries = []
 
-a = Analysis(['Gui.py'],
+if sys.platform.find("windows"):
+  binaries.append("ucrtbase.dll")
+
+a = Analysis(['DungeonRandomizer.py'],
              pathex=[],
-             binaries=[],
+             binaries=binaries,
              datas=[],
              hiddenimports=hiddenimports,
              hookspath=[],
@@ -39,9 +43,6 @@ a = Analysis(['Gui.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
-
-if sys.platform.find("windows"):
-  a.binaries.append("ucrtbase.dll")
 
 # https://stackoverflow.com/questions/17034434/how-to-remove-exclude-modules-and-files-from-pyinstaller
 excluded_binaries = [
