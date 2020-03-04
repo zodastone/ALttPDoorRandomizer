@@ -25,8 +25,8 @@ def recurse_for_py_files(names_so_far):
 hiddenimports = []
 binaries = []
 
-if sys.platform.find("windows"):
-  binaries.append(("ucrtbase.dll","."))
+#if sys.platform.find("windows"):
+#  binaries.append(("ucrtbase.dll","."))
 
 a = Analysis(['DungeonRandomizer.py'],
              pathex=[],
