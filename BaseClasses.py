@@ -1024,6 +1024,7 @@ class Direction(Enum):
     Up = 4
     Down = 5
 
+
 @unique
 class Hook(Enum):
     North = 0
@@ -1285,6 +1286,7 @@ class Sector(object):
         self.branch_factor = None
         self.dead_end_cnt = None
         self.entrance_sector = None
+        self.destination_entrance = False
         self.equations = None
 
     def region_set(self):
