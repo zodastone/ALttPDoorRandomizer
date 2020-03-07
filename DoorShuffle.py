@@ -30,8 +30,6 @@ def link_doors(world, player):
     # These connections are here because they are currently unable to be shuffled
     for entrance, ext in straight_staircases:
         connect_two_way(world, entrance, ext, player)
-    for entrance, ext in open_edges:
-        connect_two_way(world, entrance, ext, player)
     for exitName, regionName in falldown_pits:
         connect_simple_door(world, exitName, regionName, player)
     for exitName, regionName in dungeon_warps:
@@ -40,6 +38,8 @@ def link_doors(world, player):
         connect_two_way(world, ent, ext, player)
 
     if world.doorShuffle[player] == 'vanilla':
+        for entrance, ext in open_edges:
+            connect_two_way(world, entrance, ext, player)
         for exitName, regionName in vanilla_logical_connections:
             connect_simple_door(world, exitName, regionName, player)
         for entrance, ext in spiral_staircases:
@@ -50,8 +50,13 @@ def link_doors(world, player):
             connect_one_way(world, ent, ext, player)
         vanilla_key_logic(world, player)
     elif world.doorShuffle[player] == 'basic':
+        if not world.experimental[player]:
+            for entrance, ext in open_edges:
+                connect_two_way(world, entrance, ext, player)
         within_dungeon(world, player)
     elif world.doorShuffle[player] == 'crossed':
+        for entrance, ext in open_edges:
+            connect_two_way(world, entrance, ext, player)
         cross_dungeon(world, player)
     else:
         logging.getLogger('').error('Invalid door shuffle setting: %s' % world.doorShuffle[player])
@@ -819,7 +824,7 @@ def convert_to_sectors(region_names, world, player):
         matching_sectors = []
         while len(exits) > 0:
             ext = exits.pop()
-            door = world.check_for_door(ext.name, player)
+            door = ext.door
             if ext.connected_region is not None or door is not None and door.controller is not None:
                 if door is not None and door.controller is not None:
                     connect_region = world.get_entrance(door.controller.name, player).parent_region
@@ -1692,7 +1697,7 @@ open_edges = [
     ('Thieves Ambush EN Edge', 'Thieves BK Corner WN Edge'),
     ('Thieves BK Corner S Edge', 'Thieves Compass Room N Edge'),
     ('Thieves BK Corner SW Edge', 'Thieves Compass Room NW Edge'),
-    ('Thieves Compass Room WS Edge', 'Thieves Big Chest Nook WS Edge'),
+    ('Thieves Compass Room WS Edge', 'Thieves Big Chest Nook ES Edge'),
     ('Thieves Cricket Hall Left Edge', 'Thieves Cricket Hall Right Edge')
 ]
 
@@ -1942,7 +1947,7 @@ interior_doors = [
 
 key_doors = [
     ('Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S'),
-    ('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
+    ('Sewers Dark Cross Key Door N', 'Sewers Water S'),
     ('Eastern Dark Square Key Door WN', 'Eastern Cannonball Ledge Key Door EN'),
     ('Eastern Darkness Up Stairs', 'Eastern Attic Start Down Stairs'),
     ('Eastern Big Key NE', 'Eastern Hint Tile Blocked Path SE'),
@@ -1962,7 +1967,7 @@ key_doors = [
 default_small_key_doors = {
     'Hyrule Castle': [
         ('Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S'),
-        ('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
+        ('Sewers Dark Cross Key Door N', 'Sewers Water S'),
         ('Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon North Abyss Key Door N'),
         ('Hyrule Dungeon Armory Interior Key Door N', 'Hyrule Dungeon Armory Interior Key Door S')
     ],
@@ -2060,7 +2065,7 @@ default_door_connections = [
     ('Hyrule Castle West Hall E', 'Hyrule Castle Back Hall W'),
     ('Hyrule Castle Throne Room N', 'Sewers Behind Tapestry S'),
     ('Hyrule Dungeon Guardroom N', 'Hyrule Dungeon Armory S'),
-    ('Sewers Dark Cross Key Door N', 'Sewers Dark Cross Key Door S'),
+    ('Sewers Dark Cross Key Door N', 'Sewers Water S'),
     ('Sewers Water W', 'Sewers Key Rat E'),
     ('Sewers Key Rat Key Door N', 'Sewers Secret Room Key Door S'),
     ('Eastern Lobby Bridge N', 'Eastern Cannonball S'),

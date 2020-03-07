@@ -489,3 +489,55 @@ dw $0000,$0000
 dw $0000
 dw $0000,$0000,$0000,$0000
 dw $ffff ; indicates the end - we can drop this
+
+; Edge Transition Table
+org $27C500 ;ends around 27C5F0
+NorthOpenEdge:
+db $00,$80,$11, $00,$80,$11, $00,$80,$11, $00,$80,$11
+db $00,$80,$11, $00,$80,$11, $00,$80,$11, $00,$80,$11
+db $00,$80,$11, $00,$80,$11, $00,$80,$11
+SouthOpenEdge:
+db $83,$a2,$11, $00,$80,$11, $00,$80,$11, $00,$80,$11
+db $00,$80,$11, $00,$80,$11, $00,$80,$11, $00,$80,$11
+db $00,$80,$11, $00,$80,$11, $00,$80,$11
+WestOpenEdge:
+db $00,$80,$11, $00,$80,$11, $00,$80,$11
+db $00,$80,$11, $00,$80,$11, $00,$80,$11
+db $00,$80,$11, $00,$80,$11, $00,$80,$11
+EastOpenEdge:
+db $00,$80,$11, $00,$80,$11, $00,$80,$11
+db $00,$80,$11, $00,$80,$11, $00,$80,$11
+db $00,$80,$11, $00,$80,$11, $00,$80,$11
+; Edge Info Table (Midpoint, Width, Min Coord)
+NorthEdgeInfo:
+db $a8,$10,$a0, $2c,$08,$28 ;HC
+db $b8,$20,$a8 ; DP West Wing
+db $38,$20,$28, $f8,$a0,$a8, $b8,$20,$a8 ; DP Main
+db $78,$20,$68 ; DP East Wing
+db $f8,$10,$f0, $7c,$18,$70 ; TT Lobby
+db $74,$18,$68, $f8,$10,$f0 ; TT Compass
+SouthEdgeInfo:
+db $a8,$10,$a0, $2c,$08,$28 ; HC
+db $b8,$20,$a8 ; DP Sandworm
+db $38,$20,$28, $f8,$a0,$a8, $b8,$20,$a8 ; DP North Hall & Dead End
+db $78,$20,$68 ; DP Arrow Pot
+db $f8,$10,$f0, $7c,$18,$70 ; TT Ambush
+db $74,$18,$68, $f8,$10,$f0 ; TT BK Corner
+WestEdgeInfo:
+db $78,$30,$60 ; TT Attic
+db $40,$20,$30 ; DP North Hall
+db $40,$20,$30 ; DP Arrow Pot
+db $84,$18,$78, $68,$10,$60 ; HC South
+db $a0,$a0,$50 ; DP East Wing
+db $58,$50,$30, $98,$50,$70 ; TT BK Corner
+db $58,$50,$30 ; TT Compass
+EastEdgeInfo:
+db $78,$30,$60 ; TT Attic
+db $40,$20,$30 ; DP Sandworm
+db $40,$20,$30 ; DP North Hall
+db $68,$10,$60, $84,$18,$78 ; HC Guards
+db $a0,$a0,$50 ; DP Main Lobby
+db $58,$50,$30, $98,$50,$70 ; TT Ambush
+db $58,$50,$30 ; TT Nook
+MultDivInfo: ; (1placeholder, 1, 2, 3, 4, 5, 6, 10, 20)
+db $01, $01, $02, $03, $04, $05, $06, $0a, $14

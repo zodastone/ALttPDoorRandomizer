@@ -225,7 +225,7 @@ def fill_restrictive(world, base_state, locations, itempool, single_player_place
     itempool.extend(unplaced_items)
 
 
-def valid_key_placement(item, location, itempool,  world):
+def valid_key_placement(item, location, itempool, world):
     if (not item.smallkey and not item.bigkey) or item.player != location.player or world.retro[item.player]:
         return True
     dungeon = location.parent_region.dungeon
@@ -233,7 +233,7 @@ def valid_key_placement(item, location, itempool,  world):
         if dungeon.name not in item.name and (dungeon.name != 'Hyrule Castle' or 'Escape' not in item.name):
             return True
         key_logic = world.key_logic[item.player][dungeon.name]
-        unplaced_keys = len([x for x in itempool if x.name == key_logic.small_key_name and x.player == item.player])
+        unplaced_keys = len([x for x in itempool+world.itempool if x.name == key_logic.small_key_name and x.player == item.player])
         return key_logic.check_placement(unplaced_keys)
     else:
         inside_dungeon_item = ((item.smallkey and not world.keyshuffle[item.player])
