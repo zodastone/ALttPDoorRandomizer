@@ -20,6 +20,10 @@ class Hook(Enum):
     South = 2
     East = 3
     Stairs = 4
+    NEdge = 5
+    SEdge = 6
+    WEdge = 7
+    EEdge = 8
 
 
 class GraphPiece:
@@ -522,9 +526,27 @@ def opposite_h_type(h_type):
         Hook.South: Hook.North,
         Hook.West: Hook.East,
         Hook.East: Hook.West,
-
+        Hook.NEdge: Hook.SEdge,
+        Hook.SEdge: Hook.NEdge,
+        Hook.EEdge: Hook.WEdge,
+        Hook.WEdge: Hook.EEdge,
     }
     return type_map[h_type]
+
+
+edge_map = {
+    Direction.North: Hook.NEdge,
+    Direction.South: Hook.SEdge,
+    Direction.West: Hook.WEdge,
+    Direction.East: Hook.EEdge,
+}
+
+edge_map_back = {
+    Direction.North: Hook.SEdge,
+    Direction.South: Hook.NEdge,
+    Direction.West: Hook.EEdge,
+    Direction.East: Hook.WEdge,
+}
 
 
 def hook_from_door(door):
@@ -538,6 +560,8 @@ def hook_from_door(door):
             Direction.East: Hook.East,
         }
         return dir[door.direction]
+    if door.type == DoorType.Open:
+        return edge_map[door.direction]
     return None
 
 
@@ -552,16 +576,18 @@ def hanger_from_door(door):
             Direction.East: Hook.West,
         }
         return dir[door.direction]
+    if door.type == DoorType.Open:
+        return edge_map_back[door.direction]
     return None
 
 
 def connect_doors(a, b):
     # Return on unsupported types.
-    if a.type in [DoorType.Open, DoorType.StraightStairs, DoorType.Hole, DoorType.Warp, DoorType.Ladder,
+    if a.type in [DoorType.StraightStairs, DoorType.Hole, DoorType.Warp, DoorType.Ladder,
                   DoorType.Interior, DoorType.Logical]:
         return
     # Connect supported types
-    if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs:
+    if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs or a.type == DoorType.Open:
         if a.blocked:
             connect_one_way(b.entrance, a.entrance)
         elif b.blocked:

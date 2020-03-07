@@ -1,4 +1,5 @@
 WarpLeft:
+    lda DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
@@ -9,6 +10,7 @@ WarpLeft:
 	rtl
 
 WarpRight:
+    lda DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
@@ -19,6 +21,7 @@ WarpRight:
 	rtl
 
 WarpUp:
+    lda DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
@@ -29,6 +32,7 @@ WarpUp:
 	rtl
 
 WarpDown:
+    lda DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
@@ -39,11 +43,11 @@ WarpDown:
 	rtl
 
 TrapDoorFixer:
-    lda $ab : and #$0038 : beq .end
+    lda $fe : and #$0038 : beq .end
     xba : asl #2 : sta $00
     stz $0468 : lda $068c : ora $00 : sta $068c
     .end
-    stz $ab ; clear our ab here because we don't need it anymore
+    stz $fe ; clear our ab here because we don't need it anymore
     rts
 
 Cleanup:
@@ -72,7 +76,8 @@ LoadRoomHorz:
 	sty $06 : sta $07 : lda $a0 : pha ; Store normal room on stack
 	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00
 	lda $01 : and.b #$80 : cmp #$80 : bne .gtg
-	pla : sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
+	jsr HorzEdge : pla : bcs .end
+	sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
 
 	.gtg ;Good to Go!
 	pla ; Throw away normal room (don't fill up the stack)
@@ -84,7 +89,8 @@ LoadRoomHorz:
 	jsr ShiftQuad
 	jsr ShiftCameraBounds
 	ldy #$01 : jsr ShiftVariablesSubDir ; flip direction
-	lda $01 : sta $ab : and #$04 : lsr #2
+	jsr SetupScrollIndicator
+	lda $01 : sta $fe : and #$04 : lsr #2
 	sta $ee
 	lda $01 : and #$10 : beq .end : stz $0468
 	.end
@@ -100,8 +106,8 @@ LoadRoomVert:
 	sty $06 : sta $07 : lda $a0 : pha ; Store normal room on stack
 	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00
 	lda $01 : and.b #$80 : cmp #$80 : bne .gtg
-	pla : sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
-
+	jsr VertEdge : pla : bcs .end
+	sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
 	.gtg ;Good to Go!
 	pla ; Throw away normal room (don't fill up the stack)
 	lda $a0 : and.b #$F0 : lsr #3 : !sub $21 : !add $06 : sta $02
@@ -111,12 +117,19 @@ LoadRoomVert:
 	jsr ShiftQuad
 	jsr ShiftCameraBounds
 	ldy #$00 : jsr ShiftVariablesSubDir ; flip direction
-	lda $01 : sta $ab : and #$04 : lsr #2
+	jsr SetupScrollIndicator
+	lda $01 : sta $fe : and #$04 : lsr #2
 	sta $ee
 	.end
 	plb ; restore db register
 	rts
 }
+
+SetupScrollIndicator:
+    lda $ab : and #$01 : asl : sta $ac
+    lda $ab : and #$40 : clc : rol #3 : ora $ac : sta $ac
+    lda $ab : and #$20 : asl #2 : sta $ab
+    rts
 
 LookupNewRoom: ; expects data offset to be in A
 {
@@ -132,7 +145,7 @@ LookupNewRoom: ; expects data offset to be in A
 	rts
 }
 
-; INPUTS-- X: Direction Index , $02:  Shift Value
+; INPUTS-- Y: Direction Index , $02:  Shift Value
 ; Sets high bytes of various registers
 ShiftVariablesMainDir:
 {
@@ -152,7 +165,7 @@ ShiftLowCoord:
 {
 	lda $01 : and.b #$03 ; high byte index
 	jsr CalcOpposingShift
-	lda $fe : and.b #$f0 : cmp.b #$20 : bne .lowDone
+	lda $ab : and.b #$f0 : cmp.b #$20 : bne .lowDone
 	lda OppCoordIndex,y : tax
 	lda #$80 : !add $20,x : sta $20,x
 	.lowDone
@@ -160,13 +173,13 @@ ShiftLowCoord:
 }
 
 ; expects A to be (0,1,2) (dest number) and (0,1,2) (src door number) to be stored in $04
-; $0127 will be set to a bitmask aaaa qxxf
+; $ab will be set to a bitmask aaaa qxxf
 ; a - amount of adjust
 ; f - flag, if set, then amount is pos, otherwise neg.
 ; q - quadrant, if set, then quadrant needs to be modified
 CalcOpposingShift:
 {
-	stz $fe ; set up (can you zero out 127 alone?)
+	stz $ab : stz $ac ; set up
 	cmp.b $04 : beq .noOffset ; (equal, no shifts to do)
 	phy : tay ; reserve these
 	lda $04 : tax : tya : !sub $04 : sta $04 : cmp.b #$00 : bpl .shiftPos
@@ -174,8 +187,8 @@ CalcOpposingShift:
 	cpx.b #$01 : beq .skipNegQuad
 	ora #$08
 	.skipNegQuad
-	sta $fe : lda $04 : cmp.b #$FE : beq .done ;already set $0127
-	lda $fe : eor #$60
+	sta $ab : lda $04 : cmp.b #$FE : beq .done ;already set $ab
+	lda $ab : eor #$60
 	bra .setDone
 
 	.shiftPos
@@ -183,10 +196,10 @@ CalcOpposingShift:
 	cpy.b #$01 : beq .skipPosQuad
 	ora #$08
 	.skipPosQuad
-	sta $fe : lda $04 : cmp.b #$02 : bcs .done ;already set $0127
-	lda $fe : eor #$60
+	sta $ab : lda $04 : cmp.b #$02 : bcs .done ;already set $ab
+	lda $ab : eor #$60
 
-	.setDone  sta $fe
+	.setDone  sta $ab
 	.done     ply
 	.noOffset rts
 }
@@ -194,9 +207,9 @@ CalcOpposingShift:
 
 ShiftQuad:
 {
-	lda $fe : and #$08 : cmp.b #$00 : beq .quadDone
+	lda $ab : and #$08 : beq .quadDone
 	lda ShiftQuadIndex,y : tax ; X should be set to either 1 (vertical) or 2 (horizontal) (for a9,aa quadrant)
-	lda $fe : and #$01 : cmp.b #$00 : beq .decQuad
+	lda $ab : and #$01 : beq .decQuad
 	inc $02
 	txa : sta $a8, x ; alter a9/aa
 	bra .quadDone
@@ -224,8 +237,8 @@ ShiftCameraBounds:
 {
 	lda CamBoundIndex,y : tax ; should be 0 for horz travel (vert bounds) or 4 for vert travel (horz bounds)
 	rep #$30
-	lda $fe : and #$00f0 : asl #2 : sta $06
-	lda $fe : and #$0001 : cmp #$0000 : beq .subIt
+	lda $ab : and #$00f0 : asl #2 : sta $06
+	lda $ab : and #$0001 : cmp #$0000 : beq .subIt
 	lda $0618, x : !add $06 : sta $0618, x
 	lda $061A, x : !add $06 : sta $061A, x
 	sep #$30
@@ -239,19 +252,26 @@ ShiftCameraBounds:
 
 AdjustTransition:
 {
-	lda $fe : and #$00f0 : lsr
-	sep #$20 : cmp $0126 : bcc .reset
-	rep #$20
+	lda $ab : and #$01ff : beq .reset
 	phy : ldy #$06 ; operating on vertical registers during horizontal trans
 	cpx.b #$02 : bcs .horizontalScrolling
 	ldy #$00  ; operate on horizontal regs during vert trans
 	.horizontalScrolling
-	lda $fe : and #$0001 : asl : tax
-	lda.l OffsetTable,x : adc $00E2,y : and.w #$FFFE : sta $00E2,y : sta $00E0,y
+	cmp #$0008 : bcs +
+	    pha : lda $ab : and #$0200 : beq ++
+	        pla : bra .add
+	    ++ pla : eor #$ffff : inc ; convert to negative
+	    .add jsr AdjustCamAdd : ply : bra .reset
+	+ lda $ab : and #$0200 : xba : tax
+	lda.l OffsetTable,x : jsr AdjustCamAdd
+	lda $ab : !sub #$0008 : sta $ab
 	ply : bra .done
-	.reset ; clear the 0127 variable so to not disturb intra-tile doors
-	stz $fe
+	.reset ; clear the $ab variable so to not disturb intra-tile doors
+	stz $ab
 	.done
-	rep #$20 : lda $00 : and #$01fc
+	lda $00 : and #$01fc
 	rtl
 }
+
+AdjustCamAdd:
+    !add $00E2,y : sta $00E2,y : sta $00E0,y : rts
