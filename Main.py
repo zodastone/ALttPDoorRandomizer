@@ -19,10 +19,10 @@ from Doors import create_doors
 from DoorShuffle import link_doors
 from RoomData import create_rooms
 from Rules import set_rules
-from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
+from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive, dungeon_regions
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, balance_multiworld_progression
 from ItemList import generate_itempool, difficulties, fill_prizes
-from Utils import output_path, parse_player_names
+from Utils import output_path, parse_player_names, print_wiki_doors_by_room
 
 __version__ = '0.0.18.3d'
 
@@ -256,6 +256,8 @@ def main(args, seed=None):
 
     logger.info('Done. Enjoy.')
     logger.info('Total Time: %s', time.perf_counter() - start)
+
+#    print_wiki_doors_by_room(dungeon_regions,world,1)
 
     return world
 

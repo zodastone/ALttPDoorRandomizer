@@ -206,7 +206,7 @@ def read_entrance_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan)
         print(string)
 
 
-def print_wiki_doors(d_regions, world, player):
+def print_wiki_doors_by_region(d_regions, world, player):
 
     for d, region_list in d_regions.items():
         tile_map = {}
@@ -222,7 +222,7 @@ def print_wiki_doors(d_regions, world, player):
                 if tile not in tile_map:
                     tile_map[tile] = []
                 tile_map[tile].append(r)
-        print(d)
+        print('<!-- ' + d + ' -->')
         print('{| class="wikitable"')
         print('|-')
         print('! Room')
@@ -244,6 +244,44 @@ def print_wiki_doors(d_regions, world, player):
                 print('| '+' <br /> '.join(strs_to_print))
         print('|}')
 
+def print_wiki_doors_by_room(d_regions, world, player):
+    for d, region_list in d_regions.items():
+        tile_map = {}
+        for region in region_list:
+            tile = None
+            r = world.get_region(region, player)
+            for ext in r.exits:
+                door = world.check_for_door(ext.name, player)
+                if door is not None and door.roomIndex != -1:
+                    tile = door.roomIndex
+                    break
+            if tile is not None:
+                if tile not in tile_map:
+                    tile_map[tile] = []
+                tile_map[tile].append(r)
+        toprint = ""
+        toprint += ('<!-- ' + d + ' -->') + "\n"
+        for tile, region_list in tile_map.items():
+            for region in region_list:
+                toprint += ('<!-- ' + region.name + ' -->') + "\n"
+                toprint += ('{{Infobox dungeon room') + "\n"
+                toprint += ('| dungeon   = {{ROOTPAGENAME}}') + "\n"
+                toprint += ('| supertile = ' + str(tile)) + "\n"
+                toprint += ('| tile      = x') + "\n"
+                toprint += ('}}') + "\n"
+                toprint += ('') + "\n"
+                toprint += ('== Doors ==') + "\n"
+                toprint += ('{| class="wikitable"') + "\n"
+                toprint += ('|-') + "\n"
+                toprint += ('! Door !! Room Side !! Requirement') + "\n"
+                for ext in region.exits:
+                    ext_part = ext.name.replace(region.name,'')
+                    ext_part = ext_part.strip()
+                    toprint += ('{{DungeonRoomDoorList/Row|{{ROOTPAGENAME}}|{{SUBPAGENAME}}|' + ext_part + '|Side|}}') + "\n"
+                toprint += ('|}') + "\n"
+                toprint += ('') + "\n"
+        with open(os.path.join(".","resources", "user", "rooms-" + d + ".txt"),"w+") as f:
+            f.write(toprint)
 
 if __name__ == '__main__':
     pass
