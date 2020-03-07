@@ -202,8 +202,7 @@ def connect_simple_door(world, exit_name, region_name, player):
         d.dest = region
 
 
-def connect_door_only(world, exit_name, region_name, player):
-    region = world.get_region(region_name, player)
+def connect_door_only(world, exit_name, region, player):
     d = world.check_for_door(exit_name, player)
     if d is not None:
         d.dest = region
@@ -1357,8 +1356,8 @@ def add_inaccessible_doors(world, player):
     # todo: ignore standard mode hyrule castle ledge?
     for inaccessible_region in world.inaccessible_regions[player]:
         region = world.get_region(inaccessible_region, player)
-        for exit in region.exits:
-            create_door(world, player, exit.name, region.name)
+        for ext in region.exits:
+            create_door(world, player, ext.name, region.name)
 
 
 def create_door(world, player, entName, region_name):
@@ -1464,6 +1463,7 @@ def check_for_pinball_fix(state, bad_region, world, player):
 
 @unique
 class DROptions(Flag):
+    NoOptions = 0x00
     Eternal_Mini_Bosses = 0x01  # If on, GT minibosses marked as defeated when they try to spawn a heart
     Town_Portal = 0x02  # If on, Players will start with mirror scroll
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required

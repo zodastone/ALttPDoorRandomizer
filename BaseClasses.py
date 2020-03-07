@@ -41,7 +41,7 @@ class World(object):
         self.shuffle_bonk_prizes = False
         self.light_world_light_cone = False
         self.dark_world_light_cone = False
-        self.clock_mode = 'off'
+        self.clock_mode = 'none'
         self.rupoor_cost = 10
         self.aga_randomness = True
         self.lock_aga_door_in_escape = False
