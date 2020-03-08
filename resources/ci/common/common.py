@@ -113,10 +113,10 @@ def prepare_filename(BUILD_FILENAME):
 	return DEST_FILENAME
 
 # find a binary file if it's executable
-#  failing that, assume it's over 10MB
+#  failing that, assume it's over 6MB
 def find_binary(listdir):
   FILENAME_CHECKS = [ "Gui", "DungeonRandomizer" ]
-  FILESIZE_CHECK = (10 * 1024 * 1024) # 10MB
+  FILESIZE_CHECK = (6 * 1024 * 1024) # 6MB
 
   BUILD_FILENAMES = []
   executable = stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
