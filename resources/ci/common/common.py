@@ -115,6 +115,9 @@ def prepare_filename(BUILD_FILENAME):
 # find a binary file if it's executable
 #  failing that, assume it's over 10MB
 def find_binary(listdir):
+  FILENAME_CHECKS = [ "Gui", "DungeonRandomizer" ]
+  FILESIZE_CHECK = (10 * 1024 * 1024) # 10MB
+
   BUILD_FILENAMES = []
   executable = stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
   for filename in os.listdir(listdir):
@@ -122,10 +125,11 @@ def find_binary(listdir):
       if os.path.splitext(filename)[1] != ".py":
         st = os.stat(filename)
         mode = st.st_mode
-        big = st.st_size > (4.7 * 1024 * 1024) # 10MB
+        big = st.st_size > FILESIZE_CHECK
         if (mode & executable) or big:
-          if "GUI" in filename or "Gui" in filename or "DungeonRandomizer" in filename:
-            BUILD_FILENAMES.append(filename)
+          for check in FILENAME_CHECKS:
+            if check in filename:
+              BUILD_FILENAMES.append(filename)
   return BUILD_FILENAMES
 
 if __name__ == "__main__":

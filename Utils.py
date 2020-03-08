@@ -207,7 +207,6 @@ def read_entrance_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan)
 
 
 def print_wiki_doors_by_region(d_regions, world, player):
-
     for d, region_list in d_regions.items():
         tile_map = {}
         for region in region_list:
@@ -222,27 +221,31 @@ def print_wiki_doors_by_region(d_regions, world, player):
                 if tile not in tile_map:
                     tile_map[tile] = []
                 tile_map[tile].append(r)
-        print('<!-- ' + d + ' -->')
-        print('{| class="wikitable"')
-        print('|-')
-        print('! Room')
-        print('! Supertile')
-        print('! Doors')
+        toprint = ""
+        toprint += ('<!-- ' + d + ' -->') + "\n"
+        toprint += ('== Room List ==') + "\n"
+        toprint += "\n"
+        toprint += ('{| class="wikitable"') + "\n"
+        toprint += ('|-') + "\n"
+        toprint += ('! Room !! Supertile !! Doors') + "\n"
         for tile, region_list in tile_map.items():
             tile_done = False
             for region in region_list:
-                print('|-')
-                print('| '+region.name)
+                toprint += ('|-') + "\n"
+                toprint += ('| {{Dungeon Room|{{PAGENAME}}|' + region.name + '}}') + "\n"
                 if not tile_done:
                     listlen = len(region_list)
                     link = '| {{UnderworldMapLink|'+str(tile)+'}}'
-                    print(link if listlen < 2 else '| rowspan = '+str(listlen)+' '+link)
+                    toprint += (link if listlen < 2 else '| rowspan = '+str(listlen)+' '+link) + "\n"
                     tile_done = True
                 strs_to_print = []
                 for ext in region.exits:
-                    strs_to_print.append(ext.name)
-                print('| '+' <br /> '.join(strs_to_print))
-        print('|}')
+                    strs_to_print.append('{{Dungeon Door|{{PAGENAME}}|' + ext.name + '}}')
+                toprint += ('| '+'<br />'.join(strs_to_print))
+                toprint += "\n"
+        toprint += ('|}') + "\n"
+        with open(os.path.join(".","resources", "user", "regions-" + d + ".txt"),"w+") as f:
+            f.write(toprint)
 
 def print_wiki_doors_by_room(d_regions, world, player):
     for d, region_list in d_regions.items():

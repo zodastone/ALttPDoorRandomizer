@@ -22,7 +22,7 @@ from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive, dungeon_regions
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, balance_multiworld_progression
 from ItemList import generate_itempool, difficulties, fill_prizes
-from Utils import output_path, parse_player_names, print_wiki_doors_by_room
+from Utils import output_path, parse_player_names, print_wiki_doors_by_region, print_wiki_doors_by_room
 
 __version__ = '0.0.18.4d'
 
@@ -258,6 +258,7 @@ def main(args, seed=None):
     logger.info('Total Time: %s', time.perf_counter() - start)
 
 #    print_wiki_doors_by_room(dungeon_regions,world,1)
+#    print_wiki_doors_by_region(dungeon_regions,world,1)
 
     return world
 
