@@ -1,6 +1,6 @@
 HorzEdge:
     cpy #$ff : beq +
-        jsr DetectWestEdge : bra ++
+        jsr DetectWestEdge : ldy #$02 : bra ++  ; i'm not sure why normal doors want 1 and these want 2
     + jsr DetectEastEdge
     ++ cmp #$ff : beq +
         sta $00 : asl : !add $00 : tax
