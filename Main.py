@@ -64,11 +64,8 @@ def main(args, seed=None, fish=None):
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
     logger.info(
-      '%s %s %s  -  %s: %s\n',
-      world.fish.translate("cli","cli","app.title"),
-      world.fish.translate("cli","cli","version"),
+      world.fish.translate("cli","cli","app.title") + "\n",
       __version__,
-      world.fish.translate("cli","cli","seed"),
       world.seed
     )
 
@@ -271,7 +268,7 @@ def main(args, seed=None, fish=None):
         world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
 
     logger.info(world.fish.translate("cli","cli","done"))
-    logger.info('%s: %s', world.fish.translate("cli","cli","total.time"), time.perf_counter() - start)
+    logger.info(world.fish.translate("cli","cli","total.time"), time.perf_counter() - start)
 
 #    print_wiki_doors_by_room(dungeon_regions,world,1)
 
@@ -436,9 +433,9 @@ def create_playthrough(world):
 
         state_cache.append(state.copy())
 
-        logging.getLogger('').debug('Calculated sphere %i, containing %i of %i progress items.', len(collection_spheres), len(sphere), len(prog_locations))
+        logging.getLogger('').debug(world.fish.translate("cli","cli","building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations))
         if not sphere:
-            logging.getLogger('').debug('The following items could not be reached: %s', ['%s (Player %d) at %s (Player %d)' % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
+            logging.getLogger('').debug(world.fish.translate("cli","cli","cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
             if any([world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
                 raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.progression"))
             else:
@@ -492,7 +489,7 @@ def create_playthrough(world):
 
         collection_spheres.append(sphere)
 
-        logging.getLogger('').debug('Calculated final sphere %i, containing %i of %i progress items.', len(collection_spheres), len(sphere), len(required_locations))
+        logging.getLogger('').debug(world.fish.translate("cli","cli","building.final.spheres"), len(collection_spheres), len(sphere), len(required_locations))
         if not sphere:
             raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.required"))
 

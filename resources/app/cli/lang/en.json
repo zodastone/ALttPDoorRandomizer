@@ -1,6 +1,6 @@
 {
   "cli": {
-    "app.title": "ALttP Door Randomizer",
+    "app.title": "ALttP Door Randomizer Version %s - Seed: %d",
     "version": "Version",
     "seed": "Seed",
     "player": "Player",
@@ -25,19 +25,26 @@
     "splitting.up": "Splitting Up",
     "balance.multiworld": "Balancing multiworld progression",
     "cannot.beat.game": "Cannot beat game! Something went terribly wrong here!",
+    "cannot.reach.items": "The following items could not be reached: %s",
+    "cannot.reach.item": "%s (Player %d) at %s (Player %d)",
+    "check.item.location": "Checking if %s (Player %d) is required to beat the game.",
+    "check.item.location.true": "Yes, item is required.",
+    "check.item.location.false": "No, item is not required.",
     "cannot.reach.progression": "Not all progression items reachable. Something went terribly wrong here.",
     "cannot.reach.required": "Not all required items reachable. Something went terribly wrong here.",
     "patching.rom": "Patching ROM",
     "calc.playthrough": "Calculating playthrough",
     "done": "Done. Enjoy.",
-    "total.time": "Total Time",
+    "total.time": "Total Time: %s",
     "finished.run": "Finished run",
     "generation.failed": "Generation failed",
     "generation.fail.rate": "Generation fail    rate",
     "generation.success.rate": "Generation success rate",
     "enemizer.not.found": "Enemizer not found at",
     "enemizer.nothing.applied": "No Enemizer options will be applied until this is resolved.",
-    "building.collection.spheres": "Building up collection spheres"
+    "building.collection.spheres": "Building up collection spheres",
+    "building.calculating.spheres": "Calculated sphere %i, containing %i of %i progress items.",
+    "building.final.spheres": "Calculated final sphere %i, containing %i of %i progress items."
   },
   "help": {
     "lang": [ "App Language, if available, defaults to English" ],
