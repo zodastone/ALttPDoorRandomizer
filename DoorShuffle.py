@@ -5,9 +5,6 @@ import operator as op
 import time
 from enum import unique, Flag
 
-from source.classes.BabelFish import BabelFish
-import CLI as cli
-
 from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier
 from Regions import key_only_locations
@@ -308,9 +305,6 @@ def pair_existing_key_doors(world, player, door_a, door_b):
 #         paired_door.pair = False
 
 def within_dungeon(world, player):
-    settings = cli.get_settings()
-    fish = BabelFish(lang=settings["lang"] if "lang" in settings else "en")
-
     fix_big_key_doors_with_ugly_smalls(world, player)
     overworld_prep(world, player)
     entrances_map, potentials, connections = determine_entrance_list(world, player)
@@ -322,7 +316,7 @@ def within_dungeon(world, player):
         dungeon_builders[key] = simple_dungeon_builder(key, sector_list)
         dungeon_builders[key].entrance_list = list(entrances_map[key])
     recombinant_builders = {}
-    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map)
+    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, world.fish)
     main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player)
 
     paths = determine_required_paths(world, player)
@@ -332,15 +326,15 @@ def within_dungeon(world, player):
     start = time.process_time()
     for builder in world.dungeon_layouts[player].values():
         shuffle_key_doors(builder, world, player)
-    logging.getLogger('').info('%s: %s', fish.translate("cli","cli","keydoor.shuffle.time"), time.process_time()-start)
+    logging.getLogger('').info('%s: %s', world.fish.translate("cli","cli","keydoor.shuffle.time"), time.process_time()-start)
     smooth_door_pairs(world, player)
 
 
-def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map):
+def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, fish):
     for name, split_list in split_region_starts.items():
         builder = dungeon_builders.pop(name)
         recombinant_builders[name] = builder
-        split_builders = split_dungeon_builder(builder, split_list)
+        split_builders = split_dungeon_builder(builder, split_list, fish)
         dungeon_builders.update(split_builders)
         for sub_name, split_entrances in split_list.items():
             sub_builder = dungeon_builders[name+' '+sub_name]
@@ -353,11 +347,6 @@ def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map)
 
 
 def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player):
-    settings = cli.get_args_priority(None, None, None)
-    if "load" in settings:
-      settings = settings["load"]
-    fish = BabelFish(lang=settings["lang"] if "lang" in settings else "en")
-
     entrances_map, potentials, connections = connections_tuple
     enabled_entrances = {}
     sector_queue = deque(dungeon_builders.values())
@@ -377,7 +366,7 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
             sector_queue.append(builder)
             last_key = builder.name
         else:
-            logging.getLogger('').info('%s: %s', fish.translate("cli","cli","generating.dungeon"), builder.name)
+            logging.getLogger('').info('%s: %s', world.fish.translate("cli","cli","generating.dungeon"), builder.name)
             ds = generate_dungeon(builder, origin_list_sans_drops, split_dungeon, world, player)
             find_new_entrances(ds, connections, potentials, enabled_entrances, world, player)
             ds.name = name
@@ -724,9 +713,6 @@ def cross_dungeon(world, player):
 
 
 def assign_cross_keys(dungeon_builders, world, player):
-    settings = cli.get_settings()
-    fish = BabelFish(lang=settings["lang"] if "lang" in settings else "en")
-
     start = time.process_time()
     total_keys = remaining = 29
     total_candidates = 0
@@ -806,7 +792,7 @@ def assign_cross_keys(dungeon_builders, world, player):
                 dungeon.small_keys = []
             else:
                 dungeon.small_keys = [ItemFactory(dungeon_keys[name], player)] * actual_chest_keys
-    logging.getLogger('').info('%s: %s', fish.translate("cli","cli","keydoor.shuffle.time.crossed"), time.process_time()-start)
+    logging.getLogger('').info('%s: %s', world.fish.translate("cli","cli","keydoor.shuffle.time.crossed"), time.process_time()-start)
 
 
 def reassign_boss(boss_region, boss_key, builder, gt, world, player):
@@ -962,18 +948,15 @@ def calc_used_dungeon_items(builder):
 
 
 def find_valid_combination(builder, start_regions, world, player, drop_keys=True):
-    settings = cli.get_settings()
-    fish = BabelFish(lang=settings["lang"] if "lang" in settings else "en")
-
     logger = logging.getLogger('')
-    logger.info('%s %s', fish.translate("cli","cli","shuffling.keydoors"), builder.name)
+    logger.info('%s %s', world.fish.translate("cli","cli","shuffling.keydoors"), builder.name)
     # find valid combination of candidates
     if len(builder.candidates) < builder.key_doors_num:
         if not drop_keys:
             logger.info('No valid layouts for %s with %s doors', builder.name, builder.key_doors_num)
             return False
         builder.key_doors_num = len(builder.candidates)  # reduce number of key doors
-        logger.info('%s: %s', fish.translate("cli","cli","lowering.keys.candidates"), builder.name)
+        logger.info('%s: %s', world.fish.translate("cli","cli","lowering.keys.candidates"), builder.name)
     combinations = ncr(len(builder.candidates), builder.key_doors_num)
     itr = 0
     start = time.process_time()
@@ -993,7 +976,7 @@ def find_valid_combination(builder, start_regions, world, player, drop_keys=True
             if not drop_keys:
                 logger.info('No valid layouts for %s with %s doors', builder.name, builder.key_doors_num)
                 return False
-            logger.info('%s: %s', fish.translate("cli","cli","lowering.keys.layouts"), builder.name)
+            logger.info('%s: %s', world.fish.translate("cli","cli","lowering.keys.layouts"), builder.name)
             builder.key_doors_num -= 1
             if builder.key_doors_num < 0:
                 raise Exception('Bad dungeon %s - 0 key doors not valid' % builder.name)

@@ -8,9 +8,6 @@ import random
 import time
 import zlib
 
-from source.classes.BabelFish import BabelFish
-import CLI as cli
-
 from BaseClasses import World, CollectionState, Item, Region, Location, Shop
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
@@ -30,17 +27,12 @@ from Utils import output_path, parse_player_names, print_wiki_doors_by_room
 __version__ = '0.0.18.4d'
 
 
-def main(args, seed=None):
+def main(args, seed=None, fish=None):
     if args.outputpath:
         os.makedirs(args.outputpath, exist_ok=True)
         output_path.cached_path = args.outputpath
 
     start = time.perf_counter()
-
-    settings = cli.get_args_priority(None, None, None)
-    if "load" in settings:
-      settings = settings["load"]
-    fish = BabelFish(lang=settings["lang"] if "lang" in settings else "en")
 
     # initialize the world
     world = World(args.multi, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords, args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm, args.accessibility, args.shuffleganon, args.retro, args.custom, args.customitemarray, args.hints)
@@ -67,15 +59,16 @@ def main(args, seed=None):
     world.beemizer = args.beemizer.copy()
     world.experimental = args.experimental.copy()
     world.dungeon_counters = args.dungeon_counters.copy()
+    world.fish = fish
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
     logger.info(
       '%s %s %s  -  %s: %s\n',
-      fish.translate("cli","cli","app.title"),
-      fish.translate("cli","cli","version"),
+      world.fish.translate("cli","cli","app.title"),
+      world.fish.translate("cli","cli","version"),
       __version__,
-      fish.translate("cli","cli","seed"),
+      world.fish.translate("cli","cli","seed"),
       world.seed
     )
 
@@ -110,7 +103,7 @@ def main(args, seed=None):
         create_rooms(world, player)
         create_dungeons(world, player)
 
-    logger.info(fish.translate("cli","cli","shuffling.world"))
+    logger.info(world.fish.translate("cli","cli","shuffling.world"))
 
     for player in range(1, world.players + 1):
         if world.mode[player] != 'inverted':
@@ -118,7 +111,7 @@ def main(args, seed=None):
         else:
             link_inverted_entrances(world, player)
 
-    logger.info(fish.translate("cli","cli","shuffling.dungeons"))
+    logger.info(world.fish.translate("cli","cli","shuffling.dungeons"))
 
     for player in range(1, world.players + 1):
         link_doors(world, player)
@@ -126,21 +119,21 @@ def main(args, seed=None):
             mark_light_world_regions(world, player)
         else:
             mark_dark_world_regions(world, player)
-    logger.info(fish.translate("cli","cli","generating.itempool"))
+    logger.info(world.fish.translate("cli","cli","generating.itempool"))
 
     for player in range(1, world.players + 1):
         generate_itempool(world, player)
 
-    logger.info(fish.translate("cli","cli","calc.access.rules"))
+    logger.info(world.fish.translate("cli","cli","calc.access.rules"))
 
     for player in range(1, world.players + 1):
         set_rules(world, player)
 
-    logger.info(fish.translate("cli","cli","placing.dungeon.prizes"))
+    logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
 
     fill_prizes(world)
 
-    logger.info(fish.translate("cli","cli","placing.dungeon.items"))
+    logger.info(world.fish.translate("cli","cli","placing.dungeon.items"))
 
     shuffled_locations = None
     if args.algorithm in ['balanced', 'vt26'] or any(list(args.mapshuffle.values()) + list(args.compassshuffle.values()) +
@@ -157,14 +150,14 @@ def main(args, seed=None):
                 raise RuntimeError(
                   "%s: %s (%s %d)" %
                   (
-                    fish.translate("cli","cli","keylock.detected"),
+                    world.fish.translate("cli","cli","keylock.detected"),
                     key_layout.sector.name,
-                    fish.translate("cli","cli","player"),
+                    world.fish.translate("cli","cli","player"),
                     player
                   )
                 )
 
-    logger.info(fish.translate("cli","cli","fill.world"))
+    logger.info(world.fish.translate("cli","cli","fill.world"))
 
     if args.algorithm == 'flood':
         flood_items(world)  # different algo, biased towards early game progress items
@@ -183,14 +176,14 @@ def main(args, seed=None):
         distribute_items_restrictive(world, True)
 
     if world.players > 1:
-        logger.info(fish.translate("cli","cli","balance.multiworld"))
+        logger.info(world.fish.translate("cli","cli","balance.multiworld"))
         balance_multiworld_progression(world)
 
     # if we only check for beatable, we can do this sanity check first before creating the rom
     if not world.can_beat_game():
-        raise RuntimeError(fish.translate("cli","cli","cannot.beat.game"))
+        raise RuntimeError(world.fish.translate("cli","cli","cannot.beat.game"))
 
-    logger.info(fish.translate("cli","cli","patching.rom"))
+    logger.info(world.fish.translate("cli","cli","patching.rom"))
 
     outfilebase = 'DR_%s' % (args.outputname if args.outputname else world.seed)
 
@@ -214,8 +207,8 @@ def main(args, seed=None):
                         if not args.jsonout:
                             rom = LocalRom.fromJsonRom(rom, args.rom, 0x400000)
                     else:
-                        logging.warning(fish.translate("cli","cli","enemizer.not.found") + ': ' + args.enemizercli)
-                        logging.warning(fish.translate("cli","cli","enemizer.nothing.applied"))
+                        logging.warning(world.fish.translate("cli","cli","enemizer.not.found") + ': ' + args.enemizercli)
+                        logging.warning(world.fish.translate("cli","cli","enemizer.nothing.applied"))
 
                 if args.race:
                     patch_race_rom(rom)
@@ -269,7 +262,7 @@ def main(args, seed=None):
         world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
 
     if not args.skip_playthrough:
-        logger.info(fish.translate("cli","cli","calc.playthrough"))
+        logger.info(world.fish.translate("cli","cli","calc.playthrough"))
         create_playthrough(world)
 
     if args.jsonout:
@@ -277,8 +270,8 @@ def main(args, seed=None):
     elif args.create_spoiler and not args.skip_playthrough:
         world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
 
-    logger.info(fish.translate("cli","cli","done"))
-    logger.info('%s: %s', fish.translate("cli","cli","total.time"), time.perf_counter() - start)
+    logger.info(world.fish.translate("cli","cli","done"))
+    logger.info('%s: %s', world.fish.translate("cli","cli","total.time"), time.perf_counter() - start)
 
 #    print_wiki_doors_by_room(dungeon_regions,world,1)
 
@@ -414,11 +407,6 @@ def copy_dynamic_regions_and_locations(world, ret):
 
 
 def create_playthrough(world):
-    settings = cli.get_args_priority(None, None, None)
-    if "load" in settings:
-      settings = settings["load"]
-    fish = BabelFish(lang=settings["lang"] if "lang" in settings else "en")
-
     # create a copy as we will modify it
     old_world = world
     world = copy_world(world)
@@ -429,7 +417,7 @@ def create_playthrough(world):
     collection_spheres = []
     state = CollectionState(world)
     sphere_candidates = list(prog_locations)
-    logging.getLogger('').debug(fish.translate("cli","cli","building.collection.spheres"))
+    logging.getLogger('').debug(world.fish.translate("cli","cli","building.collection.spheres"))
     while sphere_candidates:
         state.sweep_for_events(key_only=True)
         state.sweep_for_crystal_access()
@@ -452,7 +440,7 @@ def create_playthrough(world):
         if not sphere:
             logging.getLogger('').debug('The following items could not be reached: %s', ['%s (Player %d) at %s (Player %d)' % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
             if any([world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
-                raise RuntimeError(fish.translate("cli","cli","cannot.reach.progression"))
+                raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.progression"))
             else:
                 old_world.spoiler.unreachables = sphere_candidates.copy()
                 break
@@ -506,7 +494,7 @@ def create_playthrough(world):
 
         logging.getLogger('').debug('Calculated final sphere %i, containing %i of %i progress items.', len(collection_spheres), len(sphere), len(required_locations))
         if not sphere:
-            raise RuntimeError(fish.translate("cli","cli","cannot.reach.required"))
+            raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.required"))
 
     # store the required locations for statistical analysis
     old_world.required_locations = [(location.name, location.player) for sphere in collection_spheres for location in sphere]

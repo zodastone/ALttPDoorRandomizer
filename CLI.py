@@ -8,8 +8,6 @@ import textwrap
 import shlex
 import sys
 
-from Main import main
-
 import source.classes.constants as CONST
 from source.classes.BabelFish import BabelFish
 
@@ -26,7 +24,15 @@ def parse_arguments(argv, no_defaults=False):
     # get settings
     settings = get_settings()
 
-    fish = BabelFish(lang=settings["lang"] if "lang" in settings else "en")
+    lang = "en"
+    if argv is not None:
+      priority = get_args_priority(None, None, argv)
+      if "load" in priority:
+        priority = priority["load"]
+        if "lang" in priority:
+          lang = priority["lang"]
+
+    fish = BabelFish(lang=lang)
 
     # we need to know how many players we have first
     parser = argparse.ArgumentParser(add_help=False)

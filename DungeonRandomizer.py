@@ -19,11 +19,6 @@ from Fill import FillError
 def start():
     args = parse_arguments(None)
 
-    settings = get_args_priority(None, None, None)
-    if "load" in settings:
-      settings = settings["load"]
-    fish = BabelFish(lang=settings["lang"] if "lang" in settings else "en")
-
     if is_bundled() and len(sys.argv) == 1:
         # for the bundled builds, if we have no arguments, the user
         # probably wants the gui. Users of the bundled build who want the command line
@@ -49,6 +44,12 @@ def start():
     loglevel = {'error': logging.ERROR, 'info': logging.INFO, 'warning': logging.WARNING, 'debug': logging.DEBUG}[args.loglevel]
     logging.basicConfig(format='%(message)s', level=loglevel)
 
+    settings = get_args_priority(None, None, None)
+    lang = "en"
+    if "load" in settings and "lang" in settings["load"]:
+        lang = settings["load"]["lang"]
+    fish = BabelFish(lang=lang)
+
     if args.gui:
         from Gui import guiMain
         guiMain(args)
@@ -58,7 +59,7 @@ def start():
         logger = logging.getLogger('')
         for _ in range(args.count):
             try:
-                main(seed=seed, args=args)
+                main(seed=seed, args=args, fish=fish)
                 logger.info('%s %s', fish.translate("cli","cli","finished.run"), _+1)
             except (FillError, Exception, RuntimeError) as err:
                 failures.append((err, seed))
@@ -73,7 +74,7 @@ def start():
         logger.info('Generation fail    rate: ' + str(fail_rate[0]   ).rjust(3, " ") + '.' + str(fail_rate[1]   ).ljust(6, '0') + '%')
         logger.info('Generation success rate: ' + str(success_rate[0]).rjust(3, " ") + '.' + str(success_rate[1]).ljust(6, '0') + '%')
     else:
-        main(seed=args.seed, args=args)
+        main(seed=args.seed, args=args, fish=fish)
 
 
 if __name__ == '__main__':
