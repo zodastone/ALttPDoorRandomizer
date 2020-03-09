@@ -12,6 +12,7 @@ class BabelFish():
 
 		self.lang_defns = {} #collect translations
 		self.add_translation_file() #start with default translation file
+		self.add_translation_file(["resources","app","cli"]) #add help translation file
 		self.add_translation_file(["resources","user","meta"]) #add user translation file
 
 	def add_translation_file(self,subpath=["resources","app","meta"]):
