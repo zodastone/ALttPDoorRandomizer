@@ -26,7 +26,7 @@ def parse_arguments(argv, no_defaults=False):
     # get settings
     settings = get_settings()
 
-    fish = BabelFish()
+    fish = BabelFish(lang=settings["lang"] if "lang" in settings else "en")
 
     # we need to know how many players we have first
     parser = argparse.ArgumentParser(add_help=False)
@@ -102,6 +102,7 @@ def parse_arguments(argv, no_defaults=False):
 def get_settings():
     # set default settings
     settings = {
+        "lang": "en",
         "retro": False,
         "mode": "open",
         "logic": "noglitches",

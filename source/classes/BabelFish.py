@@ -34,7 +34,8 @@ class BabelFish():
 				with open(langs_filename,encoding="utf-8") as f: #open it
 					self.lang_defns[lang][key[:key.rfind(os.sep)].replace(os.sep,'.')] = json.load(f) #save translation definitions
 			else:
-				print(langs_filename + " not found for translation!")
+				pass
+#				print(langs_filename + " not found for translation!")
 
 	def translate(self, domain="", key="", subkey=""): #three levels of keys
     # start with nothing

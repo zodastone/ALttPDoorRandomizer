@@ -1,0 +1,25 @@
+{
+  "cli": {
+    "app.title": "ALttP Puerta Aleatorizador",
+    "version": "Versión",
+    "seed": "Número",
+    "player": "Player",
+    "shuffling.world": "Barajando el Mundo",
+    "shuffling.dungeons": "Barajando Mazmorras",
+    "balance.doors": "-Equilibriando Puertas",
+    "re-balancing": "-Reequilibriando",
+    "balancing": "--Equilibriando",
+    "splitting.up": "División",
+    "basic.traversal": "--Recorrido Básico",
+    "generating.dungeon": "Generando mazmorra",
+    "shuffling.keydoors": "Barajando Puertas Clave para",
+    "placing.dungeon.prizes": "Placing Dungeon Prizes",
+    "placing.dungeon.items": "Placing Dungeon Items",
+    "keylock.detected": "Bloqueo de Teclas detectado",
+    "fill.world": "Llenar el Mundo",
+    "patching.rom": "Parchear ROM",
+    "calc.playthrough": "Cálculo de Juego",
+    "generation.failed": "Generación Fallida",
+    "enemizer.not.found": "Enemizer no encontrado en"
+  }
+}

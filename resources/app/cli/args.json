@@ -1,4 +1,5 @@
 {
+  "lang": {},
   "create_spoiler": {
     "action": "store_true",
     "type": "bool"

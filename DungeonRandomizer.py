@@ -8,7 +8,9 @@ import textwrap
 import shlex
 import sys
 
-from CLI import parse_arguments
+from source.classes.BabelFish import BabelFish
+
+from CLI import parse_arguments, get_args_priority
 from Main import main
 from Rom import get_sprite_from_name
 from Utils import is_bundled, close_console
@@ -16,6 +18,11 @@ from Fill import FillError
 
 def start():
     args = parse_arguments(None)
+
+    settings = get_args_priority(None, None, None)
+    if "load" in settings:
+      settings = settings["load"]
+    fish = BabelFish(lang=settings["lang"] if "lang" in settings else "en")
 
     if is_bundled() and len(sys.argv) == 1:
         # for the bundled builds, if we have no arguments, the user
@@ -52,10 +59,10 @@ def start():
         for _ in range(args.count):
             try:
                 main(seed=seed, args=args)
-                logger.info('Finished run %s', _+1)
+                logger.info('%s %s', fish.translate("cli","cli","finished.run"), _+1)
             except (FillError, Exception, RuntimeError) as err:
                 failures.append((err, seed))
-                logger.warning('Generation failed: %s', err)
+                logger.warning('%s: %s', fish.translate("cli","cli","generation.failed"), err)
             seed = random.randint(0, 999999999)
         for fail in failures:
             logger.info('%s seed failed with: %s', fail[1], fail[0])
