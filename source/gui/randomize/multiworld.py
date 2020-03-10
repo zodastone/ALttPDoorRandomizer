@@ -2,6 +2,7 @@ from tkinter import ttk, StringVar, Entry, Frame, Label, N, E, W, X, LEFT
 import source.gui.widgets as widgets
 import json
 import os
+from source.classes.Empty import Empty
 
 def multiworld_page(parent,settings):
     # Multiworld
@@ -26,16 +27,33 @@ def multiworld_page(parent,settings):
 
     ## List of Player Names
     # This one's more-complicated, build it and stuff it
-    key = "names"
-    self.widgets[key] = Frame(self.frames["widgets"])
-    self.widgets[key].label = Label(self.widgets[key], text='Player names')
-    self.widgets[key].storageVar = StringVar(value=settings["names"])
+    # widget ID
+    widget = "names"
+
+    # Empty object
+    self.widgets[widget] = Empty()
+    # pieces
+    self.widgets[widget].pieces = {}
+
+    # frame
+    self.widgets[widget].pieces["frame"] = Frame(self.frames["widgets"])
+    # frame: label
+    self.widgets[widget].pieces["frame"].label = Label(self.widgets[widget].pieces["frame"], text='Player names')
+    # storage var
+    self.widgets[widget].storageVar = StringVar(value=settings["names"])
+
+    # FIXME: Got some strange behavior here; both Entry-like objects react to mousewheel on Spinbox
     def saveMultiNames(caller,_,mode):
-        settings["names"] = self.widgets[key].storageVar.get()
-    self.widgets[key].storageVar.trace_add("write",saveMultiNames)
-    self.widgets[key].textbox = Entry(self.widgets[key], textvariable=self.widgets[key].storageVar)
-    self.widgets[key].label.pack(side=LEFT)
-    self.widgets[key].textbox.pack(side=LEFT, fill=X, expand=True)
-    self.widgets[key].pack(anchor=N, fill=X, expand=True)
+        settings["names"] = self.widgets[widget].storageVar.get()
+    self.widgets[widget].storageVar.trace_add("write",saveMultiNames)
+    # textbox
+    self.widgets[widget].pieces["textbox"] = Entry(self.widgets[widget].pieces["frame"], textvariable=self.widgets[key].storageVar)
+
+    # frame label: pack
+    self.widgets[widget].pieces["frame"].label.pack(side=LEFT, anchor=N)
+    # textbox: pack
+    self.widgets[widget].pieces["textbox"].pack(side=LEFT, anchor=N, fill=X, expand=True)
+    # frame: pack
+    self.widgets[widget].pieces["frame"].pack(side=LEFT, anchor=N, fill=X, expand=True)
 
     return self,settings

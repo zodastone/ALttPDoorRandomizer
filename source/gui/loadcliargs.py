@@ -33,6 +33,8 @@ def loadcliargs(gui, args, settings=None):
                             gui.pages[mainpage].pages[subpage].widgets[widget].checkbox.configure(text=label)
                         elif type == "selectbox":
                             gui.pages[mainpage].pages[subpage].widgets[widget].label.configure(text=label)
+                        elif type == "spinbox":
+                            gui.pages[mainpage].pages[subpage].widgets[widget].label.configure(text=label)
                     gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(args[arg])
                     # If we're on the Game Options page and it's not about Hints
                     if subpage == "gameoptions" and not widget == "hints":
@@ -86,8 +88,20 @@ def loadcliargs(gui, args, settings=None):
         subpage = "multiworld"
         widget = "worlds"
         setting = "multi"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].label.configure(text=label)
         if args[setting]:
+            # set storagevar
             gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(str(args[setting]))
+
+        # Set Multiworld Names
+        mainpage = "randomizer"
+        subpage = "multiworld"
+        widget = "names"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["frame"].label.configure(text=label)
 
         # Get Seed ID
         mainpage = "bottom"

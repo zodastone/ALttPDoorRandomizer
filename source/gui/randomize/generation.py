@@ -29,12 +29,21 @@ def generation_page(parent,settings):
     self.frames["baserom"].pack(anchor=W, fill=X)
     ## Locate base ROM
     # This one's more-complicated, build it and stuff it
+    # widget ID
     widget = "rom"
+
+    # Empty object
     self.widgets[widget] = Empty()
+    # pieces
     self.widgets[widget].pieces = {}
+
+    # frame
     self.widgets[widget].pieces["frame"] = Frame(self.frames["baserom"])
+    # frame: label
     self.widgets[widget].pieces["frame"].label = Label(self.widgets[widget].pieces["frame"], text='Base Rom: ')
+    # storage var
     self.widgets[widget].storageVar = StringVar()
+    # textbox
     self.widgets[widget].pieces["textbox"] = Entry(self.widgets[widget].pieces["frame"], textvariable=self.widgets[widget].storageVar)
     self.widgets[widget].storageVar.set(settings["rom"])
 
@@ -42,11 +51,16 @@ def generation_page(parent,settings):
     def RomSelect():
         rom = filedialog.askopenfilename(filetypes=[("Rom Files", (".sfc", ".smc")), ("All Files", "*")], initialdir=os.path.join("."))
         self.widgets[widget].storageVar.set(rom)
+    # dialog button
     self.widgets[widget].pieces["button"] = Button(self.widgets[widget].pieces["frame"], text='Select Rom', command=RomSelect)
 
+    # frame label: pack
     self.widgets[widget].pieces["frame"].label.pack(side=LEFT)
+    # textbox: pack
     self.widgets[widget].pieces["textbox"].pack(side=LEFT, fill=X, expand=True)
+    # button: pack
     self.widgets[widget].pieces["button"].pack(side=LEFT)
+    # frame: pack
     self.widgets[widget].pieces["frame"].pack(fill=X)
 
     return self,settings
