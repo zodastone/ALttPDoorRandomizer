@@ -21,6 +21,8 @@ from source.gui.bottom import bottom_frame, create_guiargs
 from GuiUtils import set_icon
 from Main import __version__ as ESVersion
 
+from source.classes.BabelFish import BabelFish
+
 
 def guiMain(args=None):
     # Save settings to file
@@ -142,6 +144,12 @@ def guiMain(args=None):
 
     # add randomizer notebook to main window
     self.pages["randomizer"].notebook.pack()
+
+    settings = get_args_priority(None, None, None)
+    lang = "en"
+    if "load" in settings and "lang" in settings["load"]:
+        lang = settings["load"]["lang"]
+    self.fish = BabelFish(lang=lang)
 
     # bottom of window: Open Output Directory, Open Documentation (if exists)
     self.frames["bottom"] = bottom_frame(self, self, None)

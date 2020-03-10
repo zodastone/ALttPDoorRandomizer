@@ -105,9 +105,13 @@ def loadcliargs(gui, args, settings=None):
 
         # Get Seed ID
         mainpage = "bottom"
+        widget = "seed"
         setting = "seed"
         if args[setting]:
-            gui.frames[mainpage].seedVar.set(str(args[setting]))
+            gui.frames[mainpage].widgets[widget].storageVar.set(str(args[setting]))
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + widget)
+        gui.frames[mainpage].widgets[widget].pieces["frame"].label.configure(text=label)
 
         # Get number of generations to run
         mainpage = "bottom"
@@ -115,9 +119,33 @@ def loadcliargs(gui, args, settings=None):
         setting = "count"
         if args[setting]:
             gui.frames[mainpage].widgets[widget].storageVar.set(str(args[setting]))
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + widget)
+        gui.frames[mainpage].widgets[widget].label.configure(text=label)
 
+        # Set Generate button
+        mainpage = "bottom"
+        widget = "go"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + widget)
+        gui.frames[mainpage].widgets[widget].pieces["button"].configure(text=label)
+
+        # Set Output Directory button
+        mainpage = "bottom"
+        widget = "outputdir"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + widget)
+        gui.frames[mainpage].widgets[widget].pieces["button"].configure(text=label)
         # Get output path
-        gui.outputPath.set(args["outputpath"])
+        gui.frames[mainpage].widgets[widget].storageVar.set(args["outputpath"])
+
+        # Set Output Directory button
+        mainpage = "bottom"
+        widget = "docs"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + widget)
+        if widget in gui.frames[mainpage].widgets:
+            gui.frames[mainpage].widgets[widget].pieces["button"].configure(text=label)
 
         # Figure out Sprite Selection
         def sprite_setter(spriteObject):
