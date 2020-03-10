@@ -3,6 +3,7 @@ import source.gui.widgets as widgets
 import json
 import os
 import webbrowser
+from source.classes.Empty import Empty
 
 def enemizer_page(parent,settings):
     def open_enemizer_download(_evt):
@@ -46,22 +47,26 @@ def enemizer_page(parent,settings):
 
     ## Enemizer CLI Path
     # This one's more-complicated, build it and stuff it
-    enemizerPathFrame = Frame(self.frames["bottomEnemizerFrame"])
-    enemizerCLIlabel = Label(enemizerPathFrame, text="EnemizerCLI path: ")
-    enemizerCLIlabel.pack(side=LEFT)
-    enemizerURL = Label(enemizerPathFrame, text="(get online)", fg="blue", cursor="hand2")
-    enemizerURL.pack(side=LEFT)
-    enemizerURL.bind("<Button-1>", open_enemizer_download)
-    self.enemizerCLIpathVar = StringVar(value=settings["enemizercli"])
-    enemizerCLIpathEntry = Entry(enemizerPathFrame, textvariable=self.enemizerCLIpathVar)
-    enemizerCLIpathEntry.pack(side=LEFT, fill=X, expand=True)
+    widget = "enemizercli"
+    self.widgets[widget] = Empty()
+    self.widgets[widget].pieces = {}
+    self.widgets[widget].pieces["frame"] = Frame(self.frames["bottomEnemizerFrame"])
+    self.widgets[widget].pieces["frame"].label = Label(self.widgets[widget].pieces["frame"], text="EnemizerCLI path: ")
+    self.widgets[widget].pieces["frame"].label.pack(side=LEFT)
+    self.widgets[widget].pieces["online"] = Empty()
+    self.widgets[widget].pieces["online"].label = Label(self.widgets[widget].pieces["frame"], text="(get online)", fg="blue", cursor="hand2")
+    self.widgets[widget].pieces["online"].label.pack(side=LEFT)
+    self.widgets[widget].pieces["online"].label.bind("<Button-1>", open_enemizer_download)
+    self.widgets[widget].storageVar = StringVar(value=settings["enemizercli"])
+    self.widgets[widget].pieces["textbox"] = Entry(self.widgets[widget].pieces["frame"], textvariable=self.widgets[widget].storageVar)
+    self.widgets[widget].pieces["textbox"].pack(side=LEFT, fill=X, expand=True)
     def EnemizerSelectPath():
         path = filedialog.askopenfilename(filetypes=[("EnemizerCLI executable", "*EnemizerCLI*")], initialdir=os.path.join("."))
         if path:
-            self.enemizerCLIpathVar.set(path)
+            self.widgets[widget].storageVar.set(path)
             settings["enemizercli"] = path
-    enemizerCLIbrowseButton = Button(enemizerPathFrame, text='...', command=EnemizerSelectPath)
-    enemizerCLIbrowseButton.pack(side=LEFT)
-    enemizerPathFrame.pack(fill=X)
+    self.widgets[widget].pieces["opendialog"] = Button(self.widgets[widget].pieces["frame"], text='...', command=EnemizerSelectPath)
+    self.widgets[widget].pieces["opendialog"].pack(side=LEFT)
+    self.widgets[widget].pieces["frame"].pack(fill=X)
 
     return self,settings

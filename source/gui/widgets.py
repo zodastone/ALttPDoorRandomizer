@@ -1,8 +1,5 @@
 from tkinter import Checkbutton, Entry, Frame, IntVar, Label, OptionMenu, Spinbox, StringVar, RIGHT, X
-
-# Need a dummy class
-class Empty():
-    pass
+from source.classes.Empty import Empty
 
 # Override Spinbox to include mousewheel support for changing value
 class mySpinbox(Spinbox):
@@ -144,6 +141,7 @@ def make_widget_from_dict(self, defn, parent):
     managerAttrs = defn["managerAttrs"] if "managerAttrs" in defn else None
     options = defn["options"] if "options" in defn else None
     widget = make_widget(self, type, parent, label, None, manager, managerAttrs, options)
+    widget.type = type
     return widget
 
 # Make a set of generic widgets from a dict
