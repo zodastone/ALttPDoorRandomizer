@@ -58,17 +58,28 @@ def loadcliargs(gui, args, settings=None):
         subpage = "enemizer"
         widget = "enemizercli"
         setting = "enemizercli"
+        # set storagevar
         gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(args[setting])
+        # set textbox/frame label
         label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
         gui.pages[mainpage].pages[subpage].widgets[widget].pieces["frame"].label.configure(text=label)
+        # set get from web label
         label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget + ".online")
         gui.pages[mainpage].pages[subpage].widgets[widget].pieces["online"].label.configure(text=label)
 
         # Get baserom path
         mainpage = "randomizer"
         subpage = "generation"
+        widget = "rom"
         setting = "rom"
-        gui.pages[mainpage].pages[subpage].romVar.set(args[setting])
+        # set storagevar
+        gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(args[setting])
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["frame"].label.configure(text=label)
+        # set button label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget + ".button")
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["button"].configure(text=label)
 
         # Get Multiworld Worlds count
         mainpage = "randomizer"

@@ -2,6 +2,7 @@ from tkinter import ttk, filedialog, StringVar, Button, Entry, Frame, Label, E, 
 import source.gui.widgets as widgets
 import json
 import os
+from source.classes.Empty import Empty
 
 def generation_page(parent,settings):
     # Generation Setup
@@ -28,20 +29,24 @@ def generation_page(parent,settings):
     self.frames["baserom"].pack(anchor=W, fill=X)
     ## Locate base ROM
     # This one's more-complicated, build it and stuff it
-    baseRomFrame = Frame(self.frames["baserom"])
-    baseRomLabel = Label(baseRomFrame, text='Base Rom: ')
-    self.romVar = StringVar()
-    romEntry = Entry(baseRomFrame, textvariable=self.romVar)
-    self.romVar.set(settings["rom"])
+    widget = "rom"
+    self.widgets[widget] = Empty()
+    self.widgets[widget].pieces = {}
+    self.widgets[widget].pieces["frame"] = Frame(self.frames["baserom"])
+    self.widgets[widget].pieces["frame"].label = Label(self.widgets[widget].pieces["frame"], text='Base Rom: ')
+    self.widgets[widget].storageVar = StringVar()
+    self.widgets[widget].pieces["textbox"] = Entry(self.widgets[widget].pieces["frame"], textvariable=self.widgets[widget].storageVar)
+    self.widgets[widget].storageVar.set(settings["rom"])
 
+    # FIXME: Translate these
     def RomSelect():
         rom = filedialog.askopenfilename(filetypes=[("Rom Files", (".sfc", ".smc")), ("All Files", "*")], initialdir=os.path.join("."))
-        self.romVar.set(rom)
-    romSelectButton = Button(baseRomFrame, text='Select Rom', command=RomSelect)
+        self.widgets[widget].storageVar.set(rom)
+    self.widgets[widget].pieces["button"] = Button(self.widgets[widget].pieces["frame"], text='Select Rom', command=RomSelect)
 
-    baseRomLabel.pack(side=LEFT)
-    romEntry.pack(side=LEFT, fill=X, expand=True)
-    romSelectButton.pack(side=LEFT)
-    baseRomFrame.pack(fill=X)
+    self.widgets[widget].pieces["frame"].label.pack(side=LEFT)
+    self.widgets[widget].pieces["textbox"].pack(side=LEFT, fill=X, expand=True)
+    self.widgets[widget].pieces["button"].pack(side=LEFT)
+    self.widgets[widget].pieces["frame"].pack(fill=X)
 
     return self,settings

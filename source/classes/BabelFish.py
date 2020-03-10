@@ -60,10 +60,10 @@ class BabelFish():
 				display_text += '.'
 #			display_text += key
       # Exits
-			if "exit" in key:
+			if "exit" in key and "gui" not in domain:
 				key = key.replace("exit","")
 				specials["exit"] = True
-			if "Exit" in key:
+			if "Exit" in key and "gui" not in domain:
 				key = key.replace("Exit","")
 				specials["exit"] = True
 			# Locations
@@ -80,10 +80,10 @@ class BabelFish():
  				display_text += '.'
 			display_text += subkey
       # Exits
-			if "exit" in subkey:
+			if "exit" in subkey and "gui" not in domain:
 				subkey = subkey.replace("exit","")
 				specials["exit"] = True
-			if "Exit" in subkey:
+			if "Exit" in subkey and "gui" not in domain:
 				subkey = subkey.replace("Exit","")
 				specials["exit"] = True
 			# Locations

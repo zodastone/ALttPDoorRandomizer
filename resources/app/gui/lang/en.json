@@ -39,8 +39,8 @@
     "adjust.sprite.unchanged": "(unchanged)",
 
     "adjust.rom": "Rom to adjust: ",
-    "adjust.rom.filetypes": "Rom Files",
-    "adjust.rom.opendialog": "Select Rom",
+    "adjust.rom.romfiles": "Rom Files",
+    "adjust.rom.button": "Select Rom",
     "adjust.rom.go": "Adjust Rom",
     "adjust.rom.dialog.error": "Error while patching",
     "adjust.rom.dialog.success": "Success",
@@ -165,8 +165,9 @@
     "randomizer.generation.saveonexit.never": "Never",
 
     "randomizer.generation.rom": "Base Rom: ",
-    "randomizer.generation.rom.filetypes": "Rom Files",
-    "randomizer.generation.rom.opendialog": "Select Rom",
+    "randomizer.generation.rom.button": "Select Rom",
+    "randomizer.generation.rom.dialog.romfiles": "Rom Files",
+    "randomizer.generation.rom.dialog.allfiles": "All Files",
 
 
     "randomizer.item.retro": "Retro mode (universal keys)",
