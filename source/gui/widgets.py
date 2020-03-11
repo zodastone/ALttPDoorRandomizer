@@ -28,27 +28,81 @@ def make_checkbox(self, parent, label, storageVar, manager, managerAttrs):
 
 # Make an OptionMenu with a label and pretty option labels
 def make_selectbox(self, parent, label, options, storageVar, manager, managerAttrs):
-    def change_storage(*args):
-        self.storageVar.set(options[self.labelVar.get()])
-    def change_selected(*args):
-        keys = options.keys()
-        vals = options.values()
-        keysList = list(keys)
-        valsList = list(vals)
-        self.labelVar.set(keysList[valsList.index(str(self.storageVar.get()))])
     self = Frame(parent, name="selectframe-" + label.lower())
-    self.storageVar = storageVar
-    self.storageVar.trace_add("write",change_selected)
+
+    labels = options
+
+    if isinstance(options,dict):
+        labels = options.keys()
+
     self.labelVar = StringVar()
+    self.storageVar = storageVar
+    self.selectbox = OptionMenu(self, self.labelVar, *labels)
+    self.selectbox.options = {}
+
+    if isinstance(options,dict):
+        self.selectbox.options["labels"] = list(options.keys())
+        self.selectbox.options["values"] = list(options.values())
+    else:
+        self.selectbox.options["labels"] = ["" for i in range(0,len(options))]
+        self.selectbox.options["values"] = options
+
+    def change_thing(thing, *args):
+        labels = self.selectbox.options["labels"]
+        values = self.selectbox.options["values"]
+        check = ""
+        lbl = ""
+        val = ""
+        idx = 0
+
+        if thing == "storage":
+            check = self.labelVar.get()
+        elif thing == "label":
+            check = self.storageVar.get()
+
+        if check in labels:
+            idx = labels.index(check)
+        if check in values:
+            idx = values.index(check)
+
+        lbl = labels[idx]
+        val = values[idx]
+
+        if thing == "storage":
+            self.storageVar.set(val)
+        elif thing == "label":
+            self.labelVar.set(lbl)
+        self.selectbox["menu"].entryconfigure(idx,label=lbl)
+        self.selectbox.configure(state="active")
+
+
+    def change_storage(*args):
+        change_thing("storage", *args)
+    def change_selected(*args):
+        change_thing("label", *args)
+
+    self.storageVar.trace_add("write",change_selected)
     self.labelVar.trace_add("write",change_storage)
     self.label = Label(self, text=label)
+
     if managerAttrs is not None and "label" in managerAttrs:
         self.label.pack(managerAttrs["label"])
     else:
         self.label.pack()
-    self.selectbox = OptionMenu(self, self.labelVar, *options.keys())
+
     self.selectbox.config(width=20)
-    self.labelVar.set(managerAttrs["default"] if "default" in managerAttrs else list(options.keys())[0])
+    idx = 0
+    default = self.selectbox.options["values"][idx]
+    if "default" in managerAttrs:
+        default = managerAttrs["default"]
+    labels = self.selectbox.options["labels"]
+    values = self.selectbox.options["values"]
+    if default in values:
+        idx = values.index(default)
+    default = labels[idx]
+    self.labelVar.set(default)
+    self.selectbox["menu"].entryconfigure(idx,label=default)
+
     if managerAttrs is not None and "selectbox" in managerAttrs:
         self.selectbox.pack(managerAttrs["selectbox"])
     else:

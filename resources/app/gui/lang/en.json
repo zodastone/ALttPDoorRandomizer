@@ -83,7 +83,7 @@
     "randomizer.enemizer.enemydamage": "Enemy Damage",
     "randomizer.enemizer.enemydamage.default": "Vanilla",
     "randomizer.enemizer.enemydamage.shuffled": "Shuffled",
-    "randomizer.enemizer.enemydamage.choas": "Chaos",
+    "randomizer.enemizer.enemydamage.chaos": "Chaos",
 
     "randomizer.enemizer.enemyhealth": "Enemy Health",
     "randomizer.enemizer.enemyhealth.default": "Vanilla",
@@ -260,13 +260,13 @@
     "randomizer.multiworld.names": "Player names",
 
 
-    "bottom.seed": "Seed #",
-    "bottom.generationcount": "Count",
-    "bottom.go": "Generate Patched Rom",
-    "bottom.dialog.error": "Error while creating seed",
-    "bottom.dialog.success": "Success",
-    "bottom.dialog.success.message": "Rom created successfully.",
-    "bottom.outputdir": "Open Output Directory",
-    "bottom.docs": "Open Documentation"
+    "bottom.content.seed": "Seed #",
+    "bottom.content.generationcount": "Count",
+    "bottom.content.go": "Generate Patched Rom",
+    "bottom.content.dialog.error": "Error while creating seed",
+    "bottom.content.dialog.success": "Success",
+    "bottom.content.dialog.success.message": "Rom created successfully.",
+    "bottom.content.outputdir": "Open Output Directory",
+    "bottom.content.docs": "Open Documentation"
   }
 }

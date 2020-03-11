@@ -110,5 +110,11 @@ SETTINGSTOPROCESS = {
       "usecustompool": "custom",
       "saveonexit": "saveonexit"
     }
+  },
+  "bottom": {
+    "content": {
+      "seed": "seed",
+      "generationcount": "count"
+    }
   }
 }

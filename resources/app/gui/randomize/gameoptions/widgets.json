@@ -18,7 +18,7 @@
       "label": {
         "text": "L/R Quickswapping"
       }
-    }    
+    }
   },
   "leftRomOptionsFrame": {
     "heartcolor": {
@@ -34,13 +34,13 @@
           "side": "right"
         }
       },
-      "options": {
-        "Red": "red",
-        "Blue": "blue",
-        "Green": "green",
-        "Yellow": "yellow",
-        "Random": "random"
-      }
+      "options": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "random"
+      ]
     },
     "heartbeep": {
       "type": "selectbox",
@@ -54,15 +54,15 @@
         "selectbox": {
           "side": "right"
         },
-        "default": "Normal"
+        "default": "normal"
       },
-      "options": {
-        "Double": "double",
-        "Normal": "normal",
-        "Half": "half",
-        "Quarter": "quarter",
-        "Off": "off"
-      }
+      "options": [
+        "double",
+        "normal",
+        "half",
+        "quarter",
+        "off"
+      ]
     }
   },
   "rightRomOptionsFrame": {
@@ -78,16 +78,16 @@
         "selectbox": {
           "side": "right"
         },
-        "default": "Normal"
+        "default": "normal"
       },
-      "options": {
-        "Instant": "instant",
-        "Quadruple": "quadruple",
-        "Triple": "triple",
-        "Double": "double",
-        "Normal": "normal",
-        "Half": "half"
-      }
+      "options": [
+        "instant",
+        "quadruple",
+        "triple",
+        "double",
+        "normal",
+        "half"
+      ]
     },
     "owpalettes": {
       "type": "selectbox",
@@ -102,11 +102,11 @@
           "side": "right"
         }
       },
-      "options": {
-        "Default": "default",
-        "Random": "random",
-        "Blackout": "blackout"
-      }
+      "options": [
+        "default",
+        "random",
+        "blackout"
+      ]
     },
     "uwpalettes": {
       "type": "selectbox",
@@ -121,11 +121,11 @@
           "side": "right"
         }
       },
-      "options": {
-        "Default": "default",
-        "Random": "random",
-        "Blackout": "blackout"
-      }
+      "options": [
+        "default",
+        "random",
+        "blackout"
+      ]
     }
   }
 }

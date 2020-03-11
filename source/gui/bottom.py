@@ -36,11 +36,12 @@ def bottom_frame(self, parent, args=None):
     savedSeed = parent.settings["seed"]
     self.widgets[widget].storageVar = StringVar(value=savedSeed)
     # textbox
+    self.widgets[widget].type = "textbox"
     self.widgets[widget].pieces["textbox"] = Entry(self.widgets[widget].pieces["frame"], width=15, textvariable=self.widgets[widget].storageVar)
     self.widgets[widget].pieces["textbox"].pack(side=LEFT)
 
     def saveSeed(caller,_,mode):
-        savedSeed = self.seedVar.get()
+        savedSeed = self.widgets["seed"].storageVar.get()
         parent.settings["seed"] = int(savedSeed) if savedSeed.isdigit() else None
     self.widgets[widget].storageVar.trace_add("write",saveSeed)
     # frame: pack
@@ -91,6 +92,7 @@ def bottom_frame(self, parent, args=None):
     self.widgets[widget].pieces = {}
 
     # button
+    self.widgets[widget].type = "button"
     self.widgets[widget].pieces["button"] = Button(self, text='Generate Patched Rom', command=generateRom)
     # button: pack
     self.widgets[widget].pieces["button"].pack(side=LEFT)
@@ -114,22 +116,26 @@ def bottom_frame(self, parent, args=None):
     self.widgets[widget].storageVar = StringVar(value=parent.settings["outputpath"])
 
     # button
+    self.widgets[widget].type = "button"
     self.widgets[widget].pieces["button"] = Button(self, text='Open Output Directory', command=open_output)
     # button: pack
     self.widgets[widget].pieces["button"].pack(side=RIGHT)
 
     ## Documentation Button
+    # widget ID
+    widget = "docs"
+
+    # Empty object
+    self.widgets[widget] = Empty()
+    # pieces
+    self.widgets[widget].pieces = {}
+    # button
+    self.widgets[widget].type = "button"
+    self.widgets[widget].selectbox = Empty()
+    self.widgets[widget].selectbox.storageVar = Empty()
     if os.path.exists(local_path('README.html')):
         def open_readme():
             open_file(local_path('README.html'))
-        # widget ID
-        widget = "docs"
-
-        # Empty object
-        self.widgets[widget] = Empty()
-        # pieces
-        self.widgets[widget].pieces = {}
-        # button
         self.widgets[widget].pieces["button"] = Button(self, text='Open Documentation', command=open_readme)
         # button: pack
         self.widgets[widget].pieces["button"].pack(side=RIGHT)

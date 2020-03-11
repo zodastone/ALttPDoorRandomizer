@@ -21,11 +21,11 @@
           "side": "right"
         }
       },
-      "options": {
-        "Vanilla": "none",
-        "Shuffled": "shuffled",
-        "Chaos": "chaos"
-      }
+      "options": [
+        "none",
+        "shuffled",
+        "chaos"
+      ]
     },
     "bossshuffle": {
       "type": "selectbox",
@@ -40,12 +40,12 @@
           "side": "right"
         }
       },
-      "options": {
-        "Vanilla": "none",
-        "Basic": "basic",
-        "Shuffled": "shuffled",
-        "Chaos": "chaos"
-      }
+      "options": [
+        "none",
+        "basic",
+        "shuffled",
+        "chaos"
+      ]
     }
   },
   "rightEnemizerFrame": {
@@ -62,11 +62,11 @@
           "side": "right"
         }
       },
-      "options": {
-        "Vanilla": "default",
-        "Shuffled": "shuffled",
-        "Chaos": "chaos"
-      }
+      "options": [
+        "default",
+        "shuffled",
+        "chaos"
+      ]
     },
     "enemyhealth": {
       "type": "selectbox",
@@ -81,13 +81,13 @@
           "side": "right"
         }
       },
-      "options": {
-        "Vanilla": "default",
-        "Easy": "easy",
-        "Normal": "normal",
-        "Hard": "hard",
-        "Expert": "expert"
-      }
+      "options": [
+        "default",
+        "easy",
+        "normal",
+        "hard",
+        "expert"
+      ]
     }
   }
 }
