@@ -268,6 +268,7 @@ def main(args, seed=None, fish=None):
         world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
 
     logger.info(world.fish.translate("cli","cli","done"))
+    logger.info(world.fish.translate("cli","cli","seed") + ": %d", world.seed)
     logger.info(world.fish.translate("cli","cli","total.time"), time.perf_counter() - start)
 
 #    print_wiki_doors_by_room(dungeon_regions,world,1)
