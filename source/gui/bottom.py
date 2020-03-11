@@ -169,7 +169,7 @@ def create_guiargs(parent):
     guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].widgets["enemizercli"].storageVar.get()
 
     # Get Multiworld Worlds count
-    guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.get())
+    guiargs.multi = int(parent.pages["bottom"].pages["content"].widgets["worlds"].storageVar.get())
 
     # Get baserom path
     guiargs.rom = parent.pages["randomizer"].pages["generation"].widgets["rom"].storageVar.get()
