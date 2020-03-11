@@ -173,7 +173,7 @@ def create_guiargs(parent):
     guiargs.custom = bool(parent.pages["randomizer"].pages["generation"].widgets["usecustompool"].storageVar.get())
 
     # Get Seed ID
-    guiargs.seed = ""
+    guiargs.seed = None
     if parent.pages["bottom"].pages["content"].widgets["seed"].storageVar.get():
         guiargs.seed = parent.pages["bottom"].pages["content"].widgets["seed"].storageVar.get()
 
