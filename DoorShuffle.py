@@ -50,9 +50,9 @@ def link_doors(world, player):
             connect_one_way(world, ent, ext, player)
         vanilla_key_logic(world, player)
     elif world.doorShuffle[player] == 'basic':
-        if not world.experimental[player]:
-            for entrance, ext in open_edges:
-                connect_two_way(world, entrance, ext, player)
+        # if not world.experimental[player]:
+        for entrance, ext in open_edges:
+            connect_two_way(world, entrance, ext, player)
         within_dungeon(world, player)
     elif world.doorShuffle[player] == 'crossed':
         for entrance, ext in open_edges:
