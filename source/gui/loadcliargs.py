@@ -2,10 +2,13 @@ from source.classes.SpriteSelector import SpriteSelector as spriteSelector
 from source.gui.randomize.gameoptions import set_sprite
 from Rom import Sprite, get_sprite_from_name
 import source.classes.constants as CONST
+from source.classes.BabelFish import BabelFish
+from source.classes.Empty import Empty
 
 # Load args/settings for most tabs
 def loadcliargs(gui, args, settings=None):
     if args is not None:
+        fish = BabelFish()
 #        for k, v in vars(args).items():
 #            if type(v) is dict:
 #                setattr(args, k, v[1])  # only get values for player 1 for now
@@ -21,39 +24,146 @@ def loadcliargs(gui, args, settings=None):
             for subpage in options[mainpage]:
                 # Cycle through each widget
                 for widget in options[mainpage][subpage]:
-                    # Get the value and set it
-                    arg = options[mainpage][subpage][widget]
-                    gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(args[arg])
-                    # If we're on the Game Options page and it's not about Hints
-                    if subpage == "gameoptions" and not widget == "hints":
-                        # Check if we've got settings
-                        # Check if we've got the widget in Adjust settings
-                        hasSettings = settings is not None
-                        hasWidget = ("adjust." + widget) in settings if hasSettings else None
-                        if hasWidget is None:
-                            # If we've got a Game Options val and we don't have an Adjust val, use the Game Options val
-                            gui.pages["adjust"].content.widgets[widget].storageVar.set(args[arg])
+                    if widget in gui.pages[mainpage].pages[subpage].widgets:
+                        thisType = ""
+                        # Get the value and set it
+                        arg = options[mainpage][subpage][widget]
+                        if args[arg] == None:
+                            args[arg] = ""
+                        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+                        if hasattr(gui.pages[mainpage].pages[subpage].widgets[widget],"type"):
+                            thisType = gui.pages[mainpage].pages[subpage].widgets[widget].type
+                            if thisType == "checkbox":
+                                gui.pages[mainpage].pages[subpage].widgets[widget].checkbox.configure(text=label)
+                            elif thisType == "selectbox":
+                                theseOptions = gui.pages[mainpage].pages[subpage].widgets[widget].selectbox.options
+                                gui.pages[mainpage].pages[subpage].widgets[widget].label.configure(text=label)
+                                i = 0
+                                for value in theseOptions["values"]:
+                                    gui.pages[mainpage].pages[subpage].widgets[widget].selectbox.options["labels"][i] = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget + '.' + value)
+                                    i += 1
+                                for i in range(0, len(theseOptions["values"])):
+                                    gui.pages[mainpage].pages[subpage].widgets[widget].selectbox["menu"].entryconfigure(i, label=theseOptions["labels"][i])
+                                gui.pages[mainpage].pages[subpage].widgets[widget].selectbox.options = theseOptions
+                            elif thisType == "spinbox":
+                                gui.pages[mainpage].pages[subpage].widgets[widget].label.configure(text=label)
+                        gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(args[arg])
+                        # If we're on the Game Options page and it's not about Hints
+                        if subpage == "gameoptions" and not widget == "hints":
+                            # Check if we've got settings
+                            # Check if we've got the widget in Adjust settings
+                            hasSettings = settings is not None
+                            hasWidget = ("adjust." + widget) in settings if hasSettings else None
+                            label = fish.translate("gui","gui","adjust." + widget)
+                            if ("adjust." + widget) in label:
+                                label = fish.translate("gui","gui","randomizer.gameoptions." + widget)
+                            if hasattr(gui.pages["adjust"].content.widgets[widget],"type"):
+                                type = gui.pages["adjust"].content.widgets[widget].type
+                                if type == "checkbox":
+                                    gui.pages["adjust"].content.widgets[widget].checkbox.configure(text=label)
+                                elif type == "selectbox":
+                                    gui.pages["adjust"].content.widgets[widget].label.configure(text=label)
+                            if hasWidget is None:
+                                # If we've got a Game Options val and we don't have an Adjust val, use the Game Options val
+                                gui.pages["adjust"].content.widgets[widget].storageVar.set(args[arg])
 
         # Get EnemizerCLI setting
-        gui.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.set(args["enemizercli"])
+        mainpage = "randomizer"
+        subpage = "enemizer"
+        widget = "enemizercli"
+        setting = "enemizercli"
+        # set storagevar
+        gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(args[setting])
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["frame"].label.configure(text=label)
+        # set get from web label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget + ".online")
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["online"].label.configure(text=label)
 
         # Get baserom path
-        gui.pages["randomizer"].pages["generation"].romVar.set(args["rom"])
+        mainpage = "randomizer"
+        subpage = "generation"
+        widget = "rom"
+        setting = "rom"
+        # set storagevar
+        gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(args[setting])
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["frame"].label.configure(text=label)
+        # set button label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget + ".button")
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["button"].configure(text=label)
 
         # Get Multiworld Worlds count
-        if args["multi"]:
-            gui.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.set(str(args["multi"]))
+        mainpage = "randomizer"
+        subpage = "multiworld"
+        widget = "worlds"
+        setting = "multi"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].label.configure(text=label)
+        if args[setting]:
+            # set storagevar
+            gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(str(args[setting]))
+
+        # Set Multiworld Names
+        mainpage = "randomizer"
+        subpage = "multiworld"
+        widget = "names"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["frame"].label.configure(text=label)
 
         # Get Seed ID
-        if args["seed"]:
-            gui.frames["bottom"].seedVar.set(str(args["seed"]))
+        mainpage = "bottom"
+        subpage = "content"
+        widget = "seed"
+        setting = "seed"
+        if args[setting]:
+            gui.pages[mainpage].widgets[widget].storageVar.set(args[setting])
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["frame"].label.configure(text=label)
 
         # Get number of generations to run
-        if args["count"]:
-            gui.frames["bottom"].widgets["generationcount"].storageVar.set(str(args["count"]))
+        mainpage = "bottom"
+        subpage = "content"
+        widget = "generationcount"
+        setting = "count"
+        if args[setting]:
+            gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(str(args[setting]))
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].label.configure(text=label)
 
+        # Set Generate button
+        mainpage = "bottom"
+        subpage = "content"
+        widget = "go"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["button"].configure(text=label)
+
+        # Set Output Directory button
+        mainpage = "bottom"
+        subpage = "content"
+        widget = "outputdir"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["button"].configure(text=label)
         # Get output path
-        gui.outputPath.set(args["outputpath"])
+        gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(args["outputpath"])
+
+        # Set Documentation button
+        mainpage = "bottom"
+        subpage = "content"
+        widget = "docs"
+        if widget in gui.pages[mainpage].pages[subpage].widgets:
+            if "button" in gui.pages[mainpage].pages[subpage].widgets[widget].pieces:
+                # set textbox/frame label
+                label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+                gui.pages[mainpage].pages[subpage].widgets[widget].pieces["button"].configure(text=label)
 
         # Figure out Sprite Selection
         def sprite_setter(spriteObject):

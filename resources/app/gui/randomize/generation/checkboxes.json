@@ -36,10 +36,10 @@
         "side": "right"
       }
     },
-    "options": {
-      "Ask Me": "ask",
-      "Always": "always",
-      "Never": "never"
-    }
+    "options": [
+      "ask",
+      "always",
+      "never"
+    ]
   }
 }

@@ -8,6 +8,7 @@ from Main import main
 from Utils import local_path, output_path, open_file
 import source.classes.constants as CONST
 import source.gui.widgets as widgets
+from source.classes.Empty import Empty
 
 
 def bottom_frame(self, parent, args=None):
@@ -17,19 +18,34 @@ def bottom_frame(self, parent, args=None):
     # Bottom Frame options
     self.widgets = {}
 
-    seedCountFrame = Frame(self)
-    seedCountFrame.pack()
-    ## Seed #
-    seedLabel = Label(self, text='Seed #')
+    # Seed input
+    # widget ID
+    widget = "seed"
+
+    # Empty object
+    self.widgets[widget] = Empty()
+    # pieces
+    self.widgets[widget].pieces = {}
+
+    # frame
+    self.widgets[widget].pieces["frame"] = Frame(self)
+    # frame: label
+    self.widgets[widget].pieces["frame"].label = Label(self.widgets[widget].pieces["frame"], text="Seed #")
+    self.widgets[widget].pieces["frame"].label.pack(side=LEFT)
+    # storagevar
     savedSeed = parent.settings["seed"]
-    self.seedVar = StringVar(value=savedSeed)
+    self.widgets[widget].storageVar = StringVar(value=savedSeed)
+    # textbox
+    self.widgets[widget].type = "textbox"
+    self.widgets[widget].pieces["textbox"] = Entry(self.widgets[widget].pieces["frame"], width=15, textvariable=self.widgets[widget].storageVar)
+    self.widgets[widget].pieces["textbox"].pack(side=LEFT)
+
     def saveSeed(caller,_,mode):
-        savedSeed = self.seedVar.get()
+        savedSeed = self.widgets["seed"].storageVar.get()
         parent.settings["seed"] = int(savedSeed) if savedSeed.isdigit() else None
-    self.seedVar.trace_add("write",saveSeed)
-    seedEntry = Entry(self, width=15, textvariable=self.seedVar)
-    seedLabel.pack(side=LEFT)
-    seedEntry.pack(side=LEFT)
+    self.widgets[widget].storageVar.trace_add("write",saveSeed)
+    # frame: pack
+    self.widgets[widget].pieces["frame"].pack(side=LEFT)
 
     ## Number of Generation attempts
     key = "generationcount"
@@ -56,10 +72,10 @@ def bottom_frame(self, parent, args=None):
             if guiargs.count is not None:
                 seed = guiargs.seed
                 for _ in range(guiargs.count):
-                    main(seed=seed, args=guiargs)
+                    main(seed=seed, args=guiargs, fish=parent.fish)
                     seed = random.randint(0, 999999999)
             else:
-                main(seed=guiargs.seed, args=guiargs)
+                main(seed=guiargs.seed, args=guiargs, fish=parent.fish)
         except Exception as e:
             logging.exception(e)
             messagebox.showerror(title="Error while creating seed", message=str(e))
@@ -67,8 +83,19 @@ def bottom_frame(self, parent, args=None):
             messagebox.showinfo(title="Success", message="Rom patched successfully")
 
     ## Generate Button
-    generateButton = Button(self, text='Generate Patched Rom', command=generateRom)
-    generateButton.pack(side=LEFT)
+    # widget ID
+    widget = "go"
+
+    # Empty object
+    self.widgets[widget] = Empty()
+    # pieces
+    self.widgets[widget].pieces = {}
+
+    # button
+    self.widgets[widget].type = "button"
+    self.widgets[widget].pieces["button"] = Button(self, text='Generate Patched Rom', command=generateRom)
+    # button: pack
+    self.widgets[widget].pieces["button"].pack(side=LEFT)
 
     def open_output():
         if args and args.outputpath:
@@ -76,15 +103,42 @@ def bottom_frame(self, parent, args=None):
         else:
             open_file(output_path(parent.settings["outputpath"]))
 
-    openOutputButton = Button(self, text='Open Output Directory', command=open_output)
-    openOutputButton.pack(side=RIGHT)
+    ## Output Button
+    # widget ID
+    widget = "outputdir"
+
+    # Empty object
+    self.widgets[widget] = Empty()
+    # pieces
+    self.widgets[widget].pieces = {}
+
+    # storagevar
+    self.widgets[widget].storageVar = StringVar(value=parent.settings["outputpath"])
+
+    # button
+    self.widgets[widget].type = "button"
+    self.widgets[widget].pieces["button"] = Button(self, text='Open Output Directory', command=open_output)
+    # button: pack
+    self.widgets[widget].pieces["button"].pack(side=RIGHT)
 
     ## Documentation Button
+    # widget ID
+    widget = "docs"
+
+    # Empty object
+    self.widgets[widget] = Empty()
+    # pieces
+    self.widgets[widget].pieces = {}
+    # button
+    self.widgets[widget].type = "button"
+    self.widgets[widget].selectbox = Empty()
+    self.widgets[widget].selectbox.storageVar = Empty()
     if os.path.exists(local_path('README.html')):
         def open_readme():
             open_file(local_path('README.html'))
-        openReadmeButton = Button(self, text='Open Documentation', command=open_readme)
-        openReadmeButton.pack(side=RIGHT)
+        self.widgets[widget].pieces["button"] = Button(self, text='Open Documentation', command=open_readme)
+        # button: pack
+        self.widgets[widget].pieces["button"].pack(side=RIGHT)
 
     return self
 
@@ -107,22 +161,26 @@ def create_guiargs(parent):
                 setattr(guiargs, arg, parent.pages[mainpage].pages[subpage].widgets[widget].storageVar.get())
 
     # Get EnemizerCLI setting
-    guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].enemizerCLIpathVar.get()
+    guiargs.enemizercli = parent.pages["randomizer"].pages["enemizer"].widgets["enemizercli"].storageVar.get()
 
     # Get Multiworld Worlds count
     guiargs.multi = int(parent.pages["randomizer"].pages["multiworld"].widgets["worlds"].storageVar.get())
 
     # Get baserom path
-    guiargs.rom = parent.pages["randomizer"].pages["generation"].romVar.get()
+    guiargs.rom = parent.pages["randomizer"].pages["generation"].widgets["rom"].storageVar.get()
 
     # Get if we're using the Custom Item Pool
     guiargs.custom = bool(parent.pages["randomizer"].pages["generation"].widgets["usecustompool"].storageVar.get())
 
     # Get Seed ID
-    guiargs.seed = int(parent.frames["bottom"].seedVar.get()) if parent.frames["bottom"].seedVar.get() else None
+    guiargs.seed = None
+    if parent.pages["bottom"].pages["content"].widgets["seed"].storageVar.get():
+        guiargs.seed = parent.pages["bottom"].pages["content"].widgets["seed"].storageVar.get()
 
     # Get number of generations to run
-    guiargs.count = int(parent.frames["bottom"].widgets["generationcount"].storageVar.get()) if parent.frames["bottom"].widgets["generationcount"].storageVar.get() != '1' else None
+    guiargs.count = 1
+    if parent.pages["bottom"].pages["content"].widgets["generationcount"].storageVar.get():
+        guiargs.count = int(parent.pages["bottom"].pages["content"].widgets["generationcount"].storageVar.get())
 
     # Get Adjust settings
     adjustargs = {

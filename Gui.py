@@ -21,6 +21,9 @@ from source.gui.bottom import bottom_frame, create_guiargs
 from GuiUtils import set_icon
 from Main import __version__ as ESVersion
 
+from source.classes.BabelFish import BabelFish
+from source.classes.Empty import Empty
+
 
 def guiMain(args=None):
     # Save settings to file
@@ -143,14 +146,22 @@ def guiMain(args=None):
     # add randomizer notebook to main window
     self.pages["randomizer"].notebook.pack()
 
+    settings = get_args_priority(None, None, None)
+    lang = "en"
+    if "load" in settings and "lang" in settings["load"]:
+        lang = settings["load"]["lang"]
+    self.fish = BabelFish(lang=lang)
+
     # bottom of window: Open Output Directory, Open Documentation (if exists)
-    self.frames["bottom"] = bottom_frame(self, self, None)
+    self.pages["bottom"] = Empty()
+    self.pages["bottom"].pages = {}
+    self.pages["bottom"].pages["content"] = bottom_frame(self, self, None)
     ## Save Settings Button
-    savesettingsButton = Button(self.frames["bottom"], text='Save Settings to File', command=lambda: save_settings_from_gui(True))
+    savesettingsButton = Button(self.pages["bottom"].pages["content"], text='Save Settings to File', command=lambda: save_settings_from_gui(True))
     savesettingsButton.pack(side=RIGHT)
 
     # set bottom frame to main window
-    self.frames["bottom"].pack(side=BOTTOM, fill=X, padx=5, pady=5)
+    self.pages["bottom"].pages["content"].pack(side=BOTTOM, fill=X, padx=5, pady=5)
 
     self.outputPath = StringVar()
     self.randomSprite = BooleanVar()

@@ -11,13 +11,13 @@
       "selectbox": {
         "side": "right"
       },
-      "default": "Basic"
+      "default": "basic"
     },
-    "options": {
-      "Vanilla": "vanilla",
-      "Basic": "basic",
-      "Crossed": "crossed"
-    }
+    "options": [
+      "vanilla",
+      "basic",
+      "crossed"
+    ]
   },
   "experimental": {
     "type": "checkbox",
@@ -37,13 +37,13 @@
       "selectbox": {
         "side": "right"
       },
-      "default": "Auto"
+      "default": "default"
     },
-    "options": {
-      "Auto": "default",
-      "Off": "off",
-      "On": "on",
-      "On Compass Pickup": "pickup"
-    }
+    "options": [
+      "default",
+      "off",
+      "on",
+      "pickup"
+    ]
   }
 }

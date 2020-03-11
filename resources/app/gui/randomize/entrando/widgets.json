@@ -21,20 +21,20 @@
         "label": { "side": "left" },
         "selectbox": { "side": "right" }
       },
-      "options": {
-        "Vanilla": "vanilla",
-        "Simple": "simple",
-        "Restricted": "restricted",
-        "Full": "full",
-        "Crossed": "crossed",
-        "Insanity": "insanity",
-        "Restricted (Legacy)": "restricted_legacy",
-        "Full (Legacy)": "full_legacy",
-        "Madness (Legacy)": "madness_legacy",
-        "Insanity (Legacy)": "insanity_legacy",
-        "Dungeons + Full": "dungeonsfull",
-        "Dungeons + Simple": "dungeonssimple"
-      }
+      "options": [
+        "vanilla",
+        "simple",
+        "restricted",
+        "full",
+        "crossed",
+        "insanity",
+        "restricted_legacy",
+        "full_legacy",
+        "madness_legacy",
+        "insanity_legacy",
+        "dungeonsfull",
+        "dungeonssimple"
+      ]
     }
   }
 }

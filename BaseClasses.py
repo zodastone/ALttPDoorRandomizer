@@ -4,6 +4,7 @@ import logging
 import json
 from collections import OrderedDict, deque, defaultdict
 
+from source.classes.BabelFish import BabelFish
 from EntranceShuffle import door_addresses
 from _vendor.collections_extended import bag
 from Utils import int16_as_bytes
@@ -71,6 +72,7 @@ class World(object):
         self.key_logic = {}
         self.pool_adjustment = {}
         self.key_layout = defaultdict(dict)
+        self.fish = BabelFish()
 
         for player in range(1, players + 1):
             # If World State is Retro, set to Open and set Retro flag
@@ -1732,43 +1734,60 @@ class Spoiler(object):
                 outfile.write('\n\nDoors:\n\n')
                 outfile.write('\n'.join(
                     ['%s%s %s %s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '',
-                                        entry['entrance'],
+                                        self.world.fish.translate("meta","doors",entry['entrance']),
                                         '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>',
-                                        entry['exit'],
+                                        self.world.fish.translate("meta","doors",entry['exit']),
                                         '({0})'.format(entry['dname']) if self.world.doorShuffle[entry['player']] == 'crossed' else '') for
                      entry in self.doors.values()]))
             if self.doorTypes:
+                # doorNames: For some reason these come in combined, somehow need to split on the thing to translate
+                # doorTypes: Small Key, Bombable, Bonkable
                 outfile.write('\n\nDoor Types:\n\n')
-                outfile.write('\n'.join(['%s%s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', entry['doorNames'], entry['type']) for entry in self.doorTypes.values()]))
+                outfile.write('\n'.join(['%s%s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', self.world.fish.translate("meta","doors",entry['doorNames']), self.world.fish.translate("meta","doorTypes",entry['type'])) for entry in self.doorTypes.values()]))
             if self.entrances:
+                # entrances: To/From overworld; Checking w/ & w/out "Exit" and translating accordingly
                 outfile.write('\n\nEntrances:\n\n')
-                outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', entry['entrance'], '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', entry['exit']) for entry in self.entrances.values()]))
+                outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","entrances",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","entrances",entry['exit'])) for entry in self.entrances.values()]))
             outfile.write('\n\nMedallions:\n')
             for dungeon, medallion in self.medallions.items():
-                outfile.write(f'\n{dungeon}: {medallion}')
+                outfile.write(f'\n{dungeon}: {medallion} Medallion')
             if self.startinventory:
                 outfile.write('\n\nStarting Inventory:\n\n')
                 outfile.write('\n'.join(self.startinventory))
-            outfile.write('\n\nLocations:\n\n')
-            outfile.write('\n'.join(['%s: %s' % (location, item) for grouping in self.locations.values() for (location, item) in grouping.items()]))
-            outfile.write('\n\nShops:\n\n')
-            outfile.write('\n'.join("{} [{}]\n    {}".format(shop['location'], shop['type'], "\n    ".join(item for item in [shop.get('item_0', None), shop.get('item_1', None), shop.get('item_2', None)] if item)) for shop in self.shops))
-            outfile.write('\n\nPlaythrough:\n\n')
-            outfile.write('\n'.join(['%s: {\n%s\n}' % (sphere_nr, '\n'.join(['  %s: %s' % (location, item) for (location, item) in sphere.items()] if sphere_nr != '0' else [f'  {item}' for item in sphere])) for (sphere_nr, sphere) in self.playthrough.items()]))
-            if self.unreachables:
-                outfile.write('\n\nUnreachable Items:\n\n')
-                outfile.write('\n'.join(['%s: %s' % (unreachable.item, unreachable) for unreachable in self.unreachables]))
-            outfile.write('\n\nPaths:\n\n')
 
+            # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
+            # items: Item names
+            outfile.write('\n\nLocations:\n\n')
+            outfile.write('\n'.join(['%s: %s' % (self.world.fish.translate("meta","locations",location), self.world.fish.translate("meta","items",item)) for grouping in self.locations.values() for (location, item) in grouping.items()]))
+
+            # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
+            # items: Item names
+            outfile.write('\n\nShops:\n\n')
+            outfile.write('\n'.join("{} [{}]\n    {}".format(self.world.fish.translate("meta","locations",shop['location']), shop['type'], "\n    ".join(self.world.fish.translate("meta","items",item) for item in [shop.get('item_0', None), shop.get('item_1', None), shop.get('item_2', None)] if item)) for shop in self.shops))
+
+            # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
+            # items: Item names
+            outfile.write('\n\nPlaythrough:\n\n')
+            outfile.write('\n'.join(['%s: {\n%s\n}' % (sphere_nr, '\n'.join(['  %s: %s' % (self.world.fish.translate("meta","locations",location), self.world.fish.translate("meta","items",item)) for (location, item) in sphere.items()] if sphere_nr != '0' else [f'  {item}' for item in sphere])) for (sphere_nr, sphere) in self.playthrough.items()]))
+            if self.unreachables:
+                # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
+                # items: Item names
+                outfile.write('\n\nUnreachable Items:\n\n')
+                outfile.write('\n'.join(['%s: %s' % (self.world.fish.translate("meta","items",unreachable.item), self.world.fish.translate("meta","locations",unreachable)) for unreachable in self.unreachables]))
+
+            # rooms: Change up room names; only if it's got no locations in it
+            # entrances: To/From overworld; Checking w/ & w/out "Exit" and translating accordingly
+            # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
+            outfile.write('\n\nPaths:\n\n')
             path_listings = []
             for location, path in sorted(self.paths.items()):
                 path_lines = []
                 for region, exit in path:
                     if exit is not None:
-                        path_lines.append("{} -> {}".format(region, exit))
+                        path_lines.append("{} -> {}".format(self.world.fish.translate("meta","rooms",region), self.world.fish.translate("meta","entrances",exit)))
                     else:
-                        path_lines.append(region)
-                path_listings.append("{}\n        {}".format(location, "\n   =>   ".join(path_lines)))
+                        path_lines.append(self.world.fish.translate("meta","rooms",region))
+                path_listings.append("{}\n        {}".format(self.world.fish.translate("meta","locations",location), "\n   =>   ".join(path_lines)))
 
             outfile.write('\n'.join(path_listings))
 
