@@ -78,7 +78,9 @@ def output_path(path):
             # True for expanding the tilde into a fully qualified path
             documents = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, True)[0]
         elif sys.platform.find("linux") or sys.platform.find("ubuntu") or sys.platform.find("unix"):
-            documents = os.path.join("~","Documents")
+            documents = os.path.expanduser("~")
+            print(documents)
+            documents = os.path.join(documents,"Documents")
         else:
             raise NotImplementedError('Not supported yet')
 
