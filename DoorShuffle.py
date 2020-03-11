@@ -671,7 +671,7 @@ def cross_dungeon(world, player):
                         key_name = dungeon_keys[builder.name] if loc.name != 'Hyrule Castle - Big Key Drop' else dungeon_bigs[builder.name]
                         loc.forced_item = loc.item = ItemFactory(key_name, player)
     recombinant_builders = {}
-    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map)
+    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, world.fish)
 
     main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player)
 
