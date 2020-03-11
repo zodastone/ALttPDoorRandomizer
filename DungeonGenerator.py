@@ -1023,6 +1023,7 @@ class DungeonBuilder(object):
         self.flex = 0
         self.key_door_proposal = None
 
+        self.allowance = None
         if name in dungeon_dead_end_allowance.keys():
             self.allowance = dungeon_dead_end_allowance[name]
         elif 'Stonewall' in name:
@@ -1124,7 +1125,7 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player, dunge
     logger.info('-Assigning Chest Locations')
     assign_location_sectors(dungeon_map, free_location_sectors, global_pole)
     logger.info('-Assigning Crystal Switches and Barriers')
-    leftover = assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole)
+    leftover = assign_crystal_switch_sectors(dungeon_map, crystal_switches, crystal_barriers, global_pole)
     for sector in leftover:
         if sector.polarity().is_neutral():
             neutral_sectors[sector] = None
@@ -1348,7 +1349,7 @@ def minimal_locations(dungeon_name):
     return 5
 
 
-def assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole, assign_one=False):
+def assign_crystal_switch_sectors(dungeon_map, crystal_switches, crystal_barriers, global_pole, assign_one=False):
     population = []
     some_c_switches_present = False
     for name, builder in dungeon_map.items():
@@ -1358,6 +1359,8 @@ def assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole, as
             some_c_switches_present = True
     if len(population) == 0:  # nothing needs a switch
         if assign_one and not some_c_switches_present:  # something should have one
+            if len(crystal_switches) == 0:
+                raise Exception('No crystal switches to assign. Ref %s' % next(iter(dungeon_map.keys())))
             valid, builder_choice, switch_choice = False, None, None
             switch_candidates = list(crystal_switches)
             switch_choice = random.choice(switch_candidates)
@@ -1373,7 +1376,9 @@ def assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole, as
                 choice = random.choice(builder_candidates)
                 builder_candidates.remove(choice)
                 builder_choice = dungeon_map[choice]
-                valid = global_pole.is_valid_choice(dungeon_map, builder_choice, [switch_choice])
+                test_set = [switch_choice]
+                test_set.extend(crystal_barriers)
+                valid = global_pole.is_valid_choice(dungeon_map, builder_choice, test_set)
             assign_sector(switch_choice, builder_choice, crystal_switches, global_pole)
         return crystal_switches
     sector_list = list(crystal_switches)
@@ -1400,45 +1405,48 @@ def assign_crystal_barrier_sectors(dungeon_map, crystal_barriers, global_pole):
 def identify_polarity_issues(dungeon_map):
     unconnected_builders = {}
     for name, builder in dungeon_map.items():
-        if len(builder.sectors) == 1:
-            continue
-        else:
-            def sector_filter(x, y):
-                return x != y
+        identify_polarity_issues_internal(name, builder, unconnected_builders)
+    return unconnected_builders
+
+
+def identify_polarity_issues_internal(name, builder, unconnected_builders):
+    if len(builder.sectors) == 1:
+        return
+    else:
+        def sector_filter(x, y):
+            return x != y
         # else:
         #     def sector_filter(x, y):
         #         return x != y and (x.outflow() > 1 or is_entrance_sector(builder, x))
-        connection_flags = {}
-        for slot in PolSlot:
-            connection_flags[slot] = {}
-            for slot2 in PolSlot:
-                connection_flags[slot][slot2] = False
-        for sector in builder.sectors:
-            others = [x for x in builder.sectors if sector_filter(x, sector)]
-            other_mag = sum_magnitude(others)
-            sector_mag = sector.magnitude()
-            check_flags(sector_mag, connection_flags)
-            unconnected_sector = True
+    connection_flags = {}
+    for slot in PolSlot:
+        connection_flags[slot] = {}
+        for slot2 in PolSlot:
+            connection_flags[slot][slot2] = False
+    for sector in builder.sectors:
+        others = [x for x in builder.sectors if sector_filter(x, sector)]
+        other_mag = sum_magnitude(others)
+        sector_mag = sector.magnitude()
+        check_flags(sector_mag, connection_flags)
+        unconnected_sector = True
+        for i in PolSlot:
+            if sector_mag[i.value] == 0 or other_mag[i.value] > 0 or self_connecting(sector, i, sector_mag):
+                unconnected_sector = False
+                break
+        if unconnected_sector:
             for i in PolSlot:
-                if sector_mag[i.value] == 0 or other_mag[i.value] > 0 or self_connecting(sector, i, sector_mag):
-                    unconnected_sector = False
-                    break
-            if unconnected_sector:
-                for i in PolSlot:
-                    if sector_mag[i.value] > 0 and other_mag[i.value] == 0 and not self_connecting(sector, i, sector_mag):
-                        builder.mag_needed[i] = [x for x in PolSlot if other_mag[x.value] > 0]
-                        if name not in unconnected_builders.keys():
-                            unconnected_builders[name] = builder
-        ttl_mag = sum_magnitude(builder.sectors)
-        for slot in PolSlot:
-            for slot2 in PolSlot:
-                if ttl_mag[slot.value] > 0 and ttl_mag[slot2.value] > 0 and not connection_flags[slot][slot2]:
-                    builder.mag_needed[slot] = [slot2]
-                    builder.mag_needed[slot2] = [slot]
+                if sector_mag[i.value] > 0 and other_mag[i.value] == 0 and not self_connecting(sector, i, sector_mag):
+                    builder.mag_needed[i] = [x for x in PolSlot if other_mag[x.value] > 0]
                     if name not in unconnected_builders.keys():
                         unconnected_builders[name] = builder
-    return unconnected_builders
-
+    ttl_mag = sum_magnitude(builder.sectors)
+    for slot in PolSlot:
+        for slot2 in PolSlot:
+            if ttl_mag[slot.value] > 0 and ttl_mag[slot2.value] > 0 and not connection_flags[slot][slot2]:
+                builder.mag_needed[slot] = [slot2]
+                builder.mag_needed[slot2] = [slot]
+                if name not in unconnected_builders.keys():
+                    unconnected_builders[name] = builder
 
 def self_connecting(sector, slot, magnitude):
     return sector.polarity()[slot.value] == 0 and sum(magnitude) > magnitude[slot.value]
@@ -1518,7 +1526,7 @@ def filter_match_deps(candidate, match_deps):
 
 
 def sum_magnitude(sector_list):
-    result = [0, 0, 0]
+    result = [0] * len(PolSlot)
     for sector in sector_list:
         vector = sector.magnitude()
         for i in range(len(result)):
@@ -1651,7 +1659,11 @@ def polarity_step_3(dungeon_map, polarized_sectors, global_pole, logger):
                     sub_candidates = odd_candidates.pop(best_charge)
                 candidate_list = random.choice(sub_candidates)
                 sub_candidates.remove(candidate_list)
-                valid = global_pole.is_valid_choice(dungeon_map, builder, candidate_list) and valid_branch_only(builder, candidate_list)
+                test_set = find_forced_connections(dungeon_map, candidate_list, polarized_sectors)
+                if ensure_test_set_connectedness(test_set, builder, polarized_sectors, dungeon_map, global_pole):
+                    valid = global_pole.is_valid_choice(dungeon_map, builder, test_set) and valid_branch_only(builder, candidate_list)
+                else:
+                    valid = False
             for candidate in candidate_list:
                 assign_sector(candidate, builder, polarized_sectors, global_pole)
 
@@ -1677,6 +1689,63 @@ def polarity_step_3(dungeon_map, polarized_sectors, global_pole, logger):
                     rejects.append(sectors)
             for sector in sectors:
                 assign_sector(sector, builder, polarized_sectors, global_pole)
+
+
+def find_forced_connections(dungeon_map, candidate_list, polarized_sectors):
+    test_set = list(candidate_list)
+    other_sectors = [x for x in polarized_sectors if x not in candidate_list]
+    dungeon_hooks = defaultdict(int)
+    for name, builder in dungeon_map.items():
+        d_mag = sum_hook_magnitude(builder.sectors)
+        for val in Hook:
+            dungeon_hooks[val] += d_mag[val.value]
+    queue = deque(candidate_list)
+    while queue:
+        candidate = queue.pop()
+        c_mag = candidate.hook_magnitude()
+        other_candidates = [x for x in candidate_list if x != candidate]
+        for val in Hook:
+            if c_mag[val.value] > 0:
+                opp = opposite_h_type(val)
+                o_val = opp.value
+                if sum_hook_magnitude(other_candidates)[o_val] == 0 and dungeon_hooks[opp] == 0 and not valid_self(c_mag, val, opp):
+                    forced_sector = []
+                    for sec in other_sectors:
+                        if sec.hook_magnitude()[o_val] > 0:
+                            forced_sector.append(sec)
+                            if len(forced_sector) > 1:
+                                break
+                    if len(forced_sector) == 1:
+                        test_set.append(forced_sector[0])
+    return test_set
+
+
+def valid_self(c_mag, val, opp):
+    if val == Hook.Stairs:
+        return c_mag[val.value] > 2
+    else:
+        return c_mag[opp.value] > 0 and sum(c_mag) > 2
+
+
+def ensure_test_set_connectedness(test_set, builder, polarized_sectors, dungeon_map, global_pole):
+    test_copy = list(test_set)
+    while not valid_connected_assignment(builder, test_copy):
+        dummy_builder = DungeonBuilder("Dummy Builder for " + builder.name)
+        dummy_builder.sectors = builder.sectors + test_copy
+        possibles = [x for x in polarized_sectors if x not in test_copy]
+        candidates = find_connected_candidates(possibles)
+        valid, sector = False, None
+        while not valid:
+            if len(candidates) == 0:
+                return False
+            sector = random.choice(candidates)
+            candidates.remove(sector)
+            t2 = test_copy+[sector]
+            valid = global_pole.is_valid_choice(dungeon_map, builder, t2) and valid_branch_only(builder, t2)
+        test_copy.append(sector)
+        dummy_builder.sectors = builder.sectors + test_copy
+    test_set[:] = test_copy
+    return True
 
 
 class GlobalPolarity:
@@ -1805,6 +1874,7 @@ def find_simple_branching_candidates(builder, sector_pool):
     candidates = defaultdict(list)
     charges = defaultdict(list)
     outflow_needed = builder.dead_ends + builder.forced_loops * 2 > builder.branches + builder.allowance
+    total_needed = builder.dead_ends + builder.forced_loops * 2 - builder.branches + builder.allowance
     original_lack = builder.total_conn_lack
     best_lack = original_lack
     for sector in sector_pool:
@@ -1817,7 +1887,8 @@ def find_simple_branching_candidates(builder, sector_pool):
             if lack < 0:
                 ttl_lack += -lack
         forced_loops = calc_forced_loops(builder.sectors + [sector])
-        valid_branches = builder.dead_ends + forced_loops * 2 + sector.dead_ends() <= builder.branches + builder.allowance + sector.branches()
+        net_outflow = builder.dead_ends + forced_loops * 2 + sector.dead_ends() - builder.branches - builder.allowance - sector.branches()
+        valid_branches = net_outflow < total_needed
         if valid_branches and (ttl_lack < original_lack or original_lack >= 0):
             candidates[ttl_lack].append(sector)
             charges[ttl_lack].append((builder.polarity()+sector.polarity()).charge())
@@ -1948,6 +2019,14 @@ def find_branching_candidates(builder, neutral_choices):
     return candidates
 
 
+def find_connected_candidates(sector_pool):
+    candidates = []
+    for sector in sector_pool:
+        if sector.adj_outflow() >= 2:
+            candidates.append(sector)
+    return candidates
+
+
 def neutralize_the_rest(sector_pool):
     neutral_choices = []
     main_pool = list(sector_pool)
@@ -2034,6 +2113,10 @@ def valid_assignment(builder, sector_list):
     return len(resolve_equations(builder, sector_list)) == 0
 
 
+def valid_equations(builder, sector_list):
+    return len(resolve_equations(builder, sector_list)) == 0
+
+
 def valid_connected_assignment(builder, sector_list):
     full_list = sector_list + builder.sectors
     for sector in full_list:
@@ -2073,13 +2156,35 @@ def valid_polarized_assignment(builder, sector_list):
 
 
 def assign_the_rest(dungeon_map, neutral_sectors, global_pole):
+    comb_w_replace = len(dungeon_map) ** len(neutral_sectors)
+    combinations = None
+    if comb_w_replace <= 1000:
+        combinations = list(itertools.product(dungeon_map.keys(), repeat=len(neutral_sectors)))
+        random.shuffle(combinations)
+    tries = 0
     while len(neutral_sectors) > 0:
-        sector_list = list(neutral_sectors)
-        choices = random.choices(list(dungeon_map.keys()), k=len(sector_list))
+        if tries > 1000 or (combinations and tries >= len(combinations)):
+            raise Exception('No valid assignment found for "neutral" sectors. Ref: %s' % next(iter(dungeon_map.keys())))
+        # sector_list = list(neutral_sectors)
+        if combinations:
+            choices = combinations[tries]
+        else:
+            choices = random.choices(list(dungeon_map.keys()), k=len(neutral_sectors))
+        neutral_sector_list = list(neutral_sectors)
+        chosen_sectors = defaultdict(list)
         for i, choice in enumerate(choices):
-            builder = dungeon_map[choice]
-            if valid_assignment(builder, [sector_list[i]]):
-                assign_sector(sector_list[i], builder, neutral_sectors, global_pole)
+            chosen_sectors[choice].append(neutral_sector_list[i])
+        all_valid = True
+        for name, sector_list in chosen_sectors.items():
+            if not valid_assignment(dungeon_map[name], sector_list):
+                all_valid = False
+                break
+        if all_valid:
+            for name, sector_list in chosen_sectors.items():
+                builder = dungeon_map[name]
+                for sector in sector_list:
+                    assign_sector(sector, builder, neutral_sectors, global_pole)
+        tries += 1
 
 
 def split_dungeon_builder(builder, split_list):
@@ -2103,8 +2208,10 @@ def balance_split(candidate_sectors, dungeon_map, global_pole):
     # categorize sectors
     check_for_forced_dead_ends(dungeon_map, candidate_sectors, global_pole)
     check_for_forced_assignments(dungeon_map, candidate_sectors, global_pole)
+    check_for_forced_crystal(dungeon_map, candidate_sectors, global_pole)
     crystal_switches, crystal_barriers, neutral_sectors, polarized_sectors = categorize_sectors(candidate_sectors)
-    leftover = assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole, len(crystal_barriers) > 0)
+    leftover = assign_crystal_switch_sectors(dungeon_map, crystal_switches, crystal_barriers,
+                                             global_pole, len(crystal_barriers) > 0)
     for sector in leftover:
         if sector.polarity().is_neutral():
             neutral_sectors[sector] = None
@@ -2156,6 +2263,14 @@ def check_for_forced_dead_ends(dungeon_map, candidate_sectors, global_pole):
                     builder.c_locked = True
 
 
+def check_crystal(dead_end, entrance):
+    if dead_end.blue_barrier and not entrance.c_switch and not dead_end.c_switch:
+        return False
+    if entrance.blue_barrier and not entrance.c_switch and not dead_end.c_switch:
+        return False
+    return True
+
+
 def check_for_forced_assignments(dungeon_map, candidate_sectors, global_pole):
     done = False
     while not done:
@@ -2166,26 +2281,47 @@ def check_for_forced_assignments(dungeon_map, candidate_sectors, global_pole):
             dungeon_hooks[name] = sum_hook_magnitude(builder.sectors)
         for val in Hook:
             if magnitude[val.value] == 1:
-                found_hooks = []
+                forced_sector = None
+                for sec in candidate_sectors:
+                    if sec.hook_magnitude()[val.value] > 0:
+                        forced_sector = sec
+                        break
                 opp = opposite_h_type(val).value
-                for name, hooks in dungeon_hooks.items():
-                    if hooks[opp] > 0 and not dungeon_map[name].c_locked:
-                        found_hooks.append(name)
-                if len(found_hooks) == 1:
-                    done = False
-                    forced_sector = None
-                    for sec in candidate_sectors:
-                        if sec.hook_magnitude()[val.value] > 0:
-                            forced_sector = sec
-                            break
-                    assign_sector(forced_sector, dungeon_map[found_hooks[0]], candidate_sectors, global_pole)
+                other_sectors = [x for x in candidate_sectors if x != forced_sector]
+                if sum_hook_magnitude(other_sectors)[opp] == 0:
+                    found_hooks = []
+                    for name, hooks in dungeon_hooks.items():
+                        if hooks[opp] > 0 and not dungeon_map[name].c_locked:
+                            found_hooks.append(name)
+                    if len(found_hooks) == 1:
+                        done = False
+                        assign_sector(forced_sector, dungeon_map[found_hooks[0]], candidate_sectors, global_pole)
 
 
-def check_crystal(dead_end, entrance):
-    if dead_end.blue_barrier and not entrance.c_switch and not dead_end.c_switch:
-        return False
-    if entrance.blue_barrier and not entrance.c_switch and not dead_end.c_switch:
-        return False
+def check_for_forced_crystal(dungeon_map, candidate_sectors, global_pole):
+    for name, builder in dungeon_map.items():
+        if check_for_forced_crystal_single(builder, candidate_sectors):
+            builder.c_switch_required = True
+
+
+def check_for_forced_crystal_single(builder, candidate_sectors):
+    builder_doors = defaultdict(dict)
+    for sector in builder.sectors:
+        for door in sector.outstanding_doors:
+            builder_doors[hook_from_door(door)][door] = sector
+    candidate_doors = defaultdict(dict)
+    for sector in candidate_sectors:
+        for door in sector.outstanding_doors:
+            candidate_doors[hook_from_door(door)][door] = sector
+    for hook in builder_doors.keys():
+        for door in builder_doors[hook].keys():
+            opp = opposite_h_type(hook)
+            for d, sector in builder_doors[opp].items():
+                if d != door and (not sector.blue_barrier or sector.c_switch):
+                    return False
+            for d, sector in candidate_doors[opp].items():
+                if not sector.blue_barrier or sector.c_switch:
+                    return False
     return True
 
 
@@ -2348,7 +2484,7 @@ def find_priority_equation(equations, access_id, current_access):
                 if best_local_profit is None or profit > best_local_profit:
                     best_local_profit = profit
                 all_candidates.append((eq, eq_list, sector))
-            elif best_profit is None or profit >= best_profit:
+            elif (best_profit is None or profit >= best_profit) and profit > 0:
                 if best_profit is None or profit > best_profit:
                     wanted_candidates = [eq]
                     best_profit = profit
@@ -2401,7 +2537,24 @@ def find_priority_equation(equations, access_id, current_access):
     leads_to_profit = [x for x in good_local_candidates if can_enable_wanted(x[0], wanted_candidates)]
     if len(leads_to_profit) == 0:
         leads_to_profit = good_local_candidates
-    return leads_to_profit[0]  # just pick one I guess
+    if len(leads_to_profit) == 1:
+        return leads_to_profit[0]
+
+    cost_point = {x[0]: find_cost_point(x, current_access) for x in leads_to_profit}
+    best_point = max(cost_point.values())
+    cost_point_candidates = [x for x in leads_to_profit if cost_point[x[0]] == best_point]
+    if len(cost_point_candidates) == 0:
+        cost_point_candidates = leads_to_profit
+    return cost_point_candidates[0]  # just pick one I guess
+
+
+def find_cost_point(eq_triplet, access):
+    cost_point = 0
+    for key, costs in eq_triplet[0].cost.items():
+        cost_count = len(costs)
+        if cost_count > 0:
+            cost_point += access[key] - cost_count
+    return cost_point
 
 
 def find_greedy_equation(equations, access_id, current_access):
