@@ -14,7 +14,7 @@ from source.gui.randomize.item import item_page
 from source.gui.randomize.entrando import entrando_page
 from source.gui.randomize.enemizer import enemizer_page
 from source.gui.randomize.dungeon import dungeon_page
-from source.gui.randomize.multiworld import multiworld_page
+#from source.gui.randomize.multiworld import multiworld_page
 from source.gui.randomize.gameoptions import gameoptions_page
 from source.gui.randomize.generation import generation_page
 from source.gui.bottom import bottom_frame, create_guiargs
@@ -132,8 +132,8 @@ def guiMain(args=None):
     self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["dungeon"], text="Dungeon Shuffle")
 
     # Multiworld
-    self.pages["randomizer"].pages["multiworld"],self.settings = multiworld_page(self.pages["randomizer"].notebook,self.settings)
-    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["multiworld"], text="Multiworld")
+#    self.pages["randomizer"].pages["multiworld"],self.settings = multiworld_page(self.pages["randomizer"].notebook,self.settings)
+#    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["multiworld"], text="Multiworld")
 
     # Game Options
     self.pages["randomizer"].pages["gameoptions"] = gameoptions_page(self, self.pages["randomizer"].notebook)

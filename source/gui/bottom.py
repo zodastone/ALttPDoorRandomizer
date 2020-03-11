@@ -7,6 +7,7 @@ from CLI import parse_arguments
 from Main import main
 from Utils import local_path, output_path, open_file
 import source.classes.constants as CONST
+from source.gui.randomize.multiworld import multiworld_page
 import source.gui.widgets as widgets
 from source.classes.Empty import Empty
 
@@ -17,6 +18,10 @@ def bottom_frame(self, parent, args=None):
 
     # Bottom Frame options
     self.widgets = {}
+
+    mw,_ = multiworld_page(self, parent.settings)
+    mw.pack(fill=X, expand=True)
+    self.widgets = mw.widgets
 
     # Seed input
     # widget ID

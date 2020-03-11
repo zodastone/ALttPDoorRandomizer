@@ -90,9 +90,6 @@ SETTINGSTOPROCESS = {
       "experimental": "experimental",
       "dungeon_counters": "dungeon_counters"
     },
-    "multiworld": {
-      "names": "names"
-    },
     "gameoptions": {
       "hints": "hints",
       "nobgm": "disablemusic",
@@ -113,6 +110,7 @@ SETTINGSTOPROCESS = {
   },
   "bottom": {
     "content": {
+      "names": "names",
       "seed": "seed",
       "generationcount": "count"
     }

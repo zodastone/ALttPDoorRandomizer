@@ -96,8 +96,8 @@ def loadcliargs(gui, args, settings=None):
         gui.pages[mainpage].pages[subpage].widgets[widget].pieces["button"].configure(text=label)
 
         # Get Multiworld Worlds count
-        mainpage = "randomizer"
-        subpage = "multiworld"
+        mainpage = "bottom"
+        subpage = "content"
         widget = "worlds"
         setting = "multi"
         # set textbox/frame label
@@ -108,8 +108,8 @@ def loadcliargs(gui, args, settings=None):
             gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(str(args[setting]))
 
         # Set Multiworld Names
-        mainpage = "randomizer"
-        subpage = "multiworld"
+        mainpage = "bottom"
+        subpage = "content"
         widget = "names"
         # set textbox/frame label
         label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)

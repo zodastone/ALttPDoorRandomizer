@@ -256,10 +256,8 @@
     "randomizer.item.sortingalgo.balanced": "Balanced",
 
 
-    "randomizer.multiworld.worlds": "Worlds",
-    "randomizer.multiworld.names": "Player names",
-
-
+    "bottom.content.worlds": "Worlds",
+    "bottom.content.names": "Player names",
     "bottom.content.seed": "Seed #",
     "bottom.content.generationcount": "Count",
     "bottom.content.go": "Generate Patched Rom",
