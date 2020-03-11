@@ -44,10 +44,10 @@ def multiworld_page(parent,settings):
 
     # FIXME: Got some strange behavior here; both Entry-like objects react to mousewheel on Spinbox
     def saveMultiNames(caller,_,mode):
-        settings["names"] = self.widgets[widget].storageVar.get()
+        settings["names"] = self.widgets["names"].storageVar.get()
     self.widgets[widget].storageVar.trace_add("write",saveMultiNames)
     # textbox
-    self.widgets[widget].pieces["textbox"] = Entry(self.widgets[widget].pieces["frame"], textvariable=self.widgets[key].storageVar)
+    self.widgets[widget].pieces["textbox"] = Entry(self.widgets[widget].pieces["frame"], textvariable=self.widgets[widget].storageVar)
 
     # frame label: pack
     self.widgets[widget].pieces["frame"].label.pack(side=LEFT, anchor=N)

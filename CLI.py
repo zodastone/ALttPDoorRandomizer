@@ -163,8 +163,8 @@ def get_settings():
         "custom": False,
         "rom": os.path.join(".", "Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
 
-        "seed": None,
-        "count": None,
+        "seed": "",
+        "count": 1,
         "startinventory": "",
         "beemizer": 0,
         "remote_items": False,

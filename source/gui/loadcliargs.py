@@ -28,6 +28,8 @@ def loadcliargs(gui, args, settings=None):
                         thisType = ""
                         # Get the value and set it
                         arg = options[mainpage][subpage][widget]
+                        if args[arg] == None:
+                            args[arg] = ""
                         label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
                         if hasattr(gui.pages[mainpage].pages[subpage].widgets[widget],"type"):
                             thisType = gui.pages[mainpage].pages[subpage].widgets[widget].type
@@ -119,7 +121,7 @@ def loadcliargs(gui, args, settings=None):
         widget = "seed"
         setting = "seed"
         if args[setting]:
-            gui.pages[mainpage].widgets[widget].storageVar.set(str(args[setting]))
+            gui.pages[mainpage].widgets[widget].storageVar.set(args[setting])
         # set textbox/frame label
         label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
         gui.pages[mainpage].pages[subpage].widgets[widget].pieces["frame"].label.configure(text=label)
