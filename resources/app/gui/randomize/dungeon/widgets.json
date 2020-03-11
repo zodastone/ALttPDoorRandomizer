@@ -37,9 +37,10 @@
       "selectbox": {
         "side": "right"
       },
-      "default": "Off"
+      "default": "Auto"
     },
     "options": {
+      "Auto": "default",
       "Off": "off",
       "On": "on",
       "On Compass Pickup": "pickup"

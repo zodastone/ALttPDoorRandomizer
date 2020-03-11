@@ -188,7 +188,7 @@ def parse_arguments(argv, no_defaults=False):
                                         base game.                        
                         ''')
     parser.add_argument('--experimental', default=defval(settings["experimental"] != 0), help='Enable experimental features', action='store_true')
-    parser.add_argument('--dungeon_counters', default=defval(settings["dungeon_counters"]), help='Enable dungeon chest counters', const='off', nargs='?', choices=['off', 'on', 'pickup'])
+    parser.add_argument('--dungeon_counters', default=defval(settings["dungeon_counters"]), help='Enable dungeon chest counters', const='off', nargs='?', choices=['off', 'on', 'pickup', 'default'])
     parser.add_argument('--crystals_ganon', default=defval(settings["crystals_ganon"]), const='7', nargs='?', choices=['random', '0', '1', '2', '3', '4', '5', '6', '7'],
                         help='''\
                              How many crystals are needed to defeat ganon. Any other
@@ -357,8 +357,8 @@ def get_settings():
         "bigkeyshuffle": False,
         "keysanity": False,
         "door_shuffle": "basic",
-        "experimental": 0,
-        "dungeon_counters": "off",
+        "experimental": False,
+        "dungeon_counters": "default",
 
         "multi": 1,
         "names": "",

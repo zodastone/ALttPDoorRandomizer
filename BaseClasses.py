@@ -7,7 +7,7 @@ from collections import OrderedDict, deque, defaultdict
 from EntranceShuffle import door_addresses
 from _vendor.collections_extended import bag
 from Utils import int16_as_bytes
-from Tables import normal_offset_table, spiral_offset_table
+from Tables import normal_offset_table, spiral_offset_table, multiply_lookup, divisor_lookup
 from RoomData import Room
 
 class World(object):
@@ -41,7 +41,7 @@ class World(object):
         self.shuffle_bonk_prizes = False
         self.light_world_light_cone = False
         self.dark_world_light_cone = False
-        self.clock_mode = 'off'
+        self.clock_mode = 'none'
         self.rupoor_cost = 10
         self.aga_randomness = True
         self.lock_aga_door_in_escape = False
@@ -1041,12 +1041,21 @@ hook_dir_map = {
     Direction.East: Hook.East,
 }
 
+edge_map = {
+    Direction.North: Hook.NEdge,
+    Direction.South: Hook.SEdge,
+    Direction.West: Hook.WEdge,
+    Direction.East: Hook.EEdge,
+}
+
 
 def hook_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
     if door.type == DoorType.Normal:
         return hook_dir_map[door.direction]
+    if door.type == DoorType.Open:
+        return edge_map[door.direction]
     return None
 
 
@@ -1158,6 +1167,8 @@ class Door(object):
         self.zeroHzCam = False
         self.zeroVtCam = False
         self.doorListPos = -1
+        self.edge_id = None
+        self.edge_width = None
 
         # logical properties
         # self.connected = False  # combine with Dest?
@@ -1182,10 +1193,18 @@ class Door(object):
             return 0x13A000 + normal_offset_table[self.roomIndex] * 24 + (self.doorIndex + self.direction.value * 3) * 2
         elif self.type == DoorType.SpiralStairs:
             return 0x13B000 + (spiral_offset_table[self.roomIndex] + self.doorIndex) * 4
+        elif self.type == DoorType.Open:
+            base_address = {
+                Direction.North: 0x13C500,
+                Direction.South: 0x13C533,
+                Direction.West: 0x13C566,
+                Direction.East: 0x13C581,
+            }
+            return base_address[self.direction] + self.edge_id * 3
 
-    def getTarget(self, toggle):
+    def getTarget(self, src):
         if self.type == DoorType.Normal:
-            bitmask = 4 * (self.layer ^ 1 if toggle else self.layer)
+            bitmask = 4 * (self.layer ^ 1 if src.toggle else self.layer)
             bitmask += 0x08 * int(self.trapFlag)
             return [self.roomIndex, bitmask + self.doorIndex]
         if self.type == DoorType.SpiralStairs:
@@ -1194,6 +1213,17 @@ class Door(object):
             bitmask += 0x20 * int(self.zeroVtCam)
             bitmask += 0x80 if self.direction == Direction.Up else 0
             return [self.roomIndex, bitmask + self.quadrant, self.shiftX, self.shiftY]
+        if self.type == DoorType.Open:
+            bitmask = self.edge_id
+            bitmask += 0x10 * self.layer
+            bitmask += 0x20 * self.quadrant
+            bitmask += 0x80
+            if src.type == DoorType.Open:
+                fraction = 0x10 * multiply_lookup[src.edge_width][self.edge_width]
+                fraction += divisor_lookup[src.edge_width][self.edge_width]
+                return [self.roomIndex, bitmask, fraction]
+            else:
+                return [self.roomIndex, bitmask]
 
     def dir(self, direction, room, doorIndex, layer):
         self.direction = direction
@@ -1208,6 +1238,12 @@ class Door(object):
         self.shiftX = shift_x
         self.zeroHzCam = zero_hz_cam
         self.zeroVtCam = zero_vt_cam
+        return self
+
+    def edge(self, edge_id, quadrant, width):
+        self.edge_id = edge_id
+        self.quadrant = quadrant
+        self.edge_width = width
         return self
 
     def small_key(self):

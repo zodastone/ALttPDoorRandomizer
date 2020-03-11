@@ -605,7 +605,7 @@ def patch_rom(world, rom, player, team, enemized):
         rom.write_byte(0x139004, 1)
     for door in world.doors:
         if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs]:
-            rom.write_bytes(door.getAddress(), door.dest.getTarget(door.toggle))
+            rom.write_bytes(door.getAddress(), door.dest.getTarget(door))
     for room in world.rooms:
         if room.player == player and room.modified:
             rom.write_bytes(room.address(), room.rom_data())
@@ -899,7 +899,7 @@ def patch_rom(world, rom, player, team, enemized):
         ERtimeincrease = 20
     if world.keyshuffle[player] or world.bigkeyshuffle[player] or world.mapshuffle[player]:
         ERtimeincrease = ERtimeincrease + 15
-    if world.clock_mode == 'off':
+    if world.clock_mode == 'none':
         rom.write_bytes(0x180190, [0x00, 0x00, 0x00])  # turn off clock mode
         write_int32(rom, 0x180200, 0)  # red clock adjustment time (in frames, sint32)
         write_int32(rom, 0x180204, 0)  # blue clock adjustment time (in frames, sint32)
@@ -1157,7 +1157,7 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_byte(0x18003B, 0x01 if world.mapshuffle[player] else 0x00)  # maps showing crystals on overworld
 
     # compasses showing dungeon count
-    if world.clock_mode != 'off' or world.dungeon_counters[player] == 'off':
+    if world.clock_mode != 'none' or world.dungeon_counters[player] == 'off':
         rom.write_byte(0x18003C, 0x00)  # Currently must be off if timer is on, because they use same HUD location
     elif world.dungeon_counters[player] == 'on':
         rom.write_byte(0x18003C, 0x02)  # always on

@@ -520,6 +520,10 @@ type_map = {
     Hook.South: Hook.North,
     Hook.West: Hook.East,
     Hook.East: Hook.West,
+    Hook.NEdge: Hook.SEdge,
+    Hook.SEdge: Hook.NEdge,
+    Hook.EEdge: Hook.WEdge,
+    Hook.WEdge: Hook.EEdge,
 }
 
 
@@ -535,21 +539,31 @@ hang_dir_map = {
 }
 
 
+edge_map_back = {
+    Direction.North: Hook.SEdge,
+    Direction.South: Hook.NEdge,
+    Direction.West: Hook.EEdge,
+    Direction.East: Hook.WEdge,
+}
+
+
 def hanger_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
     if door.type == DoorType.Normal:
         return hang_dir_map[door.direction]
+    if door.type == DoorType.Open:
+        return edge_map_back[door.direction]
     return None
 
 
 def connect_doors(a, b):
     # Return on unsupported types.
-    if a.type in [DoorType.Open, DoorType.StraightStairs, DoorType.Hole, DoorType.Warp, DoorType.Ladder,
+    if a.type in [DoorType.StraightStairs, DoorType.Hole, DoorType.Warp, DoorType.Ladder,
                   DoorType.Interior, DoorType.Logical]:
         return
     # Connect supported types
-    if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs:
+    if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs or a.type == DoorType.Open:
         if a.blocked:
             connect_one_way(b.entrance, a.entrance)
         elif b.blocked:
@@ -798,6 +812,8 @@ class ExplorationState(object):
     def add_all_doors_check_keys(self, region, key_door_proposal, world, player):
         for door in get_doors(world, region, player):
             if self.can_traverse(door):
+                if door.controller:
+                    door = door.controller
                 if door in key_door_proposal and door not in self.opened_doors:
                     if not self.in_door_list(door, self.small_doors):
                         self.append_door_to_list(door, self.small_doors)
