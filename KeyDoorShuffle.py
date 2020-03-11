@@ -147,7 +147,7 @@ def analyze_dungeon(key_layout, world, player):
     key_layout.key_counters = create_key_counters(key_layout, world, player)
     key_logic = key_layout.key_logic
 
-    find_bk_locked_sections(key_layout, world)
+    find_bk_locked_sections(key_layout, world, player)
     key_logic.bk_chests.update(find_big_chest_locations(key_layout.all_chest_locations))
     if world.retro[player] and world.mode[player] != 'standard':
         return
@@ -304,14 +304,14 @@ def queue_sorter_2(queue_item):
     return 1 if door.bigKey else 0
 
 
-def find_bk_locked_sections(key_layout, world):
+def find_bk_locked_sections(key_layout, world, player):
     if key_layout.big_key_special:
         return
     key_counters = key_layout.key_counters
     key_logic = key_layout.key_logic
 
     bk_key_not_required = set()
-    big_chest_allowed_big_key = world.accessibility != 'locations'
+    big_chest_allowed_big_key = world.accessibility[player] != 'locations'
     for counter in key_counters.values():
         key_layout.all_chest_locations.update(counter.free_locations)
         key_layout.all_locations.update(counter.free_locations)
@@ -705,7 +705,7 @@ def unique_doors(doors):
 def count_unique_sm_doors(doors):
     unique_d_set = set()
     for d in doors:
-        if d not in unique_d_set and d.dest not in unique_d_set and not d.bigKey:
+        if d not in unique_d_set and (d.dest not in unique_d_set or d.type == DoorType.SpiralStairs) and not d.bigKey:
             unique_d_set.add(d)
     return len(unique_d_set)
 
@@ -718,7 +718,8 @@ def count_unique_small_doors(key_counter, proposal):
         if door in proposal and door not in counted:
             cnt += 1
             counted.add(door)
-            counted.add(door.dest)
+            if door.type != DoorType.SpiralStairs:
+                counted.add(door.dest)
     return cnt
 
 
@@ -1067,15 +1068,6 @@ def invalid_self_locking_key(state, prev_state, prev_avail, world, player):
     if len(new_small_doors) > 0 or len(new_bk_doors) > 0:
         return False
     return prev_avail - 1 == 0
-
-
-# does not allow dest doors
-def count_unique_sm_doors(doors):
-    unique_d_set = set()
-    for d in doors:
-        if d not in unique_d_set and d.dest not in unique_d_set and not d.bigKey:
-            unique_d_set.add(d)
-    return len(unique_d_set)
 
 
 def enough_small_locations(state, avail_small_loc):
@@ -1450,8 +1442,8 @@ def validate_key_placement(key_layout, world, player):
         if not can_progress:
             missing_locations = set(max_counter.free_locations.keys()).difference(found_locations)
             missing_items = [l for l in missing_locations if l.item is None or (l.item.name != smallkey_name and l.item != dungeon.big_key) or "- Boss" in l.name]
-            #missing_key_only = set(max_counter.key_only_locations.keys()).difference(counter.key_only_locations.keys()) # do freestanding keys matter for locations?
-            if len(missing_items) > 0: #world.accessibility[player]=='locations' and (len(missing_locations)>0 or len(missing_key_only) > 0):
+            # missing_key_only = set(max_counter.key_only_locations.keys()).difference(counter.key_only_locations.keys()) # do freestanding keys matter for locations?
+            if len(missing_items) > 0:  # world.accessibility[player]=='locations' and (len(missing_locations)>0 or len(missing_key_only) > 0):
                 logging.getLogger('').error("Keylock - can't open locations: ")
                 for i in missing_locations:
                     logging.getLogger('').error(i)

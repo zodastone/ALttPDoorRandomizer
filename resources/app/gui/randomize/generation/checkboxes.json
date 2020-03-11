@@ -1,0 +1,45 @@
+{
+  "spoiler": {
+    "type": "checkbox",
+    "label": {
+      "text": "Create Spoiler Log"
+    }
+  },
+  "suppressrom": {
+    "type": "checkbox",
+    "label": {
+      "text": "Do not create patched ROM"
+    }
+  },
+  "usestartinventory": {
+    "type": "checkbox",
+    "label": {
+      "text": "Use starting inventory"
+    }
+  },
+  "usecustompool": {
+    "type": "checkbox",
+    "label": {
+      "text": "Use custom item pool"
+    }
+  },
+  "saveonexit": {
+    "type": "selectbox",
+    "label": {
+      "text": "Save Settings on Exit"
+    },
+    "managerAttrs": {
+      "label": {
+        "side": "left"
+      },
+      "selectbox": {
+        "side": "right"
+      }
+    },
+    "options": {
+      "Ask Me": "ask",
+      "Always": "always",
+      "Never": "never"
+    }
+  }
+}

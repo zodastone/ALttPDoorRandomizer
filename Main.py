@@ -24,7 +24,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes
 from Utils import output_path, parse_player_names
 
-__version__ = '0.0.17pre'
+__version__ = '0.0.18.5d'
 
 
 def main(args, seed=None):
@@ -57,8 +57,8 @@ def main(args, seed=None):
     world.enemy_health = args.enemy_health.copy()
     world.enemy_damage = args.enemy_damage.copy()
     world.beemizer = args.beemizer.copy()
-    world.dungeon_counters = args.dungeon_counters.copy()
     world.experimental = args.experimental.copy()
+    world.dungeon_counters = args.dungeon_counters.copy()
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
@@ -185,9 +185,13 @@ def main(args, seed=None):
                 patch_rom(world, rom, player, team, use_enemizer)
 
                 if use_enemizer and (args.enemizercli or not args.jsonout):
-                    patch_enemizer(world, player, rom, args.rom, args.enemizercli, args.shufflepots[player], sprite_random_on_hit)
-                    if not args.jsonout:
-                        rom = LocalRom.fromJsonRom(rom, args.rom, 0x400000)
+                    if os.path.exists(args.enemizercli):
+                        patch_enemizer(world, player, rom, args.rom, args.enemizercli, args.shufflepots[player], sprite_random_on_hit)
+                        if not args.jsonout:
+                            rom = LocalRom.fromJsonRom(rom, args.rom, 0x400000)
+                    else:
+                        logging.warning("EnemizerCLI not found at:" + args.enemizercli)
+                        logging.warning("No Enemizer options will be applied until this is resolved.")
 
                 if args.race:
                     patch_race_rom(rom)
