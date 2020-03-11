@@ -1032,6 +1032,10 @@ class Hook(Enum):
     South = 2
     East = 3
     Stairs = 4
+    NEdge = 5
+    SEdge = 6
+    WEdge = 7
+    EEdge = 8
 
 
 hook_dir_map = {
