@@ -80,10 +80,10 @@
   },
   "shuffle": {
     "choices": [
-      "full",
       "vanilla",
       "simple",
       "restricted",
+      "full",
       "crossed",
       "insanity",
       "restricted_legacy",
@@ -304,9 +304,9 @@
   },
   "saveonexit": {
     "choices": [
-      "never",
       "ask",
-      "always"
+      "always",
+      "never"
     ]
   },
   "outputname": {}

@@ -99,9 +99,9 @@ def make_selectbox(self, parent, label, options, storageVar, manager, managerAtt
     values = self.selectbox.options["values"]
     if default in values:
         idx = values.index(default)
-    default = labels[idx]
-    self.labelVar.set(default)
-    self.selectbox["menu"].entryconfigure(idx,label=default)
+    self.labelVar.set(labels[idx])
+    self.storageVar.set(values[idx])
+    self.selectbox["menu"].entryconfigure(idx,label=labels[idx])
 
     if managerAttrs is not None and "selectbox" in managerAttrs:
         self.selectbox.pack(managerAttrs["selectbox"])
