@@ -174,13 +174,15 @@ def create_guiargs(parent):
 
     # Get Seed ID
     guiargs.seed = None
-    if parent.frames["bottom"].widgets["seed"].storageVar.get():
-        guiargs.seed = int(parent.frames["bottom"].widgets["seed"].storageVar.get())
+    if parent.pages["bottom"].pages["content"].widgets["seed"].storageVar.get():
+        guiargs.seed = parent.pages["bottom"].pages["content"].widgets["seed"].storageVar.get()
+        if guiargs.seed == "None":
+            guiargs.seed = None
 
     # Get number of generations to run
     guiargs.count = 1
-    if parent.frames["bottom"].widgets["generationcount"].storageVar.get():
-        guiargs.count = int(parent.frames["bottom"].widgets["generationcount"].storageVar.get())
+    if parent.pages["bottom"].pages["content"].widgets["generationcount"].storageVar.get():
+        guiargs.count = int(parent.pages["bottom"].pages["content"].widgets["generationcount"].storageVar.get())
 
     # Get Adjust settings
     adjustargs = {
