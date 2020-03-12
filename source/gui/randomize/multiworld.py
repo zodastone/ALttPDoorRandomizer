@@ -20,6 +20,7 @@ def multiworld_page(parent,settings):
     # Defns include frame name, widget type, widget options, widget placement attributes
     with open(os.path.join("resources","app","gui","randomize","multiworld","widgets.json")) as multiworldItems:
         myDict = json.load(multiworldItems)
+        myDict = myDict["widgets"]
         dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["widgets"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]

@@ -24,6 +24,7 @@ def dungeon_page(parent):
     # This first set goes in the Keysanity frame
     with open(os.path.join("resources","app","gui","randomize","dungeon","keysanity.json")) as keysanityItems:
         myDict = json.load(keysanityItems)
+        myDict = myDict["keysanity"]
         dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["keysanity"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
@@ -34,6 +35,7 @@ def dungeon_page(parent):
     self.frames["widgets"].pack(anchor=W)
     with open(os.path.join("resources","app","gui","randomize","dungeon","widgets.json")) as dungeonWidgets:
         myDict = json.load(dungeonWidgets)
+        myDict = myDict["widgets"]
         dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["widgets"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]

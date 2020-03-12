@@ -20,6 +20,7 @@ def generation_page(parent,settings):
     # Defns include frame name, widget type, widget options, widget placement attributes
     with open(os.path.join("resources","app","gui","randomize","generation","checkboxes.json")) as checkboxes:
         myDict = json.load(checkboxes)
+        myDict = myDict["checkboxes"]
         dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["checkboxes"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
@@ -31,6 +32,7 @@ def generation_page(parent,settings):
     # Defns include frame name, widget type, widget options, widget placement attributes
     with open(os.path.join("resources","app","gui","randomize","generation","widgets.json")) as items:
         myDict = json.load(items)
+        myDict = myDict["widgets"]
         dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["widgets"])
         for key in dictWidgets:
             self.widgets[key] = dictWidgets[key]
