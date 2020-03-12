@@ -1,25 +1,11 @@
 {
   "checkboxes": {
-    "retro": {
-      "type": "checkbox",
-      "label": {
-        "text": "Retro mode (universal keys)"
-      }
-    }
+    "retro": { "type": "checkbox" }
   },
   "leftItemFrame": {
     "worldstate": {
       "type": "selectbox",
-      "label": {
-        "text": "World State"
-      },
       "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        },
         "default": "open"
       },
       "options": [
@@ -31,17 +17,6 @@
     },
     "logiclevel": {
       "type": "selectbox",
-      "label": {
-        "text": "Logic Level"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "noglitches",
         "minorglitches",
@@ -50,17 +25,6 @@
     },
     "goal": {
       "type": "selectbox",
-      "label": {
-        "text": "Goal"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "ganon",
         "pedestal",
@@ -71,67 +35,20 @@
     },
     "crystals_gt": {
       "type": "selectbox",
-      "label": {
-        "text": "Crystals to open GT"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
+        0, 1, 2, 3, 4, 5, 6, 7,
         "random"
       ]
     },
     "crystals_ganon": {
       "type": "selectbox",
-      "label": {
-        "text": "Crystals to harm Ganon"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
+        0, 1, 2, 3, 4, 5, 6, 7,
         "random"
       ]
     },
     "weapons": {
       "type": "selectbox",
-      "label": {
-        "text": "Weapons"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "random",
         "assured",
@@ -143,17 +60,6 @@
   "rightItemFrame": {
     "itempool": {
       "type": "selectbox",
-      "label": {
-        "text": "Item Pool"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "normal",
         "hard",
@@ -162,17 +68,6 @@
     },
     "itemfunction": {
       "type": "selectbox",
-      "label": {
-        "text": "Item Functionality"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "normal",
         "hard",
@@ -181,17 +76,6 @@
     },
     "timer": {
       "type": "selectbox",
-      "label": {
-        "text": "Timer Setting"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "none",
         "display",
@@ -203,17 +87,6 @@
     },
     "progressives": {
       "type": "selectbox",
-      "label": {
-        "text": "Progressive Items"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "on",
         "off",
@@ -222,17 +95,6 @@
     },
     "accessibility": {
       "type": "selectbox",
-      "label": {
-        "text": "Accessibility"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "items",
         "locations",
@@ -241,16 +103,7 @@
     },
     "sortingalgo": {
       "type": "selectbox",
-      "label": {
-        "text": "Item Sorting"
-      },
       "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        },
         "default": "balanced"
       },
       "options": [

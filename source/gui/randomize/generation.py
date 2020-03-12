@@ -25,6 +25,17 @@ def generation_page(parent,settings):
             self.widgets[key] = dictWidgets[key]
             self.widgets[key].pack(anchor=W)
 
+    self.frames["widgets"] = Frame(self)
+    self.frames["widgets"].pack(anchor=W)
+    # Load Generation Setup option widgets as defined by JSON file
+    # Defns include frame name, widget type, widget options, widget placement attributes
+    with open(os.path.join("resources","app","gui","randomize","generation","widgets.json")) as items:
+        myDict = json.load(items)
+        dictWidgets = widgets.make_widgets_from_dict(self, myDict, self.frames["widgets"])
+        for key in dictWidgets:
+            self.widgets[key] = dictWidgets[key]
+            self.widgets[key].pack(anchor=W)
+
     self.frames["baserom"] = Frame(self)
     self.frames["baserom"].pack(anchor=W, fill=X)
     ## Locate base ROM

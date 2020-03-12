@@ -1,26 +1,9 @@
 {
   "widgets": {
-    "openpyramid": {
-      "type": "checkbox",
-      "label": {
-        "text": "Pre-open Pyramid Hole"
-      }
-    },
-    "shuffleganon": {
-      "type": "checkbox",
-      "label": {
-        "text": "Include Ganon's Tower and Pyramid Hole in shuffle pool"
-      }
-    },
-    "entranceshuffle": {
+    "openpyramid":      { "type": "checkbox" },
+    "shuffleganon":     { "type": "checkbox" },
+    "entranceshuffle":  {
       "type": "selectbox",
-      "label": {
-        "text": "Entrance Shuffle"
-      },
-      "managerAttrs": {
-        "label": { "side": "left" },
-        "selectbox": { "side": "right" }
-      },
       "options": [
         "vanilla",
         "simple",

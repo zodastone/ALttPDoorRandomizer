@@ -40,7 +40,7 @@ def loadcliargs(gui, args, settings=None):
                                 gui.pages[mainpage].pages[subpage].widgets[widget].label.configure(text=label)
                                 i = 0
                                 for value in theseOptions["values"]:
-                                    gui.pages[mainpage].pages[subpage].widgets[widget].selectbox.options["labels"][i] = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget + '.' + value)
+                                    gui.pages[mainpage].pages[subpage].widgets[widget].selectbox.options["labels"][i] = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget + '.' + str(value))
                                     i += 1
                                 for i in range(0, len(theseOptions["values"])):
                                     gui.pages[mainpage].pages[subpage].widgets[widget].selectbox["menu"].entryconfigure(i, label=theseOptions["labels"][i])

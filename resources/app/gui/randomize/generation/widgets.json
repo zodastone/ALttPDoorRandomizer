@@ -1,0 +1,10 @@
+{
+  "saveonexit": {
+    "type": "selectbox",
+    "options": [
+      "ask",
+      "always",
+      "never"
+    ]
+  }
+}

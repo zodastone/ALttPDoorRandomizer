@@ -1,39 +1,15 @@
 {
-  "checkboxes": {
+  "checkboxes":   {
     "hints": {
       "type": "checkbox",
-      "label": {
-        "text": "Include Helpful Hints"
-      },
       "default": "true"
     },
-    "nobgm": {
-      "type": "checkbox",
-      "label": {
-        "text": "Disable Music & MSU-1"
-      }
-    },
-    "quickswap": {
-      "type": "checkbox",
-      "label": {
-        "text": "L/R Quickswapping"
-      }
-    }
+    "nobgm":      { "type": "checkbox" },
+    "quickswap":  { "type": "checkbox" }
   },
   "leftRomOptionsFrame": {
     "heartcolor": {
       "type": "selectbox",
-      "label": {
-        "text": "Heart Color"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "red",
         "blue",
@@ -44,16 +20,7 @@
     },
     "heartbeep": {
       "type": "selectbox",
-      "label": {
-        "text": "Heart Beep sound rate"
-      },
       "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        },
         "default": "normal"
       },
       "options": [
@@ -68,16 +35,7 @@
   "rightRomOptionsFrame": {
     "menuspeed": {
       "type": "selectbox",
-      "label": {
-        "text": "Menu Speed"
-      },
       "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        },
         "default": "normal"
       },
       "options": [
@@ -91,17 +49,6 @@
     },
     "owpalettes": {
       "type": "selectbox",
-      "label": {
-        "text": "Overworld Palettes"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "default",
         "random",
@@ -110,17 +57,6 @@
     },
     "uwpalettes": {
       "type": "selectbox",
-      "label": {
-        "text": "Underworld Palettes"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "default",
         "random",

@@ -246,9 +246,9 @@
       "None:           You will be able to reach enough locations to beat the game."
     ],
     "hints": [ "Make telepathic tiles and storytellers give helpful hints. (default: %(default)s)" ],
-    "no-shuffleganon": [
-      "If set, the Pyramid Hole and Ganon's Tower are not",
-      "included entrance shuffle pool. (default: %(default)s)"
+    "shuffleganon": [
+      "Include the Ganon's Tower and Pyramid Hole in the",
+      "entrance shuffle pool. (default: %(default)s)"
     ],
     "heartbeep": [
       "Select the rate at which the heart beep sound is played at",

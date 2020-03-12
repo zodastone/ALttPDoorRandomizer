@@ -200,12 +200,12 @@
   },
   "shuffleganon": {
     "action": "store_true",
-    "type": "bool",
-    "help": "suppress"
+    "type": "bool"
   },
   "no-shuffleganon": {
     "action": "store_false",
-    "dest": "shuffleganon"
+    "dest": "shuffleganon",
+    "help": "suppress"
   },
   "heartbeep": {
     "choices": [

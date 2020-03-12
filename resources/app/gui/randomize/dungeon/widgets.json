@@ -1,16 +1,7 @@
 {
   "dungeondoorshuffle": {
     "type": "selectbox",
-    "label": {
-      "text": "Dungeon Door Shuffle"
-    },
     "managerAttrs": {
-      "label": {
-        "side": "left"
-      },
-      "selectbox": {
-        "side": "right"
-      },
       "default": "basic"
     },
     "options": [
@@ -19,24 +10,10 @@
       "crossed"
     ]
   },
-  "experimental": {
-    "type": "checkbox",
-    "label": {
-      "text": "Enable Experimental Features"
-    }
-  },
+  "experimental": { "type": "checkbox" },
   "dungeon_counters": {
     "type": "selectbox",
-    "label": {
-      "text": "Dungeon Chest Counters"
-    },
     "managerAttrs": {
-      "label": {
-        "side": "left"
-      },
-      "selectbox": {
-        "side": "right"
-      },
       "default": "default"
     },
     "options": [

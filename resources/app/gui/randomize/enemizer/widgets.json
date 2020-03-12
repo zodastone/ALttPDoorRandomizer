@@ -1,26 +1,10 @@
 {
   "checkboxes": {
-    "potshuffle": {
-      "type": "checkbox",
-      "label": {
-        "text": "Pot Shuffle"
-      }
-    }
+    "potshuffle": { "type": "checkbox" }
   },
   "leftEnemizerFrame": {
     "enemyshuffle": {
       "type": "selectbox",
-      "label": {
-        "text": "Enemy Shuffle"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "none",
         "shuffled",
@@ -29,17 +13,6 @@
     },
     "bossshuffle": {
       "type": "selectbox",
-      "label": {
-        "text": "Boss Shuffle"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "none",
         "basic",
@@ -51,17 +24,6 @@
   "rightEnemizerFrame": {
     "enemydamage": {
       "type": "selectbox",
-      "label": {
-        "text": "Enemy Damage"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "default",
         "shuffled",
@@ -70,17 +32,6 @@
     },
     "enemyhealth": {
       "type": "selectbox",
-      "label": {
-        "text": "Enemy Health"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": [
         "default",
         "easy",

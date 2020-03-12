@@ -1,4 +1,4 @@
-from tkinter import Checkbutton, Entry, Frame, IntVar, Label, OptionMenu, Spinbox, StringVar, RIGHT, X
+from tkinter import Checkbutton, Entry, Frame, IntVar, Label, OptionMenu, Spinbox, StringVar, LEFT, RIGHT, X
 from source.classes.Empty import Empty
 
 # Override Spinbox to include mousewheel support for changing value
@@ -17,9 +17,9 @@ class mySpinbox(Spinbox):
 
 # Make a Checkbutton with a label
 def make_checkbox(self, parent, label, storageVar, manager, managerAttrs):
-    self = Frame(parent, name="checkframe-" + label.lower())
+    self = Frame(parent)
     self.storageVar = storageVar
-    self.checkbox = Checkbutton(self, text=label, variable=self.storageVar, name="checkbox-" + label.lower())
+    self.checkbox = Checkbutton(self, text=label, variable=self.storageVar)
     if managerAttrs is not None:
         self.checkbox.pack(managerAttrs)
     else:
@@ -28,7 +28,7 @@ def make_checkbox(self, parent, label, storageVar, manager, managerAttrs):
 
 # Make an OptionMenu with a label and pretty option labels
 def make_selectbox(self, parent, label, options, storageVar, manager, managerAttrs):
-    self = Frame(parent, name="selectframe-" + label.lower())
+    self = Frame(parent)
 
     labels = options
 
@@ -88,48 +88,49 @@ def make_selectbox(self, parent, label, options, storageVar, manager, managerAtt
     if managerAttrs is not None and "label" in managerAttrs:
         self.label.pack(managerAttrs["label"])
     else:
-        self.label.pack()
+        self.label.pack(side=LEFT)
 
     self.selectbox.config(width=20)
     idx = 0
     default = self.selectbox.options["values"][idx]
-    if "default" in managerAttrs:
+    if managerAttrs is not None and "default" in managerAttrs:
         default = managerAttrs["default"]
     labels = self.selectbox.options["labels"]
     values = self.selectbox.options["values"]
     if default in values:
         idx = values.index(default)
-    self.labelVar.set(labels[idx])
+    if not labels[idx] == "":
+        self.labelVar.set(labels[idx])
+        self.selectbox["menu"].entryconfigure(idx,label=labels[idx])
     self.storageVar.set(values[idx])
-    self.selectbox["menu"].entryconfigure(idx,label=labels[idx])
 
     if managerAttrs is not None and "selectbox" in managerAttrs:
         self.selectbox.pack(managerAttrs["selectbox"])
     else:
-        self.selectbox.pack()
+        self.selectbox.pack(side=RIGHT)
     return self
 
 # Make a Spinbox with a label, limit 1-100
 def make_spinbox(self, parent, label, storageVar, manager, managerAttrs):
-    self = Frame(parent, name="spinframe-" + label.lower())
+    self = Frame(parent)
     self.storageVar = storageVar
     self.label = Label(self, text=label)
     if managerAttrs is not None and "label" in managerAttrs:
         self.label.pack(managerAttrs["label"])
     else:
-        self.label.pack()
+        self.label.pack(side=LEFT)
     fromNum = 1
     toNum = 100
-    if "spinbox" in managerAttrs:
+    if managerAttrs is not None and "spinbox" in managerAttrs:
         if "from" in managerAttrs:
             fromNum = managerAttrs["spinbox"]["from"]
         if "to" in managerAttrs:
             toNum = managerAttrs["spinbox"]["to"]
-    self.spinbox = mySpinbox(self, from_=fromNum, to=toNum, width=5, textvariable=self.storageVar, name="spinbox-" + label.lower())
+    self.spinbox = mySpinbox(self, from_=fromNum, to=toNum, width=5, textvariable=self.storageVar)
     if managerAttrs is not None and "spinbox" in managerAttrs:
         self.spinbox.pack(managerAttrs["spinbox"])
     else:
-        self.spinbox.pack()
+        self.spinbox.pack(side=RIGHT)
     return self
 
 # Make an Entry box with a label
