@@ -7,9 +7,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -20,9 +17,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 2
       }
     },
@@ -46,9 +40,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -59,9 +50,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -72,9 +60,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -85,9 +70,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -98,9 +80,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -111,9 +90,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -124,9 +100,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -137,9 +110,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -150,9 +120,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -163,9 +130,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -176,9 +140,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -189,9 +150,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     }
@@ -204,9 +162,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -217,9 +172,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -230,9 +182,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -243,9 +192,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 4
       }
     },
@@ -256,9 +202,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -269,9 +212,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -282,9 +222,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -295,9 +232,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -308,9 +242,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -321,9 +252,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -334,9 +262,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -347,9 +272,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 2
       }
     },
@@ -360,9 +282,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -373,9 +292,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -386,9 +302,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 24
       }
     }
@@ -401,9 +314,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 10
       }
     },
@@ -414,9 +324,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -427,9 +334,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -440,9 +344,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -453,9 +354,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -466,9 +364,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -479,9 +374,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 4
       }
     },
@@ -492,9 +384,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -505,9 +394,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -518,9 +404,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -531,9 +414,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 3
       }
     },
@@ -544,9 +424,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -557,9 +434,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -570,9 +444,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 2
       }
     },
@@ -583,9 +454,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     }
@@ -598,9 +466,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -611,9 +476,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -624,9 +486,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -637,9 +496,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -650,9 +506,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -663,9 +516,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -676,9 +526,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 12
       }
     },
@@ -689,9 +536,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -702,9 +546,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 16
       }
     },
@@ -715,9 +556,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     },
@@ -728,9 +566,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 2
       }
     },
@@ -741,9 +576,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 4
       }
     },
@@ -754,9 +586,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 28
       }
     },
@@ -767,9 +596,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 7
       }
     },
@@ -780,9 +606,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 1
       }
     }
@@ -795,9 +618,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 5
       }
     },
@@ -808,9 +628,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -821,9 +638,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -834,9 +648,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -847,9 +658,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -860,9 +668,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -873,9 +678,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -886,9 +688,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -899,9 +698,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -912,9 +708,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 0
       }
     },
@@ -925,9 +718,6 @@
       },
       "manager": "grid",
       "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
         "default": 10
       }
     }

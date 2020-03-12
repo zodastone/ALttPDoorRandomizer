@@ -146,6 +146,8 @@ def make_textbox(self, parent, label, storageVar, manager, managerAttrs):
     # grid
     if manager == "grid":
         widget.label.grid(managerAttrs["label"] if managerAttrs is not None and "label" in managerAttrs else None, row=parent.thisRow, column=parent.thisCol)
+        if managerAttrs is not None and "label" not in managerAttrs:
+            widget.label.grid_configure(sticky="w")
         parent.thisCol += 1
         widget.textbox.grid(managerAttrs["textbox"] if managerAttrs is not None and "textbox" in managerAttrs else None, row=parent.thisRow, column=parent.thisCol)
         parent.thisRow += 1
