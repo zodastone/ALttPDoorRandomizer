@@ -1,22 +1,24 @@
 {
-  "dungeondoorshuffle": {
-    "type": "selectbox",
-    "default": "basic",
-    "options": [
-      "vanilla",
-      "basic",
-      "crossed"
-    ]
-  },
-  "experimental": { "type": "checkbox" },
-  "dungeon_counters": {
-    "type": "selectbox",
-    "default": "default",
-    "options": [
-      "default",
-      "off",
-      "on",
-      "pickup"
-    ]
+  "widgets": {
+    "dungeondoorshuffle": {
+      "type": "selectbox",
+      "default": "basic",
+      "options": [
+        "vanilla",
+        "basic",
+        "crossed"
+      ]
+    },
+    "experimental": { "type": "checkbox" },
+    "dungeon_counters": {
+      "type": "selectbox",
+      "default": "default",
+      "options": [
+        "default",
+        "off",
+        "on",
+        "pickup"
+      ]
+    }
   }
 }

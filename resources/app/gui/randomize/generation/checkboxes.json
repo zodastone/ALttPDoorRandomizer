@@ -1,6 +1,8 @@
 {
-  "spoiler":            { "type": "checkbox" },
-  "suppressrom":        { "type": "checkbox" },
-  "usestartinventory":  { "type": "checkbox" },
-  "usecustompool":      { "type": "checkbox" }
+  "checkboxes": {
+    "spoiler":            { "type": "checkbox" },
+    "suppressrom":        { "type": "checkbox" },
+    "usestartinventory":  { "type": "checkbox" },
+    "usecustompool":      { "type": "checkbox" }
+  }
 }

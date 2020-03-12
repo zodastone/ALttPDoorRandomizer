@@ -38,7 +38,7 @@ class BabelFish():
 				pass
 #				print(langs_filename + " not found for translation!")
 
-	def translate(self, domain="", key="", subkey=""): #three levels of keys
+	def translate(self, domain="", key="", subkey="", uselang=None): #three levels of keys
     # start with nothing
 		display_text = ""
 
@@ -94,7 +94,7 @@ class BabelFish():
 				subkey = " - ".join(tmp)
 			subkey = subkey.strip()
 
-		my_lang = self.lang_defns[self.locale] #handle for localization
+		my_lang = self.lang_defns[uselang if uselang is not None else self.locale ] #handle for localization
 		en_lang = self.lang_defns["en"] #handle for English
 
 		if domain in my_lang and key in my_lang[domain] and subkey in my_lang[domain][key] and not my_lang[domain][key][subkey] == "": #get localization first

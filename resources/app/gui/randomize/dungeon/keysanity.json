@@ -1,6 +1,8 @@
 {
-  "mapshuffle":       { "type": "checkbox" },
-  "compassshuffle":   { "type": "checkbox" },
-  "smallkeyshuffle":  { "type": "checkbox" },
-  "bigkeyshuffle":    { "type": "checkbox" }
+  "keysanity": {
+    "mapshuffle":       { "type": "checkbox" },
+    "compassshuffle":   { "type": "checkbox" },
+    "smallkeyshuffle":  { "type": "checkbox" },
+    "bigkeyshuffle":    { "type": "checkbox" }
+  }
 }

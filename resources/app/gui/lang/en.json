@@ -155,9 +155,9 @@
 
 
     "randomizer.generation.spoiler": "Create Spoiler Log",
-    "randomizer.generation.suppressrom": "Do not create patched ROM",
-    "randomizer.generation.usestartinventory": "Use starting inventory",
-    "randomizer.generation.usecustompool": "Use custom item pool",
+    "randomizer.generation.suppressrom": "Do Not create Patched ROM",
+    "randomizer.generation.usestartinventory": "Use Starting Inventory",
+    "randomizer.generation.usecustompool": "Use Custom Item Pool",
 
     "randomizer.generation.saveonexit": "Save Settings on Exit",
     "randomizer.generation.saveonexit.ask": "Ask Me",
