@@ -16,9 +16,7 @@
     },
     "heartbeep": {
       "type": "selectbox",
-      "managerAttrs": {
-        "default": "Normal"
-      },
+      "default": "Normal",
       "options": {
         "Double": "double",
         "Normal": "normal",
@@ -31,9 +29,7 @@
   "rightAdjustFrame": {
     "menuspeed": {
       "type": "selectbox",
-      "managerAttrs": {
-        "default": "Normal"
-      },
+      "default": "Normal",
       "options": {
         "Instant": "instant",
         "Quadruple": "quadruple",

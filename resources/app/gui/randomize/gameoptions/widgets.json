@@ -20,9 +20,7 @@
     },
     "heartbeep": {
       "type": "selectbox",
-      "managerAttrs": {
-        "default": "normal"
-      },
+      "default": "normal",
       "options": [
         "double",
         "normal",
@@ -35,9 +33,7 @@
   "rightRomOptionsFrame": {
     "menuspeed": {
       "type": "selectbox",
-      "managerAttrs": {
-        "default": "normal"
-      },
+      "default": "normal",
       "options": [
         "instant",
         "quadruple",

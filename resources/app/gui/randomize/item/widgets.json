@@ -5,9 +5,7 @@
   "leftItemFrame": {
     "worldstate": {
       "type": "selectbox",
-      "managerAttrs": {
-        "default": "open"
-      },
+      "default": "open",
       "options": [
         "standard",
         "open",
@@ -103,9 +101,7 @@
     },
     "sortingalgo": {
       "type": "selectbox",
-      "managerAttrs": {
-        "default": "balanced"
-      },
+      "default": "balanced",
       "options": [
         "freshness",
         "flood",

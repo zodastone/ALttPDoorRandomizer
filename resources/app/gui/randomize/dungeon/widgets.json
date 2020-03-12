@@ -1,9 +1,7 @@
 {
   "dungeondoorshuffle": {
     "type": "selectbox",
-    "managerAttrs": {
-      "default": "basic"
-    },
+    "default": "basic",
     "options": [
       "vanilla",
       "basic",
@@ -13,9 +11,7 @@
   "experimental": { "type": "checkbox" },
   "dungeon_counters": {
     "type": "selectbox",
-    "managerAttrs": {
-      "default": "default"
-    },
+    "default": "default",
     "options": [
       "default",
       "off",

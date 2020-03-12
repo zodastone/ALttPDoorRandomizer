@@ -19,6 +19,12 @@ class mySpinbox(Spinbox):
 def make_checkbox(self, parent, label, storageVar, manager, managerAttrs):
     self = Frame(parent)
     self.storageVar = storageVar
+    if managerAttrs is not None and "default" in managerAttrs:
+        if managerAttrs["default"] == "true" or managerAttrs["default"] == True:
+            self.storageVar.set(True)
+        elif managerAttrs["default"] == "false" or managerAttrs["default"] == False:
+            self.storageVar.set(False)
+        del managerAttrs["default"]
     self.checkbox = Checkbutton(self, text=label, variable=self.storageVar)
     if managerAttrs is not None:
         self.checkbox.pack(managerAttrs)
@@ -197,6 +203,12 @@ def make_widget_from_dict(self, defn, parent):
     manager = defn["manager"] if "manager" in defn else None
     managerAttrs = defn["managerAttrs"] if "managerAttrs" in defn else None
     options = defn["options"] if "options" in defn else None
+
+    if managerAttrs is None and "default" in defn:
+        managerAttrs = {}
+    if "default" in defn:
+        managerAttrs["default"] = defn["default"]
+
     widget = make_widget(self, type, parent, label, None, manager, managerAttrs, options)
     widget.type = type
     return widget
