@@ -87,6 +87,7 @@ class PlacementRule(object):
         self.needed_keys_wo_bk = None
         self.check_locations_w_bk = None
         self.check_locations_wo_bk = None
+        self.bk_relevant = True
 
     def contradicts(self, rule, unplaced_keys, big_key_loc):
         bk_blocked = big_key_loc in self.bk_conditional_set if self.bk_conditional_set else False
@@ -279,8 +280,8 @@ def create_exhaustive_placement_rules(key_layout, world, player):
             rule.door_reference = code
             rule.small_key = key_logic.small_key_name
             if key_counter.big_key_opened or not big_key_progress(key_counter):
-                # rule.needed_keys_w_bk = key_counter.used_keys + 1
                 rule.needed_keys_w_bk = min_keys
+                rule.bk_relevant = key_counter.big_key_opened
                 if key_counter.big_key_opened and rule.needed_keys_w_bk + 1 > len(accessible_loc):
                     valid_rule = False      # indicates that the big key cannot be in the accessible locations
                     key_logic.bk_restricted.update(accessible_loc.difference(max_ctr.key_only_locations))
@@ -291,10 +292,7 @@ def create_exhaustive_placement_rules(key_layout, world, player):
             else:
                 if big_key_progress(key_counter) and only_sm_doors(key_counter):
                     create_inclusive_rule(key_layout, max_ctr, code, key_counter, blocked_loc, accessible_loc, min_keys, world, player)
-                # if key_counter.used_keys + 2 > len(accessible_loc) and big_key_no_progress(key_counter):
-                #     key_logic.bk_restricted.update(accessible_loc.difference(max_ctr.key_only_locations))
                 rule.bk_conditional_set = blocked_loc
-                # rule.needed_keys_wo_bk = key_counter.used_keys + 1
                 rule.needed_keys_wo_bk = min_keys
                 rule.check_locations_wo_bk = set(filter_big_chest(accessible_loc))
             if valid_rule:
@@ -336,15 +334,15 @@ def refine_placement_rules(key_layout, max_ctr):
                     rule.needed_keys_w_bk -= len(key_onlys)
                 if rule.needed_keys_w_bk == 0:
                     rules_to_remove.append(rule)
-                if len(rule.check_locations_w_bk) == rule.needed_keys_w_bk + 1:
+                if rule.bk_relevant and len(rule.check_locations_w_bk) == rule.needed_keys_w_bk + 1:
                     new_restricted = set(max_ctr.free_locations) - rule.check_locations_w_bk
                     if len(new_restricted - key_logic.bk_restricted) > 0:
                         key_logic.bk_restricted.update(new_restricted)  # bk must be in one of the check_locations
                         changed = True
-                    if rule.needed_keys_w_bk > key_layout.max_chests or len(rule.check_locations_w_bk) < rule.needed_keys_w_bk:
-                        logging.getLogger('').warning('Invalid rule - what went wrong here??')
-                        rules_to_remove.append(rule)
-                        changed = True
+                if rule.needed_keys_w_bk > key_layout.max_chests or len(rule.check_locations_w_bk) < rule.needed_keys_w_bk:
+                    logging.getLogger('').warning('Invalid rule - what went wrong here??')
+                    rules_to_remove.append(rule)
+                    changed = True
             if rule.bk_conditional_set is not None:
                 rule.bk_conditional_set.difference_update(key_logic.bk_restricted)
                 rule.bk_conditional_set.difference_update(max_ctr.key_only_locations)
