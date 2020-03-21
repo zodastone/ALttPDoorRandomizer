@@ -666,8 +666,8 @@ def create_doors(world, player):
         create_door(player, 'Ice Freezors Bomb Hole', Hole), # combine these two? -- they have to lead to the same spot
         create_door(player, 'Ice Freezors Ledge Hole', Hole),
         create_door(player, 'Ice Freezors Ledge ES', Intr).dir(Ea, 0x7e, Bot, High).pos(2),
-        create_door(player, 'Ice Tall Hint WS', Intr).dir(We, 0x7e, Bot, High).pos(2),
-        create_door(player, 'Ice Tall Hint EN', Nrml).dir(Ea, 0x7e, Top, High).pos(1),
+        create_door(player, 'Ice Tall Hint WS', Intr).dir(We, 0x7e, Bot, High).pos(1),
+        create_door(player, 'Ice Tall Hint EN', Nrml).dir(Ea, 0x7e, Top, High).pos(2),
         create_door(player, 'Ice Tall Hint SE', Nrml).dir(So, 0x7e, Right, High).small_key().pos(0),
         create_door(player, 'Ice Hookshot Ledge WN', Nrml).dir(We, 0x7f, Top, High).no_exit().trap(0x4).pos(0).kill(),
         create_door(player, 'Ice Hookshot Ledge Path', Lgcl),
@@ -722,6 +722,8 @@ def create_doors(world, player):
         create_door(player, 'Mire Hub Lower Blue Barrier', Lgcl),
         create_door(player, 'Mire Hub Right Blue Barrier', Lgcl),
         create_door(player, 'Mire Hub Top Blue Barrier', Lgcl),
+        create_door(player, 'Mire Hub Switch Blue Barrier N', Lgcl),
+        create_door(player, 'Mire Hub Switch Blue Barrier S', Lgcl),
         create_door(player, 'Mire Hub Right EN', Nrml).dir(Ea, 0xc2, Top, High).small_key().pos(0),
         create_door(player, 'Mire Hub Top NW', Nrml).dir(No, 0xc2, Left, High).pos(2),
         create_door(player, 'Mire Lone Shooter WS', Nrml).dir(We, 0xc3, Bot, High).pos(6),
@@ -1161,6 +1163,8 @@ def create_doors(world, player):
     world.get_door('Mire Hub Lower Blue Barrier', player).barrier(CrystalBarrier.Blue)
     world.get_door('Mire Hub Right Blue Barrier', player).barrier(CrystalBarrier.Blue)
     world.get_door('Mire Hub Top Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Hub Switch Blue Barrier N', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Mire Hub Switch Blue Barrier S', player).barrier(CrystalBarrier.Blue)
     world.get_door('Mire Map Spike Side Blue Barrier', player).barrier(CrystalBarrier.Blue)
     world.get_door('Mire Map Spot Blue Barrier', player).barrier(CrystalBarrier.Blue)
     world.get_door('Mire Crystal Dead End Left Barrier', player).barrier(CrystalBarrier.Blue)

@@ -1,5 +1,6 @@
 import random
 import collections
+import itertools
 from collections import defaultdict, deque
 from enum import Enum, unique
 import logging
@@ -733,7 +734,7 @@ class ExplorationState(object):
                         self.key_locations += 1
                     if location.name not in dungeon_events and '- Prize' not in location.name and location.name not in ['Agahnim 1', 'Agahnim 2']:
                         self.ttl_locations += 1
-                if location not in self.found_locations:
+                if location not in self.found_locations:  # todo: special logic for TT Boss?
                     self.found_locations.append(location)
                     if not bk_Flag:
                         self.bk_found.add(location)
@@ -835,6 +836,8 @@ class ExplorationState(object):
     def add_all_doors_check_keys(self, region, key_door_proposal, world, player):
         for door in get_doors(world, region, player):
             if self.can_traverse(door):
+                if door.controller:
+                    door = door.controller
                 if door in key_door_proposal and door not in self.opened_doors:
                     if not self.in_door_list(door, self.small_doors):
                         self.append_door_to_list(door, self.small_doors)
@@ -1493,20 +1496,32 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger
         problem_builders = identify_branching_issues_2(problem_builders)
 
     # step 5: assign randomly until gone - must maintain connectedness, neutral polarity, branching, lack, etc.
+    comb_w_replace = len(dungeon_map) ** len(neutral_choices)
+    combinations = None
+    if comb_w_replace <= 1000:
+        combinations = list(itertools.product(dungeon_map.keys(), repeat=len(neutral_choices)))
+        random.shuffle(combinations)
     tries = 0
     while len(polarized_sectors) > 0:
-        if tries > 100:
+        if tries > 1000 or (combinations and tries >= len(combinations)):
             raise Exception('No valid assignment found. Ref: %s' % next(iter(dungeon_map.keys())))
-        choices = random.choices(list(dungeon_map.keys()), k=len(neutral_choices))
-        valid = []
+        if combinations:
+            choices = combinations[tries]
+        else:
+            choices = random.choices(list(dungeon_map.keys()), k=len(neutral_choices))
+        chosen_sectors = defaultdict(list)
         for i, choice in enumerate(choices):
-            builder = dungeon_map[choice]
-            if valid_assignment(builder, neutral_choices[i]):
+            chosen_sectors[choice].extend(neutral_choices[i])
+        all_valid = True
+        for name, sector_list in chosen_sectors.items():
+            if not valid_assignment(dungeon_map[name], sector_list):
+                all_valid = False
+                break
+        if all_valid:
+            for i, choice in enumerate(choices):
+                builder = dungeon_map[choice]
                 for sector in neutral_choices[i]:
                     assign_sector(sector, builder, polarized_sectors, global_pole)
-                valid.append(neutral_choices[i])
-        for c in valid:
-            neutral_choices.remove(c)
         tries += 1
 
 
@@ -1957,6 +1972,7 @@ def resolve_equations(builder, sector_list):
 # negative benefit transforms (dead end)
 def find_priority_equation(equations, current_access):
     flex = calc_flex(equations, current_access)
+    required = calc_required(equations, current_access)
     best_profit = None
     triplet_candidates = []
     local_profit_map = {}
@@ -1977,14 +1993,17 @@ def find_priority_equation(equations, current_access):
                     else:
                         triplet_candidates.append((eq, eq_list, sector))
         local_profit_map[sector] = best_local_profit
-    if len(triplet_candidates) == 0:
+    filtered_candidates = filter_requirements(triplet_candidates, equations, required, current_access)
+    if len(filtered_candidates) == 0:
+        filtered_candidates = triplet_candidates
+    if len(filtered_candidates) == 0:
         return None, None, None  # can't pay for anything
-    if len(triplet_candidates) == 1:
-        return triplet_candidates[0]
+    if len(filtered_candidates) == 1:
+        return filtered_candidates[0]
 
-    required_candidates = [x for x in triplet_candidates if x[0].required]
+    required_candidates = [x for x in filtered_candidates if x[0].required]
     if len(required_candidates) == 0:
-        required_candidates = triplet_candidates
+        required_candidates = filtered_candidates
     if len(required_candidates) == 1:
         return required_candidates[0]
 
@@ -2000,6 +2019,46 @@ def find_priority_equation(equations, current_access):
     return good_local_candidates[0]  # just pick one I guess
 
 
+def calc_required(equations, current_access):
+    ttl = 0
+    for num in current_access.values():
+        ttl += num
+    local_profit_map = {}
+    for sector, eq_list in equations.items():
+        best_local_profit = None
+        for eq in eq_list:
+            profit = eq.profit()
+            if best_local_profit is None or profit > best_local_profit:
+                best_local_profit = profit
+        local_profit_map[sector] = best_local_profit
+        ttl += best_local_profit
+    if ttl == 0:
+        new_lists = {}
+        for sector, eq_list in equations.items():
+            if len(eq_list) > 1:
+                rem_list = []
+                for eq in eq_list:
+                    if eq.profit() < local_profit_map[sector]:
+                        rem_list.append(eq)
+                if len(rem_list) > 0:
+                    new_lists[sector] = [x for x in eq_list if x not in rem_list]
+        for sector, eq_list in new_lists.items():
+            if len(eq_list) <= 1:
+                for eq in eq_list:
+                    eq.required = True
+            equations[sector] = eq_list
+    required_costs = defaultdict(int)
+    required_benefits = defaultdict(int)
+    for sector, eq_list in equations.items():
+        for eq in eq_list:
+            if eq.required:
+                for key, door_list in eq.cost.items():
+                    required_costs[key] += len(door_list)
+                for key, door_list in eq.benefit.items():
+                    required_benefits[key] += len(door_list)
+    return required_costs, required_benefits
+
+
 def calc_flex(equations, current_access):
     flex_spending = defaultdict(int)
     required_costs = defaultdict(int)
@@ -2011,6 +2070,45 @@ def calc_flex(equations, current_access):
     for key in Hook:
         flex_spending[key] = max(0, current_access[key]-required_costs[key])
     return flex_spending
+
+
+def filter_requirements(triplet_candidates, equations, required, current_access):
+    r_costs, r_exits = required
+    valid_candidates = []
+    for cand, cand_list, cand_sector in triplet_candidates:
+        valid = True
+        if not cand.required:
+            potential_benefit = defaultdict(int)
+            potential_costs = defaultdict(int)
+            for h_type, benefit in current_access.items():
+                cur_cost = len(cand.cost[h_type])
+                if benefit - cur_cost > 0:
+                    potential_benefit[h_type] += benefit - cur_cost
+            for h_type, benefit_list in cand.benefit.items():
+                potential_benefit[h_type] += len(benefit_list)
+            for sector, eq_list in equations.items():
+                if sector == cand_sector:
+                    affected_doors = [d for x in cand.benefit.values() for d in x] + [d for x in cand.cost.values() for d in x]
+                    adj_list = [x for x in eq_list if x.door not in affected_doors]
+                else:
+                    adj_list = eq_list
+                for eq in adj_list:
+                    for h_type, benefit_list in eq.benefit.items():
+                        potential_benefit[h_type] += len(benefit_list)
+                    for h_type, cost_list in eq.cost.items():
+                        potential_costs[h_type] += len(cost_list)
+            for h_type, requirement in r_costs.items():
+                if requirement > 0 and potential_benefit[h_type] < requirement:
+                    valid = False
+                    break
+            if valid:
+                for h_type, requirement in r_exits.items():
+                    if requirement > 0 and potential_costs[h_type] < requirement:
+                        valid = False
+                        break
+        if valid:
+            valid_candidates.append((cand, cand_list, cand_sector))
+    return valid_candidates
 
 
 def resolve_equation(equation, eq_list, sector, current_access, reached_doors, equations):

@@ -1,0 +1,266 @@
+{
+  "checkboxes": {
+    "retro": {
+      "type": "checkbox",
+      "label": {
+        "text": "Retro mode (universal keys)"
+      }
+    }
+  },
+  "leftItemFrame": {
+    "worldstate": {
+      "type": "selectbox",
+      "label": {
+        "text": "World State"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        },
+        "default": "Open"
+      },
+      "options": {
+        "Standard": "standard",
+        "Open": "open",
+        "Inverted": "inverted"
+      }
+    },
+    "logiclevel": {
+      "type": "selectbox",
+      "label": {
+        "text": "Logic Level"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "No Glitches": "noglitches",
+        "Minor Glitches": "minorglitches",
+        "No Logic": "nologic"
+      }
+    },
+    "goal": {
+      "type": "selectbox",
+      "label": {
+        "text": "Goal"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "Defeat Ganon": "ganon",
+        "Master Sword Pedestal": "pedestal",
+        "All Dungeons": "dungeons",
+        "Triforce Hunt": "triforcehunt",
+        "Crystals": "crystals"
+      }
+    },
+    "crystals_gt": {
+      "type": "selectbox",
+      "label": {
+        "text": "Crystals to open GT"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "0": "0",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "Random": "random"
+      }
+    },
+    "crystals_ganon": {
+      "type": "selectbox",
+      "label": {
+        "text": "Crystals to harm Ganon"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "0": "0",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "Random": "random"
+      }
+    },
+    "weapons": {
+      "type": "selectbox",
+      "label": {
+        "text": "Weapons"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "Randomized": "random",
+        "Assured": "assured",
+        "Swordless": "swordless",
+        "Vanilla": "vanilla"
+      }
+    }
+  },
+  "rightItemFrame": {
+    "itempool": {
+      "type": "selectbox",
+      "label": {
+        "text": "Item Pool"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "Normal": "normal",
+        "Hard": "hard",
+        "Expert": "expert"
+      }
+    },
+    "itemfunction": {
+      "type": "selectbox",
+      "label": {
+        "text": "Item Functionality"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "Normal": "normal",
+        "Hard": "hard",
+        "Expert": "expert"
+      }
+    },
+    "timer": {
+      "type": "selectbox",
+      "label": {
+        "text": "Timer Setting"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "No Timer": "none",
+        "Stopwatch": "display",
+        "Timed": "timed",
+        "Timed OHKO": "timed-ohko",
+        "OHKO": "ohko",
+        "Timed Countdown": "timed-countdown"
+      }
+    },
+    "progressives": {
+      "type": "selectbox",
+      "label": {
+        "text": "Progressive Items"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "On": "on",
+        "Off": "off",
+        "Random": "random"
+      }
+    },
+    "accessibility": {
+      "type": "selectbox",
+      "label": {
+        "text": "Accessibility"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        }
+      },
+      "options": {
+        "100% Inventory": "items",
+        "100% Locations": "locations",
+        "Beatable": "none"
+      }
+    },
+    "sortingalgo": {
+      "type": "selectbox",
+      "label": {
+        "text": "Item Sorting"
+      },
+      "managerAttrs": {
+        "label": {
+          "side": "left"
+        },
+        "selectbox": {
+          "side": "right"
+        },
+        "default": "Balanced"
+      },
+      "options": {
+        "Freshness": "freshness",
+        "Flood": "flood",
+        "VT8.21": "vt21",
+        "VT8.22": "vt22",
+        "VT8.25": "vt25",
+        "VT8.26": "vt26",
+        "Balanced": "balanced"
+      }
+    }
+  }
+}

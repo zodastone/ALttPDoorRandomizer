@@ -183,6 +183,10 @@ def place_bosses(world, player):
                 raise FillError('Could not place boss for location %s' % loc_text)
             bosses.remove(boss)
 
+            # GT Bosses can move dungeon - find the real dungeon to place them in
+            if level:
+                loc = [x.name for x in world.dungeons if x.player == player and level in x.bosses.keys()][0]
+                loc_text = loc + ' (' + level + ')'
             logging.getLogger('').debug('Placing boss %s at %s', boss, loc_text)
             world.get_dungeon(loc, player).bosses[level] = BossFactory(boss, player)
     elif world.boss_shuffle[player] == "chaos": #all bosses chosen at random
@@ -193,5 +197,9 @@ def place_bosses(world, player):
             except IndexError:
                 raise FillError('Could not place boss for location %s' % loc_text)
 
+            # GT Bosses can move dungeon - find the real dungeon to place them in
+            if level:
+                loc = [x.name for x in world.dungeons if x.player == player and level in x.bosses.keys()][0]
+                loc_text = loc + ' (' + level + ')'
             logging.getLogger('').debug('Placing boss %s at %s', boss, loc_text)
             world.get_dungeon(loc, player).bosses[level] = BossFactory(boss, player)

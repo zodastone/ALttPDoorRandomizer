@@ -342,6 +342,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Mire Hub Lower Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Hub', player), player))
     set_rule(world.get_entrance('Mire Hub Right Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Hub Right', player), player))
     set_rule(world.get_entrance('Mire Hub Top Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Hub Top', player), player))
+    set_rule(world.get_entrance('Mire Hub Switch Blue Barrier N', player), lambda state: state.can_reach_blue(world.get_region('Mire Hub Switch', player), player))
+    set_rule(world.get_entrance('Mire Hub Switch Blue Barrier S', player), lambda state: state.can_reach_blue(world.get_region('Mire Hub Switch', player), player))
     set_rule(world.get_entrance('Mire Map Spike Side Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Map Spike Side', player), player))
     set_rule(world.get_entrance('Mire Map Spot Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Map Spot', player), player))
     set_rule(world.get_entrance('Mire Crystal Dead End Left Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Crystal Dead End', player), player))
@@ -1185,14 +1187,13 @@ def set_inverted_big_bomb_rules(world, player):
                            'Hyrule Castle Entrance (East)',
                            'Inverted Ganons Tower',
                            'Cave 45',
-                           'Checkerboard Cave']
+                           'Checkerboard Cave',
+                           'Inverted Big Bomb Shop']
     LW_DM_entrances = ['Old Man Cave (East)',
                        'Old Man House (Bottom)',
                        'Old Man House (Top)',
                        'Death Mountain Return Cave (East)',
                        'Spectacle Rock Cave Peak',
-                       'Spectacle Rock Cave',
-                       'Spectacle Rock Cave (Bottom)',
                        'Tower of Hera',
                        'Death Mountain Return Cave (West)',
                        'Paradox Cave (Top)',
@@ -1212,7 +1213,7 @@ def set_inverted_big_bomb_rules(world, player):
                              'Chest Game',
                              'Dark World Hammer Peg Cave',
                              'Red Shield Shop',
-                             'Dark Sanctuary Hint',
+                             'Inverted Dark Sanctuary',
                              'Fortune Teller (Dark)',
                              'Dark World Shop',
                              'Dark World Lumberjack Shop',
@@ -1222,7 +1223,7 @@ def set_inverted_big_bomb_rules(world, player):
     Southern_DW_entrances = ['Hype Cave',
                              'Bonk Fairy (Dark)',
                              'Archery Game',
-                             'Inverted Big Bomb Shop',
+                             'Inverted Links House',
                              'Dark Lake Hylia Shop',
                              'Swamp Palace']
     Isolated_DW_entrances = ['Spike Cave',
@@ -1517,7 +1518,8 @@ bunny_impassible_doors = {
     'Ice Crystal Right Blue Hole', 'Ice Crystal Left Blue Barrier', 'Ice Big Chest Landing Push Blocks',
     'Ice Backwards Room Hole', 'Ice Switch Room SE', 'Ice Antechamber NE', 'Ice Antechamber Hole', 'Mire Lobby Gap',
     'Mire Post-Gap Gap', 'Mire 2 NE', 'Mire Hub Upper Blue Barrier', 'Mire Hub Lower Blue Barrier',
-    'Mire Hub Right Blue Barrier', 'Mire Hub Top Blue Barrier', 'Mire Falling Bridge WN',
+    'Mire Hub Right Blue Barrier', 'Mire Hub Top Blue Barrier', 'Mire Hub Switch Blue Barrier N',
+    'Mire Hub Switch Blue Barrier S', 'Mire Falling Bridge WN',
     'Mire Map Spike Side Blue Barrier', 'Mire Map Spot Blue Barrier', 'Mire Crystal Dead End Left Barrier',
     'Mire Crystal Dead End Right Barrier', 'Mire Cross ES', 'Mire Hidden Shooters Block Path S',
     'Mire Hidden Shooters Block Path N', 'Mire Left Bridge Hook Path', 'Mire Fishbone Blue Barrier',
@@ -1547,7 +1549,10 @@ def add_key_logic_rules(world, player):
     key_logic = world.key_logic[player]
     for d_name, d_logic in key_logic.items():
         for door_name, keys in d_logic.door_rules.items():
-            add_rule(world.get_entrance(door_name, player), create_advanced_key_rule(d_logic, player, keys))
+            spot = world.get_entrance(door_name, player)
+            add_rule(spot, create_advanced_key_rule(d_logic, player, keys))
+            if keys.opposite:
+                add_rule(spot, create_advanced_key_rule(d_logic, player, keys.opposite), 'or')
         for location in d_logic.bk_restricted:
             if location.name not in key_only_locations.keys():
                 forbid_item(location, d_logic.bk_name, player)
