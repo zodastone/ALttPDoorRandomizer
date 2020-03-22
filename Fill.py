@@ -392,7 +392,7 @@ def balance_multiworld_progression(world):
             threshold = max(reachable_locations_count.values()) - 20
 
             balancing_players = [player for player, reachables in reachable_locations_count.items() if reachables < threshold]
-            if balancing_players:
+            if balancing_players is not None and len(balancing_players) > 0:
                 balancing_state = state.copy()
                 balancing_unchecked_locations = unchecked_locations.copy()
                 balancing_reachables = reachable_locations_count.copy()

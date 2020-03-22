@@ -3,6 +3,7 @@ from argparse import Namespace
 import logging
 import os
 import random
+import re
 from CLI import parse_cli
 from Fill import FillError
 from Main import main, EnemizerError
@@ -74,26 +75,53 @@ def bottom_frame(self, parent, args=None):
                 setattr(guiargs, k, v)
             elif type(v) is dict: # use same settings for every player
                 setattr(guiargs, k, {player: getattr(guiargs, k) for player in range(1, guiargs.multi + 1)})
-        try:
-            if guiargs.count is not None:
-                seed = guiargs.seed
-                for _ in range(guiargs.count):
-                    main(seed=seed, args=guiargs, fish=parent.fish)
-                    seed = random.randint(0, 999999999)
+        argsDump = vars(guiargs)
+        hasEnemizer = "enemizercli" in argsDump and os.path.isfile(argsDump["enemizercli"])
+        needEnemizer = False
+        if not hasEnemizer:
+            falsey = [ "none", "default", "vanilla", False, 0 ]
+            for enemizerOption in [ "shufflepots", "shuffleenemies", "enemy_damage", "shufflebosses", "enemy_health" ]:
+                if enemizerOption in argsDump:
+                    if isinstance(argsDump[enemizerOption], dict):
+                        for playerID,playerSetting in argsDump[enemizerOption].items():
+                            if not playerSetting in falsey:
+                                needEnemizer = True
+                    elif not argsDump[enemizerOption] in falsey:
+                        needEnemizer = True
+        seeds = []
+        if not needEnemizer or (needEnemizer and hasEnemizer):
+            try:
+                if guiargs.count is not None:
+                    seed = guiargs.seed
+                    for _ in range(guiargs.count):
+                        seeds.append(seed)
+                        main(seed=seed, args=guiargs, fish=parent.fish)
+                        seed = random.randint(0, 999999999)
+                else:
+                    seeds.append(guiargs.seed)
+                    main(seed=guiargs.seed, args=guiargs, fish=parent.fish)
+            except (FillError, EnemizerError, Exception, RuntimeError) as e:
+                logging.exception(e)
+                messagebox.showerror(title="Error while creating seed", message=str(e))
             else:
-                main(seed=guiargs.seed, args=guiargs, fish=parent.fish)
-        except (FillError, EnemizerError, Exception, RuntimeError) as e:
-            logging.exception(e)
-            messagebox.showerror(title="Error while creating seed", message=str(e))
-        else:
-            YES = parent.fish.translate("cli","cli","yes")
-            NO = parent.fish.translate("cli","cli","no")
-            successMsg = ""
-            successMsg += (parent.fish.translate("cli","cli","made.rom").strip() % (YES if (guiargs.create_rom) else NO)) + "\n"
-            successMsg += (parent.fish.translate("cli","cli","made.playthrough").strip() % (YES if (guiargs.calc_playthrough) else NO)) + "\n"
-            successMsg += (parent.fish.translate("cli","cli","made.spoiler").strip() % (YES if (not guiargs.jsonout and guiargs.create_spoiler) else NO))
+                YES = parent.fish.translate("cli","cli","yes")
+                NO = parent.fish.translate("cli","cli","no")
+                successMsg = ""
+                made = {}
+                for k in [ "rom", "playthrough", "spoiler" ]:
+                    made[k] = parent.fish.translate("cli","cli","made." + k)
+                for k in made:
+                    v = made[k]
+                    pattern = "([\w]+)(:)([\s]+)(.*)"
+                    m = re.search(pattern,made[k])
+                    made[k] = m.group(1) + m.group(2) + ' ' + m.group(4)
+                successMsg += (made["rom"] % (YES if (guiargs.create_rom) else NO)) + "\n"
+                successMsg += (made["playthrough"] % (YES if (guiargs.calc_playthrough) else NO)) + "\n"
+                successMsg += (made["spoiler"] % (YES if (not guiargs.jsonout and guiargs.create_spoiler) else NO)) + "\n"
+                # FIXME: English
+                successMsg += ("Seed%s: %s" % ('s' if len(seeds) > 1 else "", ','.join(seeds)))
 
-            messagebox.showinfo(title="Success", message=successMsg)
+                messagebox.showinfo(title="Success", message=successMsg)
 
     ## Generate Button
     # widget ID

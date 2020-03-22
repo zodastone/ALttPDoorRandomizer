@@ -79,7 +79,7 @@ class LocalRom(object):
         self.hash = hash
         self.orig_buffer = None
         if not os.path.isfile(file):
-            raise RuntimeError("Could not find valid local base rom for patching at expected path %s." % args.rom)
+            raise RuntimeError("Could not find valid local base rom for patching at expected path %s." % file)
         with open(file, 'rb') as stream:
             self.buffer = read_rom(stream)
         if patch:

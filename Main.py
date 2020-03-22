@@ -191,6 +191,7 @@ def main(args, seed=None, fish=None):
         for team in range(world.teams):
             for player in range(1, world.players + 1):
                 sprite_random_on_hit = type(args.sprite[player]) is str and args.sprite[player].lower() == 'randomonhit'
+                enemized = False
                 use_enemizer = (world.boss_shuffle[player] != 'none' or world.enemy_shuffle[player] != 'none'
                                 or world.enemy_health[player] != 'default' or world.enemy_damage[player] != 'default'
                                 or args.shufflepots[player] or sprite_random_on_hit)
@@ -204,6 +205,7 @@ def main(args, seed=None, fish=None):
                         raise RuntimeError("Could not find valid base rom for enemizing at expected path %s." % args.rom)
                     if os.path.exists(args.enemizercli):
                         patch_enemizer(world, player, rom, args.rom, args.enemizercli, args.shufflepots[player], sprite_random_on_hit)
+                        enemized = True
                         if not args.jsonout:
                             rom = LocalRom.fromJsonRom(rom, args.rom, 0x400000)
                     else:
@@ -211,6 +213,8 @@ def main(args, seed=None, fish=None):
                         enemizerMsg += world.fish.translate("cli","cli","enemizer.nothing.applied")
                         logging.warning(enemizerMsg)
                         raise EnemizerError(enemizerMsg)
+
+                patch_rom(world, rom, player, team, enemized)
 
                 if args.race:
                     patch_race_rom(rom)

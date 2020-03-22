@@ -124,7 +124,7 @@ def loadcliargs(gui, args, settings=None):
         widget = "seed"
         setting = "seed"
         if args[setting]:
-            gui.pages[mainpage].widgets[widget].storageVar.set(args[setting])
+            gui.pages[mainpage].pages[subpage].widgets[widget].storageVar.set(args[setting])
         # set textbox/frame label
         label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
         gui.pages[mainpage].pages[subpage].widgets[widget].pieces["frame"].label.configure(text=label)

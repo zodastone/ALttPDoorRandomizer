@@ -36,7 +36,7 @@
     "cannot.reach.required": "Not all required items reachable. Something went terribly wrong here.",
     "patching.rom": "Patching ROM",
     "patching.spoiler": "Creating Spoiler",
-    "calc.playthrough": "Calculating playthrough",
+    "calc.playthrough": "Calculating Playthrough",
     "made.rom": "Patched ROM:         %s",
     "made.playthrough": "Printed Playthrough: %s",
     "made.spoiler": "Printed Spoiler:     %s",
