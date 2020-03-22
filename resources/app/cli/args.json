@@ -107,10 +107,10 @@
   },
   "dungeon_counters": {
     "choices": [
+      "default",
       "off",
       "on",
-      "pickup",
-      "default"
+      "pickup"
     ]
   },
   "crystals_ganon": {
@@ -198,15 +198,6 @@
     "action": "store_true",
     "type": "bool"
   },
-  "shuffleganon": {
-    "action": "store_true",
-    "type": "bool"
-  },
-  "no-shuffleganon": {
-    "action": "store_false",
-    "dest": "shuffleganon",
-    "help": "suppress"
-  },
   "heartbeep": {
     "choices": [
       "normal",
@@ -240,19 +231,38 @@
     ]
   },
   "sprite": {},
+  "create_rom": {
+    "action": "store_false",
+    "type": "bool"
+  },
   "suppress_rom": {
     "action": "store_true",
+    "dest": "create_rom",
+    "help": "suppress"
+  },
+  "shuffleganon": {
+    "action": "store_false",
     "type": "bool"
+  },
+  "no_shuffleganon": {
+    "action": "store_true",
+    "dest": "shuffleganon",
+    "help": "suppress"
+  },
+  "calc_playthrough": {
+    "action": "store_false",
+    "type": "bool"
+  },
+  "skip_playthrough": {
+    "action": "store_true",
+    "dest": "calc_playthrough",
+    "help": "suppress"
   },
   "gui": {
     "action": "store_true"
   },
   "jsonout": {
     "action": "store_true"
-  },
-  "skip_playthrough": {
-    "action": "store_true",
-    "type": "bool"
   },
   "enemizercli": {
     "setting": "enemizercli"

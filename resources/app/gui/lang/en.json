@@ -155,7 +155,8 @@
 
 
     "randomizer.generation.spoiler": "Create Spoiler Log",
-    "randomizer.generation.suppressrom": "Do Not create Patched ROM",
+    "randomizer.generation.createrom": "Create Patched ROM",
+    "randomizer.generation.calcplaythrough": "Calculate Playthrough",
     "randomizer.generation.usestartinventory": "Use Starting Inventory",
     "randomizer.generation.usecustompool": "Use Custom Item Pool",
 

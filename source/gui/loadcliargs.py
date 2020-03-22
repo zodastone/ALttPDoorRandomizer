@@ -1,6 +1,7 @@
 from source.classes.SpriteSelector import SpriteSelector as spriteSelector
 from source.gui.randomize.gameoptions import set_sprite
 from Rom import Sprite, get_sprite_from_name
+from Utils import update_deprecated_args
 import source.classes.constants as CONST
 from source.classes.BabelFish import BabelFish
 from source.classes.Empty import Empty
@@ -8,10 +9,12 @@ from source.classes.Empty import Empty
 # Load args/settings for most tabs
 def loadcliargs(gui, args, settings=None):
     if args is not None:
+        args = update_deprecated_args(args)
+        args = vars(args)
         fish = BabelFish()
-#        for k, v in vars(args).items():
-#            if type(v) is dict:
-#                setattr(args, k, v[1])  # only get values for player 1 for now
+        for k, v in args.items():
+            if isinstance(v,dict) and 1 in v:
+                setattr(args, k, v[1])  # only get values for player 1 for now
         # load values from commandline args
 
         # set up options to get

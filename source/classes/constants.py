@@ -102,7 +102,8 @@ SETTINGSTOPROCESS = {
     },
     "generation": {
       "spoiler": "create_spoiler",
-      "suppressrom": "suppress_rom",
+      "createrom": "create_rom",
+      "calcplaythrough": "calc_playthrough",
       "usestartinventory": "usestartinventory",
       "usecustompool": "custom",
       "saveonexit": "saveonexit"

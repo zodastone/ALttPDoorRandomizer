@@ -248,6 +248,38 @@ def print_wiki_doors_by_region(d_regions, world, player):
         with open(os.path.join(".","resources", "user", "regions-" + d + ".txt"),"w+") as f:
             f.write(toprint)
 
+def update_deprecated_args(args):
+    argVars = vars(args)
+    truthy = [ 1, True, "True", "true" ]
+    # Don't do: Yes
+    # Do:       No
+    if "suppress_rom" in argVars:
+        args.create_rom = args.suppress_rom not in truthy
+    # Don't do: No
+    # Do:       Yes
+    if "create_rom" in argVars:
+        args.suppress_rom = not args.create_rom in truthy
+
+    # Don't do: Yes
+    # Do:       No
+    if "no_shuffleganon" in argVars:
+        args.shuffleganon = not args.no_shuffleganon in truthy
+    # Don't do: No
+    # Do:       Yes
+    if "shuffleganon" in argVars:
+        args.no_shuffleganon = not args.shuffleganon in truthy
+
+    # Don't do: Yes
+    # Do:       No
+    if "skip_playthrough" in argVars:
+        args.calc_playthrough = not args.skip_playthrough in truthy
+    # Don't do: No
+    # Do:       Yes
+    if "calc_playthrough" in argVars:
+        args.skip_playthrough = not args.calc_playthrough in truthy
+
+    return args
+
 def print_wiki_doors_by_room(d_regions, world, player):
     for d, region_list in d_regions.items():
         tile_map = {}

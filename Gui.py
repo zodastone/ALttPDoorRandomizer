@@ -5,7 +5,7 @@ import sys
 from tkinter import Tk, Button, BOTTOM, TOP, StringVar, BooleanVar, X, BOTH, RIGHT, ttk, messagebox
 
 from CLI import get_args_priority
-from DungeonRandomizer import parse_arguments
+from DungeonRandomizer import parse_cli
 from source.gui.adjust.overview import adjust_page
 from source.gui.startinventory.overview import startinventory_page
 from source.gui.custom.overview import custom_page
@@ -77,9 +77,13 @@ def guiMain(args=None):
     # get args
     # getting Settings & CLI (no GUI built yet)
     self.args = get_args_priority(None, None, None)
+    lang = "en"
+    if "load" in self.args and "lang" in self.args["load"]:
+        lang = self.args["load"].lang
+    self.fish = BabelFish(lang=lang)
 
     # get saved settings
-    self.settings = self.args["settings"]
+    self.settings = vars(self.args["settings"])
 
     # make array for pages
     self.pages = {}
@@ -146,12 +150,6 @@ def guiMain(args=None):
     # add randomizer notebook to main window
     self.pages["randomizer"].notebook.pack()
 
-    settings = get_args_priority(None, None, None)
-    lang = "en"
-    if "load" in settings and "lang" in settings["load"]:
-        lang = settings["load"]["lang"]
-    self.fish = BabelFish(lang=lang)
-
     # bottom of window: Open Output Directory, Open Documentation (if exists)
     self.pages["bottom"] = Empty()
     self.pages["bottom"].pages = {}
@@ -196,5 +194,5 @@ def guiMain(args=None):
 
 
 if __name__ == '__main__':
-    args = parse_arguments(None)
+    args = parse_cli(None)
     guiMain(args)

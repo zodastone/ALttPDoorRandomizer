@@ -10,14 +10,14 @@ import sys
 
 from source.classes.BabelFish import BabelFish
 
-from CLI import parse_arguments, get_args_priority
-from Main import main
+from CLI import parse_cli, get_args_priority
+from Main import main, EnemizerError
 from Rom import get_sprite_from_name
 from Utils import is_bundled, close_console
 from Fill import FillError
 
 def start():
-    args = parse_arguments(None)
+    args = parse_cli(None)
 
     if is_bundled() and len(sys.argv) == 1:
         # for the bundled builds, if we have no arguments, the user
@@ -44,10 +44,10 @@ def start():
     loglevel = {'error': logging.ERROR, 'info': logging.INFO, 'warning': logging.WARNING, 'debug': logging.DEBUG}[args.loglevel]
     logging.basicConfig(format='%(message)s', level=loglevel)
 
-    settings = get_args_priority(None, None, None)
+    priority = get_args_priority(None, None, args)
     lang = "en"
-    if "load" in settings and "lang" in settings["load"]:
-        lang = settings["load"]["lang"]
+    if "load" in priority and "lang" in priority["load"]:
+        lang = priority["load"].lang
     fish = BabelFish(lang=lang)
 
     if args.gui:
@@ -61,7 +61,7 @@ def start():
             try:
                 main(seed=seed, args=args, fish=fish)
                 logger.info('%s %s', fish.translate("cli","cli","finished.run"), _+1)
-            except (FillError, Exception, RuntimeError) as err:
+            except (FillError, EnemizerError, Exception, RuntimeError) as err:
                 failures.append((err, seed))
                 logger.warning('%s: %s', fish.translate("cli","cli","generation.failed"), err)
             seed = random.randint(0, 999999999)

@@ -1,5 +1,7 @@
 {
   "cli": {
+    "yes": "Yes",
+    "no": "No",
     "app.title": "ALttP Door Randomizer Version %s - Seed: %d",
     "version": "Version",
     "seed": "Seed",
@@ -33,7 +35,11 @@
     "cannot.reach.progression": "Not all progression items reachable. Something went terribly wrong here.",
     "cannot.reach.required": "Not all required items reachable. Something went terribly wrong here.",
     "patching.rom": "Patching ROM",
+    "patching.spoiler": "Creating Spoiler",
     "calc.playthrough": "Calculating playthrough",
+    "made.rom": "Patched ROM:         %s",
+    "made.playthrough": "Printed Playthrough: %s",
+    "made.spoiler": "Printed Spoiler:     %s",
     "done": "Done. Enjoy.",
     "total.time": "Total Time: %s",
     "finished.run": "Finished run",
@@ -262,7 +268,7 @@
       "Alternatively, can be a ALttP Rom patched with a Link",
       "sprite that will be extracted."
     ],
-    "suppress_rom": [ "Do not create an output rom file. (default: %(default)s)" ],
+    "create_rom": [ "Create an output rom file. (default: %(default)s)" ],
     "gui": [ "Launch the GUI. (default: %(default)s)" ],
     "jsonout": [
       "Output .json patch to stdout instead of a patched rom. Used",

@@ -11,27 +11,22 @@ import sys
 import source.classes.constants as CONST
 from source.classes.BabelFish import BabelFish
 
+from Utils import update_deprecated_args
+
 
 class ArgumentDefaultsHelpFormatter(argparse.RawTextHelpFormatter):
 
     def _get_help_string(self, action):
         return textwrap.dedent(action.help)
 
-def parse_arguments(argv, no_defaults=False):
+def parse_cli(argv, no_defaults=False):
     def defval(value):
         return value if not no_defaults else None
 
     # get settings
-    settings = get_settings()
+    settings = parse_settings()
 
     lang = "en"
-    if argv is not None:
-      priority = get_args_priority(None, None, argv)
-      if "load" in priority:
-        priority = priority["load"]
-        if "lang" in priority:
-          lang = priority["lang"]
-
     fish = BabelFish(lang=lang)
 
     # we need to know how many players we have first
@@ -57,13 +52,18 @@ def parse_arguments(argv, no_defaults=False):
           argatts["const"] = argdata["choices"][0]
           argatts["default"] = argdata["choices"][0]
           argatts["nargs"] = "?"
-        elif arg in settings:
-          argatts["default"] = defval(settings[arg] != 0) if "type" in argdata and argdata["type"] == "bool" else defval(settings[arg])
+        if arg in settings:
+          default = settings[arg]
+          if "type" in argdata and argdata["type"] == "bool":
+              default = settings[arg] != 0
+          argatts["default"] = defval(default)
         arghelp = fish.translate("cli","help",arg)
         if "help" in argdata and argdata["help"] == "suppress":
           argatts["help"] = argparse.SUPPRESS
         elif not isinstance(arghelp,str):
           argatts["help"] = '\n'.join(arghelp).replace("\\'","'")
+        else:
+          argatts["help"] = arghelp + " " + argatts["help"]
         parser.add_argument(argname,**argatts)
 
     parser.add_argument('--seed', default=defval(int(settings["seed"]) if settings["seed"] != "" and settings["seed"] is not None else None), help="\n".join(fish.translate("cli","help","seed")), type=int)
@@ -87,7 +87,7 @@ def parse_arguments(argv, no_defaults=False):
     if multiargs.multi:
         defaults = copy.deepcopy(ret)
         for player in range(1, multiargs.multi + 1):
-            playerargs = parse_arguments(shlex.split(getattr(ret,f"p{player}")), True)
+            playerargs = parse_cli(shlex.split(getattr(ret,f"p{player}")), True)
 
             for name in ['logic', 'mode', 'swords', 'goal', 'difficulty', 'item_functionality',
                          'shuffle', 'door_shuffle', 'crystals_ganon', 'crystals_gt', 'openpyramid',
@@ -105,7 +105,7 @@ def parse_arguments(argv, no_defaults=False):
     return ret
 
 
-def get_settings():
+def parse_settings():
     # set default settings
     settings = {
         "lang": "en",
@@ -151,14 +151,16 @@ def get_settings():
         "quickswap": False,
         "heartcolor": "red",
         "heartbeep": "normal",
-        "sprite": None,
+        "sprite": os.path.join(".","data","sprites","official","001.link.1.zspr"),
         "fastmenu": "normal",
         "ow_palettes": "default",
         "uw_palettes": "default",
 
         "create_spoiler": False,
         "skip_playthrough": False,
+        "calc_playthrough": True,
         "suppress_rom": False,
+        "create_rom": True,
         "usestartinventory": False,
         "custom": False,
         "rom": os.path.join(".", "Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
@@ -267,8 +269,8 @@ def get_settings():
 #  3: Canned defaults
 def get_args_priority(settings_args, gui_args, cli_args):
     args = {}
-    args["settings"] = get_settings() if settings_args is None else settings_args
-    args["gui"] = {} if gui_args is None else gui_args
+    args["settings"] = parse_settings() if settings_args is None else settings_args
+    args["gui"] = gui_args
     args["cli"] = cli_args
 
     args["load"] = args["settings"]
@@ -279,17 +281,38 @@ def get_args_priority(settings_args, gui_args, cli_args):
 
     if args["cli"] is None:
         args["cli"] = {}
-        cli = vars(parse_arguments(None))
+        cli = vars(parse_cli(None))
         for k, v in cli.items():
             if isinstance(v, dict) and 1 in v:
                 args["cli"][k] = v[1]
             else:
                 args["cli"][k] = v
-            load_doesnt_have_key = k not in args["load"]
-            different_val = (k in args["load"] and k in args["cli"]) and (args["load"][k] != args["cli"][k])
-            cli_has_empty_dict = k in args["cli"] and isinstance(args["cli"][k], dict) and len(args["cli"][k]) == 0
-            if load_doesnt_have_key or different_val:
-                if not cli_has_empty_dict:
-                    args["load"][k] = args["cli"][k]
+        args["cli"] = argparse.Namespace(**args["cli"])
+
+    cli = vars(args["cli"])
+    for k in vars(args["cli"]):
+        load_doesnt_have_key = k not in args["load"]
+        cli_val = cli[k]
+        if isinstance(cli_val,dict) and 1 in cli_val:
+            cli_val = cli_val[1]
+        different_val = (k in args["load"] and k in cli) and (str(args["load"][k]) != str(cli_val))
+        cli_has_empty_dict = k in cli and isinstance(cli_val, dict) and len(cli_val) == 0
+        if load_doesnt_have_key or different_val:
+            if not cli_has_empty_dict:
+                args["load"][k] = cli_val
+
+    newArgs = {}
+    for key in [ "settings", "gui", "cli", "load" ]:
+        if args[key]:
+            if isinstance(args[key],dict):
+                newArgs[key] = argparse.Namespace(**args[key])
+            else:
+                newArgs[key] = args[key]
+
+            newArgs[key] = update_deprecated_args(newArgs[key])
+        else:
+            newArgs[key] = args[key]
+
+    args = newArgs
 
     return args

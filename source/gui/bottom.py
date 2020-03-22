@@ -3,9 +3,10 @@ from argparse import Namespace
 import logging
 import os
 import random
-from CLI import parse_arguments
-from Main import main
-from Utils import local_path, output_path, open_file
+from CLI import parse_cli
+from Fill import FillError
+from Main import main, EnemizerError
+from Utils import local_path, output_path, open_file, update_deprecated_args
 import source.classes.constants as CONST
 from source.gui.randomize.multiworld import multiworld_page
 import source.gui.widgets as widgets
@@ -68,7 +69,7 @@ def bottom_frame(self, parent, args=None):
     def generateRom():
         guiargs = create_guiargs(parent)
         # get default values for missing parameters
-        for k,v in vars(parse_arguments(['--multi', str(guiargs.multi)])).items():
+        for k,v in vars(parse_cli(['--multi', str(guiargs.multi)])).items():
             if k not in vars(guiargs):
                 setattr(guiargs, k, v)
             elif type(v) is dict: # use same settings for every player
@@ -81,11 +82,18 @@ def bottom_frame(self, parent, args=None):
                     seed = random.randint(0, 999999999)
             else:
                 main(seed=guiargs.seed, args=guiargs, fish=parent.fish)
-        except Exception as e:
+        except (FillError, EnemizerError, Exception, RuntimeError) as e:
             logging.exception(e)
             messagebox.showerror(title="Error while creating seed", message=str(e))
         else:
-            messagebox.showinfo(title="Success", message="Rom patched successfully")
+            YES = parent.fish.translate("cli","cli","yes")
+            NO = parent.fish.translate("cli","cli","no")
+            successMsg = ""
+            successMsg += (parent.fish.translate("cli","cli","made.rom").strip() % (YES if (guiargs.create_rom) else NO)) + "\n"
+            successMsg += (parent.fish.translate("cli","cli","made.playthrough").strip() % (YES if (guiargs.calc_playthrough) else NO)) + "\n"
+            successMsg += (parent.fish.translate("cli","cli","made.spoiler").strip() % (YES if (not guiargs.jsonout and guiargs.create_spoiler) else NO))
+
+            messagebox.showinfo(title="Success", message=successMsg)
 
     ## Generate Button
     # widget ID
@@ -226,4 +234,7 @@ def create_guiargs(parent):
 
     # Get output path
     guiargs.outputpath = parent.outputPath.get()
+
+    guiargs = update_deprecated_args(guiargs)
+
     return guiargs
