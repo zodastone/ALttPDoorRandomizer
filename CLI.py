@@ -124,7 +124,7 @@ def parse_settings():
         "algorithm": "balanced",
 
         "openpyramid": False,
-        "shuffleganon": False,
+        "shuffleganon": True,
         "shuffle": "vanilla",
 
         "shufflepots": False,
