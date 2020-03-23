@@ -53,7 +53,8 @@ def start():
     if args.gui:
         from Gui import guiMain
         guiMain(args)
-    elif args.count is not None:
+    elif args.count is not None and args.count > 1:
+        random.seed(None)
         seed = args.seed or random.randint(0, 999999999)
         failures = []
         logger = logging.getLogger('')

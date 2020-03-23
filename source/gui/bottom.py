@@ -91,14 +91,19 @@ def bottom_frame(self, parent, args=None):
         seeds = []
         if not needEnemizer or (needEnemizer and hasEnemizer):
             try:
-                if guiargs.count is not None:
+                if guiargs.count is not None and guiargs.seed:
                     seed = guiargs.seed
                     for _ in range(guiargs.count):
                         seeds.append(seed)
                         main(seed=seed, args=guiargs, fish=parent.fish)
                         seed = random.randint(0, 999999999)
                 else:
-                    seeds.append(guiargs.seed)
+                    if guiargs.seed:
+                        seeds.append(guiargs.seed)
+                    else:
+                        random.seed(None)
+                        guiargs.seed = random.randint(0, 999999999)
+                        seeds.append(guiargs.seed)
                     main(seed=guiargs.seed, args=guiargs, fish=parent.fish)
             except (FillError, EnemizerError, Exception, RuntimeError) as e:
                 logging.exception(e)
@@ -119,7 +124,7 @@ def bottom_frame(self, parent, args=None):
                 successMsg += (made["playthrough"] % (YES if (guiargs.calc_playthrough) else NO)) + "\n"
                 successMsg += (made["spoiler"] % (YES if (not guiargs.jsonout and guiargs.create_spoiler) else NO)) + "\n"
                 # FIXME: English
-                successMsg += ("Seed%s: %s" % ('s' if len(seeds) > 1 else "", ','.join(seeds)))
+                successMsg += ("Seed%s: %s" % ('s' if len(seeds) > 1 else "", ','.join(str(x) for x in seeds)))
 
                 messagebox.showinfo(title="Success", message=successMsg)
 
