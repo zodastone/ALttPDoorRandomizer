@@ -248,13 +248,13 @@ def main(args, seed=None, fish=None):
                       "difficulty_adjustments": world.difficulty_adjustments[player], # 2
                       "mode": world.mode[player],                                     # 3
                       "goal": world.goal[player],                                     # 4
-                      "timer": str(world.timer[player]),                              # 5
+                      "timer": str(world.timer),                                      # 5
                       "shuffle": world.shuffle[player],                               # 6
                       "doorShuffle": world.doorShuffle[player],                       # 7
                       "algorithm": world.algorithm,                                   # 8
                       "mscb": mcsb_name,                                              # 9
                       "retro": world.retro[player],                                   # A
-                      "progressive": world.progressive[player],                       # B
+                      "progressive": world.progressive,                               # B
                       "hints": str(world.hints[player])                               # C
                     }
                     #                  0  1  2  3  4 5  6  7  8 9 A B C
