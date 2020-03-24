@@ -1,5 +1,9 @@
 {
   "lang": {},
+  "diags": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "create_spoiler": {
     "action": "store_false",
     "type": "bool"
