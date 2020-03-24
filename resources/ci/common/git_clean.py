@@ -5,7 +5,8 @@ def git_clean():
     ".vscode",        # vscode IDE files
     ".idea",          # idea IDE files
     "*.json",         # keep JSON files for that one time I just nuked all that I was working on, oops
-    "*app*version.*"  # keep appversion files
+    "*app*version.*", # keep appversion files
+    "EnemizerCLI"     # keep EnemizerCLI
   ]
   excludes = ['--exclude={0}'.format(exclude) for exclude in excludes]
 
