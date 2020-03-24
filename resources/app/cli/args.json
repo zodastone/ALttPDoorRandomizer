@@ -1,8 +1,13 @@
 {
   "lang": {},
   "create_spoiler": {
-    "action": "store_true",
+    "action": "store_false",
     "type": "bool"
+  },
+  "suppress_spoiler": {
+    "action": "store_true",
+    "dest": "create_spoiler",
+    "help": "suppress"
   },
   "logic": {
     "choices": [

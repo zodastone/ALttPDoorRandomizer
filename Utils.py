@@ -253,6 +253,15 @@ def update_deprecated_args(args):
     truthy = [ 1, True, "True", "true" ]
     # Don't do: Yes
     # Do:       No
+    if "suppress_spoiler" in argVars:
+        args.create_spoiler = args.suppress_spoiler not in truthy
+    # Don't do: No
+    # Do:       Yes
+    if "create_spoiler" in argVars:
+        args.suppress_spoiler = not args.create_spoiler in truthy
+
+    # Don't do: Yes
+    # Do:       No
     if "suppress_rom" in argVars:
         args.create_rom = args.suppress_rom not in truthy
     # Don't do: No

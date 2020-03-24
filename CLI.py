@@ -156,6 +156,7 @@ def parse_settings():
         "ow_palettes": "default",
         "uw_palettes": "default",
 
+        "suppress_spoiler": True,
         "create_spoiler": False,
         "skip_playthrough": False,
         "calc_playthrough": True,
