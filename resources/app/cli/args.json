@@ -1,0 +1,323 @@
+{
+  "lang": {},
+  "create_spoiler": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "logic": {
+    "choices": [
+      "noglitches",
+      "minorglitches",
+      "nologic"
+    ]
+  },
+  "mode": {
+    "choices": [
+      "open",
+      "standard",
+      "inverted",
+      "retro"
+    ]
+  },
+  "swords": {
+    "choices": [
+      "random",
+      "assured",
+      "swordless",
+      "vanilla"
+    ]
+  },
+  "goal": {
+    "choices": [
+      "ganon",
+      "pedestal",
+      "dungeons",
+      "triforcehunt",
+      "crystals"
+    ]
+  },
+  "difficulty": {
+    "choices": [
+      "normal",
+      "hard",
+      "expert"
+    ]
+  },
+  "item_functionality": {
+    "choices": [
+      "normal",
+      "hard",
+      "expert"
+    ]
+  },
+  "timer": {
+    "choices": [
+      "none",
+      "display",
+      "timed",
+      "timed-ohko",
+      "ohko",
+      "timed-countdown"
+    ]
+  },
+  "progressive": {
+    "choices": [
+      "on",
+      "off",
+      "random"
+    ]
+  },
+  "algorithm": {
+    "choices": [
+      "balanced",
+      "freshness",
+      "flood",
+      "vt21",
+      "vt22",
+      "vt25",
+      "vt26"
+    ]
+  },
+  "shuffle": {
+    "choices": [
+      "vanilla",
+      "simple",
+      "restricted",
+      "full",
+      "crossed",
+      "insanity",
+      "restricted_legacy",
+      "full_legacy",
+      "madness_legacy",
+      "insanity_legacy",
+      "dungeonsfull",
+      "dungeonssimple"
+    ]
+  },
+  "door_shuffle": {
+    "choices": [
+      "basic",
+      "crossed",
+      "vanilla"
+    ]
+  },
+  "experimental": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "dungeon_counters": {
+    "choices": [
+      "default",
+      "off",
+      "on",
+      "pickup"
+    ]
+  },
+  "crystals_ganon": {
+    "choices": [
+      7, 6, 5, 4, 3, 2, 1, 0, "random"
+    ]
+  },
+  "crystals_gt": {
+    "choices": [
+      7, 6, 5, 4, 3, 2, 1, 0, "random"
+    ]
+  },
+  "openpyramid": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "rom": {},
+  "loglevel": {
+    "choices": [
+      "info",
+      "error",
+      "warning",
+      "debug"
+    ]
+  },
+  "fastmenu": {
+    "choices": [
+      "normal",
+      "instant",
+      "double",
+      "triple",
+      "quadruple",
+      "half"
+    ]
+  },
+  "quickswap": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "disablemusic": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "mapshuffle": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "compassshuffle": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "keyshuffle": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "bigkeyshuffle": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "keysanity": {
+    "action": "store_true",
+    "type": "bool",
+    "help": "suppress"
+  },
+  "retro": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "startinventory": {},
+  "usestartinventory": {
+    "type": "bool"
+  },
+  "custom": {
+    "type": "bool",
+    "help": "suppress"
+  },
+  "accessibility": {
+    "choices": [
+      "items",
+      "locations",
+      "none"
+    ]
+  },
+  "hints": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "heartbeep": {
+    "choices": [
+      "normal",
+      "double",
+      "half",
+      "quarter",
+      "off"
+    ]
+  },
+  "heartcolor": {
+    "choices": [
+      "red",
+      "blue",
+      "green",
+      "yellow",
+      "random"
+    ]
+  },
+  "ow_palettes": {
+    "choices": [
+      "default",
+      "random",
+      "blackout"
+    ]
+  },
+  "uw_palettes": {
+    "choices": [
+      "default",
+      "random",
+      "blackout"
+    ]
+  },
+  "sprite": {},
+  "create_rom": {
+    "action": "store_false",
+    "type": "bool"
+  },
+  "suppress_rom": {
+    "action": "store_true",
+    "dest": "create_rom",
+    "help": "suppress"
+  },
+  "shuffleganon": {
+    "action": "store_false",
+    "type": "bool"
+  },
+  "no_shuffleganon": {
+    "action": "store_true",
+    "dest": "shuffleganon",
+    "help": "suppress"
+  },
+  "calc_playthrough": {
+    "action": "store_false",
+    "type": "bool"
+  },
+  "skip_playthrough": {
+    "action": "store_true",
+    "dest": "calc_playthrough",
+    "help": "suppress"
+  },
+  "gui": {
+    "action": "store_true"
+  },
+  "jsonout": {
+    "action": "store_true"
+  },
+  "enemizercli": {
+    "setting": "enemizercli"
+  },
+  "shufflebosses": {
+    "choices": [
+      "none",
+      "basic",
+      "normal",
+      "chaos"
+    ]
+  },
+  "shuffleenemies": {
+    "choices": [
+      "none",
+      "shuffled",
+      "chaos"
+    ]
+  },
+  "enemy_health": {
+    "choices": [
+      "default",
+      "easy",
+      "normal",
+      "hard",
+      "expert"
+    ]
+  },
+  "enemy_damage": {
+    "choices": [
+      "default",
+      "shuffled",
+      "chaos"
+    ]
+  },
+  "shufflepots": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "remote_items": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "names": {},
+  "outputpath": {},
+  "race": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "saveonexit": {
+    "choices": [
+      "ask",
+      "always",
+      "never"
+    ]
+  },
+  "outputname": {}
+}

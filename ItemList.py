@@ -9,7 +9,7 @@ from EntranceShuffle import connect_entrance
 from Fill import FillError, fill_restrictive
 from Items import ItemFactory
 
-import classes.constants as CONST
+import source.classes.constants as CONST
 
 
 #This file sets the item pools for various modes. Timed modes and triforce hunt are enforced first, and then extra items are specified per mode to fill in the remaining space.
@@ -126,6 +126,7 @@ difficulties = {
     ),
 }
 
+# Translate between Mike's label array and YAML/JSON keys
 def get_custom_array_key(item):
   label_switcher = {
     "silverarrow": "silversupgrade",
@@ -257,17 +258,17 @@ def generate_itempool(world, player):
     # set up item pool
     if world.custom:
         (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = make_custom_item_pool(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.customitemarray)
-        world.rupoor_cost = min(world.customitemarray["rupoorcost"], 9999)
+        world.rupoor_cost = min(world.customitemarray[player]["rupoorcost"], 9999)
     else:
         (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = get_pool_core(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.doorShuffle[player])
 
     if player in world.pool_adjustment.keys():
         amt = world.pool_adjustment[player]
         if amt < 0:
-            for i in range(0, amt):
+            for _ in range(0, amt):
                 pool.remove('Rupees (20)')
         elif amt > 0:
-            for i in range(0, amt):
+            for _ in range(0, amt):
                 pool.append('Rupees (20)')
 
     for item in precollected_items:
@@ -321,9 +322,9 @@ def generate_itempool(world, player):
     # logic has some branches where having 4 hearts is one possible requirement (of several alternatives)
     # rather than making all hearts/heart pieces progression items (which slows down generation considerably)
     # We mark one random heart container as an advancement item (or 4 heart pieces in expert mode)
-    if world.difficulty[player] in ['normal', 'hard'] and not (world.custom and world.customitemarray["heartcontainer"] == 0):
+    if world.difficulty[player] in ['normal', 'hard'] and not (world.custom and world.customitemarray[player]["heartcontainer"] == 0):
         [item for item in items if item.name == 'Boss Heart Container'][0].advancement = True
-    elif world.difficulty[player] in ['expert'] and not (world.custom and world.customitemarray["heartpiece"] < 4):
+    elif world.difficulty[player] in ['expert'] and not (world.custom and world.customitemarray[player]["heartpiece"] < 4):
         adv_heart_pieces = [item for item in items if item.name == 'Piece of Heart'][0:4]
         for hp in adv_heart_pieces:
             hp.advancement = True
@@ -600,6 +601,8 @@ def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, r
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms)
 
 def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, customitemarray):
+    if isinstance(customitemarray,dict) and 1 in customitemarray:
+        customitemarray = customitemarray[1]
     pool = []
     placed_items = {}
     precollected_items = []
@@ -697,7 +700,7 @@ def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, s
         itemtotal = itemtotal - 28 # Corrects for small keys not being in item pool in Retro Mode
     if itemtotal < total_items_to_place:
         nothings = total_items_to_place - itemtotal
-        print("Placing " + str(nothings) + " Nothings")
+#        print("Placing " + str(nothings) + " Nothings")
         pool.extend(['Nothing'] * nothings)
 
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms)
@@ -707,24 +710,25 @@ def test():
     for difficulty in ['normal', 'hard', 'expert']:
         for goal in ['ganon', 'triforcehunt', 'pedestal']:
             for timer in ['none', 'display', 'timed', 'timed-ohko', 'ohko', 'timed-countdown']:
-                for mode in ['open', 'standard', 'inverted']:
+                for mode in ['open', 'standard', 'inverted', 'retro']:
                     for swords in ['random', 'assured', 'swordless', 'vanilla']:
                         for progressive in ['on', 'off']:
                             for shuffle in ['full', 'insanity_legacy']:
                                 for retro in [True, False]:
-                                    out = get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro)
-                                    count = len(out[0]) + len(out[1])
+                                    for door_shuffle in ['basic', 'crossed', 'vanilla']:
+                                        out = get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, door_shuffle)
+                                        count = len(out[0]) + len(out[1])
 
-                                    correct_count = total_items_to_place
-                                    if goal == 'pedestal' and swords != 'vanilla':
-                                        # pedestal goals generate one extra item
-                                        correct_count += 1
-                                    if retro:
-                                        correct_count += 28
-                                    try:
-                                        assert count == correct_count, "expected {0} items but found {1} items for {2}".format(correct_count, count, (progressive, shuffle, difficulty, timer, goal, mode, swords, retro))
-                                    except AssertionError as e:
-                                        print(e)
+                                        correct_count = total_items_to_place
+                                        if goal == 'pedestal' and swords != 'vanilla':
+                                            # pedestal goals generate one extra item
+                                            correct_count += 1
+                                        if retro:
+                                            correct_count += 28
+                                        try:
+                                            assert count == correct_count, "expected {0} items but found {1} items for {2}".format(correct_count, count, (progressive, shuffle, difficulty, timer, goal, mode, swords, retro))
+                                        except AssertionError as e:
+                                            print(e)
 
 if __name__ == '__main__':
     test()

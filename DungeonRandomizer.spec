@@ -1,5 +1,7 @@
 # -*- mode: python -*-
 
+import sys
+
 block_cipher = None
 console = True
 
@@ -21,10 +23,14 @@ def recurse_for_py_files(names_so_far):
   return returnvalue
 
 hiddenimports = []
+binaries = []
+
+#if sys.platform.find("windows"):
+#  binaries.append(("ucrtbase.dll","."))
 
 a = Analysis(['DungeonRandomizer.py'],
              pathex=[],
-             binaries=[],
+             binaries=binaries,
              datas=[],
              hiddenimports=hiddenimports,
              hookspath=[],

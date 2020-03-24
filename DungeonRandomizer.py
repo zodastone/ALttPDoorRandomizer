@@ -8,14 +8,16 @@ import textwrap
 import shlex
 import sys
 
-from CLI import parse_arguments
-from Main import main
+from source.classes.BabelFish import BabelFish
+
+from CLI import parse_cli, get_args_priority
+from Main import main, EnemizerError
 from Rom import get_sprite_from_name
 from Utils import is_bundled, close_console
 from Fill import FillError
 
 def start():
-    args = parse_arguments(None)
+    args = parse_cli(None)
 
     if is_bundled() and len(sys.argv) == 1:
         # for the bundled builds, if we have no arguments, the user
@@ -42,20 +44,27 @@ def start():
     loglevel = {'error': logging.ERROR, 'info': logging.INFO, 'warning': logging.WARNING, 'debug': logging.DEBUG}[args.loglevel]
     logging.basicConfig(format='%(message)s', level=loglevel)
 
+    priority = get_args_priority(None, None, args)
+    lang = "en"
+    if "load" in priority and "lang" in priority["load"]:
+        lang = priority["load"].lang
+    fish = BabelFish(lang=lang)
+
     if args.gui:
         from Gui import guiMain
         guiMain(args)
-    elif args.count is not None:
+    elif args.count is not None and args.count > 1:
+        random.seed(None)
         seed = args.seed or random.randint(0, 999999999)
         failures = []
         logger = logging.getLogger('')
         for _ in range(args.count):
             try:
-                main(seed=seed, args=args)
-                logger.info('Finished run %s', _+1)
-            except (FillError, Exception, RuntimeError) as err:
+                main(seed=seed, args=args, fish=fish)
+                logger.info('%s %s', fish.translate("cli","cli","finished.run"), _+1)
+            except (FillError, EnemizerError, Exception, RuntimeError) as err:
                 failures.append((err, seed))
-                logger.warning('Generation failed: %s', err)
+                logger.warning('%s: %s', fish.translate("cli","cli","generation.failed"), err)
             seed = random.randint(0, 999999999)
         for fail in failures:
             logger.info('%s seed failed with: %s', fail[1], fail[0])
@@ -66,7 +75,7 @@ def start():
         logger.info('Generation fail    rate: ' + str(fail_rate[0]   ).rjust(3, " ") + '.' + str(fail_rate[1]   ).ljust(6, '0') + '%')
         logger.info('Generation success rate: ' + str(success_rate[0]).rjust(3, " ") + '.' + str(success_rate[1]).ljust(6, '0') + '%')
     else:
-        main(seed=args.seed, args=args)
+        main(seed=args.seed, args=args, fish=fish)
 
 
 if __name__ == '__main__':

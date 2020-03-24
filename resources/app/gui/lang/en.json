@@ -1,0 +1,271 @@
+{
+  "gui": {
+    "adjust.nobgm": "Disable Music & MSU-1",
+    "adjust.quickswap": "L/R Quickswapping",
+
+    "adjust.heartcolor": "Heart Color",
+    "adjust.heartcolor.red": "Red",
+    "adjust.heartcolor.blue": "Blue",
+    "adjust.heartcolor.green": "Green",
+    "adjust.heartcolor.yellow": "Yellow",
+    "adjust.heartcolor.random": "Random",
+
+    "adjust.heartbeep": "Heart Beep sound rate",
+    "adjust.heartbeep.double": "Double",
+    "adjust.heartbeep.normal": "Normal",
+    "adjust.heartbeep.half": "Half",
+    "adjust.heartbeep.quarter": "Quarter",
+    "adjust.heartbeep.off": "Off",
+
+    "adjust.menuspeed": "Menu Speed",
+    "adjust.menuspeed.instant": "Instant",
+    "adjust.menuspeed.quadruple": "Quadruple",
+    "adjust.menuspeed.triple": "Triple",
+    "adjust.menuspeed.double": "Double",
+    "adjust.menuspeed.normal": "Normal",
+    "adjust.menuspeed.half": "Half",
+
+    "adjust.owpalettes": "Overworld Palettes",
+    "adjust.owpalettes.default": "Default",
+    "adjust.owpalettes.random": "Random",
+    "adjust.owpalettes.blackout": "Blackout",
+
+    "adjust.uwpalettes": "Underworld Palettes",
+    "adjust.uwpalettes.default": "Default",
+    "adjust.uwpalettes.random": "Random",
+    "adjust.uwpalettes.blackout": "Blackout",
+
+    "adjust.sprite": "Sprite:",
+    "adjust.sprite.unchanged": "(unchanged)",
+
+    "adjust.rom": "Rom to adjust: ",
+    "adjust.rom.romfiles": "Rom Files",
+    "adjust.rom.button": "Select Rom",
+    "adjust.rom.go": "Adjust Rom",
+    "adjust.rom.dialog.error": "Error while patching",
+    "adjust.rom.dialog.success": "Success",
+    "adjust.rom.dialog.success.message": "Rom patched successfully.",
+
+
+    "randomizer.dungeon.keysanity": "Shuffle: ",
+    "randomizer.dungeon.mapshuffle": "Maps",
+    "randomizer.dungeon.compassshuffle": "Compasses",
+    "randomizer.dungeon.smallkeyshuffle": "Small Keys",
+    "randomizer.dungeon.bigkeyshuffle": "Big Keys",
+
+    "randomizer.dungeon.dungeondoorshuffle": "Dungeon Door Shuffle",
+    "randomizer.dungeon.dungeondoorshuffle.vanilla": "Vanilla",
+    "randomizer.dungeon.dungeondoorshuffle.basic": "Basic",
+    "randomizer.dungeon.dungeondoorshuffle.crossed": "Crossed",
+
+    "randomizer.dungeon.experimental": "Enable Experimental Features",
+
+    "randomizer.dungeon.dungeon_counters": "Dungeon Chest Counters",
+    "randomizer.dungeon.dungeon_counters.default": "Auto",
+    "randomizer.dungeon.dungeon_counters.off": "Off",
+    "randomizer.dungeon.dungeon_counters.on": "On",
+    "randomizer.dungeon.dungeon_counters.pickup": "On Compass Pickup",
+
+
+    "randomizer.enemizer.potshuffle": "Pot Shuffle",
+
+    "randomizer.enemizer.enemyshuffle": "Enemy Shuffle",
+    "randomizer.enemizer.enemyshuffle.none": "Vanilla",
+    "randomizer.enemizer.enemyshuffle.shuffled": "Shuffled",
+    "randomizer.enemizer.enemyshuffle.chaos": "Chaos",
+
+    "randomizer.enemizer.bossshuffle": "Boss Shuffle",
+    "randomizer.enemizer.bossshuffle.none": "Vanilla",
+    "randomizer.enemizer.bossshuffle.basic": "Basic",
+    "randomizer.enemizer.bossshuffle.shuffled": "Shuffled",
+    "randomizer.enemizer.bossshuffle.chaos": "Chaos",
+
+    "randomizer.enemizer.enemydamage": "Enemy Damage",
+    "randomizer.enemizer.enemydamage.default": "Vanilla",
+    "randomizer.enemizer.enemydamage.shuffled": "Shuffled",
+    "randomizer.enemizer.enemydamage.chaos": "Chaos",
+
+    "randomizer.enemizer.enemyhealth": "Enemy Health",
+    "randomizer.enemizer.enemyhealth.default": "Vanilla",
+    "randomizer.enemizer.enemyhealth.easy": "Easy",
+    "randomizer.enemizer.enemyhealth.normal": "Normal",
+    "randomizer.enemizer.enemyhealth.hard": "Hard",
+    "randomizer.enemizer.enemyhealth.expert": "Expert",
+
+    "randomizer.enemizer.enemizercli": "EnemizerCLI path: ",
+    "randomizer.enemizer.enemizercli.online": "(get online)",
+
+
+    "randomizer.entrance.openpyramid": "Pre-open Pyramid Hole",
+    "randomizer.entrance.shuffleganon": "Include Ganon's Tower and Pyramid Hole in shuffle pool",
+
+    "randomizer.entrance.entranceshuffle": "Entrance Shuffle",
+    "randomizer.entrance.entranceshuffle.vanilla": "Vanilla",
+    "randomizer.entrance.entranceshuffle.simple": "Simple",
+    "randomizer.entrance.entranceshuffle.restricted": "Restricted",
+    "randomizer.entrance.entranceshuffle.full": "Full",
+    "randomizer.entrance.entranceshuffle.crossed": "Crossed",
+    "randomizer.entrance.entranceshuffle.insanity": "Insanity",
+    "randomizer.entrance.entranceshuffle.restricted_legacy": "Restricted (Legacy)",
+    "randomizer.entrance.entranceshuffle.full_legacy": "Full (Legacy)",
+    "randomizer.entrance.entranceshuffle.madness_legacy": "Madness (Legacy)",
+    "randomizer.entrance.entranceshuffle.insanity_legacy": "Insanity (Legacy)",
+    "randomizer.entrance.entranceshuffle.dungeonsfull": "Dungeons + Full",
+    "randomizer.entrance.entranceshuffle.dungeonssimple": "Dungeons + Simple",
+
+
+    "randomizer.gameoptions.hints": "Include Helpful Hints",
+    "randomizer.gameoptions.nobgm": "Disable Music & MSU-1",
+    "randomizer.gameoptions.quickswap": "L/R Quickswapping",
+
+    "randomizer.gameoptions.heartcolor": "Heart Color",
+    "randomizer.gameoptions.heartcolor.red": "Red",
+    "randomizer.gameoptions.heartcolor.blue": "Blue",
+    "randomizer.gameoptions.heartcolor.green": "Green",
+    "randomizer.gameoptions.heartcolor.yellow": "Yellow",
+    "randomizer.gameoptions.heartcolor.random": "Random",
+
+    "randomizer.gameoptions.heartbeep": "Heart Beep sound rate",
+    "randomizer.gameoptions.heartbeep.double": "Double",
+    "randomizer.gameoptions.heartbeep.normal": "Normal",
+    "randomizer.gameoptions.heartbeep.half": "Half",
+    "randomizer.gameoptions.heartbeep.quarter": "Quarter",
+    "randomizer.gameoptions.heartbeep.off": "Off",
+
+    "randomizer.gameoptions.menuspeed": "Menu Speed",
+    "randomizer.gameoptions.menuspeed.instant": "Instant",
+    "randomizer.gameoptions.menuspeed.quadruple": "Quadruple",
+    "randomizer.gameoptions.menuspeed.triple": "Triple",
+    "randomizer.gameoptions.menuspeed.double": "Double",
+    "randomizer.gameoptions.menuspeed.normal": "Normal",
+    "randomizer.gameoptions.menuspeed.half": "Half",
+
+    "randomizer.gameoptions.owpalettes": "Overworld Palettes",
+    "randomizer.gameoptions.owpalettes.default": "Default",
+    "randomizer.gameoptions.owpalettes.random": "Random",
+    "randomizer.gameoptions.owpalettes.blackout": "Blackout",
+
+    "randomizer.gameoptions.uwpalettes": "Underworld Palettes",
+    "randomizer.gameoptions.uwpalettes.default": "Default",
+    "randomizer.gameoptions.uwpalettes.random": "Random",
+    "randomizer.gameoptions.uwpalettes.blackout": "Blackout",
+
+    "randomizer.gameoptions.sprite": "Sprite:",
+    "randomizer.gameoptions.sprite.unchanged": "(unchanged)",
+
+
+    "randomizer.generation.spoiler": "Create Spoiler Log",
+    "randomizer.generation.createrom": "Create Patched ROM",
+    "randomizer.generation.calcplaythrough": "Calculate Playthrough",
+    "randomizer.generation.usestartinventory": "Use Starting Inventory",
+    "randomizer.generation.usecustompool": "Use Custom Item Pool",
+
+    "randomizer.generation.saveonexit": "Save Settings on Exit",
+    "randomizer.generation.saveonexit.ask": "Ask Me",
+    "randomizer.generation.saveonexit.always": "Always",
+    "randomizer.generation.saveonexit.never": "Never",
+
+    "randomizer.generation.rom": "Base Rom: ",
+    "randomizer.generation.rom.button": "Select Rom",
+    "randomizer.generation.rom.dialog.romfiles": "Rom Files",
+    "randomizer.generation.rom.dialog.allfiles": "All Files",
+
+
+    "randomizer.item.retro": "Retro mode (universal keys)",
+
+    "randomizer.item.worldstate": "World State",
+    "randomizer.item.worldstate.standard": "Standard",
+    "randomizer.item.worldstate.open": "Open",
+    "randomizer.item.worldstate.inverted": "Inverted",
+    "randomizer.item.worldstate.retro": "Retro",
+
+    "randomizer.item.logiclevel": "Logic Level",
+    "randomizer.item.logiclevel.noglitches": "No Glitches",
+    "randomizer.item.logiclevel.minorglitches": "Minor Glitches",
+    "randomizer.item.logiclevel.nologic": "No Logic",
+
+    "randomizer.item.goal": "Goal",
+    "randomizer.item.goal.ganon": "Defeat Ganon",
+    "randomizer.item.goal.pedestal": "Master Sword Pedestal",
+    "randomizer.item.goal.dungeons": "All Dungeons",
+    "randomizer.item.goal.triforcehunt": "Triforce Hunt",
+    "randomizer.item.goal.crystals": "Crystals",
+
+    "randomizer.item.crystals_gt": "Crystals to open GT",
+    "randomizer.item.crystals_gt.0": "0",
+    "randomizer.item.crystals_gt.1": "1",
+    "randomizer.item.crystals_gt.2": "2",
+    "randomizer.item.crystals_gt.3": "3",
+    "randomizer.item.crystals_gt.4": "4",
+    "randomizer.item.crystals_gt.5": "5",
+    "randomizer.item.crystals_gt.6": "6",
+    "randomizer.item.crystals_gt.7": "7",
+    "randomizer.item.crystals_gt.random": "Random",
+
+    "randomizer.item.crystals_ganon": "Crystals to harm Ganon",
+    "randomizer.item.crystals_ganon.0": "0",
+    "randomizer.item.crystals_ganon.1": "1",
+    "randomizer.item.crystals_ganon.2": "2",
+    "randomizer.item.crystals_ganon.3": "3",
+    "randomizer.item.crystals_ganon.4": "4",
+    "randomizer.item.crystals_ganon.5": "5",
+    "randomizer.item.crystals_ganon.6": "6",
+    "randomizer.item.crystals_ganon.7": "7",
+    "randomizer.item.crystals_ganon.random": "Random",
+
+    "randomizer.item.weapons": "Weapons",
+    "randomizer.item.weapons.random": "Randomized",
+    "randomizer.item.weapons.assured": "Assured",
+    "randomizer.item.weapons.swordless": "Swordless",
+    "randomizer.item.weapons.vanilla": "Vanilla",
+
+    "randomizer.item.itempool": "Item Pool",
+    "randomizer.item.itempool.normal": "Normal",
+    "randomizer.item.itempool.hard": "Hard",
+    "randomizer.item.itempool.expert": "Expert",
+
+    "randomizer.item.itemfunction": "Item Functionality",
+    "randomizer.item.itemfunction.normal": "Normal",
+    "randomizer.item.itemfunction.hard": "Hard",
+    "randomizer.item.itemfunction.expert": "Expert",
+
+    "randomizer.item.timer": "Timer Setting",
+    "randomizer.item.timer.none": "No Timer",
+    "randomizer.item.timer.display": "Stopwatch",
+    "randomizer.item.timer.timed": "Timed",
+    "randomizer.item.timer.timed-ohko": "Timed OHKO",
+    "randomizer.item.timer.ohko": "OHKO",
+    "randomizer.item.timer.timed-countdown": "Timed Countdown",
+
+    "randomizer.item.progressives": "Progressive Items",
+    "randomizer.item.progressives.on": "On",
+    "randomizer.item.progressives.off": "Off",
+    "randomizer.item.progressives.random": "Random",
+
+    "randomizer.item.accessibility": "Accessibility",
+    "randomizer.item.accessibility.items": "100% Inventory",
+    "randomizer.item.accessibility.locations": "100% Locations",
+    "randomizer.item.accessibility.none": "Beatable",
+
+    "randomizer.item.sortingalgo": "Item Sorting",
+    "randomizer.item.sortingalgo.freshness": "Freshness",
+    "randomizer.item.sortingalgo.flood": "Flood",
+    "randomizer.item.sortingalgo.vt21": "VT8.21",
+    "randomizer.item.sortingalgo.vt22": "VT8.22",
+    "randomizer.item.sortingalgo.vt25": "VT8.25",
+    "randomizer.item.sortingalgo.vt26": "VT8.26",
+    "randomizer.item.sortingalgo.balanced": "Balanced",
+
+
+    "bottom.content.worlds": "Worlds",
+    "bottom.content.names": "Player names",
+    "bottom.content.seed": "Seed #",
+    "bottom.content.generationcount": "Count",
+    "bottom.content.go": "Generate Patched Rom",
+    "bottom.content.dialog.error": "Error while creating seed",
+    "bottom.content.dialog.success": "Success",
+    "bottom.content.dialog.success.message": "Rom created successfully.",
+    "bottom.content.outputdir": "Open Output Directory",
+    "bottom.content.docs": "Open Documentation"
+  }
+}

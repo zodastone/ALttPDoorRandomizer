@@ -1,32 +1,11 @@
 {
   "checkboxes": {
-    "nobgm": {
-      "type": "checkbox",
-      "label": {
-        "text": "Disable Music & MSU-1"
-      }
-    },
-    "quickswap": {
-      "type": "checkbox",
-      "label": {
-        "text": "L/R Quickswapping"
-      }
-    }
+    "nobgm":      { "type": "checkbox" },
+    "quickswap":  { "type": "checkbox" }
   },
   "leftAdjustFrame": {
     "heartcolor": {
       "type": "selectbox",
-      "label": {
-        "text": "Heart Color"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": {
         "Red": "red",
         "Blue": "blue",
@@ -37,18 +16,7 @@
     },
     "heartbeep": {
       "type": "selectbox",
-      "label": {
-        "text": "Heart Beep sound rate"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        },
-        "default": "Normal"
-      },
+      "default": "Normal",
       "options": {
         "Double": "double",
         "Normal": "normal",
@@ -61,18 +29,7 @@
   "rightAdjustFrame": {
     "menuspeed": {
       "type": "selectbox",
-      "label": {
-        "text": "Menu Speed"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        },
-        "default": "Normal"
-      },
+      "default": "Normal",
       "options": {
         "Instant": "instant",
         "Quadruple": "quadruple",
@@ -84,17 +41,6 @@
     },
     "owpalettes": {
       "type": "selectbox",
-      "label": {
-        "text": "Overworld Palettes"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": {
         "Default": "default",
         "Random": "random",
@@ -103,17 +49,6 @@
     },
     "uwpalettes": {
       "type": "selectbox",
-      "label": {
-        "text": "Underworld Palettes"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
       "options": {
         "Default": "default",
         "Random": "random",

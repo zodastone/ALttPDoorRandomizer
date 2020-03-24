@@ -1,49 +1,24 @@
 {
-  "dungeondoorshuffle": {
-    "type": "selectbox",
-    "label": {
-      "text": "Dungeon Door Shuffle"
+  "widgets": {
+    "dungeondoorshuffle": {
+      "type": "selectbox",
+      "default": "basic",
+      "options": [
+        "vanilla",
+        "basic",
+        "crossed"
+      ]
     },
-    "managerAttrs": {
-      "label": {
-        "side": "left"
-      },
-      "selectbox": {
-        "side": "right"
-      },
-      "default": "Basic"
-    },
-    "options": {
-      "Vanilla": "vanilla",
-      "Basic": "basic",
-      "Crossed": "crossed"
-    }
-  },
-  "experimental": {
-    "type": "checkbox",
-    "label": {
-      "text": "Enable Experimental Features"
-    }
-  },
-  "dungeon_counters": {
-    "type": "selectbox",
-    "label": {
-      "text": "Dungeon Chest Counters"
-    },
-    "managerAttrs": {
-      "label": {
-        "side": "left"
-      },
-      "selectbox": {
-        "side": "right"
-      },
-      "default": "Auto"
-    },
-    "options": {
-      "Auto": "default",
-      "Off": "off",
-      "On": "on",
-      "On Compass Pickup": "pickup"
+    "experimental": { "type": "checkbox" },
+    "dungeon_counters": {
+      "type": "selectbox",
+      "default": "default",
+      "options": [
+        "default",
+        "off",
+        "on",
+        "pickup"
+      ]
     }
   }
 }

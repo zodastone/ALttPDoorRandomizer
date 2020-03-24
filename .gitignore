@@ -19,8 +19,8 @@ RaceRom.py
 upx/
 weights/
 
-settings.json
-working_dirs.json
+resources/user/*
+!resources/user/.gitkeep
 
 *.exe
 
