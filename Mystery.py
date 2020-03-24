@@ -5,7 +5,7 @@ import urllib.request
 import urllib.parse
 import re
 
-from DungeonRandomizer import parse_arguments
+from DungeonRandomizer import parse_cli
 from Main import main as DRMain
 
 def parse_yaml(txt):
@@ -71,7 +71,7 @@ def main():
                 weights_cache[path] = get_weights(path)
             print(f"P{player} Weights: {path} >> {weights_cache[path]['description']}")
 
-    erargs = parse_arguments(['--multi', str(args.multi)])
+    erargs = parse_cli(['--multi', str(args.multi)])
     erargs.seed = seed
     erargs.names = args.names
     erargs.create_spoiler = args.create_spoiler

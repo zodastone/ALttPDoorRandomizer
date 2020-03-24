@@ -6,12 +6,7 @@
         "text": "Bow"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "progressivebow": {
       "type": "textbox",
@@ -19,12 +14,7 @@
         "text": "Progressive Bow"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 2
-      }
+      "default": 2
     },
     "boomerang": {
       "type": "textbox",
@@ -32,12 +22,7 @@
         "text": "Blue Boomerang"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "redmerang": {
       "type": "textbox",
@@ -45,12 +30,7 @@
         "text": "Red Boomerang"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "hookshot": {
       "type": "textbox",
@@ -58,12 +38,7 @@
         "text": "Hookshot"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "mushroom": {
       "type": "textbox",
@@ -71,12 +46,7 @@
         "text": "Mushroom"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "powder": {
       "type": "textbox",
@@ -84,12 +54,7 @@
         "text": "Magic Powder"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "firerod": {
       "type": "textbox",
@@ -97,12 +62,7 @@
         "text": "Fire Rod"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "icerod": {
       "type": "textbox",
@@ -110,12 +70,7 @@
         "text": "Ice Rod"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "bombos": {
       "type": "textbox",
@@ -123,12 +78,7 @@
         "text": "Bombos"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "ether": {
       "type": "textbox",
@@ -136,12 +86,7 @@
         "text": "Ether"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "quake": {
       "type": "textbox",
@@ -149,12 +94,7 @@
         "text": "Quake"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "lamp": {
       "type": "textbox",
@@ -162,12 +102,7 @@
         "text": "Lamp"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "hammer": {
       "type": "textbox",
@@ -175,12 +110,7 @@
         "text": "Hammer"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "shovel": {
       "type": "textbox",
@@ -188,12 +118,7 @@
         "text": "Shovel"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     }
   },
   "itemList2": {
@@ -203,12 +128,7 @@
         "text": "Flute"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "bugnet": {
       "type": "textbox",
@@ -216,12 +136,7 @@
         "text": "Bug Net"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "book": {
       "type": "textbox",
@@ -229,12 +144,7 @@
         "text": "Book"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "bottle": {
       "type": "textbox",
@@ -242,12 +152,7 @@
         "text": "Bottle"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 4
-      }
+      "default": 4
     },
     "somaria": {
       "type": "textbox",
@@ -255,12 +160,7 @@
         "text": "Cane of Somaria"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "byrna": {
       "type": "textbox",
@@ -268,12 +168,7 @@
         "text": "Cane of Byrna"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "cape": {
       "type": "textbox",
@@ -281,12 +176,7 @@
         "text": "Magic Cape"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "mirror": {
       "type": "textbox",
@@ -294,12 +184,7 @@
         "text": "Magic Mirror"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "boots": {
       "type": "textbox",
@@ -307,12 +192,7 @@
         "text": "Pegasus Boots"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "powerglove": {
       "type": "textbox",
@@ -320,12 +200,7 @@
         "text": "Power Glove"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "titansmitt": {
       "type": "textbox",
@@ -333,12 +208,7 @@
         "text": "Titan's Mitt"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "progressiveglove": {
       "type": "textbox",
@@ -346,12 +216,7 @@
         "text": "Progressive Glove"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 2
-      }
+      "default": 2
     },
     "flippers": {
       "type": "textbox",
@@ -359,12 +224,7 @@
         "text": "Flippers"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "pearl": {
       "type": "textbox",
@@ -372,12 +232,7 @@
         "text": "Moon Pearl"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "heartpiece": {
       "type": "textbox",
@@ -385,12 +240,7 @@
         "text": "Piece of Heart"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 24
-      }
+      "default": 24
     }
   },
   "itemList3": {
@@ -400,12 +250,7 @@
         "text": "Heart Container"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 10
-      }
+      "default": 10
     },
     "sancheart": {
       "type": "textbox",
@@ -413,12 +258,7 @@
         "text": "Sanctuary Heart"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "sword1": {
       "type": "textbox",
@@ -426,12 +266,7 @@
         "text": "Fighters' Sword"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "sword2": {
       "type": "textbox",
@@ -439,12 +274,7 @@
         "text": "Master Sword"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "sword3": {
       "type": "textbox",
@@ -452,12 +282,7 @@
         "text": "Tempered Sword"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "sword4": {
       "type": "textbox",
@@ -465,12 +290,7 @@
         "text": "Golden Sword"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "progressivesword": {
       "type": "textbox",
@@ -478,12 +298,7 @@
         "text": "Progressive Sword"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 4
-      }
+      "default": 4
     },
     "shield1": {
       "type": "textbox",
@@ -491,12 +306,7 @@
         "text": "Fighters' Shield"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "shield2": {
       "type": "textbox",
@@ -504,12 +314,7 @@
         "text": "Fire Shield"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "shield3": {
       "type": "textbox",
@@ -517,12 +322,7 @@
         "text": "Mirror Shield"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "progressiveshield": {
       "type": "textbox",
@@ -530,12 +330,7 @@
         "text": "Progressive Shield"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 3
-      }
+      "default": 3
     },
     "mail2": {
       "type": "textbox",
@@ -543,12 +338,7 @@
         "text": "Blue Mail"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "mail3": {
       "type": "textbox",
@@ -556,12 +346,7 @@
         "text": "Red Mail"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "progressivemail": {
       "type": "textbox",
@@ -569,12 +354,7 @@
         "text": "Progressive Mail"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 2
-      }
+      "default": 2
     },
     "halfmagic": {
       "type": "textbox",
@@ -582,12 +362,7 @@
         "text": "Half Magic"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     }
   },
   "itemList4": {
@@ -597,12 +372,7 @@
         "text": "Quarter Magic"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "bombsplus5": {
       "type": "textbox",
@@ -610,12 +380,7 @@
         "text": "Bomb Cap +5"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "bombsplus10": {
       "type": "textbox",
@@ -623,12 +388,7 @@
         "text": "Bomb Cap +10"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "arrowsplus5": {
       "type": "textbox",
@@ -636,12 +396,7 @@
         "text": "Arrow Cap +5"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "arrowsplus10": {
       "type": "textbox",
@@ -649,12 +404,7 @@
         "text": "Arrow Cap +10"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "arrow1": {
       "type": "textbox",
@@ -662,12 +412,7 @@
         "text": "Arrow (1)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "arrow10": {
       "type": "textbox",
@@ -675,12 +420,7 @@
         "text": "Arrow (10)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 12
-      }
+      "default": 12
     },
     "bomb1": {
       "type": "textbox",
@@ -688,12 +428,7 @@
         "text": "Bomb (1)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "bomb3": {
       "type": "textbox",
@@ -701,12 +436,7 @@
         "text": "Bomb (3)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 16
-      }
+      "default": 16
     },
     "bomb10": {
       "type": "textbox",
@@ -714,12 +444,7 @@
         "text": "Bomb (10)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     },
     "rupee1": {
       "type": "textbox",
@@ -727,12 +452,7 @@
         "text": "Rupee (1)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 2
-      }
+      "default": 2
     },
     "rupee5": {
       "type": "textbox",
@@ -740,12 +460,7 @@
         "text": "Rupee (5)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 4
-      }
+      "default": 4
     },
     "rupee20": {
       "type": "textbox",
@@ -753,12 +468,7 @@
         "text": "Rupee (20)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 28
-      }
+      "default": 28
     },
     "rupee50": {
       "type": "textbox",
@@ -766,12 +476,7 @@
         "text": "Rupee (50)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 7
-      }
+      "default": 7
     },
     "rupee100": {
       "type": "textbox",
@@ -779,12 +484,7 @@
         "text": "Rupee (100)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 1
-      }
+      "default": 1
     }
   },
   "itemList5": {
@@ -794,12 +494,7 @@
         "text": "Rupee (300)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 5
-      }
+      "default": 5
     },
     "blueclock": {
       "type": "textbox",
@@ -807,12 +502,7 @@
         "text": "Blue Clock"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "greenclock": {
       "type": "textbox",
@@ -820,12 +510,7 @@
         "text": "Green Clock"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "redclock": {
       "type": "textbox",
@@ -833,12 +518,7 @@
         "text": "Red Clock"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "silversupgrade": {
       "type": "textbox",
@@ -846,12 +526,7 @@
         "text": "Silver Arrows Upgrade"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "generickeys": {
       "type": "textbox",
@@ -859,12 +534,7 @@
         "text": "Generic Keys"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "triforcepieces": {
       "type": "textbox",
@@ -872,12 +542,7 @@
         "text": "Triforce Pieces"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "triforcepiecesgoal": {
       "type": "textbox",
@@ -885,12 +550,7 @@
         "text": "Triforce Pieces Goal"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "triforce": {
       "type": "textbox",
@@ -898,12 +558,7 @@
         "text": "Triforce (win game)"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "rupoor": {
       "type": "textbox",
@@ -911,12 +566,7 @@
         "text": "Rupoor"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 0
-      }
+      "default": 0
     },
     "rupoorcost": {
       "type": "textbox",
@@ -924,12 +574,7 @@
         "text": "Rupoor Cost"
       },
       "manager": "grid",
-      "managerAttrs": {
-        "label": {
-          "sticky": "w"
-        },
-        "default": 10
-      }
+      "default": 10
     }
   }
 }
