@@ -2,7 +2,13 @@
 name: Build
 
 # fire on
-on: [ push, pull_request ]
+on:
+  push:
+    branches:
+      - DoorDev
+  pull_request:
+    branches:
+      - DoorDev
 
 # stuff to do
 jobs:

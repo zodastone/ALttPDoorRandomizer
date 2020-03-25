@@ -78,6 +78,9 @@ jsl MirrorCheckOverride2
 org $20825c
 jsl MirrorCheckOverride2
 
+org $02b82a
+jsl FixShopCode
+
 
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes

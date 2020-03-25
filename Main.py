@@ -19,15 +19,17 @@ from Doors import create_doors
 from DoorShuffle import link_doors
 from RoomData import create_rooms
 from Rules import set_rules
-from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive, dungeon_regions
+from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, balance_multiworld_progression
 from ItemList import generate_itempool, difficulties, fill_prizes
-from Utils import output_path, parse_player_names, print_wiki_doors_by_region, print_wiki_doors_by_room
+from Utils import output_path, parse_player_names
 
-__version__ = '0.0.20dev'
+__version__ = '0.0.20.1u'
+
 
 class EnemizerError(RuntimeError):
     pass
+
 
 def main(args, seed=None, fish=None):
     if args.outputpath:

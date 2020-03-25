@@ -51,3 +51,8 @@ MirrorCheckOverride:
 
 MirrorCheckOverride2:
     lda $7ef353 : and #$02 : rtl
+
+FixShopCode:
+    cpx #$300 : !bge +
+        sta $7ef000, x
+    + rtl
