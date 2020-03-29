@@ -186,12 +186,12 @@ def main(args, seed=None, fish=None):
 
     rom_names = []
     jsonout = {}
+    enemized = False
     if not args.suppress_rom:
         logger.info(world.fish.translate("cli","cli","patching.rom"))
         for team in range(world.teams):
             for player in range(1, world.players + 1):
                 sprite_random_on_hit = type(args.sprite[player]) is str and args.sprite[player].lower() == 'randomonhit'
-                enemized = False
                 use_enemizer = (world.boss_shuffle[player] != 'none' or world.enemy_shuffle[player] != 'none'
                                 or world.enemy_health[player] != 'default' or world.enemy_damage[player] != 'default'
                                 or args.shufflepots[player] or sprite_random_on_hit)
@@ -313,6 +313,7 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli","cli","made.rom") % (YES if (args.create_rom) else NO))
     logger.info(world.fish.translate("cli","cli","made.playthrough") % (YES if (args.calc_playthrough) else NO))
     logger.info(world.fish.translate("cli","cli","made.spoiler") % (YES if (not args.jsonout and args.create_spoiler) else NO))
+    logger.info(world.fish.translate("cli","cli","used.enemizer") % (YES if enemized else NO))
     logger.info(world.fish.translate("cli","cli","seed") + ": %d", world.seed)
     logger.info(world.fish.translate("cli","cli","total.time"), time.perf_counter() - start)
 

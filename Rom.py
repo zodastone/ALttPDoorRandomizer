@@ -162,7 +162,7 @@ def read_rom(stream):
 
 def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, random_sprite_on_hit):
     baserom_path = os.path.abspath(baserom_path)
-    basepatch_path = os.path.abspath(local_path('data/base2current.json'))
+    basepatch_path = os.path.abspath(local_path(os.path.join("data","base2current.json")))
     enemizer_basepatch_path = os.path.join(os.path.dirname(enemizercli), "enemizerBasePatch.json")
     randopatch_path = os.path.abspath(output_path('enemizer_randopatch.json'))
     options_path = os.path.abspath(output_path('enemizer_options.json'))
@@ -305,7 +305,7 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, r
 _sprite_table = {}
 def _populate_sprite_table():
     if not _sprite_table:
-        for dir in [local_path('data/sprites/official'), local_path('data/sprites/unofficial')]:
+        for dir in [local_path(os.path.join("data","sprites","official")), local_path(os.path.join("data","sprites","unofficial"))]:
             for file in os.listdir(dir):
                 filepath = os.path.join(dir, file)
                 if not os.path.isfile(filepath):
