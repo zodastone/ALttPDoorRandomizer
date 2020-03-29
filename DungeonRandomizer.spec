@@ -30,8 +30,7 @@ binaries = []
 #if sys.platform.find("windows"):
 #  binaries.append(("ucrtbase.dll","."))
 
-a = Analysis(['DungeonRandomizer.py'],
-a = Analysis([f"../{BINARY_SLUG}.py"],
+a = Analysis([f"./{BINARY_SLUG}.py"],
              pathex=[],
              binaries=binaries,
              datas=[],
