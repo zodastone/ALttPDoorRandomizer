@@ -11,12 +11,14 @@ jsl AdjustTransition
 nop
 
 ;turn off linking doors -- see .notRoomLinkDoor label in Bank02.asm
-org $02b5a6
-bra NotLinkDoor1
+org $02b5a8 ; <- 135a8 - Bank02.asm : 8368 (LDA $7EC004 : STA $A0)
+jsl CheckLinkDoorR
+bcc NotLinkDoor1
 org $02b5b6
 NotLinkDoor1:
-org $02b647
-bra NotLinkDoor2
+org $02b649 ; <- 135a8 - Bank02.asm : 8482 (LDA $7EC004 : STA $A0)
+jsl CheckLinkDoorL
+bcc NotLinkDoor2
 org $02b657
 NotLinkDoor2:
 

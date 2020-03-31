@@ -189,6 +189,26 @@ entrance_data = {
 }
 
 
+def read_layout_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan).sfc'):
+    with open(old_rom, 'rb') as stream:
+        old_rom_data = bytearray(stream.read())
+
+    string = ''
+    for room in range(0, 0xff+1):
+        # print(ent)
+        pointer_start = 0xf8000+room*3
+        highbyte = old_rom_data[pointer_start+2]
+        midbyte = old_rom_data[pointer_start+1]
+        midbyte = midbyte - 0x80 if highbyte % 2 == 0 else midbyte
+        pointer = highbyte // 2 * 0x10000
+        pointer += midbyte * 0x100
+        pointer += old_rom_data[pointer_start]
+        layout_byte = old_rom_data[pointer+1]
+        layout = (layout_byte & 0x1c) >> 2
+        string += hex(room) + ':' + str(layout) + '\n'
+    print(string)
+
+
 def read_entrance_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan).sfc'):
     with open(old_rom, 'rb') as stream:
         old_rom_data = bytearray(stream.read())
@@ -360,6 +380,6 @@ def print_graph(world):
 
 
 if __name__ == '__main__':
-    pass
     # make_new_base2current()
-    read_entrance_data(old_rom='C:\\Users\\Randall\\Documents\\kwyn\\orig\\z3.sfc')
+    # read_entrance_data(old_rom=sys.argv[1])
+    read_layout_data(old_rom=sys.argv[1])

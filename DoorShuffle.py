@@ -50,9 +50,9 @@ def link_doors(world, player):
             connect_one_way(world, ent, ext, player)
         vanilla_key_logic(world, player)
     elif world.doorShuffle[player] == 'basic':
-        # if not world.experimental[player]:
-        for entrance, ext in open_edges:
-            connect_two_way(world, entrance, ext, player)
+        if not world.experimental[player]:
+            for entrance, ext in open_edges:
+                connect_two_way(world, entrance, ext, player)
         within_dungeon(world, player)
     elif world.doorShuffle[player] == 'crossed':
         for entrance, ext in open_edges:
@@ -1079,6 +1079,9 @@ def flatten_pair_list(paired_list):
     return flat_list
 
 
+okay_normals = [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable, DoorKind.Dashable, DoorKind.DungeonChanger]
+
+
 def find_key_door_candidates(region, checked, world, player):
     dungeon = region.dungeon
     candidates = []
@@ -1103,11 +1106,12 @@ def find_key_door_candidates(region, checked, world, player):
                     elif d.type == DoorType.Normal:
                         d2 = d.dest
                         if d2 not in candidates:
-                            room_b = world.get_room(d2.roomIndex, player)
-                            pos_b, kind_b = room_b.doorList[d2.doorListPos]
-                            okay_normals = [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable,
-                                            DoorKind.Dashable, DoorKind.DungeonChanger]
-                            valid = kind in okay_normals and kind_b in okay_normals
+                            if d2.type == DoorType.Normal:
+                                room_b = world.get_room(d2.roomIndex, player)
+                                pos_b, kind_b = room_b.doorList[d2.doorListPos]
+                                valid = kind in okay_normals and kind_b in okay_normals
+                            else:
+                                valid = kind in okay_normals
                             if valid and 0 <= d2.doorListPos < 4:
                                 candidates.append(d2)
                         else:
@@ -1224,10 +1228,13 @@ def smooth_door_pairs(world, player):
             partner = door.dest
             skip.add(partner)
             room_a = world.get_room(door.roomIndex, player)
-            room_b = world.get_room(partner.roomIndex, player)
             type_a = room_a.kind(door)
-            type_b = room_b.kind(partner)
-            valid_pair = stateful_door(door, type_a) and stateful_door(partner, type_b)
+            if partner.type in [DoorType.Normal, DoorType.Interior]:
+                room_b = world.get_room(partner.roomIndex, player)
+                type_b = room_b.kind(partner)
+                valid_pair = stateful_door(door, type_a) and stateful_door(partner, type_b)
+            else:
+                valid_pair, room_b, type_b = False, None, None
             if door.type == DoorType.Normal:
                 if type_a == DoorKind.SmallKey or type_b == DoorKind.SmallKey:
                     if valid_pair:

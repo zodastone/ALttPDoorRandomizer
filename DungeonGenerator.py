@@ -20,10 +20,6 @@ class Hook(Enum):
     South = 2
     East = 3
     Stairs = 4
-    NEdge = 5
-    SEdge = 6
-    WEdge = 7
-    EEdge = 8
 
 
 class GraphPiece:
@@ -526,33 +522,14 @@ def opposite_h_type(h_type):
         Hook.South: Hook.North,
         Hook.West: Hook.East,
         Hook.East: Hook.West,
-        Hook.NEdge: Hook.SEdge,
-        Hook.SEdge: Hook.NEdge,
-        Hook.EEdge: Hook.WEdge,
-        Hook.WEdge: Hook.EEdge,
     }
     return type_map[h_type]
-
-
-edge_map = {
-    Direction.North: Hook.NEdge,
-    Direction.South: Hook.SEdge,
-    Direction.West: Hook.WEdge,
-    Direction.East: Hook.EEdge,
-}
-
-edge_map_back = {
-    Direction.North: Hook.SEdge,
-    Direction.South: Hook.NEdge,
-    Direction.West: Hook.EEdge,
-    Direction.East: Hook.WEdge,
-}
 
 
 def hook_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
-    if door.type == DoorType.Normal:
+    if door.type in [DoorType.Normal, DoorType.Open]:
         dir = {
             Direction.North: Hook.North,
             Direction.South: Hook.South,
@@ -560,15 +537,13 @@ def hook_from_door(door):
             Direction.East: Hook.East,
         }
         return dir[door.direction]
-    if door.type == DoorType.Open:
-        return edge_map[door.direction]
     return None
 
 
 def hanger_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
-    if door.type == DoorType.Normal:
+    if door.type in [DoorType.Normal, DoorType.Open]:
         dir = {
             Direction.North: Hook.South,
             Direction.South: Hook.North,
@@ -576,8 +551,6 @@ def hanger_from_door(door):
             Direction.East: Hook.West,
         }
         return dir[door.direction]
-    if door.type == DoorType.Open:
-        return edge_map_back[door.direction]
     return None
 
 

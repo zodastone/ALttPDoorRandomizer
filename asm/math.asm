@@ -15,15 +15,17 @@ cpy #$0003 : bne ++
 ++ asl : sta $00 : tya : lsr : tay : lda $00 : bra .loop
 .done rts
 
-;todo -- width in X?
+;Divisor in Y. Width of division is in X for rounding toward middle
 DivideByY:
 .loop cpy #$0001 : beq .done
 cpy #$0003 : bne ++
     jsr DivideBy3 : bra .done
 ++ cpy #$0005 : bne ++
     jsr DivideBy5 : bra .done
-; todo -- alter - width
-++ tyx : jsr DivideBy2 : sta $00 : tya : lsr : tay : lda $00 : bra .loop
+++ jsr DivideBy2 : sta $00
+tya : lsr : tay
+txa : lsr : tax
+lda $00 : bra .loop
 .done rts
 
 MultiBy3:
@@ -34,12 +36,13 @@ MultiBy5:
 sta $00 : asl #2 : !add $00
 rts
 
-;width of divison in x
+;width of divison in x: rounds toward X/2
 DivideBy2:
 sta $00
 lsr : bcc .done
-sta $02 : txa : lsr : cmp $00 : !bge .done
-lda $02 : inc
+sta $02 : txa : lsr : cmp $00 : !blt +
+    lda $02 : inc : bra .done
++ lda $02
 .done rts
 
 DivideBy3:

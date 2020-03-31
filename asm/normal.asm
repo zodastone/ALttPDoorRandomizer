@@ -42,12 +42,26 @@ WarpDown:
 	jsr Cleanup
 	rtl
 
+; carry set = use link door like normal
+; carry clear = we are in dr mode, never use linking doors
+CheckLinkDoorR:
+    lda DRMode : bne +
+        lda $7ec004 : sta $a0 ; what we wrote over
+        sec : rtl
+    + clc : rtl
+
+CheckLinkDoorL:
+    lda DRMode : bne +
+        lda $7ec003 : sta $a0 ; what we wrote over
+        sec : rtl
+    + clc : rtl
+
 TrapDoorFixer:
     lda $fe : and #$0038 : beq .end
     xba : asl #2 : sta $00
     stz $0468 : lda $068c : ora $00 : sta $068c
     .end
-    stz $fe ; clear our ab here because we don't need it anymore
+    stz $fe ; clear our fe here because we don't need it anymore
     rts
 
 Cleanup:
@@ -74,29 +88,28 @@ LoadRoomHorz:
 {
     phb : phk : plb
 	sty $06 : sta $07 : lda $a0 : pha ; Store normal room on stack
-	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00
-	lda $01 : and.b #$80 : cmp #$80 : bne .gtg
-	; jsr HorzEdge : pla : bcs .end
-	pla
+	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00-$01
+	lda $00 : cmp #$03 : bne .gtg
+	jsr HorzEdge : pla : bcs .end
 	sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
 
 	.gtg ;Good to Go!
 	pla ; Throw away normal room (don't fill up the stack)
 	lda $a0 : and.b #$0F : asl a : !sub $23 : !add $06 : sta $02
 	ldy #$00 : jsr ShiftVariablesMainDir
-	lda $aa : lsr : sta $07
-	lda $a0 : and.b #$F0 : lsr #3 : !add $07 : !sub $21 : sta $02 : sta $03
-	jsr ShiftLowCoord
-	jsr ShiftQuad
-	jsr ShiftCameraBounds
-	ldy #$01 : jsr ShiftVariablesSubDir ; flip direction
-	jsr SetupScrollIndicator
-	lda $01 : sta $fe : and #$04 : lsr #2
-	sta $ee
-	lda $01 : and #$10 : beq .end : stz $0468
+
+    lda $01 : and #$80 : beq .normal
+    ldy $06 : cpy #$ff : beq +
+        lda $01 : jsr LoadEastMidpoint : bra ++
+    + lda $01 : jsr LoadWestMidpoint
+    ++ jsr PrepScrollToEdge : bra .scroll
+
+    .normal
+    jsr PrepScrollToNormal
+	.scroll jsr ScrollY
 	.end
 	plb ; restore db register
-	rts
+    rts
 }
 
 ; Y is an adjustment for main direction of travel (stored at $06)
@@ -105,33 +118,28 @@ LoadRoomVert:
 {
     phb : phk : plb
 	sty $06 : sta $07 : lda $a0 : pha ; Store normal room on stack
-	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00
-	lda $01 : and.b #$80 : cmp #$80 : bne .gtg
-	; jsr VertEdge : pla : bcs .end
-	pla
+	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00-$01
+	lda $00 : cmp #$03 : bne .gtg
+	jsr VertEdge : pla : bcs .end
 	sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
 	.gtg ;Good to Go!
 	pla ; Throw away normal room (don't fill up the stack)
 	lda $a0 : and.b #$F0 : lsr #3 : !sub $21 : !add $06 : sta $02
 	ldy #$01 : jsr ShiftVariablesMainDir
-	lda $a0 : and.b #$0F : asl a : !add $a9 : !sub $23 : sta $02 : sta $03
-	jsr ShiftLowCoord
-	jsr ShiftQuad
-	jsr ShiftCameraBounds
-	ldy #$00 : jsr ShiftVariablesSubDir ; flip direction
-	jsr SetupScrollIndicator
-	lda $01 : sta $fe : and #$04 : lsr #2
-	sta $ee
-	.end
-	plb ; restore db register
-	rts
-}
 
-SetupScrollIndicator:
-    lda $ab : and #$01 : asl : sta $ac
-    lda $ab : and #$40 : clc : rol #3 : ora $ac : sta $ac
-    lda $ab : and #$20 : asl #2 : sta $ab
+	lda $01 : and #$80 : beq .normal
+        ldy $06 : cpy #$ff : beq +
+            lda $01 : jsr LoadSouthMidpoint : bra ++
+        + lda $01 : jsr LoadNorthMidpoint
+	++ jsr PrepScrollToEdge : bra .scroll
+
+    .normal
+    jsr PrepScrollToNormal
+    .scroll jsr ScrollX
+    .end
+    plb ; restore db register
     rts
+}
 
 LookupNewRoom: ; expects data offset to be in A
 {
@@ -163,93 +171,31 @@ ShiftVariablesMainDir:
 	rts
 }
 
-ShiftLowCoord:
+
+; Target pixel should be in A, other info in $01
+; Sets $04 $05 and $ee
+PrepScrollToEdge:
 {
-	lda $01 : and.b #$03 ; high byte index
-	jsr CalcOpposingShift
-	lda $ab : and.b #$f0 : cmp.b #$20 : bne .lowDone
-	lda OppCoordIndex,y : tax
-	lda #$80 : !add $20,x : sta $20,x
-	.lowDone
-	rts
+    sta $04 : lda $01 : and #$20 : beq +
+        lda #01
+    + sta $05
+    lda $01 : and #$10 : beq +
+        lda #01
+    + sta $ee
+    rts
 }
 
-; expects A to be (0,1,2) (dest number) and (0,1,2) (src door number) to be stored in $04
-; $ab will be set to a bitmask aaaa qxxf
-; a - amount of adjust
-; f - flag, if set, then amount is pos, otherwise neg.
-; q - quadrant, if set, then quadrant needs to be modified
-CalcOpposingShift:
+; Normal Flags should be in $01
+; Sets $04 $05 and $ee, and $fe
+PrepScrollToNormal:
 {
-	stz $ab : stz $ac ; set up
-	cmp.b $04 : beq .noOffset ; (equal, no shifts to do)
-	phy : tay ; reserve these
-	lda $04 : tax : tya : !sub $04 : sta $04 : cmp.b #$00 : bpl .shiftPos
-	lda #$40
-	cpx.b #$01 : beq .skipNegQuad
-	ora #$08
-	.skipNegQuad
-	sta $ab : lda $04 : cmp.b #$FE : beq .done ;already set $ab
-	lda $ab : eor #$60
-	bra .setDone
-
-	.shiftPos
-	lda #$41
-	cpy.b #$01 : beq .skipPosQuad
-	ora #$08
-	.skipPosQuad
-	sta $ab : lda $04 : cmp.b #$02 : bcs .done ;already set $ab
-	lda $ab : eor #$60
-
-	.setDone  sta $ab
-	.done     ply
-	.noOffset rts
-}
-
-
-ShiftQuad:
-{
-	lda $ab : and #$08 : beq .quadDone
-	lda ShiftQuadIndex,y : tax ; X should be set to either 1 (vertical) or 2 (horizontal) (for a9,aa quadrant)
-	lda $ab : and #$01 : beq .decQuad
-	inc $02
-	txa : sta $a8, x ; alter a9/aa
-	bra .quadDone
-	.decQuad
-	dec $02
-	lda #$00 : sta $a8, x ; alter a9/aa
-	.quadDone rts
-}
-
-ShiftVariablesSubDir:
-{
-	lda CoordIndex,y : tax
-	lda $21,x : !add $02 : sta $21,x ; coordinate update
-	lda CameraIndex,y : tax
-	lda $e3,x : !add $03 : sta $e3,x ; scroll register high byte
-	lda CamQuadIndex,y : tax
-	lda $0601,x : !add $02 : sta $0601,x
-	lda $0605,x : !add $02 : sta $0605,x ; high bytes of these guys
-	lda $0603,x : !add $03 : sta $0603,x
-	lda $0607,x : !add $03 : sta $0607,x
-	rts
-}
-
-ShiftCameraBounds:
-{
-	lda CamBoundIndex,y : tax ; should be 0 for horz travel (vert bounds) or 4 for vert travel (horz bounds)
-	rep #$30
-	lda $ab : and #$00f0 : asl #2 : sta $06
-	lda $ab : and #$0001 : cmp #$0000 : beq .subIt
-	lda $0618, x : !add $06 : sta $0618, x
-	lda $061A, x : !add $06 : sta $061A, x
-	sep #$30
-	rts
-	.subIt
-	lda $0618, x : !sub $06 : sta $0618, x
-	lda $061A, x : !sub $06 : sta $061A, x
-	sep #$30
-	rts
+    lda $01 : sta $fe : and #$04 : lsr #2 : sta $ee ; trap door and layer
+    stz $05 : lda #$78 : sta $04
+    lda $01 : and #$03 : beq .end
+        cmp #$02 : !bge +
+            lda #$f8 : sta $04 : bra .end
+        + inc $05
+    .end rts
 }
 
 AdjustTransition:
@@ -276,4 +222,9 @@ AdjustTransition:
 }
 
 AdjustCamAdd:
-    !add $00E2,y : sta $00E2,y : sta $00E0,y : rts
+    !add $00E2,y : pha
+    and #$01ff : cmp #$0111 : !blt +
+        cmp #$01f8 : !bge ++
+            pla : and #$ff10 : pha : bra +
+        ++ pla : and #$ff00 : !add #$0100 : pha
+    + pla : sta $00E2,y : sta $00E0,y : rts

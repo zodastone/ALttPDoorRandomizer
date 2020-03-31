@@ -1188,14 +1188,23 @@ class Door(object):
         if self.type == DoorType.Open:
             bitmask = self.edge_id
             bitmask += 0x10 * self.layer
-            bitmask += 0x20 * self.quadrant
             bitmask += 0x80
             if src.type == DoorType.Open:
+                bitmask += 0x20 * self.quadrant
                 fraction = 0x10 * multiply_lookup[src.edge_width][self.edge_width]
                 fraction += divisor_lookup[src.edge_width][self.edge_width]
                 return [self.roomIndex, bitmask, fraction]
             else:
+                bitmask += 0x20 * self.quad_indicator()
                 return [self.roomIndex, bitmask]
+
+    def quad_indicator(self):
+        if self.direction in [Direction.North, Direction.South]:
+            return self.quadrant & 0x1
+        elif self.direction in [Direction.East, Direction.West]:
+            return (self.quadrant & 0x2) >> 1
+        return 0
+
 
     def dir(self, direction, room, doorIndex, layer):
         self.direction = direction

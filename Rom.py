@@ -319,6 +319,8 @@ def get_sprite_from_name(name):
     name = name.lower()
     if name in ['random', 'randomonhit']:
         return Sprite(random.choice(list(_sprite_table.values())))
+    if name == ('(default link)'):
+        name = 'link'
     return Sprite(_sprite_table[name]) if name in _sprite_table else None
 
 class Sprite(object):
