@@ -106,7 +106,11 @@ LoadRoomHorz:
 
     .normal
     jsr PrepScrollToNormal
-	.scroll jsr ScrollY
+	.scroll
+	lda $01 : and #$40 : pha
+	jsr ScrollY
+	pla : beq .end
+	    ldy #$06 : jsr ApplyScroll
 	.end
 	plb ; restore db register
     rts
@@ -135,7 +139,11 @@ LoadRoomVert:
 
     .normal
     jsr PrepScrollToNormal
-    .scroll jsr ScrollX
+    .scroll
+    lda $01 : and #$40 : pha
+    jsr ScrollX
+    pla : beq .end
+        ldy #$00 : jsr ApplyScroll
     .end
     plb ; restore db register
     rts
@@ -198,33 +206,16 @@ PrepScrollToNormal:
     .end rts
 }
 
-AdjustTransition:
+StraightStairsFix:
 {
-	lda $ab : and #$01ff : beq .reset
-	phy : ldy #$06 ; operating on vertical registers during horizontal trans
-	cpx.b #$02 : bcs .horizontalScrolling
-	ldy #$00  ; operate on horizontal regs during vert trans
-	.horizontalScrolling
-	cmp #$0008 : bcs +
-	    pha : lda $ab : and #$0200 : beq ++
-	        pla : bra .add
-	    ++ pla : eor #$ffff : inc ; convert to negative
-	    .add jsr AdjustCamAdd : ply : bra .reset
-	+ lda $ab : and #$0200 : xba : tax
-	lda.l OffsetTable,x : jsr AdjustCamAdd
-	lda $ab : !sub #$0008 : sta $ab
-	ply : bra .done
-	.reset ; clear the $ab variable so to not disturb intra-tile doors
-	stz $ab
-	.done
-	lda $00 : and #$01fc
-	rtl
+    lda DRMode : bne +
+        !add $20 : sta $20
+    + rtl
 }
 
-AdjustCamAdd:
-    !add $00E2,y : pha
-    and #$01ff : cmp #$0111 : !blt +
-        cmp #$01f8 : !bge ++
-            pla : and #$ff10 : pha : bra +
-        ++ pla : and #$ff00 : !add #$0100 : pha
-    + pla : sta $00E2,y : sta $00E0,y : rts
+StraightStairLayerFix:
+{
+    lda DRMode : beq +
+        lda $ee : rtl
+    + lda $01c322, x : rtl
+}

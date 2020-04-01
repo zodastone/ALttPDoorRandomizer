@@ -24,11 +24,18 @@ NotLinkDoor2:
 
 
 ; Staircase routine
-org $01c3d4 ;(PC: c3d4)
+org $01c3d4 ; <- c3d4 - Bank01.asm : 9762-4 (Dungeon_DetectStaircase-> STA $A0 : LDA $063D, X)
 jsl RecordStairType : nop
 org $02a1e7 ;(PC: 121e7)
 jsl SpiralWarp
 
+
+org $029383 ; <- 11384 - Bank02.asm : 3629 (.walkingDownStaircase-> ADD $20 : STA $20)
+jsl StraightStairsFix : nop
+org $0293aa ; <- 113aa - Bank02.asm : 3653 (ADD $20 : STA $20)
+jsl StraightStairsFix : nop
+org $029396 ; <- 11384 - Bank02.asm : 3641 (LDA $01C322, X)
+jsl StraightStairLayerFix
 
 ; Graphics fix
 org $02895d

@@ -515,52 +515,57 @@ def filter_for_potential_bk_locations(locations):
             and x.name not in key_only_locations.keys() and x.name not in ['Agahnim 1', 'Agahnim 2']]
 
 
+type_map = {
+    Hook.Stairs: Hook.Stairs,
+    Hook.North: Hook.South,
+    Hook.South: Hook.North,
+    Hook.West: Hook.East,
+    Hook.East: Hook.West,
+}
+
+
 def opposite_h_type(h_type):
-    type_map = {
-        Hook.Stairs: Hook.Stairs,
-        Hook.North: Hook.South,
-        Hook.South: Hook.North,
-        Hook.West: Hook.East,
-        Hook.East: Hook.West,
-    }
     return type_map[h_type]
+
+
+hook_map = {
+    Direction.North: Hook.North,
+    Direction.South: Hook.South,
+    Direction.West: Hook.West,
+    Direction.East: Hook.East,
+}
+
+
+hanger_map = {
+    Direction.North: Hook.South,
+    Direction.South: Hook.North,
+    Direction.West: Hook.East,
+    Direction.East: Hook.West,
+}
 
 
 def hook_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
-    if door.type in [DoorType.Normal, DoorType.Open]:
-        dir = {
-            Direction.North: Hook.North,
-            Direction.South: Hook.South,
-            Direction.West: Hook.West,
-            Direction.East: Hook.East,
-        }
-        return dir[door.direction]
+    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs]:
+        return hook_map[door.direction]
     return None
 
 
 def hanger_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
-    if door.type in [DoorType.Normal, DoorType.Open]:
-        dir = {
-            Direction.North: Hook.South,
-            Direction.South: Hook.North,
-            Direction.West: Hook.East,
-            Direction.East: Hook.West,
-        }
-        return dir[door.direction]
+    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs]:
+        return hanger_map[door.direction]
     return None
 
 
 def connect_doors(a, b):
     # Return on unsupported types.
-    if a.type in [DoorType.StraightStairs, DoorType.Hole, DoorType.Warp, DoorType.Ladder,
-                  DoorType.Interior, DoorType.Logical]:
+    if a.type in [DoorType.Hole, DoorType.Warp, DoorType.Ladder, DoorType.Interior, DoorType.Logical]:
         return
     # Connect supported types
-    if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs or a.type == DoorType.Open:
+    if a.type in [DoorType.Normal, DoorType.SpiralStairs, DoorType.Open, DoorType.StraightStairs]:
         if a.blocked:
             connect_one_way(b.entrance, a.entrance)
         elif b.blocked:

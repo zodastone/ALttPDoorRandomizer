@@ -1,7 +1,8 @@
 RecordStairType: {
-    sta $a0
-    lda $0e : sta $045e
-    lda $063d, x
+    pha : lda DRMode : beq +
+         lda $0e : sta $045e : pla : bra .end
+    + pla : sta $a0
+    .end lda $063d, x
     rtl
 }
 

@@ -15,6 +15,7 @@ incsrc drhooks.asm
 ;Main Code
 org $278000 ;138000
 incsrc normal.asm
+incsrc scroll.asm
 incsrc spiral.asm
 incsrc gfx.asm
 incsrc keydoors.asm

@@ -900,7 +900,7 @@ def create_doors(world, player):
         create_door(player, 'TR Crystal Maze Blue Path', Lgcl),
         create_door(player, 'TR Crystal Maze Cane Path', Lgcl),
         create_door(player, 'TR Crystal Maze North Stairs', StrS).dir(No, 0xc4, Mid, High),
-        create_door(player, 'TR Final Abyss South Stairs', StrS).dir(No, 0xb4, Right, High),
+        create_door(player, 'TR Final Abyss South Stairs', StrS).dir(So, 0xb4, Mid, High),
         create_door(player, 'TR Final Abyss NW', Nrml).dir(No, 0xb4, Left, High).big_key().pos(0),
         create_door(player, 'TR Boss SW', Nrml).dir(So, 0xa4, Left, High).no_exit().trap(0x4).pos(0),
 
