@@ -52,7 +52,19 @@ MirrorCheckOverride:
 MirrorCheckOverride2:
     lda $7ef353 : and #$02 : rtl
 
+
+BlockEraseFix:
+    lda $7ef353 : and #$02 : beq +
+        stz $05fc : stz $05fd
+    + rtl
+
 FixShopCode:
     cpx #$300 : !bge +
         sta $7ef000, x
     + rtl
+
+VitreousKeyReset:
+    lda DRMode : beq +
+        stz $0cba, x
+    + jsl $0db818 ;restore old code
+    rtl
