@@ -21,6 +21,7 @@ incsrc keydoors.asm
 incsrc overrides.asm
 ;incsrc edges.asm
 ;incsrc math.asm
+incsrc hudadditions.asm
 warnpc $279000
 
 ; Data Section

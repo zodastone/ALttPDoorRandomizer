@@ -2256,3 +2256,19 @@ compass_data = {
     'Turtle Rock': (0x11F, 0xcb, 0x15e, 0, 0x18),
     'Ganons Tower': (0x13A, 0xcc, 0x170, 2, 0x1a)
 }
+
+# For compass boss indicator
+boss_indicator = {
+    'Eastern Palace': (0x04, 'Eastern Boss SE'),
+    'Desert Palace': (0x06, 'Desert Boss SW'),
+    'Agahnims Tower': (0x08, 'Tower Agahnim 1 SW'),
+    'Swamp Palace': (0x0a, 'Swamp Boss SW'),
+    'Palace of Darkness': (0x0c, 'PoD Boss SE'),
+    'Misery Mire': (0x0e, 'Mire Boss SW'),
+    'Skull Woods': (0x10, 'Skull Spike Corner SW'),
+    'Ice Palace': (0x12, 'Ice Antechamber NE'),
+    'Tower of Hera': (0x14, 'Hera Boss Down Stairs'),
+    'Thieves Town': (0x16, 'Thieves Boss SE'),
+    'Turtle Rock': (0x18, 'TR Boss SW'),
+    'Ganons Tower': (0x1a, 'GT Agahnim 2 SW')
+}

@@ -89,6 +89,13 @@ jsl FixShopCode
 org $1ddeea ; <- Bank1D.asm : 286 (JSL Sprite_LoadProperties)
 jsl VitreousKeyReset
 
+; also rando's hooks.asm line 1360
+org $a0ee11 ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
+jsl DrHudOverride
+org $098638 ; rando's hooks.asm line 2192
+jsl CountChestKeys
+org $06D192 ; rando's hooks.asm line 457
+jsl CountAbsorbedKeys
 
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes
