@@ -304,6 +304,8 @@ def main(args, seed=None, fish=None):
     elif args.create_spoiler:
         logger.info(world.fish.translate("cli","cli","patching.spoiler"))
         world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
+        with open(output_path('%s_Spoiler.json' % outfilebase), 'w') as outfile:
+          outfile.write(world.spoiler.to_json())
 
     YES = world.fish.translate("cli","cli","yes")
     NO = world.fish.translate("cli","cli","no")
