@@ -200,8 +200,6 @@ def main(args, seed=None, fish=None):
 
                 rom = JsonRom() if args.jsonout or use_enemizer else LocalRom(args.rom)
 
-                patch_rom(world, rom, player, team, use_enemizer)
-
                 if use_enemizer and (args.enemizercli or not args.jsonout):
                     if args.rom and not(os.path.isfile(args.rom)):
                         raise RuntimeError("Could not find valid base rom for enemizing at expected path %s." % args.rom)

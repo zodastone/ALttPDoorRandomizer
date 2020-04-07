@@ -96,6 +96,9 @@ org $098638 ; rando's hooks.asm line 2192
 jsl CountChestKeys
 org $06D192 ; rando's hooks.asm line 457
 jsl CountAbsorbedKeys
+; rando's hooks.asm line 1020
+org $05FC7E ; <- 2FC7E - sprite_dash_item.asm : 118 (LDA $7EF36F : INC A : STA $7EF36F)
+jsl CountBonkItem
 
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes

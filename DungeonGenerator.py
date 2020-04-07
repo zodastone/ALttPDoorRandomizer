@@ -1237,7 +1237,7 @@ def assign_location_sectors(dungeon_map, free_location_sectors, global_pole):
             totals[choice] += sector.chest_locations
         valid = True
         for d_name, idx in d_idx.items():
-            if totals[idx] < minimal_locations(d_name):
+            if totals[idx] < 5:  # min locations for dungeons is 5 (bk exception)
                 valid = False
                 break
     for i, choice in enumerate(choices):
@@ -1266,18 +1266,6 @@ def weighted_random_locations(dungeon_map, free_location_sectors):
 
     choices = random.choices(population, weights, k=len(free_location_sectors))
     return choices, d_idx, totals
-
-
-def minimal_locations(dungeon_name):
-    # bump to 5 if maps do something useful for all these dungeons
-    if dungeon_name == 'Hyrule Castle':
-        return 4  # bk + compass + 2 others
-    if dungeon_name == 'Agahnims Tower':
-        return 4
-    if dungeon_name == 'Ganons Tower':
-        return 4
-    # reduce gt to 4 once compasses work
-    return 5
 
 
 def assign_crystal_switch_sectors(dungeon_map, crystal_switches, global_pole, assign_one=False):

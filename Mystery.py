@@ -7,6 +7,7 @@ import re
 
 from DungeonRandomizer import parse_cli
 from Main import main as DRMain
+from source.classes.BabelFish import BabelFish
 
 def parse_yaml(txt):
     def strip(s):
@@ -100,7 +101,7 @@ def main():
     loglevel = {'error': logging.ERROR, 'info': logging.INFO, 'warning': logging.WARNING, 'debug': logging.DEBUG}[erargs.loglevel]
     logging.basicConfig(format='%(message)s', level=loglevel)
 
-    DRMain(erargs, seed)
+    DRMain(erargs, seed, BabelFish())
 
 def get_weights(path):
     try:
@@ -149,6 +150,10 @@ def roll_settings(weights):
     door_shuffle = get_choice('door_shuffle')
     ret.door_shuffle = door_shuffle if door_shuffle != 'none' else 'vanilla'
     ret.experimental = get_choice('experimental') == 'on'
+
+    ret.dungeon_counters = get_choice('dungeon_counters')
+    if ret.dungeon_counters == 'default':
+        ret.dungeon_counters = 'pickup' if ret.door_shuffle != 'vanilla' or ret.compassshuffle == 'on' else 'off'
 
     goal = get_choice('goals')
     ret.goal = {'ganon': 'ganon',
