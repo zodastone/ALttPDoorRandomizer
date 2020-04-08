@@ -715,15 +715,7 @@ def cross_dungeon(world, player):
     all_dungeon_items = [y for x in world.dungeons if x.player == player for y in x.all_items]
     target_items = 34 if world.retro[player] else 63
     d_items = target_items - len(all_dungeon_items)
-    if d_items > 0:
-        if d_items >= 1:  # restore HC map
-            world.get_dungeon('Hyrule Castle', player).dungeon_items.append(ItemFactory('Map (Escape)', player))
-        if d_items >= 2:  # restore GT map
-            world.get_dungeon('Ganons Tower', player).dungeon_items.append(ItemFactory('Map (Ganons Tower)', player))
-        if d_items > 2:
-            world.pool_adjustment[player] = d_items - 2
-    elif d_items < 0:
-        world.pool_adjustment[player] = d_items
+    world.pool_adjustment[player] = d_items
     smooth_door_pairs(world, player)
 
     # Re-assign dungeon bosses
@@ -1300,7 +1292,7 @@ def stateful_door(door, kind):
 
 
 def random_door_type(door, partner, world, player, type_a, type_b, room_a, room_b):
-    r_kind = random.choices([DoorKind.Normal, DoorKind.Bombable, DoorKind.Dashable], [5, 2, 3], k=1)[0]
+    r_kind = random.choices([DoorKind.Normal, DoorKind.Bombable, DoorKind.Dashable], [15, 4, 6], k=1)[0]
     if r_kind != DoorKind.Normal:
         if door.type == DoorType.Normal:
             add_pair(door, partner, world, player)
@@ -1492,6 +1484,7 @@ class DROptions(Flag):
     NoOptions = 0x00
     Eternal_Mini_Bosses = 0x01  # If on, GT minibosses marked as defeated when they try to spawn a heart
     Town_Portal = 0x02  # If on, Players will start with mirror scroll
+    Map_Info = 0x04
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
 
 # DATA GOES DOWN HERE

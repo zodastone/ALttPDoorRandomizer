@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '9106102ce69cf290fe2f4fce1e95a89b'
+RANDOMIZERBASEHASH = 'da4e48a9692a3f7c488dfb3dcaa58f42'
 
 
 class JsonRom(object):
@@ -592,8 +592,12 @@ def patch_rom(world, rom, player, team, enemized):
     if world.mode[player] == 'inverted':
         patch_shuffled_dark_sanc(world, rom, player)
 
+    # setup dr option flags based on experimental, etc.
+    dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' else  DROptions.Town_Portal
+    if world.experimental[player]:
+        dr_flags |= DROptions.Map_Info
+
     # patch doors
-    dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' or not world.experimental[player] else DROptions.Town_Portal
     if world.doorShuffle[player] == 'crossed':
         rom.write_byte(0x139004, 2)
         for name, layout in world.key_layout[player].items():

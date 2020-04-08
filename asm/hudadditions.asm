@@ -16,8 +16,11 @@ HudAdditions:
                     lda #$345e : sta $7ec790 : bra .next
         + lda #$207f : sta $7ec790
     .next lda DRMode : and #$0002 : bne + : plb : rts : +
-            lda DungeonReminderTable, x : sta $7ec702
+            lda $7ef36d : and #$00ff : beq +
+                lda DungeonReminderTable, x : sta $7ec702
+            + lda DRFlags : and #$0040 : beq .restore
             lda $7ef368 : and.l $0098c0, x : beq .restore
+
                 lda #$2811 : sta $7ec740
                 lda $7ef366 : and.l $0098c0, x : bne .check
                     lda BigKeyStatus, x : and #$00ff : bne + ;todo: "and" is redundant or change table to one byte
@@ -27,7 +30,7 @@ HudAdditions:
                     + lda #$207f : bra ++
                 .check lda #$2826
                 ++ sta $7ec742
-                + txa : lsr : tax
+                txa : lsr : tax
 
                 lda $7ef4e0, x : jsr ConvertToDisplay : sta $7ec7a2
                 lda #$2830 : sta $7ec7a4
@@ -47,8 +50,6 @@ ConvertToDisplay:
         !add #$2553 : rts
     + !add #$2490 : rts
 
-; and $18c0, x
-;207f is blank
 
 CountChestKeys:
     jsl ItemDowngradeFix
