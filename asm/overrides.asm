@@ -68,3 +68,9 @@ VitreousKeyReset:
         stz $0cba, x
     + jsl $0db818 ;restore old code
     rtl
+
+GuruguruFix:
+    lda $a0 : cmp #$df : !bge +
+        and #$0f : cmp #$0e : !blt +
+            iny #2
+    + rtl

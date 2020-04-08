@@ -89,6 +89,11 @@ jsl FixShopCode
 org $1ddeea ; <- Bank1D.asm : 286 (JSL Sprite_LoadProperties)
 jsl VitreousKeyReset
 
+org $1ed024 ;  f5024 sprite_guruguru_bar.asm : 27 (LDA $040C : CMP.b #$12 : INY #2
+jsl GuruguruFix : bra .next
+nop #3
+.next
+
 ; also rando's hooks.asm line 1360
 org $a0ee11 ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
 jsl DrHudOverride
