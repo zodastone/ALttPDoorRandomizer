@@ -154,7 +154,7 @@
     "randomizer.gameoptions.sprite.unchanged": "(unchanged)",
 
 
-    "randomizer.generation.spoiler": "Create Spoiler Log",
+    "randomizer.generation.createspoiler": "Create Spoiler Log",
     "randomizer.generation.createrom": "Create Patched ROM",
     "randomizer.generation.calcplaythrough": "Calculate Playthrough",
     "randomizer.generation.usestartinventory": "Use Starting Inventory",

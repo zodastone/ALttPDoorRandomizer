@@ -3,6 +3,9 @@ import os
 import shutil
 import sys
 
+# Spec file
+SPEC_FILE = os.path.join("Gui.spec")
+
 # Destination is current dir
 DEST_DIRECTORY = '.'
 
@@ -16,7 +19,7 @@ if os.path.isdir("build") and not sys.platform.find("mac") and not sys.platform.
     shutil.rmtree("build")
 
 # Run pyinstaller for Gui
-subprocess.run(" ".join(["pyinstaller Gui.spec ",
+subprocess.run(" ".join([f"pyinstaller {SPEC_FILE} ",
                                       upx_string,
                                       "-y ",
                                       "--onefile ",

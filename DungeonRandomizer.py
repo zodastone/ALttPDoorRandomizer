@@ -9,15 +9,23 @@ import shlex
 import sys
 
 from source.classes.BabelFish import BabelFish
+import source.classes.diags as diagnostics
 
 from CLI import parse_cli, get_args_priority
-from Main import main, EnemizerError
+from Main import main, EnemizerError, __version__
 from Rom import get_sprite_from_name
 from Utils import is_bundled, close_console
 from Fill import FillError
 
 def start():
     args = parse_cli(None)
+
+    # print diagnostics
+    # usage: py DungeonRandomizer.py --diags
+    if args.diags:
+        diags = diagnostics.output(__version__)
+        print("\n".join(diags))
+        sys.exit(0)
 
     if is_bundled() and len(sys.argv) == 1:
         # for the bundled builds, if we have no arguments, the user

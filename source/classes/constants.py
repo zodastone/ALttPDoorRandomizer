@@ -101,7 +101,7 @@ SETTINGSTOPROCESS = {
       "uwpalettes": "uw_palettes"
     },
     "generation": {
-      "spoiler": "create_spoiler",
+      "createspoiler": "create_spoiler",
       "createrom": "create_rom",
       "calcplaythrough": "calc_playthrough",
       "usestartinventory": "usestartinventory",
