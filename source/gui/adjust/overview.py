@@ -104,7 +104,7 @@ def adjust_page(top, parent, settings):
             arg = options[option]
             setattr(guiargs, arg, self.widgets[option].storageVar.get())
         guiargs.rom = self.romVar2.get()
-        guiargs.baserom = top.pages["randomizer"].pages["generation"].romVar.get()
+        guiargs.baserom = top.pages["randomizer"].pages["generation"].widgets["rom"].storageVar.get()
         guiargs.sprite = self.sprite
         try:
             adjust(args=guiargs)

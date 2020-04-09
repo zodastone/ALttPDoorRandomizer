@@ -23,7 +23,7 @@ def prepare_env():
 
 	# get app version
   APP_VERSION = ""
-  APP_VERSION_FILE = "./resources/app/meta/manifests/app_version.txt"
+  APP_VERSION_FILE = os.path.join(".","resources","app","meta","manifests","app_version.txt")
   if os.path.isfile(APP_VERSION_FILE):
     with open(APP_VERSION_FILE,"r") as f:
       APP_VERSION = f.readlines()[0].strip()

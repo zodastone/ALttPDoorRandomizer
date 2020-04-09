@@ -1,8 +1,17 @@
 {
   "lang": {},
+  "diags": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "create_spoiler": {
     "action": "store_true",
     "type": "bool"
+  },
+  "suppress_spoiler": {
+    "action": "store_false",
+    "dest": "create_spoiler",
+    "help": "suppress"
   },
   "logic": {
     "choices": [
@@ -195,8 +204,13 @@
     ]
   },
   "hints": {
-    "action": "store_true",
+    "action": "store_false",
     "type": "bool"
+  },
+  "no_hints": {
+    "action": "store_true",
+    "dest": "hints",
+    "help": "suppress"
   },
   "heartbeep": {
     "choices": [
