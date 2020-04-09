@@ -25,5 +25,5 @@ Note: Only one of the key indicator will probably become core at most.
 
 * Splashing at hobo no longer prevents you from buying bomb capacity upgrades
 * Small vitreous eyeballs will not drop items (DR basic and crossed only)
-* In Vanilla doors the HC back hallway area was broken - should be better now
+* In Vanilla doors the HC back hallway area was broken - should be better now - also Trap Doors
 * Firebar speed should now be consistent. Ice palace rooms have slow firebars even if shuffled to other dungeons. Others should have normal speed firebars.
