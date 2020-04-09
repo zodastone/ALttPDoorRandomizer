@@ -35,8 +35,6 @@ def is_bundled():
     return getattr(sys, 'frozen', False)
 
 def local_path(path):
-    return path
-
     if local_path.cached_path is not None:
         return os.path.join(local_path.cached_path, path)
 
@@ -260,10 +258,10 @@ def update_deprecated_args(args):
             if isinstance(argVars["hints"],dict):
                 tmp = {}
                 for idx in range(1,len(argVars["hints"]) + 1):
-                    tmp[idx] = not argVars[src] in truthy # tmp = !src
-                args.hints = tmp # dest = tmp
+                    tmp[idx] = argVars[src] not in truthy  # tmp = !src
+                args.hints = tmp  # dest = tmp
             else:
-                args.hints = not args.no_hints in truthy # dest = !src
+                args.hints = args.no_hints not in truthy  # dest = !src
         # Don't do: No
         # Do:       Yes
         if "hints" in argVars:
@@ -271,10 +269,10 @@ def update_deprecated_args(args):
             if isinstance(argVars["hints"],dict):
                 tmp = {}
                 for idx in range(1,len(argVars["hints"]) + 1):
-                    tmp[idx] = not argVars[src] in truthy # tmp = !src
-                args.no_hints = tmp # dest = tmp
+                    tmp[idx] = argVars[src] not in truthy  # tmp = !src
+                args.no_hints = tmp  # dest = tmp
             else:
-                args.no_hints = not args.hints in truthy # dest = !src
+                args.no_hints = args.hints not in truthy  # dest = !src
 
         # Spoiler defaults to FALSE
         # Don't do: No

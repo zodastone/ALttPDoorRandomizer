@@ -255,7 +255,7 @@ def main(args, seed=None, fish=None):
                       "mscb": mcsb_name,                                              # 9
                       "retro": world.retro[player],                                   # A
                       "progressive": world.progressive,                               # B
-                      "hints": str(world.hints[player])                               # C
+                      "hints": 'True' if world.hints[player] else 'False'             # C
                     }
                     #                  0  1  2  3  4 5  6  7  8 9 A B C
                     outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s_%s-%s%s%s%s%s' % (
@@ -303,9 +303,11 @@ def main(args, seed=None, fish=None):
         print(json.dumps({**jsonout, 'spoiler': world.spoiler.to_json()}))
     elif args.create_spoiler:
         logger.info(world.fish.translate("cli","cli","patching.spoiler"))
-        world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
-        with open(output_path('%s_Spoiler.json' % outfilebase), 'w') as outfile:
-          outfile.write(world.spoiler.to_json())
+        if args.jsonout:
+            with open(output_path('%s_Spoiler.json' % outfilebase), 'w') as outfile:
+              outfile.write(world.spoiler.to_json())
+        else:
+            world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
 
     YES = world.fish.translate("cli","cli","yes")
     NO = world.fish.translate("cli","cli","no")
