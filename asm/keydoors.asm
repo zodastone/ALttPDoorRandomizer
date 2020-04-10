@@ -12,8 +12,9 @@
 CheckIfDoorsOpen: {
     jsr TrapDoorFixer ; see normal.asm
     ; note we are 16bit mode right now
-    lda $040c : cmp #$00ff : bne .gtg
-    lda $a0 : dec : tax : and #$000f ; hijacked code
+    lda DRMode : beq +
+        lda $040c : cmp #$00ff : bne .gtg
+    + lda $a0 : dec : tax : and #$000f ; hijacked code
     sec : rtl ; set carry to indicate normal behavior
 
     .gtg

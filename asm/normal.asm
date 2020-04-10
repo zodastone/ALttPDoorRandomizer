@@ -42,6 +42,20 @@ WarpDown:
 	jsr Cleanup
 	rtl
 
+; carry set = use link door like normal
+; carry clear = we are in dr mode, never use linking doors
+CheckLinkDoorR:
+    lda DRMode : bne +
+        lda $7ec004 : sta $a0 ; what we wrote over
+        sec : rtl
+    + clc : rtl
+
+CheckLinkDoorL:
+    lda DRMode : bne +
+        lda $7ec003 : sta $a0 ; what we wrote over
+        sec : rtl
+    + clc : rtl
+
 TrapDoorFixer:
     lda $fe : and #$0038 : beq .end
     xba : asl #2 : sta $00

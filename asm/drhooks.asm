@@ -11,12 +11,14 @@ jsl AdjustTransition
 nop
 
 ;turn off linking doors -- see .notRoomLinkDoor label in Bank02.asm
-org $02b5a6
-bra NotLinkDoor1
+org $02b5a8 ; <- 135a8 - Bank02.asm : 8368 (LDA $7EC004 : STA $A0)
+jsl CheckLinkDoorR
+bcc NotLinkDoor1
 org $02b5b6
 NotLinkDoor1:
-org $02b647
-bra NotLinkDoor2
+org $02b649 ; <- 135a8 - Bank02.asm : 8482 (LDA $7EC004 : STA $A0)
+jsl CheckLinkDoorL
+bcc NotLinkDoor2
 org $02b657
 NotLinkDoor2:
 
@@ -77,7 +79,31 @@ org $2081f2
 jsl MirrorCheckOverride2
 org $20825c
 jsl MirrorCheckOverride2
+org $07a955 ; <- Bank07.asm : around 6564 (JP is a bit different) (STZ $05FC : STZ $05FD)
+jsl BlockEraseFix
+nop #2
 
+org $02b82a
+jsl FixShopCode
+
+org $1ddeea ; <- Bank1D.asm : 286 (JSL Sprite_LoadProperties)
+jsl VitreousKeyReset
+
+org $1ed024 ;  f5024 sprite_guruguru_bar.asm : 27 (LDA $040C : CMP.b #$12 : INY #2
+jsl GuruguruFix : bra .next
+nop #3
+.next
+
+; also rando's hooks.asm line 1360
+org $a0ee11 ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
+jsl DrHudOverride
+org $098638 ; rando's hooks.asm line 2192
+jsl CountChestKeys
+org $06D192 ; rando's hooks.asm line 457
+jsl CountAbsorbedKeys
+; rando's hooks.asm line 1020
+org $05FC7E ; <- 2FC7E - sprite_dash_item.asm : 118 (LDA $7EF36F : INC A : STA $7EF36F)
+jsl CountBonkItem
 
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes

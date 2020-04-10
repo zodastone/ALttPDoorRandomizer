@@ -1,16 +1,5 @@
 {
-  "worlds": {
-    "type": "spinbox",
-    "label": {
-      "text": "Worlds"
-    },
-    "managerAttrs": {
-      "label": {
-        "side": "left"
-      },
-      "spinbox": {
-        "side": "right"
-      }
-    }
+  "widgets": {
+    "worlds": { "type": "spinbox" }
   }
 }

@@ -234,7 +234,7 @@ def valid_key_placement(item, location, itempool, world):
             return True
         key_logic = world.key_logic[item.player][dungeon.name]
         unplaced_keys = len([x for x in itempool if x.name == key_logic.small_key_name and x.player == item.player])
-        return key_logic.check_placement(unplaced_keys)
+        return key_logic.check_placement(unplaced_keys, location if item.bigkey else None)
     else:
         inside_dungeon_item = ((item.smallkey and not world.keyshuffle[item.player])
                                or (item.bigkey and not world.bigkeyshuffle[item.player]))
@@ -392,7 +392,7 @@ def balance_multiworld_progression(world):
             threshold = max(reachable_locations_count.values()) - 20
 
             balancing_players = [player for player, reachables in reachable_locations_count.items() if reachables < threshold]
-            if balancing_players:
+            if balancing_players is not None and len(balancing_players) > 0:
                 balancing_state = state.copy()
                 balancing_unchecked_locations = unchecked_locations.copy()
                 balancing_reachables = reachable_locations_count.copy()

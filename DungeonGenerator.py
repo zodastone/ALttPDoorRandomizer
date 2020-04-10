@@ -710,7 +710,7 @@ class ExplorationState(object):
                         self.key_locations += 1
                     if location.name not in dungeon_events and '- Prize' not in location.name and location.name not in ['Agahnim 1', 'Agahnim 2']:
                         self.ttl_locations += 1
-                if location not in self.found_locations:
+                if location not in self.found_locations:  # todo: special logic for TT Boss?
                     self.found_locations.append(location)
                     if not bk_Flag:
                         self.bk_found.add(location)
@@ -1152,8 +1152,8 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player, dunge
     # polarity:
     if not global_pole.is_valid(dungeon_map):
         raise NeutralizingException('Either free location/crystal assignment is already globally invalid - lazy dev check this earlier!')
-    logger.info('-Balancing Doors')
-    assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger)
+    logger.info(world.fish.translate("cli","cli","balance.doors"))
+    assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger, world.fish)
     # the rest
     assign_the_rest(dungeon_map, neutral_sectors, global_pole)
     return dungeon_map
@@ -1322,7 +1322,7 @@ def assign_location_sectors(dungeon_map, free_location_sectors, global_pole):
             totals[choice] += sector.chest_locations
         valid = True
         for d_name, idx in d_idx.items():
-            if totals[idx] < minimal_locations(d_name):
+            if totals[idx] < 5:  # min locations for dungeons is 5 (bk exception)
                 valid = False
                 break
     for i, choice in enumerate(choices):
@@ -1351,18 +1351,6 @@ def weighted_random_locations(dungeon_map, free_location_sectors):
 
     choices = random.choices(population, weights, k=len(free_location_sectors))
     return choices, d_idx, totals
-
-
-def minimal_locations(dungeon_name):
-    # bump to 5 if maps do something useful for all these dungeons
-    if dungeon_name == 'Hyrule Castle':
-        return 4  # bk + compass + 2 others
-    if dungeon_name == 'Agahnims Tower':
-        return 4
-    if dungeon_name == 'Ganons Tower':
-        return 4
-    # reduce gt to 4 once compasses work
-    return 5
 
 
 def assign_crystal_switch_sectors(dungeon_map, crystal_switches, crystal_barriers, global_pole, assign_one=False):
@@ -1566,9 +1554,9 @@ def sum_polarity(sector_list):
     return pol
 
 
-def assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger):
+def assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger, fish):
     # step 1: fix polarity connection issues
-    logger.info('--Basic Traversal')
+    logger.info(fish.translate("cli","cli","basic.traversal"))
     unconnected_builders = identify_polarity_issues(dungeon_map)
     while len(unconnected_builders) > 0:
         for name, builder in unconnected_builders.items():
@@ -1606,7 +1594,7 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger
         problem_builders = identify_simple_branching_issues(problem_builders)
 
     # step 3: fix neutrality issues
-    polarity_step_3(dungeon_map, polarized_sectors, global_pole, logger)
+    polarity_step_3(dungeon_map, polarized_sectors, global_pole, logger, fish)
 
     # step 4: fix dead ends again
     neutral_choices: List[List] = neutralize_the_rest(polarized_sectors)
@@ -1657,7 +1645,7 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger
         tries += 1
 
 
-def polarity_step_3(dungeon_map, polarized_sectors, global_pole, logger):
+def polarity_step_3(dungeon_map, polarized_sectors, global_pole, logger, fish):
     # step 3a: fix odd builders
     odd_builders = [x for x in dungeon_map.values() if sum_polarity(x.sectors).charge() % 2 != 0]
     random.shuffle(odd_builders)
@@ -1688,7 +1676,7 @@ def polarity_step_3(dungeon_map, polarized_sectors, global_pole, logger):
     random.shuffle(builder_order)
     for builder in builder_order:
         # global_pole.check_odd_polarities(polarized_sectors, dungeon_map)
-        logger.info('--Balancing %s', builder.name)
+        logger.info('%s %s', fish.translate("cli", "cli", "balancing"), builder.name)
         while not builder.polarity().is_neutral():
             rejects = []
             candidates = find_neutralizing_candidates(builder, polarized_sectors, rejects)
@@ -2203,9 +2191,9 @@ def assign_the_rest(dungeon_map, neutral_sectors, global_pole):
         tries += 1
 
 
-def split_dungeon_builder(builder, split_list):
+def split_dungeon_builder(builder, split_list, fish):
     logger = logging.getLogger('')
-    logger.info('Splitting Up Desert/Skull')
+    logger.info(fish.translate("cli","cli","splitting.up") + ' ' + 'Desert/Skull')
     candidate_sectors = dict.fromkeys(builder.sectors)
     global_pole = GlobalPolarity(candidate_sectors)
 
@@ -2216,10 +2204,10 @@ def split_dungeon_builder(builder, split_list):
         sub_builder.all_entrances = split_entrances
         for r_name in split_entrances:
             assign_sector(find_sector(r_name, candidate_sectors), sub_builder, candidate_sectors, global_pole)
-    return balance_split(candidate_sectors, dungeon_map, global_pole)
+    return balance_split(candidate_sectors, dungeon_map, global_pole, fish)
 
 
-def balance_split(candidate_sectors, dungeon_map, global_pole):
+def balance_split(candidate_sectors, dungeon_map, global_pole, fish):
     logger = logging.getLogger('')
     # categorize sectors
     check_for_forced_dead_ends(dungeon_map, candidate_sectors, global_pole)
@@ -2236,8 +2224,8 @@ def balance_split(candidate_sectors, dungeon_map, global_pole):
     # blue barriers
     assign_crystal_barrier_sectors(dungeon_map, crystal_barriers, global_pole)
     # polarity:
-    logger.info('-Re-balancing ' + next(iter(dungeon_map.keys())) + ' et al')
-    assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger)
+    logger.info(fish.translate("cli","cli","re-balancing") + ' ' + next(iter(dungeon_map.keys())) + ' et al')
+    assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger, fish)
     # the rest
     assign_the_rest(dungeon_map, neutral_sectors, global_pole)
     return dungeon_map

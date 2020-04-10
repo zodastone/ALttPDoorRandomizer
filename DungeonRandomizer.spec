@@ -1,7 +1,11 @@
 # -*- mode: python -*-
 
+import sys
+
 block_cipher = None
 console = True
+
+BINARY_SLUG = "DungeonRandomizer"
 
 def recurse_for_py_files(names_so_far):
   returnvalue = []
@@ -21,10 +25,14 @@ def recurse_for_py_files(names_so_far):
   return returnvalue
 
 hiddenimports = []
+binaries = []
 
-a = Analysis(['DungeonRandomizer.py'],
+#if sys.platform.find("windows"):
+#  binaries.append(("ucrtbase.dll","."))
+
+a = Analysis([f"./{BINARY_SLUG}.py"],
              pathex=[],
-             binaries=[],
+             binaries=binaries,
              datas=[],
              hiddenimports=hiddenimports,
              hookspath=[],
@@ -50,7 +58,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='DungeonRandomizer',
+          name=BINARY_SLUG,
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

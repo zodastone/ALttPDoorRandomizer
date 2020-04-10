@@ -1,7 +1,13 @@
 # -*- mode: python -*-
 
+import sys
+
 block_cipher = None
 console = True
+
+if sys.platform.find("mac") or sys.platform.find("osx"):
+  console = False
+BINARY_SLUG = "Gui"
 
 def recurse_for_py_files(names_so_far):
   returnvalue = []
@@ -21,10 +27,14 @@ def recurse_for_py_files(names_so_far):
   return returnvalue
 
 hiddenimports = []
+binaries = []
 
-a = Analysis(['Gui.py'],
+#if sys.platform.find("windows"):
+#  binaries.append(("ucrtbase.dll","."))
+
+a = Analysis([f"./{BINARY_SLUG}.py"],
              pathex=[],
-             binaries=[],
+             binaries=binaries,
              datas=[],
              hiddenimports=hiddenimports,
              hookspath=[],
@@ -50,7 +60,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='Gui',
+          name=BINARY_SLUG,
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
