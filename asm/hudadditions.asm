@@ -17,8 +17,10 @@ HudAdditions:
         + lda #$207f : sta $7ec790
     .next lda DRMode : and #$0002 : bne + : plb : rts : +
             lda $7ef36d : and #$00ff : beq +
-                lda DungeonReminderTable, x : sta $7ec702
-            + lda DRFlags : and #$0040 : beq .restore
+                lda DungeonReminderTable, x : bra .reminder
+            + lda #$207f
+            .reminder sta $7ec702
+            + lda DRFlags : and #$0004 : beq .restore
             lda $7ef368 : and.l $0098c0, x : beq .restore
 
                 lda #$2811 : sta $7ec740
