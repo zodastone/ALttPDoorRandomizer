@@ -63,6 +63,13 @@ def set_rules(world, player):
     if not world.swamp_patch_required[player]:
         add_rule(world.get_entrance('Swamp Palace Moat', player), lambda state: state.has_Mirror(player))
 
+    ganons_tower = world.get_entrance('Inverted Ganons Tower' if world.mode == 'inverted' else 'Ganons Tower', player)
+    set_rule(ganons_tower, lambda state: False) # This is a safety for the TR function below to not require GT entrance in its key logic.
+
+    set_trock_key_rules(world, player)
+
+    set_rule(ganons_tower, lambda state: state.has_crystals(world.crystals_needed_for_gt, player))
+
     if world.mode != 'inverted':
         set_bunny_rules(world, player)
     else:
@@ -461,14 +468,9 @@ def global_rules(world, player):
                                                         and (state.has('Tempered Sword', player) or state.has('Golden Sword', player) or (state.has('Silver Arrows', player) and state.can_shoot_arrows(player)) or state.has('Lamp', player) or state.can_extend_magic(player, 12)))  # need to light torch a sufficient amount of times
     set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has_beam_sword(player))  # need to damage ganon to get tiles to drop
 
-    set_rule(world.get_entrance('Ganons Tower', player), lambda state: False) # This is a safety for the TR function below to not require GT entrance in its key logic.
-
     if world.swords == 'swordless':
         swordless_rules(world, player)
 
-    set_trock_key_rules(world, player)
-
-    set_rule(world.get_entrance('Ganons Tower', player), lambda state: state.has_crystals(world.crystals_needed_for_gt, player))
 
 def inverted_rules(world, player):
     if world.goal == 'triforcehunt':
@@ -851,14 +853,9 @@ def inverted_rules(world, player):
                                                         and (state.has('Tempered Sword', player) or state.has('Golden Sword', player) or (state.has('Silver Arrows', player) and state.can_shoot_arrows(player)) or state.has('Lamp', player) or state.can_extend_magic(player, 12)))  # need to light torch a sufficient amount of times
     set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has_beam_sword(player))  # need to damage ganon to get tiles to drop
 
-    set_rule(world.get_entrance('Inverted Ganons Tower', player), lambda state: False) # This is a safety for the TR function below to not require GT entrance in its key logic.
-
     if world.swords == 'swordless':
         swordless_rules(world, player)
 
-    set_trock_key_rules(world, player)
-
-    set_rule(world.get_entrance('Inverted Ganons Tower', player), lambda state: state.has_crystals(world.crystals_needed_for_gt, player))
 
 def forbid_overworld_glitches(world, player):
     for exit in OWGSets.get_boots_clip_exits_lw(world.mode == 'inverted'):
