@@ -25,7 +25,7 @@ HudAdditions:
 
                 lda #$2811 : sta $7ec740
                 lda $7ef366 : and.l $0098c0, x : bne .check
-                    lda BigKeyStatus, x : and #$00ff : bne + ;todo: "and" is redundant or change table to one byte
+                    lda BigKeyStatus, x : bne + ; change this, if bk status changes to one byte
                         lda #$2574 : bra ++
                     + cmp #$0002 : bne +
                         lda #$2420 : bra ++
@@ -59,6 +59,7 @@ CountChestKeys:
     rtl
 
 CountChest:
+    lda !MULTIWORLD_ITEM_PLAYER_ID : bne .end
     cpy #$24 : beq +
     cpy #$a0 : !blt .end
     cpy #$ae : !bge .end
