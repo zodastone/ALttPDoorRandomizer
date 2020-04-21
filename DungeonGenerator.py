@@ -1508,6 +1508,8 @@ def loop_present(hook, opp, h_mag, other_mag):
 
 
 def is_entrance_sector(builder, sector):
+    if builder is None:
+        return False
     for entrance in builder.all_entrances:
         r_set = sector.region_set()
         if entrance in r_set:
@@ -1648,28 +1650,33 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger
 def polarity_step_3(dungeon_map, polarized_sectors, global_pole, logger, fish):
     # step 3a: fix odd builders
     odd_builders = [x for x in dungeon_map.values() if sum_polarity(x.sectors).charge() % 2 != 0]
+    grouped_choices: List[List] = find_forced_groupings(polarized_sectors, dungeon_map)
     random.shuffle(odd_builders)
-    for builder in odd_builders:
-        while sum_polarity(builder.sectors).charge() % 2 != 0:
-            grouped_choices: List[List] = find_forced_groupings(polarized_sectors, dungeon_map)
-            odd_candidates = find_odd_sectors_ranked_by_charge(builder, grouped_choices)
-            sub_candidates, valid, best_charge, candidate_list = [], False, min(list(odd_candidates.keys())), None
-            while not valid:
-                if len(sub_candidates) == 0:
-                    if len(odd_candidates) == 0:
-                        raise NeutralizingException('Unable to fix dungeon parity: %s' % builder.name)
-                    while best_charge not in odd_candidates.keys():
-                        best_charge += 2
-                    sub_candidates = odd_candidates.pop(best_charge)
-                candidate_list = random.choice(sub_candidates)
-                sub_candidates.remove(candidate_list)
-                test_set = find_forced_connections(dungeon_map, candidate_list, polarized_sectors)
-                if ensure_test_set_connectedness(test_set, builder, polarized_sectors, dungeon_map, global_pole):
-                    valid = global_pole.is_valid_choice(dungeon_map, builder, test_set) and valid_branch_only(builder, candidate_list)
-                else:
-                    valid = False
-            for candidate in candidate_list:
-                assign_sector(candidate, builder, polarized_sectors, global_pole)
+    odd_candidates = find_odd_sectors(grouped_choices)
+    tries = 0
+    while len(odd_builders) > 0:
+        if tries > 1000:
+            raise Exception('Unable to fix dungeon parity. Ref: %s' % next(iter(odd_builders)).name)
+        choices = random.sample(odd_candidates, k=len(odd_builders))
+        all_valid = True
+        for i, candidate_list in enumerate(choices):
+            test_set = find_forced_connections(dungeon_map, candidate_list, polarized_sectors)
+            builder = odd_builders[i]
+            if ensure_test_set_connectedness(test_set, builder, polarized_sectors, dungeon_map, global_pole):
+                all_valid &= global_pole.is_valid_choice(dungeon_map, builder, test_set) and valid_branch_only(builder, candidate_list)
+            else:
+                all_valid = False
+                break
+            if not all_valid:
+                break
+        if all_valid:
+            for i, candidate_list in enumerate(choices):
+                builder = odd_builders[i]
+                for sector in candidate_list:
+                    assign_sector(sector, builder, polarized_sectors, global_pole)
+            odd_builders = [x for x in dungeon_map.values() if sum_polarity(x.sectors).charge() % 2 != 0]
+        else:
+            tries += 1
 
     # step 3b: neutralize all builders
     builder_order = list(dungeon_map.values())
@@ -1915,13 +1922,8 @@ def calc_sector_balance(sector):  # todo: move to base class?
                 sector.conn_balance[hanger_from_door(door)] += 1
 
 
-def find_odd_sectors_ranked_by_charge(builder, grouped_candidates):
-    polarity = builder.polarity()
-    candidates = defaultdict(list)
-    for candidate_list in [x for x in grouped_candidates if sum_polarity(x).charge() % 2 != 0]:
-        p_charge = (polarity + sum_polarity(candidate_list)).charge()
-        candidates[p_charge].append(candidate_list)
-    return candidates
+def find_odd_sectors(grouped_candidates):
+    return [x for x in grouped_candidates if sum_polarity(x).charge() % 2 != 0]
 
 
 # todo: refactor to return prioritized lists
@@ -1944,6 +1946,8 @@ def find_neutralizing_candidates(builder, sector_pool, rejects):
                         continue
                 last_r = r
                 combinations = ncr(len(main_pool), r)
+                if combinations > 100000:
+                    raise NeutralizingException('Cross Dungeon Builder: Too many combinations %s' % builder.name)
                 for i in range(0, combinations):
                     choice = kth_combination(i, main_pool, r)
                     p_charge = (polarity + sum_polarity(choice)).charge()
@@ -2067,10 +2071,11 @@ def neutralize_the_rest(sector_pool):
     return neutral_choices
 
 
+# doesn't force a grouping when all in the found_list comes from the same sector
 def find_forced_groupings(sector_pool, dungeon_map):
     dungeon_hooks = {}
     for name, builder in dungeon_map.items():
-        dungeon_hooks[name] = sum_hook_magnitude(builder.sectors)
+        dungeon_hooks[name] = categorize_groupings(builder.sectors)
     groupings = []
     queue = deque(sector_pool)
     skips = set()
@@ -2080,30 +2085,76 @@ def find_forced_groupings(sector_pool, dungeon_map):
         if not is_list and grouping in skips:
             continue
         grouping = grouping if is_list else [grouping]
-        hook_mag = sum_hook_magnitude(grouping)
+        hook_categories = categorize_groupings(grouping)
         force_found = False
         for val in Hook:
-            if hook_mag[val.value] == 1:
-                opp = opposite_h_type(val).value
-                num_found = hook_mag[opp]
-                for name, hooks in dungeon_hooks.items():
-                    if hooks[opp] > 0:
-                        num_found += hooks[opp]
-                other_sectors = [x for x in sector_pool if x not in grouping]
-                other_sector_mag = sum_hook_magnitude(other_sectors)
-                if other_sector_mag[opp] > 0:
-                    num_found += other_sector_mag[opp]
-                if num_found == 1:
-                    forced_sector = None
-                    for sec in other_sectors:
-                        if sec.hook_magnitude()[opp] > 0:
-                            forced_sector = sec
-                            break
-                    if forced_sector:
-                        grouping.append(forced_sector)
-                        skips.add(forced_sector)
-                        queue.append(grouping)
-                        force_found = True
+            if val in hook_categories.keys():
+                required_doors, flexible_doors = hook_categories[val]
+                if len(required_doors) >= 1:
+                    opp = opposite_h_type(val)
+                    found_list = []
+                    if opp in hook_categories.keys() and len(hook_categories[opp][1]) > 0:
+                        found_list.extend(hook_categories[opp][1])
+                    for name, hooks in dungeon_hooks.items():
+                        if opp in hooks.keys() and len(hooks[opp][1]) > 0:
+                            found_list.extend(hooks[opp][1])
+                    other_sectors = [x for x in sector_pool if x not in grouping]
+                    other_sector_cats = categorize_groupings(other_sectors)
+                    if opp in other_sector_cats.keys() and len(other_sector_cats[opp][1]) > 0:
+                        found_list.extend(other_sector_cats[opp][1])
+                    if len(required_doors) == len(found_list):
+                        forced_sectors = []
+                        for sec in other_sectors:
+                            cats = categorize_groupings([sec])
+                            if opp in cats.keys() and len(cats[opp][1]) > 0:
+                                forced_sectors.append(sec)
+                        if len(forced_sectors) > 0:
+                            grouping.extend(forced_sectors)
+                            skips.update(forced_sectors)
+                            merge_groups = []
+                            for group in groupings:
+                                for sector in group:
+                                    if sector in forced_sectors:
+                                        merge_groups.append(group)
+                            for merge in merge_groups:
+                                grouping = list(set(grouping).union(set(merge)))
+                                groupings.remove(merge)
+                            queue.append(grouping)
+                            force_found = True
+                elif len(flexible_doors) == 1:
+                    opp = opposite_h_type(val)
+                    found_list = []
+                    if opp in hook_categories.keys() and (len(hook_categories[opp][0]) > 0 or len(hook_categories[opp][1]) > 0):
+                        found_list.extend(hook_categories[opp][0])
+                        found_list.extend([x for x in hook_categories[opp][1] if x not in flexible_doors])
+                    for name, hooks in dungeon_hooks.items():
+                        if opp in hooks.keys() and (len(hooks[opp][0]) > 0 or len(hooks[opp][1]) > 0):
+                            found_list.extend(hooks[opp][0])
+                            found_list.extend(hooks[opp][1])
+                    other_sectors = [x for x in sector_pool if x not in grouping]
+                    other_sector_cats = categorize_groupings(other_sectors)
+                    if opp in other_sector_cats.keys() and (len(other_sector_cats[opp][0]) > 0 or len(other_sector_cats[opp][1]) > 0):
+                        found_list.extend(other_sector_cats[opp][0])
+                        found_list.extend(other_sector_cats[opp][1])
+                    if len(found_list) == 1:
+                        forced_sectors = []
+                        for sec in other_sectors:
+                            cats = categorize_groupings(sec)
+                            if opp in cats.keys() and (len(cats[opp][0]) > 0 or len(cats[opp][1]) > 0):
+                                forced_sectors.append(sec)
+                        if len(forced_sectors) > 0:
+                            grouping.extend(forced_sectors)
+                            skips.update(forced_sectors)
+                            merge_groups = []
+                            for group in groupings:
+                                for sector in group:
+                                    if sector in forced_sectors:
+                                        merge_groups.append(group)
+                            for merge in merge_groups:
+                                grouping += merge
+                                groupings.remove(merge)
+                            queue.append(grouping)
+                            force_found = True
             if force_found:
                 break
         if not force_found:
@@ -2111,10 +2162,40 @@ def find_forced_groupings(sector_pool, dungeon_map):
     return groupings
 
 
+def categorize_groupings(sectors):
+    hook_categories = {}
+    for sector in sectors:
+        for door in sector.outstanding_doors:
+            hook = hook_from_door(door)
+            if hook not in hook_categories.keys():
+                hook_categories[hook] = ([], [])
+            if door.blocked or door.dead:
+                hook_categories[hook][0].append(door)
+            else:
+                hook_categories[hook][1].append(door)
+    return hook_categories
+
+
 def valid_assignment(builder, sector_list):
+    if not valid_c_switch(builder, sector_list):
+        return False
     if not valid_polarized_assignment(builder, sector_list):
         return False
     return len(resolve_equations(builder, sector_list)) == 0
+
+
+def valid_c_switch(builder, sector_list):
+    if builder.c_switch_present:
+        return True
+    for sector in sector_list:
+        if sector.c_switch:
+            return True
+    if builder.c_switch_required:
+        return False
+    for sector in sector_list:
+        if sector.blue_barrier:
+            return False
+    return True
 
 
 def valid_equations(builder, sector_list):
@@ -2193,7 +2274,7 @@ def assign_the_rest(dungeon_map, neutral_sectors, global_pole):
 
 def split_dungeon_builder(builder, split_list, fish):
     logger = logging.getLogger('')
-    logger.info(fish.translate("cli","cli","splitting.up") + ' ' + 'Desert/Skull')
+    logger.info(fish.translate("cli", "cli", "splitting.up") + ' ' + 'Desert/Skull')
     candidate_sectors = dict.fromkeys(builder.sectors)
     global_pole = GlobalPolarity(candidate_sectors)
 
@@ -2209,6 +2290,35 @@ def split_dungeon_builder(builder, split_list, fish):
 
 def balance_split(candidate_sectors, dungeon_map, global_pole, fish):
     logger = logging.getLogger('')
+
+    comb_w_replace = len(dungeon_map) ** len(candidate_sectors)
+    if comb_w_replace <= 5000:
+        combinations = list(itertools.product(dungeon_map.keys(), repeat=len(candidate_sectors)))
+        random.shuffle(combinations)
+        tries = 0
+        while tries < len(combinations):
+            if combinations:
+                choices = combinations[tries]
+            else:
+                choices = random.choices(list(dungeon_map.keys()), k=len(candidate_sectors))
+            main_sector_list = list(candidate_sectors)
+            chosen_sectors = defaultdict(list)
+            for i, choice in enumerate(choices):
+                chosen_sectors[choice].append(main_sector_list[i])
+            all_valid = True
+            for name, sector_list in chosen_sectors.items():
+                if not valid_assignment(dungeon_map[name], sector_list):
+                    all_valid = False
+                    break
+            if all_valid:
+                for name, sector_list in chosen_sectors.items():
+                    builder = dungeon_map[name]
+                    for sector in sector_list:
+                        assign_sector(sector, builder, candidate_sectors, global_pole)
+                return dungeon_map
+            tries += 1
+        raise Exception('Split Dungeon Builder: Impossible dungeon. Ref %s' % next(iter(dungeon_map.keys())))
+
     # categorize sectors
     check_for_forced_dead_ends(dungeon_map, candidate_sectors, global_pole)
     check_for_forced_assignments(dungeon_map, candidate_sectors, global_pole)
@@ -2224,7 +2334,7 @@ def balance_split(candidate_sectors, dungeon_map, global_pole, fish):
     # blue barriers
     assign_crystal_barrier_sectors(dungeon_map, crystal_barriers, global_pole)
     # polarity:
-    logger.info(fish.translate("cli","cli","re-balancing") + ' ' + next(iter(dungeon_map.keys())) + ' et al')
+    logger.info(fish.translate("cli", "cli", "re-balancing") + ' ' + next(iter(dungeon_map.keys())) + ' et al')
     assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, logger, fish)
     # the rest
     assign_the_rest(dungeon_map, neutral_sectors, global_pole)
@@ -2738,7 +2848,7 @@ def copy_door_equations(builder, sector_list):
     equations = {}
     for sector in builder.sectors + sector_list:
         if sector.equations is None:
-            #todo: sort equations?
+            # todo: sort equations?
             sector.equations = calc_sector_equations(sector, builder)
         curr_list = equations[sector] = []
         for equation in sector.equations:
