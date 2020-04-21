@@ -27,3 +27,5 @@ Note: Only one of the key indicator will probably become core at most.
 * Small vitreous eyeballs will not drop items (DR basic and crossed only)
 * In Vanilla doors the HC back hallway area was broken - should be better now - also Trap Doors
 * Firebar speed should now be consistent. Ice palace rooms have slow firebars even if shuffled to other dungeons. Others should have normal speed firebars.
+* Red/Blue pendant swap fixed (originally ER bug)
+* Compass shuffle vs map shuffle item menu fix (originally ER bug)
