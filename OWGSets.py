@@ -110,8 +110,9 @@ def get_boots_clip_exits_lw(inverted = False):
         'Lake Hylia Island Clip Spot',
         'Death Mountain Descent',
         'Graveyard Ledge Clip Spot',
+        # TODO: Why is this listed as a special OWG only entrance?
         # Also requires a waterwalk setup, but the point still remains.
-        'Waterfall of Wishing',
+        # 'Waterfall of Wishing',
         ]
     if not inverted:
         exits.append('Spectacle Rock Clip Spot')
