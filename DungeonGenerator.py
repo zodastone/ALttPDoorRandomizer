@@ -2139,7 +2139,7 @@ def find_forced_groupings(sector_pool, dungeon_map):
                     if len(found_list) == 1:
                         forced_sectors = []
                         for sec in other_sectors:
-                            cats = categorize_groupings(sec)
+                            cats = categorize_groupings([sec])
                             if opp in cats.keys() and (len(cats[opp][0]) > 0 or len(cats[opp][1]) > 0):
                                 forced_sectors.append(sec)
                         if len(forced_sectors) > 0:

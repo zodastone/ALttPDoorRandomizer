@@ -31,7 +31,7 @@ jsl SpiralWarp
 
 
 ; Graphics fix
-org $02895d
+org $02895d ; Bank 02 line 1812 (JSL Dungeon_LoadRoom : JSL Dungeon_InitStarTileChr : JSL $00D6F9 : INC $B0)
 Splicer:
 jsl GfxFixer
 lda $b1 : beq .done
@@ -39,10 +39,14 @@ rts
 nop #5
 .done
 
-org $00fda4
+org $00d377 ;Bank 00 line 3185
+DecompDungAnimatedTiles:
+org $00fda4 ;Bank 00 line 8882
 Dungeon_InitStarTileCh:
 org $00d6ae ;(PC: 56ae)
 LoadTransAuxGfx:
+org $00d739 ;
+LoadTransAuxGfx_Alt:
 org $00df5a ;(PC: 5f5a)
 PrepTransAuxGfx:
 org $0ffd65 ;(PC: 07fd65)

@@ -6,6 +6,7 @@ RecordStairType: {
 }
 
 SpiralWarp: {
+    lda DRMode : beq .abort ; abort if not DR
     lda $040c : cmp.b #$ff : beq .abort ; abort if not in dungeon
     lda $045e : cmp #$5e : beq .gtg ; abort if not spiral - intended room is in A!
     cmp #$5f : beq .gtg
@@ -65,6 +66,16 @@ SpiralWarp: {
     ldy #$01 : jsr SetCamera
 
     stz $045e ; clear the staircase flag
+
+    ; animated tiles fix
+    lda DRMode : cmp #$02 : bne + ; only do this in crossed mode
+        ldx $a0 : lda TilesetTable, x
+        cmp $0aa1 : beq + ; already eq no need to decomp
+            sta $0aa1
+            tax : lda $02802e, x : tay
+            jsl DecompDungAnimatedTiles
+    +
+
     ply : plx : plb ; pull the stuff we pushed
     lda $a2 : and #$0f ; this is the code we are hijacking
     rtl

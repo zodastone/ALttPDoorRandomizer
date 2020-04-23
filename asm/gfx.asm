@@ -1,11 +1,24 @@
 GfxFixer:
 {
-    lda $b1 : bne .stage2
+    lda DRMode : bne +
+        jsl LoadRoomHook ;this is the code we overwrote
+        jsl Dungeon_InitStarTileCh
+        jsl LoadTransAuxGfx_Alt
+        inc $b0
+        rtl
+    + lda $b1 : bne .stage2
     jsl LoadRoomHook ; this is the rando version - let's only call this guy once - may fix star tiles and slower loads
     jsl Dungeon_InitStarTileCh
     jsl LoadTransAuxGfx
     jsl Dungeon_LoadCustomTileAttr
     jsl PrepTransAuxGfx
+    lda DRMode : cmp #$02 : bne + ; only do this in crossed mode
+        ldx $a0 : lda TilesetTable, x
+        cmp $0aa1 : beq + ; already eq no need to decomp
+            sta $0aa1
+            tax : lda $02802e, x : tay
+            jsl DecompDungAnimatedTiles
+    +
     lda #$09 : sta $17 : sta $0710
     jsl Palette_SpriteAux3
     jsl Palette_SpriteAux2
