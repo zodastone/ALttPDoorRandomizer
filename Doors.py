@@ -333,7 +333,7 @@ def create_doors(world, player):
         create_door(player, 'PoD Basement Ledge Drop Down', Lgcl),
         create_door(player, 'PoD Stalfos Basement Warp', Warp),
         create_door(player, 'PoD Arena Main SW', Nrml).dir(So, 0x2a, Left, High).pos(4),
-        create_door(player, 'PoD Arena Bridge SE', Nrml).dir(So, 0x2a, Right, High).pos(5).kill(),
+        create_door(player, 'PoD Arena Bridge SE', Nrml).dir(So, 0x2a, Right, High).pos(5),
         create_door(player, 'PoD Arena Main NW', Nrml).dir(No, 0x2a, Left, High).small_key().pos(1),
         create_door(player, 'PoD Arena Main NE', Nrml).dir(No, 0x2a, Right, High).no_exit().trap(0x4).pos(0),
         create_door(player, 'PoD Arena Main Crystal Path', Lgcl),

@@ -409,11 +409,6 @@ def determine_entrance_list(world, player):
     return entrance_map, potential_entrances, connections
 
 
-# todo: kill drop exceptions
-def drop_exception(name):
-    return name in ['Skull Pot Circle', 'Skull Back Drop']
-
-
 def add_shuffled_entrances(sectors, region_list, entrance_list):
     for sector in sectors:
         for region in sector.regions:
@@ -431,8 +426,6 @@ def find_enabled_origins(sectors, enabled, entrance_list, entrance_map, key):
                     if key not in entrance_map.keys():
                         key = ' '.join(key.split(' ')[:-1])
                     entrance_map[key].append(region.name)
-            if drop_exception(region.name):  # only because they have unique regions
-                entrance_list.append(region.name)
 
 
 def remove_drop_origins(entrance_list):
@@ -504,7 +497,7 @@ def cross_dungeon(world, player):
     all_sectors = []
     for key in dungeon_regions.keys():
         all_sectors.extend(convert_to_sectors(dungeon_regions[key], world, player))
-    dungeon_builders = create_dungeon_builders(all_sectors, world, player)
+    dungeon_builders = create_dungeon_builders(all_sectors, connections_tuple, world, player)
     for builder in dungeon_builders.values():
         builder.entrance_list = list(entrances_map[builder.name])
         dungeon_obj = world.get_dungeon(builder.name, player)
@@ -524,26 +517,16 @@ def cross_dungeon(world, player):
     check_required_paths(paths, world, player)
 
     hc = world.get_dungeon('Hyrule Castle', player)
-    del hc.dungeon_items[0]  # removes map
     hc.dungeon_items.append(ItemFactory('Compass (Escape)', player))
     at = world.get_dungeon('Agahnims Tower', player)
     at.dungeon_items.append(ItemFactory('Compass (Agahnims Tower)', player))
-    gt = world.get_dungeon('Ganons Tower', player)
-    del gt.dungeon_items[0]  # removes map
+    at.dungeon_items.append(ItemFactory('Map (Agahnims Tower)', player))
 
     assign_cross_keys(dungeon_builders, world, player)
     all_dungeon_items = [y for x in world.dungeons if x.player == player for y in x.all_items]
     target_items = 34 if world.retro[player] else 63
     d_items = target_items - len(all_dungeon_items)
-    if d_items > 0:
-        if d_items >= 1:  # restore HC map
-            world.get_dungeon('Hyrule Castle', player).dungeon_items.append(ItemFactory('Map (Escape)', player))
-        if d_items >= 2:  # restore GT map
-            world.get_dungeon('Ganons Tower', player).dungeon_items.append(ItemFactory('Map (Ganons Tower)', player))
-        if d_items > 2:
-            world.pool_adjustment[player] = d_items - 2
-    elif d_items < 0:
-        world.pool_adjustment[player] = d_items
+    world.pool_adjustment[player] = d_items
     smooth_door_pairs(world, player)
 
     # Re-assign dungeon bosses
@@ -1127,7 +1110,7 @@ def stateful_door(door, kind):
 
 
 def random_door_type(door, partner, world, player, type_a, type_b, room_a, room_b):
-    r_kind = random.choices([DoorKind.Normal, DoorKind.Bombable, DoorKind.Dashable], [5, 2, 3], k=1)[0]
+    r_kind = random.choices([DoorKind.Normal, DoorKind.Bombable, DoorKind.Dashable], [15, 4, 6], k=1)[0]
     if r_kind != DoorKind.Normal:
         if door.type == DoorType.Normal:
             add_pair(door, partner, world, player)
@@ -1301,7 +1284,7 @@ def check_if_regions_visited(state, check_paths):
 
 def check_for_pinball_fix(state, bad_region, world, player):
     pinball_region = world.get_region('Skull Pinball', player)
-    if bad_region.name == 'Skull 2 West Lobby' and state.visited_at_all(pinball_region): #revisit this for entrance shuffle
+    if bad_region.name == 'Skull 2 West Lobby' and state.visited_at_all(pinball_region):  # revisit this for entrance shuffle
         door = world.get_door('Skull Pinball WS', player)
         room = world.get_room(door.roomIndex, player)
         if room.doorList[door.doorListPos][1] == DoorKind.Trap:
@@ -1319,6 +1302,7 @@ class DROptions(Flag):
     NoOptions = 0x00
     Eternal_Mini_Bosses = 0x01  # If on, GT minibosses marked as defeated when they try to spawn a heart
     Town_Portal = 0x02  # If on, Players will start with mirror scroll
+    Map_Info = 0x04
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
 
 # DATA GOES DOWN HERE
@@ -2080,4 +2064,20 @@ compass_data = {
     'Thieves Town': (0x106, 0xca, 0x138, 0, 0x16),
     'Turtle Rock': (0x11F, 0xcb, 0x15e, 0, 0x18),
     'Ganons Tower': (0x13A, 0xcc, 0x170, 2, 0x1a)
+}
+
+# For compass boss indicator
+boss_indicator = {
+    'Eastern Palace': (0x04, 'Eastern Boss SE'),
+    'Desert Palace': (0x06, 'Desert Boss SW'),
+    'Agahnims Tower': (0x08, 'Tower Agahnim 1 SW'),
+    'Swamp Palace': (0x0a, 'Swamp Boss SW'),
+    'Palace of Darkness': (0x0c, 'PoD Boss SE'),
+    'Misery Mire': (0x0e, 'Mire Boss SW'),
+    'Skull Woods': (0x10, 'Skull Spike Corner SW'),
+    'Ice Palace': (0x12, 'Ice Antechamber NE'),
+    'Tower of Hera': (0x14, 'Hera Boss Down Stairs'),
+    'Thieves Town': (0x16, 'Thieves Boss SE'),
+    'Turtle Rock': (0x18, 'TR Boss SW'),
+    'Ganons Tower': (0x1a, 'GT Agahnim 2 SW')
 }

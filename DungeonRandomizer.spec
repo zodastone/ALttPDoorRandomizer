@@ -5,6 +5,8 @@ import sys
 block_cipher = None
 console = True
 
+BINARY_SLUG = "DungeonRandomizer"
+
 def recurse_for_py_files(names_so_far):
   returnvalue = []
   for name in os.listdir(os.path.join(*names_so_far)):
@@ -28,7 +30,7 @@ binaries = []
 #if sys.platform.find("windows"):
 #  binaries.append(("ucrtbase.dll","."))
 
-a = Analysis(['DungeonRandomizer.py'],
+a = Analysis([f"./{BINARY_SLUG}.py"],
              pathex=[],
              binaries=binaries,
              datas=[],
@@ -56,7 +58,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='DungeonRandomizer',
+          name=BINARY_SLUG,
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

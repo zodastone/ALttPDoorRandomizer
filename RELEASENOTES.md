@@ -1,6 +1,8 @@
-# Features
+# New Features
 
-## Door Randomizer
+* None yet
 
-* Native GUI executables
-* Native Dungeon Randomizer CLI executables
+# Bug Fixes
+
+* Crossed Dungeon generation improvements
+* Fix for Animated Tiles in crossed dungeon

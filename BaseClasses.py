@@ -1031,6 +1031,44 @@ class Direction(Enum):
     Down = 5
 
 
+@unique
+class Hook(Enum):
+    North = 0
+    West = 1
+    South = 2
+    East = 3
+    Stairs = 4
+    NEdge = 5
+    SEdge = 6
+    WEdge = 7
+    EEdge = 8
+
+
+hook_dir_map = {
+    Direction.North: Hook.North,
+    Direction.South: Hook.South,
+    Direction.West: Hook.West,
+    Direction.East: Hook.East,
+}
+
+edge_map = {
+    Direction.North: Hook.NEdge,
+    Direction.South: Hook.SEdge,
+    Direction.West: Hook.WEdge,
+    Direction.East: Hook.EEdge,
+}
+
+
+def hook_from_door(door):
+    if door.type == DoorType.SpiralStairs:
+        return Hook.Stairs
+    if door.type == DoorType.Normal:
+        return hook_dir_map[door.direction]
+    if door.type == DoorType.Open:
+        return edge_map[door.direction]
+    return None
+
+
 class Polarity:
     def __init__(self):
         self.vector = [0, 0, 0]
@@ -1306,6 +1344,7 @@ class Sector(object):
         self.branch_factor = None
         self.dead_end_cnt = None
         self.entrance_sector = None
+        self.destination_entrance = False
         self.equations = None
 
     def region_set(self):
@@ -1324,6 +1363,13 @@ class Sector(object):
         magnitude = [0, 0, 0]
         for door in self.outstanding_doors:
             idx, inc = pol_idx[door.direction]
+            magnitude[idx] = magnitude[idx] + 1
+        return magnitude
+
+    def hook_magnitude(self):
+        magnitude = [0] * len(Hook)
+        for door in self.outstanding_doors:
+            idx = hook_from_door(door).value
             magnitude[idx] = magnitude[idx] + 1
         return magnitude
 
@@ -1349,7 +1395,7 @@ class Sector(object):
                 self.branch_factor -= cnt_dead - 1
             for region in self.regions:
                 for ent in region.entrances:
-                    if ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld]:
+                    if ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] or ent.parent_region.name == 'Sewer Drop':
                         # same sector as another entrance
                         if region.name not in ['Skull Pot Circle', 'Skull Back Drop', 'Desert East Lobby', 'Desert West Lobby']:
                             self.branch_factor += 1

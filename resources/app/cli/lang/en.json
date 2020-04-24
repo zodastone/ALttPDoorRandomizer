@@ -40,6 +40,7 @@
     "made.rom": "Patched ROM:         %s",
     "made.playthrough": "Printed Playthrough: %s",
     "made.spoiler": "Printed Spoiler:     %s",
+    "used.enemizer": "Enemized:            %s",
     "done": "Done. Enjoy.",
     "total.time": "Total Time: %s",
     "finished.run": "Finished run",
