@@ -62,7 +62,11 @@ The game can be completed without knowing how to perform glitches of any kind.
 
 ### Minor Glitches
 
-May require Fake Flippers, Bunny Revival.
+May require Fake Flippers, Dungeon Bunny Revival.
+
+### Overworld Glitches
+
+May require overworld clipping, superbunny and minor glitches
 
 ### No Logic
 
@@ -325,7 +329,7 @@ Show the help message and exit.
 Output a Spoiler File (default: False)
 
 ```
---logic [{noglitches,minorglitches,nologic}]
+--logic [{noglitches,minorglitches,owglitches,nologic}]
 ```
 
 Select the game logic (default: noglitches)
