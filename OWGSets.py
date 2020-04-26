@@ -54,7 +54,6 @@ def get_invalid_mirror_bunny_entrances_lw():
     return [
         'Bonk Rock Cave',
         'Bonk Fairy (Light)',
-        'Blinds Hideout',
         '50 Rupee Cave',
         '20 Rupee Cave',
         'Checkerboard Cave',
