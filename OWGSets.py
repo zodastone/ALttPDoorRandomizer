@@ -187,4 +187,5 @@ def get_invalid_bunny_revival_dungeons():
         'Tower of Hera (Bottom)',
         'Swamp Palace (Entrance)',
         'Turtle Rock (Entrance)',
+        'Sanctuary'
         ]
