@@ -98,7 +98,8 @@ def get_superbunny_accessible_locations():
         'Kakariko Well - Right',
         'Kakariko Well - Bottom',
         'Kakariko Tavern',
-        'Library'
+        'Library',
+        'Spiral Cave'
         ]
 
 
