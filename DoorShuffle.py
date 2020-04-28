@@ -8,7 +8,6 @@ from enum import unique, Flag
 from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier
 from Regions import key_only_locations
-from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions, pod_regions
 from Dungeons import dungeon_regions, region_starts, split_region_starts, flexible_starts
 from Dungeons import drop_entrances, dungeon_bigs, dungeon_keys, dungeon_hints
 from Items import ItemFactory
@@ -55,10 +54,11 @@ def link_doors(world, player):
                 connect_two_way(world, entrance, ext, player)
         within_dungeon(world, player)
     elif world.doorShuffle[player] == 'crossed':
-        for entrance, ext in open_edges:
-            connect_two_way(world, entrance, ext, player)
-        for entrance, ext in straight_staircases:
-            connect_two_way(world, entrance, ext, player)
+        if not world.experimental[player]:
+            for entrance, ext in open_edges:
+                connect_two_way(world, entrance, ext, player)
+            for entrance, ext in straight_staircases:
+                connect_two_way(world, entrance, ext, player)
         cross_dungeon(world, player)
     else:
         logging.getLogger('').error('Invalid door shuffle setting: %s' % world.doorShuffle[player])
@@ -494,9 +494,10 @@ def cross_dungeon(world, player):
     entrances_map, potentials, connections = determine_entrance_list(world, player)
     connections_tuple = (entrances_map, potentials, connections)
 
-    all_sectors = []
+    all_sectors, all_regions = [], []
     for key in dungeon_regions.keys():
-        all_sectors.extend(convert_to_sectors(dungeon_regions[key], world, player))
+        all_regions += dungeon_regions[key]
+    all_sectors.extend(convert_to_sectors(all_regions, world, player))
     dungeon_builders = create_dungeon_builders(all_sectors, connections_tuple, world, player)
     for builder in dungeon_builders.values():
         builder.entrance_list = list(entrances_map[builder.name])

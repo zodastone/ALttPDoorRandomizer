@@ -1038,10 +1038,6 @@ class Hook(Enum):
     South = 2
     East = 3
     Stairs = 4
-    NEdge = 5
-    SEdge = 6
-    WEdge = 7
-    EEdge = 8
 
 
 hook_dir_map = {
@@ -1051,21 +1047,12 @@ hook_dir_map = {
     Direction.East: Hook.East,
 }
 
-edge_map = {
-    Direction.North: Hook.NEdge,
-    Direction.South: Hook.SEdge,
-    Direction.West: Hook.WEdge,
-    Direction.East: Hook.EEdge,
-}
-
 
 def hook_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
-    if door.type == DoorType.Normal:
+    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs]:
         return hook_dir_map[door.direction]
-    if door.type == DoorType.Open:
-        return edge_map[door.direction]
     return None
 
 

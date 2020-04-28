@@ -206,10 +206,56 @@ PrepScrollToNormal:
     .end rts
 }
 
+StraightStairsAdj:
+{
+    stx $0464 : sty $012e ; what we wrote over
+    lda DRMode : beq +
+        jsr GetTileAttribute : tax
+        lda $11 : cmp #$12 : beq .goingNorth
+            lda $a2 : cmp #$51 : bne ++
+                rep #$20 : lda #$0018 : !add $20 : sta $20 : sep #$20 ; special fix for throne room
+                jsr GetTileAttribute : tax
+            ++ lda StepAdjustmentDown, X : bra .end
+;            lda $ee : beq .end
+;                rep #$20 : lda #$ffe0 : !add $20 : sta $20 : sep #$20
+        .goingNorth
+            cpx #$00 : bne ++
+            lda $a0 : cmp #$51 : bne ++
+                lda #$36 : bra .end ; special fix for throne room
+            ++ ldy $ee : cpy #$00 : beq ++
+                inx
+            ++ lda StepAdjustmentUp, X
+        .end
+        pha : lda $0462 : and #$04 : bne ++
+            pla : !add #$f6 : pha
+        ++ pla : !add $0464 : sta $0464
+    + rtl
+}
+
+GetTileAttribute:
+{
+    phk : pea.w .jslrtsreturn-1
+    pea.w $02802c
+    jml $02c11d ; mucks with x/y sets a to Tile Attribute, I think
+    .jslrtsreturn
+    rts
+}
+
+; 0 open edge
+; 1 nrm door high
+; 2 straight str
+; 3 nrm door low
+; 4 trap door high
+; 5 trap door low   (none of these exist on North direction)
+StepAdjustmentUp: ; really North Stairs
+db $00, $f6, $1a, $18, $16, $38
+StepAdjustmentDown: ; really South Stairs
+db $d0, $f6, $10, $1a, $f0, $00
+
 StraightStairsFix:
 {
     lda DRMode : bne +
-        !add $20 : sta $20
+        !add $20 : sta $20 ;what we wrote over
     + rtl
 }
 
@@ -217,5 +263,38 @@ StraightStairLayerFix:
 {
     lda DRMode : beq +
         lda $ee : rtl
-    + lda $01c322, x : rtl
+    + lda $01c322, x : rtl ; what we wrote over
+}
+
+DoorToStraight:
+{
+    pha
+    lda DRMode : beq .skip
+        pla : bne .end
+        pha
+        lda $a0 : cmp #$51 : bne .skip
+        lda #$04 : sta $4e
+    .skip pla
+    .end ldx $0418 : cmp #$02 ;what we wrote over
+    rtl
+}
+
+StraightStairsTrapDoor:
+{
+    lda $0464 : bne +
+        ; reset function
+        phk : pea.w .jslrtsreturn-1
+        pea.w $02802c
+        jml $028c73 ; $10D71 .reset label of Bank02
+        .jslrtsreturn
+        lda $0468 : bne ++
+        lda $a0 : cmp.b #$ac : bne .animateTraps
+        lda $0403 : and.b #$20 : bne .animateTraps
+        lda $0403 : and.b #$10 : beq ++
+            .animateTraps
+            lda #$05 : sta $11
+            inc $0468 : stz $068e : stz $0690
+        ++ rtl
+    + jsl Dungeon_ApproachFixedColor ; what we wrote over
+    .end rtl
 }

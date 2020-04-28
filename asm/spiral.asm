@@ -1,8 +1,12 @@
 RecordStairType: {
-    pha : lda DRMode : beq +
-         lda $0e : sta $045e : pla : bra .end
-    + pla : sta $a0
-    .end lda $063d, x
+    pha
+    lda DRMode : beq .norm
+    lda $040c : cmp #$ff : beq .norm
+         lda $0e : sta $045e
+         cmp #$26 : beq .norm ; skipping in-floor staircases
+            pla : bra +
+    .norm pla : sta $a0
+    + lda $063d, x
     rtl
 }
 

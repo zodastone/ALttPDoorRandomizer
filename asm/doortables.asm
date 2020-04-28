@@ -1,23 +1,3 @@
-org $279500
-TilesetTable:
-;    0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f --Offset Ruler
-db $13,$04,$04,$06,$0d,$ff,$08,$05,$06,$07,$07,$07,$0e,$0e,$0b,$ff
-db $13,$04,$04,$0d,$0d,$0d,$08,$05,$06,$07,$07,$07,$0e,$0e,$0b,$0b
-db $04,$04,$04,$0d,$0d,$ff,$08,$05,$08,$09,$07,$07,$06,$ff,$0b,$06
-db $04,$05,$04,$12,$08,$08,$08,$08,$08,$09,$07,$07,$06,$0e,$0b,$0b
-db $04,$04,$04,$12,$0a,$0a,$08,$ff,$ff,$09,$07,$07,$0e,$0e,$0b,$0b
-db $04,$04,$04,$12,$08,$01,$09,$09,$09,$09,$07,$0e,$0e,$0e,$0b,$0b
-db $04,$04,$04,$12,$0a,$0a,$08,$09,$09,$ff,$07,$0e,$0e,$0e,$0b,$ff
-db $04,$04,$04,$12,$12,$12,$08,$05,$ff,$ff,$ff,$0e,$0e,$0e,$0b,$0b
-db $04,$04,$04,$12,$12,$12,$ff,$05,$ff,$05,$ff,$0e,$0e,$0e,$0b,$ff
-db $0c,$0c,$0c,$0c,$ff,$0e,$0e,$0c,$0c,$05,$ff,$0e,$0e,$0e,$0b,$0b
-db $0c,$0c,$0c,$0c,$0d,$0e,$0e,$05,$05,$05,$05,$0a,$0a,$ff,$0b,$0b
-db $04,$0c,$0c,$0c,$0d,$0d,$0d,$0d,$05,$05,$05,$0a,$0a,$ff,$0b,$0b
-db $04,$0c,$0c,$0c,$0d,$0d,$0d,$0d,$05,$05,$ff,$0a,$0a,$ff,$0b,$ff
-db $04,$0c,$0c,$ff,$ff,$0d,$0d,$ff,$05,$05,$05,$0a,$0a,$ff,$0b,$06
-db $04,$06,$06,$06,$06,$06,$06,$06,$06,$ff,$06,$06,$ff,$06,$06,$06
-db $06,$06,$03,$03,$03,$03,$ff,$ff,$06,$06,$06,$06,$ff,$06,$06,$06
-
 org $279700
 KeyDoorOffset:
 ;      0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f --Offset Ruler
@@ -581,4 +561,48 @@ dw $0002, $0002, $0001, $0001, $0000, $0001, $0001, $0001, $0001, $0001, $0001, 
 DungeonReminderTable: ;27f054
 dw $2D50, $2D50, $2D51, $2D52, $2D54, $2D56, $2D55, $2D5A, $2D57, $2D59, $2D53, $2D58, $2D5B, $2D5C
 ;27f070
+
+; Vert 0,6,0 Horz 2,0,8
+org $27f080
+CoordIndex: ; Horizontal 1st
+db 2, 0 ; Coordinate Index $20-$23
+OppCoordIndex:
+db 0, 2 ; Swapped coordinate Index $20-$23 (minor optimization)
+CameraIndex: ; Horizontal 1st
+db 0, 6 ; Camera Index $e2-$ea
+CamQuadIndex: ; Horizontal 1st
+db 8, 0 ; Camera quadrants $600-$60f
+ShiftQuadIndex:
+db 2, 1 ; see ShiftQuad func (relates to $a9,$aa)
+CamBoundIndex: ; Horizontal 1st
+db 0, 4 ; Camera Bounds $0618-$61f
+OppCamBoundIndex: ; Horizontal 1st
+db 4, 0 ; Camera Bounds $0618-$61f
+CamBoundBaseLine: ; X camera stuff is 1st column todo Y camera needs more testing
+dw $007f, $0077 ; Left/Top camera bounds when at edge or layout frozen
+dw $0007, $000b ; Left/Top camera bounds when not frozen + appropriate low byte $22/$20 (preadj. by #$78/#$6c)
+dw $00ff, $010b ; Right/Bot camera bounds when not frozen + appropriate low byte $20/$22
+dw $017f, $0187 ; Right/Bot camera bound when at edge or layout frozen
+;27f09e next free byte
+
+org $27f100
+TilesetTable:
+;    0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f --Offset Ruler
+db $13,$04,$04,$06,$0d,$ff,$08,$05,$06,$07,$07,$07,$0e,$0e,$0b,$ff
+db $13,$04,$04,$0d,$0d,$0d,$08,$05,$06,$07,$07,$07,$0e,$0e,$0b,$0b
+db $04,$04,$04,$0d,$0d,$ff,$08,$05,$08,$09,$07,$07,$06,$ff,$0b,$06
+db $04,$05,$04,$12,$08,$08,$08,$08,$08,$09,$07,$07,$06,$0e,$0b,$0b
+db $04,$04,$04,$12,$0a,$0a,$08,$ff,$ff,$09,$07,$07,$0e,$0e,$0b,$0b
+db $04,$04,$04,$12,$08,$01,$09,$09,$09,$09,$07,$0e,$0e,$0e,$0b,$0b
+db $04,$04,$04,$12,$0a,$0a,$08,$09,$09,$ff,$07,$0e,$0e,$0e,$0b,$ff
+db $04,$04,$04,$12,$12,$12,$08,$05,$ff,$ff,$ff,$0e,$0e,$0e,$0b,$0b
+db $04,$04,$04,$12,$12,$12,$ff,$05,$ff,$05,$ff,$0e,$0e,$0e,$0b,$ff
+db $0c,$0c,$0c,$0c,$ff,$0e,$0e,$0c,$0c,$05,$ff,$0e,$0e,$0e,$0b,$0b
+db $0c,$0c,$0c,$0c,$0d,$0e,$0e,$05,$05,$05,$05,$0a,$0a,$ff,$0b,$0b
+db $04,$0c,$0c,$0c,$0d,$0d,$0d,$0d,$05,$05,$05,$0a,$0a,$ff,$0b,$0b
+db $04,$0c,$0c,$0c,$0d,$0d,$0d,$0d,$05,$05,$ff,$0a,$0a,$ff,$0b,$ff
+db $04,$0c,$0c,$ff,$ff,$0d,$0d,$ff,$05,$05,$05,$0a,$0a,$ff,$0b,$06
+db $04,$06,$06,$06,$06,$06,$06,$06,$06,$ff,$06,$06,$ff,$06,$06,$06
+db $06,$06,$03,$03,$03,$03,$ff,$ff,$06,$06,$06,$06,$ff,$06,$06,$06
+;27f200
 

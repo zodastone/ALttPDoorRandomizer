@@ -14,9 +14,6 @@ from Regions import key_only_locations, dungeon_events, flooded_keys_reverse
 from Dungeons import dungeon_regions, split_region_starts
 
 
-
-
-
 class GraphPiece:
 
     def __init__(self):
@@ -522,11 +519,7 @@ type_map = {
     Hook.North: Hook.South,
     Hook.South: Hook.North,
     Hook.West: Hook.East,
-    Hook.East: Hook.West,
-    Hook.NEdge: Hook.SEdge,
-    Hook.SEdge: Hook.NEdge,
-    Hook.EEdge: Hook.WEdge,
-    Hook.WEdge: Hook.EEdge,
+    Hook.East: Hook.West
 }
 
 
@@ -542,21 +535,11 @@ hang_dir_map = {
 }
 
 
-edge_map_back = {
-    Direction.North: Hook.SEdge,
-    Direction.South: Hook.NEdge,
-    Direction.West: Hook.EEdge,
-    Direction.East: Hook.WEdge,
-}
-
-
 def hanger_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
-    if door.type == DoorType.Normal:
+    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs]:
         return hang_dir_map[door.direction]
-    if door.type == DoorType.Open:
-        return edge_map_back[door.direction]
     return None
 
 

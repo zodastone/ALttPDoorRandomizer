@@ -29,13 +29,21 @@ jsl RecordStairType : nop
 org $02a1e7 ;(PC: 121e7)
 jsl SpiralWarp
 
-
+org $029369 ; <- 11369 - Bank02.asm : 3610 (STX $0464 :  STY $012E)
+jsl StraightStairsAdj : nop #2
 org $029383 ; <- 11384 - Bank02.asm : 3629 (.walkingDownStaircase-> ADD $20 : STA $20)
 jsl StraightStairsFix : nop
 org $0293aa ; <- 113aa - Bank02.asm : 3653 (ADD $20 : STA $20)
 jsl StraightStairsFix : nop
-org $029396 ; <- 11384 - Bank02.asm : 3641 (LDA $01C322, X)
+org $0293d1 ; <- 113d1 - Bank02.asm : 3683 (ADD $20 : STA $20 BRANCH_IOTA)
+jsl StraightStairsFix : nop
+org $029396 ; <- 11396 - Bank02.asm : 3641 (LDA $01C322, X)
 jsl StraightStairLayerFix
+org $02c06d ; <- Bank02.asm : 9874 (LDX $0418, CMP.b #$02)
+jsl DoorToStraight : nop
+org $02941a ; <- Bank02.asm : 3748 module 7.12.11 (LDA $0464 : BNE BRANCH_$11513 : INC $B0 : RTS)
+jsl StraightStairsTrapDoor : rts
+
 
 ; Graphics fix
 org $02895d ; Bank 02 line 1812 (JSL Dungeon_LoadRoom : JSL Dungeon_InitStarTileChr : JSL $00D6F9 : INC $B0)
@@ -58,6 +66,8 @@ org $00df5a ;(PC: 5f5a)
 PrepTransAuxGfx:
 org $0ffd65 ;(PC: 07fd65)
 Dungeon_LoadCustomTileAttr:
+org $01feb0
+Dungeon_ApproachFixedColor:
 ;org $01fec1
 ;Dungeon_ApproachFixedColor_variable:
 ;org $a0f972 ; Rando version
