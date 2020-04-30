@@ -4,26 +4,29 @@ import os
 import sys
 from tkinter import Tk, Button, BOTTOM, TOP, StringVar, BooleanVar, X, BOTH, RIGHT, ttk, messagebox
 
-from argparse import Namespace
-from CLI import get_settings, get_args_priority
-from DungeonRandomizer import parse_arguments
-from gui.adjust.overview import adjust_page
-from gui.startinventory.overview import startinventory_page
-from gui.custom.overview import custom_page
-from gui.loadcliargs import loadcliargs, loadadjustargs
-from gui.randomize.item import item_page
-from gui.randomize.entrando import entrando_page
-from gui.randomize.enemizer import enemizer_page
-from gui.randomize.dungeon import dungeon_page
-from gui.randomize.multiworld import multiworld_page
-from gui.randomize.gameoptions import gameoptions_page
-from gui.randomize.generation import generation_page
-from gui.bottom import bottom_frame, create_guiargs
+from CLI import get_args_priority
+from DungeonRandomizer import parse_cli
+from source.gui.adjust.overview import adjust_page
+from source.gui.startinventory.overview import startinventory_page
+from source.gui.custom.overview import custom_page
+from source.gui.loadcliargs import loadcliargs, loadadjustargs
+from source.gui.randomize.item import item_page
+from source.gui.randomize.entrando import entrando_page
+from source.gui.randomize.enemizer import enemizer_page
+from source.gui.randomize.dungeon import dungeon_page
+#from source.gui.randomize.multiworld import multiworld_page
+from source.gui.randomize.gameoptions import gameoptions_page
+from source.gui.randomize.generation import generation_page
+from source.gui.bottom import bottom_frame, create_guiargs
 from GuiUtils import set_icon
 from Main import __version__ as ESVersion
 
+from source.classes.BabelFish import BabelFish
+from source.classes.Empty import Empty
+
 
 def guiMain(args=None):
+    # Save settings to file
     def save_settings(args):
         user_resources_path = os.path.join(".", "resources", "user")
         settings_path = os.path.join(user_resources_path)
@@ -35,6 +38,7 @@ def guiMain(args=None):
             f.write(json.dumps(args, indent=2))
         os.chmod(os.path.join(settings_path, "settings.json"),0o755)
 
+    # Save settings from GUI
     def save_settings_from_gui(confirm):
         gui_args = vars(create_guiargs(self))
         if self.randomSprite.get():
@@ -73,9 +77,13 @@ def guiMain(args=None):
     # get args
     # getting Settings & CLI (no GUI built yet)
     self.args = get_args_priority(None, None, None)
+    lang = "en"
+    if "load" in self.args and "lang" in self.args["load"]:
+        lang = self.args["load"].lang
+    self.fish = BabelFish(lang=lang)
 
     # get saved settings
-    self.settings = self.args["settings"]
+    self.settings = vars(self.args["settings"])
 
     # make array for pages
     self.pages = {}
@@ -83,6 +91,7 @@ def guiMain(args=None):
     # make array for frames
     self.frames = {}
 
+    # make pages for each section
     self.notebook = ttk.Notebook(self)
     self.pages["randomizer"] = ttk.Frame(self.notebook)
     self.pages["adjust"] = ttk.Frame(self.notebook)
@@ -127,8 +136,8 @@ def guiMain(args=None):
     self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["dungeon"], text="Dungeon Shuffle")
 
     # Multiworld
-    self.pages["randomizer"].pages["multiworld"],self.settings = multiworld_page(self.pages["randomizer"].notebook,self.settings)
-    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["multiworld"], text="Multiworld")
+#    self.pages["randomizer"].pages["multiworld"],self.settings = multiworld_page(self.pages["randomizer"].notebook,self.settings)
+#    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["multiworld"], text="Multiworld")
 
     # Game Options
     self.pages["randomizer"].pages["gameoptions"] = gameoptions_page(self, self.pages["randomizer"].notebook)
@@ -142,13 +151,15 @@ def guiMain(args=None):
     self.pages["randomizer"].notebook.pack()
 
     # bottom of window: Open Output Directory, Open Documentation (if exists)
-    self.frames["bottom"] = bottom_frame(self, self, None)
+    self.pages["bottom"] = Empty()
+    self.pages["bottom"].pages = {}
+    self.pages["bottom"].pages["content"] = bottom_frame(self, self, None)
     ## Save Settings Button
-    savesettingsButton = Button(self.frames["bottom"], text='Save Settings to File', command=lambda: save_settings_from_gui(True))
+    savesettingsButton = Button(self.pages["bottom"].pages["content"], text='Save Settings to File', command=lambda: save_settings_from_gui(True))
     savesettingsButton.pack(side=RIGHT)
 
     # set bottom frame to main window
-    self.frames["bottom"].pack(side=BOTTOM, fill=X, padx=5, pady=5)
+    self.pages["bottom"].pages["content"].pack(side=BOTTOM, fill=X, padx=5, pady=5)
 
     self.outputPath = StringVar()
     self.randomSprite = BooleanVar()
@@ -178,9 +189,10 @@ def guiMain(args=None):
     # load adjust settings into options
     loadadjustargs(self, self.settings)
 
+    # run main window
     mainWindow.mainloop()
 
 
 if __name__ == '__main__':
-    args = parse_arguments(None)
+    args = parse_cli(None)
     guiMain(args)

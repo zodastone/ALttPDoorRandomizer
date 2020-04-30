@@ -1,6 +1,9 @@
 .idea
 .vscode
 *_Spoiler.txt
+*.bmbp
+*.log
+*_Spoiler.json
 *.pyc
 *.sfc
 *.srm
@@ -18,9 +21,12 @@ EnemizerCLI/
 RaceRom.py
 upx/
 weights/
+/MultiMystery/
+/Players/
+/QUsb2Snes/
 
-settings.json
-working_dirs.json
+resources/user/*
+!resources/user/.gitkeep
 
 *.exe
 

@@ -1,0 +1,259 @@
+# workflow name
+name: Build
+
+# fire on
+on:
+  push:
+    branches:
+      - DoorDev
+  pull_request:
+    branches:
+      - DoorDev
+
+# stuff to do
+jobs:
+  # Install & Build
+  #  Set up environment
+  # Build
+  #  Run build-gui.py
+  #  Run build-dr.py
+  install-build:
+    name: Install/Build
+    # cycle through os list
+    runs-on: ${{ matrix.os-name }}
+
+    # VM settings
+    #  os & python versions
+    strategy:
+      matrix:
+        os-name: [ ubuntu-latest, ubuntu-16.04, macOS-latest, windows-latest ]
+        python-version: [ 3.7 ]
+#    needs: [ install-test ]
+    steps:
+    # checkout commit
+    - name: Checkout commit
+      uses: actions/checkout@v1
+    # install python
+    - name: Install python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: "x64"
+    - run: |
+        python --version
+    # install dependencies via pip
+    - name: Install dependencies via pip
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/install.py
+        pip install pyinstaller
+    # try to get UPX
+    - name: Get UPX
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/get_upx.py
+    # run build-gui.py
+    - name: Build GUI
+      run: |
+        python ./build-gui.py
+    # run build-dr.py
+    - name: Build DungeonRandomizer
+      run: |
+        python ./build-dr.py
+    # prepare binary artifacts for later step
+    - name: Prepare Binary Artifacts
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/prepare_binary.py
+    # upload binary artifacts for later step
+    - name: Upload Binary Artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: binaries-${{ matrix.os-name }}
+        path: ../artifact
+
+  # Install & Preparing Release
+  #  Set up environment
+  # Local Prepare Release action
+  install-prepare-release:
+    name: Install/Prepare Release
+    # cycle through os list
+    runs-on: ${{ matrix.os-name }}
+
+    # VM settings
+    #  os & python versions
+    strategy:
+      matrix:
+        # install/release on not xenial
+        os-name: [ ubuntu-latest, macOS-latest, windows-latest ]
+        python-version: [ 3.7 ]
+
+    needs: [ install-build ]
+    steps:
+    # checkout commit
+    - name: Checkout commit
+      uses: actions/checkout@v1
+    # install python
+    - name: Install Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: "x64"
+    - run: |
+        python --version
+    # install dependencies via pip
+    - name: Install Dependencies via pip
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./resources/ci/common/install.py
+    # download binary artifact
+    - name: Download Binary Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: binaries-${{ matrix.os-name }}
+        path: ./
+    # Prepare AppVersion & Release
+    - name: Prepare AppVersion & Release
+      env:
+        OS_NAME: ${{ matrix.os-name }}
+      run: |
+        python ./build-app_version.py
+        python ./resources/ci/common/prepare_appversion.py
+        python ./resources/ci/common/prepare_release.py
+    # upload appversion artifact for later step
+    - name: Upload AppVersion Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: appversion-${{ matrix.os-name }}
+        path: ./resources/app/meta/manifests/app_version.txt
+    # upload archive artifact for later step
+    - name: Upload Archive Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: archive-${{ matrix.os-name }}
+        path: ../deploy
+
+  # Deploy to GitHub Releases
+  #  Release Name:  ALttPDoorRandomizer v${GITHUB_TAG}
+  #  Release Body:  Inline content of RELEASENOTES.md
+  #  Release Body:  Fallback to URL to RELEASENOTES.md
+  #  Release Files: ../deploy
+  deploy-release:
+    name: Deploy GHReleases
+    runs-on: ${{ matrix.os-name }}
+
+    # VM settings
+    #  os & python versions
+    strategy:
+      matrix:
+        # release only on bionic
+        os-name: [ ubuntu-latest ]
+        python-version: [ 3.7 ]
+
+    needs: [ install-prepare-release ]
+    steps:
+    # checkout commit
+    - name: Checkout commit
+      uses: actions/checkout@v1
+    - name: Install Dependencies via pip
+      run: |
+        python -m pip install pytz requests
+    # download appversion artifact
+    - name: Download AppVersion Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: appversion-${{ matrix.os-name }}
+        path: ../build
+    # download ubuntu archive artifact
+    - name: Download Ubuntu Archive Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: archive-ubuntu-latest
+        path: ../deploy/linux
+    # download macos archive artifact
+    - name: Download MacOS Archive Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: archive-macOS-latest
+        path: ../deploy/macos
+    # download windows archive artifact
+    - name: Download Windows Archive Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: archive-windows-latest
+        path: ../deploy/windows
+    # debug info
+    - name: Debug Info
+      id: debug_info
+#      shell: bash
+#        git tag ${GITHUB_TAG}
+#        git push origin ${GITHUB_TAG}
+      run: |
+        GITHUB_TAG="$(head -n 1 ../build/app_version.txt)"
+        echo "::set-output name=github_tag::$GITHUB_TAG"
+        GITHUB_TAG="v${GITHUB_TAG}"
+        RELEASE_NAME="ALttPDoorRandomizer ${GITHUB_TAG}"
+        echo "Release Name: ${RELEASE_NAME}"
+        echo "Git Tag:      ${GITHUB_TAG}"
+    # read releasenotes
+    - name: Read RELEASENOTES
+      id: release_notes
+      run: |
+        body="$(cat RELEASENOTES.md)"
+        body="${body//'%'/'%25'}"
+        body="${body//$'\n'/'%0A'}"
+        body="${body//$'\r'/'%0D'}"
+        echo "::set-output name=body::$body"
+    # create a pre/release
+    - name: Create a Pre/Release
+      id: create_release
+      uses: actions/create-release@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.debug_info.outputs.github_tag }}
+        release_name: ALttPDoorRandomizer v${{ steps.debug_info.outputs.github_tag }}
+        body: ${{ steps.release_notes.outputs.body }}
+        draft: true
+        prerelease: true
+      if: contains(github.ref, 'master') || contains(github.ref, 'stable') || contains(github.ref, 'dev') || contains(github.ref, 'DoorRelease')
+    # upload linux archive asset
+    - name: Upload Linux Archive Asset
+      id: upload-linux-asset
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ../deploy/linux/ALttPDoorRandomizer.tar.gz
+        asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-linux-bionic.tar.gz
+        asset_content_type: application/gzip
+      if: contains(github.ref, 'master') || contains(github.ref, 'stable') || contains(github.ref, 'dev') || contains(github.ref, 'DoorRelease')
+    # upload macos archive asset
+    - name: Upload MacOS Archive Asset
+      id: upload-macos-asset
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ../deploy/macos/ALttPDoorRandomizer.tar.gz
+        asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-osx.tar.gz
+        asset_content_type: application/gzip
+      if: contains(github.ref, 'master') || contains(github.ref, 'stable') || contains(github.ref, 'dev') || contains(github.ref, 'DoorRelease')
+    # upload windows archive asset
+    - name: Upload Windows Archive Asset
+      id: upload-windows-asset
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ../deploy/windows/ALttPDoorRandomizer.zip
+        asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-windows.zip
+        asset_content_type: application/zip
+      if: contains(github.ref, 'master') || contains(github.ref, 'stable') || contains(github.ref, 'dev') || contains(github.ref, 'DoorRelease')

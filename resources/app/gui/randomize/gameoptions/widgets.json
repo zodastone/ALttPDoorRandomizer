@@ -1,131 +1,63 @@
 {
-  "checkboxes": {
+  "checkboxes":   {
     "hints": {
       "type": "checkbox",
-      "label": {
-        "text": "Include Helpful Hints"
-      },
       "default": "true"
     },
-    "nobgm": {
-      "type": "checkbox",
-      "label": {
-        "text": "Disable Music & MSU-1"
-      }
-    },
-    "quickswap": {
-      "type": "checkbox",
-      "label": {
-        "text": "L/R Quickswapping"
-      }
-    }    
+    "nobgm":      { "type": "checkbox" },
+    "quickswap":  { "type": "checkbox" }
   },
   "leftRomOptionsFrame": {
     "heartcolor": {
       "type": "selectbox",
-      "label": {
-        "text": "Heart Color"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
-      "options": {
-        "Red": "red",
-        "Blue": "blue",
-        "Green": "green",
-        "Yellow": "yellow",
-        "Random": "random"
-      }
+      "options": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "random"
+      ]
     },
     "heartbeep": {
       "type": "selectbox",
-      "label": {
-        "text": "Heart Beep sound rate"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        },
-        "default": "Normal"
-      },
-      "options": {
-        "Double": "double",
-        "Normal": "normal",
-        "Half": "half",
-        "Quarter": "quarter",
-        "Off": "off"
-      }
+      "default": "normal",
+      "options": [
+        "double",
+        "normal",
+        "half",
+        "quarter",
+        "off"
+      ]
     }
   },
   "rightRomOptionsFrame": {
     "menuspeed": {
       "type": "selectbox",
-      "label": {
-        "text": "Menu Speed"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        },
-        "default": "Normal"
-      },
-      "options": {
-        "Instant": "instant",
-        "Quadruple": "quadruple",
-        "Triple": "triple",
-        "Double": "double",
-        "Normal": "normal",
-        "Half": "half"
-      }
+      "default": "normal",
+      "options": [
+        "instant",
+        "quadruple",
+        "triple",
+        "double",
+        "normal",
+        "half"
+      ]
     },
     "owpalettes": {
       "type": "selectbox",
-      "label": {
-        "text": "Overworld Palettes"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
-      "options": {
-        "Default": "default",
-        "Random": "random",
-        "Blackout": "blackout"
-      }
+      "options": [
+        "default",
+        "random",
+        "blackout"
+      ]
     },
     "uwpalettes": {
       "type": "selectbox",
-      "label": {
-        "text": "Underworld Palettes"
-      },
-      "managerAttrs": {
-        "label": {
-          "side": "left"
-        },
-        "selectbox": {
-          "side": "right"
-        }
-      },
-      "options": {
-        "Default": "default",
-        "Random": "random",
-        "Blackout": "blackout"
-      }
+      "options": [
+        "default",
+        "random",
+        "blackout"
+      ]
     }
   }
 }
