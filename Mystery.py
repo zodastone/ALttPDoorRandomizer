@@ -151,7 +151,7 @@ def roll_settings(weights):
     ret.door_shuffle = door_shuffle if door_shuffle != 'none' else 'vanilla'
     ret.experimental = get_choice('experimental') == 'on'
 
-    ret.dungeon_counters = get_choice('dungeon_counters')
+    ret.dungeon_counters = get_choice('dungeon_counters') if 'dungeon_counters' in weights else 'default'
     if ret.dungeon_counters == 'default':
         ret.dungeon_counters = 'pickup' if ret.door_shuffle != 'vanilla' or ret.compassshuffle == 'on' else 'off'
 
