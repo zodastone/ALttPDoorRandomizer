@@ -24,8 +24,8 @@ class GraphPiece:
         self.possible_bk_locations = set()
 
 
-# Turtle Rock shouldn't be generated until the Big Chest entrance is reachable
-def validate_tr(builder, entrance_region_names, world, player):
+# Dungeons shouldn't be generated until all entrances are appropriately accessible
+def pre_validate(builder, entrance_region_names, world, player):
     entrance_regions = convert_regions(entrance_region_names, world, player)
     proposed_map = {}
     doors_to_connect = {}

@@ -588,6 +588,8 @@ def create_doors(world, player):
         create_door(player, 'Thieves Spike Switch Up Stairs', Sprl).dir(Up, 0xab, 0, HTH).ss(Z, 0x1a, 0x6c, True, True).small_key().pos(0),
         create_door(player, 'Thieves Attic Down Stairs', Sprl).dir(Dn, 0x64, 0, HTH).ss(Z, 0x11, 0x80, True, True),
         create_door(player, 'Thieves Attic ES', Intr).dir(Ea, 0x64, Bot, High).pos(0),
+        create_door(player, 'Thieves Attic Orange Barrier', Lgcl),
+        create_door(player, 'Thieves Attic Hint Orange Barrier', Lgcl),
         create_door(player, 'Thieves Cricket Hall Left WS', Intr).dir(We, 0x64, Bot, High).pos(0),
         create_door(player, 'Thieves Cricket Hall Left Edge', Open).dir(Ea, 0x64, None, High).edge(0, X, 0x30),
         create_door(player, 'Thieves Cricket Hall Right Edge', Open).dir(We, 0x65, None, High).edge(0, Z, 0x30),
@@ -1136,6 +1138,9 @@ def create_doors(world, player):
     world.get_door('Thieves Triple Bypass EN', player).barrier(CrystalBarrier.Blue)
     world.get_door('Thieves Hellway Orange Barrier', player).barrier(CrystalBarrier.Orange)
     world.get_door('Thieves Hellway Crystal Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Thieves Hellway Crystal Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Thieves Attic Orange Barrier', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Thieves Attic Hint Orange Barrier', player).barrier(CrystalBarrier.Orange)
 
     world.get_door('Ice Bomb Drop SE', player).c_switch()
     world.get_door('Ice Conveyor SW', player).c_switch()

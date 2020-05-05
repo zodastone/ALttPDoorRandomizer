@@ -238,7 +238,7 @@ thieves_regions = [
     'Thieves Big Chest Nook', 'Thieves Hallway', 'Thieves Boss', 'Thieves Pot Alcove Mid', 'Thieves Pot Alcove Bottom',
     'Thieves Pot Alcove Top', 'Thieves Conveyor Maze', 'Thieves Spike Track', 'Thieves Hellway',
     'Thieves Hellway N Crystal', 'Thieves Hellway S Crystal', 'Thieves Triple Bypass', 'Thieves Spike Switch',
-    'Thieves Attic', 'Thieves Cricket Hall Left', 'Thieves Cricket Hall Right', 'Thieves Attic Window',
+    'Thieves Attic', 'Thieves Attic Hint', 'Thieves Cricket Hall Left', 'Thieves Cricket Hall Right', 'Thieves Attic Window',
     'Thieves Basement Block', 'Thieves Blocked Entry', 'Thieves Lonely Zazak', 'Thieves Blind\'s Cell',
     'Thieves Conveyor Bridge', 'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap'
 ]
@@ -346,10 +346,6 @@ split_region_starts = {
 flexible_starts = {
     'Skull Woods': ['Skull Left Drop', 'Skull Pinball']
 }
-
-drop_entrances = [
-    'Sewers Rat Path', 'Skull Pinball', 'Skull Left Drop', 'Sanctuary'  # Pot circle, Back drop have unique access
-]
 
 dungeon_keys = {
     'Hyrule Castle': 'Small Key (Escape)',

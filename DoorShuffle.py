@@ -9,10 +9,10 @@ from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier
 from Regions import key_only_locations
 from Dungeons import dungeon_regions, region_starts, split_region_starts, flexible_starts
-from Dungeons import drop_entrances, dungeon_bigs, dungeon_keys, dungeon_hints
+from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor
-from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, validate_tr
+from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder
 from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout
 
@@ -150,11 +150,10 @@ def vanilla_key_logic(world, player):
 
         origin_list = list(entrances_map[builder.name])
         find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, builder.name)
-        origin_list_sans_drops = remove_drop_origins(origin_list)
-        if len(origin_list_sans_drops) <= 0:
+        if len(origin_list) <= 0:
             if last_key == builder.name or loops > 1000:
-                origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name
-                raise Exception('Infinite loop detected for "%s" located at %s' % builder.name, origin_name)
+                origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name if len(origin_list) > 0 else 'no origin'
+                raise Exception('Infinite loop detected for "%s" located at %s' % (builder.name, origin_name))
             sector_queue.append(builder)
             last_key = builder.name
             loops += 1
@@ -366,17 +365,16 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
             name = ' '.join(builder.name.split(' ')[:-1])
         origin_list = list(builder.entrance_list)
         find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, name)
-        origin_list_sans_drops = remove_drop_origins(origin_list)
-        if len(origin_list_sans_drops) <= 0 or name == "Turtle Rock" and not validate_tr(builder, origin_list_sans_drops, world, player):
+        if len(origin_list) <= 0 or not pre_validate(builder, origin_list, world, player):
             if last_key == builder.name or loops > 1000:
-                origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name
-                raise Exception('Infinite loop detected for "%s" located at %s' % builder.name, origin_name)
+                origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name if len(origin_list) > 0 else 'no origin'
+                raise Exception('Infinite loop detected for "%s" located at %s' % (builder.name, origin_name))
             sector_queue.append(builder)
             last_key = builder.name
             loops += 1
         else:
             logging.getLogger('').info('%s: %s', world.fish.translate("cli","cli","generating.dungeon"), builder.name)
-            ds = generate_dungeon(builder, origin_list_sans_drops, split_dungeon, world, player)
+            ds = generate_dungeon(builder, origin_list, split_dungeon, world, player)
             find_new_entrances(ds, entrances_map, connections, potentials, enabled_entrances, world, player)
             ds.name = name
             builder.master_sector = ds
@@ -430,22 +428,18 @@ def find_enabled_origins(sectors, enabled, entrance_list, entrance_map, key):
                     entrance_map[key].append(region.name)
 
 
-def remove_drop_origins(entrance_list):
-    return [x for x in entrance_list if x not in drop_entrances]
-
-
 def find_new_entrances(sector, entrances_map, connections, potentials, enabled, world, player):
     for region in sector.regions:
         if region.name in connections.keys() and (connections[region.name] in potentials.keys() or connections[region.name].name in world.inaccessible_regions[player]):
-            enable_new_entrances(region, connections, potentials, enabled, world, player)
+            enable_new_entrances(region, connections, potentials, enabled, world, player, region)
     inverted_aga_check(entrances_map, connections, potentials, enabled, world, player)
 
 
-def enable_new_entrances(region, connections, potentials, enabled, world, player):
+def enable_new_entrances(region, connections, potentials, enabled, world, player, region_enabler):
     new_region = connections[region.name]
     if new_region in potentials.keys():
         for potential in potentials.pop(new_region):
-            enabled[potential] = (region.name, region.dungeon)
+            enabled[potential] = (region_enabler.name, region_enabler.dungeon)
     # see if this unexplored region connects elsewhere
     queue = deque(new_region.exits)
     visited = set()
@@ -467,9 +461,10 @@ def inverted_aga_check(entrances_map, connections, potentials, enabled, world, p
         if 'Agahnims Tower' in entrances_map.keys() or aga_tower_enabled(enabled):
             for region in list(potentials.keys()):
                 if region.name == 'Hyrule Castle Ledge':
+                    enabler = world.get_region('Tower Agahnim 1', player)
                     for r_name in potentials[region]:
                         new_region = world.get_region(r_name, player)
-                        enable_new_entrances(new_region, connections, potentials, enabled, world, player)
+                        enable_new_entrances(new_region, connections, potentials, enabled, world, player, enabler)
 
 
 def aga_tower_enabled(enabled):
@@ -1374,6 +1369,8 @@ logical_connections = [
     ('Thieves Hellway Crystal Orange Barrier', 'Thieves Hellway'),
     ('Thieves Hellway Blue Barrier', 'Thieves Hellway N Crystal'),
     ('Thieves Hellway Crystal Blue Barrier', 'Thieves Hellway'),
+    ('Thieves Attic Orange Barrier', 'Thieves Attic Hint'),
+    ('Thieves Attic Hint Orange Barrier', 'Thieves Attic'),
     ('Thieves Basement Block Path', 'Thieves Blocked Entry'),
     ('Thieves Blocked Entry Path', 'Thieves Basement Block'),
     ('Thieves Conveyor Bridge Block Path', 'Thieves Conveyor Block'),
