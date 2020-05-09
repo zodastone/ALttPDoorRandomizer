@@ -365,7 +365,7 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
             name = ' '.join(builder.name.split(' ')[:-1])
         origin_list = list(builder.entrance_list)
         find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, name)
-        if len(origin_list) <= 0 or not pre_validate(builder, origin_list, world, player):
+        if len(origin_list) <= 0 or not pre_validate(builder, origin_list, split_dungeon, world, player):
             if last_key == builder.name or loops > 1000:
                 origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name if len(origin_list) > 0 else 'no origin'
                 raise Exception('Infinite loop detected for "%s" located at %s' % (builder.name, origin_name))
