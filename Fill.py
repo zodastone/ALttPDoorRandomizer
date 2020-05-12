@@ -226,7 +226,7 @@ def fill_restrictive(world, base_state, locations, itempool, keys_in_itempool = 
 
 
 def valid_key_placement(item, location, itempool, world):
-    if (not item.smallkey and not item.bigkey) or item.player != location.player or world.retro[item.player]:
+    if (not item.smallkey and not item.bigkey) or item.player != location.player or world.retro[item.player] or world.logic[item.player] == 'nologic':
         return True
     dungeon = location.parent_region.dungeon
     if dungeon:

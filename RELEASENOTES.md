@@ -10,7 +10,9 @@
 * Crossed Dungeon generation improvements
 * Fix for Animated Tiles in crossed dungeon
 * Stonewall hardlock no longer reachable from certain drops (Sewer Drop, some Skull Woods drops) that were previously possible
+* No logic uses less key door logic
 
 ##### In Progress
 
-* ~~TT Attic Hint tile should have a crystal switch accessible now~~ 
+* TT Attic Hint tile should have a crystal switch accessible now 
+* Different key logic rules in development 

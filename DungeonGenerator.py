@@ -79,14 +79,24 @@ def generate_dungeon_main(builder, entrance_region_names, split_dungeon, world, 
     dungeon_cache = {}
     backtrack = False
     itr = 0
+    attempt = 1
     finished = False
     # flag if standard and this is hyrule castle
     std_flag = world.mode[player] == 'standard' and bk_special
     while not finished:
         # what are my choices?
         itr += 1
-        if itr > 5000:
-            raise Exception('Generation taking too long. Ref %s' % name)
+        if itr > 1000:
+            if attempt > 9:
+                raise Exception('Generation taking too long. Ref %s' % name)
+            proposed_map = {}
+            choices_master = [[]]
+            depth = 0
+            dungeon_cache = {}
+            backtrack = False
+            itr = 0
+            attempt += 1
+            logger.debug(f'Starting new attempt {attempt}')
         if depth not in dungeon_cache.keys():
             dungeon, hangers, hooks = gen_dungeon_info(name, builder.sectors, entrance_regions, proposed_map,
                                                        doors_to_connect, bk_needed, bk_special, world, player)
@@ -158,6 +168,7 @@ def gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map, va
     dungeon = {}
     start = ExplorationState(dungeon=name)
     start.big_key_special = bk_special
+    group_flags, door_map = find_bk_groups(name, available_sectors, proposed_map, bk_special)
 
     def exception(d):
         return name == 'Skull Woods 2' and d.name == 'Skull Pinball WS'
@@ -176,16 +187,17 @@ def gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map, va
         for door in sector.outstanding_doors:
             if not door.stonewall and door not in proposed_map.keys():
                 hanger_set.add(door)
+                bk_flag = group_flags[door_map[door]]
                 parent = door.entrance.parent_region
                 crystal_start = CrystalBarrier.Either if parent.crystal_switch else init_crystal
                 init_state = ExplorationState(crystal_start, dungeon=name)
                 init_state.big_key_special = start.big_key_special
                 o_state = extend_reachable_state_improved([parent], init_state, proposed_map,
-                                                          valid_doors, False, world, player, exception)
+                                                          valid_doors, bk_flag, world, player, exception)
                 o_state_cache[door.name] = o_state
                 piece = create_graph_piece_from_state(door, o_state, o_state, proposed_map, exception)
                 dungeon[door.name] = piece
-    check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_doors, world, player, exception)
+    check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_doors, group_flags, door_map, world, player, exception)
 
     # catalog hooks: Dict<Hook, List<Door, Crystal, Door>>
     # and hangers: Dict<Hang, List<Door>>
@@ -205,7 +217,43 @@ def gen_dungeon_info(name, available_sectors, entrance_regions, proposed_map, va
     return dungeon, hangers, avail_hooks
 
 
-def check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_doors, world, player, exception):
+def find_bk_groups(name, available_sectors, proposed_map, bk_special):
+    groups = {}
+    door_ids = {}
+    gid = 1
+    for sector in available_sectors:
+        if bk_special:
+            my_gid = None
+            for door in sector.outstanding_doors:
+                if door in proposed_map and proposed_map[door] in door_ids:
+                    if my_gid:
+                        merge_gid = door_ids[proposed_map[door]]
+                        for door in door_ids.keys():
+                            if door_ids[door] == merge_gid:
+                                door_ids[door] = my_gid
+                        groups[my_gid] = groups[my_gid] or groups[merge_gid]
+                    else:
+                        my_gid = door_ids[proposed_map[door]]
+            if not my_gid:
+                my_gid = gid
+                gid += 1
+            for door in sector.outstanding_doors:
+                door_ids[door] = my_gid
+            if my_gid not in groups.keys():
+                groups[my_gid] = False
+            for region in sector.regions:
+                for loc in region.locations:
+                    if loc.forced_item and loc.item.bigkey and name in loc.item.name:
+                        groups[my_gid] = True
+        else:
+            for door in sector.outstanding_doors:
+                door_ids[door] = gid
+            groups[gid] = False
+    return groups, door_ids
+
+
+def check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_doors, group_flags, door_map,
+                      world, player, exception):
     not_blue = set()
     not_blue.update(hanger_set)
     doors_to_check = set()
@@ -233,17 +281,18 @@ def check_blue_states(hanger_set, dungeon, o_state_cache, proposed_map, valid_do
             hang_type = hanger_from_door(door)  # am I hangable on a hook?
             hook_type = hook_from_door(door)  # am I hookable onto a hanger?
             if (hang_type in blue_hooks and not door.stonewall) or hook_type in blue_hangers:
-                explore_blue_state(door, dungeon, o_state_cache[door.name], proposed_map, valid_doors,
+                bk_flag = group_flags[door_map[door]]
+                explore_blue_state(door, dungeon, o_state_cache[door.name], proposed_map, valid_doors, bk_flag,
                                    world, player, exception)
                 doors_to_check.add(door)
         not_blue.difference_update(doors_to_check)
 
 
-def explore_blue_state(door, dungeon, o_state, proposed_map, valid_doors, world, player, exception):
+def explore_blue_state(door, dungeon, o_state, proposed_map, valid_doors, bk_flag, world, player, exception):
     parent = door.entrance.parent_region
     blue_start = ExplorationState(CrystalBarrier.Blue, o_state.dungeon)
     blue_start.big_key_special = o_state.big_key_special
-    b_state = extend_reachable_state_improved([parent], blue_start, proposed_map, valid_doors, False,
+    b_state = extend_reachable_state_improved([parent], blue_start, proposed_map, valid_doors, bk_flag,
                                               world, player, exception)
     dungeon[door.name] = create_graph_piece_from_state(door, o_state, b_state, proposed_map, exception)
 
@@ -915,7 +964,7 @@ def extend_reachable_state(search_regions, state, world, player):
     return local_state
 
 
-def extend_reachable_state_improved(search_regions, state, proposed_map, valid_doors, isOrigin, world, player, exception):
+def extend_reachable_state_improved(search_regions, state, proposed_map, valid_doors, bk_flag, world, player, exception):
     local_state = state.copy()
     for region in search_regions:
         local_state.visit_region(region)
@@ -923,7 +972,7 @@ def extend_reachable_state_improved(search_regions, state, proposed_map, valid_d
     while len(local_state.avail_doors) > 0:
         explorable_door = local_state.next_avail_door()
         if explorable_door.door.bigKey:
-            if isOrigin:
+            if bk_flag:
                 big_not_found = not special_big_key_found(local_state, world, player) if local_state.big_key_special else local_state.count_locations_exclude_specials() == 0
                 if big_not_found:
                     continue  # we can't open this door

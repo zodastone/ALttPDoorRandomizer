@@ -177,7 +177,7 @@ def create_regions(world, player):
         create_cave_region(player, 'Dark Desert Hint', 'a storyteller'),
         create_dw_region(player, 'Dark Death Mountain (West Bottom)', None, ['Spike Cave', 'Spectacle Rock Mirror Spot', 'Dark Death Mountain Fairy']),
         create_dw_region(player, 'Dark Death Mountain (Top)', None, ['Dark Death Mountain Drop (East)', 'Dark Death Mountain Drop (West)', 'Ganons Tower', 'Superbunny Cave (Top)',
-                                                             'Hookshot Cave', 'East Death Mountain (Top) Mirror Spot', 'Turtle Rock']),
+                                                                     'Hookshot Cave', 'East Death Mountain (Top) Mirror Spot', 'Turtle Rock']),
         create_dw_region(player, 'Dark Death Mountain Ledge', None, ['Dark Death Mountain Ledge (East)', 'Dark Death Mountain Ledge (West)', 'Mimic Cave Mirror Spot', 'Spiral Cave Mirror Spot']),
         create_dw_region(player, 'Dark Death Mountain Isolated Ledge', None, ['Isolated Ledge Mirror Spot', 'Turtle Rock Isolated Ledge Entrance']),
         create_dw_region(player, 'Dark Death Mountain (East Bottom)', None, ['Superbunny Cave (Bottom)', 'Cave Shop (Dark Death Mountain)', 'Fairy Ascension Mirror Spot']),
