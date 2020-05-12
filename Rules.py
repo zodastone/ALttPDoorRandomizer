@@ -1,9 +1,9 @@
 import logging
-from BaseClasses import CollectionState, RegionType, DoorType
-from Regions import key_only_locations
-from Items import ItemFactory
-from RoomData import DoorKind
 from collections import deque
+
+from BaseClasses import CollectionState, RegionType, DoorType, Entrance
+from Regions import key_only_locations
+from RoomData import DoorKind
 
 
 def set_rules(world, player):
@@ -162,6 +162,13 @@ def global_rules(world, player):
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Prize', player))
 
+    # Castle Tower
+    set_rule(world.get_entrance('Tower Gold Knights SW', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Tower Gold Knights EN', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Tower Dark Archers WN', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Tower Red Spears WN', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Tower Red Guards EN', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Tower Red Guards SW', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_entrance('Tower Altar NW', player), lambda state: state.has_sword(player))
     set_defeat_dungeon_boss_rule(world.get_location('Agahnim 1', player))
 

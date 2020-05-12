@@ -611,9 +611,9 @@ class CollectionState(object):
 
     def can_extend_magic(self, player, smallmagic=16, fullrefill=False): #This reflects the total magic Link has, not the total extra he has.
         basemagic = 8
-        if self.has('Quarter Magic', player):
+        if self.has('Magic Upgrade (1/4)', player):
             basemagic = 32
-        elif self.has('Half Magic', player):
+        elif self.has('Magic Upgrade (1/2)', player):
             basemagic = 16
         if self.can_buy_unlimited('Green Potion', player) or self.can_buy_unlimited('Blue Potion', player):
             if self.world.difficulty_adjustments[player] == 'hard' and not fullrefill:
@@ -634,9 +634,8 @@ class CollectionState(object):
 
     def can_shoot_arrows(self, player):
         if self.world.retro[player]:
-            #TODO: need to decide how we want to handle wooden arrows  longer-term (a can-buy-a check, or via dynamic shop location)
-            #FIXME: Should do something about hard+ ganon only silvers. For the moment, i believe they effective grant wooden, so we are safe
-            return self.has('Bow', player) and (self.has('Silver Arrows', player) or self.can_buy_unlimited('Single Arrow', player))
+            #todo: Non-progressive silvers grant wooden arrows, but progressive bows do not.  Always require shop arrows to be safe
+            return self.has('Bow', player) and self.can_buy_unlimited('Single Arrow', player)
         return self.has('Bow', player)
 
     def can_get_good_bee(self, player):
@@ -756,10 +755,10 @@ class CollectionState(object):
                 if self.has('Red Mail', item.player):
                     pass
                 elif self.has('Blue Mail', item.player):
-                    self.prog_items.add(('Red Mail', item.player))
+                    self.prog_items['Red Mail', item.player] += 1
                     changed = True
                 else:
-                    self.prog_items.add(('Blue Mail', item.player))
+                    self.prog_items['Blue Mail', item.player] += 1
                     changed = True
 
         elif item.name.startswith('Bottle'):
