@@ -398,7 +398,7 @@ def determine_entrance_list(world, player):
             region = world.get_region(region_name, player)
             for ent in region.entrances:
                 parent = ent.parent_region
-                if parent.type != RegionType.Dungeon or parent.name == 'Sewer Drop':
+                if (parent.type != RegionType.Dungeon and parent.name != 'Menu') or parent.name == 'Sewer Drop':
                     if parent.name not in world.inaccessible_regions[player]:
                         entrance_map[key].append(region_name)
                     else:
