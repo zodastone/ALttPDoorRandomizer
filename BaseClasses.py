@@ -9,8 +9,6 @@ try:
 except ImportError:
     from enum import Flag
     FastEnum = Flag
-    # Bitflag logic is significantly faster when not using normal python enums.
-    logging.info('fast-enum module not found - falling back to slow enums.  Run `pip install fast-enum` to remove this warning.')
 
 
 from source.classes.BabelFish import BabelFish
