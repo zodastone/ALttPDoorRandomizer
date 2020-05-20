@@ -1664,7 +1664,7 @@ class Spoiler(object):
             for index, item in enumerate(shop.inventory):
                 if item is None:
                     continue
-                shopdata['item_{}'.format(index)] = "{} — {}".format(item['item'], item['price']) if item['price'] else item['item']
+                shopdata['item_{}'.format(index)] = "{} - {}".format(item['item'], item['price']) if item['price'] else item['item']
             self.shops.append(shopdata)
 
         for player in range(1, self.world.players + 1):
@@ -1809,6 +1809,12 @@ class Spoiler(object):
             # items: Item names
             outfile.write('\n\nShops:\n\n')
             outfile.write('\n'.join("{} [{}]\n    {}".format(self.world.fish.translate("meta","locations",shop['location']), shop['type'], "\n    ".join(self.world.fish.translate("meta","items",item) for item in [shop.get('item_0', None), shop.get('item_1', None), shop.get('item_2', None)] if item)) for shop in self.shops))
+
+            for player in range(1, self.world.players + 1):
+                if self.world.boss_shuffle[player] != 'none':
+                    bossmap = self.bosses[player] if self.world.players > 1 else self.bosses
+                    outfile.write(f'\n\nBosses (Player {player}):\n\n')
+                    outfile.write('\n'.join([f'{x}: {y}' for x, y in bossmap.items()]))
 
             # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
             # items: Item names

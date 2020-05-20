@@ -1,5 +1,7 @@
 # New Features
 
+* Spoiler lists bosses (multiworld compatible)
+
 ### Experimental features
 
 * Open "Edge" transitions can now be linked with normal doors
@@ -11,6 +13,9 @@
 * Fix for Animated Tiles in crossed dungeon
 * Stonewall hardlock no longer reachable from certain drops (Sewer Drop, some Skull Woods drops) that were previously possible
 * No logic uses less key door logic
+* Spoiler log encoding
+* Enemizer settings made consistent with website
+* Swamp flooded ladders in the basement now requires Flippers
 
 ##### In Progress
 

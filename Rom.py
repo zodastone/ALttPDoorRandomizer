@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'a793b94179f7a4afcfd958bac3a79b47'
+RANDOMIZERBASEHASH = 'bd07845238de1ce060530a996378f867'
 
 
 class JsonRom(object):
@@ -172,14 +172,14 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, r
     options = {
         'RandomizeEnemies': world.enemy_shuffle[player] != 'none',
         'RandomizeEnemiesType': 3,
-        'RandomizeBushEnemyChance': world.enemy_shuffle[player] == 'chaos',
+        'RandomizeBushEnemyChance': world.enemy_shuffle[player] == 'random',
         'RandomizeEnemyHealthRange': world.enemy_health[player] != 'default',
         'RandomizeEnemyHealthType': {'default': 0, 'easy': 0, 'normal': 1, 'hard': 2, 'expert': 3}[world.enemy_health[player]],
         'OHKO': False,
         'RandomizeEnemyDamage': world.enemy_damage[player] != 'default',
         'AllowEnemyZeroDamage': True,
         'ShuffleEnemyDamageGroups': world.enemy_damage[player] != 'default',
-        'EnemyDamageChaosMode': world.enemy_damage[player] == 'chaos',
+        'EnemyDamageChaosMode': world.enemy_damage[player] == 'random',
         'EasyModeEscape': False,
         'EnemiesAbsorbable': False,
         'AbsorbableSpawnRate': 10,
@@ -218,9 +218,9 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, r
         'SwordGraphics': "sword_gfx/normal.gfx",
         'BeeMizer': False,
         'BeesLevel': 0,
-        'RandomizeTileTrapPattern': world.enemy_shuffle[player] == 'chaos',
+        'RandomizeTileTrapPattern': world.enemy_shuffle[player] == 'random',
         'RandomizeTileTrapFloorTile': False,
-        'AllowKillableThief': bool(random.randint(0,1)) if world.enemy_shuffle[player] == 'chaos' else world.enemy_shuffle[player] != 'none',
+        'AllowKillableThief': bool(random.randint(0, 1)) if world.enemy_shuffle[player] == 'random' else world.enemy_shuffle[player] != 'none',
         'RandomizeSpriteOnHit': random_sprite_on_hit,
         'DebugMode': False,
         'DebugForceEnemy': False,

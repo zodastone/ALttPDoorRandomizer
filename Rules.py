@@ -203,6 +203,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Swamp Drain WN', player), lambda state: state.has('Drained Swamp', player))
     set_rule(world.get_entrance('Swamp Flooded Room WS', player), lambda state: state.has('Drained Swamp', player))
     set_rule(world.get_entrance('Swamp Flooded Room Ladder', player), lambda state: state.has('Drained Swamp', player))
+    set_rule(world.get_entrance('Swamp Flooded Spot Ladder', player), lambda state: state.has('Drained Swamp', player) or state.has('Flippers', player))
+    set_rule(world.get_entrance('Swamp Drain Left Up Stairs', player), lambda state: state.has('Drained Swamp', player) or state.has('Flippers', player))
     set_rule(world.get_location('Swamp Palace - Flooded Room - Left', player), lambda state: state.has('Drained Swamp', player))
     set_rule(world.get_location('Swamp Palace - Flooded Room - Right', player), lambda state: state.has('Drained Swamp', player))
     set_rule(world.get_entrance('Swamp Waterway NW', player), lambda state: state.has('Flippers', player))

@@ -17,7 +17,9 @@ cpy #$0003 : bne ++
 
 ;Divisor in Y. Width of division is in X for rounding toward middle
 DivideByY:
-.loop cpy #$0001 : beq .done
+.loop
+cpy #$0000 : beq .done
+cpy #$0001 : beq .done
 cpy #$0003 : bne ++
     jsr DivideBy3 : bra .done
 ++ cpy #$0005 : bne ++

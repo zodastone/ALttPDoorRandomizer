@@ -78,8 +78,8 @@ def bottom_frame(self, parent, args=None):
         argsDump = vars(guiargs)
         hasEnemizer = "enemizercli" in argsDump and os.path.isfile(argsDump["enemizercli"])
         needEnemizer = False
-        if not hasEnemizer:
-            falsey = [ "none", "default", "vanilla", False, 0 ]
+        if hasEnemizer:
+            falsey = ["none", "default", False, 0]
             for enemizerOption in [ "shufflepots", "shuffleenemies", "enemy_damage", "shufflebosses", "enemy_health" ]:
                 if enemizerOption in argsDump:
                     if isinstance(argsDump[enemizerOption], dict):

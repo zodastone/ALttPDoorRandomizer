@@ -160,7 +160,7 @@ def place_bosses(world, player):
     all_bosses = sorted(boss_table.keys()) #s orted to be deterministic on older pythons
     placeable_bosses = [boss for boss in all_bosses if boss not in ['Agahnim', 'Agahnim2', 'Ganon']]
 
-    if world.boss_shuffle[player] in ["basic", "normal"]:
+    if world.boss_shuffle[player] in ["simple", "full"]:
         # temporary hack for swordless kholdstare:
         if world.swords[player] == 'swordless':
             world.get_dungeon('Ice Palace', player).boss = BossFactory('Kholdstare', player)
@@ -189,7 +189,7 @@ def place_bosses(world, player):
                 loc_text = loc + ' (' + level + ')'
             logging.getLogger('').debug('Placing boss %s at %s', boss, loc_text)
             world.get_dungeon(loc, player).bosses[level] = BossFactory(boss, player)
-    elif world.boss_shuffle[player] == "chaos": #all bosses chosen at random
+    elif world.boss_shuffle[player] == "random": #all bosses chosen at random
         for [loc, level] in boss_locations:
             loc_text = loc + (' ('+level+')' if level else '')
             try:

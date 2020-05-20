@@ -543,8 +543,9 @@ db $68,$10,$60, $84,$18,$78 ; HC Guards
 db $a0,$a0,$50 ; DP Main Lobby
 db $58,$50,$30, $98,$50,$70 ; TT Ambush
 db $58,$50,$30 ; TT Nook
-MultDivInfo: ; (1placeholder, 1, 2, 3, 4, 5, 6, 10, 20)
-db $01, $01, $02, $03, $04, $05, $06, $0a, $14
+MultDivInfo: ; (1, 2, 3, 4, 5, 6, 10, 20)
+db $01, $02, $03, $04, $05, $06, $0a, $14
+; indices: 0-7
 
 
 ; dungeon tables
