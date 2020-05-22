@@ -1,6 +1,9 @@
 # New Features
 
+* Crossed Dungeon generation improvements
+* Standard mode generation improvements
 * Spoiler lists bosses (multiworld compatible)
+* Bombs escape not valid for Crossed Dungeon
 
 ### Experimental features
 
@@ -9,13 +12,13 @@
 
 # Bug Fixes
 
-* Crossed Dungeon generation improvements
 * Fix for Animated Tiles in crossed dungeon
 * Stonewall hardlock no longer reachable from certain drops (Sewer Drop, some Skull Woods drops) that were previously possible
 * No logic uses less key door logic
 * Spoiler log encoding
 * Enemizer settings made consistent with website
 * Swamp flooded ladders in the basement now requires Flippers
+* PoD EG Glitch gets killed on transitions (Only when DR is on)
 
 ##### In Progress
 

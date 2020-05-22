@@ -150,7 +150,7 @@ def vanilla_key_logic(world, player):
 
         origin_list = list(entrances_map[builder.name])
         find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, builder.name)
-        if len(origin_list) <= 0:
+        if len(origin_list) <= 0 or not pre_validate(builder, origin_list, world, player):
             if last_key == builder.name or loops > 1000:
                 origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name if len(origin_list) > 0 else 'no origin'
                 raise Exception('Infinite loop detected for "%s" located at %s' % (builder.name, origin_name))
@@ -373,7 +373,7 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
             last_key = builder.name
             loops += 1
         else:
-            logging.getLogger('').info('%s: %s', world.fish.translate("cli","cli","generating.dungeon"), builder.name)
+            logging.getLogger('').info('%s: %s', world.fish.translate("cli", "cli", "generating.dungeon"), builder.name)
             ds = generate_dungeon(builder, origin_list, split_dungeon, world, player)
             find_new_entrances(ds, entrances_map, connections, potentials, enabled_entrances, world, player)
             ds.name = name

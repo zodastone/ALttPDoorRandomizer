@@ -287,8 +287,11 @@ def generate_itempool(world, player):
                 if item in ['Progressive Bow', 'Bow'] and not found_bow:
                     found_bow = True
                     possible_weapons.append(item)
-                if item in ['Hammer', 'Bombs (10)', 'Fire Rod', 'Cane of Somaria', 'Cane of Byrna']:
+                if item in ['Hammer', 'Fire Rod', 'Cane of Somaria', 'Cane of Byrna']:
                     if item not in possible_weapons:
+                        possible_weapons.append(item)
+                if item in ['Bombs (10)']:
+                    if item not in possible_weapons and world.doorShuffle[player] != 'crossed':
                         possible_weapons.append(item)
             starting_weapon = random.choice(possible_weapons)
             placed_items["Link's Uncle"] = starting_weapon

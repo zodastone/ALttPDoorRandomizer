@@ -80,7 +80,7 @@ SpiralWarp: {
             tax : lda $02802e, x : tay
             jsl DecompDungAnimatedTiles
     +
-
+    stz $047a
     ply : plx : plb ; pull the stuff we pushed
     lda $a2 : and #$0f ; this is the code we are hijacking
     rtl

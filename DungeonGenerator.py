@@ -1228,15 +1228,16 @@ def identify_destination_sectors(accessible_sectors, reverse_d_map, dungeon_map,
                         if ent_name in split_list:
                             split_section = split_name
                             break
-                    for r_name in split_dungeon_entrances[d_name][split_section]:
-                        ent_sector = find_sector(r_name, dungeon_map[d_name].sectors)
-                        if ent_sector in accessible_sectors and ent_name not in dead_entrances:
-                            sector.destination_entrance = True
-                            found_connections.add(ent_name)
-                            accessible_sectors.add(sector)
-                            accessible_overworld.add(region)
-                            explored = False
-                            break
+                    if split_section:
+                        for r_name in split_dungeon_entrances[d_name][split_section]:
+                            ent_sector = find_sector(r_name, dungeon_map[d_name].sectors)
+                            if ent_sector in accessible_sectors and ent_name not in dead_entrances:
+                                sector.destination_entrance = True
+                                found_connections.add(ent_name)
+                                accessible_sectors.add(sector)
+                                accessible_overworld.add(region)
+                                explored = False
+                                break
 
 
 def calc_allowance_and_dead_ends(builder, connections_tuple):

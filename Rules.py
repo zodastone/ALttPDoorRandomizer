@@ -839,21 +839,28 @@ def standard_rules(world, player):
         copy_state.sweep_for_events()
         return copy_state.has('Zelda Delivered', player)
 
+    def bomb_escape_rule():
+        loc = world.get_location("Link's Uncle", player)
+        return loc.item and loc.item.name == 'Bombs (10)'
+
+    def standard_escape_rule(state):
+        return state.can_kill_most_things(player) or bomb_escape_rule()
+
     add_item_rule(world.get_location('Link\'s Uncle', player), uncle_item_rule)
 
     # ensures the required weapon for escape lands on uncle (unless player has it pre-equipped)
     for location in ['Link\'s House', 'Sanctuary', 'Sewers - Secret Room - Left', 'Sewers - Secret Room - Middle',
                      'Sewers - Secret Room - Right']:
-        add_rule(world.get_location(location, player), lambda state: state.can_kill_most_things(player))
-    add_rule(world.get_location('Secret Passage', player), lambda state: state.can_kill_most_things(player))
+        add_rule(world.get_location(location, player), lambda state: standard_escape_rule(state))
+    add_rule(world.get_location('Secret Passage', player), lambda state: standard_escape_rule(state))
 
     escape_builder = world.dungeon_layouts[player]['Hyrule Castle']
     for region in escape_builder.master_sector.regions:
         for loc in region.locations:
-            add_rule(loc, lambda state: state.can_kill_most_things(player))
+            add_rule(loc, lambda state: standard_escape_rule(state))
         if region.name in std_kill_rooms:
             for ent in std_kill_rooms[region.name]:
-                add_rule(world.get_entrance(ent, player), lambda state: state.can_kill_most_things(player))
+                add_rule(world.get_entrance(ent, player), lambda state: standard_escape_rule(state))
 
     set_rule(world.get_location('Zelda Pickup', player), lambda state: state.has('Big Key (Escape)', player))
     set_rule(world.get_entrance('Hyrule Castle Throne Room N', player), lambda state: state.has('Zelda Herself', player))
