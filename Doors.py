@@ -41,7 +41,7 @@ Intr = DoorType.Interior
 
 
 def create_doors(world, player):
-    world.doors += [
+    doors = [
         # hyrule castle
         create_door(player, 'Hyrule Castle Lobby W', Nrml).dir(We, 0x61, Mid, High).toggler().pos(0),
         create_door(player, 'Hyrule Castle Lobby E', Nrml).dir(Ea, 0x61, Mid, High).toggler().pos(2),
@@ -1071,6 +1071,10 @@ def create_doors(world, player):
         create_door(player, 'GT Brightly Lit Hall NW', Nrml).dir(No, 0x1d, Left, High).big_key().pos(0),
         create_door(player, 'GT Agahnim 2 SW', Nrml).dir(So, 0x0d, Left, High).no_exit().trap(0x4).pos(0)
     ]
+
+    world.doors += doors
+    world.initialize_doors(doors)
+
     create_paired_doors(world, player)
 
     # swamp events

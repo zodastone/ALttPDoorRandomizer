@@ -25,7 +25,7 @@ class GraphPiece:
 
 
 # Dungeons shouldn't be generated until all entrances are appropriately accessible
-def pre_validate(builder, entrance_region_names, world, player):
+def pre_validate(builder, entrance_region_names, split_dungeon, world, player):
     entrance_regions = convert_regions(entrance_region_names, world, player)
     proposed_map = {}
     doors_to_connect = {}
@@ -36,7 +36,7 @@ def pre_validate(builder, entrance_region_names, world, player):
         for door in sector.outstanding_doors:
             doors_to_connect[door.name] = door
         all_regions.update(sector.regions)
-        bk_needed = bk_needed or determine_if_bk_needed(sector, False, world, player)
+        bk_needed = bk_needed or determine_if_bk_needed(sector, split_dungeon, world, player)
         bk_special = bk_special or check_for_special(sector)
     dungeon, hangers, hooks = gen_dungeon_info(builder.name, builder.sectors, entrance_regions, proposed_map,
                                                doors_to_connect, bk_needed, bk_special, world, player)
