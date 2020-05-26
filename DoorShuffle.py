@@ -1301,12 +1301,15 @@ class DROptions(Flag):
     Eternal_Mini_Bosses = 0x01  # If on, GT minibosses marked as defeated when they try to spawn a heart
     Town_Portal = 0x02  # If on, Players will start with mirror scroll
     Map_Info = 0x04
+    Debug = 0x08
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
 
 # DATA GOES DOWN HERE
 
 logical_connections = [
     ('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
+    ('Hyrule Castle Throne Room Tapestry', 'Hyrule Castle Behind Tapestry'),
+    ('Hyrule Castle Tapestry Backwards', 'Hyrule Castle Throne Room'),
     ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path'),
     ('Eastern Hint Tile Push Block', 'Eastern Hint Tile'),
     ('Eastern Map Balcony Hook Path', 'Eastern Map Room'),
@@ -1528,8 +1531,8 @@ open_edges = [
     ('Desert Main Lobby E Edge', 'Desert East Wing W Edge'),
     ('Desert East Wing N Edge', 'Desert Arrow Pot Corner S Edge'),
     ('Desert Arrow Pot Corner W Edge', 'Desert North Hall E Edge'),
-    ('Desert North Hall W Edge', 'Desert Sandworm Corner S Edge'),
-    ('Desert Sandworm Corner E Edge', 'Desert West Wing N Edge'),
+    ('Desert West Wing N Edge', 'Desert Sandworm Corner S Edge'),
+    ('Desert Sandworm Corner E Edge', 'Desert North Hall W Edge'),
     ('Thieves Lobby N Edge', 'Thieves Ambush S Edge'),
     ('Thieves Lobby NE Edge', 'Thieves Ambush SE Edge'),
     ('Thieves Ambush ES Edge', 'Thieves BK Corner WS Edge'),

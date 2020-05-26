@@ -8,7 +8,13 @@
 ### Experimental features
 
 * Open "Edge" transitions can now be linked with normal doors
-* "Straight" staircases (the ones similar to normal doors) can be linked with both normal doors and edges      
+* "Straight" staircases (the ones similar to normal doors) can be linked with both normal doors and edges
+
+
+* Couple of temporary debug features added:
+* Total item count displays where TFH's goal usually does
+* A red square appears in the upper right corner of the hud if the castle gate is closed
+      
 
 # Bug Fixes
 
@@ -19,6 +25,7 @@
 * Enemizer settings made consistent with website
 * Swamp flooded ladders in the basement now requires Flippers
 * PoD EG Glitch gets killed on transitions (Only when DR is on)
+* Problem with standard logic fixed wanting you to pass through the tapestry backwards to rescue Zelda
 
 ##### In Progress
 

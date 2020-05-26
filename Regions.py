@@ -211,7 +211,8 @@ def create_dungeon_regions(world, player):
                                                                 'Hyrule Castle East Hall SW']),
         create_dungeon_region(player, 'Hyrule Castle West Hall', 'Hyrule Castle', None, ['Hyrule Castle West Hall E', 'Hyrule Castle West Hall S']),
         create_dungeon_region(player, 'Hyrule Castle Back Hall', 'Hyrule Castle', None, ['Hyrule Castle Back Hall E', 'Hyrule Castle Back Hall W', 'Hyrule Castle Back Hall Down Stairs']),
-        create_dungeon_region(player, 'Hyrule Castle Throne Room', 'Hyrule Castle', None, ['Hyrule Castle Throne Room N', 'Hyrule Castle Throne Room South Stairs']),
+        create_dungeon_region(player, 'Hyrule Castle Throne Room', 'Hyrule Castle', None, ['Hyrule Castle Throne Room Tapestry', 'Hyrule Castle Throne Room South Stairs']),
+        create_dungeon_region(player, 'Hyrule Castle Behind Tapestry', 'Hyrule Castle', None, ['Hyrule Castle Throne Room N', 'Hyrule Castle Tapestry Backwards']),
 
         create_dungeon_region(player, 'Hyrule Dungeon Map Room', 'Hyrule Castle', ['Hyrule Castle - Map Chest', 'Hyrule Castle - Map Guard Key Drop'], ['Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon Map Room Up Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon North Abyss', 'Hyrule Castle', None, ['Hyrule Dungeon North Abyss South Edge', 'Hyrule Dungeon North Abyss Key Door N']),

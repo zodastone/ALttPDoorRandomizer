@@ -7,6 +7,19 @@ DrHudOverride:
 
 HudAdditions:
 {
+    lda DRFlags : and #$0008 : beq ++
+        lda $7EF423 : and #$00ff
+        jsr HudHexToDec4DigitCopy
+        LDX.b $05 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+10 ; draw 100's digit
+        LDX.b $06 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+12 ; draw 10's digit
+        LDX.b $07 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+14 ; draw 1's digit
+
+        lda $7ef29b : and #$0020 : beq +
+            lda #$207f : bra .drawthing
+        + lda #$345e
+        .drawthing STA !GOAL_DRAW_ADDRESS+16 ; castle gate indicator
+    ++
+
     ldx $040c : cpx #$ff : bne + : rts : +
     lda DRMode : bne + : rts : +
         phb : phk : plb
@@ -95,3 +108,36 @@ CountBonkItem:
     ++
     phy : tay : jsr CountChest : ply
     rtl
+
+;================================================================================
+; 16-bit A, 8-bit X
+; in:	A(b) - Byte to Convert
+; out:	$04 - $07 (high - low)
+;================================================================================
+HudHexToDec4DigitCopy:
+    LDY.b #$90
+    -
+        CMP.w #1000 : !BLT +
+        INY
+        SBC.w #1000 : BRA -
+    +
+    STY $04 : LDY #$90 ; Store 1000s digit & reset Y
+    -
+        CMP.w #100 : !BLT +
+        INY
+        SBC.w #100 : BRA -
+    +
+    STY $05 : LDY #$90 ; Store 100s digit & reset Y
+    -
+        CMP.w #10 : !BLT +
+        INY
+        SBC.w #10 : BRA -
+    +
+    STY $06 : LDY #$90 ; Store 10s digit & reset Y
+    CMP.w #1 : !BLT +
+    -
+        INY
+        DEC : BNE -
+    +
+    STY $07 ; Store 1s digit
+RTS

@@ -61,6 +61,8 @@ def create_doors(world, player):
         create_door(player, 'Hyrule Castle Back Hall W', Nrml).dir(We, 0x01, Top, Low).pos(0),
         create_door(player, 'Hyrule Castle Back Hall E', Nrml).dir(Ea, 0x01, Top, Low).pos(1),
         create_door(player, 'Hyrule Castle Back Hall Down Stairs', Sprl).dir(Dn, 0x01, 0, HTL).ss(A, 0x2a, 0x00),
+        create_door(player, 'Hyrule Castle Throne Room Tapestry', Lgcl),
+        create_door(player, 'Hyrule Castle Tapestry Backwards', Lgcl),
         create_door(player, 'Hyrule Castle Throne Room N', Nrml).dir(No, 0x51, Mid, High).pos(1),
         create_door(player, 'Hyrule Castle Throne Room South Stairs', StrS).dir(So, 0x51, Mid, Low),
 
@@ -1086,7 +1088,8 @@ def create_doors(world, player):
     world.get_door('Swamp Flooded Room Ladder', player).event('Swamp Drain')
 
     if world.mode[player] == 'standard':
-        world.get_door('Hyrule Castle Throne Room N', player).event('Zelda Pickup')
+        world.get_door('Hyrule Castle Throne Room Tapestry', player).event('Zelda Pickup')
+        world.get_door('Hyrule Castle Tapestry Backwards', player).event('Zelda Pickup')
 
     # crystal switches and barriers
     world.get_door('Hera Lobby Down Stairs', player).c_switch()

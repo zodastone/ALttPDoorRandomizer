@@ -863,7 +863,8 @@ def standard_rules(world, player):
                 add_rule(world.get_entrance(ent, player), lambda state: standard_escape_rule(state))
 
     set_rule(world.get_location('Zelda Pickup', player), lambda state: state.has('Big Key (Escape)', player))
-    set_rule(world.get_entrance('Hyrule Castle Throne Room N', player), lambda state: state.has('Zelda Herself', player))
+    set_rule(world.get_entrance('Hyrule Castle Throne Room Tapestry', player), lambda state: state.has('Zelda Herself', player))
+    set_rule(world.get_entrance('Hyrule Castle Tapestry Backwards', player), lambda state: state.has('Zelda Herself', player))
 
     def check_rule_list(state, r_list):
         return True if len(r_list) <= 0 else r_list[0](state) and check_rule_list(state, r_list[1:])

@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '4fdf20e033770cf92786a790a020d2d5'
+RANDOMIZERBASEHASH = '69e8cbb3dd3cf9f5cebece101d95d0d7'
 
 
 class JsonRom(object):
@@ -598,6 +598,7 @@ def patch_rom(world, rom, player, team, enemized):
     dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' else  DROptions.Town_Portal
     if world.experimental[player]:
         dr_flags |= DROptions.Map_Info
+        dr_flags |= DROptions.Debug
 
     # patch doors
     if world.doorShuffle[player] == 'crossed':
