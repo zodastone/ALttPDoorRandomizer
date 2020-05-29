@@ -8,7 +8,7 @@ import random
 import time
 import zlib
 
-from BaseClasses import World, CollectionState, Item, Region, Location, Shop
+from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
 from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions
@@ -24,7 +24,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes
 from Utils import output_path, parse_player_names
 
-__version__ = '0.1.0.5-u'
+__version__ = '0.1.0.6-u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -371,11 +371,17 @@ def copy_world(world):
             create_inverted_regions(ret, player)
         create_dungeon_regions(ret, player)
         create_shops(ret, player)
-        create_doors(ret, player)
         create_rooms(ret, player)
         create_dungeons(ret, player)
 
     copy_dynamic_regions_and_locations(world, ret)
+    for player in range(1, world.players + 1):
+        if world.mode[player] == 'standard':
+            parent = ret.get_region('Menu', player)
+            target = ret.get_region('Hyrule Castle Secret Entrance', player)
+            connection = Entrance(player, 'Uncle S&Q', parent)
+            parent.exits.append(connection)
+            connection.connect(target)
 
     # copy bosses
     for dungeon in world.dungeons:
@@ -418,6 +424,10 @@ def copy_world(world):
     ret.state.stale = {player: True for player in range(1, world.players + 1)}
 
     ret.doors = world.doors
+    for door in ret.doors:
+        entrance = ret.check_for_entrance(door.name, door.player)
+        if entrance is not None:
+            entrance.door = door
     ret.paired_doors = world.paired_doors
     ret.rooms = world.rooms
     ret.inaccessible_regions = world.inaccessible_regions
@@ -469,7 +479,6 @@ def create_playthrough(world):
     logging.getLogger('').debug(world.fish.translate("cli","cli","building.collection.spheres"))
     while sphere_candidates:
         state.sweep_for_events(key_only=True)
-        state.sweep_for_crystal_access()
 
         sphere = []
         # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
@@ -487,7 +496,7 @@ def create_playthrough(world):
 
         logging.getLogger('').debug(world.fish.translate("cli","cli","building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations))
         if not sphere:
-            logging.getLogger('').debug(world.fish.translate("cli","cli","cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
+            logging.getLogger('').error(world.fish.translate("cli","cli","cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
             if any([world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
                 raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.progression"))
             else:
@@ -531,7 +540,6 @@ def create_playthrough(world):
     collection_spheres = []
     while required_locations:
         state.sweep_for_events(key_only=True)
-        state.sweep_for_crystal_access()
 
         sphere = list(filter(lambda loc: state.can_reach(loc) and state.not_flooding_a_key(world, loc), required_locations))
 

@@ -331,6 +331,10 @@ region_starts = {
     'Ganons Tower': ['GT Lobby']
 }
 
+standard_starts = {
+    'Hyrule Castle': ['Hyrule Castle Lobby']
+}
+
 split_region_starts = {
     'Desert Palace': {
         'Back': ['Desert Back Lobby'],
