@@ -8,7 +8,7 @@ from enum import unique, Flag
 from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier
 from Regions import key_only_locations
-from Dungeons import dungeon_regions, region_starts, split_region_starts, flexible_starts
+from Dungeons import dungeon_regions, region_starts, standard_starts, split_region_starts, flexible_starts
 from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor
@@ -148,9 +148,10 @@ def vanilla_key_logic(world, player):
     while len(sector_queue) > 0:
         builder = sector_queue.popleft()
 
+        split_dungeon = builder.name.startswith('Desert Palace') or builder.name.startswith('Skull Woods')
         origin_list = list(entrances_map[builder.name])
         find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, builder.name)
-        if len(origin_list) <= 0 or not pre_validate(builder, origin_list, world, player):
+        if len(origin_list) <= 0 or not pre_validate(builder, origin_list, split_dungeon, world, player):
             if last_key == builder.name or loops > 1000:
                 origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name if len(origin_list) > 0 else 'no origin'
                 raise Exception('Infinite loop detected for "%s" located at %s' % (builder.name, origin_name))
@@ -394,6 +395,8 @@ def determine_entrance_list(world, player):
     connections = {}
     for key, r_names in region_starts.items():
         entrance_map[key] = []
+        if world.mode[player] == 'standard' and key in standard_starts.keys():
+            r_names = standard_starts[key]
         for region_name in r_names:
             region = world.get_region(region_name, player)
             for ent in region.entrances:
@@ -1173,9 +1176,6 @@ def find_inaccessible_regions(world, player):
             if connect and connect.type is not RegionType.Dungeon and connect not in queue and connect not in visited_regions:
                 queue.append(connect)
     world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if valid_inaccessible_region(r)])
-    if world.mode[player] == 'standard':
-        world.inaccessible_regions[player].append('Hyrule Castle Ledge')
-        world.inaccessible_regions[player].append('Sewer Drop')
     logger = logging.getLogger('')
     logger.debug('Inaccessible Regions:')
     for r in world.inaccessible_regions[player]:

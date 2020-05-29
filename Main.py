@@ -8,7 +8,7 @@ import random
 import time
 import zlib
 
-from BaseClasses import World, CollectionState, Item, Region, Location, Shop
+from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
 from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions
@@ -24,7 +24,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes
 from Utils import output_path, parse_player_names
 
-__version__ = '0.1.0.5-u'
+__version__ = '0.1.0.6-u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -375,6 +375,13 @@ def copy_world(world):
         create_dungeons(ret, player)
 
     copy_dynamic_regions_and_locations(world, ret)
+    for player in range(1, world.players + 1):
+        if world.mode[player] == 'standard':
+            parent = ret.get_region('Menu', player)
+            target = ret.get_region('Hyrule Castle Secret Entrance', player)
+            connection = Entrance(player, 'Uncle S&Q', parent)
+            parent.exits.append(connection)
+            connection.connect(target)
 
     # copy bosses
     for dungeon in world.dungeons:

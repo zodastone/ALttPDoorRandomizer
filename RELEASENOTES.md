@@ -4,6 +4,7 @@
 * Standard mode generation improvements
 * Spoiler lists bosses (multiworld compatible)
 * Bombs escape not valid for Crossed Dungeon
+* Graph algorithm speed improvement for placements and playthrough
 
 ### Experimental features
 

@@ -284,16 +284,16 @@
   "shufflebosses": {
     "choices": [
       "none",
-      "basic",
-      "normal",
-      "chaos"
+      "simple",
+      "full",
+      "random"
     ]
   },
   "shuffleenemies": {
     "choices": [
       "none",
       "shuffled",
-      "chaos"
+      "random"
     ]
   },
   "enemy_health": {
@@ -309,7 +309,7 @@
     "choices": [
       "default",
       "shuffled",
-      "chaos"
+      "random"
     ]
   },
   "shufflepots": {

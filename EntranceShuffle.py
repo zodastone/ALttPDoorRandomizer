@@ -3498,7 +3498,6 @@ inverted_default_dungeon_connections = [('Desert Palace Entrance (South)', 'Dese
                                ('Ice Palace Exit', 'Dark Lake Hylia')
                               ]
 
-# format:
 indirect_connections = {
     'Turtle Rock (Top)': 'Turtle Rock',
     'East Dark World': 'Pyramid Fairy',
@@ -3509,6 +3508,7 @@ indirect_connections = {
     'Light World': 'Pyramid Fairy',
     'Old Man Cave': 'Old Man S&Q'
 }
+# format:
 # Key=Name
 # addr = (door_index, exitdata) # multiexit
 #       | ([addr], None)  # holes
