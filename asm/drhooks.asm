@@ -116,7 +116,7 @@ nop #3
 .next
 
 ; also rando's hooks.asm line 1360
-org $a0ee11 ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
+org $a0ee13 ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
 jsl DrHudOverride
 org $098638 ; rando's hooks.asm line 2192
 jsl CountChestKeys
