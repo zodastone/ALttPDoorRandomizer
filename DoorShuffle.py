@@ -1304,8 +1304,8 @@ class DROptions(Flag):
     Debug = 0x08
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
 
-# DATA GOES DOWN HERE
 
+# DATA GOES DOWN HERE
 logical_connections = [
     ('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
     ('Hyrule Castle Throne Room Tapestry', 'Hyrule Castle Behind Tapestry'),

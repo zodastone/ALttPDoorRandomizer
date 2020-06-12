@@ -1,6 +1,6 @@
 RecordStairType: {
     pha
-    lda DRMode : beq .norm
+    lda.l DRMode : beq .norm
     lda $040c : cmp #$ff : beq .norm
          lda $0e : sta $045e
          cmp #$26 : beq .norm ; skipping in-floor staircases
@@ -11,7 +11,7 @@ RecordStairType: {
 }
 
 SpiralWarp: {
-    lda DRMode : beq .abort ; abort if not DR
+    lda.l DRMode : beq .abort ; abort if not DR
     lda $040c : cmp.b #$ff : beq .abort ; abort if not in dungeon
     lda $045e : cmp #$5e : beq .gtg ; abort if not spiral - intended room is in A!
     cmp #$5f : beq .gtg
@@ -22,8 +22,8 @@ SpiralWarp: {
     phb : phk : plb : phx : phy ; push stuff
     jsr LookupSpiralOffset
     rep #$30 : and #$00FF : asl #2 : tax
-    lda SpiralTable, x : sta $00
-    lda SpiralTable+2, x : sta $02
+    lda.w SpiralTable, x : sta $00
+    lda.w SpiralTable+2, x : sta $02
     sep #$30
     lda $00 : sta $a0
     ; shift quadrant if necessary
@@ -73,8 +73,8 @@ SpiralWarp: {
     stz $045e ; clear the staircase flag
 
     ; animated tiles fix
-    lda DRMode : cmp #$02 : bne + ; only do this in crossed mode
-        ldx $a0 : lda TilesetTable, x
+    lda.l DRMode : cmp #$02 : bne + ; only do this in crossed mode
+        ldx $a0 : lda.l TilesetTable, x
         cmp $0aa1 : beq + ; already eq no need to decomp
             sta $0aa1
             tax : lda $02802e, x : tay
@@ -133,17 +133,17 @@ LookupSpiralOffset: {
     lda #$02 : sta $01 ; always 2
 
     .done
-    lda $a2 : tax : lda SpiralOffset,x
+    lda $a2 : tax : lda.w SpiralOffset,x
     !add $01 ;add a thing (0 in easy case)
     rts
 }
 
 ShiftQuadSimple: {
-	lda CoordIndex,y : tax
+	lda.w CoordIndex,y : tax
 	lda $20,x : beq .skip
 	lda $21,x : !add $06 : sta $21,x ; coordinate update
 	.skip
-	lda CamQuadIndex,y : tax
+	lda.w CamQuadIndex,y : tax
 	lda $0601,x : !add $06 : sta $0601,x
 	lda $0605,x : !add $06 : sta $0605,x ; high bytes of these guys
 	rts
@@ -152,13 +152,13 @@ ShiftQuadSimple: {
 SetCamera: {
     stz $04
     tyx : lda $a9,x : bne .nonZeroHalf
-    lda CamQuadIndex,y : tax : lda $607,x : pha
-    lda CameraIndex,y : tax : pla : cmp $e3, x : bne .noQuadAdj
+    lda.w CamQuadIndex,y : tax : lda $607,x : pha
+    lda.w CameraIndex,y : tax : pla : cmp $e3, x : bne .noQuadAdj
     dec $e3,x
 
     .noQuadAdj
     lda $07 : bne .adj0
-    lda CoordIndex,y : tax
+    lda.w CoordIndex,y : tax
     lda $20,x : beq .oddQuad
     cmp #$79 : bcc .adj0
     !sub #$78 : sta $04
@@ -170,21 +170,21 @@ SetCamera: {
 
     .nonZeroHalf ;meaning either right half or bottom half
     lda $07 : bne .setQuad
-    lda CoordIndex,y : tax
+    lda.w CoordIndex,y : tax
     lda $20,x : cmp #$78 : bcs .setQuad
     !add #$78 : sta $04
-    lda CamQuadIndex,y : tax : lda $0603, x : pha
-    lda CameraIndex,y : tax : pla : sta $e3, x
+    lda.w CamQuadIndex,y : tax : lda $0603, x : pha
+    lda.w CameraIndex,y : tax : pla : sta $e3, x
     .adj1
     tya : asl : !add #$08 : tax : jsr AdjCamBounds : bra .done
 
     .setQuad
-    lda CamQuadIndex,y : tax : lda $0607, x : pha
-    lda CameraIndex,y : tax : pla : sta $e3, x
+    lda.w CamQuadIndex,y : tax : lda $0607, x : pha
+    lda.w CameraIndex,y : tax : pla : sta $e3, x
     tya : asl : !add #$0c : tax : jsr AdjCamBounds : bra .done
 
     .done
-    lda CameraIndex,y : tax
+    lda.w CameraIndex,y : tax
     lda $04 : sta $e2, x
     rts
 }
@@ -192,13 +192,20 @@ SetCamera: {
 ; input, expects X to be an appropriate offset into the CamBoundBaseLine table
 ; when $04 is 0 no coordinate are added
 AdjCamBounds: {
-    rep #$20 : lda CamBoundBaseLine, x : sta $05
+    rep #$20 : lda.w CamBoundBaseLine, x : sta $05
     lda $04 : and #$00ff : beq .common
-    lda CoordIndex,y : tax
+    lda.w CoordIndex,y : tax
     lda $20, x : and #$00ff : !add $05 : sta $05
     .common
-    lda OppCamBoundIndex,y : tax
+    lda.w OppCamBoundIndex,y : tax
     lda $05 : sta $0618, x
     inc #2 : sta $061A, x : sep #$20
     rts
+}
+
+SpiralPriorityHack: {
+    lda.l DRMode : beq +
+        lda #$01 : rtl ; always skip the priority code - until I figure out how to fix it
+    + lda $0462 : and #$04 ; what we wrote over
+    rtl
 }

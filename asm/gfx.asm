@@ -1,6 +1,6 @@
 GfxFixer:
 {
-    lda DRMode : bne +
+    lda.l DRMode : bne +
         jsl LoadRoomHook ;this is the code we overwrote
         jsl Dungeon_InitStarTileCh
         jsl LoadTransAuxGfx_Alt
@@ -12,8 +12,8 @@ GfxFixer:
     jsl LoadTransAuxGfx
     jsl Dungeon_LoadCustomTileAttr
     jsl PrepTransAuxGfx
-    lda DRMode : cmp #$02 : bne + ; only do this in crossed mode
-        ldx $a0 : lda TilesetTable, x
+    lda.l DRMode : cmp #$02 : bne + ; only do this in crossed mode
+        ldx $a0 : lda.l TilesetTable, x
         cmp $0aa1 : beq + ; already eq no need to decomp
             sta $0aa1
             tax : lda $02802e, x : tay

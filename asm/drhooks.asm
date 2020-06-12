@@ -29,6 +29,11 @@ jsl RecordStairType : nop
 org $02a1e7 ;(PC: 121e7)
 jsl SpiralWarp
 
+org $0291b3 ; <- Bank02.asm : 3303 (LDA $0462 : AND.b #$04)
+jsl SpiralPriorityHack : nop
+org $0290f9 ; <- Bank02.asm : 3188 (LDA $0462 : AND.b #$04)
+jsl SpiralPriorityHack : nop
+
 org $029369 ; <- 11369 - Bank02.asm : 3610 (STX $0464 :  STY $012E)
 jsl StraightStairsAdj : nop #2
 org $029383 ; <- 11384 - Bank02.asm : 3629 (.walkingDownStaircase-> ADD $20 : STA $20)
@@ -116,7 +121,8 @@ nop #3
 .next
 
 ; also rando's hooks.asm line 1360
-org $a0ee13 ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
+            ; 106e4e -> goes to  a0ee4e
+org $a0ee4e ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
 jsl DrHudOverride
 org $098638 ; rando's hooks.asm line 2192
 jsl CountChestKeys

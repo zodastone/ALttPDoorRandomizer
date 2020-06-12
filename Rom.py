@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'd8639f33e6b5621f139cb6abbc641af1'
+RANDOMIZERBASEHASH = 'b2badac693edd0880357f5a75a3e60d7'
 
 
 class JsonRom(object):
@@ -595,7 +595,7 @@ def patch_rom(world, rom, player, team, enemized):
         patch_shuffled_dark_sanc(world, rom, player)
 
     # setup dr option flags based on experimental, etc.
-    dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' else  DROptions.Town_Portal
+    dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' else DROptions.Town_Portal
     if world.experimental[player]:
         dr_flags |= DROptions.Map_Info
         dr_flags |= DROptions.Debug
@@ -2137,7 +2137,7 @@ def patch_shuffled_dark_sanc(world, rom, player):
 
 # 24B116 and 20BAD8
 compass_r_addr = 0x123116  # a9 90 24 8f 9a c7 7e
-compass_w_addr = 0x103ad8  # e2 20 ad 0c 04 c9 00 d0
+compass_w_addr = 0x103af6  # e2 20 ad 0c 04 c9 00 d0
 
 
 def compass_code_good(rom):

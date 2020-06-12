@@ -819,7 +819,7 @@ class CollectionState(object):
                     del (self.prog_items[to_remove, item.player])
                 # invalidate caches, nothing can be trusted anymore now
                 self.reachable_regions[item.player] = dict()
-                self.blocked_connections[item.player] = set()
+                self.blocked_connections[item.player] = dict()
                 self.stale[item.player] = True
 
     def __getattr__(self, item):

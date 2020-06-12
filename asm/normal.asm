@@ -1,5 +1,5 @@
 WarpLeft:
-    lda DRMode : beq .end
+    lda.l DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
@@ -10,7 +10,7 @@ WarpLeft:
 	rtl
 
 WarpRight:
-    lda DRMode : beq .end
+    lda.l DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
@@ -21,7 +21,7 @@ WarpRight:
 	rtl
 
 WarpUp:
-    lda DRMode : beq .end
+    lda.l DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
@@ -32,7 +32,7 @@ WarpUp:
 	rtl
 
 WarpDown:
-    lda DRMode : beq .end
+    lda.l DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
@@ -45,13 +45,13 @@ WarpDown:
 ; carry set = use link door like normal
 ; carry clear = we are in dr mode, never use linking doors
 CheckLinkDoorR:
-    lda DRMode : bne +
+    lda.l DRMode : bne +
         lda $7ec004 : sta $a0 ; what we wrote over
         sec : rtl
     + clc : rtl
 
 CheckLinkDoorL:
-    lda DRMode : bne +
+    lda.l DRMode : bne +
         lda $7ec003 : sta $a0 ; what we wrote over
         sec : rtl
     + clc : rtl
@@ -155,10 +155,10 @@ LookupNewRoom: ; expects data offset to be in A
     rep #$30 : and #$00FF ;sanitize A reg (who knows what is in the high byte)
 	sta $00 ; offset in 00
 	lda $a2 : tax ; probably okay loading $a3 in the high byte
-	lda DoorOffset,x : and #$00FF ;we only want the low byte
+	lda.w DoorOffset,x : and #$00FF ;we only want the low byte
 	asl #3 : sta $02 : !add $02 : !add $02 ;multiply by 24 (data size)
 	!add $00 ; should now have the offset of the address I want to load
-	tax : lda DoorTable,x : sta $00
+	tax : lda.w DoorTable,x : sta $00
 	and #$00FF : sta $a0 ; assign new room
 	sep #$30
 	rts
@@ -168,11 +168,11 @@ LookupNewRoom: ; expects data offset to be in A
 ; Sets high bytes of various registers
 ShiftVariablesMainDir:
 {
-	lda CoordIndex,y : tax
+	lda.w CoordIndex,y : tax
 	lda $21,x : !add $02 : sta $21,x ; coordinate update
-	lda CameraIndex,y : tax
+	lda.w CameraIndex,y : tax
 	lda $e3,x : !add $02 : sta $e3,x ; scroll register high byte
-	lda CamQuadIndex,y : tax
+	lda.w CamQuadIndex,y : tax
 	lda $0605,x : !add $02 : sta $0605,x ; high bytes of these guys
 	lda $0607,x : !add $02 : sta $0607,x
 	lda $0601,x : !add $02 : sta $0601,x
@@ -210,13 +210,13 @@ PrepScrollToNormal:
 StraightStairsAdj:
 {
     stx $0464 : sty $012e ; what we wrote over
-    lda DRMode : beq +
+    lda.l DRMode : beq +
         jsr GetTileAttribute : tax
         lda $11 : cmp #$12 : beq .goingNorth
             lda $a2 : cmp #$51 : bne ++
                 rep #$20 : lda #$0018 : !add $20 : sta $20 : sep #$20 ; special fix for throne room
                 jsr GetTileAttribute : tax
-            ++ lda StepAdjustmentDown, X : bra .end
+            ++ lda.l StepAdjustmentDown, X : bra .end
 ;            lda $ee : beq .end
 ;                rep #$20 : lda #$ffe0 : !add $20 : sta $20 : sep #$20
         .goingNorth
@@ -225,7 +225,7 @@ StraightStairsAdj:
                 lda #$36 : bra .end ; special fix for throne room
             ++ ldy $ee : cpy #$00 : beq ++
                 inx
-            ++ lda StepAdjustmentUp, X
+            ++ lda.l StepAdjustmentUp, X
         .end
         pha : lda $0462 : and #$04 : bne ++
             pla : !add #$f6 : pha
@@ -255,14 +255,14 @@ db $d0, $f6, $10, $1a, $f0, $00
 
 StraightStairsFix:
 {
-    lda DRMode : bne +
+    lda.l DRMode : bne +
         !add $20 : sta $20 ;what we wrote over
     + rtl
 }
 
 StraightStairLayerFix:
 {
-    lda DRMode : beq +
+    lda.l DRMode : beq +
         lda $ee : rtl
     + lda $01c322, x : rtl ; what we wrote over
 }
@@ -270,7 +270,7 @@ StraightStairLayerFix:
 DoorToStraight:
 {
     pha
-    lda DRMode : beq .skip
+    lda.l DRMode : beq .skip
         pla : bne .end
         pha
         lda $a0 : cmp #$51 : bne .skip
