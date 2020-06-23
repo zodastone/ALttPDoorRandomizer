@@ -5,17 +5,18 @@
 * Spoiler lists bosses (multiworld compatible)
 * Bombs escape not valid for Crossed Dungeon
 * Graph algorithm speed improvement for placements and playthrough
+* TT Attic Hint tile should have a crystal switch accessible now
+* Updated to v.31.0.5
 
 ### Experimental features
 
 * Open "Edge" transitions can now be linked with normal doors
 * "Straight" staircases (the ones similar to normal doors) can be linked with both normal doors and edges
 
+#### Couple of temporary debug features added:
 
-* Couple of temporary debug features added:
 * Total item count displays where TFH's goal usually does
-* A red square appears in the upper right corner of the hud if the castle gate is closed
-      
+* A red square appears in the upper right corner of the hud if the castle gate is closed      
 
 # Bug Fixes
 
@@ -27,8 +28,4 @@
 * Swamp flooded ladders in the basement now requires Flippers
 * PoD EG Glitch gets killed on transitions (Only when DR is on)
 * Problem with standard logic fixed wanting you to pass through the tapestry backwards to rescue Zelda
-
-##### In Progress
-
-* TT Attic Hint tile should have a crystal switch accessible now 
-* Different key logic rules in development 
+* Fixed SRAM corruption issues (we believe)
