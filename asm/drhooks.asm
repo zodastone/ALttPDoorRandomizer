@@ -101,9 +101,9 @@ nop : stz $0dd0, X : rts
 .not_in_ganons_tower
 
 
-org $2081f2
+org $208206
 jsl MirrorCheckOverride2
-org $20825c
+org $208270
 jsl MirrorCheckOverride2
 org $07a955 ; <- Bank07.asm : around 6564 (JP is a bit different) (STZ $05FC : STZ $05FD)
 jsl BlockEraseFix
@@ -122,7 +122,7 @@ nop #3
 
 ; also rando's hooks.asm line 1360
             ; 106e4e -> goes to  a0ee4e
-org $a0ee4e ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
+org $a0ee84 ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
 jsl DrHudOverride
 org $098638 ; rando's hooks.asm line 2192
 jsl CountChestKeys

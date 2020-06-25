@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'ebd479fdf1152d9a093c56ce57e13571'
+RANDOMIZERBASEHASH = '2a64368fe169ff1e5099ef65f926417f'
 
 
 class JsonRom(object):
@@ -2136,7 +2136,7 @@ def patch_shuffled_dark_sanc(world, rom, player):
 
 
 # 24B116 and 20BAD8
-compass_r_addr = 0x123116  # a9 90 24 8f 9a c7 7e
+compass_r_addr = 0x123118  # a9 90 24 8f 9a c7 7e
 compass_w_addr = 0x103b2c  # e2 20 ad 0c 04 c9 00 d0
 
 
