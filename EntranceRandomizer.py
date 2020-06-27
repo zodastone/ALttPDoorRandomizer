@@ -2,7 +2,7 @@
 import argparse
 import os
 import logging
-import random
+import RaceRandom as random
 import textwrap
 import sys
 
@@ -255,6 +255,7 @@ def start():
     parser.add_argument('--shufflepalette', default=False, action='store_true')
     parser.add_argument('--shufflepots', default=False, action='store_true')
     parser.add_argument('--multi', default=1, type=lambda value: min(max(int(value), 1), 255))
+    parser.add_argument('--securerandom', default=False, action='store_true')
 
     parser.add_argument('--outputpath')
     args = parser.parse_args()

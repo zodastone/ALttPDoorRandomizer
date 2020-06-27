@@ -2,7 +2,7 @@
 from argparse import Namespace
 from glob import glob
 import json
-import random
+import RaceRandom as random
 import os
 import shutil
 from tkinter import Checkbutton, OptionMenu, Toplevel, LabelFrame, PhotoImage, Tk, LEFT, RIGHT, BOTTOM, TOP, StringVar, IntVar, Frame, Label, W, E, X, BOTH, Entry, Spinbox, Button, filedialog, messagebox, ttk

@@ -1,5 +1,5 @@
 import logging
-import random
+import RaceRandom as random
 
 from BaseClasses import Boss
 from Fill import FillError
