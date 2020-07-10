@@ -2,13 +2,14 @@ import collections
 import logging
 import OverworldGlitchRules
 from BaseClasses import RegionType, World
-from OverworldGlitchRules import overworld_glitches_rules
+from OverworldGlitchRules import overworld_glitches_rules, no_logic_rules
 
 
 def set_rules(world, player):
 
     if world.logic == 'nologic':
         logging.getLogger('').info('WARNING! Seeds generated under this logic often require major glitches and may be impossible!')
+        no_logic_rules(world, player)
         if world.mode != 'inverted':
             world.get_region('Links House', player).can_reach_private = lambda state: True
             world.get_region('Sanctuary', player).can_reach_private = lambda state: True
