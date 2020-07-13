@@ -42,6 +42,8 @@ def link_entrances(world, player):
         if world.mode[player] == 'standard':
             # must connect front of hyrule castle to do escape
             connect_two_way(world, 'Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)', player)
+        elif world.doorShuffle[player] != 'vanilla':
+            lw_entrances.append('Hyrule Castle Entrance (South)')
         else:
             dungeon_exits.append(('Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)'))
             lw_entrances.append('Hyrule Castle Entrance (South)')
@@ -55,6 +57,11 @@ def link_entrances(world, player):
         if world.mode[player] == 'standard':
             # rest of hyrule castle must be in light world, so it has to be the one connected to east exit of desert
             connect_mandatory_exits(world, lw_entrances, [('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)')], list(LW_Dungeon_Entrances_Must_Exit), player)
+        elif world.doorShuffle[player] != 'vanilla':
+            #  sanc is in light world, so must all of HC if door shuffle is on
+            connect_mandatory_exits(world, lw_entrances,
+                                    [('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)', 'Hyrule Castle Exit (South)')],
+                                    list(LW_Dungeon_Entrances_Must_Exit), player)
         else:
             connect_mandatory_exits(world, lw_entrances, dungeon_exits, list(LW_Dungeon_Entrances_Must_Exit), player)
         connect_mandatory_exits(world, dw_entrances, dungeon_exits, list(DW_Dungeon_Entrances_Must_Exit), player)
@@ -2046,6 +2053,14 @@ def simple_shuffle_dungeons(world, player):
         hc_target = 'Hyrule Castle'
     else:
         hc_target = multi_dungeons[2]
+
+    # door shuffle should restrict hyrule castle to the light world due to sanc being limited to the LW
+    if world.doorShuffle[player] != 'vanilla' and hc_target == 'Turtle Rock':
+        swap_w_dp = random.choice([True, False])
+        if swap_w_dp:
+            hc_target, dp_target = dp_target, hc_target
+        else:
+            hc_target, tr_target = tr_target, hc_target
 
     # ToDo improve this?
 

@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '2a64368fe169ff1e5099ef65f926417f'
+RANDOMIZERBASEHASH = 'ad03900849f7220770bd8d00ed514dad'
 
 
 class JsonRom(object):
@@ -608,6 +608,8 @@ def patch_rom(world, rom, player, team, enemized):
             rom.write_byte(0x13f01c+offset, layout.max_chests + layout.max_drops)
             rom.write_byte(0x13f02a+offset, layout.max_chests)
             builder = world.dungeon_layouts[player][name]
+            rom.write_byte(0x13f070+offset, builder.location_cnt % 10)
+            rom.write_byte(0x13f07e+offset, builder.location_cnt // 10)
             bk_status = 1 if builder.bk_required else 0
             bk_status = 2 if builder.bk_provided else bk_status
             rom.write_byte(0x13f038+offset*2, bk_status)

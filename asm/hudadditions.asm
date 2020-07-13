@@ -36,35 +36,92 @@ HudAdditions:
             + lda.w DRFlags : and #$0004 : beq .restore
             lda $7ef368 : and.l $0098c0, x : beq .restore
 
-                lda #$2811 : sta $7ec740
-                lda $7ef366 : and.l $0098c0, x : bne .check
-                    lda.w BigKeyStatus, x : bne + ; change this, if bk status changes to one byte
-                        lda #$2574 : bra ++
-                    + cmp #$0002 : bne +
-                        lda #$2420 : bra ++
-                    + lda #$207f : bra ++
-                .check lda #$2826
-                ++ sta $7ec742
+;                lda #$2811 : sta $7ec740
+;                lda $7ef366 : and.l $0098c0, x : bne .check
+;                    lda.w BigKeyStatus, x : bne + ; change this, if bk status changes to one byte
+;                        lda #$2574 : bra ++
+;                    + cmp #$0002 : bne +
+;                        lda #$2420 : bra ++
+;                    + lda #$207f : bra ++
+;                .check lda #$2826
+;                ++ sta $7ec742
                 txa : lsr : tax
 
                 lda $7ef4e0, x : jsr ConvertToDisplay : sta $7ec7a2
                 lda #$2830 : sta $7ec7a4
                 lda.w ChestKeys, x : jsr ConvertToDisplay : sta $7ec7a6
 
-                lda #$2871 : sta $7ec780
-                lda.w TotalKeys, x
-                sep #$20 : !sub $7ef4b0, x : rep #$20
-                jsr ConvertToDisplay : sta $7ec782
+;                lda #$2871 : sta $7ec780
+;                lda.w TotalKeys, x
+;                sep #$20 : !sub $7ef4b0, x : rep #$20 ; todo 4b0 no longer in use
+;                jsr ConvertToDisplay : sta $7ec782
 
     .restore
     plb : rts
 }
 
+HudOffsets:
+;   none  hc     east   desert aga    swamp  pod    mire   skull  ice    hera   tt     tr     gt
+dw $fffe, $0000, $0006, $0008, $0002, $0010, $000e, $0018, $0012, $0016, $000a, $0014, $001a, $001e
+
+DrHudDungeonItemsAdditions:
+{
+    jsl DrawHUDDungeonItems
+    lda.l HUDDungeonItems : and #$ff : bne + : rtl : +
+    lda.l DRMode : cmp #$02 : beq + : rtl : +
+
+    phx : phy : php
+    rep #$30
+
+    lda !HUD_FLAG : and.w #$0020 : beq + : bra ++ : +
+    lda HUDDungeonItems : and.w #$0003 : bne + : bra ++ : +
+        lda.w #$2810 : sta $1684 ; small keys icon
+        lda.w #$2811 : sta $16c4 ; big key icon
+        lda.w #$2810 : sta $1704 ; small keys icon
+        ldx #$0002
+            - lda $7ef364 : and.l $0098c0, x : beq + ; must have compass
+                lda.l HudOffsets, x : tay
+                jsr BkStatus : sta $16C6, y ; big key status
+                lda.l ChestKeys, x : jsr ConvertToDisplay2 : sta $1706, y ; small key totals
+            + inx #2 : cpx #$001b : bcc -
+    ++
+    lda !HUD_FLAG : and.w #$0020 : bne + : bra ++ : +
+    lda HUDDungeonItems : and.w #$000c : bne + : bra ++ : +
+        lda.w #$24f5 : sta $1704 ; blank
+        ldx #$0002
+            - lda $7ef364 : and.l $0098c0, x : beq + ; must have compass
+                lda.l HudOffsets, x : tay
+                phx ; total chest counts
+                    txa : lsr : tax
+                    lda.l TotalLocationsLow, x : jsr ConvertToDisplay2 : sta $1706, y
+                    lda.l TotalLocationsHigh, x : jsr ConvertToDisplay2 : sta $16c6, y
+                plx
+            +
+            + inx #2 : cpx #$001b : bcc -
+    ++
+    plp : ply : plx : rtl
+}
+
+BkStatus:
+    lda $7ef366 : and.l $0098c0, x : bne +++ ; has the bk already
+         lda.l BigKeyStatus, x : bne ++
+            lda #$2574 : rts ; X for no BK
+         ++ cmp #$0002 : bne +
+            lda #$2420 : rts ; symbol for BnC
+    + lda #$24f5 : rts ; black otherwise
+    +++ lda #$2826 : rts ; check mark
+
 ConvertToDisplay:
-    and #$00ff : cmp #$000a : !blt +
+    and.w #$00ff : cmp #$000a : !blt +
         !add #$2553 : rts
     + !add #$2490 : rts
 
+ConvertToDisplay2:
+    and.w #$00ff : beq ++
+        cmp #$000a : !blt +
+            !add #$2553 : rts
+        + !add #$2816 : rts
+    ++ lda #$3020 : rts
 
 CountChestKeys:
     jsl ItemDowngradeFix

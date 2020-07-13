@@ -10,6 +10,9 @@
 
 ### Experimental features
 
+* Moved BK information and total chest keys per dungeon to keysanity menu. The info there requires compass for all info.
+* Map still required for on-hud key counter.
+* Added total counter to keysanity the compass/map screen when you have the compass for the dungeon.
 * Open "Edge" transitions can now be linked with normal doors
 * "Straight" staircases (the ones similar to normal doors) can be linked with both normal doors and edges
 
@@ -28,4 +31,8 @@
 * Swamp flooded ladders in the basement now requires Flippers
 * PoD EG Glitch gets killed on transitions (Only when DR is on)
 * Problem with standard logic fixed wanting you to pass through the tapestry backwards to rescue Zelda
-* Fixed SRAM corruption issues (we believe)
+* Fixed SRAM corruption issues
+* Problem with the dungeons requiring you to take Blind through her attic fixed. (Maiden no longer despawns)
+* Hyrule Castle will not be your DW access in various Entrance Shuffles: simple, restricted, dungeonssimple, dungeonsfull 
+(Also prevents getting stuck in TR opening)
+* Beatable only (accessibility: none) no longer fails when there are unplaced items

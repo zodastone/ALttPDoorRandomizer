@@ -74,3 +74,9 @@ GuruguruFix:
         and #$0f : cmp #$0e : !blt +
             iny #2
     + rtl
+
+BlindAtticFix:
+    lda.l DRMode : beq +
+        lda #$01 : rtl
+    + lda $7EF3CC : cmp.b #$06
+    rtl

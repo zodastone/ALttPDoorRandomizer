@@ -561,10 +561,14 @@ BigKeyStatus: ;27f038 (status 2 indicate BnC guard)
 dw $0002, $0002, $0001, $0001, $0000, $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
 DungeonReminderTable: ;27f054
 dw $2D50, $2D50, $2D51, $2D52, $2D54, $2D56, $2D55, $2D5A, $2D57, $2D59, $2D53, $2D58, $2D5B, $2D5C
-;27f070
+TotalLocationsLow: ;27f070
+db $08, $08, $06, $06, $02, $00, $04, $08, $08, $08, $06, $08, $02, $07
+TotalLocationsHigh: ;27f07e
+db $00, $00, $00, $00, $00, $01, $01, $00, $00, $00, $00, $00, $01, $02
+;27F08C
 
 ; Vert 0,6,0 Horz 2,0,8
-org $27f080
+org $27f090
 CoordIndex: ; Horizontal 1st
 db 2, 0 ; Coordinate Index $20-$23
 OppCoordIndex:
@@ -584,7 +588,7 @@ dw $007f, $0077 ; Left/Top camera bounds when at edge or layout frozen
 dw $0007, $000b ; Left/Top camera bounds when not frozen + appropriate low byte $22/$20 (preadj. by #$78/#$6c)
 dw $00ff, $010b ; Right/Bot camera bounds when not frozen + appropriate low byte $20/$22
 dw $017f, $0187 ; Right/Bot camera bound when at edge or layout frozen
-;27f09e next free byte
+;27f0ae next free byte
 
 org $27f100
 TilesetTable:
