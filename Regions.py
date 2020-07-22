@@ -750,7 +750,8 @@ def create_dungeon_regions(world, player):
     world.get_region('TR Crystal Maze', player).crystal_switch = True
     world.get_region('GT Crystal Conveyor', player).crystal_switch = True   # INTERIOR not accessible
     world.get_region('GT Hookshot South Platform', player).crystal_switch = True
-    # world.get_region('GT Double Switch Switches', player).crystal_switch = True # this is not very relevant
+    # Relevant to indicate north door can access c_switch
+    world.get_region('GT Double Switch Switches', player).crystal_switch = True
     world.get_region('GT Spike Crystals', player).crystal_switch = True
     world.get_region('GT Crystal Paths', player).crystal_switch = True
     world.get_region('GT Hidden Spikes', player).crystal_switch = True

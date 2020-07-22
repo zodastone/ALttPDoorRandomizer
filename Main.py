@@ -24,7 +24,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes
 from Utils import output_path, parse_player_names
 
-__version__ = '0.1.0.11-u'
+__version__ = '0.1.0.12-u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -287,7 +287,8 @@ def main(args, seed=None, fish=None):
                                                   "roms": rom_names,
                                                   "remote_items": [player for player in range(1, world.players + 1) if world.remote_items[player]],
                                                   "locations": [((location.address, location.player), (location.item.code, location.item.player))
-                                                                for location in world.get_filled_locations() if type(location.address) is int]
+                                                                for location in world.get_filled_locations() if type(location.address) is int],
+                                                  "tags" : ["DR"]
                                                   }).encode("utf-8"))
             if args.jsonout:
                 jsonout["multidata"] = list(multidata)

@@ -1076,6 +1076,12 @@ class Polarity:
             result += abs(self.vector[i])
         return result
 
+    def __str__(self):
+        return str(self.__unicode__())
+
+    def __unicode__(self):
+        return f'{self.vector}'
+
 
 pol_idx = {
     Direction.North: (0, 'Pos'),
@@ -1383,11 +1389,23 @@ class Sector(object):
                         self.entrance_sector = True
         return self.entrance_sector
 
+    def get_start_regions(self):
+        if self.is_entrance_sector():
+            starts = []
+            for region in self.regions:
+                for ent in region.entrances:
+                    if ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] or ent.parent_region.name == 'Sewer Drop':
+                        starts.append(region)
+            return starts
+        return None
+
     def __str__(self):
         return str(self.__unicode__())
 
     def __unicode__(self):
-        return '%s' % next(iter(self.region_set()))
+        if len(self.regions) > 0:
+            return f'{self.regions[0].name}'
+        return f'{next(iter(self.region_set()))}'
 
 
 class Boss(object):
