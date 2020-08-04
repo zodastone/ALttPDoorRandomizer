@@ -9,7 +9,7 @@
     "shuffling.world": "Shuffling the World about",
     "shuffling.dungeons": "Shuffling dungeons",
     "basic.traversal": "--Basic Traversal",
-    "generating.dungeon": "Generating dungeon",
+    "generating.dungeon": "Generating dungeons",
     "shuffling.keydoors": "Shuffling Key doors for",
     "lowering.keys.candidates": "Lowering key door count because not enough candidates",
     "lowering.keys.layouts": "Lowering key door count because no valid layouts",

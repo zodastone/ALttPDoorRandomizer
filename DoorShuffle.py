@@ -13,7 +13,7 @@ from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate
-from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder
+from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout
 
 
@@ -323,25 +323,35 @@ def within_dungeon(world, player):
         dungeon_builders[key] = simple_dungeon_builder(key, sector_list)
         dungeon_builders[key].entrance_list = list(entrances_map[key])
     recombinant_builders = {}
-    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, world.fish)
+    builder_info = None, None, world, player
+    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info)
     main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player)
 
     paths = determine_required_paths(world, player)
     check_required_paths(paths, world, player)
 
     # shuffle_key_doors for dungeons
+    logging.getLogger('').info(world.fish.translate("cli", "cli", "shuffling.keydoors"))
     start = time.process_time()
     for builder in world.dungeon_layouts[player].values():
         shuffle_key_doors(builder, world, player)
-    logging.getLogger('').info('%s: %s', world.fish.translate("cli","cli","keydoor.shuffle.time"), time.process_time()-start)
+    logging.getLogger('').info('%s: %s', world.fish.translate("cli", "cli", "keydoor.shuffle.time"), time.process_time()-start)
     smooth_door_pairs(world, player)
 
 
-def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, fish):
-    for name, split_list in split_region_starts.items():
+def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info):
+    dungeon_entrances, split_dungeon_entrances, world, player = builder_info
+    if dungeon_entrances is None:
+        dungeon_entrances = default_dungeon_entrances
+    if split_dungeon_entrances is None:
+        split_dungeon_entrances = split_region_starts
+    builder_info = dungeon_entrances, split_region_starts, world, player
+
+    for name, split_list in split_dungeon_entrances.items():
         builder = dungeon_builders.pop(name)
         recombinant_builders[name] = builder
-        split_builders = split_dungeon_builder(builder, split_list, fish)
+
+        split_builders = split_dungeon_builder(builder, split_list, builder_info)
         dungeon_builders.update(split_builders)
         for sub_name, split_entrances in split_list.items():
             sub_builder = dungeon_builders[name+' '+sub_name]
@@ -358,6 +368,7 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
     enabled_entrances = {}
     sector_queue = deque(dungeon_builders.values())
     last_key, loops = None, 0
+    logging.getLogger('').info(world.fish.translate("cli", "cli", "generating.dungeon"))
     while len(sector_queue) > 0:
         builder = sector_queue.popleft()
         split_dungeon = builder.name.startswith('Desert Palace') or builder.name.startswith('Skull Woods')
@@ -374,7 +385,6 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
             last_key = builder.name
             loops += 1
         else:
-            logging.getLogger('').info('%s: %s', world.fish.translate("cli", "cli", "generating.dungeon"), builder.name)
             ds = generate_dungeon(builder, origin_list, split_dungeon, world, player)
             find_new_entrances(ds, entrances_map, connections, potentials, enabled_entrances, world, player)
             ds.name = name
@@ -510,7 +520,8 @@ def cross_dungeon(world, player):
                         key_name = dungeon_keys[builder.name] if loc.name != 'Hyrule Castle - Big Key Drop' else dungeon_bigs[builder.name]
                         loc.forced_item = loc.item = ItemFactory(key_name, player)
     recombinant_builders = {}
-    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, world.fish)
+    builder_info = None, None, world, player
+    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info)
 
     main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player)
 
@@ -542,6 +553,7 @@ def cross_dungeon(world, player):
 
 
 def assign_cross_keys(dungeon_builders, world, player):
+    logging.getLogger('').info(world.fish.translate("cli", "cli", "shuffling.keydoors"))
     start = time.process_time()
     total_keys = remaining = 29
     total_candidates = 0
@@ -594,7 +606,7 @@ def assign_cross_keys(dungeon_builders, world, player):
     while len(queue) > 0 and remaining > 0:
         builder = queue.popleft()
         name = builder.name
-        logger.info('Cross Dungeon: Increasing key count by 1 for %s', name)
+        logger.debug('Cross Dungeon: Increasing key count by 1 for %s', name)
         builder.key_doors_num += 1
         result = find_valid_combination(builder, start_regions_map[name], world, player, drop_keys=False)
         if result:
@@ -605,10 +617,10 @@ def assign_cross_keys(dungeon_builders, world, player):
                 queue.append(builder)
                 queue = deque(sorted(queue, key=lambda b: b.combo_size))
         else:
-            logger.info('Cross Dungeon: Increase failed for %s', name)
+            logger.debug('Cross Dungeon: Increase failed for %s', name)
             builder.key_doors_num -= 1
             builder.flex = 0
-    logger.info('Cross Dungeon: Keys unable to assign in pool %s', remaining)
+    logger.debug('Cross Dungeon: Keys unable to assign in pool %s', remaining)
 
     # Last Step: Adjust Small Key Dungeon Pool
     if not world.retro[player]:
@@ -621,7 +633,7 @@ def assign_cross_keys(dungeon_builders, world, player):
                 dungeon.small_keys = []
             else:
                 dungeon.small_keys = [ItemFactory(dungeon_keys[name], player)] * actual_chest_keys
-    logging.getLogger('').info('%s: %s', world.fish.translate("cli","cli","keydoor.shuffle.time.crossed"), time.process_time()-start)
+    logger.info('%s: %s', world.fish.translate("cli", "cli", "keydoor.shuffle.time.crossed"), time.process_time()-start)
 
 
 def reassign_boss(boss_region, boss_key, builder, gt, world, player):
@@ -778,7 +790,6 @@ def calc_used_dungeon_items(builder):
 
 def find_valid_combination(builder, start_regions, world, player, drop_keys=True):
     logger = logging.getLogger('')
-    logger.info('%s %s', world.fish.translate("cli","cli","shuffling.keydoors"), builder.name)
     # find valid combination of candidates
     if len(builder.candidates) < builder.key_doors_num:
         if not drop_keys:

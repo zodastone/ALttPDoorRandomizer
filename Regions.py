@@ -730,7 +730,7 @@ def create_dungeon_regions(world, player):
     world.get_region('Hera Tridorm', player).crystal_switch = True
     world.get_region('Hera Startile Wide', player).crystal_switch = True
     world.get_region('PoD Arena Main', player).crystal_switch = True
-    world.get_region('PoD Arena Bridge', player).crystal_switch = True
+    world.get_region('PoD Arena Bridge', player).crystal_switch = True  # RANGED Weapon Required
     world.get_region('PoD Sexy Statue', player).crystal_switch = True
     world.get_region('PoD Bow Statue', player).crystal_switch = True  # LADDER not accessible (maybe with cane)
     world.get_region('PoD Dark Pegs', player).crystal_switch = True

@@ -975,23 +975,26 @@ def filter_big_chest(locations):
 def count_free_locations(state):
     cnt = 0
     for loc in state.found_locations:
-        if '- Prize' not in loc.name and loc.name not in dungeon_events and loc.name not in key_only_locations and loc.name not in ['Agahnim 1', 'Agahnim 2', 'Hyrule Castle - Big Key Drop']:
-            cnt += 1
+        if '- Prize' not in loc.name and loc.name not in dungeon_events and not loc.forced_item:
+            if loc.name not in ['Agahnim 1', 'Agahnim 2']:
+                cnt += 1
     return cnt
 
 
 def count_locations_exclude_big_chest(state):
     cnt = 0
     for loc in state.found_locations:
-        if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc.name not in dungeon_events and loc.name not in key_only_locations and loc.name not in ['Agahnim 1', 'Agahnim 2', 'Hyrule Castle - Big Key Drop']:
-            cnt += 1
+        if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc.name not in dungeon_events:
+            if not loc.forced_item and loc.name not in ['Agahnim 1', 'Agahnim 2', "Hyrule Castle - Zelda's Chest",
+                                                        "Thieves' Town - Blind's Cell"]:
+                cnt += 1
     return cnt
 
 
 def count_key_only_locations(state):
     cnt = 0
     for loc in state.found_locations:
-        if loc.name in key_only_locations:
+        if loc.forced_item and loc.item.smallkey:
             cnt += 1
     return cnt
 

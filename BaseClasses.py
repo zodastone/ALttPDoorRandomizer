@@ -1058,6 +1058,16 @@ class Polarity:
                 return False
         return True
 
+    def __hash__(self):
+        h = 17
+        spot = self.vector[0]
+        h *= 31 + (spot if spot >= 0 else spot + 100)
+        spot = self.vector[1]
+        h *= 43 + (spot if spot >= 0 else spot + 100)
+        spot = self.vector[2]
+        h *= 73 + (spot if spot >= 0 else spot + 100)
+        return h
+
     def is_neutral(self):
         for i in range(len(self.vector)):
             if self.vector[i] != 0:
@@ -1115,6 +1125,7 @@ class PolSlot(Enum):
     NorthSouth = 0
     EastWest = 1
     Stairs = 2
+
 
 class CrystalBarrier(FastEnum):
     Null = 0  # no special requirement
