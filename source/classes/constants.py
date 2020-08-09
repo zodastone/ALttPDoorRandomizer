@@ -75,7 +75,6 @@ SETTINGSTOPROCESS = {
       "entranceshuffle": "shuffle"
     },
     "enemizer": {
-      "potshuffle": "shufflepots",
       "enemyshuffle": "shuffleenemies",
       "bossshuffle": "shufflebosses",
       "enemydamage": "enemy_damage",
@@ -87,6 +86,7 @@ SETTINGSTOPROCESS = {
       "smallkeyshuffle": "keyshuffle",
       "bigkeyshuffle": "bigkeyshuffle",
       "dungeondoorshuffle": "door_shuffle",
+      "potshuffle": "shufflepots",
       "experimental": "experimental",
       "dungeon_counters": "dungeon_counters"
     },

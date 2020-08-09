@@ -173,7 +173,7 @@ def vanilla_key_logic(world, player):
             world.key_logic[player][builder.name] = key_layout.key_logic
             log_key_logic(builder.name, key_layout.key_logic)
             last_key = None
-    if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player]:
+    if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player] and not world.potshuffle[player]:
         validate_vanilla_key_logic(world, player)
 
 

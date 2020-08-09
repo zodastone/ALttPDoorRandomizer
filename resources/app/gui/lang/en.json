@@ -58,6 +58,7 @@
     "randomizer.dungeon.dungeondoorshuffle.basic": "Basic",
     "randomizer.dungeon.dungeondoorshuffle.crossed": "Crossed",
 
+    "randomizer.dungeon.potshuffle": "Pot Shuffle",
     "randomizer.dungeon.experimental": "Enable Experimental Features",
 
     "randomizer.dungeon.dungeon_counters": "Dungeon Chest Counters",
@@ -65,9 +66,6 @@
     "randomizer.dungeon.dungeon_counters.off": "Off",
     "randomizer.dungeon.dungeon_counters.on": "On",
     "randomizer.dungeon.dungeon_counters.pickup": "On Compass Pickup",
-
-
-    "randomizer.enemizer.potshuffle": "Pot Shuffle",
 
     "randomizer.enemizer.enemyshuffle": "Enemy Shuffle",
     "randomizer.enemizer.enemyshuffle.none": "None",

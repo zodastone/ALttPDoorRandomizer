@@ -1,541 +1,334 @@
-from fast_enum import FastEnum
+from collections import defaultdict
 
-class PotItem(FastEnum):
-    Nothing = 0x0
-    OneRupee = 0x1
-    RockCrab = 0x2
-    Bee = 0x3
-    Random = 0x4
-    Bomb = 0x5
-    Heart = 0x6
-    FiveRupees = 0x7
-    Key = 0x8
-    FiveArrows = 0x9
-    Bomb_2 = 0xA
-    Heart_2 = 0xB
-    SmallMagic = 0xC
-    BigMagic = 0xD
-    Chicken = 0xE
-    GreenSoldier = 0xF
-    AliveRock = 0x10
-    BlueSoldier = 0x11
-    GroundBomb = 0x12
-    Heart_3 = 0x13
-    Fairy = 0x14
-    Heart_4 = 0x15
-    Hole = 0x80
-    Warp = 0x82
-    Staircase = 0x84
-    Bombable = 0x86
-    Switch = 0x88
+from BaseClasses import PotItem, Pot, PotFlags, CrystalBarrier
+from Regions import key_only_locations
 
+movable_switch_rooms = defaultdict(lambda: [],
+                                   {'PoD Stalfos Basement': ['PoD Basement Ledge'],
+                                    'Thieves Attic': ['Thieves Attic Hint'],
+                                    'Mire Hub Switch': ['Mire Hub', 'Mire Hub Right']})
 
-pot_item_room_table_lookup = 0xDB67
-
-###
-# Pointer to pot location and contents for each non-empty pot in a supertile
-# Format: [(x, y, item)] FF FF (Note: x,y are bit packed to include layer)
-pot_item_lookup_table = [
-    0xdde7,0xdde7,0xdde7,0xdde7,0xdde9,0xddef,0xddef,0xddef,0xddef,0xddf1,0xddfc,0xde0d,0xde13,0xde13,0xde13,0xde13,
-    0xde13,0xde15,0xde21,0xde21,0xde21,0xde23,0xde40,0xde5d,0xde81,0xde81,0xde83,0xde91,0xde97,0xde97,0xde99,0xde9e,
-    0xdea1,0xdea3,0xdeac,0xdeae,0xdebf,0xdecb,0xdecd,0xdede,0xdef0,0xdef0,0xdef2,0xdefa,0xdf1a,0xdf20,0xdf20,0xdf22,
-    0xdf3a,0xdf3c,0xdf41,0xdf44,0xdf46,0xdf4e,0xdf6b,0xdf79,0xdf7e,0xdf8c,0xdf98,0xdf98,0xdf9a,0xdfb1,0xdfc8,0xdfd6,
-    0xdfeb,0xdfed,0xdff9,0xdffb,0xe00a,0xe00c,0xe01d,0xe023,0xe023,0xe025,0xe039,0xe059,0xe05f,0xe05f,0xe061,0xe06a,
-    0xe06c,0xe072,0xe074,0xe07c,0xe08a,0xe098,0xe0a0,0xe0c3,0xe0dd,0xe0f7,0xe0fa,0xe0fc,0xe101,0xe109,0xe123,0xe131,
-    0xe136,0xe13c,0xe13e,0xe143,0xe14b,0xe162,0xe16a,0xe18a,0xe1a1,0xe1b0,0xe1b0,0xe1b2,0xe1c0,0xe1ce,0xe1da,0xe1da,
-    0xe1da,0xe1da,0xe1da,0xe1dc,0xe1fc,0xe213,0xe21e,0xe227,0xe227,0xe227,0xe227,0xe229,0xe231,0xe239,0xe247,0xe250,
-    0xe252,0xe25b,0xe25d,0xe262,0xe270,0xe278,0xe27e,0xe280,0xe286,0xe286,0xe286,0xe288,0xe293,0xe2aa,0xe2b8,0xe2bb,
-    0xe2bb,0xe2bd,0xe2c3,0xe2c5,0xe2cb,0xe2cb,0xe2cd,0xe2d9,0xe2d9,0xe2db,0xe2e1,0xe2e3,0xe2eb,0xe2f3,0xe2f9,0xe2fb,
-    0xe310,0xe312,0xe326,0xe329,0xe329,0xe329,0xe329,0xe329,0xe32b,0xe333,0xe347,0xe358,0xe35b,0xe35b,0xe35d,0xe360,
-    0xe362,0xe382,0xe38a,0xe395,0xe3a0,0xe3a8,0xe3bc,0xe3c1,0xe3c6,0xe3d1,0xe3df,0xe3f1,0xe3f3,0xe41a,0xe41c,0xe421,
-    0xe435,0xe441,0xe443,0xe44f,0xe451,0xe469,0xe46b,0xe473,0xe47f,0xe481,0xe48a,0xe48c,0xe494,0xe4a0,0xe4a2,0xe4b1,
-    0xe4b3,0xe4ca,0xe4d9,0xe4d9,0xe4d9,0xe4d9,0xe4db,0xe4e1,0xe4e3,0xe4fd,0xe505,0xe513,0xe51b,0xe527,0xe527,0xe527,
-    0xe529,0xe52c,0xe52c,0xe52e,0xe533,0xe53b,0xe549,0xe554,0xe55c,0xe55f,0xe55f,0xe561,0xe570,0xe570,0xe570,0xe570,
-    0xe570,0xe572,0xe575,0xe575,0xe575,0xe575,0xe575,0xe575,0xe577,0xe57a,0xe57a,0xe57a,0xe57a,0xe57c,0xe588,0xe58a,
-]
-
-
-supertile_pot_contents = {
-    0x02: {
-        'Sewers Yet More Rats': [(0x50, 0x06, PotItem.Nothing), (0x50, 0x08, PotItem.Nothing), (0x2C, 0x08, PotItem.Nothing), (0x2C, 0x0A, PotItem.Nothing)]
-    },
-    0x04: {
-        'TR Dash Room': [(0xA2, 0x19, PotItem.Nothing), (0x98, 0x19, PotItem.Nothing), (0x98, 0x16, PotItem.Nothing), (0xA2, 0x16, PotItem.Nothing)],
-        'TR Tongue Pull': [(0xF0, 0x13, PotItem.Bomb_2), (0xCC, 0x13, PotItem.Bomb_2)]
-    },
-    0x09: {
-        'PoD Shooter Room': [(0x0C, 0x04, PotItem.OneRupee), (0x30, 0x04, PotItem.Heart_2), (0x0C, 0x0C, PotItem.Switch)]
-    },
-    0x0A: {
-        'PoD Stalfos Basement': [(0xCC,0x0B, PotItem.Switch),(0x60,0x08, PotItem.Heart_2),(0x64,0x07, PotItem.Nothing),(0x68,0x08, PotItem.Heart_2),(0x64,0x09, PotItem.Nothing)],
-        'PoD Basement Ledge': [(0x9C,0x11, PotItem.Bomb_2), (0xA0,0x11, PotItem.FiveArrows)] #todo move chest to this room if the switch is in one of these pots
-    },
-    0x0B: {
-        'PoD Dark Pegs': [(0xCA, 0x03, PotItem.Bomb_2), (0xCA, 0x0C, PotItem.Bomb_2)]
-    },
-    0x11: {
-        'Sewers Secret Room': [(0x98,0x13, PotItem.Nothing),(0x98,0x0F, PotItem.Nothing),(0x90,0x0F, PotItem.Heart_2),
-                               (0xA0,0x0F, PotItem.Heart_2), (0x90,0x13, PotItem.Heart_2), (0xA0,0x13, PotItem.Heart_2)]
-    },
-    0x15: {
-        'TR Pipe Pit': [(0x60,0x04, PotItem.Bomb_2), (0x64,0x04, PotItem.SmallMagic), (0x68,0x04, PotItem.Heart_2),
-        (0x6C,0x04, PotItem.SmallMagic), (0x70,0x04, PotItem.FiveArrows), (0x0C,0x06, PotItem.OneRupee),(0x10,0x06, PotItem.FiveArrows),
-        (0x14,0x06, PotItem.FiveRupees)],
-        'TR Pipe Ledge': [(0x46,0x0B, PotItem.BigMagic)]
-    },
-    0x16: {
-        'Swamp Waterway': [(0xF0,0x13, PotItem.Key)],
-        'Swamp I': [(0xBC,0x03, PotItem.Heart_2),(0xC0,0x03, PotItem.Heart_2),(0xBC,0x04, PotItem.SmallMagic),
-        (0xC0,0x04, PotItem.SmallMagic), (0xBC,0x05, PotItem.FiveArrows), (0xC0,0x05, PotItem.FiveArrows),(0xBC,0x06, PotItem.Bomb_2),
-        (0xC0,0x06, PotItem.Bomb_2)]
-    },
-    0x17: {
-        'Hera 5F': [(0x64,0x0D, PotItem.Heart_2), (0x64,0x0E, PotItem.Heart_2), (0x64,0x0F, PotItem.Heart_2), (0x64,0x10, PotItem.Heart_2), (0x64,0x11, PotItem.Heart_2), (0x64,0x12, PotItem.Heart_2),
-                    (0x68,0x0D, PotItem.Heart_2), (0x68,0x0E, PotItem.Heart_2), (0x68,0x0F, PotItem.Heart_2), (0x68,0x10, PotItem.Heart_2), (0x68,0x11, PotItem.Heart_2), (0x68,0x12, PotItem.Heart_2)]
-    },
-    0x1A: {
-        'PoD Falling Bridge': [(0x1C,0x1B, PotItem.Bomb_2),(0x20,0x1B, PotItem.Bomb_2)],
-        'PoD Falling Bridge Ledge': [(0x1C,0x05, PotItem.Bomb_2), (0x20,0x05, PotItem.Bomb_2)],
-        'PoD Harmless Hellway': [(0xE8,0x13, PotItem.Nothing),(0xD4,0x13, PotItem.Nothing)]
-    },
-    0x1B: {
-        'PoD Mimics 2': [(0x14,0x17, PotItem.FiveArrows), (0x28,0x17, PotItem.FiveArrows)]
-    },
-    0x1E: {
-        'Ice Bomb Drop': [(0x54,0x09, PotItem.Bomb_2)]
-    },
-    0x1F: {
-        'Ice Pengator Switch': [(0x1C,0x19, PotItem.Switch), (0x1C, 0x17, PotItem.Nothing)],    # Bunny Beam
-        'Ice Big Key': [(0x56, 0x1A, PotItem.Nothing), (0x56, 0x1B, PotItem.Nothing)]
-    },
-    0x21: {
-        'Sewers Key Rat': [(0xA0,0x14, PotItem.Nothing), (0xA8,0x18, PotItem.SmallMagic), (0x30,0x1C, PotItem.Heart_2),
-                           (0x52, 0x1C, PotItem.SmallMagic), (0x64,0x1C, PotItem.Nothing), (0x68,0x1C, PotItem.Nothing)]
-    },
-    0x23: {
-        'TR Lazy Eyes': [(0x56,0x1A, PotItem.OneRupee), (0x5A,0x1A, PotItem.Heart_2), (0x5E,0x1A, PotItem.OneRupee),
-                         (0x62,0x1A, PotItem.Bomb_2), (0x66,0x1A, PotItem.OneRupee)]
-    },
-    0x24: {
-        'TR Twin Pokeys': [(0x0C,0x04, PotItem.FiveRupees), (0x30,0x04, PotItem.Heart_2),
-                           (0x0C,0x0C, PotItem.SmallMagic), (0x30,0x0C, PotItem.OneRupee)]
-    },
-    0x26: {
-        'Swamp Push Statue': [(0x96,0x13, PotItem.Switch), (0x16,0x1A, PotItem.FiveRupees), (0xDC,0x1A, PotItem.FiveArrows)],  #todo Needs somaria if switch on 3rd pot?
-        'Swamp Shooters': [(0x1C,0x04, PotItem.Bomb_2), (0x0C,0x08, PotItem.SmallMagic)]
-    },
-    0x27: {
-        'Hera 4F': [(0xD6,0x13, PotItem.Nothing),(0xD6,0x14, PotItem.Nothing),(0xA6,0x14, PotItem.Bomb_2),
-        (0xD6,0x15, PotItem.Heart_2),(0x28,0x1C, PotItem.OneRupee),(0x2C,0x1C, PotItem.OneRupee),(0x50,0x1C, PotItem.FiveRupees),
-        (0x54,0x1C, PotItem.FiveRupees),(0x66,0x11, PotItem.Nothing),(0x62,0x11, PotItem.Nothing),(0x6A,0x11, PotItem.Nothing),
-        (0xA6,0x15, PotItem.Nothing),(0xA6,0x13, PotItem.Nothing),(0x5C,0x0C, PotItem.Nothing),(0xA0,0x0C, PotItem.Nothing)]
-    },
-    0x2A: {
-        'PoD Arena Main': [(0x50,0x0C, PotItem.OneRupee), (0x50,0x13, PotItem.Heart_2)]
-    },
-    0x2B: {
-        'PoD Sexy Statue': [(0x10,0x05, PotItem.Heart_2),(0x2C,0x05, PotItem.Switch),(0x10,0x06, PotItem.Heart_2),
-                            (0x2C,0x06, PotItem.Bomb_2),(0x10,0x07, PotItem.Heart_2),(0x2C,0x07, PotItem.Bomb_2)],
-        'PoD Map Balcony': [(0x92,0x15, PotItem.Bomb_2),(0xAA,0x15, PotItem.FiveArrows),(0x92,0x16, PotItem.Bomb_2),(0xAA,0x16, PotItem.FiveArrows)]
-    },
-    0x2C: {
-        'Hookshot Cave': [(0x6C,0x18, PotItem.Heart_2), (0x70,0x18, PotItem.Heart_2)]
-    },
-    0x2F: {
-        'Kakariko Well (top)': [(0x1C,0x07, PotItem.Heart_2),(0x20,0x07, PotItem.Heart_2),(0x1C,0x09, PotItem.FiveRupees),
-                                (0x20,0x09, PotItem.FiveRupees),(0xAC,0x13, PotItem.FiveRupees),(0xB4,0x13, PotItem.FiveRupees)],
-        'Kakariko Well (bottom)': [(0x68,0x1B, PotItem.Heart_2),(0x68,0x1C, PotItem.Heart_2)]
-    },
-    0x31: {
-        'Hera Beetles': [(0x5C,0x1C, PotItem.Bomb_2), (0x60,0x1C, PotItem.Nothing)]
-    },
-    0x32: {
-        'Sewers Dark Cross': [(0x1C,0x0D, PotItem.SmallMagic)]
-    },
-    0x34: {
-        'Swamp Barrier Ledge': [(0x4E,0x08, PotItem.FiveRupees), (0x5C,0x08, PotItem.FiveRupees)]
-    },
-    0x35: {
-        'Swamp Trench 2 Pots': [(0x4C,0x17,PotItem.Nothing),(0x58,0x17,PotItem.Nothing),(0x64,0x1B,PotItem.Nothing),
-                                (0xF2,0x1C,PotItem.Nothing),(0xF0,0x16,PotItem.Heart_2),(0x4C,0x1C, PotItem.Heart_2)],
-        'Swamp Trench 2 Alcove': [(0x3C,0x06, PotItem.Key)],
-        'Swamp Trench 2 Departure': [(0x30,0x14, PotItem.Heart_2)],
-        'Swamp Big Key Ledge': [(0x14,0x08, PotItem.FiveRupees),(0x18,0x08, PotItem.FiveRupees),(0x1C,0x08, PotItem.FiveRupees),(0x20,0x08, PotItem.FiveRupees),(0x24,0x08, PotItem.FiveRupees)]
-    },
-    0x36: {
-        'Swamp Hub': [(0x0A,0x10, PotItem.Heart_2), (0x9A,0x0F, PotItem.Nothing), (0x72,0x10, PotItem.Key), (0xDE,0x0F, PotItem.Nothing)],
-        'Swamp Hub Dead Ledge': [(0x6C,0x04, PotItem.Bomb_2),(0x70,0x04, PotItem.FiveRupees)],
-        'Swamp Hub North Ledge': [(0xBC,0x05, PotItem.Nothing), (0xC0,0x05, PotItem.Nothing)]
-    },
-    0x37: {
-        'Swamp Trench 1 Alcove': [(0x3C,0x06, PotItem.Key)],
-        'Swamp Trench 1 Key Ledge': [(0x30,0x14, PotItem.Nothing)]
-    },
-    0x38: {
-        'Swamp Pot Row': [(0xA4,0x0C, PotItem.Bomb_2),(0xA4,0x0D, PotItem.FiveRupees),(0xA4,0x12, PotItem.Bomb_2),(0xA4,0x13, PotItem.Key)]
-    },
-    0x39: {
-        'Skull Spike Corner': [(0x0C,0x14, PotItem.Heart_2),(0x30,0x1C, PotItem.FiveArrows)],
-        'Skull Final Drop': [(0x64,0x16, PotItem.SmallMagic),(0x64,0x1A, PotItem.FiveArrows)]
-    },
-    0x3C: {
-        'Hookshot Cave': [(0x18,0x08, PotItem.SmallMagic),(0x40,0x0C, PotItem.FiveRupees),(0x14,0x0E, PotItem.OneRupee),(0x14,0x13, PotItem.Nothing),
-                          (0x44,0x12, PotItem.FiveRupees),(0x60,0x13, PotItem.Heart_2),(0x40,0x14, PotItem.FiveRupees),(0x40,0x1A, PotItem.FiveRupees)]
-    },
-    0x3D: {
-        'GT Mini Helmasaur Room': [(0x4C,0x0C, PotItem.Bomb_2),(0x70,0x0C, PotItem.Bomb_2)],
-        'GT Crystal Circles': [(0x18,0x16, PotItem.Heart_2),(0x28,0x16, PotItem.FiveArrows),(0x20,0x18, PotItem.Heart_2),
-                               (0x14,0x1A, PotItem.FiveRupees),(0x24,0x1A, PotItem.BigMagic)]
-    },
-    0x3E: {
-        'Ice Stalfos Hint': [(0x60,0x06, PotItem.Bomb_2),(0x64,0x06, PotItem.SmallMagic),(0x58,0x0A, PotItem.Heart_2),
-        (0x5C,0x0A, PotItem.SmallMagic)]
-    },
-    0x3F: {
-        'Ice Hammer Block': [(0x0C,0x19, PotItem.OneRupee),(0x14,0x19, PotItem.OneRupee),(0x0C,0x1A, PotItem.Bomb_2),
-        (0x14,0x1A, PotItem.Bomb_2),(0x0C,0x1B, PotItem.Switch),(0x14,0x1B, PotItem.Heart_2),(0x1C,0x17, PotItem.Key)]    # Bunny Beam
-    },
-    0x41: {
-        'Sewers Behind Tapestry': [(0x64,0x0A, PotItem.Heart_2),(0x34,0x0F, PotItem.OneRupee),(0x34,0x10, PotItem.SmallMagic),
-        (0x94,0x16, PotItem.SmallMagic)]
-    },
-    0x43: {
-        'Desert Tiles 2': [(0x70,0x1C, PotItem.Nothing),(0x4C,0x1C, PotItem.Nothing),(0x4C,0x14, PotItem.Nothing),(0x70,0x14, PotItem.Key)],
-        'Desert Wall Slide': [(0x42,0x04, PotItem.FiveArrows),(0x4E,0x04, PotItem.SmallMagic),(0x42,0x09, PotItem.Heart_2),(0x4E,0x09, PotItem.Heart_2)]
-    },
-    0x45: {
-        'Thieves Basement Block': [(0x0C,0x04, PotItem.FiveArrows),(0x30,0x0C, PotItem.FiveArrows)],
-        'Thieves Blind\'s Cell': [(0x5C,0x0B, PotItem.Nothing),(0x6C,0x0B, PotItem.Heart_2),    # Bunny Beam
-        (0xDC,0x10, PotItem.SmallMagic),(0xEC,0x10, PotItem.Heart_2)]
-    },
-    0x46: {
-        'Swamp Donut Top': [(0x60,0x05, PotItem.Heart_2)],
-        'Swamp Donut Bottom': [(0x1C,0x1B, PotItem.Heart_2)]
-    },
-    0x49: {
-        'Skull Star Pits': [(0x9C,0x1B, PotItem.Nothing),(0xAC,0x18, PotItem.Nothing),(0xAC,0x17, PotItem.Nothing),
-        (0x90,0x14, PotItem.Nothing),(0x90,0x13, PotItem.SmallMagic),(0xAC,0x14, PotItem.Heart_2),
-        (0x90,0x1B, PotItem.Heart_2),(0xAC,0x1C, PotItem.SmallMagic),(0xA0,0x1B, PotItem.Nothing)],
-        'Skull Torch Room': [(0x68,0x0F, PotItem.SmallMagic),(0x68,0x10, PotItem.SmallMagic)]
-    },
-    0x4A: {
-        'PoD Left Cage': [(0x0E, 0x05, PotItem.Switch),(0x20, 0x05, PotItem.Bomb_2),
-                          (0x0E, 0x0B, PotItem.Heart_2),(0x20, 0x0B, PotItem.OneRupee)],
-        'PoD Middle Cage': [(0x38, 0x08, PotItem.Bomb_2),(0x44, 0x08, PotItem.Bomb_2),
-                            (0x5C, 0x05, PotItem.Bomb_2),(0x6E, 0x05, PotItem.Switch),
-                            (0x5C, 0x0B, PotItem.OneRupee),(0x6E, 0x0B, PotItem.Heart_2)]
-    },
-    0x4B: {
-        'PoD Mimics 1': [(0x14,0x06, PotItem.FiveArrows), (0x28,0x06, PotItem.Heart_2)]
-    },
-    0x4E: {
-        'Ice Bomb Jump Catwalk': [(0x8C,0x07, PotItem.Nothing),(0x30,0x0A, PotItem.Nothing),(0x8C,0x0B, PotItem.Switch),(0x1C,0x0C, PotItem.Heart_2)],
-        'Ice Narrow Corridor': [(0x70,0x0C, PotItem.SmallMagic)]
-    },
-    0x50: {
-        'Hyrule Castle West Hall': [(0x60,0x26, PotItem.Heart_2), (0x64,0x26, PotItem.Heart_2)]
-    },
-    0x52: {
-        'Hyrule Castle East Hall': [(0x8A,0x03, PotItem.Heart_2), (0xC2,0x1A, PotItem.Heart_2)]
-    },
-    0x53: {
-        'Desert Beamos Hall': [(0x5C,0x0B, PotItem.Heart_2),(0x60,0x0B, PotItem.SmallMagic),
-        (0x64,0x0B, PotItem.Key),(0x68,0x0B, PotItem.Heart_2)]
-    },
-    0x54: {
-        'Swamp Attic': [(0xBA,0x19, PotItem.FiveRupees),(0xBA,0x1A, PotItem.Heart_2),(0xBA,0x1B, PotItem.Heart_2),
-        (0xBA,0x1C, PotItem.Heart_2)]
-    },
-    0x55: {
-        'Secret Passage': [(0xE6,0x18, PotItem.SmallMagic), (0xE6,0x19, PotItem.SmallMagic)]
-    },
-    0x56: {
-        'Skull Back Drop': [(0x64,0x06,PotItem.Nothing),(0x60,0x0A,PotItem.Nothing),(0x5C,0x0A,PotItem.Nothing)],
-        'Skull 2 West Lobby': [(0x0C,0x14, PotItem.Key), (0x30,0x14,PotItem.Nothing)],
-        'Skull X Room': [(0x14,0x06, PotItem.SmallMagic),(0x28,0x06, PotItem.SmallMagic),(0x18,0x07, PotItem.SmallMagic),
-        (0x24,0x07, PotItem.SmallMagic),(0x0C,0x08, PotItem.Heart_2),(0x30,0x08, PotItem.Heart_2),(0x18,0x09, PotItem.SmallMagic),
-        (0x24,0x09, PotItem.SmallMagic),(0x14,0x0A, PotItem.FiveRupees),(0x28,0x0A, PotItem.FiveRupees)]
-    },
-    0x57: {
-        'Skull 2 East Lobby': [(0x0C,0x14, PotItem.SmallMagic), (0x30,0x14, PotItem.SmallMagic), (0x1E,0x16, PotItem.Switch)],
-        'Skull Big Key': [(0x20, 0x04, PotItem.Nothing)], # Bunny Beam
-        'Skull Lone Pot': [(0x5C,0x07, PotItem.BigMagic)],
-        'Skull Pot Prison': [(0x5C,0x17, PotItem.Bomb_2), (0x64,0x17, PotItem.SmallMagic),
-                             (0x54,0x19, PotItem.FiveRupees), (0x4C,0x1B, PotItem.Heart_2)]
-    },
-    0x58: {
-        'Skull Pot Circle': [(0x60,0x09, PotItem.Nothing),(0x5C,0x08, PotItem.Nothing),(0x6C,0x08, PotItem.Nothing),
-                            (0x6C,0x06, PotItem.Nothing),(0x68,0x05, PotItem.Nothing),(0x5C,0x06, PotItem.Nothing),
-                            (0x60,0x05, PotItem.Bomb_2),(0x64,0x05, PotItem.SmallMagic),(0x5C,0x07, PotItem.Heart_2),
-                            (0x6C,0x07, PotItem.Heart_2),(0x64,0x09, PotItem.SmallMagic),(0x68,0x09, PotItem.Bomb_2)],
-        'Skull Pull Switch': [(0x0C,0x07, PotItem.SmallMagic),(0x10,0x07, PotItem.Nothing),(0x10,0x08, PotItem.SmallMagic),(0x0C,0x0C, PotItem.Nothing)]
-    },
-    0x59: {
-        'Skull 3 Lobby': [(0x1A,0x2B, PotItem.Heart_2), (0x20,0x28, PotItem.Nothing)],
-        'Skull East Bridge': [(0x4C,0x1C, PotItem.Nothing), (0x70,0x1C, PotItem.Nothing)]
-    },
-    0x5B: {
-        'GT Hidden Spikes': [(0xDA,0x25, PotItem.Nothing),(0xDE,0x25, PotItem.Switch),(0xE2,0x25, PotItem.Nothing)]
-    },
-    0x5C: {
-        'GT Refill': [(0xE4,0x19, PotItem.Nothing),(0x68,0x18, PotItem.Nothing),(0xE4,0x16, PotItem.Nothing),
-                      (0xD8,0x19, PotItem.Nothing),(0x54,0x18, PotItem.Nothing),(0xD8,0x16, PotItem.Nothing),
-                      (0x5E,0x16, PotItem.Bomb_2),(0x5E,0x1A, PotItem.BigMagic)]
-    },
-    0x5D: {
-        'GT Gauntlet 2': [(0x10,0x05, PotItem.Bomb_2),(0x2C,0x05, PotItem.FiveRupees),(0x10,0x0B, PotItem.OneRupee),(0x2C,0x0B, PotItem.FiveArrows)],
-        'GT Gauntlet 3': [(0x0C,0x14, PotItem.FiveArrows),(0x30,0x14, PotItem.Bomb_2),(0x0C,0x1C, PotItem.SmallMagic),(0x30,0x1C, PotItem.Bomb_2)]
-    },
-    0x5E: {
-        'Ice Falling Square': [(0x5C,0x04, PotItem.SmallMagic),(0x60,0x04, PotItem.SmallMagic),(0x4C,0x08, PotItem.Heart_2),(0x70,0x08, PotItem.Heart_2)]
-    },
-    0x5F: {
-        'Ice Spike Room': [(0x2C,0x1B, PotItem.Switch)]
-    },
-    0x60: {
-        'Hyrule Castle West Lobby': [(0x4C,0x04, PotItem.Heart_2), (0x70,0x04, PotItem.Heart_2)]
-    },
-    0x62: {
-        'Hyrule Castle East Lobby': [(0xD0,0x15, PotItem.Heart_2)]
-    },
-    0x63: {
-        'Desert Tiles 1': [(0x30,0x04, PotItem.Nothing),(0x0C,0x04, PotItem.Nothing),(0x0C,0x08, PotItem.Nothing),
-        (0x30,0x0C, PotItem.Nothing),(0x30,0x08, PotItem.Heart_2),(0x0C,0x0C, PotItem.Key)]
-    },
-    0x64: {
-        'Thieves Attic': [(0x24,0x1C, PotItem.Bomb_2),(0x28,0x1C, PotItem.SmallMagic),(0x2C,0x1C, PotItem.SmallMagic),(0x30,0x1C, PotItem.Switch)],
-        'Thieves Attic Hint': [(0x0C,0x16, PotItem.Bomb_2),(0x10,0x16, PotItem.Bomb_2),(0x14,0x16, PotItem.Bomb_2)] #todo: East door becomes orange if the switch is in here
-    },
-    0x65: {
-        'Thieves Attic Window': [(0x64,0x1C, PotItem.Bomb_2), (0x68,0x1C, PotItem.Bomb_2)]
-    },
-    0x66: {
-        'Swamp Refill': [(0x30,0x25, PotItem.FiveArrows),(0x34,0x25, PotItem.Bomb_2),(0x38,0x25, PotItem.FiveRupees),
-        (0x30,0x26, PotItem.FiveArrows),(0x34,0x26, PotItem.Bomb_2),(0x38,0x26, PotItem.FiveRupees)],
-        'Swamp Behind Waterfall': [(0x54,0x05, PotItem.Heart_2),(0x68,0x05, PotItem.FiveArrows),(0x54,0x06, PotItem.Heart_2),(0x68,0x06, PotItem.Bomb_2)]
-    },
-    0x67: {
-        'Skull Left Drop': [(0x16,0x1A, PotItem.Nothing),(0x12,0x16, PotItem.Nothing),(0x0C,0x07, PotItem.FiveArrows),
-                            (0x30,0x07, PotItem.SmallMagic),(0x12,0x17, PotItem.SmallMagic),(0x12,0x1A, PotItem.Heart_2)],
-        'Skull Compass Room': [(0x4A,0x14, PotItem.SmallMagic),(0x5C,0x09, PotItem.Nothing),(0x54,0x1C, PotItem.Nothing),
-                               (0x60,0x13, PotItem.Heart_2),(0x68,0x1C, PotItem.Heart_2)]
-    },
-    0x68: {
-        'Skull Pinball': [(0x54,0x0E, PotItem.Nothing),(0x54,0x0D, PotItem.Nothing),(0x58,0x0C, PotItem.Nothing),
-        (0x58,0x06, PotItem.Nothing),(0x58,0x05, PotItem.Nothing),(0x58,0x04, PotItem.Nothing),(0x40,0x11, PotItem.Nothing),
-        (0x40,0x0F, PotItem.Nothing),(0x40,0x07, PotItem.Heart_2),(0x58,0x07, PotItem.SmallMagic),(0x40,0x10, PotItem.Heart_2),
-        (0x40,0x18, PotItem.SmallMagic),(0x40,0x19, PotItem.Heart_2)]
-    },
-    0x6B: {
-        'GT Crystal Paths': [(0x1C,0x05, PotItem.Heart_2), (0x2C,0x05, PotItem.Nothing), (0x1C,0x08, PotItem.Nothing),
-                             (0x2C,0x08, PotItem.SmallMagic), (0x1C,0x0B, PotItem.SmallMagic), (0x2C,0x0B, PotItem.Nothing)],
-        'GT Mimics 2': [(0x5E,0x19, PotItem.Nothing), (0x62,0x19, PotItem.FiveArrows)]
-    },
-    0x6C: {
-        'GT Quad Pot': [(0x14,0x06, PotItem.Heart_2), (0x28,0x06, PotItem.FiveArrows), (0x14,0x0A, PotItem.Bomb_2), (0x28,0x0A, PotItem.SmallMagic)]
-    },
-    0x6D: {
-        'GT Gauntlet 5': [(0x1C,0x1A, PotItem.Heart_2), (0x20,0x1A, PotItem.Heart_2), (0x1C,0x1B, PotItem.SmallMagic), (0x20,0x1B, PotItem.SmallMagic)]
-    },
-    0x73: {
-        'Desert Circle of Pots': [(0x9A,0x15, PotItem.FiveArrows),(0x9E,0x15, PotItem.OneRupee),(0x14,0x17, PotItem.Switch),
-        (0x24,0x17, PotItem.FiveRupees),(0x90,0x18, PotItem.Heart_2),(0xA8,0x18, PotItem.FiveArrows),(0x14,0x1A, PotItem.SmallMagic),
-        (0x24,0x1A, PotItem.Heart_2),(0x9A,0x1B, PotItem.OneRupee),(0x9E,0x1B, PotItem.FiveRupees)]
-    },
-    0x74: {
-        'Desert Map Room': [(0x1E,0x05, PotItem.SmallMagic),(0x3E,0x05, PotItem.Switch),(0x5E,0x05, PotItem.SmallMagic),
-        (0x0E,0x0B, PotItem.Heart_2),(0x2E,0x0B, PotItem.FiveArrows),(0x4E,0x0B, PotItem.FiveArrows),(0x6E,0x0B, PotItem.Heart_2)]
-    },
-    0x75: {
-        'Desert Arrow Pot Corner': [(0x94,0x16, PotItem.SmallMagic),(0xA0,0x16, PotItem.FiveArrows),(0xAC,0x16, PotItem.Heart_2)]
-    },
-    0x76: {
-        'Swamp Drain Right': [(0x70,0x0C, PotItem.Heart_2)],
-        'Swamp Flooded Spot': [(0x54,0x17, PotItem.Heart_2), (0x60,0x17, PotItem.Heart_2)]
-    },
-    0x7B: {
-        'GT Conveyor Star Pits': [(0x30,0x0A, PotItem.Nothing),(0x58,0x0A, PotItem.Nothing),(0x4C,0x07, PotItem.Nothing),
-        (0x3C,0x04, PotItem.Heart_2),(0x40,0x04, PotItem.Key)]
-    },
-    0x7C: {
-        'GT Falling Bridge': [(0x24,0x15, PotItem.Nothing),(0x18,0x0B, PotItem.Nothing),(0x1C,0x04, PotItem.Heart_2),
-        (0x20,0x04, PotItem.Heart_2)]
-    },
-    0x7D: {
-        'GT Firesnake Room': [(0x2C,0x0C, PotItem.Nothing),(0x2C,0x06, PotItem.Nothing),(0x70,0x06, PotItem.Heart_2)],
-        'GT Petting Zoo': [(0x72,0x14, PotItem.Bomb_2),(0x4C,0x1C, PotItem.Bomb_2)],
-        'GT Warp Maze - Pot Rail': [(0x6C,0x14, PotItem.FiveArrows)]
-    },
-    0x7E: {
-        'Ice Tall Hint': [(0x56,0x0F, PotItem.Heart_2),(0x52,0x1A, PotItem.SmallMagic),(0x64,0x1A, PotItem.Switch),
-        (0x68,0x1A, PotItem.Nothing)]
-    },
-    0x80: {
-        'Hyrule Dungeon Cellblock': [(0x30,0x04, PotItem.Heart_2), (0x34,0x04, PotItem.Heart_2), (0x38,0x04, PotItem.Heart_2)]
-    },
-    0x82: {
-        'Hyrule Dungeon South Abyss': [(0x32,0x05, PotItem.Nothing),(0x32,0x0A, PotItem.Nothing),(0x4C,0x32, PotItem.Heart_2)]
-    },
-    0x83: {
-        'Desert West Wing': [(0x4C,0x04, PotItem.FiveArrows),(0x50,0x04, PotItem.OneRupee),(0x4C,0x1C, PotItem.FiveRupees),
-        (0x50,0x1C, PotItem.FiveArrows)]
-    },
-    0x84: {
-        'Desert Main Lobby': [(0x40,0x11, PotItem.Nothing),(0x3C,0x11, PotItem.Nothing),(0x50,0x0E, PotItem.Nothing),
-        (0x2C,0x0E, PotItem.Nothing),(0x64,0x06, PotItem.Nothing),(0x18,0x06, PotItem.Nothing),(0x18,0x07, PotItem.FiveArrows),
-        (0x64,0x07, PotItem.FiveArrows)]
-    },
-    0x85: {
-        'Desert East Wing': [(0x2C,0x1C, PotItem.Heart_2), (0x30,0x1C, PotItem.FiveArrows)]
-    },
-    0x87: {
-        'Hera Tile Room': [(0x0C,0x0B, PotItem.Nothing),(0x10,0x0C, PotItem.Nothing),(0x28,0x0C, PotItem.Nothing),
-                           (0x20,0x0C, PotItem.Nothing),(0x18,0x0C, PotItem.Nothing),(0x10,0x0B, PotItem.Nothing)],
-        'Hera Torches': [(0x4C,0x14, PotItem.SmallMagic),(0x70,0x14, PotItem.BigMagic)]
-    },
-    0x8B: {
-        'GT Conveyor Cross': [(0x4C,0x0C, PotItem.Nothing),(0x70,0x0C, PotItem.Key)],
-        'GT Hookshot South Platform': [(0x20,0x17, PotItem.Nothing),(0x1C,0x17, PotItem.Nothing)],
-        'GT Hookshot East Platform': [(0x20,0x09, PotItem.SmallMagic)], #todo: Not really, but need to put it somewhere the logic will make sense
-        'GT Map Room': [(0x4C,0x14, PotItem.Nothing),(0x4C,0x1C, PotItem.Heart_2)]
-    },
-    0x8C: {
-        'GT Hope Room': [(0x4C,0x0C, PotItem.Switch),(0x70,0x0C, PotItem.SmallMagic)],
-        'GT Bob\'s Room': [(0x4C,0x14, PotItem.Bomb_2),(0x5C,0x14, PotItem.Bomb_2),(0x64,0x15, PotItem.FiveArrows),
-                           (0x68,0x1A, PotItem.Bomb_2),(0x58,0x1B, PotItem.Bomb_2)]
-    },
-    0x8D: {
-        'GT Speed Torch Upper': [(0xCC,0x0B, PotItem.Nothing), (0xCC,0x0E, PotItem.BigMagic)],
-        'GT Pots n Blocks': [(0x1C,0x17, PotItem.Heart_2), (0x24,0x17, PotItem.Heart_2), (0x20,0x18, PotItem.BigMagic)]
-    },
-    0x8E: {
-        'Ice Lonely Freezor': [(0x50,0x05, PotItem.FiveArrows), (0x50,0x06, PotItem.Nothing)] # Bunny Beam
-    },
-    0x91: {
-        'Mire Falling Foes': [(0x54,0x04, PotItem.Heart_2), (0x68,0x04, PotItem.SmallMagic)]
-    },
-    0x92: {
-        'Mire Tall Dark and Roomy': [(0x56,0x17, PotItem.Nothing), (0x5C,0x17, PotItem.Nothing), (0x62,0x17, PotItem.Nothing), (0x68,0x17, PotItem.Nothing)]
-    },
-    0x93: {
-        'Mire Dark Shooters': [(0x1C,0x07, PotItem.Switch), (0x60,0x07, PotItem.Heart_2)] #todo: Switch needs to be on the left block?  Maybe allow on the right moving backwards through this room
-    },
-    0x96: {
-        'GT Torch Cross': [(0x0E,0x12, PotItem.Nothing),(0x20,0x05, PotItem.Nothing),(0x20,0x11, PotItem.SmallMagic),
-        (0x20,0x18, PotItem.SmallMagic),(0x0E,0x18, PotItem.Nothing)],
-        'GT Staredown': [(0x4C,0x15, PotItem.Heart_2),(0x70,0x15, PotItem.BigMagic)]
-    },
-    0x99: {
-        'Eastern Darkness': [(0x28,0x14, PotItem.SmallMagic), (0x54,0x14, PotItem.Heart_2)]
-    },
-    0x9B: {
-        'GT Double Switch Key Spot': [(0x30,0x04, PotItem.SmallMagic),(0x30,0x0C, PotItem.Key)],
-        'GT Warp Maze - Mid Section': [(0x1C,0x18, PotItem.Nothing), (0x20,0x18, PotItem.Nothing)]
-    },
-    0x9C: {
-        'GT Invisible Catwalk': [(0x38,0x08, PotItem.SmallMagic), (0x38,0x09, PotItem.FiveArrows)]
-    },
-    0x9D: {
-        'GT Crystal Conveyor': [(0x4C,0x04, PotItem.Bomb_2), (0x54,0x04, PotItem.SmallMagic)],
-        'GT Compass Room': [(0x20,0x07, PotItem.Nothing), (0x28,0x09, PotItem.Nothing)]
-    },
-    0x9F: {
-        'Ice Many Pots': [(0x8A,0x14, PotItem.Nothing),(0x8A,0x13, PotItem.Heart_2),(0xB2,0x13, PotItem.Heart_2),
-        (0x28,0x15, PotItem.Switch),(0x8A,0x15, PotItem.Key),(0x14,0x1B, PotItem.Heart_2),(0x8A,0x1B, PotItem.Heart_2),
-        (0xB2,0x1C, PotItem.Heart_2),(0xB2,0x15, PotItem.Nothing),(0xB2,0x14, PotItem.Nothing),(0x28,0x1B, PotItem.Nothing),
-        (0xB2,0x1B, PotItem.Nothing),(0xB2,0x1A, PotItem.Nothing),(0x8A,0x1C, PotItem.Nothing),(0x8A,0x1A, PotItem.Nothing),
-        (0x14,0x15, PotItem.Nothing)]
-    },
-    0xA1: {
-        'Mire Fishbone': [(0x96,0x06, PotItem.Key), (0x64,0x0B, PotItem.SmallMagic), (0x68,0x0C, PotItem.Heart_2),
-                          (0x6C,0x0D, PotItem.SmallMagic),(0x70,0x0E, PotItem.Heart_2)],
-        'Mire South Fish': [(0x60,0x1B, PotItem.Nothing),(0x5C,0x15, PotItem.Nothing),(0x60,0x17, PotItem.Heart_2),
-                            (0x5C,0x19, PotItem.Nothing), (0x4C,0x1C, PotItem.Nothing),(0x70,0x1C, PotItem.Nothing)]  # Bunny Beam
-    },
-    0xA2: {
-        'Mire Left Bridge': [(0x0C,0x1C, PotItem.BigMagic)]
-    },
-    0xA8: {
-        'Eastern Stalfos Spawn': [(0x8A,0x1C, PotItem.Nothing),(0xB2,0x1C, PotItem.Nothing),(0xB2,0x13, PotItem.Nothing),
-                                    (0x8A,0x13, PotItem.Heart_2),(0x1E,0x18, PotItem.OneRupee)]
-    },
-    0xA9: {
-        'Eastern Courtyard Ledge': [(0x0C,0x13, PotItem.Nothing),(0x70,0x13, PotItem.Nothing),(0x10,0x14, PotItem.Heart_2),(0x6C,0x14, PotItem.Heart_2)],
-        'Eastern Courtyard': [(0x90,0x2B, PotItem.FiveArrows),(0xEC,0x2B, PotItem.FiveArrows),(0x90,0x2C, PotItem.FiveArrows),(0xEC,0x2C, PotItem.Heart_2)]
-    },
-    0xAA: {
-        'Eastern Pot Switch': [(0xD4,0x0A, PotItem.Nothing),(0xE8,0x0A, PotItem.Nothing),(0xE8,0x05, PotItem.Nothing),
-        (0xD4,0x05, PotItem.Heart_2),(0x5E,0x08, PotItem.Switch)],
-        'Eastern Map Balcony': [(0x6C,0x37, PotItem.Heart_2),(0x6C,0x38, PotItem.Heart_2),(0x6C,0x39, PotItem.Heart_2)]  # Hidden Pots!
-    },
-    0xAB: {
-        'Thieves Spike Switch': [(0x14,0x18, PotItem.Key)]
-    },
-    0xAE: {
-        'Iced T': [(0x4C,0x0C, PotItem.Switch)]
-    },
-    0xB0: {
-        'Tower Circle of Pots': [(0x14,0x1B, PotItem.Nothing),(0x18,0x18, PotItem.Nothing),(0x2C,0x19, PotItem.Nothing),
-                                (0x14,0x15, PotItem.Bomb_2),(0x1C,0x15, PotItem.OneRupee),(0x20,0x15, PotItem.FiveRupees),(0x28,0x15, PotItem.FiveArrows),
-                                (0x10,0x17, PotItem.FiveRupees),(0x2C,0x17, PotItem.OneRupee),(0x24,0x18, PotItem.Heart_2),(0x10,0x19, PotItem.Heart_2),
-                                (0x1C,0x1B, PotItem.FiveArrows),(0x28,0x1B, PotItem.Bomb_2),(0x20,0x1B, PotItem.Nothing)]
-    },
-    0xB1: {
-        'Mire Spike Barrier': [(0x4C,0x04, PotItem.Heart_2), (0x70,0x04, PotItem.OneRupee)]
-    },
-    0xB2: {
-        'Mire BK Door Room': [(0x30,0x28, PotItem.OneRupee), (0x4C,0x28, PotItem.OneRupee), (0x30,0x29, PotItem.Nothing),
-                              (0x4C,0x29, PotItem.Heart_2), (0x30,0x2A, PotItem.Nothing), (0x4C,0x28, PotItem.Nothing)]  # 2x Bunny Beam
-    },
-    0xB3: {
-        'Mire Spikes': [(0x0C,0x14, PotItem.Key),(0x30,0x14, PotItem.SmallMagic),(0x30,0x1C, PotItem.Switch)]
-    },
-    0xB4: {
-        'TR Final Abyss': [(0x2C,0x1C, PotItem.BigMagic),(0x30,0x1C, PotItem.Heart_2)]
-    },
-    0xB5: {
-        'TR Dark Ride': [(0x70,0x04, PotItem.FiveRupees),(0x70,0x0F, PotItem.Heart_2),(0x4C,0x10, PotItem.Switch),
-        (0x70,0x10, PotItem.BigMagic),(0x70,0x11, PotItem.Heart_2),(0x70,0x1C, PotItem.Bomb_2)]
-    },
-    0xB6: {
-        'TR Refill': [(0x5E,0x09, PotItem.BigMagic)]
-    },
-    0xB7: {
-        'TR Roller Room': [(0x1E,0x05, PotItem.SmallMagic)]
-    },
-    0xB8: {
-        'Eastern Big Key': [(0x60,0x0D, PotItem.Switch),(0x58,0x10, PotItem.Heart_2),(0x68,0x10, PotItem.Heart_2)]
-    },
-    0xB9: {
-        'Eastern Cannonball': [(0x5C,0x12, PotItem.OneRupee),(0x60,0x12, PotItem.FiveRupees),(0x68,0x12, PotItem.FiveRupees),
-        (0x6C,0x12, PotItem.OneRupee)]
-    },
-    0xBA: {
-        'Eastern Dark Pots': [(0x64,0x08, PotItem.Nothing),(0x58,0x08, PotItem.Nothing),(0x5E,0x04, PotItem.OneRupee),
-        (0x4C,0x06, PotItem.Heart_2),(0x70,0x06, PotItem.Key),(0x4C,0x0A, PotItem.Heart_2),(0x70,0x0A, PotItem.SmallMagic),
-        (0x5E,0x0C, PotItem.OneRupee)]
-    },
-    0xBC: {
-        'Thieves Hallway': [(0x56,0x04, PotItem.Heart_2),(0x66,0x04, PotItem.Key)],
-        'Thieves Pot Alcove Bottom': [(0x1C,0x1B, PotItem.FiveRupees),(0x20,0x1B, PotItem.FiveRupees)],
-        'Thieves Pot Alcove Mid': [(0x0C,0x14, PotItem.Nothing),(0x30,0x14, PotItem.Bomb_2),(0x0C,0x1C, PotItem.Bomb_2),(0x30,0x1C, PotItem.Bomb_2)],
-        'Thieves Pot Alcove Top': [(0x1C,0x15, PotItem.FiveRupees),(0x20,0x15, PotItem.FiveRupees)],
-        'Thieves Conveyor Maze': [(0x8A,0x03, PotItem.Bomb_2),(0xB2,0x03, PotItem.Switch),(0x8A,0x0C, PotItem.Heart_2),(0xB2,0x0C, PotItem.Bomb_2)]
-    },
-    0xBE: {
-        'Ice Switch Room': [(0x5C,0x19, PotItem.Switch)]
-    },
-    0xBF: {
-        'Ice Refill': [(0x28,0x14, PotItem.FiveArrows),(0x2C,0x14, PotItem.Heart_2),(0x30,0x14, PotItem.Bomb_2),
-                        (0x28,0x1C, PotItem.SmallMagic),(0x2C,0x1C, PotItem.SmallMagic),(0x30,0x1C, PotItem.SmallMagic)]
-    },
-    0xC0: {
-        'Tower Dark Pits': [(0x30,0x0A, PotItem.Bomb_2),(0x0C,0x0E, PotItem.FiveRupees),(0x0C,0x1A, PotItem.Heart_2),
-        (0x1C,0x1B, PotItem.OneRupee)]
-    },
-    0xC2: {
-        'Mire Hub': [(0x44,0x30, PotItem.OneRupee),(0x40,0x34, PotItem.FiveArrows)],  # Bunny Beam
-        'Mire Hub Right': [(0x64,0x2E, PotItem.SmallMagic)],
-        'Mire Hub Switch': [(0xB4,0x07, PotItem.Switch)]  # Chest stays here - need blue state to get to it from the switch
-    }
+invalid_key_rooms = {
+    'Swamp Big Key Ledge',
+    'Swamp Trench 2 Departure',
+    'Desert Wall Slide',
+    'Skull X Room',  # only required for 100% locations
+    'GT Map Room',
+    'GT Warp Maze - Mid Section'
 }
+
+vanilla_pots = {
+    2: [Pot(80, 6, PotItem.Nothing, 'Sewers Yet More Rats'), Pot(80, 8, PotItem.Nothing, 'Sewers Yet More Rats'), Pot(44, 8, PotItem.Nothing, 'Sewers Yet More Rats'), Pot(44, 10, PotItem.Nothing, 'Sewers Yet More Rats')],
+    4: [Pot(162, 25, PotItem.Nothing, 'TR Dash Room'), Pot(152, 25, PotItem.Nothing, 'TR Dash Room'), Pot(152, 22, PotItem.Nothing, 'TR Dash Room'), Pot(162, 22, PotItem.Nothing, 'TR Dash Room'), Pot(204, 19, PotItem.Bomb, 'TR Tongue Pull'),
+        Pot(240, 19, PotItem.Bomb, 'TR Tongue Pull')],
+    9: [Pot(12, 4, PotItem.OneRupee, 'PoD Shooter Room'), Pot(48, 4, PotItem.Heart, 'PoD Shooter Room'), Pot(12, 12, PotItem.Switch, 'PoD Shooter Room')],
+    10: [Pot(96, 8, PotItem.Heart, 'PoD Stalfos Basement'), Pot(104, 8, PotItem.Heart, 'PoD Stalfos Basement'), Pot(204, 11, PotItem.Switch, 'PoD Stalfos Basement'), Pot(100, 9, PotItem.Nothing, 'PoD Stalfos Basement'),
+         Pot(156, 17, PotItem.Bomb, 'PoD Basement Ledge', PotFlags.SwitchLogicChange), Pot(160, 17, PotItem.FiveArrows, 'PoD Basement Ledge', PotFlags.SwitchLogicChange)],
+    11: [Pot(202, 3, PotItem.Bomb, 'PoD Dark Pegs'), Pot(202, 12, PotItem.Bomb, 'PoD Dark Pegs')],
+    17: [Pot(152, 19, PotItem.Nothing, 'Sewers Secret Room'), Pot(152, 15, PotItem.Nothing, 'Sewers Secret Room'), Pot(144, 15, PotItem.Heart, 'Sewers Secret Room'), Pot(160, 15, PotItem.Heart, 'Sewers Secret Room'),
+         Pot(144, 19, PotItem.Heart, 'Sewers Secret Room'), Pot(160, 19, PotItem.Heart, 'Sewers Secret Room')],
+    21: [Pot(96, 4, PotItem.Bomb, 'TR Pipe Pit'), Pot(100, 4, PotItem.SmallMagic, 'TR Pipe Pit'), Pot(104, 4, PotItem.Heart, 'TR Pipe Pit'), Pot(108, 4, PotItem.SmallMagic, 'TR Pipe Pit'), Pot(112, 4, PotItem.FiveArrows, 'TR Pipe Pit'),
+         Pot(12, 6, PotItem.OneRupee, 'TR Pipe Pit'), Pot(16, 6, PotItem.FiveArrows, 'TR Pipe Pit'), Pot(20, 6, PotItem.FiveRupees, 'TR Pipe Pit'), Pot(70, 11, PotItem.BigMagic, 'TR Pipe Ledge')],
+    22: [Pot(188, 3, PotItem.Heart, 'Swamp I'), Pot(192, 3, PotItem.Heart, 'Swamp I'), Pot(188, 4, PotItem.SmallMagic, 'Swamp I'), Pot(192, 4, PotItem.SmallMagic, 'Swamp I'), Pot(188, 5, PotItem.FiveArrows, 'Swamp I'),
+         Pot(192, 5, PotItem.FiveArrows, 'Swamp I'), Pot(188, 6, PotItem.Bomb, 'Swamp I'), Pot(192, 6, PotItem.Bomb, 'Swamp I'), Pot(240, 19, PotItem.Key, 'Swamp Waterway')],
+    23: [Pot(100, 13, PotItem.Heart, 'Hera 5F'), Pot(100, 14, PotItem.Heart, 'Hera 5F'), Pot(100, 15, PotItem.Heart, 'Hera 5F'), Pot(100, 16, PotItem.Heart, 'Hera 5F'), Pot(100, 17, PotItem.Heart, 'Hera 5F'), Pot(100, 18, PotItem.Heart, 'Hera 5F'),
+         Pot(104, 13, PotItem.Heart, 'Hera 5F'), Pot(104, 14, PotItem.Heart, 'Hera 5F'), Pot(104, 15, PotItem.Heart, 'Hera 5F'), Pot(104, 16, PotItem.Heart, 'Hera 5F'), Pot(104, 17, PotItem.Heart, 'Hera 5F'), Pot(104, 18, PotItem.Heart, 'Hera 5F')],
+    26: [Pot(28, 5, PotItem.Bomb, 'PoD Falling Bridge Ledge'), Pot(32, 5, PotItem.Bomb, 'PoD Falling Bridge Ledge'), Pot(28, 27, PotItem.Bomb, 'PoD Falling Bridge'), Pot(32, 27, PotItem.Bomb, 'PoD Falling Bridge'),
+         Pot(232, 19, PotItem.Nothing, 'PoD Harmless Hellway'), Pot(212, 19, PotItem.Nothing, 'PoD Harmless Hellway')],
+    27: [Pot(20, 23, PotItem.FiveArrows, 'PoD Mimics 2'), Pot(40, 23, PotItem.FiveArrows, 'PoD Mimics 2')],
+    30: [Pot(84, 9, PotItem.Bomb, 'Ice Bomb Drop')],
+    31: [Pot(28, 25, PotItem.Switch, 'Ice Pengator Switch'), Pot(28, 23, PotItem.Nothing, 'Ice Pengator Switch'), Pot(86, 26, PotItem.Nothing, 'Ice Big Key'), Pot(86, 27, PotItem.Nothing, 'Ice Big Key')],
+    33: [Pot(160, 20, PotItem.Nothing, 'Sewers Key Rat'), Pot(168, 24, PotItem.SmallMagic, 'Sewers Key Rat'), Pot(48, 28, PotItem.Heart, 'Sewers Key Rat'), Pot(82, 28, PotItem.SmallMagic, 'Sewers Key Rat'),
+         Pot(100, 28, PotItem.Nothing, 'Sewers Key Rat'), Pot(104, 28, PotItem.Nothing, 'Sewers Key Rat')],
+    35: [Pot(86, 26, PotItem.OneRupee, 'TR Lazy Eyes'), Pot(90, 26, PotItem.Heart, 'TR Lazy Eyes'), Pot(94, 26, PotItem.OneRupee, 'TR Lazy Eyes'), Pot(98, 26, PotItem.Bomb, 'TR Lazy Eyes'), Pot(102, 26, PotItem.OneRupee, 'TR Lazy Eyes')],
+    36: [Pot(12, 4, PotItem.FiveRupees, 'TR Twin Pokeys'), Pot(48, 4, PotItem.Heart, 'TR Twin Pokeys'), Pot(12, 12, PotItem.SmallMagic, 'TR Twin Pokeys'), Pot(48, 12, PotItem.OneRupee, 'TR Twin Pokeys')],
+    38: [Pot(28, 4, PotItem.Bomb, 'Swamp Shooters'), Pot(12, 8, PotItem.SmallMagic, 'Swamp Shooters'), Pot(150, 19, PotItem.Switch, 'Swamp Push Statue'), Pot(22, 26, PotItem.FiveRupees, 'Swamp Push Statue'),
+         Pot(220, 26, PotItem.FiveArrows, 'Swamp Push Statue', PotFlags.SwitchLogicChange)],
+    39: [Pot(214, 19, PotItem.Nothing, 'Hera 4F'), Pot(214, 20, PotItem.Nothing, 'Hera 4F'), Pot(166, 20, PotItem.Bomb, 'Hera 4F'), Pot(214, 21, PotItem.Heart, 'Hera 4F'), Pot(40, 28, PotItem.OneRupee, 'Hera 4F'),
+         Pot(44, 28, PotItem.OneRupee, 'Hera 4F'), Pot(80, 28, PotItem.FiveRupees, 'Hera 4F'), Pot(84, 28, PotItem.FiveRupees, 'Hera 4F'), Pot(102, 17, PotItem.Nothing, 'Hera 4F'), Pot(98, 17, PotItem.Nothing, 'Hera 4F'),
+         Pot(106, 17, PotItem.Nothing, 'Hera 4F'), Pot(166, 21, PotItem.Nothing, 'Hera 4F'), Pot(166, 19, PotItem.Nothing, 'Hera 4F'), Pot(92, 12, PotItem.Nothing, 'Hera 4F'), Pot(160, 12, PotItem.Nothing, 'Hera 4F')],
+    42: [Pot(80, 12, PotItem.OneRupee, 'PoD Arena Main'), Pot(80, 19, PotItem.Heart, 'PoD Arena Main')],
+    43: [Pot(16, 5, PotItem.Heart, 'PoD Sexy Statue'), Pot(44, 5, PotItem.Switch, 'PoD Sexy Statue'), Pot(16, 6, PotItem.Heart, 'PoD Sexy Statue'), Pot(44, 6, PotItem.Bomb, 'PoD Sexy Statue'), Pot(16, 7, PotItem.Heart, 'PoD Sexy Statue'),
+         Pot(44, 7, PotItem.Bomb, 'PoD Sexy Statue'), Pot(146, 21, PotItem.Bomb, 'PoD Map Balcony'), Pot(170, 21, PotItem.FiveArrows, 'PoD Map Balcony'), Pot(146, 22, PotItem.Bomb, 'PoD Map Balcony'),
+         Pot(170, 22, PotItem.FiveArrows, 'PoD Map Balcony')],
+    44: [Pot(108, 24, PotItem.Heart, 'Hookshot Cave'), Pot(112, 24, PotItem.Heart, 'Hookshot Cave')],
+    47: [Pot(28, 7, PotItem.Heart, 'Kakariko Well (top)'), Pot(32, 7, PotItem.Heart, 'Kakariko Well (top)'), Pot(28, 9, PotItem.FiveRupees, 'Kakariko Well (top)'), Pot(32, 9, PotItem.FiveRupees, 'Kakariko Well (top)'),
+         Pot(172, 19, PotItem.FiveRupees, 'Kakariko Well (top)'), Pot(180, 19, PotItem.FiveRupees, 'Kakariko Well (top)'), Pot(104, 27, PotItem.Heart, 'Kakariko Well (bottom)'), Pot(104, 28, PotItem.Heart, 'Kakariko Well (bottom)')],
+    49: [Pot(92, 28, PotItem.Bomb, 'Hera Beetles'), Pot(96, 28, PotItem.Nothing, 'Hera Beetles')],
+    50: [Pot(28, 13, PotItem.SmallMagic, 'Sewers Dark Cross')],
+    52: [Pot(78, 8, PotItem.FiveRupees, 'Swamp Barrier Ledge'), Pot(92, 8, PotItem.FiveRupees, 'Swamp Barrier Ledge')],
+    53: [Pot(60, 6, PotItem.Key, 'Swamp Trench 2 Alcove'), Pot(20, 8, PotItem.FiveRupees, 'Swamp Big Key Ledge'), Pot(24, 8, PotItem.FiveRupees, 'Swamp Big Key Ledge'), Pot(28, 8, PotItem.FiveRupees, 'Swamp Big Key Ledge'),
+         Pot(32, 8, PotItem.FiveRupees, 'Swamp Big Key Ledge'), Pot(36, 8, PotItem.FiveRupees, 'Swamp Big Key Ledge'), Pot(48, 20, PotItem.Heart, 'Swamp Trench 2 Departure'), Pot(76, 23, PotItem.Nothing, 'Swamp Trench 2 Pots'),
+         Pot(88, 23, PotItem.Nothing, 'Swamp Trench 2 Pots'), Pot(100, 27, PotItem.Nothing, 'Swamp Trench 2 Pots'), Pot(242, 28, PotItem.Nothing, 'Swamp Trench 2 Pots'), Pot(240, 22, PotItem.Heart, 'Swamp Trench 2 Pots'),
+         Pot(76, 28, PotItem.Heart, 'Swamp Trench 2 Pots')],
+    54: [Pot(108, 4, PotItem.Bomb, 'Swamp Hub Dead Ledge'), Pot(112, 4, PotItem.FiveRupees, 'Swamp Hub Dead Ledge'), Pot(10, 16, PotItem.Heart, 'Swamp Hub'), Pot(154, 15, PotItem.Nothing, 'Swamp Hub'), Pot(114, 16, PotItem.Key, 'Swamp Hub'),
+         Pot(222, 15, PotItem.Nothing, 'Swamp Hub'), Pot(188, 5, PotItem.Nothing, 'Swamp Hub North Ledge'), Pot(192, 5, PotItem.Nothing, 'Swamp Hub North Ledge')],
+    55: [Pot(60, 6, PotItem.Key, 'Swamp Trench 1 Alcove'), Pot(48, 20, PotItem.Nothing, 'Swamp Trench 1 Key Ledge')],
+    56: [Pot(164, 12, PotItem.Bomb, 'Swamp Pot Row'), Pot(164, 13, PotItem.FiveRupees, 'Swamp Pot Row'), Pot(164, 18, PotItem.Bomb, 'Swamp Pot Row'), Pot(164, 19, PotItem.Key, 'Swamp Pot Row')],
+    57: [Pot(12, 20, PotItem.Heart, 'Skull Spike Corner'), Pot(48, 28, PotItem.FiveArrows, 'Skull Spike Corner'), Pot(100, 22, PotItem.SmallMagic, 'Skull Final Drop'), Pot(100, 26, PotItem.FiveArrows, 'Skull Final Drop')],
+    60: [Pot(24, 8, PotItem.SmallMagic, 'Hookshot Cave'), Pot(64, 12, PotItem.FiveRupees, 'Hookshot Cave'), Pot(20, 14, PotItem.OneRupee, 'Hookshot Cave'), Pot(20, 19, PotItem.Nothing, 'Hookshot Cave'),
+         Pot(68, 18, PotItem.FiveRupees, 'Hookshot Cave'), Pot(96, 19, PotItem.Heart, 'Hookshot Cave'), Pot(64, 20, PotItem.FiveRupees, 'Hookshot Cave'), Pot(64, 26, PotItem.FiveRupees, 'Hookshot Cave')],
+    61: [Pot(76, 12, PotItem.Bomb, 'GT Mini Helmasaur Room'), Pot(112, 12, PotItem.Bomb, 'GT Mini Helmasaur Room'), Pot(24, 22, PotItem.Heart, 'GT Crystal Circles'), Pot(40, 22, PotItem.FiveArrows, 'GT Crystal Circles'),
+         Pot(32, 24, PotItem.Heart, 'GT Crystal Circles'), Pot(20, 26, PotItem.FiveRupees, 'GT Crystal Circles'), Pot(36, 26, PotItem.BigMagic, 'GT Crystal Circles')],
+    62: [Pot(96, 6, PotItem.Bomb, 'Ice Stalfos Hint'), Pot(100, 6, PotItem.SmallMagic, 'Ice Stalfos Hint'), Pot(88, 10, PotItem.Heart, 'Ice Stalfos Hint'), Pot(92, 10, PotItem.SmallMagic, 'Ice Stalfos Hint')],
+    63: [Pot(12, 25, PotItem.OneRupee, 'Ice Hammer Block'), Pot(20, 25, PotItem.OneRupee, 'Ice Hammer Block'), Pot(12, 26, PotItem.Bomb, 'Ice Hammer Block'), Pot(20, 26, PotItem.Bomb, 'Ice Hammer Block'),
+         Pot(12, 27, PotItem.Switch, 'Ice Hammer Block'), Pot(20, 27, PotItem.Heart, 'Ice Hammer Block'), Pot(28, 23, PotItem.Key, 'Ice Hammer Block')],
+    65: [Pot(100, 10, PotItem.Heart, 'Sewers Behind Tapestry'), Pot(52, 15, PotItem.OneRupee, 'Sewers Behind Tapestry'), Pot(52, 16, PotItem.SmallMagic, 'Sewers Behind Tapestry'), Pot(148, 22, PotItem.SmallMagic, 'Sewers Behind Tapestry')],
+    67: [Pot(66, 4, PotItem.FiveArrows, 'Desert Wall Slide'), Pot(78, 4, PotItem.SmallMagic, 'Desert Wall Slide'), Pot(66, 9, PotItem.Heart, 'Desert Wall Slide'), Pot(78, 9, PotItem.Heart, 'Desert Wall Slide'),
+         Pot(112, 28, PotItem.Nothing, 'Desert Tiles 2'), Pot(76, 28, PotItem.Nothing, 'Desert Tiles 2'), Pot(76, 20, PotItem.Nothing, 'Desert Tiles 2'), Pot(112, 20, PotItem.Key, 'Desert Tiles 2')],
+    69: [Pot(12, 4, PotItem.FiveArrows, 'Thieves Basement Block'), Pot(48, 12, PotItem.FiveArrows, 'Thieves Basement Block'), Pot(92, 11, PotItem.Nothing, "Thieves Blind's Cell"), Pot(108, 11, PotItem.Heart, "Thieves Blind's Cell"),
+         Pot(220, 16, PotItem.SmallMagic, "Thieves Blind's Cell"), Pot(236, 16, PotItem.Heart, "Thieves Blind's Cell")],
+    70: [Pot(96, 5, PotItem.Heart, 'Swamp Donut Top'), Pot(28, 27, PotItem.Heart, 'Swamp Donut Bottom')],
+    73: [Pot(104, 15, PotItem.SmallMagic, 'Skull Torch Room'), Pot(104, 16, PotItem.SmallMagic, 'Skull Torch Room'), Pot(156, 27, PotItem.Nothing, 'Skull Star Pits'), Pot(172, 24, PotItem.Nothing, 'Skull Star Pits'),
+         Pot(172, 23, PotItem.Nothing, 'Skull Star Pits'), Pot(144, 20, PotItem.Nothing, 'Skull Star Pits'), Pot(144, 19, PotItem.SmallMagic, 'Skull Star Pits'), Pot(172, 20, PotItem.Heart, 'Skull Star Pits'),
+         Pot(144, 27, PotItem.Heart, 'Skull Star Pits'), Pot(172, 28, PotItem.SmallMagic, 'Skull Star Pits'), Pot(160, 27, PotItem.Nothing, 'Skull Star Pits')],
+    74: [Pot(14, 5, PotItem.Switch, 'PoD Left Cage'), Pot(32, 5, PotItem.Bomb, 'PoD Left Cage'), Pot(14, 11, PotItem.Heart, 'PoD Left Cage'), Pot(32, 11, PotItem.OneRupee, 'PoD Left Cage'), Pot(56, 8, PotItem.Bomb, 'PoD Middle Cage'),
+         Pot(68, 8, PotItem.Bomb, 'PoD Middle Cage'), Pot(92, 5, PotItem.Bomb, 'PoD Middle Cage'), Pot(110, 5, PotItem.Switch, 'PoD Middle Cage'), Pot(92, 11, PotItem.OneRupee, 'PoD Middle Cage'), Pot(110, 11, PotItem.Heart, 'PoD Middle Cage')],
+    75: [Pot(20, 6, PotItem.FiveArrows, 'PoD Mimics 1'), Pot(40, 6, PotItem.Heart, 'PoD Mimics 1')],
+    78: [Pot(140, 7, PotItem.Nothing, 'Ice Bomb Jump Catwalk'), Pot(48, 10, PotItem.Nothing, 'Ice Bomb Jump Catwalk'), Pot(140, 11, PotItem.Switch, 'Ice Bomb Jump Catwalk'), Pot(28, 12, PotItem.Heart, 'Ice Bomb Jump Catwalk'),
+         Pot(112, 12, PotItem.SmallMagic, 'Ice Narrow Corridor')],
+    80: [Pot(96, 38, PotItem.Heart, 'Hyrule Castle West Hall'), Pot(100, 38, PotItem.Heart, 'Hyrule Castle West Hall')],
+    82: [Pot(138, 3, PotItem.Heart, 'Hyrule Castle East Hall'), Pot(194, 26, PotItem.Heart, 'Hyrule Castle East Hall')],
+    83: [Pot(92, 11, PotItem.Heart, 'Desert Beamos Hall'), Pot(96, 11, PotItem.SmallMagic, 'Desert Beamos Hall'), Pot(100, 11, PotItem.Key, 'Desert Beamos Hall'), Pot(104, 11, PotItem.Heart, 'Desert Beamos Hall')],
+    84: [Pot(186, 25, PotItem.FiveRupees, 'Swamp Attic'), Pot(186, 26, PotItem.Heart, 'Swamp Attic'), Pot(186, 27, PotItem.Heart, 'Swamp Attic'), Pot(186, 28, PotItem.Heart, 'Swamp Attic')],
+    85: [Pot(230, 24, PotItem.SmallMagic, 'Secret Passage'), Pot(230, 25, PotItem.SmallMagic, 'Secret Passage')],
+    86: [Pot(100, 6, PotItem.Nothing, 'Skull Back Drop'), Pot(96, 10, PotItem.Nothing, 'Skull Back Drop'), Pot(92, 10, PotItem.Nothing, 'Skull Back Drop'), Pot(20, 6, PotItem.SmallMagic, 'Skull X Room'),
+         Pot(40, 6, PotItem.SmallMagic, 'Skull X Room'), Pot(24, 7, PotItem.SmallMagic, 'Skull X Room'), Pot(36, 7, PotItem.SmallMagic, 'Skull X Room'), Pot(12, 8, PotItem.Heart, 'Skull X Room'), Pot(48, 8, PotItem.Heart, 'Skull X Room'),
+         Pot(24, 9, PotItem.SmallMagic, 'Skull X Room'), Pot(36, 9, PotItem.SmallMagic, 'Skull X Room'), Pot(20, 10, PotItem.FiveRupees, 'Skull X Room'), Pot(40, 10, PotItem.FiveRupees, 'Skull X Room'), Pot(12, 20, PotItem.Key, 'Skull 2 West Lobby'),
+         Pot(48, 20, PotItem.Nothing, 'Skull 2 West Lobby')],
+    87: [Pot(92, 7, PotItem.BigMagic, 'Skull Lone Pot'), Pot(32, 4, PotItem.Nothing, 'Skull Big Key'), Pot(92, 23, PotItem.Bomb, 'Skull Pot Prison'), Pot(100, 23, PotItem.SmallMagic, 'Skull Pot Prison'),
+         Pot(84, 25, PotItem.FiveRupees, 'Skull Pot Prison'), Pot(76, 27, PotItem.Heart, 'Skull Pot Prison'), Pot(12, 20, PotItem.SmallMagic, 'Skull 2 East Lobby'), Pot(48, 20, PotItem.SmallMagic, 'Skull 2 East Lobby'),
+         Pot(30, 22, PotItem.Switch, 'Skull 2 East Lobby')],
+    88: [Pot(12, 7, PotItem.SmallMagic, 'Skull Pull Switch'), Pot(16, 7, PotItem.Nothing, 'Skull Pull Switch'), Pot(16, 8, PotItem.SmallMagic, 'Skull Pull Switch'), Pot(12, 12, PotItem.Nothing, 'Skull Pull Switch'),
+         Pot(96, 9, PotItem.Nothing, 'Skull Pot Circle'), Pot(92, 8, PotItem.Nothing, 'Skull Pot Circle'), Pot(108, 8, PotItem.Nothing, 'Skull Pot Circle'), Pot(108, 6, PotItem.Nothing, 'Skull Pot Circle'),
+         Pot(104, 5, PotItem.Nothing, 'Skull Pot Circle'), Pot(92, 6, PotItem.Nothing, 'Skull Pot Circle'), Pot(96, 5, PotItem.Bomb, 'Skull Pot Circle'), Pot(100, 5, PotItem.SmallMagic, 'Skull Pot Circle'),
+         Pot(92, 7, PotItem.Heart, 'Skull Pot Circle'), Pot(108, 7, PotItem.Heart, 'Skull Pot Circle'), Pot(100, 9, PotItem.SmallMagic, 'Skull Pot Circle'), Pot(104, 9, PotItem.Bomb, 'Skull Pot Circle')],
+    89: [Pot(26, 43, PotItem.Heart, 'Skull 3 Lobby'), Pot(32, 40, PotItem.Nothing, 'Skull 3 Lobby'), Pot(76, 28, PotItem.Nothing, 'Skull East Bridge'), Pot(112, 28, PotItem.Nothing, 'Skull East Bridge')],
+    91: [Pot(218, 37, PotItem.Nothing, 'GT Hidden Spikes'), Pot(222, 37, PotItem.Switch, 'GT Hidden Spikes'), Pot(226, 37, PotItem.Nothing, 'GT Hidden Spikes')],
+    92: [Pot(228, 25, PotItem.Nothing, 'GT Refill'), Pot(104, 24, PotItem.Nothing, 'GT Refill'), Pot(228, 22, PotItem.Nothing, 'GT Refill'), Pot(216, 25, PotItem.Nothing, 'GT Refill'), Pot(84, 24, PotItem.Nothing, 'GT Refill'),
+         Pot(216, 22, PotItem.Nothing, 'GT Refill'), Pot(94, 22, PotItem.Bomb, 'GT Refill'), Pot(94, 26, PotItem.BigMagic, 'GT Refill')],
+    93: [Pot(16, 5, PotItem.Bomb, 'GT Gauntlet 2'), Pot(44, 5, PotItem.FiveRupees, 'GT Gauntlet 2'), Pot(16, 11, PotItem.OneRupee, 'GT Gauntlet 2'), Pot(44, 11, PotItem.FiveArrows, 'GT Gauntlet 2'), Pot(12, 20, PotItem.FiveArrows, 'GT Gauntlet 3'),
+         Pot(48, 20, PotItem.Bomb, 'GT Gauntlet 3'), Pot(12, 28, PotItem.SmallMagic, 'GT Gauntlet 3'), Pot(48, 28, PotItem.Bomb, 'GT Gauntlet 3')],
+    94: [Pot(92, 4, PotItem.SmallMagic, 'Ice Falling Square'), Pot(96, 4, PotItem.SmallMagic, 'Ice Falling Square'), Pot(76, 8, PotItem.Heart, 'Ice Falling Square'), Pot(112, 8, PotItem.Heart, 'Ice Falling Square')],
+    95: [Pot(44, 27, PotItem.Switch, 'Ice Spike Room')],
+    96: [Pot(76, 4, PotItem.Heart, 'Hyrule Castle West Lobby'), Pot(112, 4, PotItem.Heart, 'Hyrule Castle West Lobby')],
+    98: [Pot(208, 21, PotItem.Heart, 'Hyrule Castle East Lobby')],
+    99: [Pot(48, 4, PotItem.Nothing, 'Desert Tiles 1'), Pot(12, 4, PotItem.Nothing, 'Desert Tiles 1'), Pot(12, 8, PotItem.Nothing, 'Desert Tiles 1'), Pot(48, 12, PotItem.Nothing, 'Desert Tiles 1'), Pot(48, 8, PotItem.Heart, 'Desert Tiles 1'),
+         Pot(12, 12, PotItem.Key, 'Desert Tiles 1')],
+    100: [Pot(12, 22, PotItem.Bomb, 'Thieves Attic Hint', PotFlags.SwitchLogicChange), Pot(16, 22, PotItem.Bomb, 'Thieves Attic Hint', PotFlags.SwitchLogicChange), Pot(20, 22, PotItem.Bomb, 'Thieves Attic Hint', PotFlags.SwitchLogicChange),
+          Pot(36, 28, PotItem.Bomb, 'Thieves Attic'), Pot(40, 28, PotItem.SmallMagic, 'Thieves Attic'),
+          Pot(44, 28, PotItem.SmallMagic, 'Thieves Attic'), Pot(48, 28, PotItem.Switch, 'Thieves Attic')],
+    101: [Pot(100, 28, PotItem.Bomb, 'Thieves Attic Window'), Pot(104, 28, PotItem.Bomb, 'Thieves Attic Window')],
+    102: [Pot(48, 37, PotItem.FiveArrows, 'Swamp Refill'), Pot(52, 37, PotItem.Bomb, 'Swamp Refill'), Pot(56, 37, PotItem.FiveRupees, 'Swamp Refill'), Pot(48, 38, PotItem.FiveArrows, 'Swamp Refill'), Pot(52, 38, PotItem.Bomb, 'Swamp Refill'),
+          Pot(56, 38, PotItem.FiveRupees, 'Swamp Refill'), Pot(84, 5, PotItem.Heart, 'Swamp Behind Waterfall'), Pot(104, 5, PotItem.FiveArrows, 'Swamp Behind Waterfall'), Pot(84, 6, PotItem.Heart, 'Swamp Behind Waterfall'),
+          Pot(104, 6, PotItem.Bomb, 'Swamp Behind Waterfall')],
+    103: [Pot(22, 26, PotItem.Nothing, 'Skull Left Drop'), Pot(18, 22, PotItem.Nothing, 'Skull Left Drop'), Pot(12, 7, PotItem.FiveArrows, 'Skull Left Drop'), Pot(48, 7, PotItem.SmallMagic, 'Skull Left Drop'),
+          Pot(18, 23, PotItem.SmallMagic, 'Skull Left Drop'), Pot(18, 26, PotItem.Heart, 'Skull Left Drop'), Pot(96, 19, PotItem.Heart, 'Skull Compass Room'), Pot(74, 20, PotItem.SmallMagic, 'Skull Compass Room'),
+          Pot(92, 9, PotItem.Nothing, 'Skull Compass Room'), Pot(84, 28, PotItem.Nothing, 'Skull Compass Room'), Pot(104, 28, PotItem.Heart, 'Skull Compass Room')],
+    104: [Pot(84, 14, PotItem.Nothing, 'Skull Pinball'), Pot(84, 13, PotItem.Nothing, 'Skull Pinball'), Pot(88, 12, PotItem.Nothing, 'Skull Pinball'), Pot(88, 6, PotItem.Nothing, 'Skull Pinball'), Pot(88, 5, PotItem.Nothing, 'Skull Pinball'),
+          Pot(88, 4, PotItem.Nothing, 'Skull Pinball'), Pot(64, 17, PotItem.Nothing, 'Skull Pinball'), Pot(64, 15, PotItem.Nothing, 'Skull Pinball'), Pot(64, 7, PotItem.Heart, 'Skull Pinball'), Pot(88, 7, PotItem.SmallMagic, 'Skull Pinball'),
+          Pot(64, 16, PotItem.Heart, 'Skull Pinball'), Pot(64, 24, PotItem.SmallMagic, 'Skull Pinball'), Pot(64, 25, PotItem.Heart, 'Skull Pinball')],
+    107: [Pot(28, 5, PotItem.Heart, 'GT Crystal Paths'), Pot(44, 5, PotItem.Nothing, 'GT Crystal Paths'), Pot(28, 8, PotItem.Nothing, 'GT Crystal Paths'), Pot(44, 8, PotItem.SmallMagic, 'GT Crystal Paths'),
+          Pot(28, 11, PotItem.SmallMagic, 'GT Crystal Paths'), Pot(44, 11, PotItem.Nothing, 'GT Crystal Paths'), Pot(94, 25, PotItem.Nothing, 'GT Mimics 2'), Pot(98, 25, PotItem.FiveArrows, 'GT Mimics 2')],
+    108: [Pot(20, 6, PotItem.Heart, 'GT Quad Pot'), Pot(40, 6, PotItem.FiveArrows, 'GT Quad Pot'), Pot(20, 10, PotItem.Bomb, 'GT Quad Pot'), Pot(40, 10, PotItem.SmallMagic, 'GT Quad Pot')],
+    109: [Pot(28, 26, PotItem.Heart, 'GT Gauntlet 5'), Pot(32, 26, PotItem.Heart, 'GT Gauntlet 5'), Pot(28, 27, PotItem.SmallMagic, 'GT Gauntlet 5'), Pot(32, 27, PotItem.SmallMagic, 'GT Gauntlet 5')],
+    115: [Pot(154, 21, PotItem.FiveArrows, 'Desert Circle of Pots'), Pot(158, 21, PotItem.OneRupee, 'Desert Circle of Pots'), Pot(20, 23, PotItem.Switch, 'Desert Circle of Pots'), Pot(36, 23, PotItem.FiveRupees, 'Desert Circle of Pots'),
+          Pot(144, 24, PotItem.Heart, 'Desert Circle of Pots'), Pot(168, 24, PotItem.FiveArrows, 'Desert Circle of Pots'), Pot(20, 26, PotItem.SmallMagic, 'Desert Circle of Pots'), Pot(36, 26, PotItem.Heart, 'Desert Circle of Pots'),
+          Pot(154, 27, PotItem.OneRupee, 'Desert Circle of Pots'), Pot(158, 27, PotItem.FiveRupees, 'Desert Circle of Pots')],
+    116: [Pot(30, 5, PotItem.SmallMagic, 'Desert Map Room'), Pot(62, 5, PotItem.Switch, 'Desert Map Room'), Pot(94, 5, PotItem.SmallMagic, 'Desert Map Room'), Pot(14, 11, PotItem.Heart, 'Desert Map Room'),
+          Pot(46, 11, PotItem.FiveArrows, 'Desert Map Room'), Pot(78, 11, PotItem.FiveArrows, 'Desert Map Room'), Pot(110, 11, PotItem.Heart, 'Desert Map Room')],
+    117: [Pot(148, 22, PotItem.SmallMagic, 'Desert Arrow Pot Corner'), Pot(160, 22, PotItem.FiveArrows, 'Desert Arrow Pot Corner'), Pot(172, 22, PotItem.Heart, 'Desert Arrow Pot Corner')],
+    118: [Pot(112, 12, PotItem.Heart, 'Swamp Drain Right'), Pot(84, 23, PotItem.Heart, 'Swamp Flooded Spot'), Pot(96, 23, PotItem.Heart, 'Swamp Flooded Spot')],
+    123: [Pot(48, 10, PotItem.Nothing, 'GT Conveyor Star Pits'), Pot(88, 10, PotItem.Nothing, 'GT Conveyor Star Pits'), Pot(76, 7, PotItem.Nothing, 'GT Conveyor Star Pits'), Pot(60, 4, PotItem.Heart, 'GT Conveyor Star Pits'),
+          Pot(64, 4, PotItem.Key, 'GT Conveyor Star Pits')],
+    124: [Pot(36, 21, PotItem.Nothing, 'GT Falling Bridge'), Pot(24, 11, PotItem.Nothing, 'GT Falling Bridge'), Pot(28, 4, PotItem.Heart, 'GT Falling Bridge'), Pot(32, 4, PotItem.Heart, 'GT Falling Bridge')],
+    125: [Pot(44, 12, PotItem.Nothing, 'GT Firesnake Room'), Pot(44, 6, PotItem.Nothing, 'GT Firesnake Room'), Pot(112, 6, PotItem.Heart, 'GT Firesnake Room'), Pot(108, 20, PotItem.FiveArrows, 'GT Warp Maze - Pot Rail'),
+          Pot(114, 20, PotItem.Bomb, 'GT Petting Zoo'), Pot(76, 28, PotItem.Bomb, 'GT Petting Zoo')],
+    126: [Pot(86, 15, PotItem.Heart, 'Ice Tall Hint'), Pot(82, 26, PotItem.SmallMagic, 'Ice Tall Hint'), Pot(100, 26, PotItem.Switch, 'Ice Tall Hint'), Pot(104, 26, PotItem.Nothing, 'Ice Tall Hint')],
+    128: [Pot(48, 4, PotItem.Heart, 'Hyrule Dungeon Cellblock'), Pot(52, 4, PotItem.Heart, 'Hyrule Dungeon Cellblock'), Pot(56, 4, PotItem.Heart, 'Hyrule Dungeon Cellblock')],
+    130: [Pot(50, 5, PotItem.Nothing, 'Hyrule Dungeon South Abyss'), Pot(50, 10, PotItem.Nothing, 'Hyrule Dungeon South Abyss'), Pot(76, 50, PotItem.Heart, 'Hyrule Dungeon South Abyss')],
+    131: [Pot(76, 4, PotItem.FiveArrows, 'Desert West Wing'), Pot(80, 4, PotItem.OneRupee, 'Desert West Wing'), Pot(76, 28, PotItem.FiveRupees, 'Desert West Wing'), Pot(80, 28, PotItem.FiveArrows, 'Desert West Wing')],
+    132: [Pot(64, 17, PotItem.Nothing, 'Desert Main Lobby'), Pot(60, 17, PotItem.Nothing, 'Desert Main Lobby'), Pot(80, 14, PotItem.Nothing, 'Desert Main Lobby'), Pot(44, 14, PotItem.Nothing, 'Desert Main Lobby'),
+          Pot(100, 6, PotItem.Nothing, 'Desert Main Lobby'), Pot(24, 6, PotItem.Nothing, 'Desert Main Lobby'), Pot(24, 7, PotItem.FiveArrows, 'Desert Main Lobby'), Pot(100, 7, PotItem.FiveArrows, 'Desert Main Lobby')],
+    133: [Pot(44, 28, PotItem.Heart, 'Desert East Wing'), Pot(48, 28, PotItem.FiveArrows, 'Desert East Wing')],
+    135: [Pot(12, 11, PotItem.Nothing, 'Hera Tile Room'), Pot(16, 12, PotItem.Nothing, 'Hera Tile Room'), Pot(40, 12, PotItem.Nothing, 'Hera Tile Room'), Pot(32, 12, PotItem.Nothing, 'Hera Tile Room'), Pot(24, 12, PotItem.Nothing, 'Hera Tile Room'),
+          Pot(16, 11, PotItem.Nothing, 'Hera Tile Room'), Pot(76, 20, PotItem.SmallMagic, 'Hera Torches'), Pot(112, 20, PotItem.BigMagic, 'Hera Torches')],
+    139: [Pot(76, 12, PotItem.Nothing, 'GT Conveyor Cross'), Pot(112, 12, PotItem.Key, 'GT Conveyor Cross'), Pot(32, 23, PotItem.Nothing, 'GT Hookshot South Platform'), Pot(28, 23, PotItem.Nothing, 'GT Hookshot South Platform'),
+          Pot(32, 9, PotItem.SmallMagic, 'GT Hookshot East Platform'), Pot(76, 20, PotItem.Nothing, 'GT Map Room'), Pot(76, 28, PotItem.Heart, 'GT Map Room')],
+    140: [Pot(76, 12, PotItem.Switch, 'GT Hope Room'), Pot(112, 12, PotItem.SmallMagic, 'GT Hope Room'), Pot(76, 20, PotItem.Bomb, "GT Bob's Room"), Pot(92, 20, PotItem.Bomb, "GT Bob's Room"), Pot(100, 21, PotItem.FiveArrows, "GT Bob's Room"),
+          Pot(104, 26, PotItem.Bomb, "GT Bob's Room"), Pot(88, 27, PotItem.Bomb, "GT Bob's Room")],
+    141: [Pot(204, 11, PotItem.Nothing, 'GT Speed Torch Upper'), Pot(204, 14, PotItem.BigMagic, 'GT Speed Torch Upper'), Pot(28, 23, PotItem.Heart, 'GT Pots n Blocks'), Pot(36, 23, PotItem.Heart, 'GT Pots n Blocks'),
+          Pot(32, 24, PotItem.BigMagic, 'GT Pots n Blocks')],
+    142: [Pot(80, 5, PotItem.FiveArrows, 'Ice Lonely Freezor'), Pot(80, 6, PotItem.Nothing, 'Ice Lonely Freezor')],
+    145: [Pot(84, 4, PotItem.Heart, 'Mire Falling Foes'), Pot(104, 4, PotItem.SmallMagic, 'Mire Falling Foes')],
+    146: [Pot(86, 23, PotItem.Nothing, 'Mire Tall Dark and Roomy'), Pot(92, 23, PotItem.Nothing, 'Mire Tall Dark and Roomy'), Pot(98, 23, PotItem.Nothing, 'Mire Tall Dark and Roomy'), Pot(104, 23, PotItem.Nothing, 'Mire Tall Dark and Roomy')],
+    147: [Pot(28, 7, PotItem.Switch, 'Mire Dark Shooters'), Pot(96, 7, PotItem.Heart, 'Mire Dark Shooters', PotFlags.NoSwitch)],
+    150: [Pot(14, 18, PotItem.Nothing, 'GT Torch Cross'), Pot(32, 5, PotItem.Nothing, 'GT Torch Cross'), Pot(32, 17, PotItem.SmallMagic, 'GT Torch Cross'), Pot(32, 24, PotItem.SmallMagic, 'GT Torch Cross'),
+          Pot(14, 24, PotItem.Nothing, 'GT Torch Cross'), Pot(76, 21, PotItem.Heart, 'GT Staredown'), Pot(112, 21, PotItem.BigMagic, 'GT Staredown')],
+    153: [Pot(40, 20, PotItem.SmallMagic, 'Eastern Darkness'), Pot(84, 20, PotItem.Heart, 'Eastern Darkness')],
+    155: [Pot(48, 4, PotItem.SmallMagic, 'GT Double Switch Key Spot'), Pot(48, 12, PotItem.Key, 'GT Double Switch Key Spot'), Pot(28, 24, PotItem.Nothing, 'GT Warp Maze - Mid Section'), Pot(32, 24, PotItem.Nothing, 'GT Warp Maze - Mid Section')],
+    156: [Pot(56, 8, PotItem.SmallMagic, 'GT Invisible Catwalk'), Pot(56, 9, PotItem.FiveArrows, 'GT Invisible Catwalk')],
+    157: [Pot(76, 4, PotItem.Bomb, 'GT Crystal Conveyor'), Pot(84, 4, PotItem.SmallMagic, 'GT Crystal Conveyor'), Pot(32, 7, PotItem.Nothing, 'GT Compass Room'), Pot(40, 9, PotItem.Nothing, 'GT Compass Room')],
+    159: [Pot(138, 20, PotItem.Nothing, 'Ice Many Pots'), Pot(138, 19, PotItem.Heart, 'Ice Many Pots'), Pot(178, 19, PotItem.Heart, 'Ice Many Pots'), Pot(40, 21, PotItem.Switch, 'Ice Many Pots'), Pot(138, 21, PotItem.Key, 'Ice Many Pots'),
+          Pot(20, 27, PotItem.Heart, 'Ice Many Pots'), Pot(138, 27, PotItem.Heart, 'Ice Many Pots'), Pot(178, 28, PotItem.Heart, 'Ice Many Pots'), Pot(178, 21, PotItem.Nothing, 'Ice Many Pots'), Pot(178, 20, PotItem.Nothing, 'Ice Many Pots'),
+          Pot(40, 27, PotItem.Nothing, 'Ice Many Pots'), Pot(178, 27, PotItem.Nothing, 'Ice Many Pots'), Pot(178, 26, PotItem.Nothing, 'Ice Many Pots'), Pot(138, 28, PotItem.Nothing, 'Ice Many Pots'), Pot(138, 26, PotItem.Nothing, 'Ice Many Pots'),
+          Pot(20, 21, PotItem.Nothing, 'Ice Many Pots')],
+    161: [Pot(150, 6, PotItem.Key, 'Mire Fishbone'), Pot(100, 11, PotItem.SmallMagic, 'Mire Fishbone'), Pot(104, 12, PotItem.Heart, 'Mire Fishbone'), Pot(108, 13, PotItem.SmallMagic, 'Mire Fishbone'), Pot(112, 14, PotItem.Heart, 'Mire Fishbone'),
+          Pot(96, 27, PotItem.Nothing, 'Mire South Fish'), Pot(92, 21, PotItem.Nothing, 'Mire South Fish'), Pot(96, 23, PotItem.Heart, 'Mire South Fish'), Pot(92, 25, PotItem.Nothing, 'Mire South Fish'),
+          Pot(76, 28, PotItem.Nothing, 'Mire South Fish'), Pot(112, 28, PotItem.Nothing, 'Mire South Fish')],
+    162: [Pot(12, 28, PotItem.BigMagic, 'Mire Left Bridge')],
+    168: [Pot(138, 28, PotItem.Nothing, 'Eastern Stalfos Spawn'), Pot(178, 28, PotItem.Nothing, 'Eastern Stalfos Spawn'), Pot(178, 19, PotItem.Nothing, 'Eastern Stalfos Spawn'), Pot(138, 19, PotItem.Heart, 'Eastern Stalfos Spawn'),
+          Pot(30, 24, PotItem.OneRupee, 'Eastern Stalfos Spawn')],
+    169: [Pot(144, 43, PotItem.FiveArrows, 'Eastern Courtyard'), Pot(236, 43, PotItem.FiveArrows, 'Eastern Courtyard'), Pot(144, 44, PotItem.FiveArrows, 'Eastern Courtyard'), Pot(236, 44, PotItem.Heart, 'Eastern Courtyard'),
+          Pot(12, 19, PotItem.Nothing, 'Eastern Courtyard Ledge'), Pot(112, 19, PotItem.Nothing, 'Eastern Courtyard Ledge'), Pot(16, 20, PotItem.Heart, 'Eastern Courtyard Ledge'), Pot(108, 20, PotItem.Heart, 'Eastern Courtyard Ledge')],
+    170: [Pot(212, 10, PotItem.Nothing, 'Eastern Pot Switch'), Pot(232, 10, PotItem.Nothing, 'Eastern Pot Switch'), Pot(232, 5, PotItem.Nothing, 'Eastern Pot Switch'), Pot(212, 5, PotItem.Heart, 'Eastern Pot Switch'),
+          Pot(94, 8, PotItem.Switch, 'Eastern Pot Switch'), Pot(108, 55, PotItem.Heart, 'Eastern Map Balcony'), Pot(108, 56, PotItem.Heart, 'Eastern Map Balcony'), Pot(108, 57, PotItem.Heart, 'Eastern Map Balcony')],
+    171: [Pot(20, 24, PotItem.Key, 'Thieves Spike Switch')],
+    174: [Pot(76, 12, PotItem.Switch, 'Iced T')],
+    176: [Pot(20, 27, PotItem.Nothing, 'Tower Circle of Pots'), Pot(24, 24, PotItem.Nothing, 'Tower Circle of Pots'), Pot(44, 25, PotItem.Nothing, 'Tower Circle of Pots'), Pot(20, 21, PotItem.Bomb, 'Tower Circle of Pots'),
+          Pot(28, 21, PotItem.OneRupee, 'Tower Circle of Pots'), Pot(32, 21, PotItem.FiveRupees, 'Tower Circle of Pots'), Pot(40, 21, PotItem.FiveArrows, 'Tower Circle of Pots'), Pot(16, 23, PotItem.FiveRupees, 'Tower Circle of Pots'),
+          Pot(44, 23, PotItem.OneRupee, 'Tower Circle of Pots'), Pot(36, 24, PotItem.Heart, 'Tower Circle of Pots'), Pot(16, 25, PotItem.Heart, 'Tower Circle of Pots'), Pot(28, 27, PotItem.FiveArrows, 'Tower Circle of Pots'),
+          Pot(40, 27, PotItem.Bomb, 'Tower Circle of Pots'), Pot(32, 27, PotItem.Nothing, 'Tower Circle of Pots')],
+    177: [Pot(76, 4, PotItem.Heart, 'Mire Spike Barrier'), Pot(112, 4, PotItem.OneRupee, 'Mire Spike Barrier')],
+    178: [Pot(48, 40, PotItem.OneRupee, 'Mire BK Door Room'), Pot(76, 40, PotItem.OneRupee, 'Mire BK Door Room'), Pot(48, 41, PotItem.Nothing, 'Mire BK Door Room'), Pot(76, 41, PotItem.Heart, 'Mire BK Door Room'),
+          Pot(48, 42, PotItem.Nothing, 'Mire BK Door Room'), Pot(76, 40, PotItem.Nothing, 'Mire BK Door Room')],
+    179: [Pot(12, 20, PotItem.Key, 'Mire Spikes'), Pot(48, 20, PotItem.SmallMagic, 'Mire Spikes'), Pot(48, 28, PotItem.Switch, 'Mire Spikes')],
+    180: [Pot(44, 28, PotItem.BigMagic, 'TR Final Abyss'), Pot(48, 28, PotItem.Heart, 'TR Final Abyss')],
+    181: [Pot(112, 4, PotItem.FiveRupees, 'TR Dark Ride'), Pot(112, 15, PotItem.Heart, 'TR Dark Ride'), Pot(76, 16, PotItem.Switch, 'TR Dark Ride'), Pot(112, 16, PotItem.BigMagic, 'TR Dark Ride'), Pot(112, 17, PotItem.Heart, 'TR Dark Ride'),
+          Pot(112, 28, PotItem.Bomb, 'TR Dark Ride')],
+    182: [Pot(94, 9, PotItem.BigMagic, 'TR Refill')],
+    183: [Pot(30, 5, PotItem.SmallMagic, 'TR Roller Room')],
+    184: [Pot(96, 13, PotItem.Switch, 'Eastern Big Key'), Pot(88, 16, PotItem.Heart, 'Eastern Big Key'), Pot(104, 16, PotItem.Heart, 'Eastern Big Key')],
+    185: [Pot(92, 18, PotItem.OneRupee, 'Eastern Cannonball'), Pot(96, 18, PotItem.FiveRupees, 'Eastern Cannonball'), Pot(104, 18, PotItem.FiveRupees, 'Eastern Cannonball'), Pot(108, 18, PotItem.OneRupee, 'Eastern Cannonball')],
+    186: [Pot(100, 8, PotItem.Nothing, 'Eastern Dark Pots'), Pot(88, 8, PotItem.Nothing, 'Eastern Dark Pots'), Pot(94, 4, PotItem.OneRupee, 'Eastern Dark Pots'), Pot(76, 6, PotItem.Heart, 'Eastern Dark Pots'),
+          Pot(112, 6, PotItem.Key, 'Eastern Dark Pots'), Pot(76, 10, PotItem.Heart, 'Eastern Dark Pots'), Pot(112, 10, PotItem.SmallMagic, 'Eastern Dark Pots'), Pot(94, 12, PotItem.OneRupee, 'Eastern Dark Pots')],
+    188: [Pot(86, 4, PotItem.Heart, 'Thieves Hallway'), Pot(102, 4, PotItem.Key, 'Thieves Hallway'), Pot(138, 3, PotItem.Bomb, 'Thieves Conveyor Maze'), Pot(178, 3, PotItem.Switch, 'Thieves Conveyor Maze'),
+          Pot(138, 12, PotItem.Heart, 'Thieves Conveyor Maze'), Pot(178, 12, PotItem.Bomb, 'Thieves Conveyor Maze'), Pot(12, 20, PotItem.Nothing, 'Thieves Pot Alcove Mid'), Pot(48, 20, PotItem.Bomb, 'Thieves Pot Alcove Mid'),
+          Pot(12, 28, PotItem.Bomb, 'Thieves Pot Alcove Mid'), Pot(48, 28, PotItem.Bomb, 'Thieves Pot Alcove Mid'), Pot(28, 21, PotItem.FiveRupees, 'Thieves Pot Alcove Top'), Pot(32, 21, PotItem.FiveRupees, 'Thieves Pot Alcove Top'),
+          Pot(28, 27, PotItem.FiveRupees, 'Thieves Pot Alcove Bottom'), Pot(32, 27, PotItem.FiveRupees, 'Thieves Pot Alcove Bottom')],
+    190: [Pot(92, 25, PotItem.Switch, 'Ice Switch Room')],
+    191: [Pot(40, 20, PotItem.FiveArrows, 'Ice Refill'), Pot(44, 20, PotItem.Heart, 'Ice Refill'), Pot(48, 20, PotItem.Bomb, 'Ice Refill'), Pot(40, 28, PotItem.SmallMagic, 'Ice Refill'), Pot(44, 28, PotItem.SmallMagic, 'Ice Refill'),
+          Pot(48, 28, PotItem.SmallMagic, 'Ice Refill')],
+    192: [Pot(48, 10, PotItem.Bomb, 'Tower Dark Pits'), Pot(12, 14, PotItem.FiveRupees, 'Tower Dark Pits'), Pot(12, 26, PotItem.Heart, 'Tower Dark Pits'), Pot(28, 27, PotItem.OneRupee, 'Tower Dark Pits')],
+    194: [Pot(180, 7, PotItem.Switch, 'Mire Hub Switch'), Pot(100, 46, PotItem.SmallMagic, 'Mire Hub Right'), Pot(68, 48, PotItem.OneRupee, 'Mire Hub'), Pot(64, 52, PotItem.FiveArrows, 'Mire Hub')],
+    196: [Pot(84, 9, PotItem.Bomb, 'TR Crystal Maze'), Pot(24, 14, PotItem.Heart, 'TR Crystal Maze'), Pot(56, 17, PotItem.FiveRupees, 'TR Crystal Maze'), Pot(84, 17, PotItem.Bomb, 'TR Crystal Maze'),
+          Pot(12, 21, PotItem.FiveArrows, 'TR Crystal Maze'), Pot(76, 23, PotItem.OneRupee, 'TR Crystal Maze'), Pot(48, 25, PotItem.SmallMagic, 'TR Crystal Maze'), Pot(12, 26, PotItem.Heart, 'TR Crystal Maze')],
+    198: [Pot(12, 7, PotItem.BigMagic, 'TR Hub'), Pot(12, 25, PotItem.Heart, 'TR Hub')],
+    199: [Pot(12, 10, PotItem.Heart, 'TR Torches'), Pot(12, 11, PotItem.BigMagic, 'TR Torches'), Pot(12, 22, PotItem.SmallMagic, 'TR Torches Ledge'), Pot(12, 28, PotItem.FiveArrows, 'TR Torches Ledge')],
+    201: [Pot(30, 22, PotItem.OneRupee, 'Eastern Lobby'), Pot(94, 22, PotItem.OneRupee, 'Eastern Lobby'), Pot(60, 22, PotItem.Switch, 'Eastern Lobby')],
+    203: [Pot(80, 4, PotItem.Nothing, 'Thieves Ambush'), Pot(80, 28, PotItem.Nothing, 'Thieves Ambush'), Pot(88, 16, PotItem.Heart, 'Thieves Ambush'), Pot(88, 28, PotItem.FiveRupees, 'Thieves Ambush')],
+    204: [Pot(36, 4, PotItem.FiveRupees, 'Thieves Rail Ledge'), Pot(36, 28, PotItem.FiveRupees, 'Thieves Rail Ledge'), Pot(112, 4, PotItem.Heart, 'Thieves BK Corner'), Pot(112, 28, PotItem.Bomb, 'Thieves BK Corner')],
+    206: [Pot(76, 8, PotItem.SmallMagic, 'Ice Antechamber'), Pot(80, 8, PotItem.SmallMagic, 'Ice Antechamber'), Pot(108, 12, PotItem.Bomb, 'Ice Antechamber'), Pot(112, 12, PotItem.FiveArrows, 'Ice Antechamber'),
+          Pot(204, 11, PotItem.Hole, 'Ice Antechamber')],
+    208: [Pot(158, 5, PotItem.SmallMagic, 'Tower Dark Maze'), Pot(140, 11, PotItem.OneRupee, 'Tower Dark Maze'), Pot(42, 13, PotItem.SmallMagic, 'Tower Dark Maze'), Pot(48, 16, PotItem.Heart, 'Tower Dark Maze'),
+          Pot(176, 20, PotItem.OneRupee, 'Tower Dark Maze'), Pot(146, 23, PotItem.FiveRupees, 'Tower Dark Maze'), Pot(12, 28, PotItem.Heart, 'Tower Dark Maze')],
+    209: [Pot(48, 4, PotItem.BigMagic, 'Mire Conveyor Barrier'), Pot(168, 7, PotItem.OneRupee, 'Mire Conveyor Barrier'), Pot(76, 4, PotItem.OneRupee, 'Mire Neglected Room'), Pot(112, 4, PotItem.FiveArrows, 'Mire Neglected Room'),
+          Pot(76, 12, PotItem.Nothing, 'Mire Neglected Room'), Pot(112, 12, PotItem.OneRupee, 'Mire Neglected Room')],
+    214: [Pot(92, 22, PotItem.BigMagic, 'TR Main Lobby'), Pot(96, 22, PotItem.Bomb, 'TR Main Lobby')],
+    216: [Pot(202, 8, PotItem.Heart, 'Eastern Duo Eyegores'), Pot(242, 8, PotItem.FiveArrows, 'Eastern Duo Eyegores'), Pot(202, 10, PotItem.FiveArrows, 'Eastern Duo Eyegores'), Pot(242, 10, PotItem.FiveArrows, 'Eastern Duo Eyegores'),
+          Pot(202, 12, PotItem.FiveArrows, 'Eastern Duo Eyegores'), Pot(242, 12, PotItem.Heart, 'Eastern Duo Eyegores'), Pot(92, 24, PotItem.Heart, 'Eastern Single Eyegore'), Pot(96, 24, PotItem.FiveArrows, 'Eastern Single Eyegore')],
+    217: [Pot(92, 20, PotItem.FiveArrows, 'Eastern False Switches'), Pot(92, 28, PotItem.Heart, 'Eastern False Switches')],
+    218: [Pot(24, 23, PotItem.FiveArrows, 'Eastern Attic Start'), Pot(36, 23, PotItem.FiveArrows, 'Eastern Attic Start'), Pot(24, 25, PotItem.Switch, 'Eastern Attic Start'), Pot(36, 25, PotItem.Heart, 'Eastern Attic Start')],
+    219: [Pot(12, 4, PotItem.Nothing, 'Thieves Lobby'), Pot(62, 19, PotItem.Nothing, 'Thieves Lobby'), Pot(112, 4, PotItem.FiveRupees, 'Thieves Lobby'), Pot(88, 16, PotItem.Heart, 'Thieves Lobby')],
+    220: [Pot(56, 4, PotItem.FiveRupees, 'Thieves Compass Room'), Pot(112, 4, PotItem.Bomb, 'Thieves Compass Room'), Pot(68, 16, PotItem.Heart, 'Thieves Compass Room'), Pot(12, 28, PotItem.FiveArrows, 'Thieves Compass Room')],
+    227: [Pot(88, 55, PotItem.Nothing, 'Bat Cave (right)'), Pot(100, 57, PotItem.OneRupee, 'Bat Cave (right)')],
+    228: [Pot(32, 9, PotItem.FiveRupees, 'Old Man House'), Pot(112, 10, PotItem.OneRupee, 'Old Man House')],
+    229: [Pot(48, 4, PotItem.OneRupee, 'Old Man House Back'), Pot(76, 4, PotItem.OneRupee, 'Old Man House Back'), Pot(112, 16, PotItem.OneRupee, 'Old Man House Back'), Pot(64, 18, PotItem.FiveRupees, 'Old Man House Back')],
+    230: [Pot(108, 12, PotItem.FiveArrows, 'Death Mountain Return Cave'), Pot(88, 16, PotItem.Heart, 'Death Mountain Return Cave'), Pot(72, 20, PotItem.Nothing, 'Death Mountain Return Cave'),
+          Pot(56, 24, PotItem.OneRupee, 'Death Mountain Return Cave')],
+    231: [Pot(68, 5, PotItem.OneRupee, 'Death Mountain Return Cave'), Pot(72, 5, PotItem.OneRupee, 'Death Mountain Return Cave')],
+    232: [Pot(96, 4, PotItem.Heart, 'Superbunny Cave')],
+    235: [Pot(206, 8, PotItem.FiveRupees, 'Bumper Cave'), Pot(210, 8, PotItem.FiveRupees, 'Bumper Cave'), Pot(88, 14, PotItem.SmallMagic, 'Bumper Cave'), Pot(92, 14, PotItem.Heart, 'Bumper Cave'), Pot(96, 14, PotItem.SmallMagic, 'Bumper Cave')],
+    241: [Pot(64, 5, PotItem.Heart, 'Old Man Cave')],
+    248: [Pot(242, 13, PotItem.BigMagic, 'Superbunny Cave')],
+    253: [Pot(88, 6, PotItem.FiveRupees, 'Fairy Ascension Cave (Top)'), Pot(100, 6, PotItem.FiveRupees, 'Fairy Ascension Cave (Top)'), Pot(84, 23, PotItem.FiveRupees, 'Fairy Ascension Cave (Bottom)'),
+          Pot(84, 24, PotItem.FiveRupees, 'Fairy Ascension Cave (Bottom)')],
+    255: [Pot(92, 8, PotItem.Heart, 'Paradox Cave'), Pot(96, 8, PotItem.Heart, 'Paradox Cave'), Pot(112, 28, PotItem.OneRupee, 'Paradox Cave Front')],
+    257: [Pot(12, 20, PotItem.Heart, 'Snitch Lady (East)'), Pot(224, 19, PotItem.Chicken, 'Snitch Lady (West)'), Pot(228, 19, PotItem.Heart, 'Snitch Lady (West)')],
+    258: [Pot(146, 19, PotItem.Heart, 'Sick Kids House'), Pot(150, 19, PotItem.Heart, 'Sick Kids House')],
+    259: [Pot(140, 7, PotItem.Chicken, 'Tavern'), Pot(140, 9, PotItem.Nothing, 'Tavern'), Pot(12, 12, PotItem.Heart, 'Tavern (Front)')],
+    260: [Pot(202, 21, PotItem.Heart, 'Links House'), Pot(202, 22, PotItem.Heart, 'Links House'), Pot(202, 23, PotItem.Heart, 'Links House')],
+    261: [Pot(30, 20, PotItem.Heart, 'Sahasrahlas Hut'), Pot(28, 21, PotItem.Heart, 'Sahasrahlas Hut'), Pot(32, 21, PotItem.Heart, 'Sahasrahlas Hut')],
+    263: [Pot(214, 23, PotItem.Bomb, 'Light World Bomb Hut'), Pot(222, 23, PotItem.FiveArrows, 'Light World Bomb Hut'), Pot(230, 23, PotItem.Bomb, 'Light World Bomb Hut'), Pot(214, 25, PotItem.OneRupee, 'Light World Bomb Hut'),
+          Pot(222, 25, PotItem.Nothing, 'Light World Bomb Hut'), Pot(230, 25, PotItem.OneRupee, 'Light World Bomb Hut'), Pot(214, 27, PotItem.Bomb, 'Light World Bomb Hut'), Pot(230, 27, PotItem.Bomb, 'Light World Bomb Hut')],
+    264: [Pot(166, 19, PotItem.Chicken, 'Chicken House')],
+    268: [Pot(88, 14, PotItem.Heart, 'Hookshot Fairy')],
+    276: [Pot(92, 4, PotItem.Heart, 'Dark Desert Hint'), Pot(96, 4, PotItem.Heart, 'Dark Desert Hint'), Pot(92, 5, PotItem.Bomb, 'Dark Desert Hint'), Pot(96, 5, PotItem.Bomb, 'Dark Desert Hint'), Pot(92, 10, PotItem.FiveArrows, 'Dark Desert Hint'),
+          Pot(96, 10, PotItem.Heart, 'Dark Desert Hint')],
+    279: [Pot(138, 3, PotItem.Heart, 'Spike Cave'), Pot(142, 3, PotItem.Heart, 'Spike Cave'), Pot(166, 3, PotItem.Heart, 'Spike Cave'), Pot(170, 3, PotItem.Heart, 'Spike Cave'), Pot(138, 4, PotItem.Heart, 'Spike Cave'),
+          Pot(142, 4, PotItem.Heart, 'Spike Cave'), Pot(166, 4, PotItem.Heart, 'Spike Cave'), Pot(170, 4, PotItem.Heart, 'Spike Cave')],
+    281: [Pot(44, 28, PotItem.Heart, 'Blinds Hideout'), Pot(48, 28, PotItem.OneRupee, 'Blinds Hideout'), Pot(76, 28, PotItem.Heart, 'Blinds Hideout'), Pot(80, 28, PotItem.Heart, 'Blinds Hideout')],
+    282: [Pot(214, 10, PotItem.Heart, 'Palace of Darkness Hint'), Pot(218, 10, PotItem.Heart, 'Palace of Darkness Hint'), Pot(226, 10, PotItem.Heart, 'Palace of Darkness Hint'), Pot(230, 10, PotItem.Heart, 'Palace of Darkness Hint')],
+    283: [Pot(24, 53, PotItem.Nothing, 'Cave 45'), Pot(24, 54, PotItem.Heart, 'Cave 45'), Pot(32, 54, PotItem.Heart, 'Cave 45'), Pot(40, 54, PotItem.Heart, 'Cave 45'), Pot(24, 55, PotItem.Heart, 'Cave 45'), Pot(28, 56, PotItem.Heart, 'Cave 45'),
+          Pot(92, 22, PotItem.Bomb, 'Graveyard Cave'), Pot(96, 22, PotItem.Heart, 'Graveyard Cave'), Pot(92, 23, PotItem.Bomb, 'Graveyard Cave'), Pot(96, 23, PotItem.Heart, 'Graveyard Cave'), Pot(92, 24, PotItem.Bomb, 'Graveyard Cave'),
+          Pot(96, 24, PotItem.Heart, 'Graveyard Cave'), Pot(92, 25, PotItem.Bomb, 'Graveyard Cave'), Pot(96, 25, PotItem.Heart, 'Graveyard Cave')],
+    285: [Pot(60, 6, PotItem.FiveRupees, 'Blinds Hideout'), Pot(64, 6, PotItem.FiveRupees, 'Blinds Hideout'), Pot(60, 7, PotItem.FiveRupees, 'Blinds Hideout'), Pot(64, 7, PotItem.FiveRupees, 'Blinds Hideout'),
+          Pot(60, 8, PotItem.FiveRupees, 'Blinds Hideout'), Pot(64, 8, PotItem.FiveRupees, 'Blinds Hideout')],
+    287: [Pot(174, 28, PotItem.Heart, 'Lumberjack House'), Pot(178, 28, PotItem.Heart, 'Lumberjack House')],
+    292: [Pot(20, 20, PotItem.FiveRupees, '50 Rupee Cave'), Pot(40, 20, PotItem.FiveRupees, '50 Rupee Cave'), Pot(20, 21, PotItem.FiveRupees, '50 Rupee Cave'), Pot(40, 21, PotItem.FiveRupees, '50 Rupee Cave'),
+          Pot(20, 22, PotItem.FiveRupees, '50 Rupee Cave'), Pot(40, 22, PotItem.FiveRupees, '50 Rupee Cave'), Pot(24, 24, PotItem.FiveRupees, '50 Rupee Cave'), Pot(28, 24, PotItem.FiveRupees, '50 Rupee Cave'),
+          Pot(32, 24, PotItem.FiveRupees, '50 Rupee Cave'), Pot(36, 24, PotItem.FiveRupees, '50 Rupee Cave')],
+    293: [Pot(24, 25, PotItem.FiveRupees, '20 Rupee Cave'), Pot(28, 25, PotItem.FiveRupees, '20 Rupee Cave'), Pot(32, 25, PotItem.FiveRupees, '20 Rupee Cave'), Pot(36, 25, PotItem.FiveRupees, '20 Rupee Cave'),
+          Pot(88, 22, PotItem.Heart, 'Dev Cave Hint'), Pot(100, 22, PotItem.Heart, 'Dev Cave Hint'), Pot(88, 28, PotItem.Heart, 'Dev Cave Hint'), Pot(100, 28, PotItem.Heart, 'Dev Cave Hint')],
+    295: [Pot(24, 25, PotItem.Nothing, 'Hammer Pegs Cave'), Pot(28, 25, PotItem.Nothing, 'Hammer Pegs Cave'), Pot(32, 25, PotItem.Nothing, 'Hammer Pegs Cave'), Pot(36, 25, PotItem.Nothing, 'Hammer Pegs Cave')],
+}
+
+
+def shuffle_pots(world, player):
+    import random
+
+    new_pot_contents = {}
+
+    for supertile in vanilla_pots:
+        old_pots = vanilla_pots[supertile]
+        new_pots = [Pot(pot.x, pot.y, PotItem.Nothing, pot.room, pot.flags) for pot in old_pots]
+        # sort in the order Hole, Switch, Key, Other, Nothing
+        sort_order = {PotItem.Hole: 4, PotItem.Switch: 3, PotItem.Key: 2, PotItem.Nothing: 0}
+        old_pots = sorted(old_pots, key=lambda pot: sort_order.get(pot.item, 1), reverse=True)
+
+        for old_pot in old_pots:
+            if old_pot.item == PotItem.Nothing:
+                break
+            elif old_pot.item == PotItem.Hole:
+                # Can only go in vanilla position (or the other big rock)
+                available_pots = (pot for pot in new_pots if pot.x == old_pot.x and pot.y == old_pot.y)
+            elif old_pot.item == PotItem.Switch:
+                available_pots = (pot for pot in new_pots if (pot.room == old_pot.room or pot.room in movable_switch_rooms[old_pot.room]) and not (pot.flags & PotFlags.NoSwitch))
+            elif old_pot.item == PotItem.Key:
+                if world.doorShuffle[player] == 'vanilla' and not world.retro[player] and world.logic != 'nologic':
+                    available_pots = (pot for pot in new_pots if pot.room not in invalid_key_rooms)
+                else:
+                    available_pots = new_pots
+            else:
+                available_pots = new_pots
+
+            available_pots = [pot for pot in available_pots if pot.item == PotItem.Nothing]
+
+            new_pot = random.choice(available_pots)
+            new_pot.item = old_pot.item
+            if world.retro[player] and new_pot.item == PotItem.FiveArrows:
+                new_pot.item = PotItem.FiveRupees
+
+            if new_pot.item == PotItem.Key and new_pot.room != old_pot.room:
+                # Move pot key to new room
+                key = next(location for location in world.get_region(old_pot.room, player).locations if location.name in key_only_locations)
+                world.get_region(old_pot.room, player).locations.remove(key)
+                world.get_region(new_pot.room, player).locations.append(key)
+            elif new_pot.item == PotItem.Switch and (new_pot.flags & PotFlags.SwitchLogicChange):
+                if new_pot.room == 'PoD Basement Ledge':
+                    basement = world.get_region(old_pot.room, player)
+                    ledge = world.get_region(new_pot.room, player)
+                    ledge.locations.append(basement.locations.pop())
+                elif new_pot.room == 'Swamp Push Statue':
+                    from Rules import set_rule
+                    set_rule(world.get_entrance('Swamp Push Statue NE', player), lambda state: state.has('Cane of Somaria', player))
+                    world.get_door('Swamp Push Statue NW', player).blocked = True
+                elif new_pot.room == 'Thieves Attic Hint':
+                    # Rule is created based on barrier
+                    world.get_door('Thieves Attic ES', player).barrier(CrystalBarrier.Orange)
+                else:
+                    raise Exception("Switch locattion in room %s requires logic change" % new_pot.room)
+
+        new_pot_contents[supertile] = new_pots
+
+    world.pot_contents[player] = new_pot_contents

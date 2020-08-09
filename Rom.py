@@ -1,5 +1,6 @@
 import bisect
 import io
+import itertools
 import json
 import hashlib
 import logging
@@ -9,7 +10,7 @@ import struct
 import sys
 import subprocess
 
-from BaseClasses import CollectionState, ShopType, Region, Location, DoorType
+from BaseClasses import CollectionState, ShopType, Region, Location, DoorType, PotItem
 from DoorShuffle import compass_data, DROptions, boss_indicator
 from Dungeons import dungeon_music_addresses
 from Regions import location_table
@@ -160,7 +161,7 @@ def read_rom(stream):
         buffer = buffer[0x200:]
     return buffer
 
-def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, random_sprite_on_hit):
+def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_on_hit):
     baserom_path = os.path.abspath(baserom_path)
     basepatch_path = os.path.abspath(local_path(os.path.join("data","base2current.json")))
     enemizer_basepatch_path = os.path.join(os.path.dirname(enemizercli), "enemizerBasePatch.json")
@@ -207,7 +208,7 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, r
         'GrayscaleMode': False,
         'GenerateSpoilers': False,
         'RandomizeLinkSpritePalette': False,
-        'RandomizePots': shufflepots,
+        'RandomizePots': False,
         'ShuffleMusic': False,
         'BootlegMagic': True,
         'CustomBosses': False,
@@ -540,6 +541,9 @@ def patch_rom(world, rom, player, team, enemized):
 
     if world.mapshuffle[player]:
         rom.write_byte(0x155C9, random.choice([0x11, 0x16]))  # Randomize GT music too with map shuffle
+
+    if world.pot_contents[player]:
+        write_pots_to_rom(rom, world.pot_contents[player])
 
     # patch entrance/exits/holes
     for region in world.regions:
@@ -2457,3 +2461,29 @@ hash_alphabet = [
     "Lamp", "Hammer", "Shovel", "Ocarina", "Bug Net", "Book", "Bottle", "Potion", "Cane", "Cape", "Mirror", "Boots",
     "Gloves", "Flippers", "Pearl", "Shield", "Tunic", "Heart", "Map", "Compass", "Key"
 ]
+
+pot_item_room_table_lookup = 0xDB67
+
+###
+# Pointer to pot location and contents for each non-empty pot in a supertile
+# Format: [(x, y, item)] FF FF (Note: x,y are bit packed to include layer)
+pot_item_table = 0xDDE7
+pot_item_table_end = 0xE6B0
+
+def write_pots_to_rom(rom, pot_contents):
+    n = pot_item_table
+    rom.write_bytes(n, [0xFF,0xFF])
+    n += 2
+    for i in range(0x140):
+        if i in pot_contents:
+            pots = [pot for pot in pot_contents[i] if pot.item != PotItem.Nothing]
+            if len(pots) > 0:
+                write_int16(rom, pot_item_room_table_lookup + 2*i, n)
+                rom.write_bytes(n, itertools.chain(*((pot.x,pot.y,pot.item) for pot in pots)))
+                n += 3*len(pots) + 2
+                rom.write_bytes(n - 2, [0xFF,0xFF])
+            else:
+                write_int16(rom, pot_item_room_table_lookup + 2*i, n-2)
+        else:
+            write_int16(rom, pot_item_room_table_lookup + 2*i, n-2)
+    assert n <= pot_item_table_end

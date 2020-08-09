@@ -9,6 +9,7 @@
         "crossed"
       ]
     },
+    "potshuffle": { "type": "checkbox" },
     "experimental": { "type": "checkbox" },
     "dungeon_counters": {
       "type": "selectbox",
