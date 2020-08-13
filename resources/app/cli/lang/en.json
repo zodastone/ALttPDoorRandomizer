@@ -10,7 +10,7 @@
     "shuffling.dungeons": "Shuffling dungeons",
     "basic.traversal": "--Basic Traversal",
     "generating.dungeon": "Generating dungeons",
-    "shuffling.keydoors": "Shuffling Key doors for",
+    "shuffling.keydoors": "Shuffling Key doors",
     "lowering.keys.candidates": "Lowering key door count because not enough candidates",
     "lowering.keys.layouts": "Lowering key door count because no valid layouts",
     "keydoor.shuffle.time": "Key door shuffle time",

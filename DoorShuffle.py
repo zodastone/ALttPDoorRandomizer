@@ -764,7 +764,7 @@ def find_small_key_door_candidates(builder, start_regions, world, player):
     checked_doors = set()
     for region in start_regions:
         possible, checked = find_key_door_candidates(region, checked_doors, world, player)
-        candidates.extend(possible)
+        candidates.extend([x for x in possible if x not in candidates])
         checked_doors.update(checked)
     flat_candidates = []
     for candidate in candidates:

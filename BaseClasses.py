@@ -1120,6 +1120,7 @@ pol_comp = {
     'Mod': lambda x: 0 if x == 0 else 1
 }
 
+
 @unique
 class PolSlot(Enum):
     NorthSouth = 0
