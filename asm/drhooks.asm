@@ -125,7 +125,7 @@ nop #2 : jsl BlindAtticFix
 
 ; also rando's hooks.asm line 1360
 ; 106e4e -> goes to  a0ee4e
-org $a0ee84 ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
+org $a0ee8a ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
 jsl DrHudOverride
 org $0ded04 ; <- rando's hooks.asm line 2192 - 6ED04 - equipment.asm : 1963 (REP #$30)
 jsl DrHudDungeonItemsAdditions
