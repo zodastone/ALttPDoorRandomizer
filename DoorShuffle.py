@@ -12,7 +12,7 @@ from Dungeons import dungeon_regions, region_starts, standard_starts, split_regi
 from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor
-from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate
+from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout
 
@@ -1134,31 +1134,6 @@ def random_door_type(door, partner, world, player, type_a, type_b, room_a, room_
         world.spoiler.set_door_type(door.name + ' <-> ' + partner.name, spoiler_type, player)
 
 
-def determine_required_paths(world, player):
-    paths = {
-        'Hyrule Castle': ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby'],
-        'Eastern Palace': ['Eastern Boss'],
-        'Desert Palace': ['Desert Main Lobby', 'Desert East Lobby', 'Desert West Lobby', 'Desert Boss'],
-        'Tower of Hera': ['Hera Boss'],
-        'Agahnims Tower': ['Tower Agahnim 1'],
-        'Palace of Darkness': ['PoD Boss'],
-        'Swamp Palace': ['Swamp Boss'],
-        'Skull Woods': ['Skull 1 Lobby', 'Skull 2 East Lobby', 'Skull 2 West Lobby', 'Skull Boss'],
-        'Thieves Town': ['Thieves Boss', ('Thieves Blind\'s Cell', 'Thieves Boss')],
-        'Ice Palace': ['Ice Boss'],
-        'Misery Mire': ['Mire Boss'],
-        'Turtle Rock': ['TR Main Lobby', 'TR Lazy Eyes', 'TR Big Chest Entrance', 'TR Eye Bridge', 'TR Boss'],
-        'Ganons Tower': ['GT Agahnim 2']
-        }
-    if world.mode[player] == 'standard':
-        paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
-        # noinspection PyTypeChecker
-        paths['Hyrule Castle'].append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
-    if world.doorShuffle[player] in ['basic']:
-        paths['Thieves Town'].append('Thieves Attic Window')
-    return paths
-
-
 def overworld_prep(world, player):
     find_inaccessible_regions(world, player)
     add_inaccessible_doors(world, player)
@@ -1220,37 +1195,38 @@ def create_door(world, player, entName, region_name):
 
 def check_required_paths(paths, world, player):
     for dungeon_name in paths.keys():
-        builder = world.dungeon_layouts[player][dungeon_name]
-        if len(paths[dungeon_name]) > 0:
-            states_to_explore = defaultdict(list)
-            for path in paths[dungeon_name]:
-                if type(path) is tuple:
-                    states_to_explore[tuple([path[0]])].append(path[1])
-                else:
-                    states_to_explore[tuple(builder.path_entrances)].append(path)
-            cached_initial_state = None
-            for start_regs, dest_regs in states_to_explore.items():
-                check_paths = convert_regions(dest_regs, world, player)
-                start_regions = convert_regions(start_regs, world, player)
-                initial = start_regs == tuple(builder.path_entrances)
-                if not initial or cached_initial_state is None:
-                    init = determine_init_crystal(initial, cached_initial_state, start_regions)
-                    state = ExplorationState(init, dungeon_name)
-                    for region in start_regions:
-                        state.visit_region(region)
-                        state.add_all_doors_check_unattached(region, world, player)
-                    explore_state(state, world, player)
-                    if initial and cached_initial_state is None:
-                        cached_initial_state = state
-                else:
-                    state = cached_initial_state
-                valid, bad_region = check_if_regions_visited(state, check_paths)
-                if not valid:
-                    if check_for_pinball_fix(state, bad_region, world, player):
+        if dungeon_name in world.dungeon_layouts[player].keys():
+            builder = world.dungeon_layouts[player][dungeon_name]
+            if len(paths[dungeon_name]) > 0:
+                states_to_explore = defaultdict(list)
+                for path in paths[dungeon_name]:
+                    if type(path) is tuple:
+                        states_to_explore[tuple([path[0]])].append(path[1])
+                    else:
+                        states_to_explore[tuple(builder.path_entrances)].append(path)
+                cached_initial_state = None
+                for start_regs, dest_regs in states_to_explore.items():
+                    check_paths = convert_regions(dest_regs, world, player)
+                    start_regions = convert_regions(start_regs, world, player)
+                    initial = start_regs == tuple(builder.path_entrances)
+                    if not initial or cached_initial_state is None:
+                        init = determine_init_crystal(initial, cached_initial_state, start_regions)
+                        state = ExplorationState(init, dungeon_name)
+                        for region in start_regions:
+                            state.visit_region(region)
+                            state.add_all_doors_check_unattached(region, world, player)
                         explore_state(state, world, player)
-                        valid, bad_region = check_if_regions_visited(state, check_paths)
-                if not valid:
-                    raise Exception('%s cannot reach %s' % (dungeon_name, bad_region.name))
+                        if initial and cached_initial_state is None:
+                            cached_initial_state = state
+                    else:
+                        state = cached_initial_state
+                    valid, bad_region = check_if_regions_visited(state, check_paths)
+                    if not valid:
+                        if check_for_pinball_fix(state, bad_region, world, player):
+                            explore_state(state, world, player)
+                            valid, bad_region = check_if_regions_visited(state, check_paths)
+                    if not valid:
+                        raise Exception('%s cannot reach %s' % (dungeon_name, bad_region.name))
 
 
 def determine_init_crystal(initial, state, start_regions):
