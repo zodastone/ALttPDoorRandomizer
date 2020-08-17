@@ -1851,10 +1851,10 @@ def assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, builde
             valid, choice = False, None
             while not valid:
                 if len(best_candidates) == 0:
+                    if len(candidates) == 0:
+                        raise GenerationException('Cross Dungeon Builder: Simple branch problems: %s' % name)
                     best = min(charges)
-                    best_candidates = [x for i, x in candidates if charges[i] <= best]
-                if len(candidates) == 0:
-                    raise GenerationException('Cross Dungeon Builder: Simple branch problems: %s' % name)
+                    best_candidates = [x for i, x in enumerate(candidates) if charges[i] <= best]
                 choice = random.choice(best_candidates)
                 best_candidates.remove(choice)
                 i = candidates.index(choice)
