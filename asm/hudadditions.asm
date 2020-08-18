@@ -82,7 +82,10 @@ DrHudDungeonItemsAdditions:
             - lda $7ef364 : and.l $0098c0, x : beq + ; must have compass
                 lda.l HudOffsets, x : tay
                 jsr BkStatus : sta $16C6, y ; big key status
-                lda.l ChestKeys, x : jsr ConvertToDisplay2 : sta $1706, y ; small key totals
+                phx
+                    txa : lsr : tax
+                    lda.l ChestKeys, x : jsr ConvertToDisplay2 : sta $1706, y ; small key totals
+                plx
             + inx #2 : cpx #$001b : bcc -
     ++
     lda !HUD_FLAG : and.w #$0020 : bne + : bra ++ : +
@@ -105,7 +108,7 @@ DrHudDungeonItemsAdditions:
 BkStatus:
     lda $7ef366 : and.l $0098c0, x : bne +++ ; has the bk already
          lda.l BigKeyStatus, x : bne ++
-            lda #$2574 : rts ; X for no BK
+            lda #$2482 : rts ; 0/O for no BK
          ++ cmp #$0002 : bne +
             lda #$2420 : rts ; symbol for BnC
     + lda #$24f5 : rts ; black otherwise
@@ -121,7 +124,7 @@ ConvertToDisplay2:
         cmp #$000a : !blt +
             !add #$2553 : rts
         + !add #$2816 : rts
-    ++ lda #$3020 : rts
+    ++ lda #$2483 : rts ; 0/O for 0 or placeholder digit
 
 CountChestKeys:
     jsl ItemDowngradeFix
@@ -162,9 +165,9 @@ CountBonkItem:
         lda.l BonkKey_GTower
         bra ++
     + lda.b #$24 ; default to small key
-    ++
-    phy : tay : jsr CountChest : ply
-    rtl
+    ++ cmp #$24 : bne +
+        phy : tay : jsr CountChest : ply
+    + rtl
 
 ;================================================================================
 ; 16-bit A, 8-bit X

@@ -265,7 +265,7 @@ def generate_itempool(world, player):
     if player in world.pool_adjustment.keys():
         amt = world.pool_adjustment[player]
         if amt < 0:
-            for _ in range(0, amt):
+            for _ in range(amt, 0):
                 pool.remove('Rupees (20)')
         elif amt > 0:
             for _ in range(0, amt):

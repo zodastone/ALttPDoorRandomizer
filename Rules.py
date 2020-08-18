@@ -326,8 +326,6 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Moldorm Gap', player), lambda state: state.has('Hookshot', player) and world.get_region('GT Moldorm', player).dungeon.bosses['top'].can_defeat(state))
     set_defeat_dungeon_boss_rule(world.get_location('Agahnim 2', player))
 
-    add_key_logic_rules(world, player)
-
     # crystal switch rules
     set_rule(world.get_entrance('PoD Arena Crystal Path', player), lambda state: state.can_reach_blue(world.get_region('PoD Arena Crystal', player), player))
     set_rule(world.get_entrance('Swamp Trench 2 Pots Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Swamp Trench 2 Pots', player), player))
@@ -377,6 +375,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Double Switch Orange Barrier 2', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Entry', player), player))
     set_rule(world.get_entrance('GT Double Switch Orange Path', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Switches', player), player))
     set_rule(world.get_entrance('GT Double Switch Key Orange Path', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Key Spot', player), player))
+
+    add_key_logic_rules(world, player)
 
     # End of door rando rules.
 
