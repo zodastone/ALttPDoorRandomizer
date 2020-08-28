@@ -78,6 +78,9 @@ class World(object):
         self.key_logic = {}
         self.pool_adjustment = {}
         self.key_layout = defaultdict(dict)
+        self.dungeon_portals = defaultdict(list)
+        self._portal_cache = {}
+        self.sanc_portal = {}
         self.fish = BabelFish()
 
         for player in range(1, players + 1):
@@ -201,6 +204,18 @@ class World(object):
                     return door
             raise RuntimeError('No such door %s for player %d' % (doorname, player))
 
+    def get_portal(self, portal_name, player):
+        if isinstance(portal_name, Portal):
+            return portal_name
+        try:
+            return self._portal_cache[(portal_name, player)]
+        except KeyError:
+            for portal in self.dungeon_portals[player]:
+                if portal.name == portal_name and portal.player == player:
+                    self._portal_cache[(portal_name, player)] = portal
+                    return portal
+            raise RuntimeError('No such portal %s for player %d' % (portal_name, player))
+
     def check_for_door(self, doorname, player):
         if isinstance(doorname, Door):
             return doorname
@@ -266,7 +281,7 @@ class World(object):
                         pass
                     elif ret.has('Red Shield', item.player) and self.difficulty_requirements[item.player].progressive_shield_limit >= 3:
                         ret.prog_items['Mirror Shield', item.player] += 1
-                    elif ret.has('Blue Shield', item.player)  and self.difficulty_requirements[item.player].progressive_shield_limit >= 2:
+                    elif ret.has('Blue Shield', item.player) and self.difficulty_requirements[item.player].progressive_shield_limit >= 2:
                         ret.prog_items['Red Shield', item.player] += 1
                     elif self.difficulty_requirements[item.player].progressive_shield_limit >= 1:
                         ret.prog_items['Blue Shield', item.player] += 1
@@ -933,9 +948,10 @@ class Entrance(object):
         world = self.parent_region.world if self.parent_region else None
         return world.get_name_string_for_object(self) if world else f'{self.name} (Player {self.player})'
 
+
 class Dungeon(object):
 
-    def __init__(self, name, regions, big_key, small_keys, dungeon_items, player):
+    def __init__(self, name, regions, big_key, small_keys, dungeon_items, player, dungeon_id):
         self.name = name
         self.regions = regions
         self.big_key = big_key
@@ -944,6 +960,7 @@ class Dungeon(object):
         self.bosses = dict()
         self.player = player
         self.world = None
+        self.dungeon_id = dungeon_id
 
         self.entrance_regions = []
 
@@ -1148,6 +1165,7 @@ class Door(object):
         # 0-4 for spiral offset thing
         self.doorIndex = -1
         self.layer = -1  # 0 for normal floor, 1 for the inset layer
+        self.pseudo_bg = 0  # 0 for normal floor, 1 for pseudo bg
         self.toggle = False
         self.trapFlag = 0x0
         self.quadrant = 2
@@ -1158,6 +1176,16 @@ class Door(object):
         self.doorListPos = -1
         self.edge_id = None
         self.edge_width = None
+
+        #portal items
+        self.portalAble = False
+        self.roomLayout = 0x22  # free scroll-  both directions
+        self.entranceFlag = False
+        self.deadEnd = False
+        self.passage = True
+        self.dungeonLink = None
+        # self.incognitoPos = -1
+        # self.sectorLink = False
 
         # logical properties
         # self.connected = False  # combine with Dest?
@@ -1291,6 +1319,13 @@ class Door(object):
         self.dead = True
         return self
 
+    def portal(self, quadrant, roomLayout, pseudo_bg=0):
+        self.quadrant = quadrant
+        self.roomLayout = roomLayout
+        self.pseudo_bg = pseudo_bg
+        self.portalAble = True
+        return self
+
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.name == other.name
 
@@ -1418,6 +1453,109 @@ class Sector(object):
         if len(self.regions) > 0:
             return f'{self.regions[0].name}'
         return f'{next(iter(self.region_set()))}'
+
+
+class Portal(object):
+
+    def __init__(self, player, name, door, entrance_offset, exit_offset, boss_exit_idx):
+        self.player = player
+        self.name = name
+        self.door = door
+        self.ent_offset = entrance_offset
+        self.exit_offset = exit_offset
+        self.boss_exit_idx = boss_exit_idx
+        self.default = True
+        self.destination = False
+        self.deadEnd = False
+
+    def change_door(self, new_door):
+        if new_door != self.door:
+            self.default = False
+            self.door = new_door
+
+    def current_room(self):
+        return self.door.roomIndex
+
+    def relative_coords(self):
+        y_rel = (self.door.roomIndex & 0xf0) >> 3 #todo: fix the shift!!!!
+        x_rel = (self.door.roomIndex & 0x0f) * 2
+        quad = self.door.quadrant
+        if quad == 0:
+            return [y_rel, y_rel, y_rel, y_rel+1, x_rel, x_rel, x_rel, x_rel+1]
+        elif quad == 1:
+            return [y_rel, y_rel, y_rel, y_rel+1, x_rel+1, x_rel, x_rel+1, x_rel+1]
+        elif quad == 2:
+            return [y_rel+1, y_rel, y_rel+1, y_rel+1, x_rel, x_rel, x_rel, x_rel+1]
+        else:
+            return [y_rel+1, y_rel, y_rel+1, y_rel+1, x_rel+1, x_rel, x_rel+1, x_rel+1]
+
+    def scroll_x(self):
+        x_rel = (self.door.roomIndex & 0x0f) * 2
+        if self.door.doorIndex == 0:
+            return [0x00, x_rel]
+        elif self.door.doorIndex == 1:
+            return [0x80, x_rel]
+        else:
+            return [0x00, x_rel+1]
+
+    def scroll_y(self):
+        y_rel = ((self.door.roomIndex & 0xf0) >> 3) + 1
+        return [0x10, y_rel]
+
+    def link_y(self):
+        y_rel = ((self.door.roomIndex & 0xf0) >> 3) + 1
+        inset = False
+        if self.door.pseudo_bg == 1 or self.door.layer == 1:
+            inset = True
+        return [(0xd8 if not inset else 0xc0), y_rel]
+
+    def link_x(self):
+        x_rel = (self.door.roomIndex & 0x0f) * 2
+        if self.door.doorIndex == 0:
+            return [0x78, x_rel]
+        elif self.door.doorIndex == 1:
+            return [0xf8, x_rel]
+        else:
+            return [0x78, x_rel+1]
+
+    # def camera_y(self):
+    #     return [0x87, 0x01]
+
+    def camera_x(self):
+        if self.door.doorIndex == 0:
+            return [0x7f, 0x00]
+        elif self.door.doorIndex == 1:
+            return [0xff, 0x00]
+        else:
+            return [0x7f, 0x01]
+
+    def bg_setting(self):
+        if self.door.layer == 0:
+            return 0x00 | self.door.pseudo_bg
+        else:
+            return 0x10 | self.door.pseudo_bg
+
+    def hv_scroll(self):
+        return self.door.roomLayout
+
+    def scroll_quad(self):
+        quad = self.door.quadrant
+        if quad == 0:
+            return 0x00
+        elif quad == 1:
+            return 0x10
+        elif quad == 2:
+            return 0x02
+        else:
+            return 0x12
+
+
+class DungeonInfo(object):
+    def __init__(self, name):
+        self.name = name
+        self.total = 0
+        self.required_passage = {}
+        # self.dead_ends = 0  total - 1 - req = dead_ends possible
 
 
 class Boss(object):

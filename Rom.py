@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '82a102fee15ed0718257d92cd7ba031b'
+RANDOMIZERBASEHASH = '7d7ea5b59d05926be23a3963e31cb0f0'
 
 
 class JsonRom(object):
@@ -615,7 +615,10 @@ def patch_rom(world, rom, player, team, enemized):
             rom.write_byte(0x13f038+offset*2, bk_status)
         rom.write_byte(0x151f1, 2)
         rom.write_byte(0x15270, 2)
-        rom.write_byte(0x1597b, 2)
+        sanctuary = world.get_region('Sanctuary', player)
+        rom.write_byte(0x1597b, sanctuary.dungeon.dungeon_id*2)
+        if world.sanc_portal[player]:
+            rom.write_byte(0x159a6, world.sanc_portal[player].ent_offset)
         if compass_code_good(rom):
             update_compasses(rom, world, player)
         else:
@@ -626,13 +629,11 @@ def patch_rom(world, rom, player, team, enemized):
         if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs,
                                                                              DoorType.Open, DoorType.StraightStairs]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door))
-    for room in world.rooms:
-        if room.player == player and room.modified:
-            rom.write_bytes(room.address(), room.rom_data())
     for paired_door in world.paired_doors[player]:
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
         rom.write_bytes(paired_door.address_b(world, player), paired_door.rom_data_b(world, player))
     if world.doorShuffle[player] != 'vanilla':
+
         for builder in world.dungeon_layouts[player].values():
             if builder.pre_open_stonewall:
                 if builder.pre_open_stonewall.name == 'Desert Wall Slide NW':
@@ -640,13 +641,30 @@ def patch_rom(world, rom, player, team, enemized):
         for name, pair in boss_indicator.items():
             dungeon_id, boss_door = pair
             opposite_door = world.get_door(boss_door, player).dest
-            if opposite_door.roomIndex > -1:
+            if opposite_door and opposite_door.roomIndex > -1:
                 dungeon_name = opposite_door.entrance.parent_region.dungeon.name
                 dungeon_id = boss_indicator[dungeon_name][0]
                 rom.write_byte(0x13f000+dungeon_id, opposite_door.roomIndex)
     rom.write_byte(0x139006, dr_flags.value)
     if dr_flags & DROptions.Town_Portal and world.mode[player] == 'inverted':
         rom.write_byte(0x139008, 1)
+
+    for portal in world.dungeon_portals[player]:
+        if not portal.default:
+            offset = portal.ent_offset
+            rom.write_byte(0x14577 + offset*2, portal.current_room())
+            rom.write_bytes(0x14681 + offset*8, portal.relative_coords())
+            rom.write_bytes(0x14aa9 + offset*2, portal.scroll_x())
+            rom.write_bytes(0x14bb3 + offset*2, portal.scroll_y())
+            rom.write_bytes(0x14cbd + offset*2, portal.link_y())
+            rom.write_bytes(0x14dc7 + offset*2, portal.link_x())
+            rom.write_bytes(0x14fdb + offset*2, portal.camera_x())
+            rom.write_byte(0x152f9 + offset, portal.bg_setting())
+            rom.write_byte(0x1537e + offset, portal.hv_scroll())
+            rom.write_byte(0x15403 + offset, portal.scroll_quad())
+            rom.write_byte(0x15aee + portal.exit_offset, portal.current_room())
+            if portal.boss_exit_idx > -1:
+                rom.write_byte(0x7939 + portal.boss_exit_idx, portal.current_room())
 
     # fix skull woods exit, if not fixed during exit patching
     if world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla':
@@ -1310,6 +1328,10 @@ def patch_rom(world, rom, player, team, enemized):
     else:
         rom.write_byte(0xFED31, 0x2A)  # preopen bombable exit
         rom.write_byte(0xFEE41, 0x2A)  # preopen bombable exit
+
+    for room in world.rooms:
+        if room.player == player and room.modified:
+            rom.write_bytes(room.address(), room.rom_data())
 
     write_strings(rom, world, player, team)
 
@@ -2139,7 +2161,8 @@ def patch_shuffled_dark_sanc(world, rom, player):
 
 # 24B118 and 20BB32
 compass_r_addr = 0x123118  # a9 90 24 8f 9a c7 7e
-compass_w_addr = 0x103b32  # e2 20 ad 0c 04 c9 00 d0
+# compass_w_addr = 0x103b32  # e2 20 ad 0c 04 c9 00 d0
+compass_w_addr = 0x103b42  # e2 20 ad 0c 04 c9 00 d0
 
 
 def compass_code_good(rom):

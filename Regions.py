@@ -198,18 +198,45 @@ def create_regions(world, player):
         create_dw_region(player, 'Pyramid Ledge', None, ['Pyramid Entrance', 'Pyramid Drop']),
     ]
 
+
 def create_dungeon_regions(world, player):
     std_flag = world.mode[player] == 'standard'
     inv_flag = world.mode[player] == 'inverted'
     world.regions += [
-        create_dungeon_region(player, 'Hyrule Castle Lobby', 'Hyrule Castle', None, ['Hyrule Castle Lobby W', 'Hyrule Castle Lobby E',
-                                                            'Hyrule Castle Lobby WN', 'Hyrule Castle Lobby North Stairs', 'Hyrule Castle Exit (South)']),
-        create_dungeon_region(player, 'Hyrule Castle West Lobby', 'Hyrule Castle', None, ['Hyrule Castle West Lobby E', 'Hyrule Castle West Lobby N',
-                                                                 'Hyrule Castle West Lobby EN', 'Hyrule Castle Exit (West)']),
-        create_dungeon_region(player, 'Hyrule Castle East Lobby', 'Hyrule Castle', None, ['Hyrule Castle East Lobby W', 'Hyrule Castle East Lobby N',
-                                                                 'Hyrule Castle East Lobby NW', 'Hyrule Castle Exit (East)']),
-        create_dungeon_region(player, 'Hyrule Castle East Hall', 'Hyrule Castle', None, ['Hyrule Castle East Hall W', 'Hyrule Castle East Hall S',
-                                                                'Hyrule Castle East Hall SW']),
+        create_dungeon_region(player, 'Sanctuary Placeholder', 'Twilight Zone', None, ['Sanctuary Exit']),
+        create_dungeon_region(player, 'Hyrule Castle West Placeholder', 'Twilight Zone', None, ['Hyrule Castle Exit (West)']),
+        create_dungeon_region(player, 'Hyrule Castle South Placeholder', 'Twilight Zone', None, ['Hyrule Castle Exit (South)']),
+        create_dungeon_region(player, 'Hyrule Castle East Placeholder', 'Twilight Zone', None, ['Hyrule Castle Exit (East)']),
+        create_dungeon_region(player, 'Eastern Placeholder', 'Twilight Zone', None, ['Eastern Palace Exit']),
+        create_dungeon_region(player, 'Desert West Placeholder', 'Twilight Zone', None, ['Desert Palace Exit (West)']),
+        create_dungeon_region(player, 'Desert South Placeholder', 'Twilight Zone', None, ['Desert Palace Exit (South)']),
+        create_dungeon_region(player, 'Desert East Placeholder', 'Twilight Zone', None, ['Desert Palace Exit (East)']),
+        create_dungeon_region(player, 'Desert Back Placeholder', 'Twilight Zone', None, ['Desert Palace Exit (North)']),
+        create_dungeon_region(player, 'Hera Placeholder', 'Twilight Zone', None, ['Tower of Hera Exit']),
+        create_dungeon_region(player, 'Agahnims Tower Placeholder', 'Twilight Zone', None, [inv_flag and 'Inverted Agahnims Tower Exit' or 'Agahnims Tower Exit']),
+        create_dungeon_region(player, 'Palace of Darkness Placeholder', 'Twilight Zone', None, ['Palace of Darkness Exit']),
+        create_dungeon_region(player, 'Swamp Placeholder', 'Twilight Zone', None, ['Swamp Palace Exit']),
+        create_dungeon_region(player, 'Skull 1 Placeholder', 'Twilight Zone', None, ['Skull Woods First Section Exit']),
+        create_dungeon_region(player, 'Skull 2 East Placeholder', 'Twilight Zone', None, ['Skull Woods Second Section Exit (East)']),
+        create_dungeon_region(player, 'Skull 2 West Placeholder', 'Twilight Zone', None, ['Skull Woods Second Section Exit (West)']),
+        create_dungeon_region(player, 'Skull 3 Placeholder', 'Twilight Zone', None, ['Skull Woods Final Section Exit']),
+        create_dungeon_region(player, 'Thieves Town Placeholder', 'Twilight Zone', None, ['Thieves Town Exit']),
+        create_dungeon_region(player, 'Ice Placeholder', 'Twilight Zone', None, ['Ice Palace Exit']),
+        create_dungeon_region(player, 'Mire Placeholder', 'Twilight Zone', None, ['Misery Mire Exit']),
+        create_dungeon_region(player, 'Turtle Rock Main Placeholder', 'Twilight Zone', None, ['Turtle Rock Exit (Front)']),
+        create_dungeon_region(player, 'Turtle Rock Lazy Eyes Placeholder', 'Twilight Zone', None, ['Turtle Rock Ledge Exit (West)']),
+        create_dungeon_region(player, 'Turtle Rock Chest Placeholder', 'Twilight Zone', None, ['Turtle Rock Ledge Exit (East)']),
+        create_dungeon_region(player, 'Turtle Rock Eye Bridge Placeholder', 'Twilight Zone', None, ['Turtle Rock Isolated Ledge Exit']),
+        create_dungeon_region(player, 'Ganons Tower Placeholder', 'Twilight Zone', None, [inv_flag and 'Inverted Ganons Tower Exit' or 'Ganons Tower Exit']),
+
+        create_dungeon_region(player, 'Hyrule Castle Lobby', 'Hyrule Castle', None,
+                              ['Hyrule Castle Lobby W', 'Hyrule Castle Lobby E', 'Hyrule Castle Lobby WN', 'Hyrule Castle Lobby North Stairs', 'Hyrule Castle Lobby S']),
+        create_dungeon_region(player, 'Hyrule Castle West Lobby', 'Hyrule Castle', None,
+                              ['Hyrule Castle West Lobby E', 'Hyrule Castle West Lobby N', 'Hyrule Castle West Lobby EN', 'Hyrule Castle West Lobby S']),
+        create_dungeon_region(player, 'Hyrule Castle East Lobby', 'Hyrule Castle', None,
+                              ['Hyrule Castle East Lobby W', 'Hyrule Castle East Lobby N', 'Hyrule Castle East Lobby NW', 'Hyrule Castle East Lobby S']),
+        create_dungeon_region(player, 'Hyrule Castle East Hall', 'Hyrule Castle', None,
+                              ['Hyrule Castle East Hall W', 'Hyrule Castle East Hall S', 'Hyrule Castle East Hall SW']),
         create_dungeon_region(player, 'Hyrule Castle West Hall', 'Hyrule Castle', None, ['Hyrule Castle West Hall E', 'Hyrule Castle West Hall S']),
         create_dungeon_region(player, 'Hyrule Castle Back Hall', 'Hyrule Castle', None, ['Hyrule Castle Back Hall E', 'Hyrule Castle Back Hall W', 'Hyrule Castle Back Hall Down Stairs']),
         create_dungeon_region(player, 'Hyrule Castle Throne Room', 'Hyrule Castle', None, ['Hyrule Castle Throne Room Tapestry', 'Hyrule Castle Throne Room South Stairs']),
@@ -244,10 +271,10 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Sewers Pull Switch', 'Hyrule Castle', None, ['Sewers Pull Switch N', 'Sewers Pull Switch S']),
         create_dungeon_region(player, 'Sanctuary', 'Hyrule Castle',
                               ['Sanctuary'] if not std_flag else ['Sanctuary', 'Zelda Drop Off'],
-                              ['Sanctuary Exit', 'Sanctuary N']),
+                              ['Sanctuary S', 'Sanctuary N']),
 
         # Eastern Palace
-        create_dungeon_region(player, 'Eastern Lobby', 'Eastern Palace', None, ['Eastern Lobby N', 'Eastern Palace Exit', 'Eastern Lobby NW', 'Eastern Lobby NE']),
+        create_dungeon_region(player, 'Eastern Lobby', 'Eastern Palace', None, ['Eastern Lobby N', 'Eastern Lobby S', 'Eastern Lobby NW', 'Eastern Lobby NE']),
         create_dungeon_region(player, 'Eastern Lobby Bridge', 'Eastern Palace', None, ['Eastern Lobby Bridge S', 'Eastern Lobby Bridge N']),
         create_dungeon_region(player, 'Eastern Lobby Left Ledge', 'Eastern Palace', None, ['Eastern Lobby Left Ledge SW']),
         create_dungeon_region(player, 'Eastern Lobby Right Ledge', 'Eastern Palace', None, ['Eastern Lobby Right Ledge SE']),
@@ -279,11 +306,11 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Eastern Boss', 'Eastern Palace', ['Eastern Palace - Boss', 'Eastern Palace - Prize'], ['Eastern Boss SE']),
 
         # Desert Palace
-        create_dungeon_region(player, 'Desert Main Lobby', 'Desert Palace', None, ['Desert Palace Exit (South)', 'Desert Main Lobby N Edge', 'Desert Main Lobby Left Path', 'Desert Main Lobby Right Path']),
+        create_dungeon_region(player, 'Desert Main Lobby', 'Desert Palace', None, ['Desert Main Lobby S', 'Desert Main Lobby N Edge', 'Desert Main Lobby Left Path', 'Desert Main Lobby Right Path']),
         create_dungeon_region(player, 'Desert Left Alcove', 'Desert Palace', None, ['Desert Main Lobby NW Edge', 'Desert Left Alcove Path']),
         create_dungeon_region(player, 'Desert Right Alcove', 'Desert Palace', None, ['Desert Main Lobby NE Edge', 'Desert Main Lobby E Edge', 'Desert Right Alcove Path']),
         create_dungeon_region(player, 'Desert Dead End', 'Desert Palace', None, ['Desert Dead End Edge']),
-        create_dungeon_region(player, 'Desert East Lobby', 'Desert Palace', None, ['Desert East Lobby WS', 'Desert Palace Exit (East)']),
+        create_dungeon_region(player, 'Desert East Lobby', 'Desert Palace', None, ['Desert East Lobby WS', 'Desert East Lobby S']),
         create_dungeon_region(player, 'Desert East Wing', 'Desert Palace', None, ['Desert East Wing ES', 'Desert East Wing Key Door EN', 'Desert East Wing W Edge', 'Desert East Wing N Edge']),
         create_dungeon_region(player, 'Desert Compass Room', 'Desert Palace', ['Desert Palace - Compass Chest'], ['Desert Compass Key Door WN', 'Desert Compass NW']),
         create_dungeon_region(player, 'Desert Cannonball', 'Desert Palace', ['Desert Palace - Big Key Chest'], ['Desert Cannonball S']),
@@ -296,9 +323,9 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Desert Circle of Pots', 'Desert Palace', None, ['Desert Circle of Pots ES', 'Desert Circle of Pots NW']),
         create_dungeon_region(player, 'Desert Big Chest Room', 'Desert Palace', ['Desert Palace - Big Chest'], ['Desert Big Chest SW']),
         create_dungeon_region(player, 'Desert West Wing', 'Desert Palace', None, ['Desert West Wing N Edge', 'Desert West Wing WS']),
-        create_dungeon_region(player, 'Desert West Lobby', 'Desert Palace', None, ['Desert West Lobby ES', 'Desert Palace Exit (West)', 'Desert West Lobby NW']),
+        create_dungeon_region(player, 'Desert West Lobby', 'Desert Palace', None, ['Desert West Lobby ES', 'Desert West S', 'Desert West Lobby NW']),
         create_dungeon_region(player, 'Desert Fairy Fountain', 'Desert Palace', None, ['Desert Fairy Fountain SW']),
-        create_dungeon_region(player, 'Desert Back Lobby', 'Desert Palace', None, ['Desert Palace Exit (North)', 'Desert Back Lobby NW']),
+        create_dungeon_region(player, 'Desert Back Lobby', 'Desert Palace', None, ['Desert Back Lobby S', 'Desert Back Lobby NW']),
         create_dungeon_region(player, 'Desert Tiles 1', 'Desert Palace', ['Desert Palace - Desert Tiles 1 Pot Key'], ['Desert Tiles 1 SW', 'Desert Tiles 1 Up Stairs']),
         create_dungeon_region(player, 'Desert Bridge', 'Desert Palace', None, ['Desert Bridge Down Stairs', 'Desert Bridge SW']),
         create_dungeon_region(player, 'Desert Four Statues', 'Desert Palace', None, ['Desert Four Statues NW', 'Desert Four Statues ES']),
@@ -308,7 +335,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Desert Boss', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize'], ['Desert Boss SW']),
 
         # Hera
-        create_dungeon_region(player, 'Hera Lobby', 'Tower of Hera', ['Tower of Hera - Map Chest'], ['Hera Lobby Down Stairs', 'Hera Lobby Key Stairs', 'Hera Lobby Up Stairs', 'Tower of Hera Exit']),
+        create_dungeon_region(player, 'Hera Lobby', 'Tower of Hera', ['Tower of Hera - Map Chest'], ['Hera Lobby Down Stairs', 'Hera Lobby Key Stairs', 'Hera Lobby Up Stairs', 'Hera Lobby S']),
         create_dungeon_region(player, 'Hera Basement Cage', 'Tower of Hera', ['Tower of Hera - Basement Cage'], ['Hera Basement Cage Up Stairs']),
         create_dungeon_region(player, 'Hera Tile Room', 'Tower of Hera', None, ['Hera Tile Room Up Stairs', 'Hera Tile Room EN']),
         create_dungeon_region(player, 'Hera Tridorm', 'Tower of Hera', None, ['Hera Tridorm WN', 'Hera Tridorm SE']),
@@ -323,7 +350,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Hera Boss', 'Tower of Hera', ['Tower of Hera - Boss', 'Tower of Hera - Prize'], ['Hera Boss Down Stairs', 'Hera Boss Outer Hole', 'Hera Boss Inner Hole']),
 
         # AgaTower
-        create_dungeon_region(player, 'Tower Lobby', 'Castle Tower', None, ['Tower Lobby NW', inv_flag and 'Inverted Agahnims Tower Exit' or 'Agahnims Tower Exit']),
+        create_dungeon_region(player, 'Tower Lobby', 'Castle Tower', None, ['Tower Lobby NW', 'Tower Lobby S']),
         create_dungeon_region(player, 'Tower Gold Knights', 'Castle Tower', None, ['Tower Gold Knights SW', 'Tower Gold Knights EN']),
         create_dungeon_region(player, 'Tower Room 03', 'Castle Tower', ['Castle Tower - Room 03'], ['Tower Room 03 WN', 'Tower Room 03 Up Stairs']),
         create_dungeon_region(player, 'Tower Lone Statue', 'Castle Tower', None, ['Tower Lone Statue Down Stairs', 'Tower Lone Statue WN']),
@@ -343,7 +370,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Tower Agahnim 1', 'Castle Tower', ['Agahnim 1'], ['Tower Agahnim 1 SW']),
 
         # pod
-        create_dungeon_region(player, 'PoD Lobby', 'Palace of Darkness', None, ['PoD Lobby N', 'PoD Lobby NW', 'PoD Lobby NE', 'Palace of Darkness Exit']),
+        create_dungeon_region(player, 'PoD Lobby', 'Palace of Darkness', None, ['PoD Lobby N', 'PoD Lobby NW', 'PoD Lobby NE', 'PoD Lobby S']),
         create_dungeon_region(player, 'PoD Left Cage', 'Palace of Darkness', None, ['PoD Left Cage SW', 'PoD Left Cage Down Stairs']),
         create_dungeon_region(player, 'PoD Middle Cage', 'Palace of Darkness', None, ['PoD Middle Cage S', 'PoD Middle Cage SE', 'PoD Middle Cage N', 'PoD Middle Cage Down Stairs']),
         create_dungeon_region(player, 'PoD Shooter Room', 'Palace of Darkness', ['Palace of Darkness - Shooter Room'], ['PoD Shooter Room Up Stairs']),
@@ -381,7 +408,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'PoD Boss', 'Palace of Darkness', ['Palace of Darkness - Boss', 'Palace of Darkness - Prize'], ['PoD Boss SE']),
 
         # swamp
-        create_dungeon_region(player, 'Swamp Lobby', 'Swamp Palace', None, ['Swamp Palace Exit', 'Swamp Lobby Moat']),
+        create_dungeon_region(player, 'Swamp Lobby', 'Swamp Palace', None, ['Swamp Lobby S', 'Swamp Lobby Moat']),
         create_dungeon_region(player, 'Swamp Entrance', 'Swamp Palace', ['Swamp Palace - Entrance'], ['Swamp Entrance Down Stairs', 'Swamp Entrance Moat']),
         create_dungeon_region(player, 'Swamp Pot Row', 'Swamp Palace', ['Swamp Palace - Pot Row Pot Key'], ['Swamp Pot Row Up Stairs', 'Swamp Pot Row WN', 'Swamp Pot Row WS']),
         create_dungeon_region(player, 'Swamp Map Ledge', 'Swamp Palace', ['Swamp Palace - Map Chest'], ['Swamp Map Ledge EN']),
@@ -430,7 +457,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Swamp Boss', 'Swamp Palace', ['Swamp Palace - Boss', 'Swamp Palace - Prize'], ['Swamp Boss SW']),
 
         # sw
-        create_dungeon_region(player, 'Skull 1 Lobby', 'Skull Woods', None, ['Skull Woods First Section Exit', 'Skull 1 Lobby WS', 'Skull 1 Lobby ES']),
+        create_dungeon_region(player, 'Skull 1 Lobby', 'Skull Woods', None, ['Skull 1 Lobby S', 'Skull 1 Lobby WS', 'Skull 1 Lobby ES']),
         create_dungeon_region(player, 'Skull Map Room', 'Skull Woods', ['Skull Woods - Map Chest'], ['Skull Map Room WS', 'Skull Map Room SE']),
         create_dungeon_region(player, 'Skull Pot Circle', 'Skull Woods', None, ['Skull Pot Circle WN', 'Skull Pot Circle Star Path']),
         create_dungeon_region(player, 'Skull Pull Switch', 'Skull Woods', None, ['Skull Pull Switch EN', 'Skull Pull Switch S']),
@@ -439,14 +466,14 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Skull Pot Prison', 'Skull Woods', ['Skull Woods - Pot Prison'], ['Skull Pot Prison ES', 'Skull Pot Prison SE']),
         create_dungeon_region(player, 'Skull Compass Room', 'Skull Woods', ['Skull Woods - Compass Chest'], ['Skull Compass Room NE', 'Skull Compass Room ES', 'Skull Compass Room WS']),
         create_dungeon_region(player, 'Skull Left Drop', 'Skull Woods', None, ['Skull Left Drop ES']),
-        create_dungeon_region(player, 'Skull 2 East Lobby', 'Skull Woods', None, ['Skull 2 East Lobby NW', 'Skull 2 East Lobby WS', 'Skull Woods Second Section Exit (East)']),
+        create_dungeon_region(player, 'Skull 2 East Lobby', 'Skull Woods', None, ['Skull 2 East Lobby NW', 'Skull 2 East Lobby WS', 'Skull 2 East Lobby SW']),
         create_dungeon_region(player, 'Skull Big Key', 'Skull Woods', ['Skull Woods - Big Key Chest'], ['Skull Big Key SW', 'Skull Big Key WN']),
         create_dungeon_region(player, 'Skull Lone Pot', 'Skull Woods', None, ['Skull Lone Pot EN']),
         create_dungeon_region(player, 'Skull Small Hall', 'Skull Woods', None, ['Skull Small Hall ES', 'Skull Small Hall WS']),
         create_dungeon_region(player, 'Skull Back Drop', 'Skull Woods', None, ['Skull Back Drop Star Path', ]),
-        create_dungeon_region(player, 'Skull 2 West Lobby', 'Skull Woods', ['Skull Woods - West Lobby Pot Key'], ['Skull 2 West Lobby ES', 'Skull 2 West Lobby NW', 'Skull Woods Second Section Exit (West)']),
+        create_dungeon_region(player, 'Skull 2 West Lobby', 'Skull Woods', ['Skull Woods - West Lobby Pot Key'], ['Skull 2 West Lobby ES', 'Skull 2 West Lobby NW', 'Skull 2 West Lobby S']),
         create_dungeon_region(player, 'Skull X Room', 'Skull Woods', None, ['Skull X Room SW']),
-        create_dungeon_region(player, 'Skull 3 Lobby', 'Skull Woods', None, ['Skull 3 Lobby NW', 'Skull 3 Lobby EN', 'Skull Woods Final Section Exit']),
+        create_dungeon_region(player, 'Skull 3 Lobby', 'Skull Woods', None, ['Skull 3 Lobby NW', 'Skull 3 Lobby EN', 'Skull 3 Lobby SW']),
         create_dungeon_region(player, 'Skull East Bridge', 'Skull Woods', None, ['Skull East Bridge WN', 'Skull East Bridge WS']),
         create_dungeon_region(player, 'Skull West Bridge Nook', 'Skull Woods', ['Skull Woods - Bridge Room'], ['Skull West Bridge Nook ES']),
         create_dungeon_region(player, 'Skull Star Pits', 'Skull Woods', None, ['Skull Star Pits SW', 'Skull Star Pits ES']),
@@ -457,7 +484,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Skull Boss', 'Skull Woods', ['Skull Woods - Boss', 'Skull Woods - Prize']),
 
         # tt
-        create_dungeon_region(player, 'Thieves Lobby', 'Thieves\' Town', ['Thieves\' Town - Map Chest'], ['Thieves Town Exit', 'Thieves Lobby N Edge', 'Thieves Lobby NE Edge', 'Thieves Lobby E']),
+        create_dungeon_region(player, 'Thieves Lobby', 'Thieves\' Town', ['Thieves\' Town - Map Chest'], ['Thieves Lobby S', 'Thieves Lobby N Edge', 'Thieves Lobby NE Edge', 'Thieves Lobby E']),
         create_dungeon_region(player, 'Thieves Ambush', 'Thieves\' Town', ['Thieves\' Town - Ambush Chest'], ['Thieves Ambush S Edge', 'Thieves Ambush SE Edge', 'Thieves Ambush ES Edge', 'Thieves Ambush EN Edge', 'Thieves Ambush E']),
         create_dungeon_region(player, 'Thieves Rail Ledge', 'Thieves\' Town', None, ['Thieves Rail Ledge NW', 'Thieves Rail Ledge W', 'Thieves Rail Ledge Drop Down']),
         create_dungeon_region(player, 'Thieves BK Corner', 'Thieves\' Town', None, ['Thieves BK Corner WN Edge', 'Thieves BK Corner WS Edge', 'Thieves BK Corner S Edge', 'Thieves BK Corner SW Edge', 'Thieves BK Corner NE']),
@@ -490,7 +517,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Thieves Trap', 'Thieves\' Town', None, ['Thieves Trap EN']),
 
         # ice
-        create_dungeon_region(player, 'Ice Lobby', 'Ice Palace', None, ['Ice Palace Exit', 'Ice Lobby WS']),
+        create_dungeon_region(player, 'Ice Lobby', 'Ice Palace', None, ['Ice Lobby SE', 'Ice Lobby WS']),
         create_dungeon_region(player, 'Ice Jelly Key', 'Ice Palace', ['Ice Palace - Jelly Key Drop'], ['Ice Jelly Key ES', 'Ice Jelly Key Down Stairs']),
         create_dungeon_region(player, 'Ice Floor Switch', 'Ice Palace', None, ['Ice Floor Switch Up Stairs', 'Ice Floor Switch ES']),
         create_dungeon_region(player, 'Ice Cross Left', 'Ice Palace', None, ['Ice Cross Left WS', 'Ice Cross Left Push Block']),
@@ -538,7 +565,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Ice Boss', 'Ice Palace', ['Ice Palace - Boss', 'Ice Palace - Prize']),
 
         # mire
-        create_dungeon_region(player, 'Mire Lobby', 'Misery Mire', None, ['Misery Mire Exit', 'Mire Lobby Gap']),
+        create_dungeon_region(player, 'Mire Lobby', 'Misery Mire', None, ['Mire Lobby S', 'Mire Lobby Gap']),
         create_dungeon_region(player, 'Mire Post-Gap', 'Misery Mire', None, ['Mire Post-Gap Gap', 'Mire Post-Gap Down Stairs']),
         create_dungeon_region(player, 'Mire 2', 'Misery Mire', None, ['Mire 2 Up Stairs', 'Mire 2 NE']),
         create_dungeon_region(player, 'Mire Hub', 'Misery Mire', None, ['Mire Hub SE', 'Mire Hub ES', 'Mire Hub E', 'Mire Hub NE', 'Mire Hub WN', 'Mire Hub WS', 'Mire Hub Upper Blue Barrier', 'Mire Hub Lower Blue Barrier']),
@@ -595,7 +622,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Mire Boss', 'Misery Mire', ['Misery Mire - Boss', 'Misery Mire - Prize'], ['Mire Boss SW']),
 
         # tr
-        create_dungeon_region(player, 'TR Main Lobby', 'Turtle Rock', None, ['TR Main Lobby Gap', 'Turtle Rock Exit (Front)']),
+        create_dungeon_region(player, 'TR Main Lobby', 'Turtle Rock', None, ['TR Main Lobby Gap', 'TR Main Lobby SE']),
         create_dungeon_region(player, 'TR Lobby Ledge', 'Turtle Rock', None, ['TR Lobby Ledge NE', 'TR Lobby Ledge Gap']),
         create_dungeon_region(player, 'TR Compass Room', 'Turtle Rock', ['Turtle Rock - Compass Chest'], ['TR Compass Room NW']),
         create_dungeon_region(player, 'TR Hub', 'Turtle Rock', None, ['TR Hub SW', 'TR Hub SE', 'TR Hub ES', 'TR Hub EN', 'TR Hub NW', 'TR Hub NE']),
@@ -617,8 +644,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'TR Dodgers', 'Turtle Rock', None, ['TR Dodgers WN', 'TR Dodgers SE', 'TR Dodgers NE']),
         create_dungeon_region(player, 'TR Big View', 'Turtle Rock', None, ['TR Big View WS']),
         create_dungeon_region(player, 'TR Big Chest', 'Turtle Rock', ['Turtle Rock - Big Chest'], ['TR Big Chest Gap', 'TR Big Chest NE']),
-        create_dungeon_region(player, 'TR Big Chest Entrance', 'Turtle Rock', None, ['Turtle Rock Ledge Exit (East)', 'TR Big Chest Entrance Gap']),
-        create_dungeon_region(player, 'TR Lazy Eyes', 'Turtle Rock', None, ['Turtle Rock Ledge Exit (West)', 'TR Lazy Eyes ES']),
+        create_dungeon_region(player, 'TR Big Chest Entrance', 'Turtle Rock', None, ['TR Big Chest Entrance SE', 'TR Big Chest Entrance Gap']),
+        create_dungeon_region(player, 'TR Lazy Eyes', 'Turtle Rock', None, ['TR Lazy Eyes SE', 'TR Lazy Eyes ES']),
         create_dungeon_region(player, 'TR Dash Room', 'Turtle Rock', None, ['TR Dash Room SW', 'TR Dash Room ES', 'TR Dash Room NW']),
         create_dungeon_region(player, 'TR Tongue Pull', 'Turtle Rock', None, ['TR Tongue Pull WS', 'TR Tongue Pull NE']),
         create_dungeon_region(player, 'TR Rupees', 'Turtle Rock', None, ['TR Rupees SE']),
@@ -627,14 +654,14 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'TR Dash Bridge', 'Turtle Rock', None, ['TR Dash Bridge NW', 'TR Dash Bridge SW', 'TR Dash Bridge WS']),
         create_dungeon_region(player, 'TR Eye Bridge', 'Turtle Rock', ['Turtle Rock - Eye Bridge - Bottom Left', 'Turtle Rock - Eye Bridge - Bottom Right',
                                                                        'Turtle Rock - Eye Bridge - Top Left', 'Turtle Rock - Eye Bridge - Top Right'],
-                              ['Turtle Rock Isolated Ledge Exit', 'TR Eye Bridge NW']),
+                              ['TR Eye Bridge SW', 'TR Eye Bridge NW']),
         create_dungeon_region(player, 'TR Crystal Maze', 'Turtle Rock', None, ['TR Crystal Maze ES', 'TR Crystal Maze Forwards Path']),
         create_dungeon_region(player, 'TR Crystal Maze End', 'Turtle Rock', None, ['TR Crystal Maze Blue Path', 'TR Crystal Maze Cane Path', 'TR Crystal Maze North Stairs']),
         create_dungeon_region(player, 'TR Final Abyss', 'Turtle Rock', None, ['TR Final Abyss South Stairs', 'TR Final Abyss NW']),
         create_dungeon_region(player, 'TR Boss', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize'], ['TR Boss SW']),
 
         # gt
-        create_dungeon_region(player, 'GT Lobby', 'Ganon\'s Tower', None, ['GT Lobby Left Down Stairs', 'GT Lobby Up Stairs', 'GT Lobby Right Down Stairs', inv_flag and 'Inverted Ganons Tower Exit' or 'Ganons Tower Exit']),
+        create_dungeon_region(player, 'GT Lobby', 'Ganon\'s Tower', None, ['GT Lobby Left Down Stairs', 'GT Lobby Up Stairs', 'GT Lobby Right Down Stairs', 'GT Lobby S']),
         create_dungeon_region(player, 'GT Bob\'s Torch', 'Ganon\'s Tower', ['Ganons Tower - Bob\'s Torch'], ['GT Torch Up Stairs', 'GT Torch WN', 'GT Torch EN', 'GT Torch SW']),
         create_dungeon_region(player, 'GT Hope Room', 'Ganon\'s Tower', ['Ganons Tower - Hope Room - Left', 'Ganons Tower - Hope Room - Right'], ['GT Hope Room Up Stairs', 'GT Hope Room WN', 'GT Hope Room EN']),
         create_dungeon_region(player, 'GT Big Chest', 'Ganon\'s Tower', ['Ganons Tower - Big Chest'], ['GT Big Chest NW', 'GT Big Chest SW']),
@@ -653,13 +680,13 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'GT Hookshot East Platform', 'Ganon\'s Tower', None, ['GT Hookshot EN', 'GT Hookshot East-North Path', 'GT Hookshot East-South Path']),
         create_dungeon_region(player, 'GT Hookshot North Platform', 'Ganon\'s Tower', None, ['GT Hookshot NW', 'GT Hookshot North-East Path', 'GT Hookshot North-South Path']),
         create_dungeon_region(player, 'GT Hookshot South Platform', 'Ganon\'s Tower', None, ['GT Hookshot ES', 'GT Hookshot South-East Path', 'GT Hookshot South-North Path', 'GT Hookshot Platform Blue Barrier']),
-        create_dungeon_region(player, 'GT Hookshot South Entry', 'Ganon\'s Tower', None, ['GT Hookshot SW', 'GT Hookshot Entry Blue Barrier']),
+        create_dungeon_region(player, 'GT Hookshot South Entry', 'Ganon\'s Tower', None, ['GT Hookshot SW', 'GT Hookshot Entry Blue Barrier', ]),
         create_dungeon_region(player, 'GT Map Room', 'Ganon\'s Tower', ['Ganons Tower - Map Chest'], ['GT Map Room WS']),
         create_dungeon_region(player, 'GT Double Switch Entry', 'Ganon\'s Tower', None, ['GT Double Switch NW', 'GT Double Switch Orange Barrier', 'GT Double Switch Orange Barrier 2']),
         create_dungeon_region(player, 'GT Double Switch Switches', 'Ganon\'s Tower', None, ['GT Double Switch Blue Path', 'GT Double Switch Orange Path']),
         create_dungeon_region(player, 'GT Double Switch Transition', 'Ganon\'s Tower', None, ['GT Double Switch Transition Blue']),
         create_dungeon_region(player, 'GT Double Switch Key Spot', 'Ganon\'s Tower', ['Ganons Tower - Double Switch Pot Key'], ['GT Double Switch Key Blue Path', 'GT Double Switch Key Orange Path']),
-        create_dungeon_region(player, 'GT Double Switch Exit', 'Ganon\'s Tower', None, ['GT Double Switch EN', 'GT Double Switch Blue Barrier']),
+        create_dungeon_region(player, 'GT Double Switch Exit', 'Ganon\'s Tower', None, ['GT Double Switch EN', 'GT Double Switch Blue Barrier', 'GT Hookshot Entry Boomerang Path']),
         create_dungeon_region(player, 'GT Spike Crystals', 'Ganon\'s Tower', None, ['GT Spike Crystals WN', 'GT Spike Crystals Warp']),
         create_dungeon_region(player, 'GT Warp Maze - Left Section', 'Ganon\'s Tower', None, ['GT Warp Maze - Left Section Warp']),
         create_dungeon_region(player, 'GT Warp Maze - Mid Section', 'Ganon\'s Tower', None, ['GT Warp Maze - Mid Section Left Warp', 'GT Warp Maze - Mid Section Right Warp']),

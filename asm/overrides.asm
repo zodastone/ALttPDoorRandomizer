@@ -80,3 +80,26 @@ BlindAtticFix:
         lda #$01 : rtl
     + lda $7EF3CC : cmp.b #$06
     rtl
+
+SuctionOverworldFix:
+    stz $50 : stz $5e
+    lda.l DRMode : beq +
+        stz $49
+    + rtl
+
+CutoffEntranceRug:
+    pha
+    lda.l DRMode : beq +
+        lda $04 : cmp #$000A : bne +
+          lda $a0 : cmp #$00BC : beq .check ;; TT Alcove
+          cmp #$00A2 : beq .check  ; Mire Bridges
+          cmp #$00C2 : bne +  ; Mire Hub
+          .check
+              lda $0c : cmp #$0007 : !bge .skip
+              lda $0e : cmp #$0009 : !bge .skip
+              cmp #$0003 : !blt .skip
+          bra +
+            .skip pla : rtl
+    + pla : lda $9B52, y : sta $7E2000, x ; what we wrote over
+rtl
+

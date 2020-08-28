@@ -126,27 +126,27 @@ ConvertToDisplay2:
         + !add #$2816 : rts
     ++ lda #$2483 : rts ; 0/O for 0 or placeholder digit
 
-CountChestKeys:
-    jsl ItemDowngradeFix
-    jsr CountChest
-    rtl
+;CountChestKeys:
+;    jsl ItemDowngradeFix
+;    jsr CountChest
+;    rtl
 
-CountChest:
-    lda !MULTIWORLD_ITEM_PLAYER_ID : bne .end
-    cpy #$24 : beq +
-    cpy #$a0 : !blt .end
-    cpy #$ae : !bge .end
-        pha : phx
-        tya : and #$0f : bne ++
-            inc a
-        ++ tax : bra .count
-    + pha : phx
-    lda $040c : lsr : tax
-    .count
-    lda $7ef4b0, x : inc : sta $7ef4b0, x
-    lda $7ef4e0, x : inc : sta $7ef4e0, x
-    .restore plx : pla
-    .end rts
+;CountChest:
+;    lda !MULTIWORLD_ITEM_PLAYER_ID : bne .end
+;    cpy #$24 : beq +
+;    cpy #$a0 : !blt .end
+;    cpy #$ae : !bge .end
+;        pha : phx
+;        tya : and #$0f : bne ++
+;            inc a
+;        ++ tax : bra .count
+;    + pha : phx
+;    lda $040c : lsr : tax
+;    .count
+;    lda $7ef4b0, x : inc : sta $7ef4b0, x
+;    lda $7ef4e0, x : inc : sta $7ef4e0, x
+;    .restore plx : pla
+;    .end rts
 
 CountAbsorbedKeys:
     jsl IncrementSmallKeysNoPrimary : phx
@@ -155,19 +155,19 @@ CountAbsorbedKeys:
         lda $7ef4b0, x : inc : sta $7ef4b0, x
     + plx : rtl
 
-CountBonkItem:
-    jsl GiveBonkItem
-    lda $a0 ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
-    cmp #115 : bne + ; Desert Bonk Key
-        lda.l BonkKey_Desert
-        bra ++
-    + : cmp #140 : bne + ; GTower Bonk Key
-        lda.l BonkKey_GTower
-        bra ++
-    + lda.b #$24 ; default to small key
-    ++ cmp #$24 : bne +
-        phy : tay : jsr CountChest : ply
-    + rtl
+;CountBonkItem:
+;    jsl GiveBonkItem
+;    lda $a0 ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
+;    cmp #115 : bne + ; Desert Bonk Key
+;        lda.l BonkKey_Desert
+;        bra ++
+;    + : cmp #140 : bne + ; GTower Bonk Key
+;        lda.l BonkKey_GTower
+;        bra ++
+;    + lda.b #$24 ; default to small key
+;    ++ cmp #$24 : bne +
+;        phy : tay : jsr CountChest : ply
+;    + rtl
 
 ;================================================================================
 ; 16-bit A, 8-bit X

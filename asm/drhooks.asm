@@ -101,9 +101,11 @@ nop : stz $0dd0, X : rts
 .not_in_ganons_tower
 
 
-org $208206
+;org $208206
+org $20820E
 jsl MirrorCheckOverride2
-org $208270
+;org $208270
+org $208278
 jsl MirrorCheckOverride2
 org $07a955 ; <- Bank07.asm : around 6564 (JP is a bit different) (STZ $05FC : STZ $05FD)
 jsl BlockEraseFix
@@ -123,19 +125,27 @@ nop #3
 org $028fc9
 nop #2 : jsl BlindAtticFix
 
+org $028409
+jsl SuctionOverworldFix
+
 ; also rando's hooks.asm line 1360
 ; 106e4e -> goes to  a0ee4e
-org $a0ee8a ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
+;org $a0ee8a ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
+org $a0ee9a
 jsl DrHudOverride
 org $0ded04 ; <- rando's hooks.asm line 2192 - 6ED04 - equipment.asm : 1963 (REP #$30)
 jsl DrHudDungeonItemsAdditions
-org $098638 ; rando's hooks.asm line 2192
-jsl CountChestKeys
+;org $098638 ; rando's hooks.asm line 2192
+;jsl CountChestKeys
 org $06D192 ; rando's hooks.asm line 457
 jsl CountAbsorbedKeys
 ; rando's hooks.asm line 1020
-org $05FC7E ; <- 2FC7E - sprite_dash_item.asm : 118 (LDA $7EF36F : INC A : STA $7EF36F)
-jsl CountBonkItem
+;org $05FC7E ; <- 2FC7E - sprite_dash_item.asm : 118 (LDA $7EF36F : INC A : STA $7EF36F)
+;jsl CountBonkItem
+
+org $019dbd ; <- Bank01.asm : 4465 of Object_Draw8xN (LDA $9B52, Y : STA $7E2000, X)
+jsl CutoffEntranceRug : bra .nextTile : nop
+.nextTile
 
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes
