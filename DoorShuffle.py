@@ -1010,8 +1010,8 @@ def reassign_key_doors(builder, world, player):
                         dp.pair = False
                 if not found:
                     world.paired_doors[player].append(PairedDoor(d1.name, d2.name))
-                    change_door_to_small_key(d1, world, player)
-                    change_door_to_small_key(d2, world, player)
+                change_door_to_small_key(d1, world, player)
+                change_door_to_small_key(d2, world, player)
             world.spoiler.set_door_type(d1.name+' <-> '+d2.name, 'Key Door', player)
             logger.debug('Key Door: %s', d1.name+' <-> '+d2.name)
         else:
