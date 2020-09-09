@@ -602,7 +602,7 @@ def patch_rom(world, rom, player, team, enemized):
 
     # patch doors
     if world.doorShuffle[player] == 'crossed':
-        rom.write_byte(0x139004, 2)
+        rom.write_byte(0x138002, 2)
         for name, layout in world.key_layout[player].items():
             offset = compass_data[name][4]//2
             rom.write_byte(0x13f01c+offset, layout.max_chests + layout.max_drops)
@@ -621,7 +621,7 @@ def patch_rom(world, rom, player, team, enemized):
         else:
             logging.getLogger('').warning('Randomizer rom update! Compasses in crossed are borken')
     if world.doorShuffle[player] == 'basic':
-        rom.write_byte(0x139004, 1)
+        rom.write_byte(0x138002, 1)
     for door in world.doors:
         if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs,
                                                                              DoorType.Open, DoorType.StraightStairs]:
@@ -644,9 +644,11 @@ def patch_rom(world, rom, player, team, enemized):
                 dungeon_name = opposite_door.entrance.parent_region.dungeon.name
                 dungeon_id = boss_indicator[dungeon_name][0]
                 rom.write_byte(0x13f000+dungeon_id, opposite_door.roomIndex)
-    rom.write_byte(0x139006, dr_flags.value)
+            elif not opposite_door:
+                rom.write_byte(0x13f000+dungeon_id, 0)  # no supertile preceeding boss
+    rom.write_byte(0x138004, dr_flags.value)
     if dr_flags & DROptions.Town_Portal and world.mode[player] == 'inverted':
-        rom.write_byte(0x139008, 1)
+        rom.write_byte(0x138006, 1)
 
     # fix skull woods exit, if not fixed during exit patching
     if world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla':
