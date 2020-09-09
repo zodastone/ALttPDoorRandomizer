@@ -93,6 +93,7 @@ CutoffEntranceRug:
         lda $04 : cmp #$000A : bne +
           lda $a0 : cmp #$00BC : beq .check ;; TT Alcove
           cmp #$00A2 : beq .check  ; Mire Bridges
+          cmp #$001A : beq .check  ; pod falling
           cmp #$00C2 : bne +  ; Mire Hub
           .check
               lda $0c : cmp #$0007 : !bge .skip

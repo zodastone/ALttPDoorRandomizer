@@ -327,13 +327,22 @@ def choose_portals(world, player):
         for dungeon, portal_list in dungeon_portals.items():
             info = DungeonInfo(dungeon)
             region_map = defaultdict(list)
+            reachable_portals = []
             for portal in portal_list:
                 placeholder = world.get_region(portal + ' Placeholder', player)
-                portal_place = placeholder.exits[0].connected_region.name
-                if portal_place in world.inaccessible_regions[player]:
-                    region_map[portal_place].append(portal)
+                portal_region = placeholder.exits[0].connected_region
+                if portal_region.type == RegionType.LightWorld:
+                    world.get_portal(portal, player).light_world = True
+                if portal_region.name in world.inaccessible_regions[player]:
+                    region_map[portal_region.name].append(portal)
+                else:
+                    reachable_portals.append(portal)
             info.total = len(portal_list)
             info.required_passage = region_map
+            if len(reachable_portals) == 0:
+                raise Exception('please inspect this case')
+            if len(reachable_portals) == 1:
+                info.sole_entrance = reachable_portals[0]
             info_map[dungeon] = info
 
         master_door_list = [x for x in world.doors if x.player == player and x.portalAble]
@@ -352,7 +361,8 @@ def choose_portals(world, player):
             dead_end_choices = info.total - 1 - len(portal_assignment[dungeon])
             for i in range(0, dead_end_choices):
                 candidates = find_portal_candidates(master_door_list, dungeon, dead_end_allowed=True, crossed=cross_flag)
-                choice, portal = assign_portal(candidates, outstanding_portals, world, player)
+                possible_portals = outstanding_portals if not info.sole_entrance else [x for x in outstanding_portals if x != info.sole_entrance]
+                choice, portal = assign_portal(candidates, possible_portals, world, player)
                 if choice.deadEnd:
                     portal.deadEnd = True
                 clean_up_portal_assignment(portal_assignment, dungeon, portal, master_door_list, outstanding_portals)
@@ -759,7 +769,7 @@ def cross_dungeon(world, player):
         possible_portals = []
         for portal_name in dungeon_portals[d_name]:
             portal = world.get_portal(portal_name, player)
-            if portal.door ==  'Sanctuary S':
+            if portal.door == 'Sanctuary S':
                 possible_portals.clear()
                 possible_portals.append(portal)
                 break
@@ -778,6 +788,24 @@ def cross_dungeon(world, player):
                 if state.visited(sanctuary):
                     reachable_portals.append(portal)
             world.sanc_portal[player] = random.choice(reachable_portals)
+
+    for portal in world.dungeon_portals[player]:
+        if portal.door.roomIndex >= 0:
+            room = world.get_room(portal.door.roomIndex, player)
+            if room.palette is None:
+                name = portal.door.entrance.parent_region.dungeon.name
+                room.palette = palette_map[name]
+
+    for name, builder in dungeon_builders.items():
+        for region in builder.master_sector.regions:
+            for ext in region.exits:
+                if ext.door and ext.door.roomIndex >= 0:
+                    room = world.get_room(ext.door.roomIndex, player)
+                    if room.palette is None:
+                        room.palette = palette_map[name]
+    eastfairies = world.get_room(0x89, player)
+    eastfairies.palette = palette_map[world.get_region('Eastern Courtyard', player).dungeon.name]
+    # other ones that could use programmatic treatment:  Skull Boss x29, Hera Fairies xa7, Ice Boss xde
 
     if world.hints[player]:
         refine_hints(dungeon_builders)
@@ -2305,20 +2333,11 @@ boss_indicator = {
     'Ganons Tower': (0x1a, 'GT Agahnim 2 SW')
 }
 
-# For compass boss indicator
-boss_indicator = {
-    'Eastern Palace': (0x04, 'Eastern Boss SE'),
-    'Desert Palace': (0x06, 'Desert Boss SW'),
-    'Agahnims Tower': (0x08, 'Tower Agahnim 1 SW'),
-    'Swamp Palace': (0x0a, 'Swamp Boss SW'),
-    'Palace of Darkness': (0x0c, 'PoD Boss SE'),
-    'Misery Mire': (0x0e, 'Mire Boss SW'),
-    'Skull Woods': (0x10, 'Skull Spike Corner SW'),
-    'Ice Palace': (0x12, 'Ice Antechamber NE'),
-    'Tower of Hera': (0x14, 'Hera Boss Down Stairs'),
-    'Thieves Town': (0x16, 'Thieves Boss SE'),
-    'Turtle Rock': (0x18, 'TR Boss SW'),
-    'Ganons Tower': (0x1a, 'GT Agahnim 2 SW')
+palette_map = {
+    'Hyrule Castle': 0x0, 'Eastern Palace': 0xb, 'Desert Palace': 0x4, 'Agahnims Tower': 0xc,
+    'Swamp Palace': 0x8, 'Palace of Darkness': 0x10, 'Misery Mire': 0x11, 'Skull Woods': 0xe,
+    'Ice Palace': 0x14, 'Tower of Hera': 0x6, 'Thieves Town': 0x17, 'Turtle Rock': 0x19,
+    'Ganons Tower': 0x1b
 }
 
 # todo: inverted

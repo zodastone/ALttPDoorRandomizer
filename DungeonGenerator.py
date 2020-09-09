@@ -69,6 +69,7 @@ def generate_dungeon_main(builder, entrance_region_names, split_dungeon, world, 
         proposed_map = builder.valid_proposal
     else:
         proposed_map = generate_dungeon_find_proposal(builder, entrance_region_names, split_dungeon, world, player)
+        builder.valid_proposal = proposed_map
     queue = collections.deque(proposed_map.items())
     while len(queue) > 0:
         a, b = queue.popleft()
@@ -1245,7 +1246,19 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player,
         identify_destination_sectors(accessible_sectors, reverse_d_map, dungeon_map, connections,
                                      dungeon_entrances, split_dungeon_entrances)
         for name, builder in dungeon_map.items():
-            calc_allowance_and_dead_ends(builder, connections_tuple)
+            calc_allowance_and_dead_ends(builder, connections_tuple, world.dungeon_portals[player])
+
+        if world.mode[player] == 'open' and world.shuffle[player] not in ['crossed', 'insanity']:
+            sanc = find_sector('Sanctuary', candidate_sectors)
+            lw_builders = []
+            for name, portal_list in dungeon_portals.items():
+                for portal_name in portal_list:
+                    if world.get_portal(portal_name, player).light_world:
+                        lw_builders.append(dungeon_map[name])
+                        break
+            # portals only - not drops for mirror stuff
+            sanc_builder = random.choice(lw_builders)
+            assign_sector(sanc, sanc_builder, candidate_sectors, global_pole)
 
         free_location_sectors = {}
         crystal_switches = {}
@@ -1336,11 +1349,12 @@ def identify_destination_sectors(accessible_sectors, reverse_d_map, dungeon_map,
                                 break
 
 
-def calc_allowance_and_dead_ends(builder, connections_tuple):
+def calc_allowance_and_dead_ends(builder, connections_tuple, portals):
     entrances_map, potentials, connections = connections_tuple
     needed_connections = [x for x in builder.all_entrances if x not in entrances_map[builder.name]]
     starting_allowance = 0
     used_sectors = set()
+    destination_entrances = [x.door.entrance.parent_region.name for x in portals if x.destination]
     for entrance in entrances_map[builder.name]:
         sector = find_sector(entrance, builder.sectors)
         outflow_target = 0 if entrance not in drop_entrances_allowance else 1
@@ -3739,12 +3753,6 @@ drop_entrances_allowance = [
 
 dead_entrances = [
     'TR Big Chest Entrance'
-]
-
-destination_entrances = [
-    'Sanctuary', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Rat Path', 'Desert East Lobby',
-    'Desert West Lobby', 'Skull Pinball', 'Skull Pot Circle', 'Skull Left Drop', 'Skull 2 West Lobby',
-    'Skull Back Drop', 'TR Big Chest Entrance', 'TR Eye Bridge', 'TR Lazy Eyes'
 ]
 
 split_check_entrance_invalid = [

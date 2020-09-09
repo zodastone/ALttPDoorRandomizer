@@ -183,6 +183,7 @@ def global_rules(world, player):
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Prize', player))
 
     set_rule(world.get_entrance('Swamp Lobby Moat', player), lambda state: state.has('Flippers', player) and state.has('Open Floodgate', player))
+    set_rule(world.get_entrance('Swamp Entrance Moat', player), lambda state: state.has('Flippers', player) and state.has('Open Floodgate', player))
     set_rule(world.get_entrance('Swamp Trench 1 Approach Dry', player), lambda state: not state.has('Trench 1 Filled', player))
     set_rule(world.get_entrance('Swamp Trench 1 Key Ledge Dry', player), lambda state: not state.has('Trench 1 Filled', player))
     set_rule(world.get_entrance('Swamp Trench 1 Departure Dry', player), lambda state: not state.has('Trench 1 Filled', player))

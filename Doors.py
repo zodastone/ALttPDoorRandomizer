@@ -1314,6 +1314,8 @@ def create_doors(world, player):
     world.get_door('GT Petting Zoo SE', player).deadEnd = True
     world.get_door('GT DMs Room SW', player).deadEnd = True
     world.get_door("GT Bob\'s Room SE", player).passage = False
+    # can't unlink from boss right now
+    world.get_door("Hera Lobby S", player).dungeonLink = 'Tower of Hera'
 
     world.get_door('Ice Spike Cross SE', player).dungeonLink = 'linkIceFalls'
     world.get_door('Ice Tall Hint SE', player).dungeonLink = 'linkIceFalls'

@@ -1467,6 +1467,7 @@ class Portal(object):
         self.default = True
         self.destination = False
         self.deadEnd = False
+        self.light_world = False
 
     def change_door(self, new_door):
         if new_door != self.door:
@@ -1555,6 +1556,7 @@ class DungeonInfo(object):
         self.name = name
         self.total = 0
         self.required_passage = {}
+        self.sole_entrance = None
         # self.dead_ends = 0  total - 1 - req = dead_ends possible
 
 

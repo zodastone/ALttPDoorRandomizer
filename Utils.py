@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from collections import defaultdict
 
 def int16_as_bytes(value):
     value = value & 0xFFFF
@@ -225,6 +226,47 @@ def read_entrance_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan)
         print(string)
 
 
+def room_palette_data(old_rom):
+    with open(old_rom, 'rb') as stream:
+        old_rom_data = bytearray(stream.read())
+
+    offset = defaultdict(list)
+    for i in range(0, 256):
+        pointer_offset = 0x0271e2+i*2
+        header_offset = old_rom_data[pointer_offset + 1] << 8
+        header_offset += old_rom_data[pointer_offset]
+        header_offset -= 0x8000
+        header_offset += 0x020000
+        offset[header_offset].append(i)
+        # print(f'{hex(i)}: {hex(old_rom_data[header_offset+1])}')
+    for header_offset, rooms in offset.items():
+        print(f'{hex(header_offset)}: {[hex(x) for x in rooms]}')
+
+
+
+# Palette notes:
+# HC: 0
+# Sewer/Dungeon: 1
+# AT: 0xc near boss, 0x0 (other) 26 (f4, f1)
+# Sanc: 0x1d
+# Hera: 0x6
+# Desert: 0x4 (boss and near boss), 0x9 (desert tiles 1 + desert main)
+# Eastern: 0xb
+# Pod: 0xf, x10 (boss)
+# Swamp: 0x8 (boss), 0xa (other)
+# Skull: 0xe (boss), 0xd (other)
+# TT: 0x17, 0x23 (attic)
+# Ice: 0x13, 0x14 (boss)
+# Mire: 0x11 (other) , 0x12 (boss/preroom)
+# TR: 0x18, 0x19 (boss+pre)
+# GT: 0x28 (entrance + B1), 0x1a (other) 0x24 (Gauntlet - Lanmo) 0x25 (conveyor-torch-wizzrode moldorm pit f5?)
+# Aga2: 0x1b, 0x1b (Pre aga2)
+# Caves: 0x7, 0x20
+# Uncle: 0x1
+# Ganon: 0x21
+# Houses: 0x2
+
+
 def print_wiki_doors_by_region(d_regions, world, player):
     for d, region_list in d_regions.items():
         tile_map = {}
@@ -418,4 +460,4 @@ def print_graph(world):
 if __name__ == '__main__':
     # make_new_base2current()
     # read_entrance_data(old_rom=sys.argv[1])
-    read_layout_data(old_rom=sys.argv[1])
+    room_palette_data(old_rom=sys.argv[1])

@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '7d7ea5b59d05926be23a3963e31cb0f0'
+RANDOMIZERBASEHASH = '63d1141460fd237a6ce17ccc6e293985'
 
 
 class JsonRom(object):
@@ -617,12 +617,15 @@ def patch_rom(world, rom, player, team, enemized):
         rom.write_byte(0x15270, 2)
         sanctuary = world.get_region('Sanctuary', player)
         rom.write_byte(0x1597b, sanctuary.dungeon.dungeon_id*2)
-        if world.sanc_portal[player]:
+        if player in world.sanc_portal.keys():
             rom.write_byte(0x159a6, world.sanc_portal[player].ent_offset)
         if compass_code_good(rom):
             update_compasses(rom, world, player)
         else:
             logging.getLogger('').warning('Randomizer rom update! Compasses in crossed are borken')
+        for room in world.rooms:
+            if room.player == player and room.palette is not None:
+                rom.write_byte(0x13f200+room.index, room.palette)
     if world.doorShuffle[player] == 'basic':
         rom.write_byte(0x139004, 1)
     for door in world.doors:
