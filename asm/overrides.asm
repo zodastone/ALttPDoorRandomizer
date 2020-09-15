@@ -94,13 +94,13 @@ CutoffEntranceRug:
           lda $a0 : cmp #$00BC : beq .check ;; TT Alcove
           cmp #$00A2 : beq .check  ; Mire Bridges
           cmp #$001A : beq .check  ; pod falling
-	  cmp #$0049 : beq .check  ; SW torch room
-	  cmp #$0014 : beq .check  ; TR Pipe room
+	  	  cmp #$0049 : beq .check  ; SW torch room
+	  	  cmp #$0014 : beq .check  ; TR Pipe room
           cmp #$00C2 : bne +  ; Mire Hub
           .check
-              lda $0c : cmp #$0007 : !bge .skip
-              lda $0e : cmp #$0009 : !bge .skip
-              cmp #$0003 : !blt .skip
+              lda $0c : cmp #$0006 : !bge .skip
+              lda $0e : cmp #$0008 : !bge .skip
+              cmp #$0004 : !blt .skip
           bra +
             .skip pla : rtl
     + pla : lda $9B52, y : sta $7E2000, x ; what we wrote over
