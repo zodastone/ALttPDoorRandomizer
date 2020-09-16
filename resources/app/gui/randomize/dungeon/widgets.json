@@ -9,6 +9,19 @@
         "crossed"
       ]
     },
+    "dungeonintensity": {
+      "type": "selectbox",
+      "default": "2",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "random"
+      ],
+      "config": {
+        "width": 40
+      }
+    },
     "experimental": { "type": "checkbox" },
     "dungeon_counters": {
       "type": "selectbox",

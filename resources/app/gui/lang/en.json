@@ -58,6 +58,12 @@
     "randomizer.dungeon.dungeondoorshuffle.basic": "Basic",
     "randomizer.dungeon.dungeondoorshuffle.crossed": "Crossed",
 
+    "randomizer.dungeon.dungeonintensity": "Intensity Level",
+    "randomizer.dungeon.dungeonintensity.1": "1: Normal Supertile and Spiral Stairs",
+    "randomizer.dungeon.dungeonintensity.2": "2: Open Edges and Straight Stairs",
+    "randomizer.dungeon.dungeonintensity.3": "3: (Coming soon) Dungeon Lobbies",
+    "randomizer.dungeon.dungeonintensity.random": "Random",
+
     "randomizer.dungeon.experimental": "Enable Experimental Features",
 
     "randomizer.dungeon.dungeon_counters": "Dungeon Chest Counters",

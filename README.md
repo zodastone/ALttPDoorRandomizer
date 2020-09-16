@@ -36,6 +36,16 @@ Doors are shuffled between dungeons as well.
 
 Doors are not shuffled.
 
+## Intensity
+
+#### Level 1
+Normal door and spiral staircases are shuffled
+#### Level 2
+Same as Level 1 plus open edges and straight staircases are shuffled.
+#### Level 3 (Coming soon)
+Same as Level 2 plus Dungeon Lobbies are shuffled
+
+
 ## Map/Compass/Small Key/Big Key shuffle (aka Keysanity)
 
 These settings allow dungeon specific items to be distributed anywhere in the world and not just in their native dungeon.
@@ -75,3 +85,9 @@ Show the help message and exit.
 ```
 
 For specifying the door shuffle you want as above. (default: basic)
+
+```
+--intensity      
+```
+
+For specifying the door shuffle intensity level you want as above. (default: 2)

@@ -33,7 +33,7 @@ def make_checkbox(self, parent, label, storageVar, manager, managerAttrs):
     return self
 
 # Make an OptionMenu with a label and pretty option labels
-def make_selectbox(self, parent, label, options, storageVar, manager, managerAttrs):
+def make_selectbox(self, parent, label, options, storageVar, manager, managerAttrs, config=None):
     self = Frame(parent)
 
     labels = options
@@ -96,7 +96,7 @@ def make_selectbox(self, parent, label, options, storageVar, manager, managerAtt
     else:
         self.label.pack(side=LEFT)
 
-    self.selectbox.config(width=20)
+    self.selectbox.config(width=config['width'] if config and config['width'] else 20)
     idx = 0
     default = self.selectbox.options["values"][idx]
     if managerAttrs is not None and "default" in managerAttrs:
@@ -166,7 +166,8 @@ def make_textbox(self, parent, label, storageVar, manager, managerAttrs):
     return widget
 
 # Make a generic widget
-def make_widget(self, type, parent, label, storageVar=None, manager=None, managerAttrs=dict(), options=None):
+def make_widget(self, type, parent, label, storageVar=None, manager=None, managerAttrs=dict(),
+                options=None, config=None):
     widget = None
     if manager is None:
         manager = "pack"
@@ -184,7 +185,7 @@ def make_widget(self, type, parent, label, storageVar=None, manager=None, manage
     elif type == "selectbox":
         if thisStorageVar is None:
             thisStorageVar = StringVar()
-        widget = make_selectbox(self, parent, label, options, thisStorageVar, manager, managerAttrs)
+        widget = make_selectbox(self, parent, label, options, thisStorageVar, manager, managerAttrs, config)
     elif type == "spinbox":
         if thisStorageVar is None:
             thisStorageVar = StringVar()
@@ -203,13 +204,14 @@ def make_widget_from_dict(self, defn, parent):
     manager = defn["manager"] if "manager" in defn else None
     managerAttrs = defn["managerAttrs"] if "managerAttrs" in defn else None
     options = defn["options"] if "options" in defn else None
+    config = defn["config"] if "config" in defn else None
 
     if managerAttrs is None and "default" in defn:
         managerAttrs = {}
     if "default" in defn:
         managerAttrs["default"] = defn["default"]
 
-    widget = make_widget(self, type, parent, label, None, manager, managerAttrs, options)
+    widget = make_widget(self, type, parent, label, None, manager, managerAttrs, options, config)
     widget.type = type
     return widget
 

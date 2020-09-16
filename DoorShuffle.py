@@ -34,6 +34,12 @@ def link_doors(world, player):
     for ent, ext in ladders:
         connect_two_way(world, ent, ext, player)
 
+    if world.intensity[player] < 2:
+        for entrance, ext in open_edges:
+            connect_two_way(world, entrance, ext, player)
+        for entrance, ext in straight_staircases:
+            connect_two_way(world, entrance, ext, player)
+
     if world.doorShuffle[player] == 'vanilla':
         for entrance, ext in open_edges:
             connect_two_way(world, entrance, ext, player)
@@ -49,18 +55,8 @@ def link_doors(world, player):
             connect_one_way(world, ent, ext, player)
         vanilla_key_logic(world, player)
     elif world.doorShuffle[player] == 'basic':
-        if not world.experimental[player]:
-            for entrance, ext in open_edges:
-                connect_two_way(world, entrance, ext, player)
-            for entrance, ext in straight_staircases:
-                connect_two_way(world, entrance, ext, player)
         within_dungeon(world, player)
     elif world.doorShuffle[player] == 'crossed':
-        if not world.experimental[player]:
-            for entrance, ext in open_edges:
-                connect_two_way(world, entrance, ext, player)
-            for entrance, ext in straight_staircases:
-                connect_two_way(world, entrance, ext, player)
         cross_dungeon(world, player)
     else:
         logging.getLogger('').error('Invalid door shuffle setting: %s' % world.doorShuffle[player])

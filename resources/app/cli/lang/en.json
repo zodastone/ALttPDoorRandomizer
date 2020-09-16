@@ -198,6 +198,13 @@
       "Vanilla:        All doors are connected the same way they were in the",
       "                base game."
     ],
+    "intensity" : [
+      "Door Shuffle Intensity Level (default: %(default)s)",
+      "1:       Shuffles normal doors and spiral staircases",
+      "2:       And shuffles open edges and straight staircases",
+      "3:       (Coming soon) And shuffles dungeon lobbies",
+      "random:  Picks one of those at random"
+    ],
     "experimental": [ "Enable experimental features. (default: %(default)s)" ],
     "dungeon_counters": [ "Enable dungeon chest counters. (default: %(default)s)" ],
     "crystals_ganon": [
