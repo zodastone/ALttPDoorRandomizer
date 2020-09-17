@@ -8,16 +8,16 @@
       "options": [
         "none",
         "shuffled",
-        "chaos"
+        "random"
       ]
     },
     "bossshuffle": {
       "type": "selectbox",
       "options": [
         "none",
-        "basic",
-        "shuffled",
-        "chaos"
+        "simple",
+        "full",
+        "random"
       ]
     }
   },
@@ -27,7 +27,7 @@
       "options": [
         "default",
         "shuffled",
-        "chaos"
+        "random"
       ]
     },
     "enemyhealth": {

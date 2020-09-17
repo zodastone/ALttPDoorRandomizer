@@ -184,4 +184,19 @@ $a2 - MM    162 idx 0
 $a8 - EP    168 idx 2
 $bc - TT    188 idx 1
 
+;SRAM corruption investigation
+;call stack
+; 110c7 7.e.7 (Dungeon_SpiralStaircase_7)
+; 112b1
+
+;        dw $8CE2 ; = $10CE2*
+;        dw $8E0F ; = $10E0F*
+;        dw $8E1D ; = $10E1D*
+;        dw $8D10 ; = $10D10*
+;        dw $90C7 ; = $110C7*
+
+;bank2 line 3323 - x is d422 - comes from 048c
+
+; called by 10CE2, (Dungeon_SpiralStaircase_3)
+;122f0
 

@@ -1,6 +1,6 @@
 HorzEdge:
     cpy #$ff : beq +
-        jsr DetectWestEdge : bra ++
+        jsr DetectWestEdge : ldy #$02 : bra ++
     + jsr DetectEastEdge
     ++ cmp #$ff : beq +
         sta $00 : asl : !add $00 : tax
@@ -28,154 +28,156 @@ VertEdge:
 
 LoadEdgeRoomHorz:
     lda $03 : sta $a0
-    sty $09
-    and.b #$0f : asl a : !sub $23 : !add $09 : sta $02
+    sty $06
+    and.b #$0f : asl a : !sub $23 : !add $06 : sta $02
     ldy #$00 : jsr ShiftVariablesMainDir
-    lda $a0 : and.b #$F0 : lsr #3 : sta $0603 : inc : sta $0607
 
+    lda $04 : and #$80 : bne .edge
+    lda $04 : sta $01 ; load up flags in $01
+    jsr PrepScrollToNormal
+    bra .scroll
 
-    lda $aa : asl : tax ; current quad as 0/4
-    lda $04 : and #$40 : bne +
-        lda $603 : sta $00 : stz $01 : bra ++
-    +   lda $607 : sta $00 : lda #$02 : sta $01
-    ++ ; $01 now contains 0 or 2
-    lda $00 : sta $21 : sta $0601 : sta $0605
-    lda $01 : sta $aa : lsr : sta $01 : stz $00
-    lda $0a : sta $20
+    .edge
+    lda $04 : and #$10 : beq +
+       lda #$01
+    + sta $ee ; layer stuff
 
-    stz $0e
-    rep #$30
-    lda $e8 : and #$01ff : sta $02
-    lda $0a : and #$00ff : !add $00 : sta $00
+    jsr MathHorz
 
-    cmp #$006c : !bge +
-        lda #$0077 : bra ++
-    + cmp #$017c : !blt +
-        lda #$0187 : bra ++
-    + !add #$000b
-    ++ sta $0618 : inc #2 : sta $061a
-
-    lda $00 : cmp #$0078 : !bge +
-        lda #$0000 : bra ++
-    + cmp #$0178 : !blt +
-        lda #$0100 : bra ++
-    + !sub #$0078
-    ++ sta $00
-
-    ; figures out scroll amt
-    cmp $02 : bne +
-        lda #$0000 : bra .done
-    + !blt +
-        !sub $02 : inc $0e : bra .done
-    + lda $02 : !sub $00
-
-    .done sta $ab : sep #$30
-    lda $0e : asl : ora $ac : sta $ac
-    lda $0603, x : sta $e9
-
-    lda $04 : and #$80 : lsr #4 : sta $ee ; layer stuff
+    .scroll
+    jsr ScrollY
     rts
 
 LoadEdgeRoomVert:
     lda $03 : sta $a0
-    sty $09
-    and.b #$f0 : lsr #3 : !sub $21 : !add $09 : sta $02
+    sty $06
+    and.b #$f0 : lsr #3 : !sub $21 : !add $06 : sta $02
     ldy #$01 : jsr ShiftVariablesMainDir
-    lda $a0 : and.b #$0f : asl : sta $060b : inc : sta $060f
 
-    lda $a9 : asl #2 : tax ; current quad as 0/4
-    lda $04 : and #$20 : bne +
-        lda $60b : sta $00 : stz $01 : bra ++
-    +   lda $60f : sta $00 : lda #$01 : sta $01
-    ++ ; $01 now contains 0 or 1
-    lda $00 : sta $23 : sta $0609 : sta $060d
-    lda $01 : sta $a9 : stz $00 ; setup for 16 bit ops
-    lda $0a : sta $22
+    lda $04 : and #$80 : bne .edge
+    lda $04 : sta $01 ; load up flags in $01
+    jsr PrepScrollToNormal
+    bra .scroll
 
-    stz $0e ; pos/neg indicator
-    rep #$30
-    lda $e2 : and #$01ff : sta $02
-    lda $0a : and #$00ff : !add $00 : sta $00
+    .edge
+    lda $04 : and #$10 : beq +
+       lda #$01
+    + sta $ee ; layer stuff
 
-    cmp #$0078 : !bge +
-        lda #$007f : bra ++
-    + cmp #$0178 : !blt +
-        lda #$017f : bra ++
-    + !add #$0007
-    ++ sta $061c : inc #2 : sta $061e
+    jsr MathVert
+    lda $03
 
-    lda $00 : cmp #$0078 : !bge +
-        lda #$0000 : bra ++
-    + cmp #$0178 : !blt +
-        lda #$0100 : bra ++
-    + !sub #$0078
-    ++ sta $00
-
-    ; figures out scroll amt
-    cmp $02 : bne +
-        lda #$0000 : bra .done
-    + !blt +
-        !sub $02 : inc $0e : bra .done
-    + lda $02 : !sub $00
-
-    .done sta $ab : sep #$30
-    lda $0e : asl : ora $ac : sta $ac
-    lda $060b, x : sta $e3
-
-    lda $04 : and #$10 : lsr #4 : sta $ee ; layer stuff
+    .scroll
+    jsr ScrollX
     rts
 
 
+MathHorz:
+    jsr MathStart : lda $20
+    jsr MathMid : and #$0040
+    jsr MathEnd
+    rts
+
+MathVert:
+    jsr MathStart : lda $22
+    jsr MathMid : and #$0020
+    jsr MathEnd
+    rts
+
+MathStart:
+    rep #$30
+    lda $08 : and #$00ff : sta $00
+    rts
+
+MathMid:
+    and #$01ff : !sub $00 : and #$00ff : sta $00
+    ; nothing should be bigger than $a0 at this point
+
+    lda $05 : and #$00f0 : lsr #4 : tax
+    lda MultDivInfo, x : and #$00ff : tay
+    lda $00 : jsr MultiplyByY : sta $02
+
+    lda $07 : and #$00ff : jsr MultiplyByY : tax
+
+    lda $05 : and #$000f : tay
+    lda MultDivInfo, y : and #$00ff : tay
+    lda $02 : jsr DivideByY : sta $00
+    lda $0c : and #$00ff : sta $02
+    lda $04
+    rts
+
+MathEnd:
+     beq +
+        lda #$0100
+    + !add $02 : !add $00
+    sta $04
+    sep #$30
+    rts
+
+; don't need midpoint of edge Link is leaving (formerly in $06 - used by dir indicator)
+; don't need width of edge Link is going to (currently in $0b)
 LoadNorthData:
-    lda NorthEdgeInfo, x : sta $06 ; not needed I think
-    lda NorthOpenEdge, x : sta $03 : inx
-    lda NorthEdgeInfo, x : sta $07 ;probably needed for maths - unsure
-    lda NorthOpenEdge, x : sta $04 : inx
+    lda NorthOpenEdge, x : sta $03 : inx ; target room
+    lda NorthEdgeInfo, x : sta $07 ; needed for maths - (divide by 2 anyway)
+    lda NorthOpenEdge, x : sta $04 : inx ; bit field
     lda NorthEdgeInfo, x : sta $08 ; needed for maths
-    lda NorthOpenEdge, x : sta $05
-    lda $04 : and #$0f : sta $00 : asl : !add $00 : tax
-    lda SouthEdgeInfo, x : sta $0a : inx ; needed now, and for nrml transition
-    lda SouthEdgeInfo, x : sta $0b : inx ; probably not needed - unsure
+    lda NorthOpenEdge, x : sta $05 ; ratio
+    lda $04 : jsr LoadSouthMidpoint : inx ; needed now, and for nrml transition
+    lda SouthEdgeInfo, x : sta $0b : inx ; probably not needed todo: remove
     lda SouthEdgeInfo, x : sta $0c ; needed for maths
     rts
 
+LoadSouthMidpoint:
+    and #$0f : sta $00 : asl : !add $00 : tax
+    lda SouthEdgeInfo, x : sta $0a ; needed now, and for nrml transition
+    rts
+
 LoadSouthData:
-    lda SouthEdgeInfo, x : sta $06
     lda SouthOpenEdge, x : sta $03 : inx
     lda SouthEdgeInfo, x : sta $07
     lda SouthOpenEdge, x : sta $04 : inx
     lda SouthEdgeInfo, x : sta $08
     lda SouthOpenEdge, x : sta $05
-    lda $04 : and #$0f : sta $00 : asl : !add $00 : tax
-    lda NorthEdgeInfo, x : sta $0a : inx
+    lda $04 : jsr LoadNorthMidpoint : inx
     lda NorthEdgeInfo, x : sta $0b : inx
     lda NorthEdgeInfo, x : sta $0c
     rts
 
+LoadNorthMidpoint:
+    and #$0f : sta $00 : asl : !add $00 : tax
+    lda NorthEdgeInfo, x : sta $0a ; needed now, and for nrml transition
+    rts
+
 LoadWestData:
-    lda WestEdgeInfo, x : sta $06
     lda WestOpenEdge, x : sta $03 : inx
     lda WestEdgeInfo, x : sta $07
     lda WestOpenEdge, x : sta $04 : inx
     lda WestEdgeInfo, x : sta $08
     lda WestOpenEdge, x : sta $05
-    lda $04 : and #$0f : sta $00 : asl : !add $00 : tax
-    lda EastEdgeInfo, x : sta $0a : inx
+    lda $04 : jsr LoadEastMidpoint : inx
     lda EastEdgeInfo, x : sta $0b : inx
     lda EastEdgeInfo, x : sta $0c
     rts
 
+LoadEastMidpoint:
+    and #$0f : sta $00 : asl : !add $00 : tax
+    lda EastEdgeInfo, x : sta $0a ; needed now, and for nrml transition
+    rts
+
 LoadEastData:
-    lda EastEdgeInfo, x : sta $06
     lda EastOpenEdge, x : sta $03 : inx
     lda EastEdgeInfo, x : sta $07
     lda EastOpenEdge, x : sta $04 : inx
     lda EastEdgeInfo, x : sta $08
     lda EastOpenEdge, x : sta $05
-    lda $04 : and #$0f : sta $00 : asl : !add $00 : tax
-    lda WestEdgeInfo, x : sta $0a : inx
+    lda $04 : jsr LoadWestMidpoint : inx
     lda WestEdgeInfo, x : sta $0b : inx
     lda WestEdgeInfo, x : sta $0c
+
+
+LoadWestMidpoint:
+    and #$0f : sta $00 : asl : !add $00 : tax
+    lda WestEdgeInfo, x : sta $0a ; needed now, and for nrml transition
     rts
 
 
@@ -258,8 +260,8 @@ DetectWestEdge:
             ldx #$05 : bra .end
     + cmp #$cc : bne +
         lda $aa : beq ++
-            ldx #$07 : bra .end
-        ++ ldx #$06 : bra .end
+            ldx #$06 : bra .end
+        ++ ldx #$07 : bra .end
     + cmp #$dc : bne .end
         ldx #$08
     .end txa : rts
@@ -281,8 +283,8 @@ DetectEastEdge:
         ldx #$05 : bra .end
     + cmp #$cb : bne +
         lda $aa : beq ++
-            ldx #$07 : bra .end
-        ++ ldx #$06 : bra .end
+            ldx #$06 : bra .end
+        ++ ldx #$07 : bra .end
     + cmp #$db : bne .end
         ldx #$08
     .end txa : rts

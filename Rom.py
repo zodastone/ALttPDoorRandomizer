@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '9ed3ae2d129faa1cd3858e2f72b11b62'
+RANDOMIZERBASEHASH = 'b9e578ef0af231041070bd9049a55646'
 
 
 class JsonRom(object):
@@ -172,14 +172,14 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, r
     options = {
         'RandomizeEnemies': world.enemy_shuffle[player] != 'none',
         'RandomizeEnemiesType': 3,
-        'RandomizeBushEnemyChance': world.enemy_shuffle[player] == 'chaos',
+        'RandomizeBushEnemyChance': world.enemy_shuffle[player] == 'random',
         'RandomizeEnemyHealthRange': world.enemy_health[player] != 'default',
         'RandomizeEnemyHealthType': {'default': 0, 'easy': 0, 'normal': 1, 'hard': 2, 'expert': 3}[world.enemy_health[player]],
         'OHKO': False,
         'RandomizeEnemyDamage': world.enemy_damage[player] != 'default',
         'AllowEnemyZeroDamage': True,
         'ShuffleEnemyDamageGroups': world.enemy_damage[player] != 'default',
-        'EnemyDamageChaosMode': world.enemy_damage[player] == 'chaos',
+        'EnemyDamageChaosMode': world.enemy_damage[player] == 'random',
         'EasyModeEscape': False,
         'EnemiesAbsorbable': False,
         'AbsorbableSpawnRate': 10,
@@ -218,9 +218,9 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, r
         'SwordGraphics': "sword_gfx/normal.gfx",
         'BeeMizer': False,
         'BeesLevel': 0,
-        'RandomizeTileTrapPattern': world.enemy_shuffle[player] == 'chaos',
+        'RandomizeTileTrapPattern': world.enemy_shuffle[player] == 'random',
         'RandomizeTileTrapFloorTile': False,
-        'AllowKillableThief': bool(random.randint(0,1)) if world.enemy_shuffle[player] == 'chaos' else world.enemy_shuffle[player] != 'none',
+        'AllowKillableThief': bool(random.randint(0, 1)) if world.enemy_shuffle[player] == 'random' else world.enemy_shuffle[player] != 'none',
         'RandomizeSpriteOnHit': random_sprite_on_hit,
         'DebugMode': False,
         'DebugForceEnemy': False,
@@ -319,6 +319,8 @@ def get_sprite_from_name(name):
     name = name.lower()
     if name in ['random', 'randomonhit']:
         return Sprite(random.choice(list(_sprite_table.values())))
+    if name == ('(default link)'):
+        name = 'link'
     return Sprite(_sprite_table[name]) if name in _sprite_table else None
 
 class Sprite(object):
@@ -593,18 +595,21 @@ def patch_rom(world, rom, player, team, enemized):
         patch_shuffled_dark_sanc(world, rom, player)
 
     # setup dr option flags based on experimental, etc.
-    dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' else  DROptions.Town_Portal
+    dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' else DROptions.Town_Portal
     if world.experimental[player]:
         dr_flags |= DROptions.Map_Info
+        dr_flags |= DROptions.Debug
 
     # patch doors
     if world.doorShuffle[player] == 'crossed':
-        rom.write_byte(0x139004, 2)
+        rom.write_byte(0x138002, 2)
         for name, layout in world.key_layout[player].items():
             offset = compass_data[name][4]//2
             rom.write_byte(0x13f01c+offset, layout.max_chests + layout.max_drops)
             rom.write_byte(0x13f02a+offset, layout.max_chests)
             builder = world.dungeon_layouts[player][name]
+            rom.write_byte(0x13f070+offset, builder.location_cnt % 10)
+            rom.write_byte(0x13f07e+offset, builder.location_cnt // 10)
             bk_status = 1 if builder.bk_required else 0
             bk_status = 2 if builder.bk_provided else bk_status
             rom.write_byte(0x13f038+offset*2, bk_status)
@@ -616,9 +621,10 @@ def patch_rom(world, rom, player, team, enemized):
         else:
             logging.getLogger('').warning('Randomizer rom update! Compasses in crossed are borken')
     if world.doorShuffle[player] == 'basic':
-        rom.write_byte(0x139004, 1)
+        rom.write_byte(0x138002, 1)
     for door in world.doors:
-        if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs]:
+        if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs,
+                                                                             DoorType.Open, DoorType.StraightStairs]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door))
     for room in world.rooms:
         if room.player == player and room.modified:
@@ -638,9 +644,11 @@ def patch_rom(world, rom, player, team, enemized):
                 dungeon_name = opposite_door.entrance.parent_region.dungeon.name
                 dungeon_id = boss_indicator[dungeon_name][0]
                 rom.write_byte(0x13f000+dungeon_id, opposite_door.roomIndex)
-    rom.write_byte(0x139006, dr_flags.value)
+            elif not opposite_door:
+                rom.write_byte(0x13f000+dungeon_id, 0)  # no supertile preceeding boss
+    rom.write_byte(0x138004, dr_flags.value)
     if dr_flags & DROptions.Town_Portal and world.mode[player] == 'inverted':
-        rom.write_byte(0x139008, 1)
+        rom.write_byte(0x138006, 1)
 
     # fix skull woods exit, if not fixed during exit patching
     if world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla':
@@ -1318,8 +1326,8 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_bytes(0x7FC0, rom.name)
 
     # set player names
-    for p in range(1, min(world.players, 64) + 1):
-        rom.write_bytes(0x186380 + ((p - 1) * 32), hud_format_text(world.player_names[p][team]))
+    for p in range(1, min(world.players, 255) + 1):
+        rom.write_bytes(0x195FFC + ((p - 1) * 32), hud_format_text(world.player_names[p][team]))
 
     # Write title screen Code
     hashint = int(rom.get_hash(), 16)
@@ -2118,7 +2126,8 @@ def set_inverted_mode(world, player, rom):
     rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05])
 
 def patch_shuffled_dark_sanc(world, rom, player):
-    dark_sanc_entrance = str(world.get_region('Inverted Dark Sanctuary', player).entrances[0].name)
+    dark_sanc = world.get_region('Inverted Dark Sanctuary', player)
+    dark_sanc_entrance = str([i for i in dark_sanc.entrances if i.parent_region.name != 'Menu'][0].name)
     room_id, ow_area, vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x, unknown_1, unknown_2, door_1, door_2 = door_addresses[dark_sanc_entrance][1]
     door_index = door_addresses[str(dark_sanc_entrance)][0]
 
@@ -2130,9 +2139,9 @@ def patch_shuffled_dark_sanc(world, rom, player):
     rom.write_bytes(0x180262, [unknown_1, unknown_2, 0x00])
 
 
-# 24B116 and 20BAD8
-compass_r_addr = 0x123116  # a9 90 24 8f 9a c7 7e
-compass_w_addr = 0x103ad8  # e2 20 ad 0c 04 c9 00 d0
+# 24B118 and 20BB32
+compass_r_addr = 0x123118  # a9 90 24 8f 9a c7 7e
+compass_w_addr = 0x103b32  # e2 20 ad 0c 04 c9 00 d0
 
 
 def compass_code_good(rom):

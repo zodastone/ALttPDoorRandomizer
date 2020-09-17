@@ -76,8 +76,10 @@ def distribute_items_cutoff(world, cutoffrate=0.33):
         world.push_item(spot_to_fill, item_to_place, True)
         itempool.remove(item_to_place)
         fill_locations.remove(spot_to_fill)
-
-    logging.getLogger('').debug('Unplaced items: %s - Unfilled Locations: %s', [item.name for item in itempool], [location.name for location in fill_locations])
+    unplaced = [item.name for item in itempool]
+    unfilled = [location.name for location in fill_locations]
+    if unplaced or unfilled:
+        logging.warning('Unplaced items: %s - Unfilled Locations: %s', unplaced, unfilled)
 
 
 def distribute_items_staleness(world):
@@ -158,8 +160,10 @@ def distribute_items_staleness(world):
         itempool.remove(item_to_place)
         fill_locations.remove(spot_to_fill)
 
-    logging.getLogger('').debug('Unplaced items: %s - Unfilled Locations: %s', [item.name for item in itempool], [location.name for location in fill_locations])
-
+    unplaced = [item.name for item in itempool]
+    unfilled = [location.name for location in fill_locations]
+    if unplaced or unfilled:
+        logging.warning('Unplaced items: %s - Unfilled Locations: %s', unplaced, unfilled)
 
 def fill_restrictive(world, base_state, locations, itempool, keys_in_itempool = None, single_player_placement = False):
     def sweep_from_pool():
@@ -226,7 +230,7 @@ def fill_restrictive(world, base_state, locations, itempool, keys_in_itempool = 
 
 
 def valid_key_placement(item, location, itempool, world):
-    if (not item.smallkey and not item.bigkey) or item.player != location.player or world.retro[item.player]:
+    if (not item.smallkey and not item.bigkey) or item.player != location.player or world.retro[item.player] or world.logic[item.player] == 'nologic':
         return True
     dungeon = location.parent_region.dungeon
     if dungeon:
@@ -291,7 +295,7 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
     progitempool.sort(key=lambda item: 1 if item.name == 'Small Key (Escape)' and world.keyshuffle[item.player] and world.mode[item.player] == 'standard' else 0)
 
     fill_restrictive(world, world.state, fill_locations, progitempool,
-                     keys_in_itempool={player: world.keyshuffle[player] for player in range(1, world.players+1)})
+                     keys_in_itempool={player: world.keyshuffle[player] for player in range(1, world.players + 1)})
 
     random.shuffle(fill_locations)
 
@@ -299,8 +303,10 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
 
     fast_fill(world, restitempool, fill_locations)
 
-    logging.getLogger('').debug('Unplaced items: %s - Unfilled Locations: %s', [item.name for item in progitempool + prioitempool + restitempool], [location.name for location in fill_locations])
-
+    unplaced = [item.name for item in prioitempool + restitempool]
+    unfilled = [location.name for location in fill_locations]
+    if unplaced or unfilled:
+        logging.warning('Unplaced items: %s - Unfilled Locations: %s', unplaced, unfilled)
 
 def fast_fill(world, item_pool, fill_locations):
     while item_pool and fill_locations:
