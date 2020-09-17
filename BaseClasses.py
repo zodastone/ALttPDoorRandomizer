@@ -19,11 +19,13 @@ from RoomData import Room
 
 class World(object):
 
-    def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments, timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
+    def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
+                 timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
         self.players = players
         self.teams = 1
         self.shuffle = shuffle.copy()
         self.doorShuffle = doorShuffle.copy()
+        self.intensity = {}
         self.logic = logic.copy()
         self.mode = mode.copy()
         self.swords = swords.copy()
@@ -1843,6 +1845,7 @@ class Spoiler(object):
                          'goal': self.world.goal,
                          'shuffle': self.world.shuffle,
                          'door_shuffle': self.world.doorShuffle,
+                         'intensity': self.world.intensity,
                          'item_pool': self.world.difficulty,
                          'item_functionality': self.world.difficulty_adjustments,
                          'gt_crystals': self.world.crystals_needed_for_gt,
@@ -1905,6 +1908,7 @@ class Spoiler(object):
                 outfile.write('Item Functionality:              %s\n' % self.metadata['item_functionality'][player])
                 outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'][player])
                 outfile.write('Door Shuffle:                    %s\n' % self.metadata['door_shuffle'][player])
+                outfile.write('Intensity:                       %s\n' % self.metadata['intensity'][player])
                 outfile.write('Crystals required for GT:        %s\n' % self.metadata['gt_crystals'][player])
                 outfile.write('Crystals required for Ganon:     %s\n' % self.metadata['ganon_crystals'][player])
                 outfile.write('Pyramid hole pre-opened:         %s\n' % ('Yes' if self.metadata['open_pyramid'][player] else 'No'))

@@ -149,6 +149,7 @@ def roll_settings(weights):
     ret.shuffle = entrance_shuffle if entrance_shuffle != 'none' else 'vanilla'
     door_shuffle = get_choice('door_shuffle')
     ret.door_shuffle = door_shuffle if door_shuffle != 'none' else 'vanilla'
+    ret.intensity = get_choice('intensity')
     ret.experimental = get_choice('experimental') == 'on'
 
     ret.dungeon_counters = get_choice('dungeon_counters') if 'dungeon_counters' in weights else 'default'
@@ -166,7 +167,7 @@ def roll_settings(weights):
 
     ret.crystals_gt = get_choice('tower_open')
 
-    ret.crystals_ganon =  get_choice('ganon_open')
+    ret.crystals_ganon = get_choice('ganon_open')
 
     ret.mode = get_choice('world_state')
     if ret.mode == 'retro':

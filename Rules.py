@@ -159,6 +159,7 @@ def global_rules(world, player):
 
     # Tower of Hera
     set_rule(world.get_location('Tower of Hera - Big Key Chest', player), lambda state: state.has_fire_source(player))
+    set_rule(world.get_entrance('Hera Big Chest Hook Path', player), lambda state: state.has('Hookshot', player))
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Prize', player))
 
@@ -274,7 +275,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Hub NE', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Torches NW', player), lambda state: state.has('Cane of Somaria', player) and state.has('Fire Rod', player))
     set_rule(world.get_entrance('TR Big Chest Entrance Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has('Hookshot', player))
-    set_rule(world.get_entrance('TR Big Chest Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has('Hookshot', player))
+    set_rule(world.get_entrance('TR Big Chest Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has_Boots(player))
     set_rule(world.get_entrance('TR Dark Ride Up Stairs', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Dark Ride SW', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Crystal Maze Cane Path', player), lambda state: state.has('Cane of Somaria', player))

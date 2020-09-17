@@ -35,6 +35,12 @@ def link_doors(world, player):
     for ent, ext in ladders:
         connect_two_way(world, ent, ext, player)
 
+    if world.intensity[player] < 2:
+        for entrance, ext in open_edges:
+            connect_two_way(world, entrance, ext, player)
+        for entrance, ext in straight_staircases:
+            connect_two_way(world, entrance, ext, player)
+
     choose_portals(world, player)
 
     if world.doorShuffle[player] == 'vanilla':
@@ -52,18 +58,8 @@ def link_doors(world, player):
             connect_one_way(world, ent, ext, player)
         vanilla_key_logic(world, player)
     elif world.doorShuffle[player] == 'basic':
-        if not world.experimental[player]:
-            for entrance, ext in open_edges:
-                connect_two_way(world, entrance, ext, player)
-            for entrance, ext in straight_staircases:
-                connect_two_way(world, entrance, ext, player)
         within_dungeon(world, player)
     elif world.doorShuffle[player] == 'crossed':
-        if not world.experimental[player]:
-            for entrance, ext in open_edges:
-                connect_two_way(world, entrance, ext, player)
-            for entrance, ext in straight_staircases:
-                connect_two_way(world, entrance, ext, player)
         cross_dungeon(world, player)
     else:
         logging.getLogger('').error('Invalid door shuffle setting: %s' % world.doorShuffle[player])
@@ -1268,8 +1264,8 @@ def reassign_key_doors(builder, world, player):
                         dp.pair = False
                 if not found:
                     world.paired_doors[player].append(PairedDoor(d1.name, d2.name))
-                    change_door_to_small_key(d1, world, player)
-                    change_door_to_small_key(d2, world, player)
+                change_door_to_small_key(d1, world, player)
+                change_door_to_small_key(d2, world, player)
             world.spoiler.set_door_type(d1.name+' <-> '+d2.name, 'Key Door', player)
             logger.debug('Key Door: %s', d1.name+' <-> '+d2.name)
         else:
@@ -1565,6 +1561,7 @@ logical_connections = [
     ('Desert Main Lobby Right Path', 'Desert Right Alcove'),
     ('Desert Left Alcove Path', 'Desert Main Lobby'),
     ('Desert Right Alcove Path', 'Desert Main Lobby'),
+    ('Hera Big Chest Hook Path', 'Hera Big Chest Landing'),
     ('Hera Big Chest Landing Exit', 'Hera 4F'),
     ('PoD Pit Room Block Path N', 'PoD Pit Room Blocked'),
     ('PoD Pit Room Block Path S', 'PoD Pit Room'),
