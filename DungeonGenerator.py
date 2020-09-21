@@ -193,11 +193,12 @@ def gen_dungeon_info(name, available_sectors, entrance_regions, all_regions, pro
     start = ExplorationState(dungeon=name)
     start.big_key_special = bk_special
     group_flags, door_map = find_bk_groups(name, available_sectors, proposed_map, bk_special)
+    bk_flag = False if world.bigkeyshuffle[player] and not bk_special else bk_needed
 
     def exception(d):
         return name == 'Skull Woods 2' and d.name == 'Skull Pinball WS'
     original_state = extend_reachable_state_improved(entrance_regions, start, proposed_map, all_regions,
-                                                     valid_doors, bk_needed, world, player, exception)
+                                                     valid_doors, bk_flag, world, player, exception)
     dungeon['Origin'] = create_graph_piece_from_state(None, original_state, original_state, proposed_map, exception)
     either_crystal = True  # if all hooks from the origin are either, explore all bits with either
     for hook, crystal in dungeon['Origin'].hooks.items():
@@ -396,13 +397,14 @@ def check_valid(name, dungeon, hangers, hooks, proposed_map, doors_to_connect, a
     if len(dungeon.keys()) <= 1 and len(proposed_map.keys()) < len(doors_to_connect):
         return False
     # origin has no more hooks, but not all doors have been proposed
-    possible_bks = len(dungeon['Origin'].possible_bk_locations)
-    true_origin_hooks = [x for x in dungeon['Origin'].hooks.keys() if not x.bigKey or possible_bks > 0 or not bk_needed]
-    if len(true_origin_hooks) == 0 and len(proposed_map.keys()) < len(doors_to_connect):
-        return False
-    if len(true_origin_hooks) == 0 and bk_needed and possible_bks == 0 and len(proposed_map.keys()) == len(
-         doors_to_connect):
-        return False
+    if not world.bigkeyshuffle[player]:
+        possible_bks = len(dungeon['Origin'].possible_bk_locations)
+        true_origin_hooks = [x for x in dungeon['Origin'].hooks.keys() if not x.bigKey or possible_bks > 0 or not bk_needed]
+        if len(true_origin_hooks) == 0 and len(proposed_map.keys()) < len(doors_to_connect):
+            return False
+        if len(true_origin_hooks) == 0 and bk_needed and possible_bks == 0 and len(proposed_map.keys()) == len(
+             doors_to_connect):
+            return False
     for key in hangers.keys():
         if len(hooks[key]) > 0 and len(hangers[key]) == 0:
             return False
@@ -428,7 +430,7 @@ def check_valid(name, dungeon, hangers, hooks, proposed_map, doors_to_connect, a
         if len(outstanding_doors[key]) > 0 and len(hangers[key]) == 0 and len(hooks[opp_key]) == 0:
             return False
     all_visited = set()
-    bk_possible = not bk_needed
+    bk_possible = not bk_needed or (world.bigkeyshuffle[player] and not bk_special)
     for piece in dungeon.values():
         all_visited.update(piece.visited_regions)
         if not bk_possible and len(piece.possible_bk_locations) > 0:
@@ -501,11 +503,12 @@ def valid_path(name, starting_regions, target, valid_doors, proposed_map, all_re
 
     start = ExplorationState(dungeon=name)
     start.big_key_special = bk_special
+    bk_flag = False if world.bigkeyshuffle[player] and not bk_special else bk_needed
 
     def exception(d):
         return name == 'Skull Woods 2' and d.name == 'Skull Pinball WS'
     original_state = extend_reachable_state_improved(starting_regions, start, proposed_map, all_regions,
-                                                     valid_doors, bk_needed, world, player, exception)
+                                                     valid_doors, bk_flag, world, player, exception)
 
     for exp_door in original_state.unattached_doors:
         if not exp_door.door.blocked:

@@ -1141,10 +1141,13 @@ def check_rules_deep(original_counter, key_layout, world, player):
         big_avail = counter.big_key_opened
         big_maybe_not_found = not counter.big_key_opened
         if not key_layout.big_key_special and not big_avail:
-            for location in counter.free_locations:
-                if location not in key_logic.bk_restricted:
-                    big_avail = True
-                    break
+            if world.bigkeyshuffle[player]:
+                big_avail = True
+            else:
+                for location in counter.free_locations:
+                    if location not in key_logic.bk_restricted:
+                        big_avail = True
+                        break
         outstanding_big_locs = {x for x in big_locations if x not in counter.free_locations}
         if big_maybe_not_found:
             if len(outstanding_big_locs) == 0:

@@ -87,22 +87,28 @@ SuctionOverworldFix:
         stz $49
     + rtl
 
+; TT Alcove, Mire bridges, pod falling, SW torch room, TR Pipe room, Bob's Room, Ice Many Pots, Mire Hub
+; swamp waterfall
+CutoffRooms:
+db $bc, $a2, $1a, $49, $14, $8c, $9f, $c2
+db $66
+
 CutoffEntranceRug:
-    pha
-    lda.l DRMode : beq +
-        lda $04 : cmp #$000A : bne +
-          lda $a0 : cmp #$00BC : beq .check ;; TT Alcove
-          cmp #$00A2 : beq .check  ; Mire Bridges
-          cmp #$001A : beq .check  ; pod falling
-	  	  cmp #$0049 : beq .check  ; SW torch room
-	  	  cmp #$0014 : beq .check  ; TR Pipe room
-          cmp #$00C2 : bne +  ; Mire Hub
-          .check
-              lda $0c : cmp #$0006 : !bge .skip
-              lda $0e : cmp #$0008 : !bge .skip
-              cmp #$0004 : !blt .skip
-          bra +
-            .skip pla : rtl
-    + pla : lda $9B52, y : sta $7E2000, x ; what we wrote over
+    pha : phx
+    lda.l DRMode : beq .norm
+        lda $04 : cmp #$000A : beq +
+        cmp #$000C : bne .norm
+          + lda $a0 : sep #$20 : ldx #$0000
+          	- cmp.l CutoffRooms, x : beq .check
+          	inx : cpx #$0009 : !blt - ; CutoffRoom Count is here!
+        rep #$20
+    .norm plx : pla : lda $9B52, y : sta $7E2000, x ; what we wrote over
 rtl
+     .check
+		  rep #$20
+		  lda $0c : cmp #$0006 : !bge .skip
+		  lda $0e : cmp #$0008 : !bge .skip
+		  cmp #$0004 : !blt .skip
+      bra  .norm
+.skip plx : pla : rtl
 

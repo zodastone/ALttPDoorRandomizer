@@ -1186,6 +1186,7 @@ class Door(object):
         self.deadEnd = False
         self.passage = True
         self.dungeonLink = None
+        self.bk_shuffle_req = False
         # self.incognitoPos = -1
         # self.sectorLink = False
 
@@ -1327,6 +1328,13 @@ class Door(object):
         self.pseudo_bg = pseudo_bg
         self.portalAble = True
         return self
+
+    def dead_end(self, allowPassage=False):
+        self.deadEnd = True
+        if allowPassage:
+            self.passage = True
+        else:
+            self.passage = False
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.name == other.name
@@ -1551,6 +1559,12 @@ class Portal(object):
             return 0x02
         else:
             return 0x12
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+    def __unicode__(self):
+        return f'{self.name}:{self.door.name}'
 
 
 class DungeonInfo(object):
