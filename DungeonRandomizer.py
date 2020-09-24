@@ -75,7 +75,7 @@ def start():
                 logger.warning('%s: %s', fish.translate("cli","cli","generation.failed"), err)
             seed = random.randint(0, 999999999)
         for fail in failures:
-            logger.info('%s seed failed with: %s', fail[1], fail[0])
+            logger.info('%s\tseed failed with: %s', fail[1], fail[0])
         fail_rate = 100 * len(failures) / args.count
         success_rate = 100 * (args.count - len(failures)) / args.count
         fail_rate = str(fail_rate).split('.')

@@ -1,31 +1,38 @@
 # New Features
 
-* Mirror Scroll no longer erases blocks, the real mirror still will. (Sorry!)
-* Standard+Crossed Dungeon now gives you a little magic, a few bombs, and a few arrows if you die or S&Q after meeting your uncle (also works with mirror/scroll)
-* Dungeon reminder added to hud for Crossed dungeons
-* Blinking red square added to hud and it indicates a boss room is close by. Only appears if you have the compass. (Basic & Crossed)
-* Agahnims dungeon items can be started with now
-* GUI updates courtesy of Mike T
+* Crossed Dungeon generation improvements
+* Standard mode generation improvements
+* Spoiler lists bosses (multiworld compatible)
+* Bombs escape not valid for Crossed Dungeon
+* Graph algorithm speed improvement for placements and playthrough
+* TT Attic Hint tile should have a crystal switch accessible now
+* Updated to v.31.0.5
 
-## Map Features (Crossed only + Experimental)
+### Experimental features
 
-* Key counters added to hud. Indicates number of keys in chests (found/total). In small key shuffle, this count indicates how many smalls for that dungeon could be outside it.
-* Total key indicator added to hud if you have found the map. Counts down from the total number of keys in dungeon to 0 as you collect them.
-* Big Key indicator added to hud. Indicates if BK is not in the dungeon, or if BnC guard has it (Probably will move away from hud if kept)
+* Moved BK information and total chest keys per dungeon to keysanity menu. The info there requires compass for all info.
+* Map still required for on-hud key counter.
+* Added total counter to keysanity the compass/map screen when you have the compass for the dungeon.
+* Open "Edge" transitions can now be linked with normal doors
+* "Straight" staircases (the ones similar to normal doors) can be linked with both normal doors and edges
 
-Note: Only one of the key indicator will probably become core at most.
+#### Couple of temporary debug features added:
 
-## Experimental changes
-
-* Mirror scroll is now core for non-vanilla Door Shuffle (no longer experimental)
-* GT Bosses stay dead in non-vanilla Door Shuffle (no longer experimental)
-* Map features listed above are now experimental
+* Total item count displays where TFH's goal usually does
+* A red square appears in the upper right corner of the hud if the castle gate is closed      
 
 # Bug Fixes
 
-* Splashing at hobo no longer prevents you from buying bomb capacity upgrades
-* Small vitreous eyeballs will not drop items (DR basic and crossed only)
-* In Vanilla doors the HC back hallway area was broken - should be better now - also Trap Doors
-* Firebar speed should now be consistent. Ice palace rooms have slow firebars even if shuffled to other dungeons. Others should have normal speed firebars.
-* Red/Blue pendant swap fixed (originally ER bug)
-* Compass shuffle vs map shuffle item menu fix (originally ER bug)
+* Fix for Animated Tiles in crossed dungeon
+* Stonewall hardlock no longer reachable from certain drops (Sewer Drop, some Skull Woods drops) that were previously possible
+* No logic uses less key door logic
+* Spoiler log encoding
+* Enemizer settings made consistent with website
+* Swamp flooded ladders in the basement now requires Flippers
+* PoD EG Glitch gets killed on transitions (Only when DR is on)
+* Problem with standard logic fixed wanting you to pass through the tapestry backwards to rescue Zelda
+* Fixed SRAM corruption issues
+* Problem with the dungeons requiring you to take Blind through her attic fixed. (Maiden no longer despawns)
+* Hyrule Castle will not be your DW access in various Entrance Shuffles: simple, restricted, dungeonssimple, dungeonsfull 
+(Also prevents getting stuck in TR opening)
+* Beatable only (accessibility: none) no longer fails when there are unplaced items

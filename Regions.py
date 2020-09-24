@@ -4,6 +4,7 @@ from BaseClasses import Region, Location, Entrance, RegionType, Shop, ShopType
 
 def create_regions(world, player):
     world.regions += [
+        create_lw_region(player, 'Menu', None, ['Links House S&Q', 'Sanctuary S&Q', 'Old Man S&Q']),
         create_lw_region(player, 'Light World', ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'Purple Chest'],
                          ["Blinds Hideout", "Hyrule Castle Secret Entrance Drop", 'Zoras River', 'Kings Grave Outer Rocks', 'Dam',
                           'Links House', 'Tavern North', 'Chicken House', 'Aginahs Cave', 'Sahasrahlas Hut', 'Kakariko Well Drop', 'Kakariko Well Cave',
@@ -177,7 +178,7 @@ def create_regions(world, player):
         create_cave_region(player, 'Dark Desert Hint', 'a storyteller'),
         create_dw_region(player, 'Dark Death Mountain (West Bottom)', None, ['Spike Cave', 'Spectacle Rock Mirror Spot', 'Dark Death Mountain Fairy']),
         create_dw_region(player, 'Dark Death Mountain (Top)', None, ['Dark Death Mountain Drop (East)', 'Dark Death Mountain Drop (West)', 'Ganons Tower', 'Superbunny Cave (Top)',
-                                                             'Hookshot Cave', 'East Death Mountain (Top) Mirror Spot', 'Turtle Rock']),
+                                                                     'Hookshot Cave', 'East Death Mountain (Top) Mirror Spot', 'Turtle Rock']),
         create_dw_region(player, 'Dark Death Mountain Ledge', None, ['Dark Death Mountain Ledge (East)', 'Dark Death Mountain Ledge (West)', 'Mimic Cave Mirror Spot', 'Spiral Cave Mirror Spot']),
         create_dw_region(player, 'Dark Death Mountain Isolated Ledge', None, ['Isolated Ledge Mirror Spot', 'Turtle Rock Isolated Ledge Entrance']),
         create_dw_region(player, 'Dark Death Mountain (East Bottom)', None, ['Superbunny Cave (Bottom)', 'Cave Shop (Dark Death Mountain)', 'Fairy Ascension Mirror Spot']),
@@ -211,7 +212,8 @@ def create_dungeon_regions(world, player):
                                                                 'Hyrule Castle East Hall SW']),
         create_dungeon_region(player, 'Hyrule Castle West Hall', 'Hyrule Castle', None, ['Hyrule Castle West Hall E', 'Hyrule Castle West Hall S']),
         create_dungeon_region(player, 'Hyrule Castle Back Hall', 'Hyrule Castle', None, ['Hyrule Castle Back Hall E', 'Hyrule Castle Back Hall W', 'Hyrule Castle Back Hall Down Stairs']),
-        create_dungeon_region(player, 'Hyrule Castle Throne Room', 'Hyrule Castle', None, ['Hyrule Castle Throne Room N', 'Hyrule Castle Throne Room South Stairs']),
+        create_dungeon_region(player, 'Hyrule Castle Throne Room', 'Hyrule Castle', None, ['Hyrule Castle Throne Room Tapestry', 'Hyrule Castle Throne Room South Stairs']),
+        create_dungeon_region(player, 'Hyrule Castle Behind Tapestry', 'Hyrule Castle', None, ['Hyrule Castle Throne Room N', 'Hyrule Castle Tapestry Backwards']),
 
         create_dungeon_region(player, 'Hyrule Dungeon Map Room', 'Hyrule Castle', ['Hyrule Castle - Map Chest', 'Hyrule Castle - Map Guard Key Drop'], ['Hyrule Dungeon Map Room Key Door S', 'Hyrule Dungeon Map Room Up Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon North Abyss', 'Hyrule Castle', None, ['Hyrule Dungeon North Abyss South Edge', 'Hyrule Dungeon North Abyss Key Door N']),
@@ -314,7 +316,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Hera Beetles', 'Tower of Hera', None, ['Hera Beetles Down Stairs', 'Hera Beetles WS', 'Hera Beetles Holes']),
         create_dungeon_region(player, 'Hera Startile Corner', 'Tower of Hera', None, ['Hera Startile Corner ES', 'Hera Startile Corner NW', 'Hera Startile Corner Holes']),
         create_dungeon_region(player, 'Hera Startile Wide', 'Tower of Hera', None, ['Hera Startile Wide SW', 'Hera Startile Wide Up Stairs', 'Hera Startile Wide Holes']),
-        create_dungeon_region(player, 'Hera 4F', 'Tower of Hera', ['Tower of Hera - Compass Chest'], ['Hera 4F Down Stairs', 'Hera 4F Up Stairs', 'Hera 4F Holes']),
+        create_dungeon_region(player, 'Hera 4F', 'Tower of Hera', ['Tower of Hera - Compass Chest'], ['Hera 4F Down Stairs', 'Hera 4F Up Stairs', 'Hera Big Chest Hook Path', 'Hera 4F Holes']),
         create_dungeon_region(player, 'Hera Big Chest Landing', 'Tower of Hera', ['Tower of Hera - Big Chest'], ['Hera Big Chest Landing Exit', 'Hera Big Chest Landing Holes']),
         create_dungeon_region(player, 'Hera 5F', 'Tower of Hera', None, ['Hera 5F Down Stairs', 'Hera 5F Up Stairs', 'Hera 5F Star Hole', 'Hera 5F Pothole Chain', 'Hera 5F Normal Holes']),
         create_dungeon_region(player, 'Hera Fairies', 'Tower of Hera', None, ['Hera Fairies\' Warp']),
@@ -473,7 +475,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Thieves Hellway S Crystal', 'Thieves\' Town', None, ['Thieves Hellway Crystal Orange Barrier', 'Thieves Hellway Crystal ES']),
         create_dungeon_region(player, 'Thieves Triple Bypass', 'Thieves\' Town', None, ['Thieves Triple Bypass WN', 'Thieves Triple Bypass EN', 'Thieves Triple Bypass SE']),
         create_dungeon_region(player, 'Thieves Spike Switch', 'Thieves\' Town', ['Thieves\' Town - Spike Switch Pot Key'], ['Thieves Spike Switch SW', 'Thieves Spike Switch Up Stairs']),
-        create_dungeon_region(player, 'Thieves Attic', 'Thieves\' Town', None, ['Thieves Attic Down Stairs', 'Thieves Attic ES']),
+        create_dungeon_region(player, 'Thieves Attic', 'Thieves\' Town', None, ['Thieves Attic Down Stairs', 'Thieves Attic ES', 'Thieves Attic Orange Barrier']),
+        create_dungeon_region(player, 'Thieves Attic Hint', 'Thieves\' Town', None, ['Thieves Attic Hint Orange Barrier']),
         create_dungeon_region(player, 'Thieves Cricket Hall Left', 'Thieves\' Town', None, ['Thieves Cricket Hall Left WS', 'Thieves Cricket Hall Left Edge']),
         create_dungeon_region(player, 'Thieves Cricket Hall Right', 'Thieves\' Town', None, ['Thieves Cricket Hall Right Edge', 'Thieves Cricket Hall Right ES']),
         create_dungeon_region(player, 'Thieves Attic Window', 'Thieves\' Town', ['Thieves\' Town - Attic', 'Attic Cracked Floor'], ['Thieves Attic Window WS']),
@@ -727,7 +730,7 @@ def create_dungeon_regions(world, player):
     world.get_region('Hera Tridorm', player).crystal_switch = True
     world.get_region('Hera Startile Wide', player).crystal_switch = True
     world.get_region('PoD Arena Main', player).crystal_switch = True
-    world.get_region('PoD Arena Bridge', player).crystal_switch = True
+    world.get_region('PoD Arena Bridge', player).crystal_switch = True  # RANGED Weapon Required
     world.get_region('PoD Sexy Statue', player).crystal_switch = True
     world.get_region('PoD Bow Statue', player).crystal_switch = True  # LADDER not accessible (maybe with cane)
     world.get_region('PoD Dark Pegs', player).crystal_switch = True
@@ -747,7 +750,8 @@ def create_dungeon_regions(world, player):
     world.get_region('TR Crystal Maze', player).crystal_switch = True
     world.get_region('GT Crystal Conveyor', player).crystal_switch = True   # INTERIOR not accessible
     world.get_region('GT Hookshot South Platform', player).crystal_switch = True
-    # world.get_region('GT Double Switch Switches', player).crystal_switch = True # this is not very relevant
+    # Relevant to indicate north door can access c_switch
+    world.get_region('GT Double Switch Switches', player).crystal_switch = True
     world.get_region('GT Spike Crystals', player).crystal_switch = True
     world.get_region('GT Crystal Paths', player).crystal_switch = True
     world.get_region('GT Hidden Spikes', player).crystal_switch = True

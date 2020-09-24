@@ -41,7 +41,8 @@ class KeyLogic(object):
 
     def __init__(self, dungeon_name):
         self.door_rules = {}
-        self.bk_restricted = set()
+        self.bk_restricted = set()  # subset of free locations
+        self.bk_locked = set()      # includes potentially other locations and key only locations
         self.sm_restricted = set()
         self.small_key_name = dungeon_keys[dungeon_name]
         self.bk_name = dungeon_bigs[dungeon_name]
@@ -50,7 +51,9 @@ class KeyLogic(object):
         self.logic_min = {}
         self.logic_max = {}
         self.placement_rules = []
+        self.location_rules = {}
         self.outside_keys = 0
+        self.dungeon = dungeon_name
 
     def check_placement(self, unplaced_keys, big_key_loc=None):
         for rule in self.placement_rules:
@@ -77,6 +80,18 @@ class DoorRules(object):
         self.opposite = None
 
 
+class LocationRule(object):
+    def __init__(self):
+        self.small_key_num = 0
+        self.conditional_sets = []
+
+
+class ConditionalLocationRule(object):
+    def __init__(self, conditional_set):
+        self.conditional_set = conditional_set
+        self.small_key_num = 0
+
+
 class PlacementRule(object):
 
     def __init__(self):
@@ -88,6 +103,7 @@ class PlacementRule(object):
         self.check_locations_w_bk = None
         self.check_locations_wo_bk = None
         self.bk_relevant = True
+        self.key_reduced = False
 
     def contradicts(self, rule, unplaced_keys, big_key_loc):
         bk_blocked = big_key_loc in self.bk_conditional_set if self.bk_conditional_set else False
@@ -208,6 +224,7 @@ def analyze_dungeon(key_layout, world, player):
 
     find_bk_locked_sections(key_layout, world, player)
     key_logic.bk_chests.update(find_big_chest_locations(key_layout.all_chest_locations))
+    key_logic.bk_chests.update(find_big_key_locked_locations(key_layout.all_chest_locations))
     if world.retro[player] and world.mode[player] != 'standard':
         return
 
@@ -297,7 +314,9 @@ def create_exhaustive_placement_rules(key_layout, world, player):
                 rule.check_locations_wo_bk = set(filter_big_chest(accessible_loc))
             if valid_rule:
                 key_logic.placement_rules.append(rule)
+                adjust_locations_rules(key_logic, rule, accessible_loc, key_layout, key_counter, max_ctr)
     refine_placement_rules(key_layout, max_ctr)
+    refine_location_rules(key_layout)
 
 
 def placement_self_lock_adjustment(rule, max_ctr, blocked_loc, ctr, world, player):
@@ -317,6 +336,37 @@ def check_sm_restriction_needed(key_layout, max_ctr, rule, blocked):
         key_layout.key_logic.sm_restricted.update(blocked.difference(max_ctr.key_only_locations))
         return True
     return False
+
+
+def adjust_locations_rules(key_logic, rule, accessible_loc, key_layout, key_counter, max_ctr):
+    if rule.bk_conditional_set:
+        test_set = (rule.bk_conditional_set - key_logic.bk_locked) - set(max_ctr.key_only_locations.keys())
+        needed = rule.needed_keys_wo_bk if test_set else 0
+    else:
+        test_set = None
+        needed = rule.needed_keys_w_bk
+    if needed > 0:
+        accessible_loc.update(key_counter.other_locations)
+        blocked_loc = key_layout.all_locations-accessible_loc
+        for location in blocked_loc:
+            if location not in key_logic.location_rules.keys():
+                loc_rule = LocationRule()
+                key_logic.location_rules[location] = loc_rule
+            else:
+                loc_rule = key_logic.location_rules[location]
+            if test_set:
+                if location not in key_logic.bk_locked:
+                    cond_rule = None
+                    for other in loc_rule.conditional_sets:
+                        if other.conditional_set == test_set:
+                            cond_rule = other
+                            break
+                    if not cond_rule:
+                        cond_rule = ConditionalLocationRule(test_set)
+                        loc_rule.conditional_sets.append(cond_rule)
+                    cond_rule.small_key_num = max(needed, cond_rule.small_key_num)
+            else:
+                loc_rule.small_key_num = max(needed, loc_rule.small_key_num)
 
 
 def refine_placement_rules(key_layout, max_ctr):
@@ -407,6 +457,20 @@ def refine_placement_rules(key_layout, max_ctr):
                     removed_rules[r2] = r1
 
 
+def refine_location_rules(key_layout):
+    locs_to_remove = []
+    for loc, rule in key_layout.key_logic.location_rules.items():
+        conditions_to_remove = []
+        for cond_rule in rule.conditional_sets:
+            if cond_rule.small_key_num <= rule.small_key_num:
+                conditions_to_remove.append(cond_rule)
+        rule.conditional_sets = [x for x in rule.conditional_sets if x not in conditions_to_remove]
+        if rule.small_key_num == 0 and len(rule.conditional_sets) == 0:
+            locs_to_remove.append(loc)
+    for loc in locs_to_remove:
+        del key_layout.key_logic.location_rules[loc]
+
+
 def create_inclusive_rule(key_layout, max_ctr, code, key_counter, blocked_loc, accessible_loc, min_keys, world, player):
     key_logic = key_layout.key_logic
     rule = PlacementRule()
@@ -421,6 +485,7 @@ def create_inclusive_rule(key_layout, max_ctr, code, key_counter, blocked_loc, a
         rule.check_locations_w_bk = accessible_loc
         check_sm_restriction_needed(key_layout, max_ctr, rule, blocked_loc)
         key_logic.placement_rules.append(rule)
+        adjust_locations_rules(key_logic, rule, accessible_loc, key_layout, key_counter, max_ctr)
 
 
 def queue_sorter(queue_item):
@@ -438,12 +503,10 @@ def queue_sorter_2(queue_item):
 
 
 def find_bk_locked_sections(key_layout, world, player):
-    if key_layout.big_key_special:
-        return
     key_counters = key_layout.key_counters
     key_logic = key_layout.key_logic
 
-    bk_key_not_required = set()
+    bk_not_required = set()
     big_chest_allowed_big_key = world.accessibility[player] != 'locations'
     for counter in key_counters.values():
         key_layout.all_chest_locations.update(counter.free_locations)
@@ -452,10 +515,19 @@ def find_bk_locked_sections(key_layout, world, player):
         if counter.big_key_opened and counter.important_location:
             big_chest_allowed_big_key = False
         if not counter.big_key_opened:
-            bk_key_not_required.update(counter.free_locations)
-    key_logic.bk_restricted.update(dict.fromkeys(set(key_layout.all_chest_locations).difference(bk_key_not_required)))
+            bk_not_required.update(counter.free_locations)
+            bk_not_required.update(counter.key_only_locations)
+            bk_not_required.update(counter.other_locations)
+    # todo?: handle bk special differently in cross dungeon
+    # notably: things behind bk doors - relying on the bk door logic atm
+    if not key_layout.big_key_special:
+        key_logic.bk_restricted.update(dict.fromkeys(set(key_layout.all_chest_locations).difference(bk_not_required)))
+        key_logic.bk_locked.update(dict.fromkeys(set(key_layout.all_locations) - bk_not_required))
     if not big_chest_allowed_big_key:
-        key_logic.bk_restricted.update(find_big_chest_locations(key_layout.all_chest_locations))
+        bk_required_locations = find_big_chest_locations(key_layout.all_chest_locations)
+        bk_required_locations += find_big_key_locked_locations(key_layout.all_chest_locations)
+        key_logic.bk_restricted.update(bk_required_locations)
+        key_logic.bk_locked.update(bk_required_locations)
 
 
 def empty_counter(counter):
@@ -903,23 +975,26 @@ def filter_big_chest(locations):
 def count_free_locations(state):
     cnt = 0
     for loc in state.found_locations:
-        if '- Prize' not in loc.name and loc.name not in dungeon_events and loc.name not in key_only_locations and loc.name not in ['Agahnim 1', 'Agahnim 2', 'Hyrule Castle - Big Key Drop']:
-            cnt += 1
+        if '- Prize' not in loc.name and loc.name not in dungeon_events and not loc.forced_item:
+            if loc.name not in ['Agahnim 1', 'Agahnim 2']:
+                cnt += 1
     return cnt
 
 
 def count_locations_exclude_big_chest(state):
     cnt = 0
     for loc in state.found_locations:
-        if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc.name not in dungeon_events and loc.name not in key_only_locations and loc.name not in ['Agahnim 1', 'Agahnim 2', 'Hyrule Castle - Big Key Drop']:
-            cnt += 1
+        if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc.name not in dungeon_events:
+            if not loc.forced_item and loc.name not in ['Agahnim 1', 'Agahnim 2', "Hyrule Castle - Zelda's Chest",
+                                                        "Thieves' Town - Blind's Cell"]:
+                cnt += 1
     return cnt
 
 
-def count_key_only_locations(state):
+def count_small_key_only_locations(state):
     cnt = 0
     for loc in state.found_locations:
-        if loc.name in key_only_locations:
+        if loc.forced_item and loc.item.smallkey:
             cnt += 1
     return cnt
 
@@ -932,6 +1007,14 @@ def find_big_chest_locations(locations):
     ret = []
     for loc in locations:
         if 'Big Chest' in loc.name:
+            ret.append(loc)
+    return ret
+
+
+def find_big_key_locked_locations(locations):
+    ret = []
+    for loc in locations:
+        if loc.name in ["Thieves' Town - Blind's Cell", "Hyrule Castle - Zelda's Chest"]:
             ret.append(loc)
     return ret
 
@@ -1149,7 +1232,7 @@ def set_paired_rules(key_logic, world, player):
 # Soft lock stuff
 def validate_key_layout(key_layout, world, player):
     # retro is all good - except for hyrule castle in standard mode
-    if world.retro[player] and (world.mode[player] != 'standard' or key_layout.sector.name != 'Hyrule Castle'):
+    if (world.retro[player] and (world.mode[player] != 'standard' or key_layout.sector.name != 'Hyrule Castle')) or world.logic[player] == 'nologic':
         return True
     flat_proposal = key_layout.flat_prop
     state = ExplorationState(dungeon=key_layout.sector.name)
@@ -1169,8 +1252,8 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
         return True   # I think that's the end
     # todo: fix state to separate out these types
     ttl_locations = count_free_locations(state) if state.big_key_opened else count_locations_exclude_big_chest(state)
-    ttl_key_only = count_key_only_locations(state)
-    available_small_locations = cnt_avail_small_locations(ttl_locations, ttl_key_only, state, world, player)
+    ttl_small_key_only = count_small_key_only_locations(state)
+    available_small_locations = cnt_avail_small_locations(ttl_locations, ttl_small_key_only, state, world, player)
     available_big_locations = cnt_avail_big_locations(ttl_locations, state, world, player)
     if invalid_self_locking_key(key_layout, state, prev_state, prev_avail, world, player):
         return False
@@ -1184,7 +1267,7 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
                 state_copy = state.copy()
                 open_a_door(exp_door.door, state_copy, flat_proposal)
                 state_copy.used_smalls += 1
-                if state_copy.used_smalls > ttl_key_only:
+                if state_copy.used_smalls > ttl_small_key_only:
                     state_copy.used_locations += 1
                 code = state_id(state_copy, flat_proposal)
                 if code not in checked_states.keys():
@@ -1260,7 +1343,10 @@ def create_key_counters(key_layout, world, player):
     key_counters = {}
     flat_proposal = key_layout.flat_prop
     state = ExplorationState(dungeon=key_layout.sector.name)
-    state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
+    if world.doorShuffle[player] == 'vanilla':
+        state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
+    else:
+        state.key_locations = world.dungeon_layouts[player][key_layout.sector.name].key_doors_num
     state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in key_layout.sector.regions
     for region in key_layout.start_regions:
         state.visit_region(region, key_checks=True)
@@ -1294,8 +1380,10 @@ def create_key_counter(state, key_layout, world, player):
         if important_location(loc, world, player):
             key_counter.important_location = True
             key_counter.other_locations[loc] = None
-        elif loc.event and 'Small Key' in loc.item.name:
+        elif loc.forced_item and loc.item.name == key_layout.key_logic.small_key_name:
             key_counter.key_only_locations[loc] = None
+        elif loc.forced_item and loc.item.name == key_layout.key_logic.bk_name:
+            key_counter.other_locations[loc] = None
         elif loc.name not in dungeon_events:
             key_counter.free_locations[loc] = None
         else:
@@ -1306,11 +1394,6 @@ def create_key_counter(state, key_layout, world, player):
         key_counter.big_key_opened = state.visited(world.get_region('Hyrule Dungeon Cellblock', player))
     else:
         key_counter.big_key_opened = state.big_key_opened
-    # if soft_lock_check:
-    #     avail_chests = available_chest_small_keys(key_counter, key_counter.big_key_opened, world)
-    #     avail_keys = avail_chests + len(key_counter.key_only_locations)
-    #     if avail_keys <= key_counter.used_keys and avail_keys < key_layout.max_chests + key_layout.max_drops:
-    #         raise SoftLockException()
     return key_counter
 
 
@@ -1322,13 +1405,14 @@ def imp_locations_factory(world, player):
     if imp_locations:
         return imp_locations
     imp_locations = ['Agahnim 1', 'Agahnim 2', 'Attic Cracked Floor', 'Suspicious Maiden']
-    if world.mode[player] == 'standard' or world.doorShuffle[player] == 'crossed':
-        imp_locations.append('Hyrule Dungeon Cellblock')
+    if world.mode[player] == 'standard':
+        imp_locations.append('Zelda Pickup')
+        imp_locations.append('Zelda Dropoff')
     return imp_locations
 
 
 def important_location(loc, world, player):
-    return '- Prize' in loc.name or loc.name in imp_locations_factory(world, player)
+    return '- Prize' in loc.name or loc.name in imp_locations_factory(world, player) or (loc.forced_item is not None and loc.item.bigkey)
 
 
 def create_odd_key_counter(door, parent_counter, key_layout, world, player):
@@ -1390,6 +1474,8 @@ def find_counter_hint(opened_doors, bk_hint, key_layout):
 
 def find_max_counter(key_layout):
     max_counter = find_counter_hint(dict.fromkeys(key_layout.flat_prop), False, key_layout)
+    if max_counter is None:
+        raise Exception("Max Counter is none - something is amiss")
     if len(max_counter.child_doors) > 0:
         max_counter = find_counter_hint(dict.fromkeys(key_layout.flat_prop), True, key_layout)
     return max_counter
@@ -1604,7 +1690,10 @@ def validate_key_placement(key_layout, world, player):
     for code, counter in key_layout.key_counters.items():
         if len(counter.child_doors) == 0:
             continue
-        big_found = any(i.item == dungeon.big_key for i in counter.free_locations if "- Big Chest" not in i.name) or big_key_outside
+        if key_layout.big_key_special:
+            big_found = any(i.forced_item is not None and i.item.bigkey for i in counter.other_locations) or big_key_outside
+        else:
+            big_found = any(i.item is not None and i.item == dungeon.big_key for i in counter.free_locations if "- Big Chest" not in i.name) or big_key_outside
         if counter.big_key_opened and not big_found:
             continue  # Can't get to this state
         found_locations = set(i for i in counter.free_locations if big_found or "- Big Chest" not in i.name)

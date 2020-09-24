@@ -1,28 +1,19 @@
 import logging
-from BaseClasses import CollectionState, RegionType, DoorType
+from collections import deque
+
+from BaseClasses import CollectionState, RegionType, DoorType, Entrance
 from Regions import key_only_locations
 from RoomData import DoorKind
-from collections import deque
 
 
 def set_rules(world, player):
 
     if world.logic[player] == 'nologic':
         logging.getLogger('').info('WARNING! Seeds generated under this logic often require major glitches and may be impossible!')
-        if world.mode[player] != 'inverted':
-            world.get_region('Links House', player).can_reach_private = lambda state: True
-            world.get_region('Sanctuary', player).can_reach_private = lambda state: True
-            old_rule = world.get_region('Old Man House', player).can_reach
-            world.get_region('Old Man House', player).can_reach_private = lambda state: state.can_reach('Old Man', 'Location', player) or old_rule(state)
-            return
-        else:
-            world.get_region('Inverted Links House', player).can_reach_private = lambda state: True
-            world.get_region('Inverted Dark Sanctuary', player).entrances[0].parent_region.can_reach_private = lambda state: True
-            if world.shuffle[player] != 'vanilla':
-                old_rule = world.get_region('Old Man House', player).can_reach
-                world.get_region('Old Man House', player).can_reach_private = lambda state: state.can_reach('Old Man', 'Location', player) or old_rule(state)
-            world.get_region('Hyrule Castle Ledge', player).can_reach_private = lambda state: True
-            return
+        world.get_region('Menu', player).can_reach_private = lambda state: True
+        for exit in world.get_region('Menu', player).exits:
+            exit.hide_path = True
+        return
 
     global_rules(world, player)
     if world.mode[player] != 'inverted':
@@ -113,8 +104,11 @@ def global_rules(world, player):
     add_item_rule(world.get_location('Ganon', player), lambda item: item.name == 'Triforce' and item.player == player)
 
     # we can s&q to the old man house after we rescue him. This may be somewhere completely different if caves are shuffled!
-    old_rule = world.get_region('Old Man House', player).can_reach_private
-    world.get_region('Old Man House', player).can_reach_private = lambda state: state.can_reach('Old Man', 'Location', player) or old_rule(state)
+    world.get_region('Menu', player).can_reach_private = lambda state: True
+    for exit in world.get_region('Menu', player).exits:
+        exit.hide_path = True
+
+    set_rule(world.get_entrance('Old Man S&Q', player), lambda state: state.can_reach('Old Man', 'Location', player))
 
     set_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
     set_rule(world.get_location('Dark Blacksmith Ruins', player), lambda state: state.has('Return Smith', player))
@@ -165,9 +159,17 @@ def global_rules(world, player):
 
     # Tower of Hera
     set_rule(world.get_location('Tower of Hera - Big Key Chest', player), lambda state: state.has_fire_source(player))
+    set_rule(world.get_entrance('Hera Big Chest Hook Path', player), lambda state: state.has('Hookshot', player))
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Prize', player))
 
+    # Castle Tower
+    set_rule(world.get_entrance('Tower Gold Knights SW', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Tower Gold Knights EN', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Tower Dark Archers WN', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Tower Red Spears WN', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Tower Red Guards EN', player), lambda state: state.can_kill_most_things(player))
+    set_rule(world.get_entrance('Tower Red Guards SW', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_entrance('Tower Altar NW', player), lambda state: state.has_sword(player))
     set_defeat_dungeon_boss_rule(world.get_location('Agahnim 1', player))
 
@@ -205,6 +207,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Swamp Flooded Room Ladder', player), lambda state: state.has('Drained Swamp', player))
     set_rule(world.get_location('Swamp Palace - Flooded Room - Left', player), lambda state: state.has('Drained Swamp', player))
     set_rule(world.get_location('Swamp Palace - Flooded Room - Right', player), lambda state: state.has('Drained Swamp', player))
+    set_rule(world.get_entrance('Swamp Flooded Spot Ladder', player), lambda state: state.has('Flippers', player) or state.has('Drained Swamp', player))
+    set_rule(world.get_entrance('Swamp Drain Left Up Stairs', player), lambda state: state.has('Flippers', player) or state.has('Drained Swamp', player))
     set_rule(world.get_entrance('Swamp Waterway NW', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Swamp Waterway N', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Swamp Waterway NE', player), lambda state: state.has('Flippers', player))
@@ -270,7 +274,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Hub NE', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Torches NW', player), lambda state: state.has('Cane of Somaria', player) and state.has('Fire Rod', player))
     set_rule(world.get_entrance('TR Big Chest Entrance Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has('Hookshot', player))
-    set_rule(world.get_entrance('TR Big Chest Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has('Hookshot', player))
+    set_rule(world.get_entrance('TR Big Chest Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has_Boots(player))
     set_rule(world.get_entrance('TR Dark Ride Up Stairs', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Dark Ride SW', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Crystal Maze Cane Path', player), lambda state: state.has('Cane of Somaria', player))
@@ -323,8 +327,6 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Moldorm Gap', player), lambda state: state.has('Hookshot', player) and world.get_region('GT Moldorm', player).dungeon.bosses['top'].can_defeat(state))
     set_defeat_dungeon_boss_rule(world.get_location('Agahnim 2', player))
 
-    add_key_logic_rules(world, player)
-
     # crystal switch rules
     set_rule(world.get_entrance('PoD Arena Crystal Path', player), lambda state: state.can_reach_blue(world.get_region('PoD Arena Crystal', player), player))
     set_rule(world.get_entrance('Swamp Trench 2 Pots Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Swamp Trench 2 Pots', player), player))
@@ -375,6 +377,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Double Switch Orange Path', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Switches', player), player))
     set_rule(world.get_entrance('GT Double Switch Key Orange Path', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Key Spot', player), player))
 
+    add_key_logic_rules(world, player)
+
     # End of door rando rules.
 
     add_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
@@ -384,16 +388,6 @@ def global_rules(world, player):
 
 
 def default_rules(world, player):
-    if world.mode[player] == 'standard':
-        # Links house requires reaching Sanc so skipping that chest isn't a softlock.
-        world.get_region('Hyrule Castle Secret Entrance', player).can_reach_private = lambda state: True
-        old_rule = world.get_region('Links House', player).can_reach_private
-        world.get_region('Links House', player).can_reach_private = lambda state: state.has('Zelda Delivered', player) or old_rule(state)
-    else:
-        # these are default save&quit points and always accessible
-        world.get_region('Links House', player).can_reach_private = lambda state: True
-        world.get_region('Sanctuary', player).can_reach_private = lambda state: True
-
     # overworld requirements
     set_rule(world.get_entrance('Kings Grave', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('Kings Grave Outer Rocks', player), lambda state: state.can_lift_heavy_rocks(player))
@@ -506,12 +500,7 @@ def default_rules(world, player):
 
 def inverted_rules(world, player):
     # s&q regions. link's house entrance is set to true so the filler knows the chest inside can always be reached
-    world.get_region('Inverted Links House', player).can_reach_private = lambda state: True
-    world.get_region('Inverted Links House', player).entrances[0].can_reach = lambda state: True
-    world.get_region('Inverted Dark Sanctuary', player).entrances[0].parent_region.can_reach_private = lambda state: True
-
-    old_rule = world.get_region('Hyrule Castle Ledge', player).can_reach_private
-    world.get_region('Hyrule Castle Ledge', player).can_reach_private = lambda state: (state.has_Mirror(player) and state.has('Beat Agahnim 1', player) and state.can_reach_light_world(player)) or old_rule(state)
+    set_rule(world.get_entrance('Castle Ledge S&Q', player), lambda state: state.has_Mirror(player) and state.has('Beat Agahnim 1', player))
 
     # overworld requirements 
     set_rule(world.get_location('Maze Race', player), lambda state: state.has_Pearl(player))
@@ -824,7 +813,19 @@ std_kill_rooms = {
 }  # all trap rooms?
 
 
+def add_connection(parent_name, target_name, entrance_name, world, player):
+    parent = world.get_region(parent_name, player)
+    target = world.get_region(target_name, player)
+    connection = Entrance(player, entrance_name, parent)
+    parent.exits.append(connection)
+    connection.connect(target)
+
+
 def standard_rules(world, player):
+    add_connection('Menu', 'Hyrule Castle Secret Entrance', 'Uncle S&Q', world, player)
+    world.get_entrance('Uncle S&Q', player).hide_path = True
+    set_rule(world.get_entrance('Links House S&Q', player), lambda state: state.can_reach('Sanctuary', 'Region', player))
+    set_rule(world.get_entrance('Sanctuary S&Q', player), lambda state: state.can_reach('Sanctuary', 'Region', player))
     # these are because of rails
     if world.shuffle[player] != 'vanilla':
         set_rule(world.get_entrance('Hyrule Castle Exit (East)', player), lambda state: state.has('Zelda Delivered', player))
@@ -837,24 +838,32 @@ def standard_rules(world, player):
         copy_state.sweep_for_events()
         return copy_state.has('Zelda Delivered', player)
 
+    def bomb_escape_rule():
+        loc = world.get_location("Link's Uncle", player)
+        return loc.item and loc.item.name == 'Bombs (10)'
+
+    def standard_escape_rule(state):
+        return state.can_kill_most_things(player) or bomb_escape_rule()
+
     add_item_rule(world.get_location('Link\'s Uncle', player), uncle_item_rule)
 
     # ensures the required weapon for escape lands on uncle (unless player has it pre-equipped)
     for location in ['Link\'s House', 'Sanctuary', 'Sewers - Secret Room - Left', 'Sewers - Secret Room - Middle',
                      'Sewers - Secret Room - Right']:
-        add_rule(world.get_location(location, player), lambda state: state.can_kill_most_things(player))
-    add_rule(world.get_location('Secret Passage', player), lambda state: state.can_kill_most_things(player))
+        add_rule(world.get_location(location, player), lambda state: standard_escape_rule(state))
+    add_rule(world.get_location('Secret Passage', player), lambda state: standard_escape_rule(state))
 
     escape_builder = world.dungeon_layouts[player]['Hyrule Castle']
     for region in escape_builder.master_sector.regions:
         for loc in region.locations:
-            add_rule(loc, lambda state: state.can_kill_most_things(player))
+            add_rule(loc, lambda state: standard_escape_rule(state))
         if region.name in std_kill_rooms:
             for ent in std_kill_rooms[region.name]:
-                add_rule(world.get_entrance(ent, player), lambda state: state.can_kill_most_things(player))
+                add_rule(world.get_entrance(ent, player), lambda state: standard_escape_rule(state))
 
     set_rule(world.get_location('Zelda Pickup', player), lambda state: state.has('Big Key (Escape)', player))
-    set_rule(world.get_entrance('Hyrule Castle Throne Room N', player), lambda state: state.has('Zelda Herself', player))
+    set_rule(world.get_entrance('Hyrule Castle Throne Room Tapestry', player), lambda state: state.has('Zelda Herself', player))
+    set_rule(world.get_entrance('Hyrule Castle Tapestry Backwards', player), lambda state: state.has('Zelda Herself', player))
 
     def check_rule_list(state, r_list):
         return True if len(r_list) <= 0 else r_list[0](state) and check_rule_list(state, r_list[1:])
@@ -1039,7 +1048,7 @@ def set_big_bomb_rules(world, player):
     # the basic routes assume you can reach eastern light world with the bomb.
     # you can then use the southern teleporter, or (if you have beaten Aga1) the hyrule castle gate warp
     def basic_routes(state):
-        return southern_teleporter(state) or state.can_reach('Top of Pyramid', 'Entrance', player)
+        return southern_teleporter(state) or state.has('Beat Agahnim 1', player)
 
     # Key for below abbreviations:
     # P = pearl
@@ -1072,7 +1081,7 @@ def set_big_bomb_rules(world, player):
         #1. Mirror and enter via gate: Need mirror and Aga1
         #2. cross peg bridge: Need hammer and moon pearl
         # -> CPB or (M and A)
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: cross_peg_bridge(state) or (state.has_Mirror(player) and state.can_reach('Top of Pyramid', 'Entrance', player)))
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: cross_peg_bridge(state) or (state.has_Mirror(player) and state.has('Beat Agahnim 1', player)))
     elif bombshop_entrance.name in Isolated_DW_entrances:
         # 1. mirror then flute then basic routes
         # -> M and Flute and BR

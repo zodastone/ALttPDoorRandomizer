@@ -12,7 +12,7 @@
 CheckIfDoorsOpen: {
     jsr TrapDoorFixer ; see normal.asm
     ; note we are 16bit mode right now
-    lda DRMode : beq +
+    lda.l DRMode : beq +
         lda $040c : cmp #$00ff : bne .gtg
     + lda $a0 : dec : tax : and #$000f ; hijacked code
     sec : rtl ; set carry to indicate normal behavior
@@ -22,9 +22,9 @@ CheckIfDoorsOpen: {
     stx $00 : ldy #$0000
     .nextDoor
     lda $a0 : asl : tax
-    lda KeyDoorOffset, x : beq .skipDoor
+    lda.w KeyDoorOffset, x : beq .skipDoor
     asl : sty $05 : !add $05 : tax
-    lda PairedDoorTable, x : beq .skipDoor
+    lda.w PairedDoorTable, x : beq .skipDoor
     sta $02 : and #$00ff : asl a : tax
     lda $02 : and #$ff00 : sta $03
     lda $7ef000, x : and #$f000 : and $03 : beq .skipDoor

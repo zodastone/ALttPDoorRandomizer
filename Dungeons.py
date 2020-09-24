@@ -162,13 +162,13 @@ dungeon_music_addresses = {'Eastern Palace - Prize': [0x1559A],
 
 hyrule_castle_regions = [
     'Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall',
-    'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Dungeon Map Room',
-    'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk', 'Hyrule Dungeon South Abyss',
-    'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom', 'Hyrule Dungeon Armory Main',
-    'Hyrule Dungeon Armory Boomerang',  'Hyrule Dungeon Armory North Branch', 'Hyrule Dungeon Staircase',
-    'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water',
-    'Sewers Key Rat', 'Sewers Rat Path', 'Sewers Secret Room Blocked Path', 'Sewers Secret Room',
-    'Sewers Yet More Rats', 'Sewers Pull Switch', 'Sanctuary'
+    'Hyrule Castle West Hall', 'Hyrule Castle Back Hall', 'Hyrule Castle Throne Room', 'Hyrule Castle Behind Tapestry',
+    'Hyrule Dungeon Map Room', 'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk',
+    'Hyrule Dungeon South Abyss', 'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom',
+    'Hyrule Dungeon Armory Main', 'Hyrule Dungeon Armory Boomerang',  'Hyrule Dungeon Armory North Branch',
+    'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room',
+    'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Rat Path', 'Sewers Secret Room Blocked Path',
+    'Sewers Secret Room', 'Sewers Yet More Rats', 'Sewers Pull Switch', 'Sanctuary'
 ]
 
 eastern_regions = [
@@ -238,7 +238,7 @@ thieves_regions = [
     'Thieves Big Chest Nook', 'Thieves Hallway', 'Thieves Boss', 'Thieves Pot Alcove Mid', 'Thieves Pot Alcove Bottom',
     'Thieves Pot Alcove Top', 'Thieves Conveyor Maze', 'Thieves Spike Track', 'Thieves Hellway',
     'Thieves Hellway N Crystal', 'Thieves Hellway S Crystal', 'Thieves Triple Bypass', 'Thieves Spike Switch',
-    'Thieves Attic', 'Thieves Cricket Hall Left', 'Thieves Cricket Hall Right', 'Thieves Attic Window',
+    'Thieves Attic', 'Thieves Attic Hint', 'Thieves Cricket Hall Left', 'Thieves Cricket Hall Right', 'Thieves Attic Window',
     'Thieves Basement Block', 'Thieves Blocked Entry', 'Thieves Lonely Zazak', 'Thieves Blind\'s Cell',
     'Thieves Conveyor Bridge', 'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap'
 ]
@@ -331,6 +331,10 @@ region_starts = {
     'Ganons Tower': ['GT Lobby']
 }
 
+standard_starts = {
+    'Hyrule Castle': ['Hyrule Castle Lobby']
+}
+
 split_region_starts = {
     'Desert Palace': {
         'Back': ['Desert Back Lobby'],
@@ -346,10 +350,6 @@ split_region_starts = {
 flexible_starts = {
     'Skull Woods': ['Skull Left Drop', 'Skull Pinball']
 }
-
-drop_entrances = [
-    'Sewers Rat Path', 'Skull Pinball', 'Skull Left Drop', 'Sanctuary'  # Pot circle, Back drop have unique access
-]
 
 dungeon_keys = {
     'Hyrule Castle': 'Small Key (Escape)',
