@@ -16,7 +16,7 @@ from InvertedRegions import create_inverted_regions, mark_dark_world_regions
 from EntranceShuffle import link_entrances, link_inverted_entrances
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, JsonRom, get_hash_string
 from Doors import create_doors
-from DoorShuffle import link_doors, connect_portal
+from DoorShuffle import link_doors, connect_portal_copy
 from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
@@ -444,7 +444,7 @@ def copy_world(world):
     ret.dungeon_portals = world.dungeon_portals
     for player, portals in world.dungeon_portals.items():
         for portal in portals:
-            connect_portal(portal, ret, player)
+            connect_portal_copy(portal, ret, player)
     ret.sanc_portal = world.sanc_portal
 
     for player in range(1, world.players + 1):

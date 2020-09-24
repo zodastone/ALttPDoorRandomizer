@@ -1253,15 +1253,16 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player,
 
         if world.mode[player] == 'open' and world.shuffle[player] not in ['crossed', 'insanity']:
             sanc = find_sector('Sanctuary', candidate_sectors)
-            lw_builders = []
-            for name, portal_list in dungeon_portals.items():
-                for portal_name in portal_list:
-                    if world.get_portal(portal_name, player).light_world:
-                        lw_builders.append(dungeon_map[name])
-                        break
-            # portals only - not drops for mirror stuff
-            sanc_builder = random.choice(lw_builders)
-            assign_sector(sanc, sanc_builder, candidate_sectors, global_pole)
+            if sanc:  # only run if sanc if a candidate
+                lw_builders = []
+                for name, portal_list in dungeon_portals.items():
+                    for portal_name in portal_list:
+                        if world.get_portal(portal_name, player).light_world:
+                            lw_builders.append(dungeon_map[name])
+                            break
+                # portals only - not drops for mirror stuff
+                sanc_builder = random.choice(lw_builders)
+                assign_sector(sanc, sanc_builder, candidate_sectors, global_pole)
 
         free_location_sectors = {}
         crystal_switches = {}

@@ -4,6 +4,7 @@ import logging
 import operator as op
 import time
 from enum import unique, Flag
+from typing import DefaultDict, Dict, List
 
 from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo
@@ -41,8 +42,21 @@ def link_doors(world, player):
         for entrance, ext in straight_staircases:
             connect_two_way(world, entrance, ext, player)
 
+    if world.doorShuffle[player] in ['basic', 'crossed']:
+        find_inaccessible_regions(world, player)
+
     if world.intensity[player] >= 3:
         choose_portals(world, player)
+    else:
+        for portal in world.dungeon_portals[player]:
+            connect_portal(portal, world, player)
+        world.get_portal('Desert East', player).destination = True
+        world.get_portal('Desert Back', player).deadEnd = True
+        world.get_portal('Skull 1', player).deadEnd = True
+        world.get_portal('Skull 2 West', player).destination = True
+        world.get_portal('Skull 3', player).deadEnd = True
+        world.get_portal('Turtle Rock Lazy Eyes', player).destination = True
+        world.get_portal('Turtle Rock Eye Bridge', player).destination = True
 
     if world.doorShuffle[player] == 'vanilla':
         for entrance, ext in open_edges:
@@ -320,12 +334,12 @@ def choose_portals(world, player):
         world.get_room(0x62, player).delete(5)
         world.get_room(0x62, player).change(1, DoorKind.DungeonEntrance)
 
-        find_inaccessible_regions(world, player)
         info_map = {}
         for dungeon, portal_list in dungeon_portals.items():
             info = DungeonInfo(dungeon)
             region_map = defaultdict(list)
             reachable_portals = []
+            inaccessible_portals = []
             for portal in portal_list:
                 placeholder = world.get_region(portal + ' Placeholder', player)
                 portal_region = placeholder.exits[0].connected_region
@@ -333,12 +347,17 @@ def choose_portals(world, player):
                     world.get_portal(portal, player).light_world = True
                 if portal_region.name in world.inaccessible_regions[player]:
                     region_map[portal_region.name].append(portal)
+                    inaccessible_portals.append(portal)
                 else:
                     reachable_portals.append(portal)
             info.total = len(portal_list)
             info.required_passage = region_map
             if len(reachable_portals) == 0:
-                raise Exception('please inspect this case')
+                if len(inaccessible_portals) == 1:
+                    info.sole_entrance = inaccessible_portals[0]
+                    info.required_passage.clear()
+                else:
+                    raise Exception('please inspect this case')
             if len(reachable_portals) == 1:
                 info.sole_entrance = reachable_portals[0]
             info_map[dungeon] = info
@@ -347,7 +366,7 @@ def choose_portals(world, player):
         portal_assignment = defaultdict(list)
         for dungeon, info in info_map.items():
             outstanding_portals = list(dungeon_portals[dungeon])
-            if dungeon == 'Hyrule Castle' and world.mode[player] == 'Standard':
+            if dungeon == 'Hyrule Castle' and world.mode[player] == 'standard':
                 sanc = world.get_portal('Sanctuary', player)
                 sanc.destination = True
                 clean_up_portal_assignment(portal_assignment, dungeon, sanc, master_door_list, outstanding_portals)
@@ -413,6 +432,27 @@ def connect_portal(portal, world, player):
     world.regions.remove(placeholder)
 
 
+def connect_portal_copy(portal, world, player):
+    ent, ext = portal_map[portal.name]
+    if world.mode[player] == 'inverted' and portal.name in ['Ganons Tower', 'Agahnims Tower']:
+        ext = 'Inverted ' + ext
+    portal_entrance = world.get_entrance(portal.door.entrance.name, player)  # ensures I get the right one for copying
+    target_exit = world.get_entrance(ext, player)
+    entrance_region = portal_entrance.parent_region
+    copy_entrance = None
+    for e in portal_entrance.parent_region.entrances:
+        if e.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] and e.parent_region.name != 'Menu':
+            copy_entrance = e
+            break
+    entrance_region.exits.remove(portal_entrance)
+    entrance_region.exits.append(target_exit)
+    target_exit.parent_region = entrance_region
+    target_exit.connected_region = copy_entrance.parent_region
+
+    placeholder = world.get_region(portal.name + ' Placeholder', player)
+    world.regions.remove(placeholder)
+
+
 def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allowed=False, crossed=False, bk_shuffle=False):
     filter_list = [x for x in door_list if bk_shuffle or not x.bk_shuffle_req]
     if need_passage:
@@ -469,7 +509,7 @@ def clean_up_portal_assignment(portal_assignment, dungeon, portal, master_door_l
 
 def create_dungeon_entrances(world, player):
     entrance_map = defaultdict(list)
-    split_map = defaultdict(dict)
+    split_map: DefaultDict[str, DefaultDict[str, List]] = defaultdict(lambda: defaultdict(list))
     for key, portal_list in dungeon_portals.items():
         if world.mode[player] == 'standard' and key in standard_starts.keys():
             portal = world.get_portal('Hyrule Castle South', player)
@@ -477,13 +517,43 @@ def create_dungeon_entrances(world, player):
         else:
             if key in dungeon_drops.keys():
                 entrance_map[key].extend(dungeon_drops[key])
-            for portal_name in portal_list:
-                portal = world.get_portal(portal_name, player)
-                r_name = portal.door.entrance.parent_region.name
-                entrance_map[key].append(r_name)
-                if key in split_portals.keys():
-                    for split_key in split_portals[key]:
-                        split_map[key][split_key] = []
+            if key in split_portals.keys() and world.intensity[player] >= 3:
+                dead_ends = []
+                destinations = []
+                the_rest = []
+                for portal_name in portal_list:
+                    portal = world.get_portal(portal_name, player)
+                    r_name = portal.door.entrance.parent_region.name
+                    entrance_map[key].append(r_name)
+                    if portal.deadEnd:
+                        dead_ends.append(r_name)
+                    elif portal.destination:
+                        destinations.append(r_name)
+                    else:
+                        the_rest.append(r_name)
+                choices = list(split_portals[key])
+                for r_name in dead_ends:
+                    choice = random.choice(choices)
+                    choices.remove(choice)
+                    split_map[key][choice].append(r_name)
+                for r_name in the_rest:
+                    choice = random.choice(choices)
+                    split_map[key][choice].append(r_name)
+                dest_choices = [x for x in choices if len(split_map[key][x]) > 0]
+                for r_name in destinations:
+                    choice = random.choice(dest_choices)
+                    split_map[key][choice].append(r_name)
+            else:
+                for portal_name in portal_list:
+                    portal = world.get_portal(portal_name, player)
+                    r_name = portal.door.entrance.parent_region.name
+                    entrance_map[key].append(r_name)
+                    if key in split_portals.keys():
+                        for split_key in split_portals[key]:
+                            if split_key not in split_map[key]:
+                                split_map[key][split_key] = []
+                            if world.intensity[player] < 3:
+                                split_map[key][split_portal_defaults[key][r_name]].append(r_name)
     return entrance_map, split_map
 
 
@@ -2376,19 +2446,19 @@ split_portals = {
     'Skull Woods': ['1', '2', '3']
 }
 
-# split_portals = {
-#     'Desert Palace': {
-#         'Desert Back': 'Back',
-#         'Desert South': 'Main',
-#         'Desert West': 'Main',
-#         'Desert East': 'Main'
-#     },
-#     'Skull Woods': {
-#         'Skull 1': '1',
-#         'Skull 2 East': '2',
-#         'Skull 2 West': '2',
-#         'Skull 3': '3'
-#     }
-# }
+split_portal_defaults = {
+    'Desert Palace': {
+        'Desert Back Lobby': 'Back',
+        'Desert Main Lobby': 'Main',
+        'Desert West Lobby': 'Main',
+        'Desert East Lobby': 'Main'
+    },
+    'Skull Woods': {
+        'Skull 1 Lobby': '1',
+        'Skull 2 East Lobby': '2',
+        'Skull 2 West Lobby': '2',
+        'Skull 3 Lobby': '3'
+    }
+}
 
 
