@@ -30,6 +30,12 @@ class GraphPiece:
 # Dungeons shouldn't be generated until all entrances are appropriately accessible
 def pre_validate(builder, entrance_region_names, split_dungeon, world, player):
     entrance_regions = convert_regions(entrance_region_names, world, player)
+    excluded = {}
+    for region in entrance_regions:
+        portal = next((x for x in world.dungeon_portals[player] if x.door.entrance.parent_region == region), None)
+        if portal and portal.destination:
+            excluded[region] = None
+    entrance_regions = [x for x in entrance_regions if x not in excluded.keys()]
     proposed_map = {}
     doors_to_connect = {}
     all_regions = set()
@@ -90,6 +96,12 @@ def generate_dungeon_find_proposal(builder, entrance_region_names, split_dungeon
     logger = logging.getLogger('')
     name = builder.name
     entrance_regions = convert_regions(entrance_region_names, world, player)
+    excluded = {}
+    for region in entrance_regions:
+        portal = next((x for x in world.dungeon_portals[player] if x.door.entrance.parent_region == region), None)
+        if portal and portal.destination:
+            excluded[region] = None
+    entrance_regions = [x for x in entrance_regions if x not in excluded.keys()]
     doors_to_connect = {}
     all_regions = set()
     bk_needed = False
@@ -1076,14 +1088,18 @@ def special_big_key_found(state, world, player):
 def valid_region_to_explore_in_regions(region, all_regions, world, player):
     if region is None:
         return False
-    return (region.type == RegionType.Dungeon and region in all_regions) or region.name in world.inaccessible_regions[player]
+    return (region.type == RegionType.Dungeon and region in all_regions)\
+        or region.name in world.inaccessible_regions[player]\
+        or (region.name == 'Hyrule Castle Ledge' and world.mode[player] == 'standard')
 
 
 # cross-utility methods
 def valid_region_to_explore(region, name, world, player):
     if region is None:
         return False
-    return (region.type == RegionType.Dungeon and region.dungeon.name in name) or region.name in world.inaccessible_regions[player]
+    return (region.type == RegionType.Dungeon and region.dungeon.name in name)\
+        or region.name in world.inaccessible_regions[player]\
+        or (region.name == 'Hyrule Castle Ledge' and world.mode[player] == 'standard')
 
 
 def get_doors(world, region, player):
@@ -1159,9 +1175,7 @@ class DungeonBuilder(object):
         self.key_door_proposal = None
 
         self.allowance = None
-        if name in dungeon_dead_end_allowance.keys():
-            self.allowance = dungeon_dead_end_allowance[name]
-        elif 'Stonewall' in name:
+        if 'Stonewall' in name:
             self.allowance = 1
         elif 'Prewall' in name:
             orig_name = name[:-8]
@@ -2597,12 +2611,42 @@ def categorize_groupings(sectors):
 
 
 def valid_assignment(builder, sector_list, builder_info):
+    if not valid_entrance(builder, sector_list, builder_info):
+        return False
     if not valid_c_switch(builder, sector_list):
         return False
     if not valid_polarized_assignment(builder, sector_list):
         return False
     resolved, problems = check_for_valid_layout(builder, sector_list, builder_info)
     return resolved
+
+
+def valid_entrance(builder, sector_list, builder_info):
+    is_dead_end = False
+    if len(builder.sectors) == 0:
+        is_dead_end = True
+    else:
+        entrances, splits, world, player = builder_info
+        if builder.name not in entrances.keys():
+            name_parts = builder.name.rsplit(' ', 1)
+            entrance_list = splits[name_parts[0]][name_parts[1]]
+            entrances = []
+            for sector in builder.sectors:
+                if sector.is_entrance_sector():
+                    sector.region_set()
+                    entrances.append(sector)
+            all_dead = True
+            for sector in entrances:
+                for region in entrance_list:
+                    if region in sector.region_set():
+                        portal = next((x for x in world.dungeon_portals[player] if x.door.entrance.parent_region.name == region))
+                        if not portal.deadEnd:
+                            all_dead = False
+                        break
+                if not all_dead:
+                    break
+            is_dead_end = all_dead
+    return len(sector_list) == 0 if is_dead_end else True
 
 
 def valid_c_switch(builder, sector_list):
@@ -2699,17 +2743,38 @@ def split_dungeon_builder(builder, split_list, builder_info):
             builder.split_dungeon_map[name].valid_proposal = proposal
         return builder.split_dungeon_map  # we made this earlier in gen, just use it
 
-    attempts, comb_w_replace = 0, None
+    attempts, comb_w_replace, merge_attempt = 0, None, False
     while attempts < 5:  # does not solve coin flips 3% of the time
         try:
             candidate_sectors = dict.fromkeys(builder.sectors)
             global_pole = GlobalPolarity(candidate_sectors)
 
-            dungeon_map = {}
+            dungeon_map, sub_builder, merge_keys = {}, None, []
+            if merge_attempt:
+                candidates = []
+                for name, split_entrances in split_list.items():
+                    if len(split_entrances) > 1:
+                        candidates.append(name)
+                        continue
+                    elif len(split_entrances) <= 0:
+                        continue
+                    x, y, world, player = builder_info
+                    r_name = split_entrances[0]
+                    p = next(x for x in world.dungeon_portals[player] if x.door.entrance.parent_region.name == r_name)
+                    if not p.deadEnd:
+                        candidates.append(name)
+                merge_keys = random.sample(candidates, 2)
             for name, split_entrances in split_list.items():
                 key = builder.name + ' ' + name
-                dungeon_map[key] = sub_builder = DungeonBuilder(key)
-                sub_builder.all_entrances = split_entrances
+                if merge_keys and name in merge_keys:
+                    other_key = builder.name + ' ' + [x for x in merge_keys if x != name][0]
+                    if other_key in dungeon_map:
+                        key = other_key
+                        sub_builder = dungeon_map[other_key]
+                        sub_builder.all_entrances.extend(split_entrances)
+                if key not in dungeon_map:
+                    dungeon_map[key] = sub_builder = DungeonBuilder(key)
+                    sub_builder.all_entrances = list(split_entrances)
                 for r_name in split_entrances:
                     assign_sector(find_sector(r_name, candidate_sectors), sub_builder, candidate_sectors, global_pole)
             comb_w_replace = len(dungeon_map) ** len(candidate_sectors)
@@ -2719,6 +2784,9 @@ def split_dungeon_builder(builder, split_list, builder_info):
                 attempts += 5  # all the combinations were tried already, no use repeating
             else:
                 attempts += 1
+        if attempts >= 5 and not merge_attempt:
+            merge_attempt, attempts = True, 0
+
     raise GenerationException('Unable to resolve in 5 attempts')
 
 
@@ -2735,8 +2803,8 @@ def balance_split(candidate_sectors, dungeon_map, global_pole, builder_info):
             for i, choice in enumerate(choices):
                 chosen_sectors[choice].append(main_sector_list[i])
             all_valid = True
-            for name, sector_list in chosen_sectors.items():
-                if not valid_assignment(dungeon_map[name], sector_list, builder_info):
+            for name, builder in dungeon_map.items():
+                if not valid_assignment(builder, chosen_sectors[name], builder_info):
                     all_valid = False
                     break
             if all_valid:
@@ -3287,7 +3355,7 @@ def find_priority_equation(equations, access_id, current_access):
     if len(filtered_candidates) == 1:
         return filtered_candidates[0]
 
-    neutral_candidates = [x for x in filtered_candidates if x[0].neutral_profit() or x[0].neutral()]
+    neutral_candidates = [x for x in filtered_candidates if (x[0].neutral_profit() or x[0].neutral()) and x[0].profit(current_access) == local_profit_map[x[2]]]
     if len(neutral_candidates) == 0:
         neutral_candidates = filtered_candidates
     if len(neutral_candidates) == 1:

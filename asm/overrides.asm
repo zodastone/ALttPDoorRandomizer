@@ -88,10 +88,10 @@ SuctionOverworldFix:
     + rtl
 
 ; TT Alcove, Mire bridges, pod falling, SW torch room, TR Pipe room, Bob's Room, Ice Many Pots, Mire Hub
-; swamp waterfall
+; swamp waterfall, Gauntlet 3
 CutoffRooms:
 db $bc, $a2, $1a, $49, $14, $8c, $9f, $c2
-db $66
+db $66, $5d
 
 CutoffEntranceRug:
     pha : phx

@@ -51,10 +51,7 @@ def link_doors(world, player):
         for portal in world.dungeon_portals[player]:
             connect_portal(portal, world, player)
         world.get_portal('Desert East', player).destination = True
-        world.get_portal('Desert Back', player).deadEnd = True
-        world.get_portal('Skull 1', player).deadEnd = True
         world.get_portal('Skull 2 West', player).destination = True
-        world.get_portal('Skull 3', player).deadEnd = True
         world.get_portal('Turtle Rock Lazy Eyes', player).destination = True
         world.get_portal('Turtle Rock Eye Bridge', player).destination = True
 
@@ -343,10 +340,12 @@ def choose_portals(world, player):
             for portal in portal_list:
                 placeholder = world.get_region(portal + ' Placeholder', player)
                 portal_region = placeholder.exits[0].connected_region
+                name = portal_region.name
                 if portal_region.type == RegionType.LightWorld:
                     world.get_portal(portal, player).light_world = True
-                if portal_region.name in world.inaccessible_regions[player]:
-                    region_map[portal_region.name].append(portal)
+                if name in world.inaccessible_regions[player]:
+                    name_key = 'Desert Ledge' if name == 'Desert Palace Entrance (North) Spot' else name
+                    region_map[name_key].append(portal)
                     inaccessible_portals.append(portal)
                 else:
                     reachable_portals.append(portal)
@@ -403,6 +402,9 @@ def choose_portals(world, player):
     if not sanctuary_door.entranceFlag:
         world.get_room(0x12, player).delete(3)
         world.get_room(0x12, player).change(2, DoorKind.NormalLow)
+    hera_door = world.get_door('Hera Lobby S', player)
+    if not hera_door.entranceFlag:
+        world.get_room(0x77, player).change(0, DoorKind.NormalLow2)
 
     if not world.swamp_patch_required[player]:
         swamp_region = world.get_entrance('Swamp Palace', player).connected_region
@@ -425,10 +427,12 @@ def connect_portal(portal, world, player):
     else:
         edit_entrance = world.get_entrance(ent, player)
     entrance_region = portal_entrance.parent_region
+    old_region = edit_entrance.connected_region
     edit_entrance.connected_region = entrance_region
     entrance_region.exits.remove(portal_entrance)
     entrance_region.exits.append(target_exit)
     entrance_region.entrances.append(edit_entrance)
+    old_region.entrances.remove(edit_entrance)
     world.regions.remove(placeholder)
 
 
@@ -485,7 +489,7 @@ def assign_portal(candidates, possible_portals, world, player):
         old_door = portal.door
         if old_door:
             old_door.entranceFlag = False
-            if old_door.name not in ['Hyrule Castle Lobby S', 'Sanctuary S']:
+            if old_door.name not in ['Hyrule Castle Lobby S', 'Sanctuary S', 'Hera Lobby S']:
                 old_door_kind = DoorKind.NormalLow if old_door.layer or old_door.pseudo_bg else DoorKind.Normal
                 world.get_room(old_door.roomIndex, player).change(old_door.doorListPos, old_door_kind)
         portal.change_door(candidate)
@@ -510,6 +514,7 @@ def clean_up_portal_assignment(portal_assignment, dungeon, portal, master_door_l
 def create_dungeon_entrances(world, player):
     entrance_map = defaultdict(list)
     split_map: DefaultDict[str, DefaultDict[str, List]] = defaultdict(lambda: defaultdict(list))
+    originating: DefaultDict[str, DefaultDict[str, Dict]] = defaultdict(lambda: defaultdict(dict))
     for key, portal_list in dungeon_portals.items():
         if world.mode[player] == 'standard' and key in standard_starts.keys():
             portal = world.get_portal('Hyrule Castle South', player)
@@ -523,25 +528,36 @@ def create_dungeon_entrances(world, player):
                 the_rest = []
                 for portal_name in portal_list:
                     portal = world.get_portal(portal_name, player)
-                    r_name = portal.door.entrance.parent_region.name
-                    entrance_map[key].append(r_name)
+                    entrance_map[key].append(portal.door.entrance.parent_region.name)
                     if portal.deadEnd:
-                        dead_ends.append(r_name)
+                        dead_ends.append(portal)
                     elif portal.destination:
-                        destinations.append(r_name)
+                        destinations.append(portal)
                     else:
-                        the_rest.append(r_name)
+                        the_rest.append(portal)
                 choices = list(split_portals[key])
-                for r_name in dead_ends:
+                for portal in dead_ends:
                     choice = random.choice(choices)
                     choices.remove(choice)
+                    r_name = portal.door.entrance.parent_region.name
                     split_map[key][choice].append(r_name)
-                for r_name in the_rest:
+                for portal in the_rest:
+                    if len(choices) == 0:
+                        choices.append('Extra')
                     choice = random.choice(choices)
+                    p_entrance = portal.door.entrance
+                    r_name = p_entrance.parent_region.name
                     split_map[key][choice].append(r_name)
+                    originating[key][choice][p_entrance.connected_region.name] = None
                 dest_choices = [x for x in choices if len(split_map[key][x]) > 0]
-                for r_name in destinations:
-                    choice = random.choice(dest_choices)
+                for portal in destinations:
+                    restricted = portal.door.entrance.connected_region.name in world.inaccessible_regions[player]
+                    if restricted:
+                        filtered_choices = [x for x in choices if any(y not in world.inaccessible_regions[player] for y in originating[key][x].keys())]
+                    else:
+                        filtered_choices = dest_choices
+                    choice = random.choice(filtered_choices)
+                    r_name = portal.door.entrance.parent_region.name
                     split_map[key][choice].append(r_name)
             else:
                 for portal_name in portal_list:
@@ -605,7 +621,10 @@ def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map,
         split_builders = split_dungeon_builder(builder, split_list, builder_info)
         dungeon_builders.update(split_builders)
         for sub_name, split_entrances in split_list.items():
-            sub_builder = dungeon_builders[name+' '+sub_name]
+            key = name+' '+sub_name
+            if key not in dungeon_builders:
+                continue
+            sub_builder = dungeon_builders[key]
             sub_builder.split_flag = True
             entrance_list = list(split_entrances)
             for ent in entrances_map[name]:
@@ -700,9 +719,10 @@ def determine_entrance_list_2(world, player):
                     if parent.name not in world.inaccessible_regions[player]:
                         entrance_map[key].append(region_name)
                     else:
-                        if ent.parent_region not in potential_entrances.keys():
+                        if parent not in potential_entrances.keys():
                             potential_entrances[parent] = []
-                        potential_entrances[parent].append(region_name)
+                        if region_name not in potential_entrances[parent]:
+                            potential_entrances[parent].append(region_name)
                         connections[region_name] = parent
     return entrance_map, potential_entrances, connections
 
@@ -1047,7 +1067,9 @@ def combine_layouts(recombinant_builders, dungeon_builders, entrances_map):
 
 
 def valid_region_to_explore(region, world, player):
-    return region and (region.type == RegionType.Dungeon or region.name in world.inaccessible_regions[player])
+    return region and (region.type == RegionType.Dungeon
+                       or region.name in world.inaccessible_regions[player]
+                       or (region.name == 'Hyrule Castle Ledge' and world.mode[player] == 'standard'))
 
 
 def shuffle_key_doors(builder, world, player):
@@ -1503,6 +1525,9 @@ def valid_inaccessible_region(r):
 
 
 def add_inaccessible_doors(world, player):
+    if world.mode[player] == 'standard':
+        create_door(world, player, 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge')
+        create_door(world, player, 'Hyrule Castle Entrance (West)', 'Hyrule Castle Ledge')
     # todo: ignore standard mode hyrule castle ledge?
     for inaccessible_region in world.inaccessible_regions[player]:
         region = world.get_region(inaccessible_region, player)

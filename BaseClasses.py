@@ -1419,10 +1419,9 @@ class Sector(object):
                 self.branch_factor -= cnt_dead - 1
             for region in self.regions:
                 for ent in region.entrances:
-                    if ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] or ent.parent_region.name == 'Sewer Drop':
-                        # same sector as another entrance
-                        if region.name not in ['Skull Pot Circle', 'Skull Back Drop', 'Desert East Lobby', 'Desert West Lobby']:
-                            self.branch_factor += 1
+                    if (ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] and ent.parent_region.name != 'Menu') or ent.parent_region.name == 'Sewer Drop':
+                        self.branch_factor += 1
+                        break  # you only ever get one allowance for an entrance region, multiple entrances don't help
         return self.branch_factor
 
     def branches(self):

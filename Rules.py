@@ -42,7 +42,7 @@ def set_rules(world, player):
     elif world.goal[player] == 'ganon':
         # require aga2 to beat ganon
         add_rule(world.get_location('Ganon', player), lambda state: state.has('Beat Agahnim 2', player))
-    
+
     if world.mode[player] != 'inverted':
         set_big_bomb_rules(world, player)
     else:
@@ -593,7 +593,7 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Bumper Cave Exit (Top)', player), lambda state: state.has('Cape', player))
     set_rule(world.get_entrance('Bumper Cave Exit (Bottom)', player), lambda state: state.has('Cape', player) or state.has('Hookshot', player))
 
-    set_rule(world.get_entrance('Skull Woods Final Section', player), lambda state: state.has('Fire Rod', player)) 
+    set_rule(world.get_entrance('Skull Woods Final Section', player), lambda state: state.has('Fire Rod', player))
     set_rule(world.get_entrance('Misery Mire', player), lambda state: state.has_sword(player) and state.has_misery_mire_medallion(player))  # sword required to cast magic (!)
 
     set_rule(world.get_entrance('Hookshot Cave', player), lambda state: state.can_lift_rocks(player))
@@ -608,7 +608,7 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Superbunny Cave Exit (Bottom)', player), lambda state: False)  # Cannot get to bottom exit from top. Just exists for shuffling
     set_rule(world.get_entrance('Floating Island Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_sword(player) and state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock (Top)', 'Region', player)) # sword required to cast magic (!)
-    
+
     # new inverted spots
     set_rule(world.get_entrance('Post Aga Teleporter', player), lambda state: state.has('Beat Agahnim 1', player))
     set_rule(world.get_entrance('Mire Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -626,7 +626,7 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Graveyard Cave Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Bomb Hut Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Skull Woods Mirror Spot', player), lambda state: state.has_Mirror(player))
-    
+
     # inverted flute spots
 
     set_rule(world.get_entrance('DDM Flute', player), lambda state: state.can_flute(player))
@@ -639,7 +639,7 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('EDDM Flute', player), lambda state: state.can_flute(player))
     set_rule(world.get_entrance('Dark Grassy Lawn Flute', player), lambda state: state.can_flute(player))
     set_rule(world.get_entrance('Hammer Peg Area Flute', player), lambda state: state.can_flute(player))
-    
+
     set_rule(world.get_entrance('Inverted Pyramid Hole', player), lambda state: state.has('Beat Agahnim 2', player) or world.open_pyramid[player])
     set_rule(world.get_entrance('Inverted Ganons Tower', player), lambda state: False) # This is a safety for the TR function below to not require GT entrance in its key logic.
 
@@ -776,7 +776,7 @@ def swordless_rules(world, player):
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has('Hammer', player) or state.has('Beat Agahnim 1', player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
         set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_Pearl(player) and state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock (Top)', 'Region', player))   # sword not required to use medallion for opening in swordless (!)
         set_rule(world.get_entrance('Misery Mire', player), lambda state: state.has_Pearl(player) and state.has_misery_mire_medallion(player))  # sword not required to use medallion for opening in swordless (!)
-        set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has('Hammer', player) and state.has_Mirror(player))    
+        set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has('Hammer', player) and state.has_Mirror(player))
     else:
         # only need ddm access for aga tower in inverted
         set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock (Top)', 'Region', player))   # sword not required to use medallion for opening in swordless (!)
@@ -904,7 +904,9 @@ def find_rules_for_zelda_delivery(world, player):
         region, path_rules, path = queue.popleft()
         for ext in region.exits:
             connect = ext.connected_region
-            if connect and connect.type == RegionType.Dungeon and connect not in visited:
+            valid_region = connect and connect not in visited and\
+                (connect.type == RegionType.Dungeon or connect.name == 'Hyrule Castle Ledge')
+            if valid_region:
                 rule = ext.access_rule
                 rule_list = list(path_rules)
                 next_path = list(path)
@@ -1262,7 +1264,7 @@ def set_inverted_big_bomb_rules(world, player):
     LW_bush_entrances = ['Bush Covered House',
                          'Light World Bomb Hut',
                          'Graveyard Cave']
-    
+
     set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_reach('East Dark World', 'Region', player) and state.can_reach('Inverted Big Bomb Shop', 'Region', player) and state.has('Crystal 5', player) and state.has('Crystal 6', player))
 
     # crossing peg bridge starting from the southern dark world
@@ -1562,7 +1564,8 @@ def add_key_logic_rules(world, player):
     for d_name, d_logic in key_logic.items():
         for door_name, keys in d_logic.door_rules.items():
             spot = world.get_entrance(door_name, player)
-            add_rule(spot, create_advanced_key_rule(d_logic, player, keys))
+            if not world.retro[player] or world.mode[player] != 'standard' or not retro_in_hc(spot):
+                add_rule(spot, create_advanced_key_rule(d_logic, player, keys))
             if keys.opposite:
                 add_rule(spot, create_advanced_key_rule(d_logic, player, keys.opposite), 'or')
         for location in d_logic.bk_restricted:
@@ -1574,6 +1577,10 @@ def add_key_logic_rules(world, player):
             add_rule(world.get_entrance(door.name, player), create_rule(d_logic.bk_name, player))
         for chest in d_logic.bk_chests:
             add_rule(world.get_location(chest.name, player), create_rule(d_logic.bk_name, player))
+
+
+def retro_in_hc(spot):
+    return spot.parent_region.dungeon.name == 'Hyrule Castle' if spot.parent_region.dungeon else False
 
 
 def create_rule(item_name, player):
