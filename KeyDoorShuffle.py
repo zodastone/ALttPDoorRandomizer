@@ -832,6 +832,13 @@ def available_chest_small_keys_logic(key_counter, world, player, sm_restricted):
         return key_counter.max_chests
 
 
+def big_key_drop_available(key_counter):
+    for loc in key_counter.other_locations:
+        if loc.forced_big_key():
+            return True
+    return False
+
+
 def bk_restricted_rules(rule, door, odd_counter, empty_flag, key_counter, key_layout, world, player):
     if key_counter.big_key_opened:
         return
@@ -1138,8 +1145,9 @@ def check_rules_deep(original_counter, key_layout, world, player):
             bail = 0
         last_counter = counter
         chest_keys = available_chest_small_keys_logic(counter, world, player, key_logic.sm_restricted)
-        big_avail = counter.big_key_opened
-        big_maybe_not_found = not counter.big_key_opened
+        bk_drop = big_key_drop_available(counter)
+        big_avail = counter.big_key_opened or bk_drop
+        big_maybe_not_found = not counter.big_key_opened and not bk_drop  # better named as big_missing?
         if not key_layout.big_key_special and not big_avail:
             if world.bigkeyshuffle[player]:
                 big_avail = True
@@ -1150,7 +1158,7 @@ def check_rules_deep(original_counter, key_layout, world, player):
                         break
         outstanding_big_locs = {x for x in big_locations if x not in counter.free_locations}
         if big_maybe_not_found:
-            if len(outstanding_big_locs) == 0:
+            if len(outstanding_big_locs) == 0 and not key_layout.big_key_special:
                 big_maybe_not_found = False
         big_uses_chest = big_avail and not key_layout.big_key_special
         collected_alt = len(counter.key_only_locations) + chest_keys
@@ -1158,7 +1166,7 @@ def check_rules_deep(original_counter, key_layout, world, player):
             chest_keys -= 1
         collected = len(counter.key_only_locations) + chest_keys
         can_progress = len(counter.child_doors) == 0
-        smalls_opened = False
+        smalls_opened, big_opened = False, False
         small_rules = []
         for door in counter.child_doors.keys():
             can_open = False
@@ -1232,6 +1240,15 @@ def set_paired_rules(key_logic, world, player):
             rule.opposite = key_logic.door_rules[door.dest.name]
 
 
+def check_bk_special(regions, world, player):
+    for r_name in regions:
+        region = world.get_region(r_name, player)
+        for loc in region.locations:
+            if loc.forced_big_key():
+                return True
+    return False
+
+
 # Soft lock stuff
 def validate_key_layout(key_layout, world, player):
     # retro is all good - except for hyrule castle in standard mode
@@ -1240,7 +1257,7 @@ def validate_key_layout(key_layout, world, player):
     flat_proposal = key_layout.flat_prop
     state = ExplorationState(dungeon=key_layout.sector.name)
     state.key_locations = key_layout.max_chests
-    state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in key_layout.sector.regions
+    state.big_key_special = check_bk_special(key_layout.sector.regions, world, player)
     for region in key_layout.start_regions:
         state.visit_region(region, key_checks=True)
         state.add_all_doors_check_keys(region, flat_proposal, world, player)
@@ -1262,7 +1279,10 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
         return False
     # todo: allow more key shuffles - refine placement rules
     # if (not smalls_avail or available_small_locations == 0) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
-    if (not smalls_avail or not enough_small_locations(state, available_small_locations)) and (state.big_key_opened or num_bigs == 0 or available_big_locations == 0):
+    found_forced_bk = state.found_forced_bk()
+    smalls_done = not smalls_avail or not enough_small_locations(state, available_small_locations)
+    bk_done = state.big_key_opened or num_bigs == 0 or (available_big_locations == 0 and not found_forced_bk)
+    if smalls_done and bk_done:
         return False
     else:
         if smalls_avail and available_small_locations > 0:
@@ -1281,10 +1301,11 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
                     valid = checked_states[code]
                 if not valid:
                     return False
-        if not state.big_key_opened and available_big_locations >= num_bigs > 0:
+        if not state.big_key_opened and (available_big_locations >= num_bigs > 0 or (found_forced_bk and num_bigs > 0)):
             state_copy = state.copy()
             open_a_door(state.big_doors[0].door, state_copy, flat_proposal)
-            state_copy.used_locations += 1
+            if not found_forced_bk:
+                state_copy.used_locations += 1
             code = state_id(state_copy, flat_proposal)
             if code not in checked_states.keys():
                 valid = validate_key_layout_sub_loop(key_layout, state_copy, checked_states, flat_proposal,
@@ -1350,7 +1371,10 @@ def create_key_counters(key_layout, world, player):
         state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
     else:
         state.key_locations = world.dungeon_layouts[player][key_layout.sector.name].key_doors_num
-    state.big_key_special = world.get_region('Hyrule Dungeon Cellblock', player) in key_layout.sector.regions
+    state.big_key_special, special_region = False, None
+    forced_bk = world.get_region('Hyrule Dungeon Cellblock', player)
+    if forced_bk in key_layout.sector.regions:
+        state.big_key_special, special_region = True, forced_bk
     for region in key_layout.start_regions:
         state.visit_region(region, key_checks=True)
         state.add_all_doors_check_keys(region, flat_proposal, world, player)
@@ -1365,7 +1389,7 @@ def create_key_counters(key_layout, world, player):
             if door.bigKey:
                 key_layout.key_logic.bk_doors.add(door)
             # open the door, if possible
-            if not door.bigKey or not child_state.big_key_special or child_state.big_key_opened:
+            if not door.bigKey or not child_state.big_key_special or child_state.visited(special_region):
                 open_a_door(door, child_state, flat_proposal)
                 expand_key_state(child_state, flat_proposal, world, player)
                 code = state_id(child_state, key_layout.flat_prop)
@@ -1393,10 +1417,7 @@ def create_key_counter(state, key_layout, world, player):
             key_counter.other_locations[loc] = None
     key_counter.open_doors.update(dict.fromkeys(state.opened_doors))
     key_counter.used_keys = count_unique_sm_doors(state.opened_doors)
-    if state.big_key_special:
-        key_counter.big_key_opened = state.visited(world.get_region('Hyrule Dungeon Cellblock', player))
-    else:
-        key_counter.big_key_opened = state.big_key_opened
+    key_counter.big_key_opened = state.big_key_opened
     return key_counter
 
 

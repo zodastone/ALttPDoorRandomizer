@@ -1,4 +1,5 @@
 !add = "clc : adc"
+!addl = "clc : adc.l"
 !sub = "sec : sbc"
 !bge = "bcs"
 !blt = "bcc"

@@ -858,10 +858,6 @@ class ExplorationState(object):
                 if location.name in flooded_keys_reverse.keys() and self.location_found(
                      flooded_keys_reverse[location.name]):
                     self.perform_event(flooded_keys_reverse[location.name], key_region)
-        if key_checks and region.name == 'Hyrule Dungeon Cellblock' and not self.big_key_opened:
-            self.big_key_opened = True
-            self.avail_doors.extend(self.big_doors)
-            self.big_doors.clear()
 
     def flooded_key_check(self, location):
         if location.name not in flooded_keys.keys():
@@ -979,6 +975,12 @@ class ExplorationState(object):
 
     def visited_at_all(self, region):
         return region in self.visited_blue or region in self.visited_orange
+
+    def found_forced_bk(self):
+        for location in self.found_locations:
+            if location.forced_big_key():
+                return True
+        return False
 
     def can_traverse(self, door, exception=None):
         if door.blocked:
@@ -2763,7 +2765,7 @@ def split_dungeon_builder(builder, split_list, builder_info):
                     p = next(x for x in world.dungeon_portals[player] if x.door.entrance.parent_region.name == r_name)
                     if not p.deadEnd:
                         candidates.append(name)
-                merge_keys = random.sample(candidates, 2)
+                merge_keys = random.sample(candidates, 2) if len(candidates) >= 2 else []
             for name, split_entrances in split_list.items():
                 key = builder.name + ' ' + name
                 if merge_keys and name in merge_keys:

@@ -333,7 +333,7 @@ region_starts = {
 }
 
 standard_starts = {
-    'Hyrule Castle': ['Hyrule Castle Lobby']
+    'Hyrule Castle': ['Hyrule Castle South']
 }
 
 split_region_starts = {

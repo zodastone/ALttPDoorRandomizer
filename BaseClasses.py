@@ -1620,6 +1620,15 @@ class Location(object):
             return True
         return False
 
+    def forced_big_key(self):
+        if self.forced_item and self.forced_item.bigkey and self.player == self.forced_item.player:
+            item_dungeon = self.forced_item.name.split('(')[1][:-1]
+            if item_dungeon == 'Escape':
+                item_dungeon = 'Hyrule Castle'
+            if self.parent_region.dungeon.name == item_dungeon:
+                return True
+        return False
+
     def __str__(self):
         return str(self.__unicode__())
 
