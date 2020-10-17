@@ -8,6 +8,8 @@ import random
 import struct
 import sys
 import subprocess
+import bps.apply
+import bps.io
 
 from BaseClasses import CollectionState, ShopType, Region, Location, DoorType
 from DoorShuffle import compass_data, DROptions, boss_indicator
@@ -112,16 +114,14 @@ class LocalRom(object):
         if JAP10HASH != basemd5.hexdigest():
             logging.getLogger('').warning('Supplied Base Rom does not match known MD5 for JAP(1.0) release. Will try to patch anyway.')
 
+        orig_buffer = self.buffer.copy()
+
         # extend to 2MB
         self.buffer.extend(bytearray([0x00] * (0x200000 - len(self.buffer))))
 
         # load randomizer patches
-        with open(local_path('data/base2current.json'), 'r') as stream:
-            patches = json.load(stream)
-        for patch in patches:
-            if isinstance(patch, dict):
-                for baseaddress, values in patch.items():
-                    self.write_bytes(int(baseaddress), values)
+        with open(local_path('data/base2current.bps'), 'rb') as stream:
+            bps.apply.apply_to_bytearrays(bps.io.read_bps(stream), orig_buffer, self.buffer)
 
         # verify md5
         patchedmd5 = hashlib.md5()

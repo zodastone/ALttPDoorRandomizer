@@ -1,2 +1,3 @@
 aenum
 fast-enum
+python-bps-continued
