@@ -1760,9 +1760,10 @@ class Spoiler(object):
     def __init__(self, world):
         self.world = world
         self.hashes = {}
-        self.entrances = OrderedDict()
-        self.doors = OrderedDict()
-        self.doorTypes = OrderedDict()
+        self.entrances = {}
+        self.doors = {}
+        self.doorTypes = {}
+        self.lobbies = {}
         self.medallions = {}
         self.playthrough = {}
         self.unreachables = []
@@ -1784,6 +1785,12 @@ class Spoiler(object):
             self.doors[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction), ('dname', d_name)])
         else:
             self.doors[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction), ('dname', d_name)])
+
+    def set_lobby(self, lobby_name, door_name, player):
+        if self.world.players == 1:
+            self.lobbies[(lobby_name, player)] = {'lobby_name': lobby_name, 'door_name': door_name}
+        else:
+            self.lobbies[(lobby_name, player)] = {'player': player, 'lobby_name': lobby_name, 'door_name': door_name}
 
     def set_door_type(self, doorNames, type, player):
         if self.world.players == 1:
@@ -1864,6 +1871,11 @@ class Spoiler(object):
         if self.world.players == 1:
             self.bosses = self.bosses["1"]
 
+        for player in range(1, self.world.players + 1):
+            if self.world.intensity[player] >= 3:
+                for portal in self.world.dungeon_portals[player]:
+                    self.set_lobby(portal.name, portal.door.name, player)
+
         from Main import __version__ as ERVersion
         self.metadata = {'version': ERVersion,
                          'logic': self.world.logic,
@@ -1899,6 +1911,7 @@ class Spoiler(object):
         out = OrderedDict()
         out['Entrances'] = list(self.entrances.values())
         out['Doors'] = list(self.doors.values())
+        out['Lobbies'] = list(self.lobbies.values())
         out['DoorTypes'] = list(self.doorTypes.values())
         out.update(self.locations)
         out['Starting Inventory'] = self.startinventory
@@ -1960,6 +1973,12 @@ class Spoiler(object):
                                         self.world.fish.translate("meta","doors",entry['exit']),
                                         '({0})'.format(entry['dname']) if self.world.doorShuffle[entry['player']] == 'crossed' else '') for
                      entry in self.doors.values()]))
+            if self.lobbies:
+                outfile.write('\n\nDungeon Lobbies:\n\n')
+                outfile.write('\n'.join(
+                    [f"{'Player {0}: '.format(entry['player']) if self.world.players > 1 else ''}{entry['lobby_name']}: {entry['door_name']}"
+                     for
+                     entry in self.lobbies.values()]))
             if self.doorTypes:
                 # doorNames: For some reason these come in combined, somehow need to split on the thing to translate
                 # doorTypes: Small Key, Bombable, Bonkable

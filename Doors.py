@@ -247,7 +247,7 @@ def create_doors(world, player):
         create_door(player, 'Desert Tiles 2 NE', Intr).dir(No, 0x43, Right, High).small_key().pos(1),
         create_door(player, 'Desert Wall Slide SE', Intr).dir(So, 0x43, Right, High).small_key().pos(1),
         create_door(player, 'Desert Wall Slide NW', Nrml).dir(No, 0x43, Left, High).big_key().pos(0).no_entrance(),
-        create_door(player, 'Desert Boss SW', Nrml).dir(So, 0x33, Left, High).no_exit().trap(0x4).pos(0).portal(Z, 0x00),
+        create_door(player, 'Desert Boss SW', Nrml).dir(So, 0x33, Left, High).no_exit().trap(0x4).pos(0),  # .portal(Z, 0x00), problem with enemizer
 
         # Hera
         create_door(player, 'Hera Lobby S', Nrml).dir(So, 0x77, Mid, Low).pos(0).portal(Z, 0x22, 1),
@@ -935,7 +935,7 @@ def create_doors(world, player):
         create_door(player, 'TR Crystal Maze North Stairs', StrS).dir(No, 0xc4, Mid, High),
         create_door(player, 'TR Final Abyss South Stairs', StrS).dir(So, 0xb4, Mid, High),
         create_door(player, 'TR Final Abyss NW', Nrml).dir(No, 0xb4, Left, High).big_key().pos(0),
-        create_door(player, 'TR Boss SW', Nrml).dir(So, 0xa4, Left, High).no_exit().trap(0x4).pos(0).portal(Z, 0x00),
+        create_door(player, 'TR Boss SW', Nrml).dir(So, 0xa4, Left, High).no_exit().trap(0x4).pos(0),  # .portal(Z, 0x00), -enemizer doesn't work
 
         create_door(player, 'GT Lobby S', Nrml).dir(So, 0x0c, Mid, High).pos(0).portal(Z, 0x22),
         create_door(player, 'GT Lobby Left Down Stairs', Sprl).dir(Dn, 0x0c, 1, HTL).ss(A, 0x0f, 0x80),
@@ -1303,8 +1303,8 @@ def create_doors(world, player):
     world.get_door('TR Big Chest Entrance SE', player).passage = False
     world.get_door('Sewers Secret Room Key Door S', player).dungeonLink = 'Hyrule Castle'
     world.get_door('Desert Cannonball S', player).dead_end()
-    world.get_door('Desert Boss SW', player).dead_end()
-    world.get_door('Desert Boss SW', player).dungeonLink = 'Desert Palace'
+    # world.get_door('Desert Boss SW', player).dead_end()
+    # world.get_door('Desert Boss SW', player).dungeonLink = 'Desert Palace'
     world.get_door('Skull 1 Lobby S', player).dungeonLink = 'Skull Woods'
     world.get_door('Skull Map Room SE', player).dungeonLink = 'Skull Woods'
     world.get_door('Skull Spike Corner SW', player).dungeonLink = 'Skull Woods'
@@ -1314,8 +1314,8 @@ def create_doors(world, player):
     world.get_door('Mire Right Bridge SE', player).dead_end(allowPassage=True)
     world.get_door('TR Roller Room SW', player).dead_end()
     world.get_door('TR Tile Room SE', player).dead_end()
-    world.get_door('TR Boss SW', player).dead_end()
-    world.get_door('TR Boss SW', player).dungeonLink = 'Turtle Rock'
+    # world.get_door('TR Boss SW', player).dead_end()
+    # world.get_door('TR Boss SW', player).dungeonLink = 'Turtle Rock'
     world.get_door('GT Petting Zoo SE', player).dead_end()
     world.get_door('GT DMs Room SW', player).dead_end()
     world.get_door("GT Bob\'s Room SE", player).passage = False
