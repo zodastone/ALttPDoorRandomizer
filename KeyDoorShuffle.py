@@ -243,13 +243,14 @@ def analyze_dungeon(key_layout, world, player):
         possible_smalls = count_unique_small_doors(key_counter, key_layout.flat_prop)
         avail_bigs = exist_relevant_big_doors(key_counter, key_layout) or exist_big_chest(key_counter)
         non_big_locs = count_locations_big_optional(key_counter.free_locations)
-        if not key_counter.big_key_opened:
+        big_avail = key_counter.big_key_opened or (key_layout.big_key_special and any(x for x in key_counter.other_locations.keys() if x.forced_item and x.forced_item.bigkey))
+        if not big_avail:
             if chest_keys == non_big_locs and chest_keys > 0 and available <= possible_smalls and not avail_bigs:
                 key_logic.bk_restricted.update(filter_big_chest(key_counter.free_locations))
         # try to relax the rules here? - smallest requirement that doesn't force a softlock
         child_queue = deque()
         for child in key_counter.child_doors.keys():
-            if not child.bigKey or not key_layout.big_key_special or key_counter.big_key_opened:
+            if not child.bigKey or not key_layout.big_key_special or big_avail:
                 odd_counter = create_odd_key_counter(child, key_counter, key_layout, world, player)
                 empty_flag = empty_counter(odd_counter)
                 child_queue.append((child, odd_counter, empty_flag))
