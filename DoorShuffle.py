@@ -8,8 +8,7 @@ from typing import DefaultDict, Dict, List
 
 from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo
-from Regions import key_only_locations
-from Dungeons import dungeon_regions, region_starts, standard_starts, split_region_starts, flexible_starts
+from Dungeons import dungeon_regions, region_starts, standard_starts, split_region_starts
 from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor
@@ -188,7 +187,7 @@ def vanilla_key_logic(world, player):
             world.key_logic[player][builder.name] = key_layout.key_logic
             log_key_logic(builder.name, key_layout.key_logic)
             last_key = None
-    if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player]:
+    if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player] and not world.keydropshuffle[player]:
         validate_vanilla_key_logic(world, player)
 
 
@@ -207,9 +206,9 @@ def switch_dir(direction):
     return oppositemap[direction]
 
 
-def convert_key_doors(key_doors, world, player):
+def convert_key_doors(k_doors, world, player):
     result = []
-    for d in key_doors:
+    for d in k_doors:
         if type(d) is tuple:
             result.append((world.get_door(d[0], player), world.get_door(d[1], player)))
         else:
@@ -866,7 +865,7 @@ def cross_dungeon(world, player):
             for region in sector.regions:
                 region.dungeon = dungeon_obj
                 for loc in region.locations:
-                    if loc.name in key_only_locations:
+                    if loc.forced_item:
                         key_name = dungeon_keys[builder.name] if loc.name != 'Hyrule Castle - Big Key Drop' else dungeon_bigs[builder.name]
                         loc.forced_item = loc.item = ItemFactory(key_name, player)
     recombinant_builders = {}
@@ -885,9 +884,12 @@ def cross_dungeon(world, player):
     at.dungeon_items.append(ItemFactory('Map (Agahnims Tower)', player))
 
     assign_cross_keys(dungeon_builders, world, player)
-    all_dungeon_items = [y for x in world.dungeons if x.player == player for y in x.all_items]
-    target_items = 34 if world.retro[player] else 63
-    d_items = target_items - len(all_dungeon_items)
+    all_dungeon_items_cnt = len(list(y for x in world.dungeons if x.player == player for y in x.all_items))
+    if world.keydropshuffle[player]:
+        target_items = 35 if world.retro[player] else 96
+    else:
+        target_items = 34 if world.retro[player] else 63
+    d_items = target_items - all_dungeon_items_cnt
     world.pool_adjustment[player] = d_items
     smooth_door_pairs(world, player)
 
@@ -949,7 +951,11 @@ def cross_dungeon(world, player):
 def assign_cross_keys(dungeon_builders, world, player):
     logging.getLogger('').info(world.fish.translate("cli", "cli", "shuffling.keydoors"))
     start = time.process_time()
-    total_keys = remaining = 29
+    if world.retro[player]:
+        remaining = 61 if world.keydropshuffle[player] else 29
+    else:
+        remaining = len(list(x for dgn in world.dungeons if dgn.player == player for x in dgn.small_keys))
+    total_keys = remaining
     total_candidates = 0
     start_regions_map = {}
     # Step 1: Find Small Key Door Candidates
@@ -1027,7 +1033,7 @@ def assign_cross_keys(dungeon_builders, world, player):
                 dungeon.small_keys = []
             else:
                 dungeon.small_keys = [ItemFactory(dungeon_keys[name], player)] * actual_chest_keys
-    logger.info('%s: %s', world.fish.translate("cli", "cli", "keydoor.shuffle.time.crossed"), time.process_time()-start)
+    logger.info(f'{world.fish.translate("cli", "cli", "keydoor.shuffle.time.crossed")}: {time.process_time()-start}')
 
 
 def reassign_boss(boss_region, boss_key, builder, gt, world, player):
@@ -1176,10 +1182,10 @@ def calc_used_dungeon_items(builder):
     base = 4
     if builder.bk_required and not builder.bk_provided:
         base += 1
-    if builder.name == 'Hyrule Castle':
-        base -= 1  # Missing compass/map
-    if builder.name == 'Agahnims Tower':
-        base -= 2  # Missing both compass/map
+    # if builder.name == 'Hyrule Castle':
+    #     base -= 1  # Missing compass/map
+    # if builder.name == 'Agahnims Tower':
+    #     base -= 2  # Missing both compass/map
     # gt can lose map once compasses work
     return base
 
@@ -1690,6 +1696,8 @@ class DROptions(Flag):
 # DATA GOES DOWN HERE
 logical_connections = [
     ('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
+    ('Hyrule Dungeon Cellblock Door', 'Hyrule Dungeon Cell'),
+    ('Hyrule Dungeon Cell Exit', 'Hyrule Dungeon Cellblock'),
     ('Hyrule Castle Throne Room Tapestry', 'Hyrule Castle Behind Tapestry'),
     ('Hyrule Castle Tapestry Backwards', 'Hyrule Castle Throne Room'),
     ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path'),
@@ -1761,6 +1769,8 @@ logical_connections = [
     ('Thieves Blocked Entry Path', 'Thieves Basement Block'),
     ('Thieves Conveyor Bridge Block Path', 'Thieves Conveyor Block'),
     ('Thieves Conveyor Block Path', 'Thieves Conveyor Bridge'),
+    ("Thieves Blind's Cell Door", "Thieves Blind's Cell Interior"),
+    ("Thieves Blind's Cell Exit", "Thieves Blind's Cell"),
     ('Ice Cross Bottom Push Block Left', 'Ice Floor Switch'),
     ('Ice Cross Right Push Block Top', 'Ice Bomb Drop'),
     ('Ice Big Key Push Block', 'Ice Dead End'),

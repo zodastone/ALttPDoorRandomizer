@@ -59,6 +59,10 @@
       "expert"
     ]
   },
+  "keydropshuffle" : {
+    "action": "store_true",
+    "type": "bool"
+  },
   "timer": {
     "choices": [
       "none",

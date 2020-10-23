@@ -32,8 +32,10 @@ HudAdditions:
             lda $7ef368 : and.l $0098c0, x : beq .restore
                 txa : lsr : tax
 
-                lda $7ef4e0, x : jsr ConvertToDisplay : sta $7ec7a2
-                lda #$2830 : sta $7ec7a4
+				lda.l GenericKeys : bne +
+                	lda $7ef4e0, x : jsr ConvertToDisplay : sta $7ec7a2
+                	lda #$2830 : sta $7ec7a4
+                +
                 lda.w ChestKeys, x : jsr ConvertToDisplay : sta $7ec7a6
                 ; todo 4b0 no longer in use
 
@@ -63,32 +65,58 @@ DrHudDungeonItemsAdditions:
     phx : phy : php
     rep #$30
 
-    lda !HUD_FLAG : and.w #$0020 : beq + : bra ++ : +
-    lda HUDDungeonItems : and.w #$0003 : bne + : bra ++ : +
+    lda.w #$24f5 : sta $1606 : sta $1610 : sta $161a : sta $1624
+    sta $1644 : sta $164a : sta $1652 : sta $1662 : sta $1684 : sta $16c4
+    ldx #$0000
+    - sta $1704, x : sta $170e, x : sta $1718, x
+    inx #2 : cpx #$0008 : !blt -
+
+    lda !HUD_FLAG : and.w #$0020 : beq + : brl ++ : +
+    lda HUDDungeonItems : and.w #$0007 : bne + : brl ++ : +
+    	; bk symbols
+		lda.w #$2811 : sta $1606 : sta $1610 : sta $161a : sta $1624
+		; sm symbols
+		lda.w #$2810 : sta $160a : sta $1614 : sta $161e : sta $16e4
     	; blank out stuff
-    	lda.w #$24f5 : sta $1606 : sta $1610 : sta $161a : sta $1624 : sta $1644
-    				   sta $164a : sta $1652 : sta $1662
-    	ldy #$0000
-    		- sta $1706, y : iny #2 : cpy #$001c : bcc -
-        lda.w #$2810 : sta $1684 ; small keys icon
-        lda.w #$2811 : sta $16c4 ; big key icon
-        lda.w #$2810 : sta $1704 ; small keys icon
+    	lda.w #$24f5 : sta $1724
+
         ldx #$0002
-            - lda $7ef368 : and.l $0098c0, x : beq + ; must have map
-                lda.l HudOffsets, x : tay
-                jsr BkStatus : sta $16C6, y ; big key status
-                phx
-                    txa : lsr : tax
-                    lda.l ChestKeys, x : jsr ConvertToDisplay2 : sta $1706, y ; small key totals
-                plx
-            + inx #2 : cpx #$001b : bcc -
+        	- lda #$0000 : !addl RowOffsets,x : !addl ColumnOffsets, x : tay
+        	lda.l DungeonReminderTable, x : sta $1644, y : iny #2
+        	lda.w #$24f5 : sta $1644, y
+        	lda $7ef368 : and.l $0098c0, x : beq + ; must have map
+        		jsr BkStatus : sta $1644, y : bra .smallKey ; big key status
+        	+ lda $7ef366 : and.l $0098c0, x : beq .smallKey
+        		lda.w #$2826 : sta $1644, y
+        	.smallKey
+        	+ iny #2
+			cpx #$001a : bne +
+				tya : !add #$003c : tay
+        	+ stx $00
+        		txa : lsr : tax
+        		lda.w #$24f5 : sta $1644, y
+        		lda.l $7ef37c, x : beq +
+        			jsr ConvertToDisplay2 : sta $1644, y
+        		+ iny #2 : lda.w #$24f5 : sta $1644, y
+        		phx : ldx $00
+        			lda $7ef368 : and.l $0098c0, x : beq + ; must have map
+        				plx : lda.l ChestKeys, x : jsr ConvertToDisplay2 : sta $1644, y ; small key totals
+        				bra .skipStack
+        		+ plx
+        		.skipStack iny #2
+        		cpx #$000d : beq +
+        			lda.w #$24f5 : sta $1644, y
+        		+
+        	ldx $00
+            + inx #2 : cpx #$001b : bcs ++ : brl -
     ++
     lda !HUD_FLAG : and.w #$0020 : bne + : brl ++ : +
-    lda HUDDungeonItems : and.w #$000f : bne + : brl ++ : +
+    lda HUDDungeonItems : and.w #$000c : bne + : brl ++ : +
         ; map symbols (do I want these) ; note compass symbol is 2c20
         lda.w #$2821 : sta $1606 : sta $1610 : sta $161a : sta $1624
         ; blank out a couple thing from old hud
         lda.w #$24f5 : sta $16e4 : sta $1724
+        sta $160a : sta $1614 : sta $161e ; blank out sm key indicators
         ldx #$0002
         	- lda #$0000 ; start of hud area
         	!addl RowOffsets, x : !addl ColumnOffsets, x : tay

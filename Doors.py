@@ -92,6 +92,8 @@ def create_doors(world, player):
         create_door(player, 'Hyrule Dungeon Staircase Up Stairs', Sprl).dir(Up, 0x70, 2, LTH).ss(A, 0x32, 0x94, True),
         create_door(player, 'Hyrule Dungeon Staircase Down Stairs', Sprl).dir(Dn, 0x70, 1, HTH).ss(A, 0x11, 0x58),
         create_door(player, 'Hyrule Dungeon Cellblock Up Stairs', Sprl).dir(Up, 0x80, 0, HTH).ss(A, 0x1a, 0x44),
+        create_door(player, 'Hyrule Dungeon Cellblock Door', Lgcl).big_key(),
+        create_door(player, 'Hyrule Dungeon Cell Exit', Lgcl),
 
         # sewers
         create_door(player, 'Sewers Behind Tapestry S', Nrml).dir(So, 0x41, Mid, High).no_exit().trap(0x4).pos(0).portal(Z, 0x22),
@@ -625,6 +627,8 @@ def create_doors(world, player):
         create_door(player, 'Thieves Lonely Zazak NW', Intr).dir(No, 0x45, Left, High).pos(1),
         create_door(player, 'Thieves Lonely Zazak ES', Intr).dir(Ea, 0x45, Right, High).pos(3),
         create_door(player, 'Thieves Blind\'s Cell WS', Intr).dir(We, 0x45, Right, High).pos(3),
+        create_door(player, "Thieves Blind's Cell Door", Lgcl).big_key(),
+        create_door(player, "Thieves Blind's Cell Exit", Lgcl),
         create_door(player, 'Thieves Conveyor Bridge EN', Nrml).dir(Ea, 0x44, Top, High).pos(2),
         create_door(player, 'Thieves Conveyor Bridge ES', Nrml).dir(Ea, 0x44, Bot, High).pos(3),
         create_door(player, 'Thieves Conveyor Bridge Block Path', Lgcl),

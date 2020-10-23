@@ -37,3 +37,7 @@ incsrc hudadditions.asm
 warnpc $279700
 
 incsrc doortables.asm
+warnpc $288000
+
+; deals with own hooks
+incsrc keydropshuffle.asm

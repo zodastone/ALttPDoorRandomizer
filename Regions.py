@@ -252,10 +252,11 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Hyrule Dungeon Armory Boomerang', 'Hyrule Castle', ['Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Boomerang Guard Key Drop'], ['Hyrule Dungeon Armory Boomerang WS']),
         create_dungeon_region(player, 'Hyrule Dungeon Armory North Branch', 'Hyrule Castle', None, ['Hyrule Dungeon Armory Interior Key Door S', 'Hyrule Dungeon Armory Down Stairs']),
         create_dungeon_region(player, 'Hyrule Dungeon Staircase', 'Hyrule Castle', None, ['Hyrule Dungeon Staircase Up Stairs', 'Hyrule Dungeon Staircase Down Stairs']),
-        create_dungeon_region(player, 'Hyrule Dungeon Cellblock', 'Hyrule Castle',
-                              ['Hyrule Castle - Big Key Drop', 'Hyrule Castle - Zelda\'s Chest'] if not std_flag else
-                              ['Hyrule Castle - Big Key Drop', 'Hyrule Castle - Zelda\'s Chest', 'Zelda Pickup'],
-                              ['Hyrule Dungeon Cellblock Up Stairs']),
+        create_dungeon_region(player, 'Hyrule Dungeon Cellblock', 'Hyrule Castle', ['Hyrule Castle - Big Key Drop'], ['Hyrule Dungeon Cellblock Up Stairs', 'Hyrule Dungeon Cellblock Door']),
+        create_dungeon_region(player, 'Hyrule Dungeon Cell', 'Hyrule Castle',
+                              ["Hyrule Castle - Zelda's Chest"] if not std_flag else
+                              ["Hyrule Castle - Zelda's Chest", 'Zelda Pickup'],
+                              ['Hyrule Dungeon Cell Exit']),
 
 
         create_dungeon_region(player, 'Sewers Behind Tapestry', 'Hyrule Castle', None, ['Sewers Behind Tapestry S', 'Sewers Behind Tapestry Down Stairs']),
@@ -510,7 +511,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Thieves Basement Block', 'Thieves\' Town', None, ['Thieves Basement Block Up Stairs', 'Thieves Basement Block WN', 'Thieves Basement Block Path']),
         create_dungeon_region(player, 'Thieves Blocked Entry', 'Thieves\' Town', None, ['Thieves Blocked Entry Path', 'Thieves Blocked Entry SW']),
         create_dungeon_region(player, 'Thieves Lonely Zazak', 'Thieves\' Town', None, ['Thieves Lonely Zazak WS', 'Thieves Lonely Zazak ES', 'Thieves Lonely Zazak NW']),
-        create_dungeon_region(player, 'Thieves Blind\'s Cell', 'Thieves\' Town', ['Thieves\' Town - Blind\'s Cell', 'Suspicious Maiden'], ['Thieves Blind\'s Cell WS']),
+        create_dungeon_region(player, "Thieves Blind's Cell", 'Thieves\' Town', None, ["Thieves Blind's Cell WS", "Thieves Blind's Cell Door"]),
+        create_dungeon_region(player, "Thieves Blind's Cell Interior", 'Thieves\' Town', ['Thieves\' Town - Blind\'s Cell', 'Suspicious Maiden'], ["Thieves Blind's Cell Exit"]),
         create_dungeon_region(player, 'Thieves Conveyor Bridge', 'Thieves\' Town', None, ['Thieves Conveyor Bridge EN', 'Thieves Conveyor Bridge ES', 'Thieves Conveyor Bridge WS', 'Thieves Conveyor Bridge Block Path']),
         create_dungeon_region(player, 'Thieves Conveyor Block', 'Thieves\' Town', None, ['Thieves Conveyor Block Path', 'Thieves Conveyor Block WN']),
         create_dungeon_region(player, 'Thieves Big Chest Room', 'Thieves\' Town', ['Thieves\' Town - Big Chest'], ['Thieves Big Chest Room ES']),
@@ -858,6 +860,29 @@ def create_shops(world, player):
         for index, item in enumerate(inventory):
             shop.add_inventory(index, *item)
 
+
+def adjust_locations(world, player):
+    if world.keydropshuffle[player]:
+        for location in key_only_locations.keys():
+            loc = world.get_location(location, player)
+            key_item = loc.item
+            key_item.location = None
+
+            loc.forced_item = None
+            loc.item = None
+            loc.event = False
+            loc.address = key_drop_data[location][1]
+            loc.player_address = key_drop_data[location][0]
+
+            item_dungeon = key_item.name.split('(')[1][:-1]
+            item_dungeon = 'Hyrule Castle' if item_dungeon == 'Escape' else item_dungeon
+            dungeon = world.get_dungeon(item_dungeon, player)
+            if key_item.smallkey and not world.retro[player]:
+                dungeon.small_keys.append(key_item)
+            elif key_item.bigkey:
+                dungeon.big_key = key_item
+
+
 # (type, room_id, shopkeeper, custom, locked, [items])
 # item = (item, price, max=0, replacement=None, replacement_price=0)
 _basic_shop_defaults = [('Red Potion', 150), ('Small Heart', 10), ('Bombs (10)', 50)]
@@ -910,6 +935,42 @@ key_only_locations = {
   'Ganons Tower - Double Switch Pot Key': 'Small Key (Ganons Tower)',
   'Ganons Tower - Conveyor Star Pits Pot Key': 'Small Key (Ganons Tower)',
   'Ganons Tower - Mini Helmasaur Key Drop': 'Small Key (Ganons Tower)'
+}
+
+key_drop_data = {
+    'Hyrule Castle - Map Guard Key Drop': [0x140036, 0x140037],
+    'Hyrule Castle - Boomerang Guard Key Drop': [0x140033, 0x140034],
+    'Hyrule Castle - Key Rat Key Drop': [0x14000c, 0x14000d],
+    'Hyrule Castle - Big Key Drop': [0x14003c, 0x14003d],
+    'Eastern Palace - Dark Square Pot Key': [0x14005a, 0x14005b],
+    'Eastern Palace - Dark Eyegore Key Drop': [0x140048, 0x140049],
+    'Desert Palace - Desert Tiles 1 Pot Key': [0x140030, 0x140031],
+    'Desert Palace - Beamos Hall Pot Key': [0x14002a, 0x14002b],
+    'Desert Palace - Desert Tiles 2 Pot Key': [0x140027, 0x140028],
+    'Castle Tower - Dark Archer Key Drop': [0x140060, 0x140061],
+    'Castle Tower - Circle of Pots Key Drop': [0x140051, 0x140052],
+    'Swamp Palace - Pot Row Pot Key': [0x140018, 0x140019],
+    'Swamp Palace - Trench 1 Pot Key': [0x140015, 0x140016],
+    'Swamp Palace - Hookshot Pot Key': [0x140012, 0x140013],
+    'Swamp Palace - Trench 2 Pot Key': [0x14000f, 0x140010],
+    'Swamp Palace - Waterway Pot Key': [0x140009, 0x14000a],
+    'Skull Woods - West Lobby Pot Key': [0x14002d, 0x14002e],
+    'Skull Woods - Spike Corner Key Drop': [0x14001b, 0x14001c],
+    'Thieves\' Town - Hallway Pot Key': [0x14005d, 0x14005e],
+    'Thieves\' Town - Spike Switch Pot Key': [0x14004e, 0x14004f],
+    'Ice Palace - Jelly Key Drop': [0x140003, 0x140004],
+    'Ice Palace - Conveyor Key Drop': [0x140021, 0x140022],
+    'Ice Palace - Hammer Block Key Drop': [0x140024, 0x140025],
+    'Ice Palace - Many Pots Pot Key': [0x140045, 0x140046],
+    'Misery Mire - Spikes Pot Key': [0x140054, 0x140055],
+    'Misery Mire - Fishbone Pot Key': [0x14004b, 0x14004c],
+    'Misery Mire - Conveyor Crystal Key Drop': [0x140063, 0x140064],
+    'Turtle Rock - Pokey 1 Key Drop': [0x140057, 0x140058],
+    'Turtle Rock - Pokey 2 Key Drop': [0x140006, 0x140007],
+    'Ganons Tower - Conveyor Cross Pot Key': [0x14003f, 0x140040],
+    'Ganons Tower - Double Switch Pot Key': [0x140042, 0x140043],
+    'Ganons Tower - Conveyor Star Pits Pot Key': [0x140039, 0x14003a],
+    'Ganons Tower - Mini Helmasaur Key Drop': [0x14001e, 0x14001f]
 }
 
 dungeon_events = [

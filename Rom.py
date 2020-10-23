@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '094edde26279e8084d525135366fa67c'
+RANDOMIZERBASEHASH = '78aac1dbdce621865572e06cfcd3c112'
 
 
 class JsonRom(object):
@@ -503,7 +503,7 @@ def patch_rom(world, rom, player, team, enemized):
 
         if not location.crystal:
             if location.item is not None:
-                # Keys in their native dungeon should use the orignal item code for keys
+                # Keys in their native dungeon should use the original item code for keys
                 if location.parent_region.dungeon:
                     if location.parent_region.dungeon.is_dungeon_item(location.item):
                         if location.item.bigkey:
@@ -600,29 +600,35 @@ def patch_rom(world, rom, player, team, enemized):
         dr_flags |= DROptions.Map_Info
         dr_flags |= DROptions.Debug
 
+    # fix hc big key problems
+    if world.doorShuffle[player] == 'crossed' or world.keydropshuffle[player]:
+        rom.write_byte(0x151f1, 2)
+        rom.write_byte(0x15270, 2)
+        sanctuary = world.get_region('Sanctuary', player)
+        rom.write_byte(0x1597b, sanctuary.dungeon.dungeon_id*2)
+        if compass_code_good(rom):
+            update_compasses(rom, world, player)
+        else:
+            logging.getLogger('').warning('Randomizer rom update! Compasses in crossed are borken')
+
     # patch doors
     if world.doorShuffle[player] == 'crossed':
         rom.write_byte(0x138002, 2)
         for name, layout in world.key_layout[player].items():
             offset = compass_data[name][4]//2
-            rom.write_byte(0x13f01c+offset, layout.max_chests + layout.max_drops)
-            rom.write_byte(0x13f02a+offset, layout.max_chests)
+            if world.retro[player]:
+                rom.write_byte(0x13f02a+offset, layout.max_chests + layout.max_drops)
+            else:
+                rom.write_byte(0x13f01c+offset, layout.max_chests + layout.max_drops)  # not currently used
+                rom.write_byte(0x13f02a+offset, layout.max_chests)
             builder = world.dungeon_layouts[player][name]
             rom.write_byte(0x13f070+offset, builder.location_cnt % 10)
             rom.write_byte(0x13f07e+offset, builder.location_cnt // 10)
             bk_status = 1 if builder.bk_required else 0
             bk_status = 2 if builder.bk_provided else bk_status
             rom.write_byte(0x13f038+offset*2, bk_status)
-        rom.write_byte(0x151f1, 2)
-        rom.write_byte(0x15270, 2)
-        sanctuary = world.get_region('Sanctuary', player)
-        rom.write_byte(0x1597b, sanctuary.dungeon.dungeon_id*2)
         if player in world.sanc_portal.keys():
             rom.write_byte(0x159a6, world.sanc_portal[player].ent_offset)
-        if compass_code_good(rom):
-            update_compasses(rom, world, player)
-        else:
-            logging.getLogger('').warning('Randomizer rom update! Compasses in crossed are borken')
         for room in world.rooms:
             if room.player == player and room.palette is not None:
                 rom.write_byte(0x13f200+room.index, room.palette)
@@ -676,6 +682,9 @@ def patch_rom(world, rom, player, team, enemized):
         write_int16(rom, 0x15DB5 + 2 * exit_ids['Skull Woods Final Section Exit'][1], 0x00F8)
 
     write_custom_shops(rom, world, player)
+
+    if world.keydropshuffle[player]:
+        rom.write_byte(0x140000, 1)
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':

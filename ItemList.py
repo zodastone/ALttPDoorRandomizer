@@ -355,8 +355,11 @@ def generate_itempool(world, player):
 
     if world.retro[player]:
         set_up_take_anys(world, player)
+        if world.keydropshuffle[player]:
+            world.itempool += [ItemFactory('Small Key (Universal)', player)] * 32
 
     create_dynamic_shop_locations(world, player)
+
 
 take_any_locations = [
     'Snitch Lady (East)', 'Snitch Lady (West)', 'Bush Covered House', 'Light World Bomb Hut',

@@ -196,7 +196,11 @@ def determine_if_bk_needed(sector, split_dungeon, world, player):
 
 
 def check_for_special(sector):
-    return 'Hyrule Dungeon Cellblock' in sector.region_set()
+    for region in sector.regions:
+        for loc in region.locations:
+            if loc.forced_big_key():
+                return True
+    return False
 
 
 def gen_dungeon_info(name, available_sectors, entrance_regions, all_regions, proposed_map, valid_doors, bk_needed, bk_special, world, player):
@@ -661,7 +665,7 @@ def create_graph_piece_from_state(door, o_state, b_state, proposed_map, exceptio
 def filter_for_potential_bk_locations(locations):
     return [x for x in locations if
             '- Big Chest' not in x.name and '- Prize' not in x.name and x.name not in dungeon_events
-            and x.name not in key_only_locations.keys() and x.name not in ['Agahnim 1', 'Agahnim 2']]
+            and  not x.forced_item and x.name not in ['Agahnim 1', 'Agahnim 2']]
 
 
 type_map = {
@@ -763,6 +767,9 @@ def connect_simple_door(exit_door, region):
     exit_door.dest = region
 
 
+special_big_key_doors = ['Hyrule Dungeon Cellblock Door', "Thieves Blind's Cell Door"]
+
+
 class ExplorationState(object):
 
     def __init__(self, init_crystal=CrystalBarrier.Orange, dungeon=None):
@@ -844,7 +851,7 @@ class ExplorationState(object):
         if region.type == RegionType.Dungeon:
             for location in region.locations:
                 if key_checks and location not in self.found_locations:
-                    if location.name in key_only_locations and 'Small Key' in location.item.name:
+                    if location.forced_item and 'Small Key' in location.item.name:
                         self.key_locations += 1
                     if location.name not in dungeon_events and '- Prize' not in location.name and location.name not in ['Agahnim 1', 'Agahnim 2']:
                         self.ttl_locations += 1
@@ -955,7 +962,7 @@ class ExplorationState(object):
                 if door in key_door_proposal and door not in self.opened_doors:
                     if not self.in_door_list(door, self.small_doors):
                         self.append_door_to_list(door, self.small_doors)
-                elif door.bigKey and not self.big_key_opened:
+                elif (door.bigKey or door.name in special_big_key_doors) and not self.big_key_opened:
                     if not self.in_door_list(door, self.big_doors):
                         self.append_door_to_list(door, self.big_doors)
                 elif door.req_event is not None and door.req_event not in self.events:
@@ -989,18 +996,10 @@ class ExplorationState(object):
             return self.crystal == CrystalBarrier.Either or door.crystal == self.crystal
         return True
 
-    def can_traverse_bk_check(self, door, isOrigin):
-        if door.blocked:
-            return False
-        if door.crystal not in [CrystalBarrier.Null, CrystalBarrier.Either]:
-            return self.crystal == CrystalBarrier.Either or door.crystal == self.crystal
-        return not isOrigin or not door.bigKey or self.count_locations_exclude_specials() > 0
-        # return not door.bigKey or len([x for x in self.found_locations if '- Prize' not in x.name]) > 0
-
     def count_locations_exclude_specials(self):
         cnt = 0
         for loc in self.found_locations:
-            if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc.name not in dungeon_events and loc.name not in key_only_locations.keys():
+            if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc.name not in dungeon_events and not loc.forced_item:
                 cnt += 1
         return cnt
 
@@ -1410,21 +1409,19 @@ def calc_allowance_and_dead_ends(builder, connections_tuple, portals):
 
 def define_sector_features(sectors):
     for sector in sectors:
-        if 'Hyrule Dungeon Cellblock' in sector.region_set():
-            sector.bk_provided = True
-        if 'Thieves Blind\'s Cell' in sector.region_set():
-            sector.bk_required = True
         for region in sector.regions:
             for loc in region.locations:
-                if '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2', 'Hyrule Castle - Big Key Drop']:
+                if '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2']:
                     pass
-                elif loc.event and 'Small Key' in loc.item.name:
+                elif loc.forced_item and 'Small Key' in loc.item.name:
                     sector.key_only_locations += 1
-                elif loc.name not in dungeon_events:
+                elif loc.forced_item and loc.forced_item.bigkey:
+                    sector.bk_provided = True
+                elif loc.name not in dungeon_events and not loc.forced_item:
                     sector.chest_locations += 1
-                    if '- Big Chest' in loc.name:
+                    if '- Big Chest' in loc.name or loc.name in ["Hyrule Castle - Zelda's Chest",
+                                                                 "Thieves' Town - Blind's Cell"]:
                         sector.bk_required = True
-                        sector.big_chest_present = True
             for ext in region.exits:
                 door = ext.door
                 if door is not None:

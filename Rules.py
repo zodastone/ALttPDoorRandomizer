@@ -2,7 +2,6 @@ import logging
 from collections import deque
 
 from BaseClasses import CollectionState, RegionType, DoorType, Entrance
-from Regions import key_only_locations
 from RoomData import DoorKind
 
 
@@ -124,13 +123,12 @@ def global_rules(world, player):
     set_rule(world.get_location('Mimic Cave', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_location('Sahasrahla', player), lambda state: state.has('Green Pendant', player))
 
-
     set_rule(world.get_location('Spike Cave', player), lambda state:
-    state.has('Hammer', player) and state.can_lift_rocks(player) and
-    ((state.has('Cape', player) and state.can_extend_magic(player, 16, True)) or
-     (state.has('Cane of Byrna', player) and
-      (state.can_extend_magic(player, 12, True) or
-       (state.world.can_take_damage and (state.has_Boots(player) or state.has_hearts(player, 4))))))
+             state.has('Hammer', player) and state.can_lift_rocks(player) and
+             ((state.has('Cape', player) and state.can_extend_magic(player, 16, True)) or
+             (state.has('Cane of Byrna', player) and
+              (state.can_extend_magic(player, 12, True) or
+              (state.world.can_take_damage and (state.has_Boots(player) or state.has_hearts(player, 4))))))
              )
 
     set_rule(world.get_location('Hookshot Cave - Top Right', player), lambda state: state.has('Hookshot', player))
@@ -757,8 +755,8 @@ def no_glitches_rules(world, player):
 
 def open_rules(world, player):
     # softlock protection as you can reach the sewers small key door with a guard drop key
-    set_rule(world.get_location('Hyrule Castle - Boomerang Chest', player), lambda state: state.has_key('Small Key (Escape)', player))
-    set_rule(world.get_location('Hyrule Castle - Zelda\'s Chest', player), lambda state: state.has_key('Small Key (Escape)', player))
+    set_rule(world.get_location('Hyrule Castle - Boomerang Chest', player), lambda state: state.has_sm_key('Small Key (Escape)', player))
+    set_rule(world.get_location('Hyrule Castle - Zelda\'s Chest', player), lambda state: state.has_sm_key('Small Key (Escape)', player))
 
 
 def swordless_rules(world, player):
@@ -1569,7 +1567,7 @@ def add_key_logic_rules(world, player):
             if keys.opposite:
                 add_rule(spot, create_advanced_key_rule(d_logic, player, keys.opposite), 'or')
         for location in d_logic.bk_restricted:
-            if location.name not in key_only_locations.keys():
+            if not location.forced_item:
                 forbid_item(location, d_logic.bk_name, player)
         for location in d_logic.sm_restricted:
             forbid_item(location, d_logic.small_key_name, player)
@@ -1588,23 +1586,23 @@ def create_rule(item_name, player):
 
 
 def create_key_rule(small_key_name, player, keys):
-    return lambda state: state.has_key(small_key_name, player, keys)
+    return lambda state: state.has_sm_key(small_key_name, player, keys)
 
 
 def create_key_rule_allow_small(small_key_name, player, keys, location):
     loc = location.name
-    return lambda state: state.has_key(small_key_name, player, keys) or (item_name(state, loc, player) in [(small_key_name, player)] and state.has_key(small_key_name, player, keys-1))
+    return lambda state: state.has_sm_key(small_key_name, player, keys) or (item_name(state, loc, player) in [(small_key_name, player)] and state.has_sm_key(small_key_name, player, keys-1))
 
 
 def create_key_rule_bk_exception(small_key_name, big_key_name, player, keys, bk_keys, bk_locs):
     chest_names = [x.name for x in bk_locs]
-    return lambda state: (state.has_key(small_key_name, player, keys) and not item_in_locations(state, big_key_name, player, zip(chest_names, [player] * len(chest_names)))) or (item_in_locations(state, big_key_name, player, zip(chest_names, [player] * len(chest_names))) and state.has_key(small_key_name, player, bk_keys))
+    return lambda state: (state.has_sm_key(small_key_name, player, keys) and not item_in_locations(state, big_key_name, player, zip(chest_names, [player] * len(chest_names)))) or (item_in_locations(state, big_key_name, player, zip(chest_names, [player] * len(chest_names))) and state.has_sm_key(small_key_name, player, bk_keys))
 
 
 def create_key_rule_bk_exception_or_allow(small_key_name, big_key_name, player, keys, location, bk_keys, bk_locs):
     loc = location.name
     chest_names = [x.name for x in bk_locs]
-    return lambda state: (state.has_key(small_key_name, player, keys) and not item_in_locations(state, big_key_name, player, zip(chest_names, [player] * len(chest_names)))) or (item_name(state, loc, player) in [(small_key_name, player)] and state.has_key(small_key_name, player, keys-1)) or (item_in_locations(state, big_key_name, player, zip(chest_names, [player] * len(chest_names))) and state.has_key(small_key_name, player, bk_keys))
+    return lambda state: (state.has_sm_key(small_key_name, player, keys) and not item_in_locations(state, big_key_name, player, zip(chest_names, [player] * len(chest_names)))) or (item_name(state, loc, player) in [(small_key_name, player)] and state.has_sm_key(small_key_name, player, keys-1)) or (item_in_locations(state, big_key_name, player, zip(chest_names, [player] * len(chest_names))) and state.has_sm_key(small_key_name, player, bk_keys))
 
 
 def create_advanced_key_rule(key_logic, player, rule):

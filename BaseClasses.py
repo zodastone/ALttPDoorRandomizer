@@ -127,6 +127,8 @@ class World(object):
             set_player_attr('treasure_hunt_icon', 'Triforce Piece')
             set_player_attr('treasure_hunt_count', 0)
 
+            set_player_attr('keydropshuffle', False)
+
     def get_name_string_for_object(self, obj):
         return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_names(obj.player)})'
 
@@ -562,15 +564,20 @@ class CollectionState(object):
     def _do_not_flood_the_keys(self, reachable_events):
         adjusted_checks = list(reachable_events)
         for event in reachable_events:
-            if event.name in flooded_keys.keys() and self.world.get_location(flooded_keys[event.name], event.player) not in reachable_events:
-                adjusted_checks.remove(event)
+            if event.name in flooded_keys.keys():
+                flood_location = self.world.get_location(flooded_keys[event.name], event.player)
+                if flood_location.item and flood_location not in self.locations_checked:
+                    adjusted_checks.remove(event)
         if len(adjusted_checks) < len(reachable_events):
             return adjusted_checks
         return reachable_events
 
     def not_flooding_a_key(self, world, location):
         if location.name in flooded_keys.keys():
-            return world.get_location(flooded_keys[location.name], location.player) in self.locations_checked
+            flood_location = world.get_location(flooded_keys[location.name], location.player)
+            item = flood_location.item
+            item_is_important = False if not item else item.advancement or item.bigkey or item.smallkey
+            return flood_location in self.locations_checked or not item_is_important
         return True
 
     def has(self, item, player, count=1):
@@ -578,7 +585,7 @@ class CollectionState(object):
             return (item, player) in self.prog_items
         return self.prog_items[item, player] >= count
 
-    def has_key(self, item, player, count=1):
+    def has_sm_key(self, item, player, count=1):
         if self.world.retro[player]:
             return self.can_buy_unlimited('Small Key (Universal)', player)
         if count == 1:
@@ -1357,7 +1364,6 @@ class Sector(object):
         self.name = None
         self.r_name_set = None
         self.chest_locations = 0
-        self.big_chest_present = False
         self.key_only_locations = 0
         self.c_switch = False
         self.orange_barrier = False
@@ -2019,3 +2025,8 @@ flooded_keys = {
     'Trench 1 Switch': 'Swamp Palace - Trench 1 Pot Key',
     'Trench 2 Switch': 'Swamp Palace - Trench 2 Pot Key'
 }
+
+dungeon_names = [
+    'Hyrule Castle', 'Eastern Palace', 'Desert Palace', 'Tower of Hera', 'Agahnims Tower', 'Palace of Darkness',
+    'Swamp Palace', 'Skull Woods', 'Thieves Town', 'Ice Palace', 'Misery Mire', 'Turtle Rock', 'Ganons Tower'
+]

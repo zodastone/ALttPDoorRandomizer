@@ -31,7 +31,7 @@ def main(args=None):
                      ['Std ', ' --mode standard'],
                      ['Inv ', ' --mode inverted']]:
 
-            basecommand = f"py DungeonRandomizer.py --door_shuffle {args.dr} --intensity {args.tense} --suppress_rom --suppress_spoiler"
+            basecommand = f"python3.8 DungeonRandomizer.py --door_shuffle {args.dr} --intensity {args.tense} --suppress_rom --suppress_spoiler"
 
             def gen_seed():
                 taskcommand = basecommand + " " + command + mode[1]
@@ -46,7 +46,7 @@ def main(args=None):
 
     test("Vanilla   ", "--shuffle vanilla")
     test("Retro     ", "--retro --shuffle vanilla")
-    test("Keysanity ", "--shuffle vanilla --keysanity")
+    test("Keysanity ", "--shuffle vanilla --keydropshuffle --keysanity")
     test("Simple    ", "--shuffle simple")
     test("Full      ", "--shuffle full")
     test("Crossed   ", "--shuffle crossed")
