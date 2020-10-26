@@ -123,11 +123,36 @@ class LocalRom(object):
         with open(local_path('data/base2current.bps'), 'rb') as stream:
             bps.apply.apply_to_bytearrays(bps.io.read_bps(stream), orig_buffer, self.buffer)
 
+        self.create_json_patch(orig_buffer)
+
         # verify md5
         patchedmd5 = hashlib.md5()
         patchedmd5.update(self.buffer)
         if RANDOMIZERBASEHASH != patchedmd5.hexdigest():
             raise RuntimeError('Provided Base Rom unsuitable for patching. Please provide a JAP(1.0) "Zelda no Densetsu - Kamigami no Triforce (Japan).sfc" rom to use as a base.')
+
+    def create_json_patch(self, orig_buffer):
+        # extend to 2MB
+        orig_buffer.extend(bytearray([0x00] * (len(self.buffer) - len(orig_buffer))))
+
+        i = 0
+        patches = []
+
+        while i < len(self.buffer):
+            if self.buffer[i] == orig_buffer[i]:
+                i += 1
+                continue
+
+            patch_start = i
+            patch_contents = []
+            while self.buffer[i] != orig_buffer[i]:
+                patch_contents.append(self.buffer[i])
+                i += 1
+            patches.append({patch_start: patch_contents})
+
+        with open(local_path('data/base2current.json'), 'w') as fp:
+            json.dump(patches, fp, separators=(',', ':'))
+
 
     def write_crc(self):
         crc = (sum(self.buffer[:0x7FDC] + self.buffer[0x7FE0:]) + 0x01FE) & 0xFFFF
