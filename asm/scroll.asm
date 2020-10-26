@@ -188,9 +188,9 @@ CheckRoomLayoutX:
     jsr LoadRoomLayout ;switches to 8-bit
     cmp #$04 : !blt .lock
     cmp #$05 : bne +
-        lda $06 : cmp #$ff : beq .lock
+        lda $04 : cmp #$f8 : beq .lock
     + cmp #$06 : bne .free
-        lda $06 : cmp #$ff : bne .lock
+        lda $04 : cmp #$f8 : bne .lock
     .free rep #$30 : clc : rts
     .lock rep #$30 : sec : rts
 

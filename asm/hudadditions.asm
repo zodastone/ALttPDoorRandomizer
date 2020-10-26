@@ -32,7 +32,7 @@ HudAdditions:
             lda $7ef368 : and.l $0098c0, x : beq .restore
                 txa : lsr : tax
 
-				lda.l GenericKeys : bne +
+				lda.l GenericKeys : and #$00ff : bne +
                 	lda $7ef4e0, x : jsr ConvertToDisplay : sta $7ec7a2
                 	lda #$2830 : sta $7ec7a4
                 +
