@@ -545,8 +545,7 @@ def cross_dungeon(world, player):
         reassign_boss('GT Lanmolas 2', 'middle', builder, gt, world, player)
         reassign_boss('GT Moldorm', 'top', builder, gt, world, player)
 
-    if world.hints[player]:
-        refine_hints(dungeon_builders)
+    refine_hints(dungeon_builders)
 
 
 def assign_cross_keys(dungeon_builders, world, player):
