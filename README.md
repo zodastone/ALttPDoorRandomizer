@@ -45,6 +45,14 @@ Same as Level 1 plus open edges and straight staircases are shuffled.
 #### Level 3 (Coming soon)
 Same as Level 2 plus Dungeon Lobbies are shuffled
 
+## KeyDropShuffle
+
+--keydropshuffle in CLI
+
+Adds 33 new locations to the randomization pool. The 32 small keys found under pots and dropped by enemies and the Big
+Key drop location are added to the pool. The keys normally found there are added to the item pool. Retro adds 
+32 generic keys to the pool instead.
+
 
 ## Map/Compass/Small Key/Big Key shuffle (aka Keysanity)
 

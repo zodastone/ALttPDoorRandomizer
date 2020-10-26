@@ -11,6 +11,7 @@
 and where enemies drop keys. This includes 32 small key location and the ball and chain guard who normally drop the HC
 Big Key. 
 	* Multiworld untested - May need changes to MultiClient/MultiServer to recognize new locations
+	* GT Big Key count / total location count needs to be updated
 
 ### Experimental features
 
