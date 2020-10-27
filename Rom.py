@@ -9,7 +9,7 @@ import struct
 import sys
 import subprocess
 
-from BaseClasses import CollectionState, ShopType, Region, Location, DoorType
+from BaseClasses import CollectionState, ShopType, Region, Location, DoorType, RegionType
 from DoorShuffle import compass_data, DROptions, boss_indicator
 from Dungeons import dungeon_music_addresses
 from Regions import location_table
@@ -1671,7 +1671,10 @@ def write_strings(rom, world, player, team):
         if ped_hint:
             hint = dest.pedestal_hint_text if dest.pedestal_hint_text else "unknown item"
         else:
-            hint = dest.hint_text if dest.hint_text else "something"
+            if isinstance(dest, Region) and dest.type == RegionType.Dungeon and dest.dungeon:
+                hint = dest.dungeon.name
+            else:
+                hint = dest.hint_text if dest.hint_text else "something"
         if dest.player != player:
             if ped_hint:
                 hint += f" for {world.player_names[dest.player][team]}!"

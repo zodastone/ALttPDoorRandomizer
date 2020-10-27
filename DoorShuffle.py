@@ -944,8 +944,7 @@ def cross_dungeon(world, player):
     eastfairies.palette = palette_map[world.get_region('Eastern Courtyard', player).dungeon.name]
     # other ones that could use programmatic treatment:  Skull Boss x29, Hera Fairies xa7, Ice Boss xde
 
-    if world.hints[player]:
-        refine_hints(dungeon_builders)
+    refine_hints(dungeon_builders)
 
 
 def assign_cross_keys(dungeon_builders, world, player):
