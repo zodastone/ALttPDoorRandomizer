@@ -2358,12 +2358,12 @@ HintLocations = ['telepathic_tile_eastern_palace',
 InconvenientLocations = ['Spike Cave',
                          'Sahasrahla',
                          'Purple Chest',
-                         'Tower of Hera - Big Key Chest',
                          'Magic Bat']
 
 InconvenientDungeonLocations = ['Swamp Left',
                                 'Mire Left',
                                 'Eastern Palace - Big Key Chest',
+                                'Tower of Hera - Big Key Chest',
                                 'Thieves\' Town - Big Chest',
                                 'Ice Palace - Big Chest',
                                 'Ganons Tower - Big Chest']
