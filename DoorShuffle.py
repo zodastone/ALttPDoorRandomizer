@@ -168,7 +168,7 @@ def vanilla_key_logic(world, player):
         analyze_dungeon(key_layout, world, player)
         world.key_logic[player][builder.name] = key_layout.key_logic
         log_key_logic(builder.name, key_layout.key_logic)
-    if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player]:
+    if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player] and not world.keydropshuffle[player]:
         validate_vanilla_key_logic(world, player)
 
 
@@ -689,7 +689,8 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
     combine_layouts(recombinant_builders, dungeon_builders, entrances_map)
     world.dungeon_layouts[player] = {}
     for builder in dungeon_builders.values():
-        builder.entrance_list = builder.layout_starts = builder.path_entrances = find_accessible_entrances(world, player, builder.all_entrances)
+        find_enabled_origins([builder.master_sector], enabled_entrances, builder.layout_starts, entrances_map, builder.name)
+        builder.path_entrances = entrances_map[builder.name]
     world.dungeon_layouts[player] = dungeon_builders
 
 

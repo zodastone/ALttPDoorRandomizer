@@ -202,7 +202,7 @@
       "Door Shuffle Intensity Level (default: %(default)s)",
       "1:       Shuffles normal doors and spiral staircases",
       "2:       And shuffles open edges and straight staircases",
-      "3:       (Coming soon) And shuffles dungeon lobbies",
+      "3:       And shuffles dungeon lobbies",
       "random:  Picks one of those at random"
     ],
     "experimental": [ "Enable experimental features. (default: %(default)s)" ],
@@ -244,6 +244,7 @@
     "compassshuffle": [ "Compasses are no longer restricted to their dungeons, but can be anywhere. (default: %(default)s)" ],
     "keyshuffle": [ "Small Keys are no longer restricted to their dungeons, but can be anywhere. (default: %(default)s)" ],
     "bigkeyshuffle": [ "Big Keys are no longer restricted to their dungeons, but can be anywhere. (default: %(default)s)" ],
+    "keydropshuffle": [ "Key Drops (Pots and Enemies) are shuffled and other items can take their place (default: %(default)s)" ],
     "retro": [
       "Keys are universal, shooting arrows costs rupees,",
       "and a few other little things make this more like Zelda-1. (default: %(default)s)"

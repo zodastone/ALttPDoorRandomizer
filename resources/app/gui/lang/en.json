@@ -46,12 +46,12 @@
     "adjust.rom.dialog.success": "Success",
     "adjust.rom.dialog.success.message": "Rom patched successfully.",
 
-
     "randomizer.dungeon.keysanity": "Shuffle: ",
     "randomizer.dungeon.mapshuffle": "Maps",
     "randomizer.dungeon.compassshuffle": "Compasses",
     "randomizer.dungeon.smallkeyshuffle": "Small Keys",
     "randomizer.dungeon.bigkeyshuffle": "Big Keys",
+    "randomizer.dungeon.keydropshuffle": "Key Drops (pots and enemies)",
 
     "randomizer.dungeon.dungeondoorshuffle": "Dungeon Door Shuffle",
     "randomizer.dungeon.dungeondoorshuffle.vanilla": "Vanilla",
@@ -61,7 +61,7 @@
     "randomizer.dungeon.dungeonintensity": "Intensity Level",
     "randomizer.dungeon.dungeonintensity.1": "1: Normal Supertile and Spiral Stairs",
     "randomizer.dungeon.dungeonintensity.2": "2: Open Edges and Straight Stairs",
-    "randomizer.dungeon.dungeonintensity.3": "3: (Coming soon) Dungeon Lobbies",
+    "randomizer.dungeon.dungeonintensity.3": "3: Dungeon Lobbies",
     "randomizer.dungeon.dungeonintensity.random": "Random",
 
     "randomizer.dungeon.experimental": "Enable Experimental Features",
