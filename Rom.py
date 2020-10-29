@@ -8,6 +8,8 @@ import random
 import struct
 import sys
 import subprocess
+import bps.apply
+import bps.io
 
 from BaseClasses import CollectionState, ShopType, Region, Location, DoorType, RegionType
 from DoorShuffle import compass_data, DROptions, boss_indicator
@@ -22,7 +24,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '796d527e1a2ebbcac4023f6b8b9444bf'
+RANDOMIZERBASEHASH = 'c83a85f4dca8a0f264280aecde8e41c2'
 
 
 class JsonRom(object):
@@ -112,22 +114,45 @@ class LocalRom(object):
         if JAP10HASH != basemd5.hexdigest():
             logging.getLogger('').warning('Supplied Base Rom does not match known MD5 for JAP(1.0) release. Will try to patch anyway.')
 
+        orig_buffer = self.buffer.copy()
+
         # extend to 2MB
         self.buffer.extend(bytearray([0x00] * (0x200000 - len(self.buffer))))
 
         # load randomizer patches
-        with open(local_path('data/base2current.json'), 'r') as stream:
-            patches = json.load(stream)
-        for patch in patches:
-            if isinstance(patch, dict):
-                for baseaddress, values in patch.items():
-                    self.write_bytes(int(baseaddress), values)
+        with open(local_path('data/base2current.bps'), 'rb') as stream:
+            bps.apply.apply_to_bytearrays(bps.io.read_bps(stream), orig_buffer, self.buffer)
+
+        self.create_json_patch(orig_buffer)
 
         # verify md5
         patchedmd5 = hashlib.md5()
         patchedmd5.update(self.buffer)
         if RANDOMIZERBASEHASH != patchedmd5.hexdigest():
             raise RuntimeError('Provided Base Rom unsuitable for patching. Please provide a JAP(1.0) "Zelda no Densetsu - Kamigami no Triforce (Japan).sfc" rom to use as a base.')
+
+    def create_json_patch(self, orig_buffer):
+        # extend to 2MB
+        orig_buffer.extend(bytearray([0x00] * (len(self.buffer) - len(orig_buffer))))
+
+        i = 0
+        patches = []
+
+        while i < len(self.buffer):
+            if self.buffer[i] == orig_buffer[i]:
+                i += 1
+                continue
+
+            patch_start = i
+            patch_contents = []
+            while self.buffer[i] != orig_buffer[i]:
+                patch_contents.append(self.buffer[i])
+                i += 1
+            patches.append({patch_start: patch_contents})
+
+        with open(local_path('data/base2current.json'), 'w') as fp:
+            json.dump(patches, fp, separators=(',', ':'))
+
 
     def write_crc(self):
         crc = (sum(self.buffer[:0x7FDC] + self.buffer[0x7FE0:]) + 0x01FE) & 0xFFFF
