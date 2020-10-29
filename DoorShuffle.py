@@ -154,20 +154,39 @@ def vanilla_key_logic(world, player):
         world.dungeon_layouts[player][builder.name] = builder
 
     add_inaccessible_doors(world, player)
-    for builder in builders:
-        origin_list = find_accessible_entrances(world, player, default_dungeon_entrances[builder.name])
-        start_regions = convert_regions(origin_list, world, player)
-        doors = convert_key_doors(default_small_key_doors[builder.name], world, player)
-        key_layout = build_key_layout(builder, start_regions, doors, world, player)
-        valid = validate_key_layout(key_layout, world, player)
-        if not valid:
-            logging.getLogger('').warning('Vanilla key layout not valid %s', builder.name)
-        builder.key_door_proposal = doors
-        if player not in world.key_logic.keys():
-            world.key_logic[player] = {}
-        analyze_dungeon(key_layout, world, player)
-        world.key_logic[player][builder.name] = key_layout.key_logic
-        log_key_logic(builder.name, key_layout.key_logic)
+    entrances_map, potentials, connections = determine_entrance_list(world, player)
+
+    enabled_entrances = {}
+    sector_queue = deque(builders)
+    last_key, loops = None, 0
+    while len(sector_queue) > 0:
+        builder = sector_queue.popleft()
+
+        split_dungeon = builder.name.startswith('Desert Palace') or builder.name.startswith('Skull Woods')
+        origin_list = list(entrances_map[builder.name])
+        find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, builder.name)
+        if len(origin_list) <= 0 or not pre_validate(builder, origin_list, split_dungeon, world, player):
+            if last_key == builder.name or loops > 1000:
+                origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name if len(origin_list) > 0 else 'no origin'
+                raise Exception('Infinite loop detected for "%s" located at %s' % (builder.name, origin_name))
+            sector_queue.append(builder)
+            last_key = builder.name
+            loops += 1
+        else:
+            find_new_entrances(builder.master_sector, entrances_map, connections, potentials, enabled_entrances, world, player)
+            start_regions = convert_regions(origin_list, world, player)
+            doors = convert_key_doors(default_small_key_doors[builder.name], world, player)
+            key_layout = build_key_layout(builder, start_regions, doors, world, player)
+            valid = validate_key_layout(key_layout, world, player)
+            if not valid:
+                logging.getLogger('').warning('Vanilla key layout not valid %s', builder.name)
+            builder.key_door_proposal = doors
+            if player not in world.key_logic.keys():
+                world.key_logic[player] = {}
+            analyze_dungeon(key_layout, world, player)
+            world.key_logic[player][builder.name] = key_layout.key_logic
+            log_key_logic(builder.name, key_layout.key_logic)
+            last_key = None
     if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player] and not world.keydropshuffle[player]:
         validate_vanilla_key_logic(world, player)
 
@@ -837,6 +856,7 @@ def cross_dungeon(world, player):
     for key in dungeon_regions.keys():
         all_regions += dungeon_regions[key]
     all_sectors.extend(convert_to_sectors(all_regions, world, player))
+    merge_sectors(all_sectors, world, player)
     entrances, splits = create_dungeon_entrances(world, player)
     dungeon_builders = create_dungeon_builders(all_sectors, connections_tuple, world, player, entrances, splits)
     for builder in dungeon_builders.values():
@@ -1074,6 +1094,30 @@ def convert_to_sectors(region_names, world, player):
         sector.outstanding_doors.extend(outstanding_doors)
         sectors.append(sector)
     return sectors
+
+
+def merge_sectors(all_sectors, world, player):
+    if world.mixed_travel[player] == 'force':
+        sectors_to_remove = {}
+        merge_sectors = {}
+        for sector in all_sectors:
+            r_set = sector.region_set()
+            if 'PoD Arena Ledge' in r_set:
+                sectors_to_remove['Arenahover'] = sector
+            elif 'PoD Big Chest Balcony' in r_set:
+                sectors_to_remove['Hammerjump'] = sector
+            elif 'Mire Chest View' in r_set:
+                sectors_to_remove['Mire BJ'] = sector
+            elif 'PoD Falling Bridge Ledge' in r_set:
+                merge_sectors['Hammerjump'] = sector
+            elif 'PoD Arena Bridge' in r_set:
+                merge_sectors['Arenahover'] = sector
+            elif 'Mire BK Chest Ledge' in r_set:
+                merge_sectors['Mire BJ'] = sector
+        for key, old_sector in sectors_to_remove.items():
+            merge_sectors[key].regions.extend(old_sector.regions)
+            merge_sectors[key].outstanding_doors.extend(old_sector.outstanding_doors)
+            all_sectors.remove(old_sector)
 
 
 # those with split region starts like Desert/Skull combine for key layouts
@@ -1697,6 +1741,7 @@ class DROptions(Flag):
     Town_Portal = 0x02  # If on, Players will start with mirror scroll
     Map_Info = 0x04
     Debug = 0x08
+    Rails = 0x10  # If on, draws rails
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
 
 

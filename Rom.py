@@ -24,7 +24,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'c83a85f4dca8a0f264280aecde8e41c2'
+RANDOMIZERBASEHASH = '6904a4588b21d1674e1fa25e96da8339'
 
 
 class JsonRom(object):
@@ -624,6 +624,10 @@ def patch_rom(world, rom, player, team, enemized):
     if world.experimental[player]:
         dr_flags |= DROptions.Map_Info
         dr_flags |= DROptions.Debug
+    if world.doorShuffle[player] == 'crossed' and world.logic[player] != 'nologic'\
+       and world.mixed_travel[player] == 'prevent':
+        dr_flags |= DROptions.Rails
+
 
     # fix hc big key problems
     if world.doorShuffle[player] == 'crossed' or world.keydropshuffle[player]:
@@ -1358,7 +1362,7 @@ def patch_rom(world, rom, player, team, enemized):
         item_dungeon = hera_basement.item.name.split('(')[1][:-1]
         if item_dungeon == 'Escape':
             item_dungeon = 'Hyrule Castle'
-        is_small_key_this_dungeon = hera_basement.dungeon.name == item_dungeon
+        is_small_key_this_dungeon = hera_basement.parent_region.dungeon.name == item_dungeon
     if is_small_key_this_dungeon:
         rom.write_byte(0x4E3BB, 0xE4)
     else:

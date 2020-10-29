@@ -72,6 +72,10 @@
     "randomizer.dungeon.dungeon_counters.on": "On",
     "randomizer.dungeon.dungeon_counters.pickup": "On Compass Pickup",
 
+    "randomizer.dungeon.mixed_travel": "Mixed Dungeon Travel ",
+    "randomizer.dungeon.mixed_travel.prevent": "Prevent Mixed Dungeon Travel",
+    "randomizer.dungeon.mixed_travel.allow": "Allow Mixed Dungeon Travel",
+    "randomizer.dungeon.mixed_travel.force": "Force Reachable Areas to Same Dungeon",
 
     "randomizer.enemizer.potshuffle": "Pot Shuffle",
 

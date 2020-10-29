@@ -90,7 +90,8 @@ SETTINGSTOPROCESS = {
       "dungeondoorshuffle": "door_shuffle",
       "dungeonintensity": "intensity",
       "experimental": "experimental",
-      "dungeon_counters": "dungeon_counters"
+      "dungeon_counters": "dungeon_counters",
+      "mixed_travel": "mixed_travel"
     },
     "gameoptions": {
       "hints": "hints",

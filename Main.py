@@ -24,7 +24,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes
 from Utils import output_path, parse_player_names
 
-__version__ = '0.2.0.4-u'
+__version__ = '0.2.0.5-u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -67,6 +67,7 @@ def main(args, seed=None, fish=None):
     world.dungeon_counters = args.dungeon_counters.copy()
     world.fish = fish
     world.keydropshuffle = args.keydropshuffle.copy()
+    world.mixed_travel = args.mixed_travel.copy()
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
@@ -374,6 +375,7 @@ def copy_world(world):
     ret.intensity = world.intensity.copy()
     ret.experimental = world.experimental.copy()
     ret.keydropshuffle = world.keydropshuffle.copy()
+    ret.mixed_travel = world.mixed_travel.copy()
 
     for player in range(1, world.players + 1):
         if world.mode[player] != 'inverted':
