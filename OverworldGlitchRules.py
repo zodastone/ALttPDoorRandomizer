@@ -181,32 +181,32 @@ def get_invalid_bunny_revival_dungeons():
 def overworld_glitches_rules(world, player):
 
     # Boots-accessible locations.
-    create_owg_connections(player, world, get_boots_clip_exits_lw(world.mode[player] == 'inverted'), lambda state: state.can_boots_clip_lw(player))
-    create_owg_connections(player, world, get_boots_clip_exits_dw(world.mode[player] == 'inverted'), lambda state: state.can_boots_clip_dw(player))
+    create_owg_connections(player, world, get_boots_clip_exits_lw(world.mode == 'inverted'), lambda state: state.can_boots_clip_lw(player))
+    create_owg_connections(player, world, get_boots_clip_exits_dw(world.mode == 'inverted'), lambda state: state.can_boots_clip_dw(player))
 
-    if world.mode[player] != 'inverted':
+    if world.mode != 'inverted':
         create_owg_connections(player, world, [('Ice Palace Clip', 'South Dark World', 'Dark Lake Hylia Central Island')], lambda state: state.can_boots_clip_dw(player) and state.has('Flippers', player))
 
     # Glitched speed drops.
-    create_owg_connections(player, world, get_glitched_speed_drops_dw(world.mode[player] == 'inverted'), lambda state: state.can_get_glitched_speed_dw(player))
+    create_owg_connections(player, world, get_glitched_speed_drops_dw(world.mode == 'inverted'), lambda state: state.can_get_glitched_speed_dw(player))
     # Dark Death Mountain Ledge Clip Spot also accessible with mirror.
-    if world.mode[player] != 'inverted':
+    if world.mode != 'inverted':
         add_alternate_rule(world.get_entrance('Dark Death Mountain Ledge Clip Spot', player), lambda state: state.has_Mirror(player))
 
     # Mirror clip spots.
-    if world.mode[player] != 'inverted':
+    if world.mode != 'inverted':
         create_owg_connections(player, world, get_mirror_clip_spots_dw(), lambda state: state.has_Mirror(player))
     else:
         create_owg_connections(player, world, get_mirror_clip_spots_lw(), lambda state: state.has_Mirror(player))
 
     # Regions that require the boots and some other stuff.
-    if world.mode[player] != 'inverted':
+    if world.mode != 'inverted':
         world.get_entrance('Turtle Rock Teleporter', player).access_rule = lambda state: (state.can_boots_clip_lw(player) or state.can_lift_heavy_rocks(player)) and state.has('Hammer', player)
         add_alternate_rule(world.get_entrance('Waterfall of Wishing', player), lambda state: state.has('Moon Pearl', player) or state.has_Boots(player))
     else:
         add_alternate_rule(world.get_entrance('Waterfall of Wishing Cave', player), lambda state: state.has('Moon Pearl', player))
 
-    world.get_entrance('Dark Desert Teleporter', player).access_rule = lambda state: (state.has('Flute', player) or state.has_Boots(player)) and state.can_lift_heavy_rocks(player)
+    world.get_entrance('Dark Desert Teleporter', player).access_rule = lambda state: (state.can_flute(player) or state.has_Boots(player)) and state.can_lift_heavy_rocks(player)
     add_alternate_rule(world.get_entrance('Catfish Exit Rock', player), lambda state: state.can_boots_clip_dw(player))
     add_alternate_rule(world.get_entrance('East Dark World Broken Bridge Pass', player), lambda state: state.can_boots_clip_dw(player))
 
