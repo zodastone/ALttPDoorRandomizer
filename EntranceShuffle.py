@@ -1912,7 +1912,7 @@ def connect_mandatory_exits(world, entrances, caves, must_be_exits, player):
 
     if world.logic in ['owglitches', 'nologic']:
         import OverworldGlitchRules
-        for entrance in OverworldGlitchRules.get_non_mandatory_exits(world.mode[player] == 'inverted'):
+        for entrance in OverworldGlitchRules.get_non_mandatory_exits(world.mode == 'inverted'):
             invalid_connections[entrance] = set()
             if entrance in must_be_exits:
                 must_be_exits.remove(entrance)

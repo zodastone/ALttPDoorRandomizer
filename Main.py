@@ -241,7 +241,7 @@ def copy_world(world):
     ret.boss_shuffle = world.boss_shuffle
 
     for player in range(1, world.players + 1):
-        if world.mode[player] != 'inverted':
+        if world.mode != 'inverted':
             create_regions(ret, player)
         else:
             create_inverted_regions(ret, player)
