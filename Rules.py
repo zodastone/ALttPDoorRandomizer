@@ -1,7 +1,8 @@
 import collections
 import logging
+
 import OverworldGlitchRules
-from BaseClasses import RegionType, World
+from BaseClasses import RegionType, CollectionState
 from OverworldGlitchRules import overworld_glitches_rules, no_logic_rules
 
 
@@ -889,20 +890,6 @@ def inverted_rules(world, player):
     if world.swords == 'swordless':
         swordless_rules(world, player)
 
-
-def forbid_overworld_glitches(world, player):
-    for exit in OWGSets.get_boots_clip_exits_lw(world.mode == 'inverted'):
-        set_rule(world.get_entrance(exit, player), lambda state: False)
-    for exit in OWGSets.get_boots_clip_exits_dw(world.mode == 'inverted'):
-        set_rule(world.get_entrance(exit, player), lambda state: False)
-    for exit in OWGSets.get_glitched_speed_drops_dw():
-        set_rule(world.get_entrance(exit, player), lambda state: False)
-    if world.mode != 'inverted':
-        for exit in OWGSets.get_mirror_clip_spots_dw():
-            set_rule(world.get_entrance(exit, player), lambda state: False)
-    else:
-        for exit in OWGSets.get_mirror_clip_spots_lw():
-            set_rule(world.get_entrance(exit, player), lambda state: False)
 
 def no_glitches_rules(world, player):
     if world.mode != 'inverted':
