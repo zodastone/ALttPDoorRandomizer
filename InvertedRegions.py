@@ -29,7 +29,7 @@ def create_inverted_regions(world, player):
                                                                         "Blind\'s Hideout - Right",
                                                                         "Blind\'s Hideout - Far Left",
                                                                         "Blind\'s Hideout - Far Right"]),
-        create_lw_region(player, 'Northeast Light World', None, ['Zoras River', 'Waterfall of Wishing', 'Potion Shop Outer Rock', 'Northeast Dark World Mirror Spot', 'Northeast Light World Warp']),
+        create_lw_region(player, 'Northeast Light World', None, ['Zoras River', 'Waterfall of Wishing', 'Potion Shop Outer Rock', 'Catfish Mirror Spot', 'Northeast Light World Warp']),
         create_lw_region(player, 'Potion Shop Area', None, ['Potion Shop', 'Potion Shop Inner Bushes', 'Potion Shop Inner Rock', 'Potion Shop Mirror Spot', 'Potion Shop River Drop']),
         create_lw_region(player, 'Graveyard Cave Area', None, ['Graveyard Cave', 'Graveyard Cave Inner Bushes', 'Graveyard Cave Mirror Spot']),
         create_lw_region(player, 'River', None, ['Light World Pier', 'Potion Shop Pier']),
