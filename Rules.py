@@ -1,7 +1,8 @@
 import collections
 import logging
-import OWGSets
-from BaseClasses import CollectionState, RegionType
+import OverworldGlitchRules
+from BaseClasses import RegionType
+from OverworldGlitchRules import overworld_glitches_rules
 
 
 def set_rules(world, player):
@@ -43,6 +44,7 @@ def set_rules(world, player):
         # Initially setting no_glitches_rules to set the baseline rules for some
         # entrances. The overworld_glitches_rules set is primarily additive.
         no_glitches_rules(world, player)
+        fake_flipper_rules(world, player)
         overworld_glitches_rules(world, player)
     else:
         raise NotImplementedError('Not implemented yet')
@@ -899,7 +901,7 @@ def no_glitches_rules(world, player):
         set_rule(world.get_entrance('Northeast Light World Warp', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # can be fake flippered to
         set_rule(world.get_entrance('Hobo Bridge', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
         set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has('Flippers', player))
-        set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has('Flippers', player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))
+        set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has('Flippers', player))
         set_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: state.has('Flippers', player))
 
     add_rule(world.get_entrance('Ganons Tower (Hookshot Room)', player), lambda state: state.has('Hookshot', player) or state.has_Boots(player))
@@ -909,9 +911,30 @@ def no_glitches_rules(world, player):
         add_rule(world.get_location(location, player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: False)  # no glitches does not require block override
     forbid_bomb_jump_requirements(world, player)
-    forbid_overworld_glitches(world, player)
-    add_conditional_lamps(world, player) 
-    
+    add_conditional_lamps(world, player)
+
+
+def fake_flipper_rules(world, player):
+    if world.mode != 'inverted':
+        set_rule(world.get_entrance('Zoras River', player), lambda state: True)
+        set_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: True)
+        set_rule(world.get_entrance('Hobo Bridge', player), lambda state: True)
+        set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+        set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))
+        set_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: state.has_Pearl(player))
+    else:
+        set_rule(world.get_entrance('Zoras River', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Lake Hylia Island Pier', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Lake Hylia Warp', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Northeast Light World Warp', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Hobo Bridge', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has('Flippers', player))
+        set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: True)
+        set_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: True)
+        set_rule(world.get_entrance('East Dark World Pier', player), lambda state: True) #todo: Ice Palace exit
+
+
 def forbid_bomb_jump_requirements(world, player):
     DMs_room_chests = ['Ganons Tower - DMs Room - Top Left', 'Ganons Tower - DMs Room - Top Right', 'Ganons Tower - DMs Room - Bottom Left', 'Ganons Tower - DMs Room - Bottom Right']
     for location in DMs_room_chests:
@@ -966,51 +989,6 @@ def add_conditional_lamps(world, player):
         add_lamp_requirement(world.get_location('Sewers - Dark Cross', player), player)
         add_lamp_requirement(world.get_entrance('Sewers Back Door', player), player)
         add_lamp_requirement(world.get_entrance('Throne Room', player), player)
-
-def overworld_glitches_rules(world, player):
-    # Spots that are immediately accessible.
-    for entrance in OWGSets.get_immediately_accessible_entrances(world, player):
-        set_rule(world.get_entrance(entrance, player), lambda state: True)
-
-    # Boots-accessible locations.
-    for entrance in OWGSets.get_boots_clip_exits_lw(world.mode == 'inverted'):
-        set_rule(world.get_entrance(entrance, player), lambda state: state.can_boots_clip_lw(player))
-    for entrance in OWGSets.get_boots_clip_exits_dw(world.mode == 'inverted'):
-        set_rule(world.get_entrance(entrance, player), lambda state: state.can_boots_clip_dw(player))
-
-    # Glitched speed drops.
-    for drop in OWGSets.get_glitched_speed_drops_dw():
-        set_rule(world.get_entrance(drop, player), lambda state: state.can_get_glitched_speed_dw(player))
-    # Dark Death Mountain Ledge Clip Spot also accessible with mirror.
-    if world.mode != 'inverted':
-        add_rule(world.get_entrance('Dark Death Mountain Ledge Clip Spot', player), lambda state: state.has_Mirror(player), 'or')
-
-    # Mirror clip spots.
-    if world.mode != 'inverted':
-        for clip_spot in OWGSets.get_mirror_clip_spots_dw():
-            set_rule(world.get_entrance(clip_spot, player), lambda state: state.has_Mirror(player))
-    else:
-        for clip_spot in OWGSets.get_mirror_clip_spots_lw():
-            set_rule(world.get_entrance(clip_spot, player), lambda state: state.has_Mirror(player))
-
-    # Locations that you can superbunny mirror into, but need a sword to clear.
-    for superbunny_mirror_weapon_region in OWGSets.get_sword_required_superbunny_mirror_regions():
-        region = world.get_region(superbunny_mirror_weapon_region, player)
-        if check_is_dark_world(region):
-            for spot in region.locations:
-                add_rule(world.get_location(spot, player), lambda state: state.can_superbunny_mirror_with_sword(player), 'or')
-
-    # Regions that require the boots and some other stuff.
-    if world.mode != 'inverted':
-        set_rule(world.get_entrance('Dark Desert Teleporter', player), lambda state: (state.has('Ocarina', player) or state.can_boots_clip_lw(player)) and state.can_lift_heavy_rocks(player))
-        set_rule(world.get_entrance('Turtle Rock Teleporter', player), lambda state: (state.can_boots_clip_lw(player) or state.can_lift_heavy_rocks(player)) and state.has('Hammer', player))
-        add_rule(world.get_entrance('Catfish Exit Rock', player), lambda state: state.can_boots_clip_dw(player), 'or')
-        add_rule(world.get_entrance('East Dark World Broken Bridge Pass', player), lambda state: state.can_boots_clip_dw(player), 'or')
-    else:
-        add_rule(world.get_entrance('South Dark World Teleporter', player), lambda state: state.has_Boots(player) and state.can_lift_rocks(player), 'or')
-
-    # Zora's Ledge via waterwalk setup.
-    add_rule(world.get_location('Zora\'s Ledge', player), lambda state: state.has_Boots(player), 'or')
 
 def open_rules(world, player):
     # softlock protection as you can reach the sewers small key door with a guard drop key
@@ -1608,12 +1586,17 @@ def set_bunny_rules(world, player):
         if world.logic == 'owglitches':
             if region.name == 'Swamp Palace (Entrance)':
                 return lambda state: state.has_Pearl(player)
-            if region.name in OWGSets.get_invalid_bunny_revival_dungeons():
+            if region.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
                 return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
             if region.type == RegionType.Dungeon:
                 return lambda state: True
-            if (((location is None or location.name not in OWGSets.get_superbunny_accessible_locations())
-                    or (connecting_entrance is not None and connecting_entrance.name in OWGSets.get_invalid_bunny_revival_dungeons()))
+            if region.name in OverworldGlitchRules.get_sword_required_superbunny_mirror_regions():
+                return lambda state: state.has_Mirror(player) and state.has_sword(player) or state.has_Pearl(player)
+            if (region.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_regions()
+                or location is not None and location.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_locations()):
+                return lambda state: state.has_Mirror(player) and state.has_Boots(player) or state.has_Pearl(player)
+            if (((location is None or location.name not in OverworldGlitchRules.get_superbunny_accessible_locations())
+                    or (connecting_entrance is not None and connecting_entrance.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons()))
                     and not region.is_light_world):
                 return lambda state: state.has_Pearl(player)
         else:
@@ -1642,10 +1625,13 @@ def set_bunny_rules(world, player):
                 seen.add(new_region)
                 if not new_region.is_light_world:
                     # For OWG, establish superbunny and revival rules.
-                    if world.logic == 'owglitches' and entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_dw():
-                        if new_region.name == 'Two Brothers House':
+                    if world.logic == 'owglitches' and entrance.name not in OverworldGlitchRules.get_invalid_mirror_bunny_entrances_dw():
+                        if region.name in OverworldGlitchRules.get_sword_required_superbunny_mirror_regions():
+                            possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player) and state.has_sword(player))
+                        elif (region.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_regions()
+                                or location is not None and location.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_locations()):
                             possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player) and state.has_Boots(player))
-                        if location is not None and location.name in OWGSets.get_superbunny_accessible_locations():
+                        elif location is not None and location.name in OverworldGlitchRules.get_superbunny_accessible_locations():
                             if new_region.name == 'Superbunny Cave (Bottom)' or region.name == 'Kakariko Well (top)':
                                 possible_options.append(lambda state: path_to_access_rule(new_path, entrance))
                             else:
@@ -1678,19 +1664,20 @@ def set_bunny_rules(world, player):
         if entrance.player == player and entrance.connected_region.is_dark_world:
             if world.logic == 'owglitches':
                 if entrance.connected_region.type == RegionType.Dungeon:
-                    if entrance.parent_region.type != RegionType.Dungeon and entrance.connected_region.name in OWGSets.get_invalid_bunny_revival_dungeons():
+                    if entrance.parent_region.type != RegionType.Dungeon and entrance.connected_region.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
                         add_rule(entrance, get_rule_to_add(entrance.connected_region, None, entrance))
                     continue
                 if entrance.connected_region.name == 'Turtle Rock (Entrance)':
                     add_rule(world.get_entrance('Turtle Rock Entrance Gap', player), get_rule_to_add(entrance.connected_region, None, entrance))
             for location in entrance.connected_region.locations:
-                if world.logic == 'owglitches' and entrance.name in OWGSets.get_invalid_mirror_bunny_entrances_dw():
+                if world.logic == 'owglitches' and entrance.name in OverworldGlitchRules.get_invalid_mirror_bunny_entrances_dw():
                     add_rule(location, get_rule_to_add(entrance.connected_region, location, entrance))
                     continue
                 if location.name in bunny_accessible_locations:
                         continue
                 add_rule(location, get_rule_to_add(entrance.connected_region, location))
 
+#todo: combine this with set_bunny_rules
 def set_inverted_bunny_rules(world, player):
 
     # regions for the exits of multi-entrace caves/drops that bunny cannot pass
@@ -1713,12 +1700,12 @@ def set_inverted_bunny_rules(world, player):
         if world.logic == 'owglitches':
             if region.name == 'Swamp Palace (Entrance)':
                 return lambda state: state.has_Pearl(player)
-            if region.name in OWGSets.get_invalid_bunny_revival_dungeons():
+            if region.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
                 return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
             if region.type == RegionType.Dungeon:
                 return lambda state: True
-            if (((location is None or location.name not in OWGSets.get_superbunny_accessible_locations())
-                    or (connecting_entrance is not None and connecting_entrance.name in OWGSets.get_invalid_bunny_revival_dungeons()))
+            if (((location is None or location.name not in OverworldGlitchRules.get_superbunny_accessible_locations())
+                    or (connecting_entrance is not None and connecting_entrance.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons()))
                     and not region.is_dark_world):
                 return lambda state: state.has_Pearl(player)
         else:
@@ -1747,10 +1734,13 @@ def set_inverted_bunny_rules(world, player):
                 seen.add(new_region)
                 if not new_region.is_dark_world:
                     # For OWG, establish superbunny and revival rules.
-                    if world.logic == 'owglitches' and entrance.name not in OWGSets.get_invalid_mirror_bunny_entrances_lw():
-                        if new_region.name == 'Two Brothers House':
+                    if world.logic == 'owglitches' and entrance.name not in OverworldGlitchRules.get_invalid_mirror_bunny_entrances_lw():
+                        if region.name in OverworldGlitchRules.get_sword_required_superbunny_mirror_regions():
+                            possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player) and state.has_sword(player))
+                        elif (region.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_regions()
+                                or location is not None and location.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_locations()):
                             possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player) and state.has_Boots(player))
-                        if location is not None and location.name in OWGSets.get_superbunny_accessible_locations():
+                        elif location is not None and location.name in OverworldGlitchRules.get_superbunny_accessible_locations():
                             if new_region.name == 'Superbunny Cave (Bottom)' or region.name == 'Kakariko Well (top)':
                                 possible_options.append(lambda state: path_to_access_rule(new_path, entrance))
                             else:
@@ -1784,13 +1774,13 @@ def set_inverted_bunny_rules(world, player):
         if entrance.player == player and entrance.connected_region.is_light_world:
             if world.logic == 'owglitches':
                 if entrance.connected_region.type == RegionType.Dungeon:
-                    if entrance.parent_region.type != RegionType.Dungeon and entrance.connected_region.name in OWGSets.get_invalid_bunny_revival_dungeons():
+                    if entrance.parent_region.type != RegionType.Dungeon and entrance.connected_region.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
                         add_rule(entrance, get_rule_to_add(entrance.connected_region, None, entrance))
                     continue
                 if entrance.connected_region.name == 'Turtle Rock (Entrance)':
                     add_rule(world.get_entrance('Turtle Rock Entrance Gap', player), get_rule_to_add(entrance.connected_region, None, entrance))
             for location in entrance.connected_region.locations:
-                if world.logic == 'owglitches' and entrance.name in OWGSets.get_invalid_mirror_bunny_entrances_lw():
+                if world.logic == 'owglitches' and entrance.name in OverworldGlitchRules.get_invalid_mirror_bunny_entrances_lw():
                     add_rule(location, get_rule_to_add(entrance.connected_region, location, entrance))
                     continue
                 if location.name in bunny_accessible_locations:
