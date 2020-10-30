@@ -192,9 +192,6 @@ def overworld_glitches_rules(world, player):
     create_owg_connections(player, world, get_boots_clip_exits_lw(world.mode == 'inverted'), lambda state: state.can_boots_clip_lw(player))
     create_owg_connections(player, world, get_boots_clip_exits_dw(world.mode == 'inverted'), lambda state: state.can_boots_clip_dw(player))
 
-    if world.mode != 'inverted':
-        create_owg_connections(player, world, [('Ice Palace Clip', 'South Dark World', 'Dark Lake Hylia Central Island')], lambda state: state.can_boots_clip_dw(player) and state.has('Flippers', player))
-
     # Glitched speed drops.
     create_owg_connections(player, world, get_glitched_speed_drops_dw(world.mode == 'inverted'), lambda state: state.can_get_glitched_speed_dw(player))
     # Dark Death Mountain Ledge Clip Spot also accessible with mirror.
