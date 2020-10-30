@@ -1,6 +1,6 @@
 from collections import namedtuple
 import logging
-import random
+import RaceRandom as random
 
 from BaseClasses import Region, RegionType, Shop, ShopType, Location
 from Bosses import place_bosses
@@ -228,7 +228,7 @@ take_any_locations = [
     'Bonk Fairy (Dark)', 'Lake Hylia Healer Fairy', 'Swamp Healer Fairy', 'Desert Healer Fairy',
     'Dark Lake Hylia Healer Fairy', 'Dark Lake Hylia Ledge Healer Fairy', 'Dark Desert Healer Fairy',
     'Dark Death Mountain Healer Fairy', 'Long Fairy Cave', 'Good Bee Cave', '20 Rupee Cave',
-    'Kakariko Gamble Game', 'Capacity Upgrade', '50 Rupee Cave', 'Lost Woods Gamble', 'Hookshot Fairy',
+    'Kakariko Gamble Game', '50 Rupee Cave', 'Lost Woods Gamble', 'Hookshot Fairy',
     'Palace of Darkness Hint', 'East Dark World Hint', 'Archery Game', 'Dark Lake Hylia Ledge Hint',
     'Dark Lake Hylia Ledge Spike Cave', 'Fortune Teller (Dark)', 'Dark Sanctuary Hint', 'Dark Desert Hint']
 
@@ -337,7 +337,7 @@ def set_up_shops(world, player):
 
     # Randomized changes to Shops
     if world.retro:
-        for shop in random.sample([s for s in world.shops if s.replaceable and s.region.player == player], 5):
+        for shop in random.sample([s for s in world.shops if s.replaceable and s.type == ShopType.Shop and s.region.player == player], 5):
             shop.active = True
             shop.add_inventory(0, 'Single Arrow', 80)
             shop.add_inventory(1, 'Small Key (Universal)', 100)

@@ -3,6 +3,8 @@ from enum import Enum, unique
 import logging
 import json
 from collections import OrderedDict
+
+from EntranceShuffle import door_addresses
 from _vendor.collections_extended import bag
 from Utils import int16_as_bytes
 
@@ -417,9 +419,9 @@ class CollectionState(object):
 
     def can_extend_magic(self, player, smallmagic=16, fullrefill=False): #This reflects the total magic Link has, not the total extra he has.
         basemagic = 8
-        if self.has('Quarter Magic', player):
+        if self.has('Magic Upgrade (1/4)', player):
             basemagic = 32
-        elif self.has('Half Magic', player):
+        elif self.has('Magic Upgrade (1/2)', player):
             basemagic = 16
         if self.can_buy_unlimited('Green Potion', player) or self.can_buy_unlimited('Blue Potion', player):
             if self.world.difficulty_adjustments == 'hard' and not fullrefill:
@@ -436,13 +438,12 @@ class CollectionState(object):
                 or (self.has('Cane of Byrna', player) and (enemies < 6 or self.can_extend_magic(player)))
                 or self.can_shoot_arrows(player)
                 or self.has('Fire Rod', player)
-               )
+                or (self.has('Bombs (10)', player) and enemies < 6))
 
     def can_shoot_arrows(self, player):
         if self.world.retro:
-            #TODO: need to decide how we want to handle wooden arrows  longer-term (a can-buy-a check, or via dynamic shop location)
-            #FIXME: Should do something about hard+ ganon only silvers. For the moment, i believe they effective grant wooden, so we are safe
-            return self.has('Bow', player) and (self.has('Silver Arrows', player) or self.can_buy_unlimited('Single Arrow', player))
+            #TODO: Progressive and Non-Progressive silvers work differently (progressive is not usable until the shop arrow is bought)
+            return self.has('Bow', player) and self.can_buy_unlimited('Single Arrow', player)
         return self.has('Bow', player)
 
     def can_get_good_bee(self, player):
@@ -916,8 +917,8 @@ class Shop(object):
         # [id][roomID-low][roomID-high][doorID][zero][shop_config][shopkeeper_config][sram_index]
         entrances = self.region.entrances
         config = self.item_count
-        if len(entrances) == 1 and entrances[0].addresses:
-            door_id = entrances[0].addresses+1
+        if len(entrances) == 1 and entrances[0].name in door_addresses:
+            door_id = door_addresses[entrances[0].name][0]+1
         else:
             door_id = 0
             config |= 0x40 # ignore door id

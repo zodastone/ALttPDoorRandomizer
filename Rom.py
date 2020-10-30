@@ -3,7 +3,7 @@ import json
 import hashlib
 import logging
 import os
-import random
+import RaceRandom as random
 import struct
 import subprocess
 
@@ -18,7 +18,7 @@ from EntranceShuffle import door_addresses
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '1907d4caccffe60fc69940cfa11b2dab'
+RANDOMIZERBASEHASH = 'ac23ab12e7c442515d51370642772c3b'
 
 
 class JsonRom(object):
@@ -662,8 +662,10 @@ def patch_rom(world, player, rom):
                     [difficulty.progressive_sword_limit, overflow_replacement,
                      difficulty.progressive_shield_limit, overflow_replacement,
                      difficulty.progressive_armor_limit, overflow_replacement,
-                     difficulty.progressive_bottle_limit, overflow_replacement,
-                     difficulty.progressive_bow_limit, overflow_replacement])
+                     difficulty.progressive_bottle_limit, overflow_replacement])
+    
+    #Work around for json patch ordering issues - write bow limit separately so that it is replaced in the patch
+    rom.write_bytes(0x180098, [difficulty.progressive_bow_limit, overflow_replacement])
     
     if difficulty.progressive_bow_limit < 2 and world.swords == 'swordless':
         rom.write_bytes(0x180098, [2, overflow_replacement])
@@ -915,7 +917,16 @@ def patch_rom(world, player, rom):
     rom.write_byte(0x18005F, world.crystals_needed_for_ganon)
     rom.write_byte(0x18008A, 0x01 if world.mode == "standard" else 0x00) # block HC upstairs doors in rain state in standard mode
 
-    rom.write_byte(0x18016A, 0x01 if world.keysanity else 0x00)  # free roaming item text boxes
+     # Bitfield - enable text box to show with free roaming items
+     #
+     # ---o bmcs
+     # o - enabled for outside dungeon items
+     # b - enabled for inside big keys
+     # m - enabled for inside maps
+     # c - enabled for inside compasses
+     # s - enabled for inside small keys
+    rom.write_byte(0x18016A, 0xFF if world.keysanity else 0x00)
+    
     rom.write_byte(0x18003B, 0x01 if world.keysanity else 0x00)  # maps showing crystals on overworld
 
     # compasses showing dungeon count
@@ -926,6 +937,14 @@ def patch_rom(world, player, rom):
     else:
         rom.write_byte(0x18003C, 0x00)
 
+     # Bitfield - enable free items to show up in menu
+     #
+     # ----dcba
+     # d - Compass
+     # c - Map
+     # b - Big Key
+     # a - Small Key
+     #
     rom.write_byte(0x180045, 0xFF if world.keysanity else 0x00)  # free roaming items in menu
 
     # Map reveals
@@ -1005,7 +1024,7 @@ def patch_rom(world, player, rom):
     rom.write_bytes(0x02F539, [0xEA, 0xEA, 0xEA, 0xEA, 0xEA] if world.powder_patch_required[player] else [0xAD, 0xBF, 0x0A, 0xF0, 0x4F])
 
     # allow smith into multi-entrance caves in appropriate shuffles
-    if world.shuffle in ['restricted', 'full', 'crossed', 'insanity']:
+    if world.shuffle in ['restricted', 'full', 'crossed', 'insanity'] or (world.shuffle == 'simple' and world.mode == 'inverted'):
         rom.write_byte(0x18004C, 0x01)
 
     # set correct flag for hera basement item
@@ -1030,7 +1049,7 @@ def patch_rom(world, player, rom):
     # set rom name
     # 21 bytes
     from Main import __version__
-    rom.name = bytearray('ER_{0}_{1:09}\0'.format(__version__[0:7],world.seed), 'utf8')
+    rom.name = bytearray('ER_{0}_{1}\0'.format(__version__[0:7], world.seed), 'utf8')
     assert len(rom.name) <= 21
     rom.write_bytes(0x7FC0, rom.name)
 
@@ -1288,18 +1307,15 @@ def write_strings(rom, world, player):
 
     prog_bow_locs = world.find_items('Progressive Bow', player)
     distinguished_prog_bow_loc = next((location for location in prog_bow_locs if location.item.code == 0x65), None)
+    progressive_silvers = world.difficulty_requirements.progressive_bow_limit >= 2 or world.swords == 'swordless'
     if distinguished_prog_bow_loc:
         prog_bow_locs.remove(distinguished_prog_bow_loc)
-        silverarrow_hint = (' %s?' % hint_text(distinguished_prog_bow_loc).replace('Ganon\'s', 'my'))
-        tt['ganon_phase_3_no_silvers_alt'] = 'Did you find the silver arrows%s' % silverarrow_hint
-
-    if any(prog_bow_locs):
-        silverarrow_hint = (' %s?' % hint_text(random.choice(prog_bow_locs)).replace('Ganon\'s', 'my'))
+        silverarrow_hint = (' %s?' % hint_text(distinguished_prog_bow_loc).replace('Ganon\'s', 'my')) if progressive_silvers else '?\nI think not!'
         tt['ganon_phase_3_no_silvers'] = 'Did you find the silver arrows%s' % silverarrow_hint
 
-
-    silverarrow_hint = (' %s?' % hint_text(silverarrows[0]).replace('Ganon\'s', 'my')) if silverarrows else '?\nI think not!'
-
+    if any(prog_bow_locs):
+        silverarrow_hint = (' %s?' % hint_text(random.choice(prog_bow_locs)).replace('Ganon\'s', 'my')) if progressive_silvers else '?\nI think not!'
+        tt['ganon_phase_3_no_silvers_alt'] = 'Did you find the silver arrows%s' % silverarrow_hint
 
     crystal5 = world.find_items('Crystal 5', player)[0]
     crystal6 = world.find_items('Crystal 6', player)[0]
