@@ -405,6 +405,7 @@ def guiMain(args=None):
         guiargs.sprite = sprite
         guiargs.skip_playthrough = False
         guiargs.outputpath = None
+        guiargs.securerandom = False
         try:
             if guiargs.count is not None:
                 seed = guiargs.seed

@@ -83,9 +83,12 @@ class World(object):
         self.spoiler = Spoiler(self)
         self.lamps_needed_for_dark_rooms = 1
 
-    def intialize_regions(self):
-        for region in self.regions:
+    def initialize_regions(self, regions=None):
+        for region in regions if regions else self.regions:
             region.world = self
+            self._region_cache[(region.name, region.player)] = region
+            for exit in region.exits:
+                self._entrance_cache[(exit.name, exit.player)] = exit
 
     def get_region(self, regionname, player):
         if isinstance(regionname, Region):
