@@ -73,7 +73,8 @@ class World(object):
         self.customitemarray = customitemarray
         self.can_take_damage = True
         self.difficulty_requirements = None
-        self.fix_fake_world = True
+        self.fix_fake_world = logic not in ['owglitches', 'nologic'] or shuffle in ['crossed', 'insanity', 'madness_legacy']
+        self.pre_open_pyramid = goal == 'crystals' and shuffle in ['vanilla', 'dungeonssimple', 'dungeonsfull']
         self.boss_shuffle = boss_shuffle
         self.hints = hints
         self.crystals_needed_for_ganon = 7
