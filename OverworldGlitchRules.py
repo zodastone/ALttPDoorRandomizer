@@ -221,7 +221,7 @@ def no_logic_rules(world, player):
     Add OWG transitions to no logic player's world
     """
     create_no_logic_connections(player, world, get_boots_clip_exits_lw(world.mode == 'inverted'))
-    create_no_logic_connections(player, world, get_boots_clip_exits_dw(world.mode == 'inverted', player))
+    create_no_logic_connections(player, world, get_boots_clip_exits_dw(world.mode == 'inverted'))
 
     # Glitched speed drops.
     create_no_logic_connections(player, world, get_glitched_speed_drops_dw(world.mode == 'inverted'))

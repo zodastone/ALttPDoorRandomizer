@@ -1027,7 +1027,10 @@ def swordless_rules(world, player):
         set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has('Hammer', player))
 
 def standard_rules(world, player):
-    add_rule(world.get_entrance('Sewers Door', player), lambda state: state.can_kill_most_things(player))
+    if world.retro:
+        set_rule(world.get_entrance('Sewers Door', player), lambda state: state.can_kill_most_things(player))  # key is manually placed
+    else:
+        add_rule(world.get_entrance('Sewers Door', player), lambda state: state.can_kill_most_things(player))
 
     set_rule(world.get_entrance('Hyrule Castle Exit (East)', player), lambda state: state.can_reach('Sanctuary', 'Region', player))
     set_rule(world.get_entrance('Hyrule Castle Exit (West)', player), lambda state: state.can_reach('Sanctuary', 'Region', player))
