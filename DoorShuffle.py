@@ -137,7 +137,7 @@ def vanilla_key_logic(world, player):
 
     overworld_prep(world, player)
     for builder in builders:
-        origin_list = find_accessible_entrances(world, player, default_dungeon_entrances[builder.name])
+        origin_list = find_accessible_entrances(world, player, builder)
         start_regions = convert_regions(origin_list, world, player)
         doors = convert_key_doors(default_small_key_doors[builder.name], world, player)
         key_layout = build_key_layout(builder, start_regions, doors, world, player)
@@ -372,7 +372,7 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
     combine_layouts(recombinant_builders, dungeon_builders, entrances_map)
     world.dungeon_layouts[player] = {}
     for builder in dungeon_builders.values():
-        builder.entrance_list = builder.layout_starts = builder.path_entrances = find_accessible_entrances(world, player, builder.all_entrances)
+        builder.entrance_list = builder.layout_starts = builder.path_entrances = find_accessible_entrances(world, player, builder)
     world.dungeon_layouts[player] = dungeon_builders
 
 
@@ -1144,7 +1144,12 @@ def find_inaccessible_regions(world, player):
         logger.debug('%s', r)
 
 
-def find_accessible_entrances(world, player, entrances):
+def find_accessible_entrances(world, player, builder):
+    # todo: lobby shuffle
+    if world.mode[player] == 'standard' and builder.name == 'Hyrule Castle':
+        return ['Hyrule Castle Lobby']
+    entrances = default_dungeon_entrances[builder.name]
+
     if world.mode[player] != 'inverted':
         start_regions = ['Links House', 'Sanctuary']
     else:
