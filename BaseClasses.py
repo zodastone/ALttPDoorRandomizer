@@ -565,6 +565,8 @@ class CollectionState(object):
 
     def has_key(self, item, player, count=1):
         if self.world.retro[player]:
+            if self.world.mode[player] == 'standard' and self.world.doorShuffle[player] == 'vanilla' and item == 'Small Key (Escape)':
+                return True  # Cannot access the shop until escape is finished.  This is safe because the key is manually placed in make_custom_item_pool
             return self.can_buy_unlimited('Small Key (Universal)', player)
         if count == 1:
             return (item, player) in self.prog_items
