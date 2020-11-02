@@ -469,15 +469,9 @@ def connect_portal_copy(portal, world, player):
     portal_entrance = world.get_entrance(portal.door.entrance.name, player)  # ensures I get the right one for copying
     target_exit = world.get_entrance(ext, player)
     entrance_region = portal_entrance.parent_region
-    copy_entrance = None
-    for e in portal_entrance.parent_region.entrances:
-        if e.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] and e.parent_region.name != 'Menu':
-            copy_entrance = e
-            break
     entrance_region.exits.remove(portal_entrance)
     entrance_region.exits.append(target_exit)
     target_exit.parent_region = entrance_region
-    target_exit.connected_region = copy_entrance.parent_region
 
     placeholder = world.get_region(portal.name + ' Placeholder', player)
     world.regions.remove(placeholder)
