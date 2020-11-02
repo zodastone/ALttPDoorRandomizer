@@ -12,7 +12,7 @@ from Dungeons import dungeon_regions, region_starts, standard_starts, split_regi
 from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor
-from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths
+from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths, drop_entrances
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from DungeonGenerator import dungeon_portals, dungeon_drops
 from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout
@@ -1570,12 +1570,12 @@ def find_inaccessible_regions(world, player):
 
 
 def find_accessible_entrances(world, player, builder):
-    # todo: lobby shuffle
-    if world.mode[player] == 'standard' and builder.name == 'Hyrule Castle':
-        return ['Hyrule Castle Lobby']
-    entrances = default_dungeon_entrances[builder.name]
+    entrances = [region.name for region in (portal.door.entrance.parent_region for portal in world.dungeon_portals[player]) if region.dungeon.name == builder.name]
+    entrances.extend(drop_entrances[builder.name])
 
-    if world.mode[player] != 'inverted':
+    if world.mode[player] == 'standard' and builder.name == 'Hyrule Castle':
+        start_regions = ['Hyrule Castle Courtyard']
+    elif world.mode[player] != 'inverted':
         start_regions = ['Links House', 'Sanctuary']
     else:
         start_regions = ['Inverted Links House', 'Inverted Dark Sanctuary']

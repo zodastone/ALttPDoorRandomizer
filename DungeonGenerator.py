@@ -3795,6 +3795,22 @@ default_dungeon_entrances = {
     'Ganons Tower': ['GT Lobby']
 }
 
+drop_entrances = {
+    'Hyrule Castle': ['Sewers Rat Path'],
+    'Eastern Palace': [],
+    'Desert Palace': [],
+    'Tower of Hera': [],
+    'Agahnims Tower': [],
+    'Palace of Darkness': [],
+    'Swamp Palace': [],
+    'Skull Woods': ['Skull Pinball', 'Skull Left Drop', 'Skull Pot Circle', 'Skull Back Drop'],
+    'Thieves Town': [],
+    'Ice Palace': [],
+    'Misery Mire': [],
+    'Turtle Rock': [],
+    'Ganons Tower': []
+}
+
 
 # todo: calculate these for ER - the multi entrance dungeons anyway
 dungeon_dead_end_allowance = {
