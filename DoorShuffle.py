@@ -1582,6 +1582,13 @@ def find_accessible_entrances(world, player, builder):
     regs = convert_regions(start_regions, world, player)
     visited_regions = set()
     visited_entrances = []
+
+    # Add Sanctuary as an additional entrance in open mode, since you can save and quit to there
+    if world.mode[player] == 'open' and world.get_region('Sanctuary', player).dungeon.name == builder.name and 'Sanctuary' not in entrances:
+        entrances.append('Sanctuary')
+        visited_entrances.append('Sanctuary')
+        regs.remove(world.get_region('Sanctuary', player))
+
     queue = deque(regs)
     while len(queue) > 0:
         next_region = queue.popleft()
@@ -1594,7 +1601,7 @@ def find_accessible_entrances(world, player, builder):
             connect = ext.connected_region
             if connect is None or ext.door and ext.door.blocked:
                 continue
-            if connect.name in entrances:
+            if connect.name in entrances and connect not in visited_entrances:
                 visited_entrances.append(connect.name)
             elif connect and connect not in queue and connect not in visited_regions:
                 queue.append(connect)
