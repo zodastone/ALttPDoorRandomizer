@@ -663,7 +663,7 @@ async def process_server_cmd(ctx : Context, cmd, args):
         ctx.player_names = {p: n for p, n in args[1]}
         msgs = []
         if ctx.locations_checked:
-            msgs.append(['LocationChecks', [Regions.location_table[loc][0] for loc in ctx.locations_checked]])
+            msgs.append(['LocationChecks', [Regions.lookup_name_to_id[loc] for loc in ctx.locations_checked]])
         if ctx.locations_scouted:
             msgs.append(['LocationScouts', list(ctx.locations_scouted)])
         if msgs:
@@ -676,7 +676,7 @@ async def process_server_cmd(ctx : Context, cmd, args):
         elif start_index != len(ctx.items_received):
             sync_msg = [['Sync']]
             if ctx.locations_checked:
-                sync_msg.append(['LocationChecks', [Regions.location_table[loc][0] for loc in ctx.locations_checked]])
+                sync_msg.append(['LocationChecks', [Regions.lookup_name_to_id[loc] for loc in ctx.locations_checked]])
             await send_msgs(ctx.socket, sync_msg)
         if start_index == len(ctx.items_received):
             for item in items:
@@ -688,7 +688,7 @@ async def process_server_cmd(ctx : Context, cmd, args):
             if location not in ctx.locations_info:
                 replacements = {0xA2: 'Small Key', 0x9D: 'Big Key', 0x8D: 'Compass', 0x7D: 'Map'}
                 item_name = replacements.get(item, get_item_name_from_id(item))
-                logging.info(f"Saw {color(item_name, 'red', 'bold')} at {list(Regions.location_table.keys())[location - 1]}")
+                logging.info(f"Saw {color(item_name, 'red', 'bold')} at {list(Regions.lookup_id_to_name.keys())[location - 1]}")
                 ctx.locations_info[location] = (item, player)
         ctx.watcher_event.set()
 
@@ -769,7 +769,7 @@ async def console_loop(ctx : Context):
                     get_location_name_from_address(item.location), index, len(ctx.items_received)))
 
         if command[0] == '/missing':
-            for location in [k for k, v in Regions.location_table.items() if type(v[0]) is int]:
+            for location in [k for k, v in Regions.lookup_name_to_id.items() if type(v[0]) is int]:
                 if location not in ctx.locations_checked:
                     logging.info('Missing: ' + location)
         if command[0] == '/getitem' and len(command) > 1:
@@ -784,23 +784,26 @@ async def console_loop(ctx : Context):
 
         await snes_flush_writes(ctx)
 
+
 def get_item_name_from_id(code):
     items = [k for k, i in Items.item_table.items() if type(i[3]) is int and i[3] == code]
-    return items[0] if items else 'Unknown item'
+    return items[0] if items else f'Unknown item (ID:{code})'
+
 
 def get_location_name_from_address(address):
     if type(address) is str:
         return address
 
-    locs = [k for k, l in Regions.location_table.items() if type(l[0]) is int and l[0] == address]
-    return locs[0] if locs else 'Unknown location'
+    return Regions.lookup_id_to_name.get(address, f'Unknown location (ID:{address})')
+
 
 async def track_locations(ctx : Context, roomid, roomdata):
     new_locations = []
+
     def new_check(location):
         ctx.locations_checked.add(location)
         logging.info("New check: %s (%d/216)" % (location, len(ctx.locations_checked)))
-        new_locations.append(Regions.location_table[location][0])
+        new_locations.append(Regions.lookup_name_to_id[location])
 
     for location, (loc_roomid, loc_mask) in location_table_uw.items():
         if location not in ctx.locations_checked and loc_roomid == roomid and (roomdata << 4) & loc_mask != 0:
@@ -915,7 +918,7 @@ async def game_watcher(ctx : Context):
 
         if scout_location > 0 and scout_location not in ctx.locations_scouted:
             ctx.locations_scouted.add(scout_location)
-            logging.info(f'Scouting item at {list(Regions.location_table.keys())[scout_location - 1]}')
+            logging.info(f'Scouting item at {list(Regions.lookup_id_to_name.keys())[scout_location - 1]}')
             await send_msgs(ctx.socket, [['LocationScouts', [scout_location]]])
         await track_locations(ctx, roomid, roomdata)
 
