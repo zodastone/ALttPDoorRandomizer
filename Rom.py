@@ -24,7 +24,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '6904a4588b21d1674e1fa25e96da8339'
+RANDOMIZERBASEHASH = '78947c3825898cac3ab57cbe44b50390'
 
 
 class JsonRom(object):
@@ -635,10 +635,7 @@ def patch_rom(world, rom, player, team, enemized):
         rom.write_byte(0x15270, 2)
         sanctuary = world.get_region('Sanctuary', player)
         rom.write_byte(0x1597b, sanctuary.dungeon.dungeon_id*2)
-        if compass_code_good(rom):
-            update_compasses(rom, world, player)
-        else:
-            logging.getLogger('').warning('Randomizer rom update! Compasses in crossed are borken')
+        update_compasses(rom, world, player)
 
     # patch doors
     if world.doorShuffle[player] == 'crossed':
@@ -2211,67 +2208,13 @@ def patch_shuffled_dark_sanc(world, rom, player):
     rom.write_bytes(0x180262, [unknown_1, unknown_2, 0x00])
 
 
-# 24B118 and 20BB32
-compass_r_addr = 0x123118  # a9 90 24 8f 9a c7 7e
-# compass_w_addr = 0x103b32  # e2 20 ad 0c 04 c9 00 d0
-compass_w_addr = 0x103b53  # e2 20 ad 0c 04 c9 00 d0
-
-
-def compass_code_good(rom):
-    if isinstance(rom, LocalRom):
-        # a990248f9ac77e
-        if rom.buffer[compass_r_addr] != 0xa9 or rom.buffer[compass_r_addr+1] != 0x90 or rom.buffer[compass_r_addr+2] != 0x24:
-            return False
-        if rom.buffer[compass_r_addr+3] != 0x8f or rom.buffer[compass_r_addr+4] != 0x9a or rom.buffer[compass_r_addr+5] != 0xc7:
-            return False
-        if rom.buffer[compass_w_addr] != 0xe2 or rom.buffer[compass_w_addr+1] != 0x20 or rom.buffer[compass_w_addr+2] != 0xad:
-            return False
-        if rom.buffer[compass_w_addr+3] != 0x0c or rom.buffer[compass_w_addr+4] != 0x04 or rom.buffer[compass_w_addr+5] != 0xc9:
-            return False
-    return True
-
-
 def update_compasses(rom, world, player):
     layouts = world.dungeon_layouts[player]
-    # cmp XX : bne escape
-    # cpy 32 : bne escape
-    # brl .itemCounts
-    # c9 02 d0 eastern
-    # nop #2
-    new_code = [0x07, 0xC0, 0x32, 0xD0, 0x03, 0x82, 0xB9, 0x01, 0xC9, 0x02, 0xD0, 0x10, 0xEA, 0xEA]
-    rom.write_bytes(compass_w_addr + 8, new_code)
-    # 05 06 07 08
-    # C9 00 D0 02 80 04 C9 02 D0 15 C0 32 D0 03 82 B3 01
-    # C9 XX D0 07 C0 32 D0 03 82 B9 01 C9 02 D0 10 EA EA
-
     for name, builder in layouts.items():
-        digit_offset, sram_byte, write_offset, jmp_nop_flag, dungeon_id = compass_data[name]
-        digit1 = builder.location_cnt // 10
-        digit2 = builder.location_cnt % 10
-        rom.write_byte(compass_r_addr+digit_offset, 0x90+digit1)
-        rom.write_byte(compass_r_addr+digit_offset+7, 0x90+digit2)
-
-        # read compass count code
-        start_address = compass_r_addr+digit_offset+15
-
-        # -0x59 relative to compass_r_addr, +8000 because rom -120000 to get rid of high byte
-        jmp_address = compass_r_addr-0x118059
-        # lda $7ef4(sb); jmp $jmp_address
-        rom.write_bytes(start_address, [0xaf, sram_byte, 0xf4, 0x7e, 0x4c, jmp_address % 0x100, jmp_address // 0x100])
-
-        # write compass count code
-        write_address = compass_w_addr+write_offset
-        # 0x186 relative to compass_r_addr, +8000 because rom -100000 to get rid of high byte
-        jmp_address = compass_w_addr-0xf7e7a
-        # lda $7ef4(sb); inc; sta $7ef4(sb)
-        rom.write_bytes(write_address, [0xaf, sram_byte, 0xf4, 0x7e, 0x1a, 0x8f, sram_byte, 0xf4, 0x7e])
-        if jmp_nop_flag == 0:
-            rom.write_bytes(write_address+9, [0x4c, jmp_address % 0x100, jmp_address // 0x100])  # jmp $jmp_address
-        else:
-            for i in range(0, jmp_nop_flag):
-                rom.write_byte(write_address+9+i, 0xea)  # nop
+        dungeon_id = compass_data[name][4]
+        rom.write_byte(0x187000 + dungeon_id//2, builder.location_cnt)
         if builder.bk_provided:
-            rom.write_byte(compass_w_addr+6, dungeon_id)
+            rom.write_byte(0x186FFF, dungeon_id)
 
 
 InconvenientDungeonEntrances = {'Turtle Rock': 'Turtle Rock Main',

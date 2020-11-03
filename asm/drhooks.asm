@@ -104,12 +104,6 @@ nop : stz $0dd0, X : rts
 .not_in_ganons_tower
 
 
-;org $208206
-org $20820E
-jsl MirrorCheckOverride2
-;org $208270
-org $20827C
-jsl MirrorCheckOverride2
 org $07a955 ; <- Bank07.asm : around 6564 (JP is a bit different) (STZ $05FC : STZ $05FD)
 jsl BlockEraseFix
 nop #2
@@ -131,11 +125,6 @@ nop #2 : jsl BlindAtticFix
 org $028409
 jsl SuctionOverworldFix
 
-; also rando's hooks.asm line 1360
-; 106e4e -> goes to  a0ee4e
-;org $a0ee8a ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
-org $a0eeab
-jsl DrHudOverride
 org $0ded04 ; <- rando's hooks.asm line 2192 - 6ED04 - equipment.asm : 1963 (REP #$30)
 jsl DrHudDungeonItemsAdditions
 ;org $098638 ; rando's hooks.asm line 2192

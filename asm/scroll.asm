@@ -177,20 +177,20 @@ ScrollX: ;change the X offset variables
     rts
 
 LimitXCamera:
-    cmp #$0080 : !bge +
+    cmp #$0079 : !bge +
         lda #$0000 : bra .end
-    + cmp #$0181 : !blt +
-        lda #$0180
-    + !sub #$0080
+    + cmp #$0178 : !blt +
+        lda #$0178
+    + !sub #$0078
     .end rts
 
 CheckRoomLayoutX:
     jsr LoadRoomLayout ;switches to 8-bit
     cmp #$04 : !blt .lock
     cmp #$05 : bne +
-        lda $04 : cmp #$f8 : beq .lock
+        lda $06 : cmp #$ff : beq .lock
     + cmp #$06 : bne .free
-        lda $04 : cmp #$f8 : bne .lock
+        lda $06 : cmp #$ff : bne .lock
     .free rep #$30 : clc : rts
     .lock rep #$30 : sec : rts
 

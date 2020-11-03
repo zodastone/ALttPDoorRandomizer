@@ -49,10 +49,6 @@ MirrorCheckOverride:
     rtl
     + lda.l DRScroll : rtl
 
-MirrorCheckOverride2:
-    lda $7ef353 : and #$02 : rtl
-
-
 BlockEraseFix:
     lda $7ef353 : and #$02 : beq +
         stz $05fc : stz $05fd
