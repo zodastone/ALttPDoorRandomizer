@@ -22,6 +22,7 @@
         "width": 35
       }
     },
+    "potshuffle": { "type": "checkbox" },
     "experimental": { "type": "checkbox" },
     "dungeon_counters": {
       "type": "selectbox",
