@@ -314,6 +314,7 @@ def shuffle_pots(world, player):
                 key = next(location for location in world.get_region(old_pot.room, player).locations if location.name in key_drop_data)
                 world.get_region(old_pot.room, player).locations.remove(key)
                 world.get_region(new_pot.room, player).locations.append(key)
+                key.parent_region = world.get_region(new_pot.room, player)
             elif new_pot.item == PotItem.Switch and (new_pot.flags & PotFlags.SwitchLogicChange):
                 if new_pot.room == 'PoD Basement Ledge':
                     basement = world.get_region(old_pot.room, player)
