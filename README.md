@@ -14,7 +14,11 @@ Please just DM me on discord for now. I (Aerinon) can be found at the [ALTTP Ran
 
 # Installation
 
-Clone this repository and then run ```DungeonRandomizer.py``` (requires Python 3).
+Install Python 3
+
+Run ```pip install python-bps-continued```.  On Linux, you should use pip3.  On Windows, you may need to run ```python -m pip install python-bps-continued``` or ```py -m pip install python-bps-continued```.
+
+Clone this repository then run ```DungeonRandomizer.py```.
 
 Alternatively, run ```Gui.py``` for a simple graphical user interface. (WIP)
 
