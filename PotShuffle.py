@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from BaseClasses import PotItem, Pot, PotFlags, CrystalBarrier
-from Regions import key_only_locations
+from Regions import key_drop_data
 
 movable_switch_rooms = defaultdict(lambda: [],
                                    {'PoD Stalfos Basement': ['PoD Basement Ledge'],
@@ -311,7 +311,7 @@ def shuffle_pots(world, player):
 
             if new_pot.item == PotItem.Key and new_pot.room != old_pot.room:
                 # Move pot key to new room
-                key = next(location for location in world.get_region(old_pot.room, player).locations if location.name in key_only_locations)
+                key = next(location for location in world.get_region(old_pot.room, player).locations if location.name in key_drop_data)
                 world.get_region(old_pot.room, player).locations.remove(key)
                 world.get_region(new_pot.room, player).locations.append(key)
             elif new_pot.item == PotItem.Switch and (new_pot.flags & PotFlags.SwitchLogicChange):
