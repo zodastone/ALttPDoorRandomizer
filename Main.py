@@ -201,6 +201,9 @@ def main(args, seed=None, fish=None):
                                 or world.enemy_health[player] != 'default' or world.enemy_damage[player] != 'default'
                                 or args.shufflepots[player] or sprite_random_on_hit)
 
+                if use_enemizer:
+                    base_patch = LocalRom(args.rom)  # update base2current.json
+
                 rom = JsonRom() if args.jsonout or use_enemizer else LocalRom(args.rom)
 
                 if use_enemizer and (args.enemizercli or not args.jsonout):
