@@ -40,6 +40,8 @@ def link_doors(world, player):
             connect_two_way(world, entrance, ext, player)
         for entrance, ext in straight_staircases:
             connect_two_way(world, entrance, ext, player)
+            
+    connect_custom(world, player)
 
     find_inaccessible_regions(world, player)
 
@@ -195,6 +197,12 @@ def convert_key_doors(k_doors, world, player):
         else:
             result.append(world.get_door(d, player))
     return result
+
+
+def connect_custom(world, player):
+    if hasattr(world, 'custom_doors') and world.custom_doors[player]:
+        for entrance, ext in world.custom_doors[player]:
+            connect_two_way(world, entrance, ext, player)
 
 
 def connect_simple_door(world, exit_name, region_name, player):

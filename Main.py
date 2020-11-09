@@ -21,10 +21,10 @@ from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, balance_multiworld_progression
-from ItemList import generate_itempool, difficulties, fill_prizes
+from ItemList import generate_itempool, difficulties, fill_prizes, fill_specific_items
 from Utils import output_path, parse_player_names
 
-__version__ = '0.2.0.7-u'
+__version__ = '0.2.0.8-u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -138,6 +138,9 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
 
     fill_prizes(world)
+
+    # used for debugging
+    # fill_specific_items(world)
 
     logger.info(world.fish.translate("cli","cli","placing.dungeon.items"))
 

@@ -88,6 +88,7 @@ SuctionOverworldFix:
 CutoffRooms:
 db $bc, $a2, $1a, $49, $14, $8c, $9f, $c2
 db $66, $5d, $a8
+; Don't forget CutoffRoomCount!!!
 
 CutoffEntranceRug:
     pha : phx
@@ -96,7 +97,7 @@ CutoffEntranceRug:
         cmp #$000C : bne .norm
           + lda $a0 : sep #$20 : ldx #$0000
           	- cmp.l CutoffRooms, x : beq .check
-          	inx : cpx #$0009 : !blt - ; CutoffRoom Count is here!
+          	inx : cpx #$000B : !blt - ; CutoffRoomCount is here!
         rep #$20
     .norm plx : pla : lda $9B52, y : sta $7E2000, x ; what we wrote over
 rtl
@@ -108,3 +109,15 @@ rtl
       bra  .norm
 .skip plx : pla : rtl
 
+
+StoreTempBunnyState:
+	LDA $5D : CMP #$1C : BNE +
+		STA $5F
+	+ LDA #$15 : STA $5D ; what we wrote over
+RTL
+
+RetrieveBunnyState:
+	STY $5D : STZ $02D8 ; what we wrote over
+	LDA $5F : BEQ +
+		STA $5D
++ RTL

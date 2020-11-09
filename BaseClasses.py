@@ -476,7 +476,7 @@ class CollectionState(object):
                         new_crystal_state = crystal_state
                         for exit in new_region.exits:
                             door = exit.door
-                            if door is not None and door.crystal == CrystalBarrier.Either:
+                            if door is not None and door.crystal == CrystalBarrier.Either and door.entrance.can_reach(self):
                                 new_crystal_state = CrystalBarrier.Either
                                 break
                         if new_region in rrp:
@@ -487,7 +487,7 @@ class CollectionState(object):
                         for exit in new_region.exits:
                             door = exit.door
                             if door is not None and not door.blocked:
-                                door_crystal_state = new_crystal_state & (door.crystal or CrystalBarrier.Either)
+                                door_crystal_state = door.crystal if door.crystal else new_crystal_state
                                 bc[exit] = door_crystal_state
                                 queue.append((exit, door_crystal_state))
                             elif door is None:
@@ -1906,7 +1906,8 @@ class Spoiler(object):
                          'enemy_damage': self.world.enemy_damage,
                          'players': self.world.players,
                          'teams': self.world.teams,
-                         'experimental' : self.world.experimental
+                         'experimental': self.world.experimental,
+                         'keydropshuffle': self.world.keydropshuffle,
                          }
 
     def to_json(self):
@@ -1967,6 +1968,7 @@ class Spoiler(object):
                 outfile.write('Enemy damage:                    %s\n' % self.metadata['enemy_damage'][player])
                 outfile.write('Hints:                           %s\n' % ('Yes' if self.metadata['hints'][player] else 'No'))
                 outfile.write('Experimental:                    %s\n' % ('Yes' if self.metadata['experimental'][player] else 'No'))
+                outfile.write('Key Drops shuffled:              %s\n' % ('Yes' if self.metadata['keydropshuffle'][player] else 'No'))
             if self.doors:
                 outfile.write('\n\nDoors:\n\n')
                 outfile.write('\n'.join(

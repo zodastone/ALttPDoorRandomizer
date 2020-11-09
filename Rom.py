@@ -24,7 +24,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '78947c3825898cac3ab57cbe44b50390'
+RANDOMIZERBASEHASH = 'fb2886fc00a7736369ce6ba90b526bc9'
 
 
 class JsonRom(object):
@@ -709,8 +709,21 @@ def patch_rom(world, rom, player, team, enemized):
 
     write_custom_shops(rom, world, player)
 
+    def credits_digit(num):
+        # top: $54 is 1, 55 2, etc , so 57=4, 5C=9
+        # bot: $7A is 1, 7B is 2, etc so 7D=4, 82=9 (zero unknown...)
+        return 0x53+num, 0x79+num
+
     if world.keydropshuffle[player]:
         rom.write_byte(0x140000, 1)
+        mid_top, mid_bot = credits_digit(4)
+        last_top, last_bot = credits_digit(9)
+        # top half
+        rom.write_byte(0x118C53, mid_top)
+        rom.write_byte(0x118C54, last_top)
+        # bottom half
+        rom.write_byte(0x118C71, mid_bot)
+        rom.write_byte(0x118C72, last_bot)
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':
@@ -765,7 +778,7 @@ def patch_rom(world, rom, player, team, enemized):
     TRIFORCE_PIECE = ItemFactory('Triforce Piece', player).code
     GREEN_CLOCK = ItemFactory('Green Clock', player).code
 
-    rom.write_byte(0x18004F, 0x01) # Byrna Invulnerability: on
+    rom.write_byte(0x18004F, 0x01)  # Byrna Invulnerability: on
 
     # handle difficulty_adjustments
     if world.difficulty_adjustments[player] == 'hard':
@@ -2210,11 +2223,18 @@ def patch_shuffled_dark_sanc(world, rom, player):
 
 def update_compasses(rom, world, player):
     layouts = world.dungeon_layouts[player]
+    provided_dungeon = False
     for name, builder in layouts.items():
         dungeon_id = compass_data[name][4]
         rom.write_byte(0x187000 + dungeon_id//2, builder.location_cnt)
         if builder.bk_provided:
+            if provided_dungeon:
+                logging.getLogger('').warning('Multiple dungeons have forced BKs! Compass code might need updating?')
             rom.write_byte(0x186FFF, dungeon_id)
+            provided_dungeon = True
+    if not provided_dungeon:
+        rom.write_byte(0x186FFF, 0xff)
+
 
 
 InconvenientDungeonEntrances = {'Turtle Rock': 'Turtle Rock Main',

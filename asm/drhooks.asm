@@ -139,6 +139,14 @@ org $019dbd ; <- Bank01.asm : 4465 of Object_Draw8xN (LDA $9B52, Y : STA $7E2000
 jsl CutoffEntranceRug : bra .nextTile : nop
 .nextTile
 
+;maybe set 02e2 to 0
+
+org $0799de ; <- Bank07.asm : 4088 (LDA.b #$15 : STA $5D)
+JSL StoreTempBunnyState
+;
+org $08c450 ; <- ancilla_receive_item.asm : 146-148 (STY $5D : STZ $02D8)
+JSL RetrieveBunnyState : NOP
+
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes
 ; Hera BK door back can be seen with Pot clipping - likely useful for no logic seeds

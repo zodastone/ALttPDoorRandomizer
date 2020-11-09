@@ -116,10 +116,12 @@ KeyGet:
     lda $7ef36f ; what we wrote over
     pha
         lda.l ShuffleKeyDrops : bne +
-            pla : rtl
-        +
-        ldy $0e80, x
-        phy
+            - pla : rtl
+        + ldy $0e80, x
+        lda $a0 : cmp #$87 : bne +
+        	jsr ShouldKeyBeCountedForDungeon : bcc -
+        		jsl CountChestKeyLong : bra -
+        + phy
             jsr KeyGetPlayer : sta !MULTIWORLD_ITEM_PLAYER_ID
             jsl.l $0791b3 ; Player_HaltDashAttackLong
             jsl.l Link_ReceiveItem
@@ -136,6 +138,16 @@ KeyGet:
     pla : dec : rtl
 }
 
+; Input Y - the item type
+ShouldKeyBeCountedForDungeon:
+{
+	phx
+		lda $040c : lsr : tax
+		tya : cmp KeyTable, x : bne +
+			- plx : sec : rts
+		+ cmp #$24 : beq -
+	plx : clc : rts
+}
 
 BigKeyGet:
 {

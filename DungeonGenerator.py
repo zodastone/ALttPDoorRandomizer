@@ -564,6 +564,8 @@ def determine_paths_for_dungeon(world, player, all_regions, name):
         paths.append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
     if world.doorShuffle[player] in ['basic'] and name == 'Thieves Town':
         paths.append('Thieves Attic Window')
+    elif 'Thieves Attic Window' in all_r_names:
+        paths.append('Thieves Attic Window')
     for boss in boss_path_checks:
         if boss in all_r_names:
             paths.append(boss)
@@ -1260,6 +1262,9 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player,
                         sector = find_sector(r_name, all_sectors)
                     reverse_d_map[sector] = key
 
+        complete_dungeons = {x: y for x, y in dungeon_map.items() if sum(len(sector.outstanding_doors) for sector in y.sectors) <= 0}
+        [dungeon_map.pop(key) for key in complete_dungeons.keys()]
+
         # categorize sectors
         identify_destination_sectors(accessible_sectors, reverse_d_map, dungeon_map, connections,
                                      dungeon_entrances, split_dungeon_entrances)
@@ -1315,6 +1320,7 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player,
             assign_polarized_sectors(dungeon_map, polarized_sectors, global_pole, builder_info)
             # the rest
             assign_the_rest(dungeon_map, neutral_sectors, global_pole, builder_info)
+            dungeon_map.update(complete_dungeons)
             finished = True
         except NeutralizingException:
             pass
