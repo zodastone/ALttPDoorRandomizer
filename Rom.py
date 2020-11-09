@@ -24,7 +24,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'fb2886fc00a7736369ce6ba90b526bc9'
+RANDOMIZERBASEHASH = '16fab813f3cbef58c66a47595a3858ee'
 
 
 class JsonRom(object):
@@ -629,7 +629,7 @@ def patch_rom(world, rom, player, team, enemized):
         dr_flags |= DROptions.Rails
 
 
-    # fix hc big key problems
+    # fix hc big key problems (map and compass too)
     if world.doorShuffle[player] == 'crossed' or world.keydropshuffle[player]:
         rom.write_byte(0x151f1, 2)
         rom.write_byte(0x15270, 2)
@@ -713,6 +713,8 @@ def patch_rom(world, rom, player, team, enemized):
         # top: $54 is 1, 55 2, etc , so 57=4, 5C=9
         # bot: $7A is 1, 7B is 2, etc so 7D=4, 82=9 (zero unknown...)
         return 0x53+num, 0x79+num
+
+    # collection rate address: 238C37
 
     if world.keydropshuffle[player]:
         rom.write_byte(0x140000, 1)
@@ -1388,9 +1390,10 @@ def patch_rom(world, rom, player, team, enemized):
         rom.write_byte(0xFED31, 0x2A)  # preopen bombable exit
         rom.write_byte(0xFEE41, 0x2A)  # preopen bombable exit
 
-    for room in world.rooms:
-        if room.player == player and room.modified:
-            rom.write_bytes(room.address(), room.rom_data())
+    if world.doorShuffle[player] != 'vanilla' or world.keydropshuffle[player]:
+        for room in world.rooms:
+            if room.player == player and room.modified:
+                rom.write_bytes(room.address(), room.rom_data())
 
     write_strings(rom, world, player, team)
 

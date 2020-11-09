@@ -11,7 +11,7 @@ LampCheckOverride:
 
 	LDA $7EF3CA : BNE +
 		.lightWorld
-		LDA $040C : CMP.b #$02 : BNE ++ ; check if we're in HC
+		LDA $040C : CMP.b #$04 : !BGE ++ ; check if we're in HC
 			LDA LampConeSewers : BRA .done
 		++
 			LDA LampConeLightWorld : BRA .done
