@@ -32,12 +32,13 @@ class SpriteSelector(object):
             webbrowser.open("http://alttpr.com/sprite_preview")
 
         def open_unofficial_sprite_dir(_evt):
+            if not os.path.isdir(self.unofficial_sprite_dir):
+                os.makedirs(self.unofficial_sprite_dir)
             open_file(self.unofficial_sprite_dir)
 
         # Open SpriteSomething directory for Link sprites
         def open_spritesomething_listing(_evt):
-            webbrowser.open("https://artheau.github.io/SpriteSomething/?mode=zelda3/link")
-#            webbrowser.open("https://artheau.github.io/SpriteSomething/resources/app/snes/zelda3/link/sprites.html")
+            webbrowser.open("https://artheau.github.io/SpriteSomething/resources/app/snes/zelda3/link/sprites.html")
 
         official_frametitle = Frame(self.window)
         official_title_text = Label(official_frametitle, text="Official Sprites")
@@ -57,8 +58,8 @@ class SpriteSelector(object):
         spritesomething_title_link.pack(side=LEFT)
         spritesomething_title_link.bind("<Button-1>", open_spritesomething_listing)
 
-        self.icon_section(official_frametitle, self.official_sprite_dir+'/*', 'Official sprites not found. Click "Update official sprites" to download them.')
-        self.icon_section(unofficial_frametitle, self.unofficial_sprite_dir+'/*', 'Put sprites in the unofficial sprites folder (see open link above) to have them appear here.')
+        self.icon_section(official_frametitle, os.path.join(self.official_sprite_dir,"*"), 'Official sprites not found. Click "Update official sprites" to download them.')
+        self.icon_section(unofficial_frametitle, os.path.join(self.unofficial_sprite_dir,"*"), 'Put sprites in the unofficial sprites folder (see open link above) to have them appear here.')
 
         frame = Frame(self.window)
         frame.pack(side=BOTTOM, fill=X, pady=5)
@@ -150,10 +151,10 @@ class SpriteSelector(object):
 
             try:
                 task.update_status("Determining needed sprites")
-                current_sprites = [os.path.basename(file) for file in glob(self.official_sprite_dir+'/*')]
+                current_sprites = [os.path.basename(file) for file in glob(os.path.join(self.official_sprite_dir,"*"))]
                 official_sprites = [(sprite['file'], os.path.basename(urlparse(sprite['file']).path)) for sprite in sprites_arr]
                 needed_sprites = [(sprite_url, filename) for (sprite_url, filename) in official_sprites if filename not in current_sprites]
-                bundled_sprites = [os.path.basename(file) for file in glob(self.local_official_sprite_dir+'/*')]
+                bundled_sprites = [os.path.basename(file) for file in glob(os.path.join(self.unofficial_sprite_dir,"*"))]
                 # todo: eventually use the above list to avoid downloading any sprites that we already have cached in the bundle.
 
                 official_filenames = [filename for (_, filename) in official_sprites]
@@ -230,23 +231,23 @@ class SpriteSelector(object):
 
     @property
     def official_sprite_dir(self):
-        if is_bundled():
-            return output_path("sprites/official")
+#        if is_bundled():
+#            return output_path(os.path.join("sprites","official"))
         return self.local_official_sprite_dir
 
     @property
     def local_official_sprite_dir(self):
-        return local_path("data/sprites/official")
+        return local_path(os.path.join("data","sprites","official"))
 
     @property
     def unofficial_sprite_dir(self):
-        if is_bundled():
-            return output_path("sprites/unofficial")
+#        if is_bundled():
+#            return output_path(os.path.join("sprites","unofficial"))
         return self.local_unofficial_sprite_dir
 
     @property
     def local_unofficial_sprite_dir(self):
-        return local_path("data/sprites/unofficial")
+        return local_path(os.path.join("data","sprites","unofficial"))
 
 
 def get_image_for_sprite(sprite):

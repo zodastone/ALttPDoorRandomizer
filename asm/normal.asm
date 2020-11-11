@@ -1,5 +1,5 @@
 WarpLeft:
-    lda DRMode : beq .end
+    lda.l DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
@@ -10,7 +10,7 @@ WarpLeft:
 	rtl
 
 WarpRight:
-    lda DRMode : beq .end
+    lda.l DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
@@ -21,7 +21,7 @@ WarpRight:
 	rtl
 
 WarpUp:
-    lda DRMode : beq .end
+    lda.l DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
@@ -32,7 +32,7 @@ WarpUp:
 	rtl
 
 WarpDown:
-    lda DRMode : beq .end
+    lda.l DRMode : beq .end
 	lda $040c : cmp.b #$ff : beq .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
@@ -42,15 +42,30 @@ WarpDown:
 	jsr Cleanup
 	rtl
 
+; carry set = use link door like normal
+; carry clear = we are in dr mode, never use linking doors
+CheckLinkDoorR:
+    lda.l DRMode : bne +
+        lda $7ec004 : sta $a0 ; what we wrote over
+        sec : rtl
+    + clc : rtl
+
+CheckLinkDoorL:
+    lda.l DRMode : bne +
+        lda $7ec003 : sta $a0 ; what we wrote over
+        sec : rtl
+    + clc : rtl
+
 TrapDoorFixer:
     lda $fe : and #$0038 : beq .end
     xba : asl #2 : sta $00
     stz $0468 : lda $068c : ora $00 : sta $068c
     .end
-    stz $fe ; clear our ab here because we don't need it anymore
+    stz $fe ; clear our fe here because we don't need it anymore
     rts
 
 Cleanup:
+    stz $047a
 	inc $11
 	lda $ef
 	rts
@@ -74,29 +89,32 @@ LoadRoomHorz:
 {
     phb : phk : plb
 	sty $06 : sta $07 : lda $a0 : pha ; Store normal room on stack
-	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00
-	lda $01 : and.b #$80 : cmp #$80 : bne .gtg
-	; jsr HorzEdge : pla : bcs .end
-	pla
+	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00-$01
+	lda $00 : cmp #$03 : bne .gtg
+	jsr HorzEdge : pla : bcs .end
 	sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
 
 	.gtg ;Good to Go!
 	pla ; Throw away normal room (don't fill up the stack)
 	lda $a0 : and.b #$0F : asl a : !sub $23 : !add $06 : sta $02
 	ldy #$00 : jsr ShiftVariablesMainDir
-	lda $aa : lsr : sta $07
-	lda $a0 : and.b #$F0 : lsr #3 : !add $07 : !sub $21 : sta $02 : sta $03
-	jsr ShiftLowCoord
-	jsr ShiftQuad
-	jsr ShiftCameraBounds
-	ldy #$01 : jsr ShiftVariablesSubDir ; flip direction
-	jsr SetupScrollIndicator
-	lda $01 : sta $fe : and #$04 : lsr #2
-	sta $ee
-	lda $01 : and #$10 : beq .end : stz $0468
+
+    lda $01 : and #$80 : beq .normal
+    ldy $06 : cpy #$ff : beq +
+        lda $01 : jsr LoadEastMidpoint : bra ++
+    + lda $01 : jsr LoadWestMidpoint
+    ++ jsr PrepScrollToEdge : bra .scroll
+
+    .normal
+    jsr PrepScrollToNormal
+	.scroll
+	lda $01 : and #$40 : pha
+	jsr ScrollY
+	pla : beq .end
+	    ldy #$06 : jsr ApplyScroll
 	.end
 	plb ; restore db register
-	rts
+    rts
 }
 
 ; Y is an adjustment for main direction of travel (stored at $06)
@@ -105,43 +123,42 @@ LoadRoomVert:
 {
     phb : phk : plb
 	sty $06 : sta $07 : lda $a0 : pha ; Store normal room on stack
-	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00
-	lda $01 : and.b #$80 : cmp #$80 : bne .gtg
-	; jsr VertEdge : pla : bcs .end
-	pla
+	lda $07 : jsr LookupNewRoom ; New room is in A, Room Data is in $00-$01
+	lda $00 : cmp #$03 : bne .gtg
+	jsr VertEdge : pla : bcs .end
 	sta $a0 : bra .end ; Restore normal room, abort (straight staircases and open edges can get in this routine)
 	.gtg ;Good to Go!
 	pla ; Throw away normal room (don't fill up the stack)
 	lda $a0 : and.b #$F0 : lsr #3 : !sub $21 : !add $06 : sta $02
 	ldy #$01 : jsr ShiftVariablesMainDir
-	lda $a0 : and.b #$0F : asl a : !add $a9 : !sub $23 : sta $02 : sta $03
-	jsr ShiftLowCoord
-	jsr ShiftQuad
-	jsr ShiftCameraBounds
-	ldy #$00 : jsr ShiftVariablesSubDir ; flip direction
-	jsr SetupScrollIndicator
-	lda $01 : sta $fe : and #$04 : lsr #2
-	sta $ee
-	.end
-	plb ; restore db register
-	rts
-}
 
-SetupScrollIndicator:
-    lda $ab : and #$01 : asl : sta $ac
-    lda $ab : and #$40 : clc : rol #3 : ora $ac : sta $ac
-    lda $ab : and #$20 : asl #2 : sta $ab
+	lda $01 : and #$80 : beq .normal
+        ldy $06 : cpy #$ff : beq +
+            lda $01 : jsr LoadSouthMidpoint : bra ++
+        + lda $01 : jsr LoadNorthMidpoint
+	++ jsr PrepScrollToEdge : bra .scroll
+
+    .normal
+    jsr PrepScrollToNormal
+    .scroll
+    lda $01 : and #$40 : pha
+    jsr ScrollX
+    pla : beq .end
+        ldy #$00 : jsr ApplyScroll
+    .end
+    plb ; restore db register
     rts
+}
 
 LookupNewRoom: ; expects data offset to be in A
 {
     rep #$30 : and #$00FF ;sanitize A reg (who knows what is in the high byte)
 	sta $00 ; offset in 00
 	lda $a2 : tax ; probably okay loading $a3 in the high byte
-	lda DoorOffset,x : and #$00FF ;we only want the low byte
+	lda.w DoorOffset,x : and #$00FF ;we only want the low byte
 	asl #3 : sta $02 : !add $02 : !add $02 ;multiply by 24 (data size)
 	!add $00 ; should now have the offset of the address I want to load
-	tax : lda DoorTable,x : sta $00
+	tax : lda.w DoorTable,x : sta $00
 	and #$00FF : sta $a0 ; assign new room
 	sep #$30
 	rts
@@ -151,11 +168,11 @@ LookupNewRoom: ; expects data offset to be in A
 ; Sets high bytes of various registers
 ShiftVariablesMainDir:
 {
-	lda CoordIndex,y : tax
+	lda.w CoordIndex,y : tax
 	lda $21,x : !add $02 : sta $21,x ; coordinate update
-	lda CameraIndex,y : tax
+	lda.w CameraIndex,y : tax
 	lda $e3,x : !add $02 : sta $e3,x ; scroll register high byte
-	lda CamQuadIndex,y : tax
+	lda.w CamQuadIndex,y : tax
 	lda $0605,x : !add $02 : sta $0605,x ; high bytes of these guys
 	lda $0607,x : !add $02 : sta $0607,x
 	lda $0601,x : !add $02 : sta $0601,x
@@ -163,117 +180,122 @@ ShiftVariablesMainDir:
 	rts
 }
 
-ShiftLowCoord:
+
+; Target pixel should be in A, other info in $01
+; Sets $04 $05 and $ee
+PrepScrollToEdge:
 {
-	lda $01 : and.b #$03 ; high byte index
-	jsr CalcOpposingShift
-	lda $ab : and.b #$f0 : cmp.b #$20 : bne .lowDone
-	lda OppCoordIndex,y : tax
-	lda #$80 : !add $20,x : sta $20,x
-	.lowDone
-	rts
+    sta $04 : lda $01 : and #$20 : beq +
+        lda #01
+    + sta $05
+    lda $01 : and #$10 : beq +
+        lda #01
+    + sta $ee
+    rts
 }
 
-; expects A to be (0,1,2) (dest number) and (0,1,2) (src door number) to be stored in $04
-; $ab will be set to a bitmask aaaa qxxf
-; a - amount of adjust
-; f - flag, if set, then amount is pos, otherwise neg.
-; q - quadrant, if set, then quadrant needs to be modified
-CalcOpposingShift:
+; Normal Flags should be in $01
+; Sets $04 $05 and $ee, and $fe
+PrepScrollToNormal:
 {
-	stz $ab : stz $ac ; set up
-	cmp.b $04 : beq .noOffset ; (equal, no shifts to do)
-	phy : tay ; reserve these
-	lda $04 : tax : tya : !sub $04 : sta $04 : cmp.b #$00 : bpl .shiftPos
-	lda #$40
-	cpx.b #$01 : beq .skipNegQuad
-	ora #$08
-	.skipNegQuad
-	sta $ab : lda $04 : cmp.b #$FE : beq .done ;already set $ab
-	lda $ab : eor #$60
-	bra .setDone
-
-	.shiftPos
-	lda #$41
-	cpy.b #$01 : beq .skipPosQuad
-	ora #$08
-	.skipPosQuad
-	sta $ab : lda $04 : cmp.b #$02 : bcs .done ;already set $ab
-	lda $ab : eor #$60
-
-	.setDone  sta $ab
-	.done     ply
-	.noOffset rts
+    lda $01 : sta $fe : and #$04 : lsr #2 : sta $ee ; trap door and layer
+    stz $05 : lda #$78 : sta $04
+    lda $01 : and #$03 : beq .end
+        cmp #$02 : !bge +
+            lda #$f8 : sta $04 : bra .end
+        + inc $05
+    .end rts
 }
 
-
-ShiftQuad:
+StraightStairsAdj:
 {
-	lda $ab : and #$08 : beq .quadDone
-	lda ShiftQuadIndex,y : tax ; X should be set to either 1 (vertical) or 2 (horizontal) (for a9,aa quadrant)
-	lda $ab : and #$01 : beq .decQuad
-	inc $02
-	txa : sta $a8, x ; alter a9/aa
-	bra .quadDone
-	.decQuad
-	dec $02
-	lda #$00 : sta $a8, x ; alter a9/aa
-	.quadDone rts
+    stx $0464 : sty $012e ; what we wrote over
+    lda.l DRMode : beq +
+        jsr GetTileAttribute : tax
+        lda $11 : cmp #$12 : beq .goingNorth
+            lda $a2 : cmp #$51 : bne ++
+                rep #$20 : lda #$0018 : !add $20 : sta $20 : sep #$20 ; special fix for throne room
+                jsr GetTileAttribute : tax
+            ++ lda.l StepAdjustmentDown, X : bra .end
+;            lda $ee : beq .end
+;                rep #$20 : lda #$ffe0 : !add $20 : sta $20 : sep #$20
+        .goingNorth
+            cpx #$00 : bne ++
+            lda $a0 : cmp #$51 : bne ++
+                lda #$36 : bra .end ; special fix for throne room
+            ++ ldy $ee : cpy #$00 : beq ++
+                inx
+            ++ lda.l StepAdjustmentUp, X
+        .end
+        pha : lda $0462 : and #$04 : bne ++
+            pla : !add #$f6 : pha
+        ++ pla : !add $0464 : sta $0464
+    + rtl
 }
 
-ShiftVariablesSubDir:
+GetTileAttribute:
 {
-	lda CoordIndex,y : tax
-	lda $21,x : !add $02 : sta $21,x ; coordinate update
-	lda CameraIndex,y : tax
-	lda $e3,x : !add $03 : sta $e3,x ; scroll register high byte
-	lda CamQuadIndex,y : tax
-	lda $0601,x : !add $02 : sta $0601,x
-	lda $0605,x : !add $02 : sta $0605,x ; high bytes of these guys
-	lda $0603,x : !add $03 : sta $0603,x
-	lda $0607,x : !add $03 : sta $0607,x
-	rts
+    phk : pea.w .jslrtsreturn-1
+    pea.w $02802c
+    jml $02c11d ; mucks with x/y sets a to Tile Attribute, I think
+    .jslrtsreturn
+    rts
 }
 
-ShiftCameraBounds:
+; 0 open edge
+; 1 nrm door high
+; 2 straight str
+; 3 nrm door low
+; 4 trap door high
+; 5 trap door low   (none of these exist on North direction)
+StepAdjustmentUp: ; really North Stairs
+db $00, $f6, $1a, $18, $16, $38
+StepAdjustmentDown: ; really South Stairs
+db $d0, $f6, $10, $1a, $f0, $00
+
+StraightStairsFix:
 {
-	lda CamBoundIndex,y : tax ; should be 0 for horz travel (vert bounds) or 4 for vert travel (horz bounds)
-	rep #$30
-	lda $ab : and #$00f0 : asl #2 : sta $06
-	lda $ab : and #$0001 : cmp #$0000 : beq .subIt
-	lda $0618, x : !add $06 : sta $0618, x
-	lda $061A, x : !add $06 : sta $061A, x
-	sep #$30
-	rts
-	.subIt
-	lda $0618, x : !sub $06 : sta $0618, x
-	lda $061A, x : !sub $06 : sta $061A, x
-	sep #$30
-	rts
+    lda.l DRMode : bne +
+        !add $20 : sta $20 ;what we wrote over
+    + rtl
 }
 
-AdjustTransition:
+StraightStairLayerFix:
 {
-	lda $ab : and #$01ff : beq .reset
-	phy : ldy #$06 ; operating on vertical registers during horizontal trans
-	cpx.b #$02 : bcs .horizontalScrolling
-	ldy #$00  ; operate on horizontal regs during vert trans
-	.horizontalScrolling
-	cmp #$0008 : bcs +
-	    pha : lda $ab : and #$0200 : beq ++
-	        pla : bra .add
-	    ++ pla : eor #$ffff : inc ; convert to negative
-	    .add jsr AdjustCamAdd : ply : bra .reset
-	+ lda $ab : and #$0200 : xba : tax
-	lda.l OffsetTable,x : jsr AdjustCamAdd
-	lda $ab : !sub #$0008 : sta $ab
-	ply : bra .done
-	.reset ; clear the $ab variable so to not disturb intra-tile doors
-	stz $ab
-	.done
-	lda $00 : and #$01fc
-	rtl
+    lda.l DRMode : beq +
+        lda $ee : rtl
+    + lda $01c322, x : rtl ; what we wrote over
 }
 
-AdjustCamAdd:
-    !add $00E2,y : sta $00E2,y : sta $00E0,y : rts
+DoorToStraight:
+{
+    pha
+    lda.l DRMode : beq .skip
+        pla : bne .end
+        pha
+        lda $a0 : cmp #$51 : bne .skip
+        lda #$04 : sta $4e
+    .skip pla
+    .end ldx $0418 : cmp #$02 ;what we wrote over
+    rtl
+}
+
+StraightStairsTrapDoor:
+{
+    lda $0464 : bne +
+        ; reset function
+        phk : pea.w .jslrtsreturn-1
+        pea.w $02802c
+        jml $028c73 ; $10D71 .reset label of Bank02
+        .jslrtsreturn
+        lda $0468 : bne ++
+        lda $a0 : cmp.b #$ac : bne .animateTraps
+        lda $0403 : and.b #$20 : bne .animateTraps
+        lda $0403 : and.b #$10 : beq ++
+            .animateTraps
+            lda #$05 : sta $11
+            inc $0468 : stz $068e : stz $0690
+        ++ rtl
+    + jsl Dungeon_ApproachFixedColor ; what we wrote over
+    .end rtl
+}

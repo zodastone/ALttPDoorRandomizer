@@ -1,6 +1,6 @@
 {
   "checkboxes": {
-    "spoiler":            { "type": "checkbox" },
+    "createspoiler":      { "type": "checkbox" },
     "createrom":          { "type": "checkbox" },
     "calcplaythrough":    { "type": "checkbox" },
     "usestartinventory":  { "type": "checkbox" },

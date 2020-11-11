@@ -90,7 +90,7 @@ def parse_cli(argv, no_defaults=False):
             playerargs = parse_cli(shlex.split(getattr(ret,f"p{player}")), True)
 
             for name in ['logic', 'mode', 'swords', 'goal', 'difficulty', 'item_functionality',
-                         'shuffle', 'door_shuffle', 'crystals_ganon', 'crystals_gt', 'openpyramid',
+                         'shuffle', 'door_shuffle', 'intensity', 'crystals_ganon', 'crystals_gt', 'openpyramid',
                          'mapshuffle', 'compassshuffle', 'keyshuffle', 'bigkeyshuffle', 'startinventory',
                          'retro', 'accessibility', 'hints', 'beemizer', 'experimental', 'dungeon_counters',
                          'shufflebosses', 'shuffleenemies', 'enemy_health', 'enemy_damage', 'shufflepots',
@@ -123,6 +123,7 @@ def parse_settings():
         "accessibility": "items",
         "algorithm": "balanced",
 
+        # Shuffle Ganon defaults to TRUE
         "openpyramid": False,
         "shuffleganon": True,
         "shuffle": "vanilla",
@@ -140,13 +141,16 @@ def parse_settings():
         "bigkeyshuffle": False,
         "keysanity": False,
         "door_shuffle": "basic",
+        "intensity": 2,
         "experimental": False,
         "dungeon_counters": "default",
 
         "multi": 1,
         "names": "",
 
+        # Hints default to TRUE
         "hints": True,
+        "no_hints": False,
         "disablemusic": False,
         "quickswap": False,
         "heartcolor": "red",
@@ -156,10 +160,11 @@ def parse_settings():
         "ow_palettes": "default",
         "uw_palettes": "default",
 
+        # Spoiler     defaults to FALSE
+        # Playthrough defaults to TRUE
+        # ROM         defaults to TRUE
         "create_spoiler": False,
-        "skip_playthrough": False,
         "calc_playthrough": True,
-        "suppress_rom": False,
         "create_rom": True,
         "usestartinventory": False,
         "custom": False,
@@ -309,9 +314,9 @@ def get_args_priority(settings_args, gui_args, cli_args):
             else:
                 newArgs[key] = args[key]
 
-            newArgs[key] = update_deprecated_args(newArgs[key])
         else:
             newArgs[key] = args[key]
+        newArgs[key] = update_deprecated_args(newArgs[key])
 
     args = newArgs
 

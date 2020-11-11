@@ -35,8 +35,6 @@ def is_bundled():
     return getattr(sys, 'frozen', False)
 
 def local_path(path):
-    return path
-
     if local_path.cached_path is not None:
         return os.path.join(local_path.cached_path, path)
 
@@ -189,6 +187,26 @@ entrance_data = {
 }
 
 
+def read_layout_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan).sfc'):
+    with open(old_rom, 'rb') as stream:
+        old_rom_data = bytearray(stream.read())
+
+    string = ''
+    for room in range(0, 0xff+1):
+        # print(ent)
+        pointer_start = 0xf8000+room*3
+        highbyte = old_rom_data[pointer_start+2]
+        midbyte = old_rom_data[pointer_start+1]
+        midbyte = midbyte - 0x80 if highbyte % 2 == 0 else midbyte
+        pointer = highbyte // 2 * 0x10000
+        pointer += midbyte * 0x100
+        pointer += old_rom_data[pointer_start]
+        layout_byte = old_rom_data[pointer+1]
+        layout = (layout_byte & 0x1c) >> 2
+        string += hex(room) + ':' + str(layout) + '\n'
+    print(string)
+
+
 def read_entrance_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan).sfc'):
     with open(old_rom, 'rb') as stream:
         old_rom_data = bytearray(stream.read())
@@ -249,34 +267,72 @@ def print_wiki_doors_by_region(d_regions, world, player):
             f.write(toprint)
 
 def update_deprecated_args(args):
-    argVars = vars(args)
-    truthy = [ 1, True, "True", "true" ]
-    # Don't do: Yes
-    # Do:       No
-    if "suppress_rom" in argVars:
-        args.create_rom = args.suppress_rom not in truthy
-    # Don't do: No
-    # Do:       Yes
-    if "create_rom" in argVars:
-        args.suppress_rom = not args.create_rom in truthy
+    if args:
+        argVars = vars(args)
+        truthy = [ 1, True, "True", "true" ]
+        # Hints default to TRUE
+        # Don't do: Yes
+        # Do:       No
+        if "no_hints" in argVars:
+            src = "no_hints"
+            if isinstance(argVars["hints"],dict):
+                tmp = {}
+                for idx in range(1,len(argVars["hints"]) + 1):
+                    tmp[idx] = argVars[src] not in truthy  # tmp = !src
+                args.hints = tmp  # dest = tmp
+            else:
+                args.hints = args.no_hints not in truthy  # dest = !src
+        # Don't do: No
+        # Do:       Yes
+        if "hints" in argVars:
+            src = "hints"
+            if isinstance(argVars["hints"],dict):
+                tmp = {}
+                for idx in range(1,len(argVars["hints"]) + 1):
+                    tmp[idx] = argVars[src] not in truthy  # tmp = !src
+                args.no_hints = tmp  # dest = tmp
+            else:
+                args.no_hints = args.hints not in truthy  # dest = !src
 
-    # Don't do: Yes
-    # Do:       No
-    if "no_shuffleganon" in argVars:
-        args.shuffleganon = not args.no_shuffleganon in truthy
-    # Don't do: No
-    # Do:       Yes
-    if "shuffleganon" in argVars:
-        args.no_shuffleganon = not args.shuffleganon in truthy
+        # Spoiler defaults to FALSE
+        # Don't do: No
+        # Do:       Yes
+        if "create_spoiler" in argVars:
+            args.suppress_spoiler = not args.create_spoiler in truthy
+        # Don't do: Yes
+        # Do:       No
+        if "suppress_spoiler" in argVars:
+            args.create_spoiler = not args.suppress_spoiler in truthy
 
-    # Don't do: Yes
-    # Do:       No
-    if "skip_playthrough" in argVars:
-        args.calc_playthrough = not args.skip_playthrough in truthy
-    # Don't do: No
-    # Do:       Yes
-    if "calc_playthrough" in argVars:
-        args.skip_playthrough = not args.calc_playthrough in truthy
+        # ROM defaults to TRUE
+        # Don't do: Yes
+        # Do:       No
+        if "suppress_rom" in argVars:
+            args.create_rom = not args.suppress_rom in truthy
+        # Don't do: No
+        # Do:       Yes
+        if "create_rom" in argVars:
+            args.suppress_rom = not args.create_rom in truthy
+
+        # Shuffle Ganon defaults to TRUE
+        # Don't do: Yes
+        # Do:       No
+        if "no_shuffleganon" in argVars:
+            args.shuffleganon = not args.no_shuffleganon in truthy
+        # Don't do: No
+        # Do:       Yes
+        if "shuffleganon" in argVars:
+            args.no_shuffleganon = not args.shuffleganon in truthy
+
+        # Playthrough defaults to TRUE
+        # Don't do: Yes
+        # Do:       No
+        if "skip_playthrough" in argVars:
+            args.calc_playthrough = not args.skip_playthrough in truthy
+        # Don't do: No
+        # Do:       Yes
+        if "calc_playthrough" in argVars:
+            args.skip_playthrough = not args.calc_playthrough in truthy
 
     return args
 
@@ -360,6 +416,6 @@ def print_graph(world):
 
 
 if __name__ == '__main__':
-    pass
     # make_new_base2current()
-    read_entrance_data(old_rom='C:\\Users\\Randall\\Documents\\kwyn\\orig\\z3.sfc')
+    # read_entrance_data(old_rom=sys.argv[1])
+    read_layout_data(old_rom=sys.argv[1])

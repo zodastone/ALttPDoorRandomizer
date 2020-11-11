@@ -1,23 +1,31 @@
 import copy
-from enum import Enum, unique, Flag
-import logging
 import json
-from collections import OrderedDict, deque, defaultdict
+import logging
+from collections import OrderedDict, Counter, deque, defaultdict
+from enum import Enum, unique
+
+try:
+    from fast_enum import FastEnum
+except ImportError:
+    from enum import Flag
+    FastEnum = Flag
+
 
 from source.classes.BabelFish import BabelFish
-from EntranceShuffle import door_addresses
-from _vendor.collections_extended import bag
+from EntranceShuffle import door_addresses, indirect_connections
 from Utils import int16_as_bytes
 from Tables import normal_offset_table, spiral_offset_table, multiply_lookup, divisor_lookup
 from RoomData import Room
 
 class World(object):
 
-    def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments, timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
+    def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
+                 timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
         self.players = players
         self.teams = 1
         self.shuffle = shuffle.copy()
         self.doorShuffle = doorShuffle.copy()
+        self.intensity = {}
         self.logic = logic.copy()
         self.mode = mode.copy()
         self.swords = swords.copy()
@@ -126,6 +134,12 @@ class World(object):
         for region in regions if regions else self.regions:
             region.world = self
             self._region_cache[region.player][region.name] = region
+            for exit in region.exits:
+                self._entrance_cache[(exit.name, exit.player)] = exit
+
+    def initialize_doors(self, doors):
+        for door in doors:
+            self._door_cache[(door.name, door.player)] = door
 
     def get_regions(self, player=None):
         return self.regions if player is None else self._region_cache[player].values()
@@ -235,41 +249,41 @@ class World(object):
                     if ret.has('Golden Sword', item.player):
                         pass
                     elif ret.has('Tempered Sword', item.player) and self.difficulty_requirements[item.player].progressive_sword_limit >= 4:
-                        ret.prog_items.add(('Golden Sword', item.player))
+                        ret.prog_items['Golden Sword', item.player] += 1
                     elif ret.has('Master Sword', item.player) and self.difficulty_requirements[item.player].progressive_sword_limit >= 3:
-                        ret.prog_items.add(('Tempered Sword', item.player))
+                        ret.prog_items['Tempered Sword', item.player] += 1
                     elif ret.has('Fighter Sword', item.player) and self.difficulty_requirements[item.player].progressive_sword_limit >= 2:
-                        ret.prog_items.add(('Master Sword', item.player))
+                        ret.prog_items['Master Sword', item.player] += 1
                     elif self.difficulty_requirements[item.player].progressive_sword_limit >= 1:
-                        ret.prog_items.add(('Fighter Sword', item.player))
+                        ret.prog_items['Fighter Sword', item.player] += 1
                 elif 'Glove' in item.name:
                     if ret.has('Titans Mitts', item.player):
                         pass
                     elif ret.has('Power Glove', item.player):
-                        ret.prog_items.add(('Titans Mitts', item.player))
+                        ret.prog_items['Titans Mitts', item.player] += 1
                     else:
-                        ret.prog_items.add(('Power Glove', item.player))
+                        ret.prog_items['Power Glove', item.player] += 1
                 elif 'Shield' in item.name:
                     if ret.has('Mirror Shield', item.player):
                         pass
                     elif ret.has('Red Shield', item.player) and self.difficulty_requirements[item.player].progressive_shield_limit >= 3:
-                        ret.prog_items.add(('Mirror Shield', item.player))
+                        ret.prog_items['Mirror Shield', item.player] += 1
                     elif ret.has('Blue Shield', item.player)  and self.difficulty_requirements[item.player].progressive_shield_limit >= 2:
-                        ret.prog_items.add(('Red Shield', item.player))
+                        ret.prog_items['Red Shield', item.player] += 1
                     elif self.difficulty_requirements[item.player].progressive_shield_limit >= 1:
-                        ret.prog_items.add(('Blue Shield', item.player))
+                        ret.prog_items['Blue Shield', item.player] += 1
                 elif 'Bow' in item.name:
                     if ret.has('Silver Arrows', item.player):
                         pass
                     elif ret.has('Bow', item.player) and self.difficulty_requirements[item.player].progressive_bow_limit >= 2:
-                        ret.prog_items.add(('Silver Arrows', item.player))
+                        ret.prog_items['Silver Arrows', item.player] += 1
                     elif self.difficulty_requirements[item.player].progressive_bow_limit >= 1:
-                        ret.prog_items.add(('Bow', item.player))
+                        ret.prog_items['Bow', item.player] += 1
             elif item.name.startswith('Bottle'):
                 if ret.bottle_count(item.player) < self.difficulty_requirements[item.player].progressive_bottle_limit:
-                    ret.prog_items.add((item.name, item.player))
+                    ret.prog_items[item.name, item.player] += 1
             elif item.advancement or item.smallkey or item.bigkey:
-                ret.prog_items.add((item.name, item.player))
+                ret.prog_items[item.name, item.player] += 1
 
         for item in self.itempool:
             soft_collect(item)
@@ -384,7 +398,6 @@ class World(object):
         prog_locations = [location for location in self.get_locations() if location.item is not None and (location.item.advancement or location.event) and location not in state.locations_checked]
 
         while prog_locations:
-            state.sweep_for_crystal_access()
             sphere = []
             # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
             for location in prog_locations:
@@ -408,11 +421,10 @@ class World(object):
 class CollectionState(object):
 
     def __init__(self, parent):
-        self.prog_items = bag()
+        self.prog_items = Counter()
         self.world = parent
-        self.reachable_regions = {player: set() for player in range(1, parent.players + 1)}
-        self.colored_regions = {player: {} for player in range(1, parent.players + 1)}
-        self.blocked_color_regions = {player: set() for player in range(1, parent.players + 1)}
+        self.reachable_regions = {player: dict() for player in range(1, parent.players + 1)}
+        self.blocked_connections = {player: dict() for player in range(1, parent.players + 1)}
         self.events = []
         self.path = {}
         self.locations_checked = set()
@@ -421,88 +433,71 @@ class CollectionState(object):
             self.collect(item, True)
 
     def update_reachable_regions(self, player):
-        player_regions = self.world.get_regions(player)
         self.stale[player] = False
         rrp = self.reachable_regions[player]
-        ccr = self.colored_regions[player]
-        blocked = self.blocked_color_regions[player]
-        new_regions = True
-        reachable_regions_count = len(rrp)
-        while new_regions:
-            player_regions = [region for region in player_regions if region not in rrp]
-            for candidate in player_regions:
-                if candidate.can_reach_private(self):
-                    rrp.add(candidate)
-                    if candidate.type == RegionType.Dungeon:
-                        c_switch_present = False
-                        for ext in candidate.exits:
-                            door = self.world.check_for_door(ext.name, player)
-                            if door is not None and door.crystal == CrystalBarrier.Either:
-                                c_switch_present = True
-                                break
-                        if c_switch_present:
-                            ccr[candidate] = CrystalBarrier.Either
-                            self.spread_crystal_access(candidate, CrystalBarrier.Either, rrp, ccr, player)
-                            for ext in candidate.exits:
-                                connect = ext.connected_region
-                                if connect in rrp and not ext.can_reach(self):
-                                    blocked.add(candidate)
-                        else:
-                            color_type = CrystalBarrier.Null
-                            for entrance in candidate.entrances:
-                                if entrance.parent_region in rrp:
-                                    if entrance.can_reach(self):
-                                        door = self.world.check_for_door(entrance.name, player)
-                                        if door is None or entrance.parent_region.type != RegionType.Dungeon:
-                                            color_type |= CrystalBarrier.Orange
-                                        elif entrance.parent_region in ccr.keys():
-                                            color_type |= (ccr[entrance.parent_region] & (door.crystal or CrystalBarrier.Either))
-                                    else:
-                                        blocked.add(entrance.parent_region)
-                            if color_type:
-                                ccr[candidate] = color_type
-                                for ext in candidate.exits:
-                                    connect = ext.connected_region
-                                    if connect in rrp and connect in ccr:
-                                        door = self.world.check_for_door(ext.name, player)
-                                        if door is not None and not door.blocked:
-                                            if ext.can_reach(self):
-                                                new_color = ccr[connect] | (ccr[candidate] & (door.crystal or CrystalBarrier.Either))
-                                                if new_color != ccr[connect]:
-                                                    self.spread_crystal_access(candidate, new_color, rrp, ccr, player)
-                                            else:
-                                                blocked.add(candidate)
-            new_regions = len(rrp) > reachable_regions_count
-            reachable_regions_count = len(rrp)
+        bc = self.blocked_connections[player]
 
-    def spread_crystal_access(self, region, crystal, rrp, ccr, player):
-        queue = deque([(region, crystal)])
-        visited = set()
-        updated = False
-        while len(queue) > 0:
-            region, crystal = queue.popleft()
-            visited.add(region)
-            for ext in region.exits:
-                connect = ext.connected_region
-                if connect is not None and connect.type == RegionType.Dungeon:
-                    if connect not in visited and connect in rrp and connect in ccr:
-                        if ext.can_reach(self):
-                            door = self.world.check_for_door(ext.name, player)
+        # init on first call - this can't be done on construction since the regions don't exist yet
+        start = self.world.get_region('Menu', player)
+        if not start in rrp:
+            rrp[start] = CrystalBarrier.Orange
+            for exit in start.exits:
+                bc[exit] = CrystalBarrier.Orange
+
+        queue = deque(self.blocked_connections[player].items())
+
+        # run BFS on all connections, and keep track of those blocked by missing items
+        while True:
+            try:
+                connection, crystal_state = queue.popleft()
+                new_region = connection.connected_region
+                if new_region is None or new_region in rrp and (new_region.type != RegionType.Dungeon or (rrp[new_region] & crystal_state) == crystal_state):
+                    bc.pop(connection, None)
+                elif connection.can_reach(self):
+                    if new_region.type == RegionType.Dungeon:
+                        new_crystal_state = crystal_state
+                        for exit in new_region.exits:
+                            door = exit.door
+                            if door is not None and door.crystal == CrystalBarrier.Either:
+                                new_crystal_state = CrystalBarrier.Either
+                                break
+                        if new_region in rrp:
+                            new_crystal_state |= rrp[new_region]
+
+                        rrp[new_region] = new_crystal_state
+
+                        for exit in new_region.exits:
+                            door = exit.door
                             if door is not None and not door.blocked:
-                                current_crystal = ccr[connect]
-                                new_crystal = current_crystal | (crystal & (door.crystal or CrystalBarrier.Either))
-                                if current_crystal != new_crystal:
-                                    updated = True
-                                    ccr[connect] = new_crystal
-                                    queue.append((connect, new_crystal))
-        return updated
+                                door_crystal_state = new_crystal_state & (door.crystal or CrystalBarrier.Either)
+                                bc[exit] = door_crystal_state
+                                queue.append((exit, door_crystal_state))
+                            elif door is None:
+                                queue.append((exit, new_crystal_state))
+                    else:
+                        new_crystal_state = CrystalBarrier.Orange
+                        rrp[new_region] = new_crystal_state
+                        bc.pop(connection, None)
+                        for exit in new_region.exits:
+                            bc[exit] = new_crystal_state
+                            queue.append((exit, new_crystal_state))
+
+                    self.path[new_region] = (new_region.name, self.path.get(connection, None))
+
+                    # Retry connections if the new region can unblock them
+                    if new_region.name in indirect_connections:
+                        new_entrance = self.world.get_entrance(indirect_connections[new_region.name], player)
+                        if new_entrance in bc and new_entrance not in queue and new_entrance.parent_region in rrp:
+                            queue.append((new_entrance, rrp[new_entrance.parent_region]))
+            except IndexError:
+                break
+
 
     def copy(self):
         ret = CollectionState(self.world)
         ret.prog_items = self.prog_items.copy()
         ret.reachable_regions = {player: copy.copy(self.reachable_regions[player]) for player in range(1, self.world.players + 1)}
-        ret.colored_regions = {player: copy.copy(self.colored_regions[player]) for player in range(1, self.world.players + 1)}
-        ret.blocked_color_regions = {player: copy.copy(self.blocked_color_regions[player]) for player in range(1, self.world.players + 1)}
+        ret.blocked_connections = {player: copy.copy(self.blocked_connections[player]) for player in range(1, self.world.players + 1)}
         ret.events = copy.copy(self.events)
         ret.path = copy.copy(self.path)
         ret.locations_checked = copy.copy(self.locations_checked)
@@ -523,19 +518,6 @@ class CollectionState(object):
 
         return spot.can_reach(self)
 
-    def sweep_for_crystal_access(self):
-        for player, rrp in self.reachable_regions.items():
-            updated = True
-            while updated:
-                if self.stale[player]:
-                    self.update_reachable_regions(player)
-                updated = False
-                dungeon_regions = self.blocked_color_regions[player]
-                ccr = self.colored_regions[player]
-                for region in dungeon_regions.copy():
-                    if region in ccr.keys():
-                        updated |= self.spread_crystal_access(region, ccr[region], rrp, ccr, player)
-                self.stale[player] = updated
 
     def sweep_for_events(self, key_only=False, locations=None):
         # this may need improvement
@@ -554,18 +536,13 @@ class CollectionState(object):
                     self.collect(event.item, True, event)
             new_locations = len(reachable_events) > checked_locations
             checked_locations = len(reachable_events)
-            if new_locations:
-                self.sweep_for_crystal_access()
+
 
     def can_reach_blue(self, region, player):
-        if region not in self.colored_regions[player].keys():
-            return False
-        return self.colored_regions[player][region] in [CrystalBarrier.Blue, CrystalBarrier.Either]
+        return region in self.reachable_regions[player] and self.reachable_regions[player][region] in [CrystalBarrier.Blue, CrystalBarrier.Either]
 
     def can_reach_orange(self, region, player):
-        if region not in self.colored_regions[player].keys():
-            return False
-        return self.colored_regions[player][region] in [CrystalBarrier.Orange, CrystalBarrier.Either]
+        return region in self.reachable_regions[player] and self.reachable_regions[player][region] in [CrystalBarrier.Orange, CrystalBarrier.Either]
 
     def _do_not_flood_the_keys(self, reachable_events):
         adjusted_checks = list(reachable_events)
@@ -584,14 +561,14 @@ class CollectionState(object):
     def has(self, item, player, count=1):
         if count == 1:
             return (item, player) in self.prog_items
-        return self.prog_items.count((item, player)) >= count
+        return self.prog_items[item, player] >= count
 
     def has_key(self, item, player, count=1):
         if self.world.retro[player]:
             return self.can_buy_unlimited('Small Key (Universal)', player)
         if count == 1:
             return (item, player) in self.prog_items
-        return self.prog_items.count((item, player)) >= count
+        return self.prog_items[item, player] >= count
 
     def can_buy_unlimited(self, item, player):
         for shop in self.world.shops:
@@ -600,7 +577,7 @@ class CollectionState(object):
         return False
 
     def item_count(self, item, player):
-        return self.prog_items.count((item, player))
+        return self.prog_items[item, player]
 
     def has_crystals(self, count, player):
         crystals = ['Crystal 1', 'Crystal 2', 'Crystal 3', 'Crystal 4', 'Crystal 5', 'Crystal 6', 'Crystal 7']
@@ -634,9 +611,9 @@ class CollectionState(object):
 
     def can_extend_magic(self, player, smallmagic=16, fullrefill=False): #This reflects the total magic Link has, not the total extra he has.
         basemagic = 8
-        if self.has('Quarter Magic', player):
+        if self.has('Magic Upgrade (1/4)', player):
             basemagic = 32
-        elif self.has('Half Magic', player):
+        elif self.has('Magic Upgrade (1/2)', player):
             basemagic = 16
         if self.can_buy_unlimited('Green Potion', player) or self.can_buy_unlimited('Blue Potion', player):
             if self.world.difficulty_adjustments[player] == 'hard' and not fullrefill:
@@ -657,9 +634,8 @@ class CollectionState(object):
 
     def can_shoot_arrows(self, player):
         if self.world.retro[player]:
-            #TODO: need to decide how we want to handle wooden arrows  longer-term (a can-buy-a check, or via dynamic shop location)
-            #FIXME: Should do something about hard+ ganon only silvers. For the moment, i believe they effective grant wooden, so we are safe
-            return self.has('Bow', player) and (self.has('Silver Arrows', player) or self.can_buy_unlimited('Single Arrow', player))
+            #todo: Non-progressive silvers grant wooden arrows, but progressive bows do not.  Always require shop arrows to be safe
+            return self.has('Bow', player) and self.can_buy_unlimited('Single Arrow', player)
         return self.has('Bow', player)
 
     def can_get_good_bee(self, player):
@@ -734,63 +710,63 @@ class CollectionState(object):
                 if self.has('Golden Sword', item.player):
                     pass
                 elif self.has('Tempered Sword', item.player) and self.world.difficulty_requirements[item.player].progressive_sword_limit >= 4:
-                    self.prog_items.add(('Golden Sword', item.player))
+                    self.prog_items['Golden Sword', item.player] += 1
                     changed = True
                 elif self.has('Master Sword', item.player) and self.world.difficulty_requirements[item.player].progressive_sword_limit >= 3:
-                    self.prog_items.add(('Tempered Sword', item.player))
+                    self.prog_items['Tempered Sword', item.player] += 1
                     changed = True
                 elif self.has('Fighter Sword', item.player) and self.world.difficulty_requirements[item.player].progressive_sword_limit >= 2:
-                    self.prog_items.add(('Master Sword', item.player))
+                    self.prog_items['Master Sword', item.player] += 1
                     changed = True
                 elif self.world.difficulty_requirements[item.player].progressive_sword_limit >= 1:
-                    self.prog_items.add(('Fighter Sword', item.player))
+                    self.prog_items['Fighter Sword', item.player] += 1
                     changed = True
             elif 'Glove' in item.name:
                 if self.has('Titans Mitts', item.player):
                     pass
                 elif self.has('Power Glove', item.player):
-                    self.prog_items.add(('Titans Mitts', item.player))
+                    self.prog_items['Titans Mitts', item.player] += 1
                     changed = True
                 else:
-                    self.prog_items.add(('Power Glove', item.player))
+                    self.prog_items['Power Glove', item.player] += 1
                     changed = True
             elif 'Shield' in item.name:
                 if self.has('Mirror Shield', item.player):
                     pass
                 elif self.has('Red Shield', item.player) and self.world.difficulty_requirements[item.player].progressive_shield_limit >= 3:
-                    self.prog_items.add(('Mirror Shield', item.player))
+                    self.prog_items['Mirror Shield', item.player] += 1
                     changed = True
                 elif self.has('Blue Shield', item.player)  and self.world.difficulty_requirements[item.player].progressive_shield_limit >= 2:
-                    self.prog_items.add(('Red Shield', item.player))
+                    self.prog_items['Red Shield', item.player] += 1
                     changed = True
                 elif self.world.difficulty_requirements[item.player].progressive_shield_limit >= 1:
-                    self.prog_items.add(('Blue Shield', item.player))
+                    self.prog_items['Blue Shield', item.player] += 1
                     changed = True
             elif 'Bow' in item.name:
                 if self.has('Silver Arrows', item.player):
                     pass
                 elif self.has('Bow', item.player):
-                    self.prog_items.add(('Silver Arrows', item.player))
+                    self.prog_items['Silver Arrows', item.player] += 1
                     changed = True
                 else:
-                    self.prog_items.add(('Bow', item.player))
+                    self.prog_items['Bow', item.player] += 1
                     changed = True
             elif 'Armor' in item.name:
                 if self.has('Red Mail', item.player):
                     pass
                 elif self.has('Blue Mail', item.player):
-                    self.prog_items.add(('Red Mail', item.player))
+                    self.prog_items['Red Mail', item.player] += 1
                     changed = True
                 else:
-                    self.prog_items.add(('Blue Mail', item.player))
+                    self.prog_items['Blue Mail', item.player] += 1
                     changed = True
 
         elif item.name.startswith('Bottle'):
             if self.bottle_count(item.player) < self.world.difficulty_requirements[item.player].progressive_bottle_limit:
-                self.prog_items.add((item.name, item.player))
+                self.prog_items[item.name, item.player] += 1
                 changed = True
         elif event or item.advancement:
-            self.prog_items.add((item.name, item.player))
+            self.prog_items[item.name, item.player] += 1
             changed = True
 
         self.stale[item.player] = True
@@ -839,13 +815,13 @@ class CollectionState(object):
                         to_remove = None
 
             if to_remove is not None:
-                try:
-                    self.prog_items.remove((to_remove, item.player))
-                except ValueError:
-                    return
 
+                self.prog_items[to_remove, item.player] -= 1
+                if self.prog_items[to_remove, item.player] < 1:
+                    del (self.prog_items[to_remove, item.player])
                 # invalidate caches, nothing can be trusted anymore now
-                self.reachable_regions[item.player] = set()
+                self.reachable_regions[item.player] = dict()
+                self.blocked_connections[item.player] = dict()
                 self.stale[item.player] = True
 
     def __getattr__(self, item):
@@ -935,10 +911,11 @@ class Entrance(object):
         self.access_rule = lambda state: True
         self.player = player
         self.door = None
+        self.hide_path = False
 
     def can_reach(self, state):
         if self.parent_region.can_reach(state) and self.access_rule(state):
-            if not self in state.path:
+            if not self.hide_path and not self in state.path:
                 state.path[self] = (self.name, state.path.get(self.parent_region, (self.parent_region.name, None)))
             return True
 
@@ -1031,6 +1008,31 @@ class Direction(Enum):
     Down = 5
 
 
+@unique
+class Hook(Enum):
+    North = 0
+    West = 1
+    South = 2
+    East = 3
+    Stairs = 4
+
+
+hook_dir_map = {
+    Direction.North: Hook.North,
+    Direction.South: Hook.South,
+    Direction.West: Hook.West,
+    Direction.East: Hook.East,
+}
+
+
+def hook_from_door(door):
+    if door.type == DoorType.SpiralStairs:
+        return Hook.Stairs
+    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs]:
+        return hook_dir_map[door.direction]
+    return None
+
+
 class Polarity:
     def __init__(self):
         self.vector = [0, 0, 0]
@@ -1058,6 +1060,16 @@ class Polarity:
                 return False
         return True
 
+    def __hash__(self):
+        h = 17
+        spot = self.vector[0]
+        h *= 31 + (spot if spot >= 0 else spot + 100)
+        spot = self.vector[1]
+        h *= 43 + (spot if spot >= 0 else spot + 100)
+        spot = self.vector[2]
+        h *= 73 + (spot if spot >= 0 else spot + 100)
+        return h
+
     def is_neutral(self):
         for i in range(len(self.vector)):
             if self.vector[i] != 0:
@@ -1075,6 +1087,12 @@ class Polarity:
         for i in range(len(self.vector)):
             result += abs(self.vector[i])
         return result
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+    def __unicode__(self):
+        return f'{self.vector}'
 
 
 pol_idx = {
@@ -1104,14 +1122,15 @@ pol_comp = {
     'Mod': lambda x: 0 if x == 0 else 1
 }
 
+
 @unique
 class PolSlot(Enum):
     NorthSouth = 0
     EastWest = 1
     Stairs = 2
 
-@unique
-class CrystalBarrier(Flag):
+
+class CrystalBarrier(FastEnum):
     Null = 0  # no special requirement
     Blue = 1  # blue must be down and explore state set to Blue
     Orange = 2  # orange must be down and explore state set to Orange
@@ -1161,23 +1180,25 @@ class Door(object):
             entrance.door = self
 
     def getAddress(self):
-        if self.type == DoorType.Normal:
+        if self.type in [DoorType.Normal, DoorType.StraightStairs]:
             return 0x13A000 + normal_offset_table[self.roomIndex] * 24 + (self.doorIndex + self.direction.value * 3) * 2
         elif self.type == DoorType.SpiralStairs:
             return 0x13B000 + (spiral_offset_table[self.roomIndex] + self.doorIndex) * 4
         elif self.type == DoorType.Open:
             base_address = {
                 Direction.North: 0x13C500,
-                Direction.South: 0x13C533,
-                Direction.West: 0x13C566,
-                Direction.East: 0x13C581,
+                Direction.South: 0x13C521,
+                Direction.West: 0x13C542,
+                Direction.East: 0x13C55D,
             }
             return base_address[self.direction] + self.edge_id * 3
 
     def getTarget(self, src):
-        if self.type == DoorType.Normal:
+        if self.type in [DoorType.Normal, DoorType.StraightStairs]:
             bitmask = 4 * (self.layer ^ 1 if src.toggle else self.layer)
             bitmask += 0x08 * int(self.trapFlag)
+            if src.type == DoorType.StraightStairs:
+                bitmask += 0x40
             return [self.roomIndex, bitmask + self.doorIndex]
         if self.type == DoorType.SpiralStairs:
             bitmask = int(self.layer) << 2
@@ -1187,15 +1208,25 @@ class Door(object):
             return [self.roomIndex, bitmask + self.quadrant, self.shiftX, self.shiftY]
         if self.type == DoorType.Open:
             bitmask = self.edge_id
-            bitmask += 0x10 * self.layer
-            bitmask += 0x20 * self.quadrant
+            bitmask += 0x10 * (self.layer ^ 1 if src.toggle else self.layer)
             bitmask += 0x80
+            if src.type == DoorType.StraightStairs:
+                bitmask += 0x40
             if src.type == DoorType.Open:
+                bitmask += 0x20 * self.quadrant
                 fraction = 0x10 * multiply_lookup[src.edge_width][self.edge_width]
                 fraction += divisor_lookup[src.edge_width][self.edge_width]
                 return [self.roomIndex, bitmask, fraction]
             else:
+                bitmask += 0x20 * self.quad_indicator()
                 return [self.roomIndex, bitmask]
+
+    def quad_indicator(self):
+        if self.direction in [Direction.North, Direction.South]:
+            return self.quadrant & 0x1
+        elif self.direction in [Direction.East, Direction.West]:
+            return (self.quadrant & 0x2) >> 1
+        return 0
 
     def dir(self, direction, room, doorIndex, layer):
         self.direction = direction
@@ -1294,6 +1325,7 @@ class Sector(object):
         self.branch_factor = None
         self.dead_end_cnt = None
         self.entrance_sector = None
+        self.destination_entrance = False
         self.equations = None
 
     def region_set(self):
@@ -1312,6 +1344,13 @@ class Sector(object):
         magnitude = [0, 0, 0]
         for door in self.outstanding_doors:
             idx, inc = pol_idx[door.direction]
+            magnitude[idx] = magnitude[idx] + 1
+        return magnitude
+
+    def hook_magnitude(self):
+        magnitude = [0] * len(Hook)
+        for door in self.outstanding_doors:
+            idx = hook_from_door(door).value
             magnitude[idx] = magnitude[idx] + 1
         return magnitude
 
@@ -1337,7 +1376,7 @@ class Sector(object):
                 self.branch_factor -= cnt_dead - 1
             for region in self.regions:
                 for ent in region.entrances:
-                    if ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld]:
+                    if ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] or ent.parent_region.name == 'Sewer Drop':
                         # same sector as another entrance
                         if region.name not in ['Skull Pot Circle', 'Skull Back Drop', 'Desert East Lobby', 'Desert West Lobby']:
                             self.branch_factor += 1
@@ -1364,11 +1403,23 @@ class Sector(object):
                         self.entrance_sector = True
         return self.entrance_sector
 
+    def get_start_regions(self):
+        if self.is_entrance_sector():
+            starts = []
+            for region in self.regions:
+                for ent in region.entrances:
+                    if ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] or ent.parent_region.name == 'Sewer Drop':
+                        starts.append(region)
+            return starts
+        return None
+
     def __str__(self):
         return str(self.__unicode__())
 
     def __unicode__(self):
-        return '%s' % next(iter(self.region_set()))
+        if len(self.regions) > 0:
+            return f'{self.regions[0].name}'
+        return f'{next(iter(self.region_set()))}'
 
 
 class Boss(object):
@@ -1619,7 +1670,7 @@ class Spoiler(object):
             for index, item in enumerate(shop.inventory):
                 if item is None:
                     continue
-                shopdata['item_{}'.format(index)] = "{} — {}".format(item['item'], item['price']) if item['price'] else item['item']
+                shopdata['item_{}'.format(index)] = "{} - {}".format(item['item'], item['price']) if item['price'] else item['item']
             self.shops.append(shopdata)
 
         for player in range(1, self.world.players + 1):
@@ -1654,6 +1705,7 @@ class Spoiler(object):
                          'goal': self.world.goal,
                          'shuffle': self.world.shuffle,
                          'door_shuffle': self.world.doorShuffle,
+                         'intensity': self.world.intensity,
                          'item_pool': self.world.difficulty,
                          'item_functionality': self.world.difficulty_adjustments,
                          'gt_crystals': self.world.crystals_needed_for_gt,
@@ -1716,6 +1768,7 @@ class Spoiler(object):
                 outfile.write('Item Functionality:              %s\n' % self.metadata['item_functionality'][player])
                 outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'][player])
                 outfile.write('Door Shuffle:                    %s\n' % self.metadata['door_shuffle'][player])
+                outfile.write('Intensity:                       %s\n' % self.metadata['intensity'][player])
                 outfile.write('Crystals required for GT:        %s\n' % self.metadata['gt_crystals'][player])
                 outfile.write('Crystals required for Ganon:     %s\n' % self.metadata['ganon_crystals'][player])
                 outfile.write('Pyramid hole pre-opened:         %s\n' % ('Yes' if self.metadata['open_pyramid'][player] else 'No'))
@@ -1765,6 +1818,12 @@ class Spoiler(object):
             outfile.write('\n\nShops:\n\n')
             outfile.write('\n'.join("{} [{}]\n    {}".format(self.world.fish.translate("meta","locations",shop['location']), shop['type'], "\n    ".join(self.world.fish.translate("meta","items",item) for item in [shop.get('item_0', None), shop.get('item_1', None), shop.get('item_2', None)] if item)) for shop in self.shops))
 
+            for player in range(1, self.world.players + 1):
+                if self.world.boss_shuffle[player] != 'none':
+                    bossmap = self.bosses[player] if self.world.players > 1 else self.bosses
+                    outfile.write(f'\n\nBosses ({self.world.get_player_names(player)}):\n\n')
+                    outfile.write('\n'.join([f'{x}: {y}' for x, y in bossmap.items() if y not in ['Agahnim', 'Agahnim 2', 'Ganon']]))
+
             # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
             # items: Item names
             outfile.write('\n\nPlaythrough:\n\n')
@@ -1773,7 +1832,9 @@ class Spoiler(object):
                 # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
                 # items: Item names
                 outfile.write('\n\nUnreachable Items:\n\n')
-                outfile.write('\n'.join(['%s: %s' % (self.world.fish.translate("meta","items",unreachable.item), self.world.fish.translate("meta","locations",unreachable)) for unreachable in self.unreachables]))
+                outfile.write('\n'.join(['%s: %s' % (self.world.fish.translate("meta", "items", unreachable.item.name),
+                                                     self.world.fish.translate("meta", "locations", unreachable.name))
+                                         for unreachable in self.unreachables]))
 
             # rooms: Change up room names; only if it's got no locations in it
             # entrances: To/From overworld; Checking w/ & w/out "Exit" and translating accordingly

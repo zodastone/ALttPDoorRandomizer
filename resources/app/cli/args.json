@@ -1,8 +1,17 @@
 {
   "lang": {},
+  "diags": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "create_spoiler": {
     "action": "store_true",
     "type": "bool"
+  },
+  "suppress_spoiler": {
+    "action": "store_false",
+    "dest": "create_spoiler",
+    "help": "suppress"
   },
   "logic": {
     "choices": [
@@ -101,6 +110,11 @@
       "vanilla"
     ]
   },
+  "intensity": {
+    "choices":[
+      "3", "2", "1", "random"
+    ]
+  },
   "experimental": {
     "action": "store_true",
     "type": "bool"
@@ -115,12 +129,12 @@
   },
   "crystals_ganon": {
     "choices": [
-      7, 6, 5, 4, 3, 2, 1, 0, "random"
+      "7", "6", "5", "4", "3", "2", "1", "0", "random"
     ]
   },
   "crystals_gt": {
     "choices": [
-      7, 6, 5, 4, 3, 2, 1, 0, "random"
+      "7", "6", "5", "4", "3", "2", "1", "0", "random"
     ]
   },
   "openpyramid": {
@@ -195,8 +209,13 @@
     ]
   },
   "hints": {
-    "action": "store_true",
+    "action": "store_false",
     "type": "bool"
+  },
+  "no_hints": {
+    "action": "store_true",
+    "dest": "hints",
+    "help": "suppress"
   },
   "heartbeep": {
     "choices": [
@@ -270,16 +289,16 @@
   "shufflebosses": {
     "choices": [
       "none",
-      "basic",
-      "normal",
-      "chaos"
+      "simple",
+      "full",
+      "random"
     ]
   },
   "shuffleenemies": {
     "choices": [
       "none",
       "shuffled",
-      "chaos"
+      "random"
     ]
   },
   "enemy_health": {
@@ -295,7 +314,7 @@
     "choices": [
       "default",
       "shuffled",
-      "chaos"
+      "random"
     ]
   },
   "shufflepots": {

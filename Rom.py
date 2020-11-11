@@ -10,7 +10,7 @@ import sys
 import subprocess
 
 from BaseClasses import CollectionState, ShopType, Region, Location, DoorType
-from DoorShuffle import compass_data, DROptions
+from DoorShuffle import compass_data, DROptions, boss_indicator
 from Dungeons import dungeon_music_addresses
 from Regions import location_table
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
@@ -22,7 +22,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '5e01caffabb4509a0987ef2f2f0bcd56'
+RANDOMIZERBASEHASH = 'b9e578ef0af231041070bd9049a55646'
 
 
 class JsonRom(object):
@@ -162,7 +162,7 @@ def read_rom(stream):
 
 def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, random_sprite_on_hit):
     baserom_path = os.path.abspath(baserom_path)
-    basepatch_path = os.path.abspath(local_path('data/base2current.json'))
+    basepatch_path = os.path.abspath(local_path(os.path.join("data","base2current.json")))
     enemizer_basepatch_path = os.path.join(os.path.dirname(enemizercli), "enemizerBasePatch.json")
     randopatch_path = os.path.abspath(output_path('enemizer_randopatch.json'))
     options_path = os.path.abspath(output_path('enemizer_options.json'))
@@ -172,14 +172,14 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, r
     options = {
         'RandomizeEnemies': world.enemy_shuffle[player] != 'none',
         'RandomizeEnemiesType': 3,
-        'RandomizeBushEnemyChance': world.enemy_shuffle[player] == 'chaos',
+        'RandomizeBushEnemyChance': world.enemy_shuffle[player] == 'random',
         'RandomizeEnemyHealthRange': world.enemy_health[player] != 'default',
         'RandomizeEnemyHealthType': {'default': 0, 'easy': 0, 'normal': 1, 'hard': 2, 'expert': 3}[world.enemy_health[player]],
         'OHKO': False,
         'RandomizeEnemyDamage': world.enemy_damage[player] != 'default',
         'AllowEnemyZeroDamage': True,
         'ShuffleEnemyDamageGroups': world.enemy_damage[player] != 'default',
-        'EnemyDamageChaosMode': world.enemy_damage[player] == 'chaos',
+        'EnemyDamageChaosMode': world.enemy_damage[player] == 'random',
         'EasyModeEscape': False,
         'EnemiesAbsorbable': False,
         'AbsorbableSpawnRate': 10,
@@ -218,9 +218,9 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, r
         'SwordGraphics': "sword_gfx/normal.gfx",
         'BeeMizer': False,
         'BeesLevel': 0,
-        'RandomizeTileTrapPattern': world.enemy_shuffle[player] == 'chaos',
+        'RandomizeTileTrapPattern': world.enemy_shuffle[player] == 'random',
         'RandomizeTileTrapFloorTile': False,
-        'AllowKillableThief': bool(random.randint(0,1)) if world.enemy_shuffle[player] == 'chaos' else world.enemy_shuffle[player] != 'none',
+        'AllowKillableThief': bool(random.randint(0, 1)) if world.enemy_shuffle[player] == 'random' else world.enemy_shuffle[player] != 'none',
         'RandomizeSpriteOnHit': random_sprite_on_hit,
         'DebugMode': False,
         'DebugForceEnemy': False,
@@ -305,7 +305,7 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, shufflepots, r
 _sprite_table = {}
 def _populate_sprite_table():
     if not _sprite_table:
-        for dir in [local_path('data/sprites/official'), local_path('data/sprites/unofficial')]:
+        for dir in [local_path(os.path.join("data","sprites","official")), local_path(os.path.join("data","sprites","unofficial"))]:
             for file in os.listdir(dir):
                 filepath = os.path.join(dir, file)
                 if not os.path.isfile(filepath):
@@ -319,6 +319,8 @@ def get_sprite_from_name(name):
     name = name.lower()
     if name in ['random', 'randomonhit']:
         return Sprite(random.choice(list(_sprite_table.values())))
+    if name == ('(default link)'):
+        name = 'link'
     return Sprite(_sprite_table[name]) if name in _sprite_table else None
 
 class Sprite(object):
@@ -385,7 +387,7 @@ class Sprite(object):
 
     @staticmethod
     def default_link_sprite():
-        return Sprite(local_path('data/default.zspr'))
+        return get_sprite_from_name('Link')
 
     def decode8(self, pos):
         arr = [[0 for _ in range(8)] for _ in range(8)]
@@ -592,10 +594,25 @@ def patch_rom(world, rom, player, team, enemized):
     if world.mode[player] == 'inverted':
         patch_shuffled_dark_sanc(world, rom, player)
 
+    # setup dr option flags based on experimental, etc.
+    dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' else DROptions.Town_Portal
+    if world.experimental[player]:
+        dr_flags |= DROptions.Map_Info
+        dr_flags |= DROptions.Debug
+
     # patch doors
-    dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' or not world.experimental[player] else DROptions.Town_Portal
     if world.doorShuffle[player] == 'crossed':
-        rom.write_byte(0x139004, 2)
+        rom.write_byte(0x138002, 2)
+        for name, layout in world.key_layout[player].items():
+            offset = compass_data[name][4]//2
+            rom.write_byte(0x13f01c+offset, layout.max_chests + layout.max_drops)
+            rom.write_byte(0x13f02a+offset, layout.max_chests)
+            builder = world.dungeon_layouts[player][name]
+            rom.write_byte(0x13f070+offset, builder.location_cnt % 10)
+            rom.write_byte(0x13f07e+offset, builder.location_cnt // 10)
+            bk_status = 1 if builder.bk_required else 0
+            bk_status = 2 if builder.bk_provided else bk_status
+            rom.write_byte(0x13f038+offset*2, bk_status)
         rom.write_byte(0x151f1, 2)
         rom.write_byte(0x15270, 2)
         rom.write_byte(0x1597b, 2)
@@ -604,9 +621,10 @@ def patch_rom(world, rom, player, team, enemized):
         else:
             logging.getLogger('').warning('Randomizer rom update! Compasses in crossed are borken')
     if world.doorShuffle[player] == 'basic':
-        rom.write_byte(0x139004, 1)
+        rom.write_byte(0x138002, 1)
     for door in world.doors:
-        if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs]:
+        if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs,
+                                                                             DoorType.Open, DoorType.StraightStairs]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door))
     for room in world.rooms:
         if room.player == player and room.modified:
@@ -619,9 +637,18 @@ def patch_rom(world, rom, player, team, enemized):
             if builder.pre_open_stonewall:
                 if builder.pre_open_stonewall.name == 'Desert Wall Slide NW':
                     dr_flags |= DROptions.Open_Desert_Wall
-    rom.write_byte(0x139006, dr_flags.value)
+        for name, pair in boss_indicator.items():
+            dungeon_id, boss_door = pair
+            opposite_door = world.get_door(boss_door, player).dest
+            if opposite_door.roomIndex > -1:
+                dungeon_name = opposite_door.entrance.parent_region.dungeon.name
+                dungeon_id = boss_indicator[dungeon_name][0]
+                rom.write_byte(0x13f000+dungeon_id, opposite_door.roomIndex)
+            elif not opposite_door:
+                rom.write_byte(0x13f000+dungeon_id, 0)  # no supertile preceeding boss
+    rom.write_byte(0x138004, dr_flags.value)
     if dr_flags & DROptions.Town_Portal and world.mode[player] == 'inverted':
-        rom.write_byte(0x139008, 1)
+        rom.write_byte(0x138006, 1)
 
     # fix skull woods exit, if not fixed during exit patching
     if world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla':
@@ -1045,6 +1072,7 @@ def patch_rom(world, rom, player, team, enemized):
                     'Big Key (Desert Palace)': (0x367, 0x10), 'Compass (Desert Palace)': (0x365, 0x10), 'Map (Desert Palace)': (0x369, 0x10),
                     'Big Key (Tower of Hera)': (0x366, 0x20), 'Compass (Tower of Hera)': (0x364, 0x20), 'Map (Tower of Hera)': (0x368, 0x20),
                     'Big Key (Escape)': (0x367, 0xC0), 'Compass (Escape)': (0x365, 0xC0), 'Map (Escape)': (0x369, 0xC0),
+                    'Big Key (Agahnims Tower)': (0x367, 0x08), 'Compass (Agahnims Tower)': (0x365, 0x08), 'Map (Agahnims Tower)': (0x369, 0x08),
                     'Big Key (Palace of Darkness)': (0x367, 0x02), 'Compass (Palace of Darkness)': (0x365, 0x02), 'Map (Palace of Darkness)': (0x369, 0x02),
                     'Big Key (Thieves Town)': (0x366, 0x10), 'Compass (Thieves Town)': (0x364, 0x10), 'Map (Thieves Town)': (0x368, 0x10),
                     'Big Key (Skull Woods)': (0x366, 0x80), 'Compass (Skull Woods)': (0x364, 0x80), 'Map (Skull Woods)': (0x368, 0x80),
@@ -1170,8 +1198,8 @@ def patch_rom(world, rom, player, team, enemized):
 
     rom.write_byte(0x180045, ((0x01 if world.keyshuffle[player] else 0x00)
                               | (0x02 if world.bigkeyshuffle[player] else 0x00)
-                              | (0x04 if world.compassshuffle[player] else 0x00)
-                              | (0x08 if world.mapshuffle[player] else 0x00)))  # free roaming items in menu
+                              | (0x04 if world.mapshuffle[player] else 0x00)
+                              | (0x08 if world.compassshuffle[player] else 0x00)))  # free roaming items in menu
 
     # Map reveals
     reveal_bytes = {
@@ -1229,6 +1257,7 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_bytes(0x180185, [0,0,0]) # Uncle respawn refills (magic, bombs, arrows)
     rom.write_bytes(0x180188, [0,0,0]) # Zelda respawn refills (magic, bombs, arrows)
     rom.write_bytes(0x18018B, [0,0,0]) # Mantle respawn refills (magic, bombs, arrows)
+    bow_max, bomb_max, magic_max = 0, 0, 0
     if world.mode[player] == 'standard':
         if uncle_location.item is not None and uncle_location.item.name in ['Bow', 'Progressive Bow']:
             rom.write_byte(0x18004E, 1) # Escape Fill (arrows)
@@ -1236,16 +1265,25 @@ def patch_rom(world, rom, player, team, enemized):
             rom.write_bytes(0x180185, [0,0,70]) # Uncle respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x180188, [0,0,10]) # Zelda respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x18018B, [0,0,10]) # Mantle respawn refills (magic, bombs, arrows)
+            bow_max = 70
         elif uncle_location.item is not None and uncle_location.item.name in ['Bombs (10)']:
             rom.write_byte(0x18004E, 2) # Escape Fill (bombs)
             rom.write_bytes(0x180185, [0,50,0]) # Uncle respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x180188, [0,3,0]) # Zelda respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x18018B, [0,3,0]) # Mantle respawn refills (magic, bombs, arrows)
+            bomb_max = 50
         elif uncle_location.item is not None and uncle_location.item.name in ['Cane of Somaria', 'Cane of Byrna', 'Fire Rod']:
             rom.write_byte(0x18004E, 4) # Escape Fill (magic)
             rom.write_bytes(0x180185, [0x80,0,0]) # Uncle respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x180188, [0x20,0,0]) # Zelda respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x18018B, [0x20,0,0]) # Mantle respawn refills (magic, bombs, arrows)
+            magic_max = 0x80
+        if world.doorShuffle[player] == 'crossed':
+            # Uncle respawn refills (magic, bombs, arrows)
+            rom.write_bytes(0x180185, [max(0x20, magic_max), max(3, bomb_max), max(10, bow_max)])
+            rom.write_bytes(0x180188, [0x20, 3, 10])  # Zelda respawn refills (magic, bombs, arrows)
+            rom.write_bytes(0x18018B, [0x20, 3, 10])  # Mantle respawn refills (magic, bombs, arrows)
+
 
     # patch swamp: Need to enable permanent drain of water as dam or swamp were moved
     rom.write_byte(0x18003D, 0x01 if world.swamp_patch_required[player] else 0x00)
@@ -1288,8 +1326,8 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_bytes(0x7FC0, rom.name)
 
     # set player names
-    for p in range(1, min(world.players, 64) + 1):
-        rom.write_bytes(0x186380 + ((p - 1) * 32), hud_format_text(world.player_names[p][team]))
+    for p in range(1, min(world.players, 255) + 1):
+        rom.write_bytes(0x195FFC + ((p - 1) * 32), hud_format_text(world.player_names[p][team]))
 
     # Write title screen Code
     hashint = int(rom.get_hash(), 16)
@@ -2088,7 +2126,8 @@ def set_inverted_mode(world, player, rom):
     rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05])
 
 def patch_shuffled_dark_sanc(world, rom, player):
-    dark_sanc_entrance = str(world.get_region('Inverted Dark Sanctuary', player).entrances[0].name)
+    dark_sanc = world.get_region('Inverted Dark Sanctuary', player)
+    dark_sanc_entrance = str([i for i in dark_sanc.entrances if i.parent_region.name != 'Menu'][0].name)
     room_id, ow_area, vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x, unknown_1, unknown_2, door_1, door_2 = door_addresses[dark_sanc_entrance][1]
     door_index = door_addresses[str(dark_sanc_entrance)][0]
 
@@ -2100,9 +2139,9 @@ def patch_shuffled_dark_sanc(world, rom, player):
     rom.write_bytes(0x180262, [unknown_1, unknown_2, 0x00])
 
 
-# 24B116 and 20BAD8
-compass_r_addr = 0x123116  # a9 90 24 8f 9a c7 7e
-compass_w_addr = 0x103ad8  # e2 20 ad 0c 04 c9 00 d0
+# 24B118 and 20BB32
+compass_r_addr = 0x123118  # a9 90 24 8f 9a c7 7e
+compass_w_addr = 0x103b32  # e2 20 ad 0c 04 c9 00 d0
 
 
 def compass_code_good(rom):
@@ -2319,12 +2358,12 @@ HintLocations = ['telepathic_tile_eastern_palace',
 InconvenientLocations = ['Spike Cave',
                          'Sahasrahla',
                          'Purple Chest',
-                         'Tower of Hera - Big Key Chest',
                          'Magic Bat']
 
 InconvenientDungeonLocations = ['Swamp Left',
                                 'Mire Left',
                                 'Eastern Palace - Big Key Chest',
+                                'Tower of Hera - Big Key Chest',
                                 'Thieves\' Town - Big Chest',
                                 'Ice Palace - Big Chest',
                                 'Ganons Tower - Big Chest']

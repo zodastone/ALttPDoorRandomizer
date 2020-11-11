@@ -7,6 +7,7 @@ console = True
 
 if sys.platform.find("mac") or sys.platform.find("osx"):
   console = False
+BINARY_SLUG = "Gui"
 
 def recurse_for_py_files(names_so_far):
   returnvalue = []
@@ -31,7 +32,7 @@ binaries = []
 #if sys.platform.find("windows"):
 #  binaries.append(("ucrtbase.dll","."))
 
-a = Analysis(['DungeonRandomizer.py'],
+a = Analysis([f"./{BINARY_SLUG}.py"],
              pathex=[],
              binaries=binaries,
              datas=[],
@@ -59,7 +60,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='Gui',
+          name=BINARY_SLUG,
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

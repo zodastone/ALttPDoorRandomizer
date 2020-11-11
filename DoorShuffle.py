@@ -8,13 +8,12 @@ from enum import unique, Flag
 from functools import reduce
 from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier
 from Regions import key_only_locations
-from Dungeons import hyrule_castle_regions, eastern_regions, desert_regions, hera_regions, tower_regions, pod_regions
-from Dungeons import dungeon_regions, region_starts, split_region_starts, flexible_starts
-from Dungeons import drop_entrances, dungeon_bigs, dungeon_keys, dungeon_hints
+from Dungeons import dungeon_regions, region_starts, standard_starts, split_region_starts, flexible_starts
+from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor
-from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, validate_tr
-from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder
+from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths
+from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout
 
 
@@ -28,8 +27,6 @@ def link_doors(world, player):
         connect_interior_doors(edge_a, edge_b, world, player)
 
     # These connections are here because they are currently unable to be shuffled
-    for entrance, ext in straight_staircases:
-        connect_two_way(world, entrance, ext, player)
     for exitName, regionName in falldown_pits:
         connect_simple_door(world, exitName, regionName, player)
     for exitName, regionName in dungeon_warps:
@@ -37,8 +34,16 @@ def link_doors(world, player):
     for ent, ext in ladders:
         connect_two_way(world, ent, ext, player)
 
+    if world.intensity[player] < 2:
+        for entrance, ext in open_edges:
+            connect_two_way(world, entrance, ext, player)
+        for entrance, ext in straight_staircases:
+            connect_two_way(world, entrance, ext, player)
+
     if world.doorShuffle[player] == 'vanilla':
         for entrance, ext in open_edges:
+            connect_two_way(world, entrance, ext, player)
+        for entrance, ext in straight_staircases:
             connect_two_way(world, entrance, ext, player)
         for exitName, regionName in vanilla_logical_connections:
             connect_simple_door(world, exitName, regionName, player)
@@ -50,13 +55,8 @@ def link_doors(world, player):
             connect_one_way(world, ent, ext, player)
         vanilla_key_logic(world, player)
     elif world.doorShuffle[player] == 'basic':
-        # if not world.experimental[player]:
-        for entrance, ext in open_edges:
-            connect_two_way(world, entrance, ext, player)
         within_dungeon(world, player)
     elif world.doorShuffle[player] == 'crossed':
-        for entrance, ext in open_edges:
-            connect_two_way(world, entrance, ext, player)
         cross_dungeon(world, player)
     else:
         logging.getLogger('').error('Invalid door shuffle setting: %s' % world.doorShuffle[player])
@@ -102,7 +102,8 @@ def create_door_spoiler(world, player):
             for ext in next.exits:
                 door_a = ext.door
                 connect = ext.connected_region
-                if door_a and door_a.type in [DoorType.Normal, DoorType.SpiralStairs] and door_a not in done:
+                if door_a and door_a.type in [DoorType.Normal, DoorType.SpiralStairs, DoorType.Open,
+                                              DoorType.StraightStairs] and door_a not in done:
                     done.add(door_a)
                     door_b = door_a.dest
                     if door_b:
@@ -135,38 +136,20 @@ def vanilla_key_logic(world, player):
         world.dungeon_layouts[player][builder.name] = builder
 
     overworld_prep(world, player)
-    entrances_map, potentials, connections = determine_entrance_list(world, player)
-
-    enabled_entrances = {}
-    sector_queue = deque(builders)
-    last_key, loops = None, 0
-    while len(sector_queue) > 0:
-        builder = sector_queue.popleft()
-
-        origin_list = list(entrances_map[builder.name])
-        find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, builder.name)
-        origin_list_sans_drops = remove_drop_origins(origin_list)
-        if len(origin_list_sans_drops) <= 0:
-            if last_key == builder.name or loops > 1000:
-                origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name
-                raise Exception('Infinite loop detected for "%s" located at %s' % builder.name, origin_name)
-            sector_queue.append(builder)
-            last_key = builder.name
-            loops += 1
-        else:
-            find_new_entrances(builder.master_sector, entrances_map, connections, potentials, enabled_entrances, world, player)
-            start_regions = convert_regions(origin_list, world, player)
-            doors = convert_key_doors(default_small_key_doors[builder.name], world, player)
-            key_layout = build_key_layout(builder, start_regions, doors, world, player)
-            valid = validate_key_layout(key_layout, world, player)
-            if not valid:
-                logging.getLogger('').warning('Vanilla key layout not valid %s', builder.name)
-            if player not in world.key_logic.keys():
-                world.key_logic[player] = {}
-            analyze_dungeon(key_layout, world, player)
-            world.key_logic[player][builder.name] = key_layout.key_logic
-            log_key_logic(builder.name, key_layout.key_logic)
-            last_key = None
+    for builder in builders:
+        origin_list = find_accessible_entrances(world, player, default_dungeon_entrances[builder.name])
+        start_regions = convert_regions(origin_list, world, player)
+        doors = convert_key_doors(default_small_key_doors[builder.name], world, player)
+        key_layout = build_key_layout(builder, start_regions, doors, world, player)
+        valid = validate_key_layout(key_layout, world, player)
+        if not valid:
+            logging.getLogger('').warning('Vanilla key layout not valid %s', builder.name)
+        builder.key_door_proposal = doors
+        if player not in world.key_logic.keys():
+            world.key_logic[player] = {}
+        analyze_dungeon(key_layout, world, player)
+        world.key_logic[player][builder.name] = key_layout.key_logic
+        log_key_logic(builder.name, key_layout.key_logic)
     if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player]:
         validate_vanilla_key_logic(world, player)
 
@@ -318,25 +301,35 @@ def within_dungeon(world, player):
         dungeon_builders[key] = simple_dungeon_builder(key, sector_list)
         dungeon_builders[key].entrance_list = list(entrances_map[key])
     recombinant_builders = {}
-    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, world.fish)
+    builder_info = None, None, world, player
+    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info)
     main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player)
 
     paths = determine_required_paths(world, player)
     check_required_paths(paths, world, player)
 
     # shuffle_key_doors for dungeons
+    logging.getLogger('').info(world.fish.translate("cli", "cli", "shuffling.keydoors"))
     start = time.process_time()
     for builder in world.dungeon_layouts[player].values():
         shuffle_key_doors(builder, world, player)
-    logging.getLogger('').info('%s: %s', world.fish.translate("cli","cli","keydoor.shuffle.time"), time.process_time()-start)
+    logging.getLogger('').info('%s: %s', world.fish.translate("cli", "cli", "keydoor.shuffle.time"), time.process_time()-start)
     smooth_door_pairs(world, player)
 
 
-def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, fish):
-    for name, split_list in split_region_starts.items():
+def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info):
+    dungeon_entrances, split_dungeon_entrances, world, player = builder_info
+    if dungeon_entrances is None:
+        dungeon_entrances = default_dungeon_entrances
+    if split_dungeon_entrances is None:
+        split_dungeon_entrances = split_region_starts
+    builder_info = dungeon_entrances, split_region_starts, world, player
+
+    for name, split_list in split_dungeon_entrances.items():
         builder = dungeon_builders.pop(name)
         recombinant_builders[name] = builder
-        split_builders = split_dungeon_builder(builder, split_list, fish)
+
+        split_builders = split_dungeon_builder(builder, split_list, builder_info)
         dungeon_builders.update(split_builders)
         for sub_name, split_entrances in split_list.items():
             sub_builder = dungeon_builders[name+' '+sub_name]
@@ -353,6 +346,7 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
     enabled_entrances = {}
     sector_queue = deque(dungeon_builders.values())
     last_key, loops = None, 0
+    logging.getLogger('').info(world.fish.translate("cli", "cli", "generating.dungeon"))
     while len(sector_queue) > 0:
         builder = sector_queue.popleft()
         split_dungeon = builder.name.startswith('Desert Palace') or builder.name.startswith('Skull Woods')
@@ -361,17 +355,15 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
             name = ' '.join(builder.name.split(' ')[:-1])
         origin_list = list(builder.entrance_list)
         find_enabled_origins(builder.sectors, enabled_entrances, origin_list, entrances_map, name)
-        origin_list_sans_drops = remove_drop_origins(origin_list)
-        if len(origin_list_sans_drops) <= 0 or name == "Turtle Rock" and not validate_tr(builder, origin_list_sans_drops, world, player):
+        if len(origin_list) <= 0 or not pre_validate(builder, origin_list, split_dungeon, world, player):
             if last_key == builder.name or loops > 1000:
-                origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name
-                raise Exception('Infinite loop detected for "%s" located at %s' % builder.name, origin_name)
+                origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name if len(origin_list) > 0 else 'no origin'
+                raise Exception('Infinite loop detected for "%s" located at %s' % (builder.name, origin_name))
             sector_queue.append(builder)
             last_key = builder.name
             loops += 1
         else:
-            logging.getLogger('').info('%s: %s', world.fish.translate("cli","cli","generating.dungeon"), builder.name)
-            ds = generate_dungeon(builder, origin_list_sans_drops, split_dungeon, world, player)
+            ds = generate_dungeon(builder, origin_list, split_dungeon, world, player)
             find_new_entrances(ds, entrances_map, connections, potentials, enabled_entrances, world, player)
             ds.name = name
             builder.master_sector = ds
@@ -380,8 +372,7 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
     combine_layouts(recombinant_builders, dungeon_builders, entrances_map)
     world.dungeon_layouts[player] = {}
     for builder in dungeon_builders.values():
-        find_enabled_origins([builder.master_sector], enabled_entrances, builder.layout_starts, entrances_map, builder.name)
-        builder.path_entrances = entrances_map[builder.name]
+        builder.entrance_list = builder.layout_starts = builder.path_entrances = find_accessible_entrances(world, player, builder.all_entrances)
     world.dungeon_layouts[player] = dungeon_builders
 
 
@@ -391,11 +382,13 @@ def determine_entrance_list(world, player):
     connections = {}
     for key, r_names in region_starts.items():
         entrance_map[key] = []
+        if world.mode[player] == 'standard' and key in standard_starts.keys():
+            r_names = standard_starts[key]
         for region_name in r_names:
             region = world.get_region(region_name, player)
             for ent in region.entrances:
                 parent = ent.parent_region
-                if parent.type != RegionType.Dungeon or parent.name == 'Sewer Drop':
+                if (parent.type != RegionType.Dungeon and parent.name != 'Menu') or parent.name == 'Sewer Drop':
                     if parent.name not in world.inaccessible_regions[player]:
                         entrance_map[key].append(region_name)
                     else:
@@ -404,11 +397,6 @@ def determine_entrance_list(world, player):
                         potential_entrances[parent].append(region_name)
                         connections[region_name] = parent
     return entrance_map, potential_entrances, connections
-
-
-# todo: kill drop exceptions
-def drop_exception(name):
-    return name in ['Skull Pot Circle', 'Skull Back Drop']
 
 
 def add_shuffled_entrances(sectors, region_list, entrance_list):
@@ -428,26 +416,20 @@ def find_enabled_origins(sectors, enabled, entrance_list, entrance_map, key):
                     if key not in entrance_map.keys():
                         key = ' '.join(key.split(' ')[:-1])
                     entrance_map[key].append(region.name)
-            if drop_exception(region.name):  # only because they have unique regions
-                entrance_list.append(region.name)
-
-
-def remove_drop_origins(entrance_list):
-    return [x for x in entrance_list if x not in drop_entrances]
 
 
 def find_new_entrances(sector, entrances_map, connections, potentials, enabled, world, player):
     for region in sector.regions:
         if region.name in connections.keys() and (connections[region.name] in potentials.keys() or connections[region.name].name in world.inaccessible_regions[player]):
-            enable_new_entrances(region, connections, potentials, enabled, world, player)
+            enable_new_entrances(region, connections, potentials, enabled, world, player, region)
     inverted_aga_check(entrances_map, connections, potentials, enabled, world, player)
 
 
-def enable_new_entrances(region, connections, potentials, enabled, world, player):
+def enable_new_entrances(region, connections, potentials, enabled, world, player, region_enabler):
     new_region = connections[region.name]
     if new_region in potentials.keys():
         for potential in potentials.pop(new_region):
-            enabled[potential] = (region.name, region.dungeon)
+            enabled[potential] = (region_enabler.name, region_enabler.dungeon)
     # see if this unexplored region connects elsewhere
     queue = deque(new_region.exits)
     visited = set()
@@ -469,9 +451,10 @@ def inverted_aga_check(entrances_map, connections, potentials, enabled, world, p
         if 'Agahnims Tower' in entrances_map.keys() or aga_tower_enabled(enabled):
             for region in list(potentials.keys()):
                 if region.name == 'Hyrule Castle Ledge':
+                    enabler = world.get_region('Tower Agahnim 1', player)
                     for r_name in potentials[region]:
                         new_region = world.get_region(r_name, player)
-                        enable_new_entrances(new_region, connections, potentials, enabled, world, player)
+                        enable_new_entrances(new_region, connections, potentials, enabled, world, player, enabler)
 
 
 def aga_tower_enabled(enabled):
@@ -481,191 +464,6 @@ def aga_tower_enabled(enabled):
             return True
     return False
 
-
-def within_dungeon_legacy(world, player):
-    # TODO: The "starts" regions need access logic
-    # Aerinon's note: I think this is handled already by ER Rules - may need to check correct requirements
-    dungeon_region_starts_es = ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Sewers Secret Room']
-    dungeon_region_starts_ep = ['Eastern Lobby']
-    dungeon_region_starts_dp = ['Desert Back Lobby', 'Desert Main Lobby', 'Desert West Lobby', 'Desert East Lobby']
-    dungeon_region_starts_th = ['Hera Lobby']
-    dungeon_region_starts_at = ['Tower Lobby']
-    dungeon_region_starts_pd = ['PoD Lobby']
-    dungeon_region_lists = [
-        (dungeon_region_starts_es, hyrule_castle_regions),
-        (dungeon_region_starts_ep, eastern_regions),
-        (dungeon_region_starts_dp, desert_regions),
-        (dungeon_region_starts_th, hera_regions),
-        (dungeon_region_starts_at, tower_regions),
-        (dungeon_region_starts_pd, pod_regions),
-    ]
-    for start_list, region_list in dungeon_region_lists:
-        shuffle_dungeon(world, player, start_list, region_list)
-
-    world.dungeon_layouts[player] = {}
-    for key in dungeon_regions.keys():
-        world.dungeon_layouts[player][key] = (key, region_starts[key])
-
-
-def shuffle_dungeon(world, player, start_region_names, dungeon_region_names):
-    logger = logging.getLogger('')
-    # Part one - generate a random layout
-    available_regions = []
-    for name in [r for r in dungeon_region_names if r not in start_region_names]:
-        available_regions.append(world.get_region(name, player))
-    random.shuffle(available_regions)
-
-    # "Ugly" doors are doors that we don't want to see from the front, because of some
-    # sort of unsupported key door. To handle them, make a map of "ugly regions" and
-    # never link across them.
-    ugly_regions = {}
-    next_ugly_region = 1
-
-    # Add all start regions to the open set.
-    available_doors = []
-    for name in start_region_names:
-        logger.info("Starting in %s", name)
-        for door in get_doors(world, world.get_region(name, player), player):
-            ugly_regions[door.name] = 0
-            available_doors.append(door)
-
-    # Loop until all available doors are used
-    while len(available_doors) > 0:
-        # Pick a random available door to connect, prioritizing ones that aren't blocked.
-        # This makes them either get picked up through another door (so they head deeper
-        # into the dungeon), or puts them late in the dungeon (so they probably are part
-        # of a loop). Panic if neither of these happens.
-        random.shuffle(available_doors)
-        available_doors.sort(key=lambda door: 1 if door.blocked else 0 if door.ugly else 2)
-        door = available_doors.pop()
-        logger.info('Linking %s', door.name)
-        # Find an available region that has a compatible door
-        connect_region, connect_door = find_compatible_door_in_regions(world, door, available_regions, player)
-        # Also ignore compatible doors if they're blocked; these should only be used to
-        # create loops.
-        if connect_region is not None and not door.blocked:
-            logger.info('  Found new region %s via %s', connect_region.name, connect_door.name)
-            # Apply connection and add the new region's doors to the available list
-            maybe_connect_two_way(world, door, connect_door, player)
-            # Figure out the new room's ugliness region
-            new_room_ugly_region = ugly_regions[door.name]
-            if connect_door.ugly:
-                next_ugly_region += 1
-                new_room_ugly_region = next_ugly_region
-            is_new_region = connect_region in available_regions
-            # Add the doors
-            for door in get_doors(world, connect_region, player):
-                ugly_regions[door.name] = new_room_ugly_region
-                if is_new_region:
-                    available_doors.append(door)
-                # If an ugly door is anything but the connect door, panic and die
-                if door != connect_door and door.ugly:
-                    logger.info('Failed because of ugly door, trying again.')
-                    shuffle_dungeon(world, player, start_region_names, dungeon_region_names)
-                    return
-
-            # We've used this region and door, so don't use them again
-            if is_new_region:
-                available_regions.remove(connect_region)
-            if connect_door in available_doors:
-                available_doors.remove(connect_door)
-        else:
-            # If there's no available region with a door, use an internal connection
-            connect_door = find_compatible_door_in_list(ugly_regions, world, door, available_doors, player)
-            if connect_door is not None:
-                logger.info('  Adding loop via %s', connect_door.name)
-                maybe_connect_two_way(world, door, connect_door, player)
-                if connect_door in available_doors:
-                    available_doors.remove(connect_door)
-    # Check that we used everything, and retry if we failed
-    if len(available_regions) > 0 or len(available_doors) > 0:
-        logger.info('Failed to add all regions to dungeon, trying again.')
-        shuffle_dungeon(world, player, start_region_names, dungeon_region_names)
-        return
-
-
-# Connects a and b. Or don't if they're an unsupported connection type.
-# TODO: This is gross, don't do it this way
-def maybe_connect_two_way(world, a, b, player):
-    # Return on unsupported types.
-    if a.type in [DoorType.Open, DoorType.StraightStairs, DoorType.Hole, DoorType.Warp, DoorType.Ladder,
-                  DoorType.Interior, DoorType.Logical]:
-        return
-    # Connect supported types
-    if a.type == DoorType.Normal or a.type == DoorType.SpiralStairs:
-        if a.blocked:
-            connect_one_way(world, b.name, a.name, player)
-        elif b.blocked:
-            connect_one_way(world, a.name, b.name, player)
-        else:
-            connect_two_way(world, a.name, b.name, player)
-        return
-    # If we failed to account for a type, panic
-    raise RuntimeError('Unknown door type ' + a.type.name)
-
-
-# Finds a compatible door in regions, returns the region and door
-def find_compatible_door_in_regions(world, door, regions, player):
-    if door.type in [DoorType.Hole, DoorType.Warp, DoorType.Logical]:
-        return door.dest, door
-    for region in regions:
-        for proposed_door in get_doors(world, region, player):
-            if doors_compatible(door, proposed_door):
-                return region, proposed_door
-    return None, None
-
-
-def find_compatible_door_in_list(ugly_regions, world, door, doors, player):
-    if door.type in [DoorType.Hole, DoorType.Warp, DoorType.Logical]:
-        return door
-    for proposed_door in doors:
-        if ugly_regions[door.name] != ugly_regions[proposed_door.name]:
-            continue
-        if doors_compatible(door, proposed_door):
-            return proposed_door
-
-
-def get_doors(world, region, player):
-    res = []
-    for exit in region.exits:
-        door = world.check_for_door(exit.name, player)
-        if door is not None:
-            res.append(door)
-    return res
-
-
-def get_entrance_doors(world, region, player):
-    res = []
-    for exit in region.entrances:
-        door = world.check_for_door(exit.name, player)
-        if door is not None:
-            res.append(door)
-    return res
-
-
-def doors_compatible(a, b):
-    if a.type != b.type:
-        return False
-    if a.type == DoorType.Open:
-        return doors_fit_mandatory_pair(open_edges, a, b)
-    if a.type == DoorType.StraightStairs:
-        return doors_fit_mandatory_pair(straight_staircases, a, b)
-    if a.type == DoorType.Interior:
-        return doors_fit_mandatory_pair(interior_doors, a, b)
-    if a.type == DoorType.Ladder:
-        return doors_fit_mandatory_pair(ladders, a, b)
-    if a.type == DoorType.Normal and (a.smallKey or b.smallKey or a.bigKey or b.bigKey):
-        return doors_fit_mandatory_pair(key_doors, a, b)
-    if a.type in [DoorType.Hole, DoorType.Warp, DoorType.Logical]:
-        return False  # these aren't compatible with anything
-    return a.direction == switch_dir(b.direction)
-
-
-def doors_fit_mandatory_pair(pair_list, a, b):
-  for pair_a, pair_b in pair_list:
-      if (a.name == pair_a and b.name == pair_b) or (a.name == pair_b and b.name == pair_a):
-          return True
-  return False
 
 # goals:
 # 1. have enough chests to be interesting (2 more than dungeon items)
@@ -683,10 +481,11 @@ def cross_dungeon(world, player):
     entrances_map, potentials, connections = determine_entrance_list(world, player)
     connections_tuple = (entrances_map, potentials, connections)
 
-    all_sectors = []
+    all_sectors, all_regions = [], []
     for key in dungeon_regions.keys():
-        all_sectors.extend(convert_to_sectors(dungeon_regions[key], world, player))
-    dungeon_builders = create_dungeon_builders(all_sectors, world, player)
+        all_regions += dungeon_regions[key]
+    all_sectors.extend(convert_to_sectors(all_regions, world, player))
+    dungeon_builders = create_dungeon_builders(all_sectors, connections_tuple, world, player)
     for builder in dungeon_builders.values():
         builder.entrance_list = list(entrances_map[builder.name])
         dungeon_obj = world.get_dungeon(builder.name, player)
@@ -698,7 +497,8 @@ def cross_dungeon(world, player):
                         key_name = dungeon_keys[builder.name] if loc.name != 'Hyrule Castle - Big Key Drop' else dungeon_bigs[builder.name]
                         loc.forced_item = loc.item = ItemFactory(key_name, player)
     recombinant_builders = {}
-    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, world.fish)
+    builder_info = None, None, world, player
+    handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info)
 
     main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player)
 
@@ -706,26 +506,16 @@ def cross_dungeon(world, player):
     check_required_paths(paths, world, player)
 
     hc = world.get_dungeon('Hyrule Castle', player)
-    del hc.dungeon_items[0]  # removes map
     hc.dungeon_items.append(ItemFactory('Compass (Escape)', player))
     at = world.get_dungeon('Agahnims Tower', player)
     at.dungeon_items.append(ItemFactory('Compass (Agahnims Tower)', player))
-    gt = world.get_dungeon('Ganons Tower', player)
-    del gt.dungeon_items[0]  # removes map
+    at.dungeon_items.append(ItemFactory('Map (Agahnims Tower)', player))
 
     assign_cross_keys(dungeon_builders, world, player)
     all_dungeon_items = [y for x in world.dungeons if x.player == player for y in x.all_items]
     target_items = 34 if world.retro[player] else 63
     d_items = target_items - len(all_dungeon_items)
-    if d_items > 0:
-        if d_items >= 1:  # restore HC map
-            world.get_dungeon('Hyrule Castle', player).dungeon_items.append(ItemFactory('Map (Escape)', player))
-        if d_items >= 2:  # restore GT map
-            world.get_dungeon('Ganons Tower', player).dungeon_items.append(ItemFactory('Map (Ganons Tower)', player))
-        if d_items > 2:
-            world.pool_adjustment[player] = d_items - 2
-    elif d_items < 0:
-        world.pool_adjustment[player] = d_items
+    world.pool_adjustment[player] = d_items
     smooth_door_pairs(world, player)
 
     # Re-assign dungeon bosses
@@ -735,11 +525,11 @@ def cross_dungeon(world, player):
         reassign_boss('GT Lanmolas 2', 'middle', builder, gt, world, player)
         reassign_boss('GT Moldorm', 'top', builder, gt, world, player)
 
-    if world.hints[player]:
-        refine_hints(dungeon_builders)
+    refine_hints(dungeon_builders)
 
 
 def assign_cross_keys(dungeon_builders, world, player):
+    logging.getLogger('').info(world.fish.translate("cli", "cli", "shuffling.keydoors"))
     start = time.process_time()
     total_keys = remaining = 29
     total_candidates = 0
@@ -792,7 +582,7 @@ def assign_cross_keys(dungeon_builders, world, player):
     while len(queue) > 0 and remaining > 0:
         builder = queue.popleft()
         name = builder.name
-        logger.info('Cross Dungeon: Increasing key count by 1 for %s', name)
+        logger.debug('Cross Dungeon: Increasing key count by 1 for %s', name)
         builder.key_doors_num += 1
         result = find_valid_combination(builder, start_regions_map[name], world, player, drop_keys=False)
         if result:
@@ -803,10 +593,10 @@ def assign_cross_keys(dungeon_builders, world, player):
                 queue.append(builder)
                 queue = deque(sorted(queue, key=lambda b: b.combo_size))
         else:
-            logger.info('Cross Dungeon: Increase failed for %s', name)
+            logger.debug('Cross Dungeon: Increase failed for %s', name)
             builder.key_doors_num -= 1
             builder.flex = 0
-    logger.info('Cross Dungeon: Keys unable to assign in pool %s', remaining)
+    logger.debug('Cross Dungeon: Keys unable to assign in pool %s', remaining)
 
     # Last Step: Adjust Small Key Dungeon Pool
     if not world.retro[player]:
@@ -819,7 +609,7 @@ def assign_cross_keys(dungeon_builders, world, player):
                 dungeon.small_keys = []
             else:
                 dungeon.small_keys = [ItemFactory(dungeon_keys[name], player)] * actual_chest_keys
-    logging.getLogger('').info('%s: %s', world.fish.translate("cli","cli","keydoor.shuffle.time.crossed"), time.process_time()-start)
+    logger.info('%s: %s', world.fish.translate("cli", "cli", "keydoor.shuffle.time.crossed"), time.process_time()-start)
 
 
 def reassign_boss(boss_region, boss_key, builder, gt, world, player):
@@ -950,7 +740,7 @@ def find_small_key_door_candidates(builder, start_regions, world, player):
     checked_doors = set()
     for region in start_regions:
         possible, checked = find_key_door_candidates(region, checked_doors, world, player)
-        candidates.extend(possible)
+        candidates.extend([x for x in possible if x not in candidates])
         checked_doors.update(checked)
     flat_candidates = []
     for candidate in candidates:
@@ -976,7 +766,6 @@ def calc_used_dungeon_items(builder):
 
 def find_valid_combination(builder, start_regions, world, player, drop_keys=True):
     logger = logging.getLogger('')
-    logger.info('%s %s', world.fish.translate("cli","cli","shuffling.keydoors"), builder.name)
     # find valid combination of candidates
     if len(builder.candidates) < builder.key_doors_num:
         if not drop_keys:
@@ -1079,6 +868,9 @@ def flatten_pair_list(paired_list):
     return flat_list
 
 
+okay_normals = [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable, DoorKind.Dashable, DoorKind.DungeonChanger]
+
+
 def find_key_door_candidates(region, checked, world, player):
     dungeon = region.dungeon
     candidates = []
@@ -1103,11 +895,12 @@ def find_key_door_candidates(region, checked, world, player):
                     elif d.type == DoorType.Normal:
                         d2 = d.dest
                         if d2 not in candidates:
-                            room_b = world.get_room(d2.roomIndex, player)
-                            pos_b, kind_b = room_b.doorList[d2.doorListPos]
-                            okay_normals = [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable,
-                                            DoorKind.Dashable, DoorKind.DungeonChanger]
-                            valid = kind in okay_normals and kind_b in okay_normals
+                            if d2.type == DoorType.Normal:
+                                room_b = world.get_room(d2.roomIndex, player)
+                                pos_b, kind_b = room_b.doorList[d2.doorListPos]
+                                valid = kind in okay_normals and kind_b in okay_normals
+                            else:
+                                valid = kind in okay_normals
                             if valid and 0 <= d2.doorListPos < 4:
                                 candidates.append(d2)
                         else:
@@ -1192,8 +985,8 @@ def reassign_key_doors(builder, world, player):
                         dp.pair = False
                 if not found:
                     world.paired_doors[player].append(PairedDoor(d1.name, d2.name))
-                    change_door_to_small_key(d1, world, player)
-                    change_door_to_small_key(d2, world, player)
+                change_door_to_small_key(d1, world, player)
+                change_door_to_small_key(d2, world, player)
             world.spoiler.set_door_type(d1.name+' <-> '+d2.name, 'Key Door', player)
             logger.debug('Key Door: %s', d1.name+' <-> '+d2.name)
         else:
@@ -1224,10 +1017,13 @@ def smooth_door_pairs(world, player):
             partner = door.dest
             skip.add(partner)
             room_a = world.get_room(door.roomIndex, player)
-            room_b = world.get_room(partner.roomIndex, player)
             type_a = room_a.kind(door)
-            type_b = room_b.kind(partner)
-            valid_pair = stateful_door(door, type_a) and stateful_door(partner, type_b)
+            if partner.type in [DoorType.Normal, DoorType.Interior]:
+                room_b = world.get_room(partner.roomIndex, player)
+                type_b = room_b.kind(partner)
+                valid_pair = stateful_door(door, type_a) and stateful_door(partner, type_b)
+            else:
+                valid_pair, room_b, type_b = False, None, None
             if door.type == DoorType.Normal:
                 if type_a == DoorKind.SmallKey or type_b == DoorKind.SmallKey:
                     if valid_pair:
@@ -1302,7 +1098,7 @@ def stateful_door(door, kind):
 
 
 def random_door_type(door, partner, world, player, type_a, type_b, room_a, room_b):
-    r_kind = random.choices([DoorKind.Normal, DoorKind.Bombable, DoorKind.Dashable], [5, 2, 3], k=1)[0]
+    r_kind = random.choices([DoorKind.Normal, DoorKind.Bombable, DoorKind.Dashable], [15, 4, 6], k=1)[0]
     if r_kind != DoorKind.Normal:
         if door.type == DoorType.Normal:
             add_pair(door, partner, world, player)
@@ -1312,31 +1108,6 @@ def random_door_type(door, partner, world, player, type_a, type_b, room_a, room_
             room_b.change(partner.doorListPos, r_kind)
         spoiler_type = 'Bomb Door' if r_kind == DoorKind.Bombable else 'Dash Door'
         world.spoiler.set_door_type(door.name + ' <-> ' + partner.name, spoiler_type, player)
-
-
-def determine_required_paths(world, player):
-    paths = {
-        'Hyrule Castle': ['Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby'],
-        'Eastern Palace': ['Eastern Boss'],
-        'Desert Palace': ['Desert Main Lobby', 'Desert East Lobby', 'Desert West Lobby', 'Desert Boss'],
-        'Tower of Hera': ['Hera Boss'],
-        'Agahnims Tower': ['Tower Agahnim 1'],
-        'Palace of Darkness': ['PoD Boss'],
-        'Swamp Palace': ['Swamp Boss'],
-        'Skull Woods': ['Skull 1 Lobby', 'Skull 2 East Lobby', 'Skull 2 West Lobby', 'Skull Boss'],
-        'Thieves Town': ['Thieves Boss', ('Thieves Blind\'s Cell', 'Thieves Boss')],
-        'Ice Palace': ['Ice Boss'],
-        'Misery Mire': ['Mire Boss'],
-        'Turtle Rock': ['TR Main Lobby', 'TR Lazy Eyes', 'TR Big Chest Entrance', 'TR Eye Bridge', 'TR Boss'],
-        'Ganons Tower': ['GT Agahnim 2']
-        }
-    if world.mode[player] == 'standard':
-        paths['Hyrule Castle'].append('Hyrule Dungeon Cellblock')
-        # noinspection PyTypeChecker
-        paths['Hyrule Castle'].append(('Hyrule Dungeon Cellblock', 'Sanctuary'))
-    if world.doorShuffle[player] in ['basic']:
-        paths['Thieves Town'].append('Thieves Attic Window')
-    return paths
 
 
 def overworld_prep(world, player):
@@ -1367,13 +1138,37 @@ def find_inaccessible_regions(world, player):
             if connect and connect.type is not RegionType.Dungeon and connect not in queue and connect not in visited_regions:
                 queue.append(connect)
     world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if valid_inaccessible_region(r)])
-    if world.mode[player] == 'standard':
-        world.inaccessible_regions[player].append('Hyrule Castle Ledge')
-        world.inaccessible_regions[player].append('Sewer Drop')
     logger = logging.getLogger('')
     logger.debug('Inaccessible Regions:')
     for r in world.inaccessible_regions[player]:
         logger.debug('%s', r)
+
+
+def find_accessible_entrances(world, player, entrances):
+    if world.mode[player] != 'inverted':
+        start_regions = ['Links House', 'Sanctuary']
+    else:
+        start_regions = ['Inverted Links House', 'Inverted Dark Sanctuary']
+    regs = convert_regions(start_regions, world, player)
+    visited_regions = set()
+    visited_entrances = []
+    queue = deque(regs)
+    while len(queue) > 0:
+        next_region = queue.popleft()
+        visited_regions.add(next_region)
+        if world.mode[player] == 'inverted' and next_region.name == 'Tower Agahnim 1':
+            connect = world.get_region('Hyrule Castle Ledge', player)
+            if connect not in queue and connect not in visited_regions:
+                queue.append(connect)
+        for ext in next_region.exits:
+            connect = ext.connected_region
+            if connect is None or ext.door and ext.door.blocked:
+                continue
+            if connect.name in entrances:
+                visited_entrances.append(connect.name)
+            elif connect and connect not in queue and connect not in visited_regions:
+                queue.append(connect)
+    return visited_entrances
 
 
 def valid_inaccessible_region(r):
@@ -1403,37 +1198,38 @@ def create_door(world, player, entName, region_name):
 
 def check_required_paths(paths, world, player):
     for dungeon_name in paths.keys():
-        builder = world.dungeon_layouts[player][dungeon_name]
-        if len(paths[dungeon_name]) > 0:
-            states_to_explore = defaultdict(list)
-            for path in paths[dungeon_name]:
-                if type(path) is tuple:
-                    states_to_explore[tuple([path[0]])].append(path[1])
-                else:
-                    states_to_explore[tuple(builder.path_entrances)].append(path)
-            cached_initial_state = None
-            for start_regs, dest_regs in states_to_explore.items():
-                check_paths = convert_regions(dest_regs, world, player)
-                start_regions = convert_regions(start_regs, world, player)
-                initial = start_regs == tuple(builder.path_entrances)
-                if not initial or cached_initial_state is None:
-                    init = determine_init_crystal(initial, cached_initial_state, start_regions)
-                    state = ExplorationState(init, dungeon_name)
-                    for region in start_regions:
-                        state.visit_region(region)
-                        state.add_all_doors_check_unattached(region, world, player)
-                    explore_state(state, world, player)
-                    if initial and cached_initial_state is None:
-                        cached_initial_state = state
-                else:
-                    state = cached_initial_state
-                valid, bad_region = check_if_regions_visited(state, check_paths)
-                if not valid:
-                    if check_for_pinball_fix(state, bad_region, world, player):
+        if dungeon_name in world.dungeon_layouts[player].keys():
+            builder = world.dungeon_layouts[player][dungeon_name]
+            if len(paths[dungeon_name]) > 0:
+                states_to_explore = defaultdict(list)
+                for path in paths[dungeon_name]:
+                    if type(path) is tuple:
+                        states_to_explore[tuple([path[0]])].append(path[1])
+                    else:
+                        states_to_explore[tuple(builder.path_entrances)].append(path)
+                cached_initial_state = None
+                for start_regs, dest_regs in states_to_explore.items():
+                    check_paths = convert_regions(dest_regs, world, player)
+                    start_regions = convert_regions(start_regs, world, player)
+                    initial = start_regs == tuple(builder.path_entrances)
+                    if not initial or cached_initial_state is None:
+                        init = determine_init_crystal(initial, cached_initial_state, start_regions)
+                        state = ExplorationState(init, dungeon_name)
+                        for region in start_regions:
+                            state.visit_region(region)
+                            state.add_all_doors_check_unattached(region, world, player)
                         explore_state(state, world, player)
-                        valid, bad_region = check_if_regions_visited(state, check_paths)
-                if not valid:
-                    raise Exception('%s cannot reach %s' % (dungeon_name, bad_region.name))
+                        if initial and cached_initial_state is None:
+                            cached_initial_state = state
+                    else:
+                        state = cached_initial_state
+                    valid, bad_region = check_if_regions_visited(state, check_paths)
+                    if not valid:
+                        if check_for_pinball_fix(state, bad_region, world, player):
+                            explore_state(state, world, player)
+                            valid, bad_region = check_if_regions_visited(state, check_paths)
+                    if not valid:
+                        raise Exception('%s cannot reach %s' % (dungeon_name, bad_region.name))
 
 
 def determine_init_crystal(initial, state, start_regions):
@@ -1476,7 +1272,7 @@ def check_if_regions_visited(state, check_paths):
 
 def check_for_pinball_fix(state, bad_region, world, player):
     pinball_region = world.get_region('Skull Pinball', player)
-    if bad_region.name == 'Skull 2 West Lobby' and state.visited_at_all(pinball_region): #revisit this for entrance shuffle
+    if bad_region.name == 'Skull 2 West Lobby' and state.visited_at_all(pinball_region):  # revisit this for entrance shuffle
         door = world.get_door('Skull Pinball WS', player)
         room = world.get_room(door.roomIndex, player)
         if room.doorList[door.doorListPos][1] == DoorKind.Trap:
@@ -1494,12 +1290,16 @@ class DROptions(Flag):
     NoOptions = 0x00
     Eternal_Mini_Bosses = 0x01  # If on, GT minibosses marked as defeated when they try to spawn a heart
     Town_Portal = 0x02  # If on, Players will start with mirror scroll
+    Map_Info = 0x04
+    Debug = 0x08
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
 
-# DATA GOES DOWN HERE
 
+# DATA GOES DOWN HERE
 logical_connections = [
     ('Hyrule Dungeon North Abyss Catwalk Dropdown', 'Hyrule Dungeon North Abyss'),
+    ('Hyrule Castle Throne Room Tapestry', 'Hyrule Castle Behind Tapestry'),
+    ('Hyrule Castle Tapestry Backwards', 'Hyrule Castle Throne Room'),
     ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path'),
     ('Eastern Hint Tile Push Block', 'Eastern Hint Tile'),
     ('Eastern Map Balcony Hook Path', 'Eastern Map Room'),
@@ -1508,6 +1308,7 @@ logical_connections = [
     ('Desert Main Lobby Right Path', 'Desert Right Alcove'),
     ('Desert Left Alcove Path', 'Desert Main Lobby'),
     ('Desert Right Alcove Path', 'Desert Main Lobby'),
+    ('Hera Big Chest Hook Path', 'Hera Big Chest Landing'),
     ('Hera Big Chest Landing Exit', 'Hera 4F'),
     ('PoD Pit Room Block Path N', 'PoD Pit Room Blocked'),
     ('PoD Pit Room Block Path S', 'PoD Pit Room'),
@@ -1562,6 +1363,8 @@ logical_connections = [
     ('Thieves Hellway Crystal Orange Barrier', 'Thieves Hellway'),
     ('Thieves Hellway Blue Barrier', 'Thieves Hellway N Crystal'),
     ('Thieves Hellway Crystal Blue Barrier', 'Thieves Hellway'),
+    ('Thieves Attic Orange Barrier', 'Thieves Attic Hint'),
+    ('Thieves Attic Hint Orange Barrier', 'Thieves Attic'),
     ('Thieves Basement Block Path', 'Thieves Blocked Entry'),
     ('Thieves Blocked Entry Path', 'Thieves Basement Block'),
     ('Thieves Conveyor Bridge Block Path', 'Thieves Conveyor Block'),
@@ -1719,8 +1522,8 @@ open_edges = [
     ('Desert Main Lobby E Edge', 'Desert East Wing W Edge'),
     ('Desert East Wing N Edge', 'Desert Arrow Pot Corner S Edge'),
     ('Desert Arrow Pot Corner W Edge', 'Desert North Hall E Edge'),
-    ('Desert North Hall W Edge', 'Desert Sandworm Corner S Edge'),
-    ('Desert Sandworm Corner E Edge', 'Desert West Wing N Edge'),
+    ('Desert West Wing N Edge', 'Desert Sandworm Corner S Edge'),
+    ('Desert Sandworm Corner E Edge', 'Desert North Hall W Edge'),
     ('Thieves Lobby N Edge', 'Thieves Ambush S Edge'),
     ('Thieves Lobby NE Edge', 'Thieves Ambush SE Edge'),
     ('Thieves Ambush ES Edge', 'Thieves BK Corner WS Edge'),
@@ -2255,4 +2058,20 @@ compass_data = {
     'Thieves Town': (0x106, 0xca, 0x138, 0, 0x16),
     'Turtle Rock': (0x11F, 0xcb, 0x15e, 0, 0x18),
     'Ganons Tower': (0x13A, 0xcc, 0x170, 2, 0x1a)
+}
+
+# For compass boss indicator
+boss_indicator = {
+    'Eastern Palace': (0x04, 'Eastern Boss SE'),
+    'Desert Palace': (0x06, 'Desert Boss SW'),
+    'Agahnims Tower': (0x08, 'Tower Agahnim 1 SW'),
+    'Swamp Palace': (0x0a, 'Swamp Boss SW'),
+    'Palace of Darkness': (0x0c, 'PoD Boss SE'),
+    'Misery Mire': (0x0e, 'Mire Boss SW'),
+    'Skull Woods': (0x10, 'Skull Spike Corner SW'),
+    'Ice Palace': (0x12, 'Ice Antechamber NE'),
+    'Tower of Hera': (0x14, 'Hera Boss Down Stairs'),
+    'Thieves Town': (0x16, 'Thieves Boss SE'),
+    'Turtle Rock': (0x18, 'TR Boss SW'),
+    'Ganons Tower': (0x1a, 'GT Agahnim 2 SW')
 }

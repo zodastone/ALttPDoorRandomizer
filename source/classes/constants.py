@@ -87,6 +87,7 @@ SETTINGSTOPROCESS = {
       "smallkeyshuffle": "keyshuffle",
       "bigkeyshuffle": "bigkeyshuffle",
       "dungeondoorshuffle": "door_shuffle",
+      "dungeonintensity": "intensity",
       "experimental": "experimental",
       "dungeon_counters": "dungeon_counters"
     },
@@ -101,7 +102,7 @@ SETTINGSTOPROCESS = {
       "uwpalettes": "uw_palettes"
     },
     "generation": {
-      "spoiler": "create_spoiler",
+      "createspoiler": "create_spoiler",
       "createrom": "create_rom",
       "calcplaythrough": "calc_playthrough",
       "usestartinventory": "usestartinventory",

@@ -9,8 +9,8 @@
     "shuffling.world": "Shuffling the World about",
     "shuffling.dungeons": "Shuffling dungeons",
     "basic.traversal": "--Basic Traversal",
-    "generating.dungeon": "Generating dungeon",
-    "shuffling.keydoors": "Shuffling Key doors for",
+    "generating.dungeon": "Generating dungeons",
+    "shuffling.keydoors": "Shuffling Key doors",
     "lowering.keys.candidates": "Lowering key door count because not enough candidates",
     "lowering.keys.layouts": "Lowering key door count because no valid layouts",
     "keydoor.shuffle.time": "Key door shuffle time",
@@ -40,6 +40,7 @@
     "made.rom": "Patched ROM:         %s",
     "made.playthrough": "Printed Playthrough: %s",
     "made.spoiler": "Printed Spoiler:     %s",
+    "used.enemizer": "Enemized:            %s",
     "done": "Done. Enjoy.",
     "total.time": "Total Time: %s",
     "finished.run": "Finished run",
@@ -196,6 +197,13 @@
       "Crossed:        Doors are mixed between all dungeons.",
       "Vanilla:        All doors are connected the same way they were in the",
       "                base game."
+    ],
+    "intensity" : [
+      "Door Shuffle Intensity Level (default: %(default)s)",
+      "1:       Shuffles normal doors and spiral staircases",
+      "2:       And shuffles open edges and straight staircases",
+      "3:       (Coming soon) And shuffles dungeon lobbies",
+      "random:  Picks one of those at random"
     ],
     "experimental": [ "Enable experimental features. (default: %(default)s)" ],
     "dungeon_counters": [ "Enable dungeon chest counters. (default: %(default)s)" ],
