@@ -55,3 +55,13 @@ CgramAuxToMain: ; ripped this from bank02 because it ended with rts
     inc $15
     rts
 }
+
+OverridePaletteHeader:
+	lda.l DRMode : cmp #$02 : bne +
+	cpx #$01c2 : !bge +
+		rep #$20
+		txa : lsr : tax
+		lda.l PaletteTable, x
+		iny : rtl
+	+ rep #$20 : iny : lda [$0D], Y ; what we wrote over
+rtl

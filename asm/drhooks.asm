@@ -59,6 +59,9 @@ rts
 nop #5
 .done
 
+org $01b618 ; Bank01.asm : 7963 Dungeon_LoadHeader (REP #$20 : INY : LDA [$0D], Y)
+nop : jsl OverridePaletteHeader
+
 org $00d377 ;Bank 00 line 3185
 DecompDungAnimatedTiles:
 org $00fda4 ;Bank 00 line 8882
@@ -101,10 +104,6 @@ nop : stz $0dd0, X : rts
 .not_in_ganons_tower
 
 
-org $208206
-jsl MirrorCheckOverride2
-org $208270
-jsl MirrorCheckOverride2
 org $07a955 ; <- Bank07.asm : around 6564 (JP is a bit different) (STZ $05FC : STZ $05FD)
 jsl BlockEraseFix
 nop #2
@@ -123,19 +122,30 @@ nop #3
 org $028fc9
 nop #2 : jsl BlindAtticFix
 
-; also rando's hooks.asm line 1360
-; 106e4e -> goes to  a0ee4e
-org $a0ee8a ; <- 6FC4C - headsup_display.asm : 836 (LDA $7EF36E : AND.w #$00FF : ADD.w #$0007 : AND.w #$FFF8 : TAX)
-jsl DrHudOverride
+org $028409
+jsl SuctionOverworldFix
+
 org $0ded04 ; <- rando's hooks.asm line 2192 - 6ED04 - equipment.asm : 1963 (REP #$30)
 jsl DrHudDungeonItemsAdditions
-org $098638 ; rando's hooks.asm line 2192
-jsl CountChestKeys
+;org $098638 ; rando's hooks.asm line 2192
+;jsl CountChestKeys
 org $06D192 ; rando's hooks.asm line 457
 jsl CountAbsorbedKeys
 ; rando's hooks.asm line 1020
-org $05FC7E ; <- 2FC7E - sprite_dash_item.asm : 118 (LDA $7EF36F : INC A : STA $7EF36F)
-jsl CountBonkItem
+;org $05FC7E ; <- 2FC7E - sprite_dash_item.asm : 118 (LDA $7EF36F : INC A : STA $7EF36F)
+;jsl CountBonkItem
+
+org $019dbd ; <- Bank01.asm : 4465 of Object_Draw8xN (LDA $9B52, Y : STA $7E2000, X)
+jsl CutoffEntranceRug : bra .nextTile : nop
+.nextTile
+
+;maybe set 02e2 to 0
+
+org $0799de ; <- Bank07.asm : 4088 (LDA.b #$15 : STA $5D)
+JSL StoreTempBunnyState
+;
+org $08c450 ; <- ancilla_receive_item.asm : 146-148 (STY $5D : STZ $02D8)
+JSL RetrieveBunnyState : NOP
 
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes

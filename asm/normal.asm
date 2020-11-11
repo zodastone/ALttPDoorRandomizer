@@ -190,8 +190,9 @@ PrepScrollToEdge:
     + sta $05
     lda $01 : and #$10 : beq +
         lda #01
-    + sta $ee
-    rts
+    + sta $ee : bne +
+    	stz $0476
+    + rts
 }
 
 ; Normal Flags should be in $01
@@ -199,7 +200,9 @@ PrepScrollToEdge:
 PrepScrollToNormal:
 {
     lda $01 : sta $fe : and #$04 : lsr #2 : sta $ee ; trap door and layer
-    stz $05 : lda #$78 : sta $04
+    bne +
+    	stz $0476
+    + stz $05 : lda #$78 : sta $04
     lda $01 : and #$03 : beq .end
         cmp #$02 : !bge +
             lda #$f8 : sta $04 : bra .end

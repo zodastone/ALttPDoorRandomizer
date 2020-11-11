@@ -19,7 +19,7 @@
         "random"
       ],
       "config": {
-        "width": 40
+        "width": 35
       }
     },
     "experimental": { "type": "checkbox" },
@@ -32,6 +32,18 @@
         "on",
         "pickup"
       ]
+    },
+    "mixed_travel": {
+      "type" : "selectbox",
+      "default": "auto",
+      "options": [
+        "prevent",
+        "allow",
+        "force"
+      ],
+      "config": {
+        "width": 35
+      }
     }
   }
 }

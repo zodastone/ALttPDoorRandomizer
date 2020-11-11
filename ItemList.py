@@ -6,7 +6,7 @@ from BaseClasses import Region, RegionType, Shop, ShopType, Location
 from Bosses import place_bosses
 from Dungeons import get_dungeon_item_pool
 from EntranceShuffle import connect_entrance
-from Fill import FillError, fill_restrictive
+from Fill import FillError, fill_restrictive, fast_fill
 from Items import ItemFactory
 
 import source.classes.constants as CONST
@@ -355,8 +355,11 @@ def generate_itempool(world, player):
 
     if world.retro[player]:
         set_up_take_anys(world, player)
+        if world.keydropshuffle[player]:
+            world.itempool += [ItemFactory('Small Key (Universal)', player)] * 32
 
     create_dynamic_shop_locations(world, player)
+
 
 take_any_locations = [
     'Snitch Lady (East)', 'Snitch Lady (West)', 'Bush Covered House', 'Light World Bomb Hut',
@@ -735,3 +738,21 @@ def test():
 
 if __name__ == '__main__':
     test()
+
+
+def fill_specific_items(world):
+    keypool = [item for item in world.itempool if item.smallkey]
+    cage = world.get_location('Tower of Hera - Basement Cage', 1)
+    c_dungeon = cage.parent_region.dungeon
+    key_item = next(x for x in keypool if c_dungeon.name in x.name or (c_dungeon.name == 'Hyrule Castle' and 'Escape' in x.name))
+    world.itempool.remove(key_item)
+    all_state = world.get_all_state(True)
+    fill_restrictive(world, all_state, [cage], [key_item])
+
+    # somaria = next(item for item in world.itempool if item.name == 'Cane of Somaria')
+    # shooter = world.get_location('Palace of Darkness - Shooter Room', 1)
+    # world.itempool.remove(somaria)
+    # all_state = world.get_all_state(True)
+    # fill_restrictive(world, all_state, [shooter], [somaria])
+
+

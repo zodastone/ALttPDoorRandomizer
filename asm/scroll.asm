@@ -177,11 +177,11 @@ ScrollX: ;change the X offset variables
     rts
 
 LimitXCamera:
-    cmp #$0080 : !bge +
+    cmp #$0079 : !bge +
         lda #$0000 : bra .end
-    + cmp #$0181 : !blt +
-        lda #$0180
-    + !sub #$0080
+    + cmp #$0178 : !blt +
+        lda #$0178
+    + !sub #$0078
     .end rts
 
 CheckRoomLayoutX:

@@ -7,27 +7,28 @@ from Items import ItemFactory
 
 
 def create_dungeons(world, player):
-    def make_dungeon(name, default_boss, dungeon_regions, big_key, small_keys, dungeon_items):
-        dungeon = Dungeon(name, dungeon_regions, big_key, [] if world.retro[player] else small_keys, dungeon_items, player)
+    def make_dungeon(name, id, default_boss, dungeon_regions, big_key, small_keys, dungeon_items):
+        dungeon = Dungeon(name, dungeon_regions, big_key, [] if world.retro[player] else small_keys,
+                          dungeon_items, player, id)
         dungeon.boss = BossFactory(default_boss, player)
         for region in dungeon.regions:
             world.get_region(region, player).dungeon = dungeon
             dungeon.world = world
         return dungeon
 
-    ES = make_dungeon('Hyrule Castle', None, hyrule_castle_regions, None, [ItemFactory('Small Key (Escape)', player)], [ItemFactory('Map (Escape)', player)])
-    EP = make_dungeon('Eastern Palace', 'Armos Knights', eastern_regions, ItemFactory('Big Key (Eastern Palace)', player), [], ItemFactory(['Map (Eastern Palace)', 'Compass (Eastern Palace)'], player))
-    DP = make_dungeon('Desert Palace', 'Lanmolas', desert_regions, ItemFactory('Big Key (Desert Palace)', player), [ItemFactory('Small Key (Desert Palace)', player)], ItemFactory(['Map (Desert Palace)', 'Compass (Desert Palace)'], player))
-    ToH = make_dungeon('Tower of Hera', 'Moldorm', hera_regions, ItemFactory('Big Key (Tower of Hera)', player), [ItemFactory('Small Key (Tower of Hera)', player)], ItemFactory(['Map (Tower of Hera)', 'Compass (Tower of Hera)'], player))
-    PoD = make_dungeon('Palace of Darkness', 'Helmasaur King', pod_regions, ItemFactory('Big Key (Palace of Darkness)', player), ItemFactory(['Small Key (Palace of Darkness)'] * 6, player), ItemFactory(['Map (Palace of Darkness)', 'Compass (Palace of Darkness)'], player))
-    TT = make_dungeon('Thieves Town', 'Blind', thieves_regions, ItemFactory('Big Key (Thieves Town)', player), [ItemFactory('Small Key (Thieves Town)', player)], ItemFactory(['Map (Thieves Town)', 'Compass (Thieves Town)'], player))
-    SW = make_dungeon('Skull Woods', 'Mothula', skull_regions, ItemFactory('Big Key (Skull Woods)', player), ItemFactory(['Small Key (Skull Woods)'] * 3, player), ItemFactory(['Map (Skull Woods)', 'Compass (Skull Woods)'], player))
-    SP = make_dungeon('Swamp Palace', 'Arrghus', swamp_regions, ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
-    IP = make_dungeon('Ice Palace', 'Kholdstare', ice_regions, ItemFactory('Big Key (Ice Palace)', player), ItemFactory(['Small Key (Ice Palace)'] * 2, player), ItemFactory(['Map (Ice Palace)', 'Compass (Ice Palace)'], player))
-    MM = make_dungeon('Misery Mire', 'Vitreous', mire_regions, ItemFactory('Big Key (Misery Mire)', player), ItemFactory(['Small Key (Misery Mire)'] * 3, player), ItemFactory(['Map (Misery Mire)', 'Compass (Misery Mire)'], player))
-    TR = make_dungeon('Turtle Rock', 'Trinexx', tr_regions, ItemFactory('Big Key (Turtle Rock)', player), ItemFactory(['Small Key (Turtle Rock)'] * 4, player), ItemFactory(['Map (Turtle Rock)', 'Compass (Turtle Rock)'], player))
-    AT = make_dungeon('Agahnims Tower', 'Agahnim', tower_regions, None, ItemFactory(['Small Key (Agahnims Tower)'] * 2, player), [])
-    GT = make_dungeon('Ganons Tower', 'Agahnim2', gt_regions, ItemFactory('Big Key (Ganons Tower)', player), ItemFactory(['Small Key (Ganons Tower)'] * 4, player), ItemFactory(['Map (Ganons Tower)', 'Compass (Ganons Tower)'], player))
+    ES = make_dungeon('Hyrule Castle', 1, None, hyrule_castle_regions, None, [ItemFactory('Small Key (Escape)', player)], [ItemFactory('Map (Escape)', player)])
+    EP = make_dungeon('Eastern Palace', 2, 'Armos Knights', eastern_regions, ItemFactory('Big Key (Eastern Palace)', player), [], ItemFactory(['Map (Eastern Palace)', 'Compass (Eastern Palace)'], player))
+    DP = make_dungeon('Desert Palace', 3, 'Lanmolas', desert_regions, ItemFactory('Big Key (Desert Palace)', player), [ItemFactory('Small Key (Desert Palace)', player)], ItemFactory(['Map (Desert Palace)', 'Compass (Desert Palace)'], player))
+    ToH = make_dungeon('Tower of Hera', 10, 'Moldorm', hera_regions, ItemFactory('Big Key (Tower of Hera)', player), [ItemFactory('Small Key (Tower of Hera)', player)], ItemFactory(['Map (Tower of Hera)', 'Compass (Tower of Hera)'], player))
+    PoD = make_dungeon('Palace of Darkness', 6, 'Helmasaur King', pod_regions, ItemFactory('Big Key (Palace of Darkness)', player), ItemFactory(['Small Key (Palace of Darkness)'] * 6, player), ItemFactory(['Map (Palace of Darkness)', 'Compass (Palace of Darkness)'], player))
+    TT = make_dungeon('Thieves Town', 11, 'Blind', thieves_regions, ItemFactory('Big Key (Thieves Town)', player), [ItemFactory('Small Key (Thieves Town)', player)], ItemFactory(['Map (Thieves Town)', 'Compass (Thieves Town)'], player))
+    SW = make_dungeon('Skull Woods', 8, 'Mothula', skull_regions, ItemFactory('Big Key (Skull Woods)', player), ItemFactory(['Small Key (Skull Woods)'] * 3, player), ItemFactory(['Map (Skull Woods)', 'Compass (Skull Woods)'], player))
+    SP = make_dungeon('Swamp Palace', 5, 'Arrghus', swamp_regions, ItemFactory('Big Key (Swamp Palace)', player), [ItemFactory('Small Key (Swamp Palace)', player)], ItemFactory(['Map (Swamp Palace)', 'Compass (Swamp Palace)'], player))
+    IP = make_dungeon('Ice Palace', 9, 'Kholdstare', ice_regions, ItemFactory('Big Key (Ice Palace)', player), ItemFactory(['Small Key (Ice Palace)'] * 2, player), ItemFactory(['Map (Ice Palace)', 'Compass (Ice Palace)'], player))
+    MM = make_dungeon('Misery Mire', 7, 'Vitreous', mire_regions, ItemFactory('Big Key (Misery Mire)', player), ItemFactory(['Small Key (Misery Mire)'] * 3, player), ItemFactory(['Map (Misery Mire)', 'Compass (Misery Mire)'], player))
+    TR = make_dungeon('Turtle Rock', 12, 'Trinexx', tr_regions, ItemFactory('Big Key (Turtle Rock)', player), ItemFactory(['Small Key (Turtle Rock)'] * 4, player), ItemFactory(['Map (Turtle Rock)', 'Compass (Turtle Rock)'], player))
+    AT = make_dungeon('Agahnims Tower', 4, 'Agahnim', tower_regions, None, ItemFactory(['Small Key (Agahnims Tower)'] * 2, player), [])
+    GT = make_dungeon('Ganons Tower', 13, 'Agahnim2', gt_regions, ItemFactory('Big Key (Ganons Tower)', player), ItemFactory(['Small Key (Ganons Tower)'] * 4, player), ItemFactory(['Map (Ganons Tower)', 'Compass (Ganons Tower)'], player))
 
     GT.bosses['bottom'] = BossFactory('Armos Knights', player)
     GT.bosses['middle'] = BossFactory('Lanmolas', player)
@@ -166,9 +167,9 @@ hyrule_castle_regions = [
     'Hyrule Dungeon Map Room', 'Hyrule Dungeon North Abyss', 'Hyrule Dungeon North Abyss Catwalk',
     'Hyrule Dungeon South Abyss', 'Hyrule Dungeon South Abyss Catwalk', 'Hyrule Dungeon Guardroom',
     'Hyrule Dungeon Armory Main', 'Hyrule Dungeon Armory Boomerang',  'Hyrule Dungeon Armory North Branch',
-    'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Sewers Behind Tapestry', 'Sewers Rope Room',
-    'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Rat Path', 'Sewers Secret Room Blocked Path',
-    'Sewers Secret Room', 'Sewers Yet More Rats', 'Sewers Pull Switch', 'Sanctuary'
+    'Hyrule Dungeon Staircase', 'Hyrule Dungeon Cellblock', 'Hyrule Dungeon Cell', 'Sewers Behind Tapestry',
+    'Sewers Rope Room', 'Sewers Dark Cross', 'Sewers Water', 'Sewers Key Rat', 'Sewers Rat Path',
+    'Sewers Secret Room Blocked Path', 'Sewers Secret Room', 'Sewers Yet More Rats', 'Sewers Pull Switch', 'Sanctuary'
 ]
 
 eastern_regions = [
@@ -238,9 +239,10 @@ thieves_regions = [
     'Thieves Big Chest Nook', 'Thieves Hallway', 'Thieves Boss', 'Thieves Pot Alcove Mid', 'Thieves Pot Alcove Bottom',
     'Thieves Pot Alcove Top', 'Thieves Conveyor Maze', 'Thieves Spike Track', 'Thieves Hellway',
     'Thieves Hellway N Crystal', 'Thieves Hellway S Crystal', 'Thieves Triple Bypass', 'Thieves Spike Switch',
-    'Thieves Attic', 'Thieves Attic Hint', 'Thieves Cricket Hall Left', 'Thieves Cricket Hall Right', 'Thieves Attic Window',
-    'Thieves Basement Block', 'Thieves Blocked Entry', 'Thieves Lonely Zazak', 'Thieves Blind\'s Cell',
-    'Thieves Conveyor Bridge', 'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap'
+    'Thieves Attic', 'Thieves Attic Hint', 'Thieves Cricket Hall Left', 'Thieves Cricket Hall Right',
+    'Thieves Attic Window', 'Thieves Basement Block', 'Thieves Blocked Entry', 'Thieves Lonely Zazak',
+    "Thieves Blind's Cell", "Thieves Blind's Cell Interior", 'Thieves Conveyor Bridge', 'Thieves Conveyor Block',
+    'Thieves Big Chest Room', 'Thieves Trap'
 ]
 
 ice_regions = [
@@ -332,7 +334,7 @@ region_starts = {
 }
 
 standard_starts = {
-    'Hyrule Castle': ['Hyrule Castle Lobby']
+    'Hyrule Castle': ['Hyrule Castle South']
 }
 
 split_region_starts = {

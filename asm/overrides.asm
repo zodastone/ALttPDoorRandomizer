@@ -11,7 +11,7 @@ LampCheckOverride:
 
 	LDA $7EF3CA : BNE +
 		.lightWorld
-		LDA $040C : CMP.b #$02 : BNE ++ ; check if we're in HC
+		LDA $040C : CMP.b #$04 : !BGE ++ ; check if we're in HC
 			LDA LampConeSewers : BRA .done
 		++
 			LDA LampConeLightWorld : BRA .done
@@ -49,10 +49,6 @@ MirrorCheckOverride:
     rtl
     + lda.l DRScroll : rtl
 
-MirrorCheckOverride2:
-    lda $7ef353 : and #$02 : rtl
-
-
 BlockEraseFix:
     lda $7ef353 : and #$02 : beq +
         stz $05fc : stz $05fd
@@ -80,3 +76,48 @@ BlindAtticFix:
         lda #$01 : rtl
     + lda $7EF3CC : cmp.b #$06
     rtl
+
+SuctionOverworldFix:
+    stz $50 : stz $5e
+    lda.l DRMode : beq +
+        stz $49
+    + rtl
+
+; TT Alcove, Mire bridges, pod falling, SW torch room, TR Pipe room, Bob's Room, Ice Many Pots, Mire Hub
+; swamp waterfall, Gauntlet 3, Eastern Push block
+CutoffRooms:
+db $bc, $a2, $1a, $49, $14, $8c, $9f, $c2
+db $66, $5d, $a8
+; Don't forget CutoffRoomCount!!!
+
+CutoffEntranceRug:
+    pha : phx
+    lda.l DRMode : beq .norm
+        lda $04 : cmp #$000A : beq +
+        cmp #$000C : bne .norm
+          + lda $a0 : sep #$20 : ldx #$0000
+          	- cmp.l CutoffRooms, x : beq .check
+          	inx : cpx #$000B : !blt - ; CutoffRoomCount is here!
+        rep #$20
+    .norm plx : pla : lda $9B52, y : sta $7E2000, x ; what we wrote over
+rtl
+     .check
+		  rep #$20
+		  lda $0c : cmp #$0006 : !bge .skip
+		  lda $0e : cmp #$0008 : !bge .skip
+		  cmp #$0004 : !blt .skip
+      bra  .norm
+.skip plx : pla : rtl
+
+
+StoreTempBunnyState:
+	LDA $5D : CMP #$1C : BNE +
+		STA $5F
+	+ LDA #$15 : STA $5D ; what we wrote over
+RTL
+
+RetrieveBunnyState:
+	STY $5D : STZ $02D8 ; what we wrote over
+	LDA $5F : BEQ +
+		STA $5D
++ RTL

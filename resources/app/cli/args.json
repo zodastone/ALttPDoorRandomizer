@@ -59,6 +59,17 @@
       "expert"
     ]
   },
+  "keydropshuffle" : {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "mixed_travel" : {
+    "choices": [
+      "prevent",
+      "allow",
+      "force"
+    ]
+  },
   "timer": {
     "choices": [
       "none",

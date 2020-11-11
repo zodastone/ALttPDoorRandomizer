@@ -22,7 +22,7 @@ Alternatively, run ```Gui.py``` for a simple graphical user interface. (WIP)
 
 Only extra settings are found here. All entrance randomizer settings are supported. See their [readme](https://github.com/KevinCathcart/ALttPEntranceRandomizer/blob/master/README.md)
 
-## Door Shuffle
+## Door Shuffle (--doorShuffle)
 
 ### Basic
 
@@ -36,14 +36,40 @@ Doors are shuffled between dungeons as well.
 
 Doors are not shuffled.
 
-## Intensity
+## Intensity (--intensity number)
 
 #### Level 1
 Normal door and spiral staircases are shuffled
 #### Level 2
 Same as Level 1 plus open edges and straight staircases are shuffled.
-#### Level 3 (Coming soon)
+#### Level 3
 Same as Level 2 plus Dungeon Lobbies are shuffled
+
+## KeyDropShuffle (--keydropshuffle)
+
+Adds 33 new locations to the randomization pool. The 32 small keys found under pots and dropped by enemies and the Big
+Key drop location are added to the pool. The keys normally found there are added to the item pool. Retro adds 
+32 generic keys to the pool instead.
+
+## Crossed Dungeon Specific Settings
+
+### Mixed Travel (--mixed_travel value)
+
+Due to Hammerjump, Hovering in PoD Arena, and the Mire Big Key Chest bomb jump two sections of a supertile that are
+otherwise unconnected logically can be reach using these glitches. To prevent the player from unintentionally
+
+#### Prevent
+
+Rails are added the 3 spots to prevent this tricks. This setting is recommend for those learning crossed dungeon mode to
+learn what is dangerous and what is not. No logic seeds ignore this setting.
+
+#### Allow
+
+The rooms are left alone and it is up to the discretion of the player whether to use these tricks or not.
+
+#### Force
+
+The two disjointed sections are forced to be in the same dungeon but never logically required to complete that game.
 
 
 ## Map/Compass/Small Key/Big Key shuffle (aka Keysanity)

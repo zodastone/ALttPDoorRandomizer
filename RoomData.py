@@ -9,7 +9,9 @@ def create_rooms(world, player):
         # Room(player, 0x03, 0x509cf).door(Position.SouthW, DoorKind.CaveEntrance),
         Room(player, 0x04, 0xfe25c).door(Position.NorthW, DoorKind.StairKey2).door(Position.InteriorW, DoorKind.Dashable).door(Position.InteriorS, DoorKind.Dashable).door(Position.InteriorE, DoorKind.TrapTriggerable).door(Position.SouthW, DoorKind.Normal),
         Room(player, 0x06, 0xfa192).door(Position.SouthW, DoorKind.Trap),
+        Room(player, 0x07, None),
         # Room(player, 0x08, 0x5064f).door(Position.InteriorS2, DoorKind.CaveEntranceLow08).door(Position.SouthE, DoorKind.CaveEntrance).door(Position.SouthW2, DoorKind.NormalLow2).door(Position.SouthW2, DoorKind.ToggleFlag),
+        Room(player, 0x09, None),
         Room(player, 0x0a, 0xfa734).door(Position.North, DoorKind.StairKey),
         Room(player, 0x0b, 0xfabf0).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.InteriorS, DoorKind.Trap2).door(Position.InteriorN, DoorKind.SmallKey),
         Room(player, 0x0c, 0xfef53).door(Position.South, DoorKind.DungeonEntrance),
@@ -23,6 +25,7 @@ def create_rooms(world, player):
         Room(player, 0x14, 0xfe464).door(Position.SouthE, DoorKind.SmallKey).door(Position.WestS, DoorKind.SmallKey).door(Position.NorthW, DoorKind.Normal).door(Position.WestN, DoorKind.Normal).door(Position.SouthW, DoorKind.Normal).door(Position.EastN, DoorKind.Normal).door(Position.EastS, DoorKind.Normal),
         Room(player, 0x15, 0xfe63e).door(Position.WestS, DoorKind.Trap).door(Position.WestN, DoorKind.Normal),
         Room(player, 0x16, 0xfa150).door(Position.InteriorV, DoorKind.Bombable).door(Position.InteriorW, DoorKind.SmallKey).door(Position.InteriorE, DoorKind.Normal).door(Position.NorthW, DoorKind.Normal),
+        Room(player, 0x17, None),
         # Room(player, 0x18, 0x506e5).door(Position.NorthW2, DoorKind.NormalLow).door(Position.NorthW2, DoorKind.ToggleFlag),
         Room(player, 0x19, 0xfacc6).door(Position.East, DoorKind.Bombable).door(Position.EastN, DoorKind.SmallKey),
         Room(player, 0x1a, 0xfa670).door(Position.InteriorE, DoorKind.SmallKey).door(Position.WestN, DoorKind.SmallKey).door(Position.West, DoorKind.Bombable).door(Position.SouthW, DoorKind.SmallKey).door(Position.InteriorN, DoorKind.Normal).door(Position.SouthE, DoorKind.Normal),
@@ -38,6 +41,7 @@ def create_rooms(world, player):
         Room(player, 0x23, 0xfed30).door(Position.SouthE, DoorKind.BombableEntrance).door(Position.EastS, DoorKind.Normal),
         Room(player, 0x24, 0xfe6ee).door(Position.NorthE, DoorKind.BigKey).door(Position.InteriorN, DoorKind.Trap2).door(Position.InteriorW, DoorKind.Trap2).door(Position.InteriorE, DoorKind.Trap2).door(Position.SouthE, DoorKind.DungeonEntrance).door(Position.NorthW, DoorKind.Normal).door(Position.WestS, DoorKind.Normal).door(Position.InteriorS, DoorKind.Normal),
         Room(player, 0x26, 0xf9cbb).door(Position.South, DoorKind.SmallKey).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.InteriorE, DoorKind.TrapTriggerable).door(Position.InteriorN, DoorKind.Normal),
+        Room(player, 0x27, None),
         Room(player, 0x28, 0xf92a8).door(Position.NorthW, DoorKind.StairKey2).door(Position.South, DoorKind.DungeonEntrance),
         Room(player, 0x2a, 0xfa594).door(Position.NorthE, DoorKind.Trap).door(Position.NorthW, DoorKind.SmallKey).door(Position.EastS, DoorKind.Bombable).door(Position.East2, DoorKind.NormalLow).door(Position.SouthW, DoorKind.Normal).door(Position.SouthE, DoorKind.Normal),
         Room(player, 0x2b, 0xfaaa7).door(Position.InteriorS, DoorKind.Bombable).door(Position.WestS, DoorKind.Bombable).door(Position.NorthW, DoorKind.Trap).door(Position.West2, DoorKind.NormalLow),
@@ -66,6 +70,7 @@ def create_rooms(world, player):
 
         Room(player, 0x40, 0xf8eea).door(Position.InteriorS2, DoorKind.NormalLow2),
         Room(player, 0x41, 0x50f15).door(Position.South, DoorKind.Trap),
+        Room(player, 0x42, None),
         Room(player, 0x43, 0xf87f8).door(Position.NorthW, DoorKind.BigKey).door(Position.InteriorE, DoorKind.SmallKey).door(Position.SouthE, DoorKind.SmallKey),
         Room(player, 0x44, 0xfdbcd).door(Position.InteriorN, DoorKind.Trap2).door(Position.InteriorS, DoorKind.SmallKey).door(Position.EastN, DoorKind.Normal).door(Position.EastS, DoorKind.Normal),
         Room(player, 0x45, 0xfdcae).door(Position.WestN, DoorKind.Trap).door(Position.InteriorW, DoorKind.Normal).door(Position.WestS, DoorKind.Normal).door(Position.InteriorS, DoorKind.Normal),
@@ -82,6 +87,7 @@ def create_rooms(world, player):
         Room(player, 0x51, 0x51029).door(Position.North, DoorKind.Normal).door(Position.North, DoorKind.DungeonChanger),
         Room(player, 0x52, 0x51230).door(Position.WestN2, DoorKind.Warp).door(Position.SouthW2, DoorKind.NormalLow2).door(Position.South, DoorKind.Normal),
         Room(player, 0x53, 0xf88ad).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.InteriorS, DoorKind.Trap2).door(Position.NorthE, DoorKind.SmallKey),
+        Room(player, 0x54, None),
         # Room(player, 0x55, 0x50166).door(Position.InteriorW2, DoorKind.NormalLow).door(Position.SouthW, DoorKind.Normal).door(Position.SouthW, DoorKind.IncognitoEntrance),
         Room(player, 0x56, 0xfbb4e).door(Position.InteriorW, DoorKind.SmallKey).door(Position.SouthW, DoorKind.DungeonEntrance).door(Position.InteriorS, DoorKind.Normal).door(Position.EastS, DoorKind.Normal),
         Room(player, 0x57, 0xfbbd2).door(Position.InteriorN, DoorKind.Bombable).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.EastS, DoorKind.SmallKey).door(Position.SouthW, DoorKind.DungeonEntrance).door(Position.WestS, DoorKind.Normal).door(Position.SouthE, DoorKind.Normal),
@@ -109,6 +115,7 @@ def create_rooms(world, player):
         Room(player, 0x6d, 0xffa4e).door(Position.NorthW, DoorKind.Trap).door(Position.InteriorW, DoorKind.Trap).door(Position.WestS, DoorKind.Trap),
         Room(player, 0x6e, 0xfc74b).door(Position.NorthE, DoorKind.Trap),
 
+        Room(player, 0x70, None),
         Room(player, 0x71, 0x52341).door(Position.InteriorW, DoorKind.SmallKey).door(Position.SouthW2, DoorKind.TrapTriggerableLow).door(Position.InteriorS2, DoorKind.TrapTriggerableLow),
         Room(player, 0x72, 0x51fda).door(Position.InteriorV, DoorKind.SmallKey),
         Room(player, 0x73, 0xf8972).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.InteriorS, DoorKind.Trap2).door(Position.InteriorE, DoorKind.Normal),
@@ -122,11 +129,14 @@ def create_rooms(world, player):
         Room(player, 0x7e, 0xfc7c6).door(Position.SouthE, DoorKind.SmallKey).door(Position.InteriorS, DoorKind.TrapTriggerable).door(Position.EastN, DoorKind.Normal),
         Room(player, 0x7f, 0xfc827).door(Position.WestN, DoorKind.Trap).door(Position.InteriorW, DoorKind.Normal),
 
+        Room(player, 0x80, None),
         Room(player, 0x81, 0x5224b).door(Position.NorthW2, DoorKind.NormalLow2),
+        Room(player, 0x82, None),
         Room(player, 0x83, 0xf8bba).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.SouthW, DoorKind.DungeonEntrance).door(Position.InteriorS, DoorKind.Normal),
         Room(player, 0x84, 0xf8cb7).door(Position.South, DoorKind.DungeonEntrance),
         Room(player, 0x85, 0xf8d7d).door(Position.NorthE, DoorKind.Trap).door(Position.InteriorN, DoorKind.SmallKey).door(Position.SouthE, DoorKind.DungeonEntrance).door(Position.InteriorS, DoorKind.Normal),
         Room(player, 0x87, 0xfd1b7).door(Position.InteriorN, DoorKind.Trap2).door(Position.InteriorE, DoorKind.Normal),
+        Room(player, 0x89, None),
         Room(player, 0x8b, 0xff33f).door(Position.InteriorN, DoorKind.TrapTriggerable).door(Position.InteriorS, DoorKind.SmallKey).door(Position.EastN, DoorKind.Normal).door(Position.SouthW, DoorKind.Normal).door(Position.NorthW, DoorKind.Normal),
         Room(player, 0x8c, 0xff3ef).door(Position.EastN, DoorKind.Trap).door(Position.InteriorW, DoorKind.Trap2).door(Position.InteriorN, DoorKind.SmallKey).door(Position.WestN, DoorKind.Normal).door(Position.SouthW, DoorKind.Normal).door(Position.SouthE, DoorKind.Normal),
         Room(player, 0x8d, 0xff4e0).door(Position.SouthE, DoorKind.Trap).door(Position.InteriorN, DoorKind.SmallKey).door(Position.WestN, DoorKind.Normal).door(Position.NorthE, DoorKind.Normal).door(Position.InteriorS, DoorKind.Normal),
@@ -153,6 +163,7 @@ def create_rooms(world, player):
         Room(player, 0xa3, 0xfb667).door(Position.West, DoorKind.Normal).door(Position.SouthW, DoorKind.Normal),
         Room(player, 0xa4, 0xfe741).door(Position.SouthW, DoorKind.Trap),
         Room(player, 0xa5, 0xffb7f).door(Position.NorthE, DoorKind.Trap).door(Position.InteriorE, DoorKind.Trap2).door(Position.InteriorW, DoorKind.Trap2),
+        Room(player, 0xa6, None),
         Room(player, 0xa8, 0x51887).door(Position.InteriorS, DoorKind.Trap2).door(Position.InteriorW, DoorKind.TrapTriggerable).door(Position.SouthE, DoorKind.SmallKey).door(Position.InteriorN2, DoorKind.NormalLow2).door(Position.EastN2, DoorKind.NormalLow2).door(Position.East, DoorKind.Normal),
         Room(player, 0xa9, 0x519c9).door(Position.West, DoorKind.Trap).door(Position.East, DoorKind.Trap).door(Position.North, DoorKind.BigKey).door(Position.WestN2, DoorKind.NormalLow2).door(Position.EastN2, DoorKind.NormalLow2).door(Position.South, DoorKind.Normal),
         Room(player, 0xaa, 0x51b29).door(Position.InteriorE, DoorKind.Trap2).door(Position.WestN2, DoorKind.NormalLow2).door(Position.InteriorN, DoorKind.Normal).door(Position.InteriorS, DoorKind.Normal).door(Position.West, DoorKind.Normal).door(Position.SouthW, DoorKind.Normal),
@@ -250,6 +261,7 @@ class Room(object):
         self.doorListAddress = address
         self.doorList = []
         self.modified = False
+        self.palette = None
 
     def kind(self, door):
         return self.doorList[door.doorListPos][1]

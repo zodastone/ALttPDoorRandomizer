@@ -3,6 +3,7 @@
     "mapshuffle":       { "type": "checkbox" },
     "compassshuffle":   { "type": "checkbox" },
     "smallkeyshuffle":  { "type": "checkbox" },
-    "bigkeyshuffle":    { "type": "checkbox" }
+    "bigkeyshuffle":    { "type": "checkbox" },
+    "keydropshuffle":   { "type": "checkbox" }
   }
 }

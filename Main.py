@@ -11,20 +11,20 @@ import zlib
 from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
-from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions
+from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions, adjust_locations
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
 from EntranceShuffle import link_entrances, link_inverted_entrances
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, JsonRom, get_hash_string
 from Doors import create_doors
-from DoorShuffle import link_doors
+from DoorShuffle import link_doors, connect_portal_copy
 from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, balance_multiworld_progression
-from ItemList import generate_itempool, difficulties, fill_prizes
+from ItemList import generate_itempool, difficulties, fill_prizes, fill_specific_items
 from Utils import output_path, parse_player_names
 
-__version__ = '0.1.1-dev'
+__version__ = '0.2.0.8-u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -66,6 +66,8 @@ def main(args, seed=None, fish=None):
     world.experimental = args.experimental.copy()
     world.dungeon_counters = args.dungeon_counters.copy()
     world.fish = fish
+    world.keydropshuffle = args.keydropshuffle.copy()
+    world.mixed_travel = args.mixed_travel.copy()
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
@@ -105,6 +107,7 @@ def main(args, seed=None, fish=None):
         create_doors(world, player)
         create_rooms(world, player)
         create_dungeons(world, player)
+        adjust_locations(world, player)
 
     logger.info(world.fish.translate("cli","cli","shuffling.world"))
 
@@ -135,6 +138,9 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
 
     fill_prizes(world)
+
+    # used for debugging
+    # fill_specific_items(world)
 
     logger.info(world.fish.translate("cli","cli","placing.dungeon.items"))
 
@@ -371,6 +377,8 @@ def copy_world(world):
     ret.beemizer = world.beemizer.copy()
     ret.intensity = world.intensity.copy()
     ret.experimental = world.experimental.copy()
+    ret.keydropshuffle = world.keydropshuffle.copy()
+    ret.mixed_travel = world.mixed_travel.copy()
 
     for player in range(1, world.players + 1):
         if world.mode[player] != 'inverted':
@@ -441,6 +449,11 @@ def copy_world(world):
     ret.inaccessible_regions = world.inaccessible_regions
     ret.dungeon_layouts = world.dungeon_layouts
     ret.key_logic = world.key_logic
+    ret.dungeon_portals = world.dungeon_portals
+    for player, portals in world.dungeon_portals.items():
+        for portal in portals:
+            connect_portal_copy(portal, ret, player)
+    ret.sanc_portal = world.sanc_portal
 
     for player in range(1, world.players + 1):
         set_rules(ret, player)
@@ -502,11 +515,11 @@ def create_playthrough(world):
 
         state_cache.append(state.copy())
 
-        logging.getLogger('').debug(world.fish.translate("cli","cli","building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations))
+        logging.getLogger('').debug(world.fish.translate("cli", "cli", "building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations))
         if not sphere:
-            logging.getLogger('').error(world.fish.translate("cli","cli","cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
+            logging.getLogger('').error(world.fish.translate("cli", "cli", "cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
             if any([world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
-                raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.progression"))
+                raise RuntimeError(world.fish.translate("cli", "cli", "cannot.reach.progression"))
             else:
                 old_world.spoiler.unreachables = sphere_candidates.copy()
                 break
