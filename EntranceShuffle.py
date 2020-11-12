@@ -18,6 +18,8 @@ def link_entrances(world, player):
     for exitname, regionname in mandatory_connections:
         connect_simple(world, exitname, regionname, player)
 
+    connect_custom(world, player)
+
     # if we do not shuffle, set default connections
     if world.shuffle[player] == 'vanilla':
         for exitname, regionname in default_connections:
@@ -1780,6 +1782,15 @@ def link_inverted_entrances(world, player):
     if world.get_entrance('Inverted Ganons Tower', player).connected_region.name != 'GT Lobby':
         world.ganonstower_vanilla[player] = False
 
+
+def connect_custom(world, player):
+    if hasattr(world, 'custom_entrances') and world.custom_entrances[player]:
+        for exit_name, region_name in world.custom_entrances[player]:
+            # doesn't actually change addresses
+            connect_simple(world, exit_name, region_name, player)
+    # this needs to remove custom connections from the pool
+
+
 def connect_simple(world, exitname, regionname, player):
     world.get_entrance(exitname, player).connect(world.get_region(regionname, player))
 
@@ -2863,6 +2874,7 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Spectacle Rock Cave Drop', 'Spectacle Rock Cave (Bottom)'),
                          ('Spectacle Rock Cave Peak Drop', 'Spectacle Rock Cave (Bottom)'),
                          ('Death Mountain Return Ledge Drop', 'Light World'),
+                         ('Old Man Cave Dropdown', 'Old Man Cave'),
                          ('Old Man House Front to Back', 'Old Man House Back'),
                          ('Old Man House Back to Front', 'Old Man House'),
                          ('Broken Bridge (West)', 'East Death Mountain (Bottom)'),
@@ -2972,6 +2984,7 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('Spectacle Rock Cave Drop', 'Spectacle Rock Cave (Bottom)'),
                                   ('Spectacle Rock Cave Peak Drop', 'Spectacle Rock Cave (Bottom)'),
                                   ('Death Mountain Return Ledge Drop', 'Light World'),
+                                  ('Old Man Cave Dropdown', 'Old Man Cave'),
                                   ('Old Man House Front to Back', 'Old Man House Back'),
                                   ('Old Man House Back to Front', 'Old Man House'),
                                   ('Broken Bridge (West)', 'East Death Mountain (Bottom)'),

@@ -74,6 +74,10 @@ def add_rule(spot, rule, combine='and'):
         spot.access_rule = lambda state: rule(state) and old_rule(state)
 
 
+def or_rule(rule1, rule2):
+    return lambda state: rule1(state) or rule2(state)
+
+
 def add_lamp_requirement(spot, player):
     add_rule(spot, lambda state: state.has('Lamp', player, state.world.lamps_needed_for_dark_rooms))
 
@@ -1563,9 +1567,10 @@ def add_key_logic_rules(world, player):
         for door_name, keys in d_logic.door_rules.items():
             spot = world.get_entrance(door_name, player)
             if not world.retro[player] or world.mode[player] != 'standard' or not retro_in_hc(spot):
-                add_rule(spot, create_advanced_key_rule(d_logic, player, keys))
-            if keys.opposite:
-                add_rule(spot, create_advanced_key_rule(d_logic, player, keys.opposite), 'or')
+                rule = create_advanced_key_rule(d_logic, player, keys)
+                if keys.opposite:
+                    rule = or_rule(rule, create_advanced_key_rule(d_logic, player, keys.opposite))
+                add_rule(spot, rule)
         for location in d_logic.bk_restricted:
             if not location.forced_item:
                 forbid_item(location, d_logic.bk_name, player)

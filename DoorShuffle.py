@@ -398,6 +398,14 @@ def choose_portals(world, player):
     if not hera_door.entranceFlag:
         world.get_room(0x77, player).change(0, DoorKind.NormalLow2)
 
+    # tr rock bomb entrances
+    for portal in world.dungeon_portals[player]:
+        if not portal.destination and not portal.deadEnd:
+            if portal.door.name == 'TR Lazy Eyes SE':
+                world.get_room(0x23, player).change(0, DoorKind.DungeonEntrance)
+            if portal.door.name == 'TR Eye Bridge SW':
+                world.get_room(0xd5, player).change(0, DoorKind.DungeonEntrance)
+
     if not world.swamp_patch_required[player]:
         swamp_region = world.get_entrance('Swamp Palace', player).connected_region
         if swamp_region.name != 'Swamp Lobby':
@@ -905,27 +913,13 @@ def cross_dungeon(world, player):
                 state.visit_region(start_area)
                 state.add_all_doors_check_unattached(start_area, world, player)
                 explore_state(state, world, player)
-                if state.visited(sanctuary):
+                if state.visited_at_all(sanctuary):
                     reachable_portals.append(portal)
             world.sanc_portal[player] = random.choice(reachable_portals)
 
-    for portal in world.dungeon_portals[player]:
-        if portal.door.roomIndex >= 0:
-            room = world.get_room(portal.door.roomIndex, player)
-            if room.palette is None:
-                name = portal.door.entrance.parent_region.dungeon.name
-                room.palette = palette_map[name]
+    check_entrance_fixes(world, player)
 
-    for name, builder in dungeon_builders.items():
-        for region in builder.master_sector.regions:
-            for ext in region.exits:
-                if ext.door and ext.door.roomIndex >= 0:
-                    room = world.get_room(ext.door.roomIndex, player)
-                    if room.palette is None:
-                        room.palette = palette_map[name]
-    eastfairies = world.get_room(0x89, player)
-    eastfairies.palette = palette_map[world.get_region('Eastern Courtyard', player).dungeon.name]
-    # other ones that could use programmatic treatment:  Skull Boss x29, Hera Fairies xa7, Ice Boss xde
+    palette_assignment(world, player)
 
     refine_hints(dungeon_builders)
 
@@ -1024,6 +1018,91 @@ def reassign_boss(boss_region, boss_key, builder, gt, world, player):
         if new_dungeon != gt:
             gt_boss = gt.bosses.pop(boss_key)
             new_dungeon.bosses[boss_key] = gt_boss
+
+
+def check_entrance_fixes(world, player):
+    # I believe these modes will be fine
+    if world.shuffle[player] not in ['insanity', 'insanity_legacy', 'madness_legacy']:
+        checks = {
+            'Palace of Darkness': 'pod',
+            'Skull Woods Final Section': 'sw',
+            'Turtle Rock': 'tr',
+            'Ganons Tower': 'gt',
+        }
+        if world.mode[player] == 'inverted':
+            del checks['Ganons Tower']
+        for ent_name, key in checks.items():
+            entrance = world.get_entrance(ent_name, player)
+            if entrance.connected_region.dungeon:
+                layout = world.dungeon_layouts[player][entrance.connected_region.dungeon.name]
+                if 'Sanctuary' in layout.master_sector.region_set():
+                    world.force_fix[player][key] = True
+
+
+def palette_assignment(world, player):
+    for portal in world.dungeon_portals[player]:
+        if portal.door.roomIndex >= 0:
+            room = world.get_room(portal.door.roomIndex, player)
+            if room.palette is None:
+                name = portal.door.entrance.parent_region.dungeon.name
+                room.palette = palette_map[name][0]
+
+    for name, builder in world.dungeon_layouts[player].items():
+        for region in builder.master_sector.regions:
+            for ext in region.exits:
+                if ext.door and ext.door.roomIndex >= 0 and ext.door.name not in palette_non_influencers:
+                    room = world.get_room(ext.door.roomIndex, player)
+                    if room.palette is None:
+                        room.palette = palette_map[name][0]
+
+    for name, tuple in palette_map.items():
+        if tuple[1] is not None:
+            door_name = boss_indicator[name][1]
+            door = world.get_door(door_name, player)
+            room = world.get_room(door.roomIndex, player)
+            room.palette = tuple[1]
+            if tuple[2]:
+                leading_door = world.get_door(tuple[2], player)
+                ent = next(iter(leading_door.entrance.parent_region.entrances))
+                if ent.door and door.roomIndex:
+                    room = world.get_room(door.roomIndex, player)
+                    room.palette = tuple[1]
+
+
+    rat_path = world.get_region('Sewers Rat Path', player)
+    visited_rooms = set()
+    visited_regions = {rat_path}
+    queue = deque([(rat_path, 0)])
+    while len(queue) > 0:
+        region, dist = queue.popleft()
+        if dist > 5:
+            continue
+        for ext in region.exits:
+            if ext.door and ext.door.roomIndex >= 0 and ext.door.name not in palette_non_influencers:
+                room_idx = ext.door.roomIndex
+                if room_idx not in visited_rooms:
+                    room = world.get_room(room_idx, player)
+                    room.palette = 0x1
+                    visited_rooms.add(room_idx)
+            if ext.door and ext.door.type in [DoorType.SpiralStairs, DoorType.Ladder]:
+                if ext.door.dest and ext.door.dest.roomIndex:
+                    visited_rooms.add(ext.door.dest.roomIndex)
+                    if ext.connected_region:
+                        visited_regions.add(ext.connected_region)
+            elif ext.connected_region and ext.connected_region.type == RegionType.Dungeon and ext.connected_region not in visited_regions:
+                queue.append((ext.connected_region, dist+1))
+                visited_regions.add(ext.connected_region)
+
+    for connection in ['Sanctuary S', 'Sanctuary N']:
+        adjacent = world.get_entrance(connection, player)
+        if adjacent.door.dest and adjacent.door.dest.entrance.parent_region.type == RegionType.Dungeon:
+            if adjacent.door and adjacent.door.dest and adjacent.door.dest.roomIndex >= 0:
+                room = world.get_room(adjacent.door.dest.roomIndex, player)
+                room.palette = 0x1d
+
+    eastfairies = world.get_room(0x89, player)
+    eastfairies.palette = palette_map[world.get_region('Eastern Courtyard', player).dungeon.name][0]
+    # other ones that could use programmatic treatment:  Skull Boss x29, Hera Fairies xa7, Ice Boss xde (Ice Fairies!)
 
 
 def refine_hints(dungeon_builders):
@@ -2525,14 +2604,49 @@ boss_indicator = {
     'Ganons Tower': (0x1a, 'GT Agahnim 2 SW')
 }
 
+# tuples: (non-boss, boss)
+# see Utils for other notes
 palette_map = {
-    'Hyrule Castle': 0x0, 'Eastern Palace': 0xb, 'Desert Palace': 0x4, 'Agahnims Tower': 0xc,
-    'Swamp Palace': 0x8, 'Palace of Darkness': 0x10, 'Misery Mire': 0x11, 'Skull Woods': 0xe,
-    'Ice Palace': 0x14, 'Tower of Hera': 0x6, 'Thieves Town': 0x17, 'Turtle Rock': 0x19,
-    'Ganons Tower': 0x1b
+    'Hyrule Castle': (0x0, None),
+    'Eastern Palace': (0xb, None),
+    'Desert Palace': (0x9, 0x4, 'Desert Boss SW'),
+    'Agahnims Tower': (0x0, 0xc, 'Tower Agahnim 1 SW'),  # ancillary 0x26 for F1, F4
+    'Swamp Palace': (0xa, 0x8, 'Swamp Boss SW'),
+    'Palace of Darkness': (0xf, 0x10, 'PoD Boss SE'),
+    'Misery Mire': (0x11, 0x12, 'Mire Boss SW'),
+    'Skull Woods': (0xd, 0xe, 'Skull Spike Corner SW'),
+    'Ice Palace': (0x13, 0x14, 'Ice Antechamber NE'),
+    'Tower of Hera': (0x6, None),
+    'Thieves Town': (0x17, None),  # the attic uses 0x23
+    'Turtle Rock': (0x18, 0x19, 'TR Boss SW'),
+    'Ganons Tower': (0x28, 0x1b, 'GT Agahnim 2 SW'),  # other palettes: 0x1a (other) 0x24 (Gauntlet - Lanmo) 0x25 (conveyor-torch-wizzrode moldorm pit f5?)
 }
 
-# todo: inverted
+# implications:
+# pipe room -> where lava chest is
+# dark alley -> where pod basement is
+# conveyor star or hidden star -> where DMs room is
+# falling bridge -> where Rando room is
+# petting zoo -> where firesnake is
+# basement cage -> where tile room is
+# bob's room -> where big chest/hope/torch are
+# invis bridges -> compass room
+
+palette_non_influencers = {
+    'PoD Shooter Room Up Stairs', 'TR Lava Dual Pipes EN', 'TR Lava Dual Pipes WN', 'TR Lava Dual Pipes SW',
+    'TR Lava Escape SE', 'TR Lava Escape NW', 'PoD Arena Ledge ES', 'Swamp Big Key Ledge WN', 'Swamp Hub Dead Ledge EN',
+    'Swamp Map Ledge EN', 'Skull Pot Prison ES', 'Skull Pot Prison SE', 'PoD Dark Alley NE', 'GT Conveyor Star Pits EN',
+    'GT Hidden Star ES', 'GT Falling Bridge WN', 'GT Falling Bridge WS', 'GT Petting Zoo SE',
+    'Hera Basement Cage Up Stairs', "GT Bob's Room SE", 'GT Warp Maze (Pits) ES', 'GT Invisible Bridges WS',
+    'Mire Over Bridge E', 'Mire Over Bridge W', 'Eastern Courtyard Ledge S', 'Eastern Courtyard Ledge W',
+    'Eastern Courtyard Ledge E', 'Eastern Map Valley WN', 'Eastern Map Valley SW', 'Mire BK Door Room EN',
+    'Mire BK Door Room N', 'TR Tile Room SE', 'TR Tile Room NE', 'TR Refill SE', 'Eastern Cannonball Ledge WN',
+    'Eastern Cannonball Ledge Key Door EN', 'Mire Neglected Room SE', 'Mire Neglected Room NE', 'Mire Chest View NE',
+    'TR Compass Room NW', 'Desert Dead End Edge', 'Hyrule Dungeon South Abyss Catwalk North Edge',
+    'Hyrule Dungeon South Abyss Catwalk West Edge'
+}
+
+
 portal_map = {
     'Sanctuary': ('Sanctuary', 'Sanctuary Exit'),
     'Hyrule Castle West': ('Hyrule Castle Entrance (West)', 'Hyrule Castle Exit (West)'),

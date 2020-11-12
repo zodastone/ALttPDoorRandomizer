@@ -2,21 +2,22 @@
 
 * Lobby shuffle added as Intensity level 3
 	* Can now be found in the spoiler
+	* Palette changes:
+		* Certain doors/transition no longer have an effect on the palette choice (dead ends mostly or just bridges)
+		* Sanctuary palette back to the adjacent rooms to Sanctuary (sanctuary stays the dungeon color for now)
+		* Sewer palette comes back for part of Hyrule Castle for areas "near" the sewer dropdown
 	* Known issues:
-		* If a dungeon is vanilla in ER and Sanc is in that dungeon and the dungeon has an entrance that needs to let link out: is broken.
-			* e.g. PoD, GT, TR
-		* Some TR lobbies that need a bomb aren't pre-opened.
-		* Palettes aren't perfect - may add Sanctuary and Sewer palette back. May add a way to turn off palette "fixing"
+		* Palettes aren't perfect 
+			May add a way to turn off palette "fixing"
 			* Some ugly colors
-			* Invisible floors can be see in many palettes
-		* Animated tiles aren't loaded correctly in lobbies
-		* If a wallmaster grabs you and the lobby is dark, the lamp doesn't turn on
+			* Invisible floors can be see in many palettes		
 * --keydropshuffle added (coming to the GUI soon). This add 33 new locations to the game where keys are found under pots
 and where enemies drop keys. This includes 32 small key location and the ball and chain guard who normally drop the HC
 Big Key. 
 	* Overall location count updated
 	* Setting mentioned in spoiler
-	* GT Big Key count / total location count needs to be updated
+	* Known issue:
+		* GT Big Key count needs to be updated
 * --mixed_travel setting added
 	* Due to Hammerjump, Hovering in PoD Arena, and the Mire Big Key Chest bomb jump two sections of a supertile that are
 otherwise unconnected logically can be reach using these glitches. To prevent the player from unintentionally
@@ -35,6 +36,16 @@ otherwise unconnected logically can be reach using these glitches. To prevent th
 
 # Bug Fixes
 
+* 2.0.10u
+	* Fix POD, TR, GT and SKULL 3 entrance if sanc ends up in that dungeon in crossed ER+
+	* TR Lobbies that need a bomb and can be entered before bombing should be pre-opened
+	* Animated tiles are loaded correctly in lobbies
+	* If a wallmaster grabs you and the lobby is dark, the lamp turns on now
+	* Certain key rules no longer override item requirements (e.g. Somaria behind TR Hub)
+	* Old Man Cave is correctly one way in the graph
+	* Some key logic fixes
+* 2.0.9-u
+	* /missing command in MultiClient fixed
 * 2.0.8-u
 	* Player sprite disappears after picking up a key drop in keydropshuffle
 	* Sewers and Hyrule Castle compass problems

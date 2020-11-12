@@ -24,7 +24,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '16fab813f3cbef58c66a47595a3858ee'
+RANDOMIZERBASEHASH = 'e16cc8659527baecc02e3b49b83fa49b'
 
 
 class JsonRom(object):
@@ -621,8 +621,9 @@ def patch_rom(world, rom, player, team, enemized):
 
     # setup dr option flags based on experimental, etc.
     dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' else DROptions.Town_Portal
-    if world.experimental[player]:
+    if world.doorShuffle[player] == 'crossed':
         dr_flags |= DROptions.Map_Info
+    if world.experimental[player]:
         dr_flags |= DROptions.Debug
     if world.doorShuffle[player] == 'crossed' and world.logic[player] != 'nologic'\
        and world.mixed_travel[player] == 'prevent':
@@ -703,9 +704,17 @@ def patch_rom(world, rom, player, team, enemized):
             if portal.boss_exit_idx > -1:
                 rom.write_byte(0x7939 + portal.boss_exit_idx, portal.current_room())
 
-    # fix skull woods exit, if not fixed during exit patching
-    if world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla':
+    world.force_fix[player]['sw'] |= world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla'
+
+    # fix exits, if not fixed during exit patching
+    if world.force_fix[player]['sw']:
         write_int16(rom, 0x15DB5 + 2 * exit_ids['Skull Woods Final Section Exit'][1], 0x00F8)
+    if world.force_fix[player]['pod']:
+        write_int16(rom, 0x15DB5 + 2 * exit_ids['Palace of Darkness Exit'][1], 0x0640)
+    if world.force_fix[player]['tr']:
+        write_int16(rom, 0x15DB5 + 2 * exit_ids['Turtle Rock Exit (Front)'][1], 0x0134)
+    if world.force_fix[player]['gt']:
+        write_int16(rom, 0x15DB5 + 2 * exit_ids['Ganons Tower Exit'][1], 0x00A4)
 
     write_custom_shops(rom, world, player)
 

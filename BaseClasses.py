@@ -129,6 +129,7 @@ class World(object):
 
             set_player_attr('keydropshuffle', False)
             set_player_attr('mixed_travel', 'prevent')
+            set_player_attr('force_fix', {'gt': False, 'sw': False, 'pod': False, 'tr': False});
 
     def get_name_string_for_object(self, obj):
         return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_names(obj.player)})'

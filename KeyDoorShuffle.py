@@ -1389,7 +1389,7 @@ def create_key_counters(key_layout, world, player):
             if door.bigKey or door.name in special_big_key_doors:
                 key_layout.key_logic.bk_doors.add(door)
             # open the door, if possible
-            if not door.bigKey or not child_state.big_key_special or child_state.visited(special_region):
+            if not door.bigKey or not child_state.big_key_special or child_state.visited_at_all(special_region):
                 open_a_door(door, child_state, flat_proposal)
                 expand_key_state(child_state, flat_proposal, world, player)
                 code = state_id(child_state, key_layout.flat_prop)

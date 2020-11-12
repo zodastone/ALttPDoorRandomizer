@@ -1067,7 +1067,7 @@ def extend_reachable_state_improved(search_regions, state, proposed_map, all_reg
         explorable_door = local_state.next_avail_door()
         if explorable_door.door.bigKey:
             if bk_flag:
-                big_not_found = not special_big_key_found(local_state, world, player) if local_state.big_key_special else local_state.count_locations_exclude_specials() == 0
+                big_not_found = not special_big_key_found(local_state) if local_state.big_key_special else local_state.count_locations_exclude_specials() == 0
                 if big_not_found:
                     continue  # we can't open this door
         if explorable_door.door in proposed_map:
@@ -1083,9 +1083,11 @@ def extend_reachable_state_improved(search_regions, state, proposed_map, all_reg
     return local_state
 
 
-def special_big_key_found(state, world, player):
-    cellblock = world.get_region('Hyrule Dungeon Cellblock', player)
-    return state.visited(cellblock)
+def special_big_key_found(state):
+    for location in state.found_locations:
+        if location.forced_item and location.forced_item.bigkey:
+            return True
+    return False
 
 
 def valid_region_to_explore_in_regions(region, all_regions, world, player):

@@ -33,6 +33,22 @@ GfxFixer:
     rtl
 }
 
+FixAnimatedTiles:
+	LDA.L DRMode : cmp #$02 : bne +
+		PHX
+			LDX $A0 : LDA.l TilesetTable, x
+			CMP $0AA1 : beq ++
+				TAX : PLA : BRA +
+			++
+		PLX
+	+ LDA $02802E, X ; what we wrote over
+	RTL
+
+FixWallmasterLamp:
+ORA $0458
+STY $1C : STA $1D : RTL ; what we wrote over
+
+
 CgramAuxToMain: ; ripped this from bank02 because it ended with rts
 {
     rep #$20

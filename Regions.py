@@ -100,7 +100,8 @@ def create_regions(world, player):
         create_lw_region(player, 'Hyrule Castle Ledge', None, ['Hyrule Castle Entrance (East)', 'Hyrule Castle Entrance (West)', 'Agahnims Tower', 'Hyrule Castle Ledge Courtyard Drop']),
         create_dungeon_region(player, 'Sewer Drop', 'a drop\'s exit', None, ['Sewer Drop']),  # This exists only to be referenced for access checks
 
-        create_cave_region(player, 'Old Man Cave', 'a connector', ['Old Man'], ['Old Man Cave Exit (East)', 'Old Man Cave Exit (West)']),
+        create_cave_region(player, 'Old Man Cave', 'a connector', ['Old Man'], ['Old Man Cave Exit (East)']),
+        create_cave_region(player, 'Old Man Cave Ledge', 'a connector', None, ['Old Man Cave Exit (West)', 'Old Man Cave Dropdown']),
         create_cave_region(player, 'Old Man House', 'a connector', None, ['Old Man House Exit (Bottom)', 'Old Man House Front to Back']),
         create_cave_region(player, 'Old Man House Back', 'a connector', None, ['Old Man House Exit (Top)', 'Old Man House Back to Front']),
         create_lw_region(player, 'Death Mountain', None, ['Old Man Cave (East)', 'Old Man House (Bottom)', 'Old Man House (Top)', 'Death Mountain Return Cave (East)', 'Spectacle Rock Cave', 'Spectacle Rock Cave Peak', 'Spectacle Rock Cave (Bottom)', 'Broken Bridge (West)', 'Death Mountain Teleporter']),

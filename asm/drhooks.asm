@@ -62,6 +62,12 @@ nop #5
 org $01b618 ; Bank01.asm : 7963 Dungeon_LoadHeader (REP #$20 : INY : LDA [$0D], Y)
 nop : jsl OverridePaletteHeader
 
+org $02817e ; Bank02.asm : 414 (LDA $02811E, X)
+jsl FixAnimatedTiles
+
+org $028a06 ; Bank02.asm : 1941 Dungeon_ResetTorchBackgroundAndPlayer
+JSL FixWallmasterLamp
+
 org $00d377 ;Bank 00 line 3185
 DecompDungAnimatedTiles:
 org $00fda4 ;Bank 00 line 8882
