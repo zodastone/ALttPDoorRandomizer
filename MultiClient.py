@@ -769,7 +769,7 @@ async def console_loop(ctx : Context):
                     get_location_name_from_address(item.location), index, len(ctx.items_received)))
 
         if command[0] == '/missing':
-            for location in [k for k, v in Regions.lookup_name_to_id.items() if type(v[0]) is int]:
+            for location in [k for k, v in Regions.lookup_name_to_id.items() if type(v) is int]:
                 if location not in ctx.locations_checked:
                     logging.info('Missing: ' + location)
         if command[0] == '/getitem' and len(command) > 1:
