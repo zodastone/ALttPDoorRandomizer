@@ -24,7 +24,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes, fill_specific_items
 from Utils import output_path, parse_player_names
 
-__version__ = '0.2.0.11u'
+__version__ = '0.2.0.12u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -208,6 +208,9 @@ def main(args, seed=None, fish=None):
                 use_enemizer = (world.boss_shuffle[player] != 'none' or world.enemy_shuffle[player] != 'none'
                                 or world.enemy_health[player] != 'default' or world.enemy_damage[player] != 'default'
                                 or args.shufflepots[player] or sprite_random_on_hit)
+
+                if use_enemizer:
+                    base_patch = LocalRom(args.rom)  # update base2current.json
 
                 rom = JsonRom() if args.jsonout or use_enemizer else LocalRom(args.rom)
 
