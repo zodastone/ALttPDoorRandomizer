@@ -40,7 +40,15 @@ def link_doors(world, player):
             connect_two_way(world, entrance, ext, player)
         for entrance, ext in straight_staircases:
             connect_two_way(world, entrance, ext, player)
-            
+
+    if world.intensity[player] < 3 or world.doorShuffle == 'vanilla':
+        mirror_route = world.get_entrance('Sanctuary Mirror Route', player)
+        mr_door = mirror_route.door
+        sanctuary = mirror_route.parent_region
+        sanctuary.exits.remove(mirror_route)
+        world.remove_entrance(mirror_route, player)
+        world.remove_door(mr_door, player)
+
     connect_custom(world, player)
 
     find_inaccessible_regions(world, player)
@@ -637,6 +645,11 @@ def within_dungeon(world, player):
     logging.getLogger('').info('%s: %s', world.fish.translate("cli", "cli", "keydoor.shuffle.time"), time.process_time()-start)
     smooth_door_pairs(world, player)
 
+    if world.intensity[player] >= 3:
+        portal = world.get_portal('Sanctuary', player)
+        target = portal.door.entrance.parent_region
+        connect_simple_door(world, 'Sanctuary Mirror Route', target, player)
+
 
 def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info):
     dungeon_entrances, split_dungeon_entrances, world, player = builder_info
@@ -916,10 +929,18 @@ def cross_dungeon(world, player):
                 if state.visited_at_all(sanctuary):
                     reachable_portals.append(portal)
             world.sanc_portal[player] = random.choice(reachable_portals)
+    if world.intensity[player] >= 3:
+        if player in world.sanc_portal:
+            portal = world.sanc_portal[player]
+        else:
+            portal = world.get_portal('Sanctuary', player)
+        target = portal.door.entrance.parent_region
+        connect_simple_door(world, 'Sanctuary Mirror Route', target, player)
 
     check_entrance_fixes(world, player)
 
-    palette_assignment(world, player)
+    if world.standardize_palettes[player] == 'standardize':
+        palette_assignment(world, player)
 
     refine_hints(dungeon_builders)
 
@@ -1093,6 +1114,10 @@ def palette_assignment(world, player):
                 queue.append((ext.connected_region, dist+1))
                 visited_regions.add(ext.connected_region)
 
+    sanc = world.get_region('Sanctuary', player)
+    if sanc.dungeon.name == 'Hyrule Castle':
+        room = world.get_room(0x12, player)
+        room.palette = 0x1d
     for connection in ['Sanctuary S', 'Sanctuary N']:
         adjacent = world.get_entrance(connection, player)
         if adjacent.door.dest and adjacent.door.dest.entrance.parent_region.type == RegionType.Dungeon:
@@ -1143,7 +1168,7 @@ def convert_to_sectors(region_names, world, player):
                             if existing not in matching_sectors:
                                 matching_sectors.append(existing)
             else:
-                if door and not door.controller and not door.dest and not door.entranceFlag:
+                if door and not door.controller and not door.dest and not door.entranceFlag and door.type != DoorType.Logical:
                     outstanding_doors.append(door)
         sector = Sector()
         if not new_sector:
@@ -1418,7 +1443,8 @@ def find_key_door_candidates(region, checked, world, player):
                             valid = True
                 if valid and d not in candidates:
                     candidates.append(d)
-                if ext.connected_region.type != RegionType.Dungeon or ext.connected_region.dungeon == dungeon:
+                connected = ext.connected_region
+                if connected and (connected.type != RegionType.Dungeon or connected.dungeon == dungeon):
                     queue.append((ext.connected_region, d, current))
                 if d is not None:
                     checked_doors.append(d)
@@ -1815,6 +1841,8 @@ class DROptions(Flag):
     Map_Info = 0x04
     Debug = 0x08
     Rails = 0x10  # If on, draws rails
+    OriginalPalettes = 0x20
+    Reserved = 0x40  # Reserved for PoD sliding wall?
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
 
 

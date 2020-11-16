@@ -978,21 +978,31 @@ def filter_big_chest(locations):
     return [x for x in locations if '- Big Chest' not in x.name]
 
 
+def count_locations_exclude_logic(locations, key_logic):
+    cnt = 0
+    for loc in locations:
+        if loc not in key_logic.bk_restricted and not loc.forced_item and not prize_or_event(loc):
+                cnt += 1
+    return cnt
+
+
+def prize_or_event(loc):
+    return loc.name in dungeon_events or '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2']
+
+
 def count_free_locations(state):
     cnt = 0
     for loc in state.found_locations:
-        if '- Prize' not in loc.name and loc.name not in dungeon_events and not loc.forced_item:
-            if loc.name not in ['Agahnim 1', 'Agahnim 2']:
-                cnt += 1
+        if not prize_or_event(loc) and not loc.forced_item:
+            cnt += 1
     return cnt
 
 
 def count_locations_exclude_big_chest(state):
     cnt = 0
     for loc in state.found_locations:
-        if '- Big Chest' not in loc.name and '- Prize' not in loc.name and loc.name not in dungeon_events:
-            if not loc.forced_item and loc.name not in ['Agahnim 1', 'Agahnim 2']:
-                cnt += 1
+        if '- Big Chest' not in loc.name and not loc.forced_item and not prize_or_event(loc):
+            cnt += 1
     return cnt
 
 

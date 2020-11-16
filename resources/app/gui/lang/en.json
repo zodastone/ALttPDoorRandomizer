@@ -77,6 +77,10 @@
     "randomizer.dungeon.mixed_travel.allow": "Allow Mixed Dungeon Travel",
     "randomizer.dungeon.mixed_travel.force": "Force Reachable Areas to Same Dungeon",
 
+    "randomizer.dungeon.standardize_palettes": "Crossed Dungeon Palette ",
+    "randomizer.dungeon.standardize_palettes.standardize": "Standardize Palettes",
+    "randomizer.dungeon.standardize_palettes.original": "Keep Original Palettes",
+
     "randomizer.enemizer.potshuffle": "Pot Shuffle",
 
     "randomizer.enemizer.enemyshuffle": "Enemy Shuffle",

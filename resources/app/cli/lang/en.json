@@ -251,6 +251,11 @@
       "Allow:     Take the rails off, \"I know what I'm doing\"",
       "Force:     Force these troublesome connections to be in the same dungeon (but not in logic). No rails will appear"
     ],
+    "standardize_palettes": [
+      "In cross dungeon shuffle, we can keep the rooms original palette or attempt to standardize them",
+      "Standardize: Attempts to make the palette the same between dungeons",
+      "Original:    Dungeons rooms retain original palettes"
+    ],
     "retro": [
       "Keys are universal, shooting arrows costs rupees,",
       "and a few other little things make this more like Zelda-1. (default: %(default)s)"

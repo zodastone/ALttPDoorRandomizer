@@ -153,6 +153,9 @@ JSL StoreTempBunnyState
 org $08c450 ; <- ancilla_receive_item.asm : 146-148 (STY $5D : STZ $02D8)
 JSL RetrieveBunnyState : NOP
 
+org $02d9ce ; <- Bank02.asm : Dungeon_LoadEntrance 10829 (STA $A0 : STA $048E)
+JSL CheckDarkWorldSanc : NOP
+
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes
 ; Hera BK door back can be seen with Pot clipping - likely useful for no logic seeds

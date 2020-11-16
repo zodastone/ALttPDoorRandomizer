@@ -121,20 +121,19 @@ KeyGet:
         lda $a0 : cmp #$87 : bne +
         	jsr ShouldKeyBeCountedForDungeon : bcc -
         		jsl CountChestKeyLong : bra -
-        + phy
-            jsr KeyGetPlayer : sta !MULTIWORLD_ITEM_PLAYER_ID
-            jsl.l $0791b3 ; Player_HaltDashAttackLong
-            jsl.l Link_ReceiveItem
-        pla : sta $00
-        lda !MULTIWORLD_ITEM_PLAYER_ID : bne .end
-        phx
-            lda $040c : lsr : tax
-            lda $00 : cmp KeyTable, x : bne +
-                - plx : pla : rtl
-            + cmp #$af : beq - ; universal key
-            cmp #$24 : beq -   ; small key for this dungeon
-        plx
-    .end
+        + sty $00
+		jsr KeyGetPlayer : sta !MULTIWORLD_ITEM_PLAYER_ID
+		lda !MULTIWORLD_ITEM_PLAYER_ID : bne .receive
+		phx
+			lda $040c : lsr : tax
+			lda $00 : cmp KeyTable, x : bne +
+					- plx : pla : rtl
+			+ cmp #$af : beq - ; universal key
+			cmp #$24 : beq -   ; small key for this dungeon
+		plx
+		.receive
+		jsl.l $0791b3 ; Player_HaltDashAttackLong
+		jsl.l Link_ReceiveItem
     pla : dec : rtl
 }
 

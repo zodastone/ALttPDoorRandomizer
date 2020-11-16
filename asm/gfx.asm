@@ -34,7 +34,8 @@ GfxFixer:
 }
 
 FixAnimatedTiles:
-	LDA.L DRMode : cmp #$02 : bne +
+	LDA.L DRMode : CMP #$02 : BNE +
+	LDA $040C : CMP.b #$FF : BEQ +
 		PHX
 			LDX $A0 : LDA.l TilesetTable, x
 			CMP $0AA1 : beq ++
@@ -74,6 +75,7 @@ CgramAuxToMain: ; ripped this from bank02 because it ended with rts
 
 OverridePaletteHeader:
 	lda.l DRMode : cmp #$02 : bne +
+	lda.l DRFlags : and #$20 : bne +
 	cpx #$01c2 : !bge +
 		rep #$20
 		txa : lsr : tax

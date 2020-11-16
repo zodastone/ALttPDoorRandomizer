@@ -71,6 +71,16 @@ The rooms are left alone and it is up to the discretion of the player whether to
 
 The two disjointed sections are forced to be in the same dungeon but never logically required to complete that game.
 
+### Standardize Palettes (--standardize_palettes)
+No effect if door shuffle is not on crossed
+
+#### Standardize
+Rooms in the same dungeon have their palettes changed to match. Hyrule Castle is split between Sewer and HC palette.
+Rooms adjacent to sanctuary get their coloring to match sanc.
+
+#### Original
+Room keep their original palettes.
+
 
 ## Map/Compass/Small Key/Big Key shuffle (aka Keysanity)
 

@@ -91,7 +91,8 @@ SETTINGSTOPROCESS = {
       "dungeonintensity": "intensity",
       "experimental": "experimental",
       "dungeon_counters": "dungeon_counters",
-      "mixed_travel": "mixed_travel"
+      "mixed_travel": "mixed_travel",
+      "standardize_palettes": "standardize_palettes",
     },
     "gameoptions": {
       "hints": "hints",

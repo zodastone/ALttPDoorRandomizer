@@ -4,7 +4,7 @@ from BaseClasses import Region, Location, Entrance, RegionType, Shop, ShopType
 
 def create_regions(world, player):
     world.regions += [
-        create_lw_region(player, 'Menu', None, ['Links House S&Q', 'Sanctuary S&Q', 'Old Man S&Q']),
+        create_menu_region(player, 'Menu', None, ['Links House S&Q', 'Sanctuary S&Q', 'Old Man S&Q']),
         create_lw_region(player, 'Light World', ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'Purple Chest'],
                          ["Blinds Hideout", "Hyrule Castle Secret Entrance Drop", 'Zoras River', 'Kings Grave Outer Rocks', 'Dam',
                           'Links House', 'Tavern North', 'Chicken House', 'Aginahs Cave', 'Sahasrahlas Hut', 'Kakariko Well Drop', 'Kakariko Well Cave',
@@ -273,7 +273,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Sewers Pull Switch', 'Hyrule Castle', None, ['Sewers Pull Switch N', 'Sewers Pull Switch S']),
         create_dungeon_region(player, 'Sanctuary', 'Hyrule Castle',
                               ['Sanctuary'] if not std_flag else ['Sanctuary', 'Zelda Drop Off'],
-                              ['Sanctuary S', 'Sanctuary N']),
+                              ['Sanctuary S', 'Sanctuary N', 'Sanctuary Mirror Route']),
 
         # Eastern Palace
         create_dungeon_region(player, 'Eastern Lobby', 'Eastern Palace', None, ['Eastern Lobby N', 'Eastern Lobby S', 'Eastern Lobby NW', 'Eastern Lobby NE']),
@@ -788,14 +788,21 @@ def create_dungeon_regions(world, player):
     world.get_region('GT Crystal Circles', player).crystal_switch = True
 
 
+def create_menu_region(player, name, locations=None, exits=None):
+    return _create_region(player, name, RegionType.Menu, 'Menu', locations, exits)
+
+
 def create_lw_region(player, name, locations=None, exits=None):
     return _create_region(player, name, RegionType.LightWorld, 'Light World', locations, exits)
+
 
 def create_dw_region(player, name, locations=None, exits=None):
     return _create_region(player, name, RegionType.DarkWorld, 'Dark World', locations, exits)
 
+
 def create_cave_region(player, name, hint='Hyrule', locations=None, exits=None):
     return _create_region(player, name, RegionType.Cave, hint, locations, exits)
+
 
 def create_dungeon_region(player, name, hint='Hyrule', locations=None, exits=None):
     return _create_region(player, name, RegionType.Dungeon, hint, locations, exits)

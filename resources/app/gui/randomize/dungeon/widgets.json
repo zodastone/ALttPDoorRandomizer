@@ -35,11 +35,22 @@
     },
     "mixed_travel": {
       "type" : "selectbox",
-      "default": "auto",
+      "default": "prevent",
       "options": [
         "prevent",
         "allow",
         "force"
+      ],
+      "config": {
+        "width": 35
+      }
+    },
+    "standardize_palettes" : {
+      "type": "selectbox",
+      "default": "standardize",
+      "options": [
+        "standardize",
+        "original"
       ],
       "config": {
         "width": 35

@@ -14,6 +14,7 @@ import bps.io
 from BaseClasses import CollectionState, ShopType, Region, Location, DoorType, RegionType
 from DoorShuffle import compass_data, DROptions, boss_indicator
 from Dungeons import dungeon_music_addresses
+from KeyDoorShuffle import count_locations_exclude_logic
 from Regions import location_table
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
 from Text import Uncle_texts, Ganon1_texts, TavernMan_texts, Sahasrahla2_texts, Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
@@ -24,7 +25,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'e16cc8659527baecc02e3b49b83fa49b'
+RANDOMIZERBASEHASH = 'f6be3fdaac906a2217e7ee328e27b95b'
 
 
 class JsonRom(object):
@@ -623,11 +624,13 @@ def patch_rom(world, rom, player, team, enemized):
     dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' else DROptions.Town_Portal
     if world.doorShuffle[player] == 'crossed':
         dr_flags |= DROptions.Map_Info
-    if world.experimental[player]:
+    if world.experimental[player] and world.goal[player] != 'triforcehunt':
         dr_flags |= DROptions.Debug
     if world.doorShuffle[player] == 'crossed' and world.logic[player] != 'nologic'\
        and world.mixed_travel[player] == 'prevent':
         dr_flags |= DROptions.Rails
+    if world.standardize_palettes[player] == 'original':
+        dr_flags |= DROptions.OriginalPalettes
 
 
     # fix hc big key problems (map and compass too)
@@ -656,6 +659,9 @@ def patch_rom(world, rom, player, team, enemized):
             rom.write_byte(0x13f038+offset*2, bk_status)
         if player in world.sanc_portal.keys():
             rom.write_byte(0x159a6, world.sanc_portal[player].ent_offset)
+            sanc_region = world.sanc_portal[player].door.entrance.parent_region
+            if sanc_region.is_dark_world and not sanc_region.is_light_world:
+                rom.write_byte(0x13ff00, 1)
         for room in world.rooms:
             if room.player == player and room.palette is not None:
                 rom.write_byte(0x13f200+room.index, room.palette)
@@ -723,10 +729,10 @@ def patch_rom(world, rom, player, team, enemized):
         # bot: $7A is 1, 7B is 2, etc so 7D=4, 82=9 (zero unknown...)
         return 0x53+num, 0x79+num
 
-    # collection rate address: 238C37
-
     if world.keydropshuffle[player]:
         rom.write_byte(0x140000, 1)
+        rom.write_byte(0x187010, 249)  # dynamic credits
+        # collection rate address: 238C37
         mid_top, mid_bot = credits_digit(4)
         last_top, last_bot = credits_digit(9)
         # top half
@@ -735,6 +741,23 @@ def patch_rom(world, rom, player, team, enemized):
         # bottom half
         rom.write_byte(0x118C71, mid_bot)
         rom.write_byte(0x118C72, last_bot)
+
+    if world.keydropshuffle[player] or world.doorShuffle[player] != 'vanilla':
+        gt = world.dungeon_layouts[player]['Ganons Tower']
+        gt_logic = world.key_logic[player]['Ganons Tower']
+        total = 0
+        for region in gt.master_sector.regions:
+            total += count_locations_exclude_logic(region.locations, gt_logic)
+        rom.write_byte(0x187012, total)  # dynamic credits
+        # gt big key address: 238B59
+        mid_top, mid_bot = credits_digit(total // 10)
+        last_top, last_bot = credits_digit(total % 10)
+        # top half
+        rom.write_byte(0x118B75, mid_top)
+        rom.write_byte(0x118B76, last_top)
+        # bottom half
+        rom.write_byte(0x118B93, mid_bot)
+        rom.write_byte(0x118B94, last_bot)
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':

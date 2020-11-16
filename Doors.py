@@ -120,6 +120,7 @@ def create_doors(world, player):
         # logically one way the sanc, but should be linked - also toggle
         create_door(player, 'Sanctuary N', Nrml).dir(No, 0x12, Mid, High).no_exit().toggler().pos(0),
         create_door(player, 'Sanctuary S', Nrml).dir(So, 0x12, Mid, High).pos(2).portal(Z, 0x22, 1),
+        create_door(player, 'Sanctuary Mirror Route', Lgcl),
 
         # Eastern Palace
         create_door(player, 'Eastern Lobby S', Nrml).dir(So, 0xc9, Mid, High).pos(4).portal(Z, 0x20),

@@ -129,6 +129,7 @@ class World(object):
 
             set_player_attr('keydropshuffle', False)
             set_player_attr('mixed_travel', 'prevent')
+            set_player_attr('standardize_palettes', 'standardize')
             set_player_attr('force_fix', {'gt': False, 'sw': False, 'pod': False, 'tr': False});
 
     def get_name_string_for_object(self, obj):
@@ -147,6 +148,11 @@ class World(object):
     def initialize_doors(self, doors):
         for door in doors:
             self._door_cache[(door.name, door.player)] = door
+
+    def remove_door(self, door, player):
+        if (door, player) in self._door_cache.keys():
+            del self._door_cache[(door, player)]
+        self.doors.remove(door)
 
     def get_regions(self, player=None):
         return self.regions if player is None else self._region_cache[player].values()
@@ -175,6 +181,10 @@ class World(object):
                         self._entrance_cache[(entrance, player)] = exit
                         return exit
             raise RuntimeError('No such entrance %s for player %d' % (entrance, player))
+
+    def remove_entrance(self, entrance, player):
+        if (entrance, player) in self._entrance_cache.keys():
+            del self._entrance_cache[(entrance, player)]
 
     def get_location(self, location, player):
         if isinstance(location, Location):
@@ -862,6 +872,7 @@ class CollectionState(object):
 
 @unique
 class RegionType(Enum):
+    Menu = 0
     LightWorld = 1
     DarkWorld = 2
     Cave = 3  # Also includes Houses

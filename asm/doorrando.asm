@@ -34,6 +34,7 @@ incsrc overrides.asm
 incsrc edges.asm
 incsrc math.asm
 incsrc hudadditions.asm
+incsrc dr_lobby.asm
 warnpc $279700
 
 incsrc doortables.asm

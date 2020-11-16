@@ -36,6 +36,13 @@ otherwise unconnected logically can be reach using these glitches. To prevent th
 
 # Bug Fixes
 
+* 2.0.11u
+	* Option to keep original palettes in crossed dungeon mode
+	* If sanc if in a DW dungeon because of crossed+ ER, then you start in bunny form
+	* Mirroring from sanc to the portal is now in logic
+	* Another fix for animated tiles (fairy fountains)
+	* GT Big Key stat fixed on credits
+	* Todo: Standard logic fixes for lobbies
 * 2.0.10u
 	* Fix POD, TR, GT and SKULL 3 entrance if sanc ends up in that dungeon in crossed ER+
 	* TR Lobbies that need a bomb and can be entered before bombing should be pre-opened
