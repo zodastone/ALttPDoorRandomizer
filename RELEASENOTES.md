@@ -36,6 +36,9 @@ otherwise unconnected logically can be reach using these glitches. To prevent th
 
 # Bug Fixes
 
+* 2.0.11u
+	* Fix output path setting in settings.json
+	* Fix trock entrances when intensity <= 2
 * 2.0.10u
 	* Fix POD, TR, GT and SKULL 3 entrance if sanc ends up in that dungeon in crossed ER+
 	* TR Lobbies that need a bomb and can be entered before bombing should be pre-opened

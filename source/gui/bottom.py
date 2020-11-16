@@ -268,7 +268,7 @@ def create_guiargs(parent):
     guiargs.randomSprite = parent.randomSprite.get()
 
     # Get output path
-    guiargs.outputpath = parent.outputPath.get()
+    guiargs.outputpath = parent.settings["outputpath"]
 
     guiargs = update_deprecated_args(guiargs)
 
