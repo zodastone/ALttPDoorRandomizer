@@ -369,6 +369,9 @@ def choose_portals(world, player):
                 sanc = world.get_portal('Sanctuary', player)
                 sanc.destination = True
                 clean_up_portal_assignment(portal_assignment, dungeon, sanc, master_door_list, outstanding_portals)
+                for target_region, possible_portals in info.required_passage.items():
+                    info.required_passage[target_region] = [x for x in possible_portals if x != sanc.name]
+                info.required_passage = {x: y for x, y in info.required_passage.items() if len(y) > 0}
             for target_region, possible_portals in info.required_passage.items():
                 candidates = find_portal_candidates(master_door_list, dungeon, need_passage=True, crossed=cross_flag,
                                                     bk_shuffle=bk_shuffle)
@@ -596,6 +599,8 @@ def create_dungeon_entrances(world, player):
                     filtered_choices = [x for x in choices if any(y not in world.inaccessible_regions[player] for y in originating[key][x].keys())]
                 else:
                     filtered_choices = dest_choices
+                if len(filtered_choices) == 0:
+                    raise Exception('No valid destinations')
                 choice = random.choice(filtered_choices)
                 r_name = portal.door.entrance.parent_region.name
                 split_map[key][choice].append(r_name)
@@ -649,6 +654,8 @@ def within_dungeon(world, player):
         portal = world.get_portal('Sanctuary', player)
         target = portal.door.entrance.parent_region
         connect_simple_door(world, 'Sanctuary Mirror Route', target, player)
+
+    refine_boss_exits(world, player)
 
 
 def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info):
@@ -943,6 +950,7 @@ def cross_dungeon(world, player):
         palette_assignment(world, player)
 
     refine_hints(dungeon_builders)
+    refine_boss_exits(world, player)
 
 
 def assign_cross_keys(dungeon_builders, world, player):
@@ -1136,6 +1144,44 @@ def refine_hints(dungeon_builders):
             for location in region.locations:
                 if not location.event and '- Boss' not in location.name and '- Prize' not in location.name and location.name != 'Sanctuary':
                     location.hint_text = dungeon_hints[name]
+
+
+def refine_boss_exits(world, player):
+    for d_name, d_boss in {'Desert Palace': 'Desert Boss',
+                           'Skull Woods': 'Skull Boss',
+                           'Turtle Rock': 'TR Boss'}.items():
+        possible_portals = []
+        current_boss = None
+        for portal_name in dungeon_portals[d_name]:
+            portal = world.get_portal(portal_name, player)
+            if not portal.destination:
+                possible_portals.append(portal)
+            if portal.boss_exit_idx > -1:
+                current_boss = portal
+        if len(possible_portals) == 1:
+            if possible_portals[0] != current_boss:
+                possible_portals[0].change_boss_exit(current_boss.boss_exit_idx)
+                current_boss.change_boss_exit(-1)
+        else:
+            reachable_portals = []
+            for portal in possible_portals:
+                start_area = portal.door.entrance.parent_region
+                state = ExplorationState(dungeon=d_name)
+                state.visit_region(start_area)
+                state.add_all_doors_check_unattached(start_area, world, player)
+                explore_state_not_inaccessible(state, world, player)
+                if state.visited_at_all(world.get_region(d_boss, player)):
+                    reachable_portals.append(portal)
+            if len(reachable_portals) == 0:
+                reachable_portals = possible_portals
+            unreachable = world.inaccessible_regions[player]
+            filtered = [x for x in reachable_portals if x.door.entrance.connected_region.name not in unreachable]
+            if 0 < len(filtered) < len(reachable_portals):
+                reachable_portals = filtered
+            chosen_one = random.choice(reachable_portals) if len(reachable_portals) > 1 else reachable_portals[0]
+            if chosen_one != current_boss:
+                chosen_one.change_boss_exit(current_boss.boss_exit_idx)
+                current_boss.change_boss_exit(-1)
 
 
 def convert_to_sectors(region_names, world, player):
@@ -1802,6 +1848,15 @@ def explore_state(state, world, player):
         door = state.next_avail_door().door
         connect_region = world.get_entrance(door.name, player).connected_region
         if state.can_traverse(door) and not state.visited(connect_region) and valid_region_to_explore(connect_region, world, player):
+            state.visit_region(connect_region)
+            state.add_all_doors_check_unattached(connect_region, world, player)
+
+
+def explore_state_not_inaccessible(state, world, player):
+    while len(state.avail_doors) > 0:
+        door = state.next_avail_door().door
+        connect_region = world.get_entrance(door.name, player).connected_region
+        if state.can_traverse(door) and not state.visited(connect_region) and connect_region.type == RegionType.Dungeon:
             state.visit_region(connect_region)
             state.add_all_doors_check_unattached(connect_region, world, player)
 

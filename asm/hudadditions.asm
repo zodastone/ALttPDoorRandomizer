@@ -95,12 +95,18 @@ DrHudDungeonItemsAdditions:
         	+ stx $00
         		txa : lsr : tax
         		lda.w #$24f5 : sta $1644, y
-        		lda.l $7ef37c, x : beq +
+        		lda.l GenericKeys : bne +
+        		lda.l $7ef37c, x : and #$00FF : beq +
         			jsr ConvertToDisplay2 : sta $1644, y
         		+ iny #2 : lda.w #$24f5 : sta $1644, y
         		phx : ldx $00
         			lda $7ef368 : and.l $0098c0, x : beq + ; must have map
-        				plx : lda.l ChestKeys, x : jsr ConvertToDisplay2 : sta $1644, y ; small key totals
+        				plx : sep #$30 : lda.l ChestKeys, x : sta $02
+        				lda.l GenericKeys : bne +++
+        					lda $02 : !sub $7ef4e0, x : sta $02
+        				+++ lda $02
+        				rep #$30
+        				jsr ConvertToDisplay2 : sta $1644, y ; small key totals
         				bra .skipStack
         		+ plx
         		.skipStack iny #2
@@ -131,15 +137,18 @@ DrHudDungeonItemsAdditions:
 			+ lda $7ef364 : and.l $0098c0, x : beq + ; must have compass
                 phx ; total chest counts
                     txa : lsr : tax
-                    lda.l TotalLocationsHigh, x : jsr ConvertToDisplay2 : sta $1644, y : iny #2
-                    lda.l TotalLocationsLow, x : jsr ConvertToDisplay2 : sta $1644, y
+                    sep #$30
+                    lda.l TotalLocations, x : !sub $7EF4BF, x : JSR HudHexToDec2DigitCopy
+                    rep #$30
+                    lda $06 : jsr ConvertToDisplay2 : sta $1644, y : iny #2
+                    lda $07 : jsr ConvertToDisplay2 : sta $1644, y
                 plx
                 bra .skipBlanks
 			+ lda.w #$24f5 : sta $1644, y : iny #2 : sta $1644, y
             .skipBlanks iny #2
             cpx #$001a : beq +
 				lda.w #$24f5 : sta $1644, y ; blank out spot
-            + inx #2 : cpx #$001b : bcc -
+            + inx #2 : cpx #$001b : !bge ++ : brl -
     ++
     plp : ply : plx : rtl
 }
@@ -203,4 +212,27 @@ HudHexToDec4DigitCopy:
         DEC : BNE -
     +
     STY $07 ; Store 1s digit
+RTS
+
+;================================================================================
+; 8-bit registers
+; in:	A(b) - Byte to Convert
+; out:	$06 - $07 (high - low)
+;================================================================================
+HudHexToDec2DigitCopy: ; modified
+	PHY
+		LDY.b #$00
+		-
+			CMP.b #10 : !BLT +
+			INY
+			SBC.b #10 : BRA -
+		+
+		STY $06 : LDY #$00 ; Store 10s digit and reset Y
+		CMP.b #1 : !BLT +
+		-
+			INY
+			DEC : BNE -
+		+
+		STY $07	; Store 1s digit
+	PLY
 RTS

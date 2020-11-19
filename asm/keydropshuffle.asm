@@ -127,7 +127,7 @@ KeyGet:
 		phx
 			lda $040c : lsr : tax
 			lda $00 : cmp KeyTable, x : bne +
-					- plx : pla : rtl
+					- JSL.l FullInventoryExternal : jsl CountChestKeyLong : plx : pla : rtl
 			+ cmp #$af : beq - ; universal key
 			cmp #$24 : beq -   ; small key for this dungeon
 		plx

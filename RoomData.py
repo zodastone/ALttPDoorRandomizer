@@ -263,6 +263,9 @@ class Room(object):
         self.modified = False
         self.palette = None
 
+    def position(self, door):
+        return self.doorList[door.doorListPos][0]
+
     def kind(self, door):
         return self.doorList[door.doorListPos][1]
 

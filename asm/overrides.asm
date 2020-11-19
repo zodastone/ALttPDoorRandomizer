@@ -121,3 +121,22 @@ RetrieveBunnyState:
 	LDA $5F : BEQ +
 		STA $5D
 + RTL
+
+RainPrevention:
+	LDA $00 : XBA : AND #$00FF ; what we wrote over
+	PHA
+		LDA $7EF3C5 : AND #$00FF : CMP #$0002 : !BGE .done ; only in rain states (0 or 1)
+		LDA.l $7EF3C6 : AND #$0004 : BNE .done ; zelda's been rescued
+			LDA.l BlockSanctuaryDoorInRain : BEQ .done ;flagged
+			LDA $A0 : CMP #$0012 : BNE + ;we're in the sanctuary
+				LDA.l $7EF3CC : AND #$00FF : CMP #$0001 : BEQ .done ; zelda is following
+					LDA $00 : CMP #$02A1 : BNE .done
+						PLA : LDA #$0008 : RTL
+			+ LDA.l BlockCastleDoorsInRain : BEQ .done ;flagged
+			LDX #$FFFE
+			- INX #2 : LDA.l RemoveRainDoorsRoom, X : CMP #$FFFF : BEQ .done
+			CMP $A0 : BNE -
+				LDA.l RainDoorMatch, X : CMP $00 : BNE -
+					PLA : LDA #$0008 : RTL
+	.done PLA : RTL
+

@@ -1499,6 +1499,10 @@ class Portal(object):
         self.deadEnd = False
         self.light_world = False
 
+    def change_boss_exit(self, exit_idx):
+        self.default = False
+        self.boss_exit_idx = exit_idx
+
     def change_door(self, new_door):
         if new_door != self.door:
             self.default = False

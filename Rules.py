@@ -832,10 +832,13 @@ def standard_rules(world, player):
     set_rule(world.get_entrance('Sanctuary S&Q', player), lambda state: state.can_reach('Sanctuary', 'Region', player))
     # these are because of rails
     if world.shuffle[player] != 'vanilla':
-        # todo:
-        set_rule(world.get_entrance('Hyrule Castle Exit (East)', player), lambda state: state.has('Zelda Delivered', player))
-        set_rule(world.get_entrance('Hyrule Castle Exit (West)', player), lambda state: state.has('Zelda Delivered', player))
-        set_rule(world.get_entrance('Sanctuary Exit', player), lambda state: state.has('Zelda Delivered', player))
+        # where ever these happen to be
+        for portal_name in ['Hyrule Castle East', 'Hyrule Castle West']:
+            entrance = world.get_portal(portal_name, player).door.entrance
+            set_rule(entrance, lambda state: state.has('Zelda Delivered', player))
+    set_rule(world.get_entrance('Sanctuary Exit', player), lambda state: state.has('Zelda Delivered', player))
+    # zelda should be saved before agahnim is in play
+    set_rule(world.get_location('Agahnim 1', player), lambda state: state.has('Zelda Delivered', player))
 
     # too restrictive for crossed?
     def uncle_item_rule(item):

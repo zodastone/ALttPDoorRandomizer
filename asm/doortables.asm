@@ -562,23 +562,26 @@ db $01, $02, $03, $04, $05, $06, $0a, $14
 ;   HC   HC   EP   DP   AT   SP   PD   MM   SW   IP   TH   TT   TR   GT
 org $27f000
 CompassBossIndicator:
-dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-TotalKeys: ;27f01c
-db $04, $04, $02, $04, $04, $06, $06, $06, $05, $06, $01, $03, $06, $08
-ChestKeys: ;27f02a
-db $01, $01, $00, $01, $02, $01, $06, $03, $03, $02, $01, $01, $04, $04
-BigKeyStatus: ;27f038 (status 2 indicate BnC guard)
-dw $0002, $0002, $0001, $0001, $0000, $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001
-DungeonReminderTable: ;27f054
-dw $2D50, $2D50, $2D51, $2D52, $2D54, $2D56, $2D55, $2D5A, $2D57, $2D59, $2D53, $2D58, $2D5B, $2D5C
-TotalLocationsLow: ;27f070
-db $08, $08, $06, $06, $02, $00, $04, $08, $08, $08, $06, $08, $02, $07
-TotalLocationsHigh: ;27f07e
-db $00, $00, $00, $00, $00, $01, $01, $00, $00, $00, $00, $00, $01, $02
-;27F08C
+dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
+TotalKeys: ;27f020
+db $04, $04, $02, $04, $04, $06, $06, $06, $05, $06, $01, $03, $06, $08, $00, $00
+ChestKeys: ;27f030
+db $01, $01, $00, $01, $02, $01, $06, $03, $03, $02, $01, $01, $04, $04, $00, $00
+BigKeyStatus: ;27f040 (status 2 indicate BnC guard)
+dw $0002, $0002, $0001, $0001, $0000, $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0000, $0000
+DungeonReminderTable: ;27f060
+dw $2D50, $2D50, $2D51, $2D52, $2D54, $2D56, $2D55, $2D5A, $2D57, $2D59, $2D53, $2D58, $2D5B, $2D5C, $0000, $0000
+TotalLocationsLow: ;27f080
+db $08, $08, $06, $06, $02, $00, $04, $08, $08, $08, $06, $08, $02, $07, $00, $00
+TotalLocationsHigh: ;27f090
+db $00, $00, $00, $00, $00, $01, $01, $00, $00, $00, $00, $00, $01, $02, $00, $00
+org $27f0a0
+TotalLocations:
+db $08, $08, $06, $06, $02, $0a, $0e, $08, $08, $08, $06, $08, $0c, $1b, $00, $00
+; no more room here
 
 ; Vert 0,6,0 Horz 2,0,8
-org $27f090
+org $27f0b0
 CoordIndex: ; Horizontal 1st
 db 2, 0 ; Coordinate Index $20-$23
 OppCoordIndex:
@@ -598,7 +601,16 @@ dw $007f, $0077 ; Left/Top camera bounds when at edge or layout frozen
 dw $0007, $000b ; Left/Top camera bounds when not frozen + appropriate low byte $22/$20 (preadj. by #$78/#$6c)
 dw $00ff, $010b ; Right/Bot camera bounds when not frozen + appropriate low byte $20/$22
 dw $017f, $0187 ; Right/Bot camera bound when at edge or layout frozen
-;27f0ae next free byte
+;27f0ce next free byte
+
+org $27f0f0
+RemoveRainDoorsRoom:
+dw $0060, $0062, $ffff ; ffff indicates end of list
+RainDoorMatch: ; org $27f0f6 and f8 for now
+dw $0081, $0061 ; not xba'd
+BlockSanctuaryDoorInRain: ;27f0fa
+dw $0000
+
 
 org $27f100
 TilesetTable:

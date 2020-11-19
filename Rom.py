@@ -26,7 +26,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'f6be3fdaac906a2217e7ee328e27b95b'
+RANDOMIZERBASEHASH = '87fb1ec80d48487a84eac3a0a9bf9e04'
 
 
 class JsonRom(object):
@@ -648,16 +648,17 @@ def patch_rom(world, rom, player, team, enemized):
         for name, layout in world.key_layout[player].items():
             offset = compass_data[name][4]//2
             if world.retro[player]:
-                rom.write_byte(0x13f02a+offset, layout.max_chests + layout.max_drops)
+                rom.write_byte(0x13f030+offset, layout.max_chests + layout.max_drops)
             else:
-                rom.write_byte(0x13f01c+offset, layout.max_chests + layout.max_drops)  # not currently used
-                rom.write_byte(0x13f02a+offset, layout.max_chests)
+                rom.write_byte(0x13f020+offset, layout.max_chests + layout.max_drops)  # not currently used
+                rom.write_byte(0x13f030+offset, layout.max_chests)
             builder = world.dungeon_layouts[player][name]
-            rom.write_byte(0x13f070+offset, builder.location_cnt % 10)
-            rom.write_byte(0x13f07e+offset, builder.location_cnt // 10)
+            rom.write_byte(0x13f080+offset, builder.location_cnt % 10)
+            rom.write_byte(0x13f090+offset, builder.location_cnt // 10)
+            rom.write_byte(0x13f0a0+offset, builder.location_cnt)
             bk_status = 1 if builder.bk_required else 0
             bk_status = 2 if builder.bk_provided else bk_status
-            rom.write_byte(0x13f038+offset*2, bk_status)
+            rom.write_byte(0x13f040+offset*2, bk_status)
         if player in world.sanc_portal.keys():
             rom.write_byte(0x159a6, world.sanc_portal[player].ent_offset)
             sanc_region = world.sanc_portal[player].door.entrance.parent_region
@@ -1282,7 +1283,21 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_byte(0x18005F, world.crystals_needed_for_ganon[player])
 
     # block HC upstairs doors in rain state in standard mode
-    rom.write_byte(0x18008A, 0x01 if world.mode[player] == "standard" and world.shuffle[player] != 'vanilla' else 0x00)
+    prevent_rain = world.mode[player] == "standard" and world.shuffle[player] != 'vanilla'
+    rom.write_byte(0x18008A, 0x01 if prevent_rain else 0x00)
+    # block sanc door in rain state and the dungeon is not vanilla
+    rom.write_byte(0x13f0fa, 0x01 if world.mode[player] == "standard" and world.doorShuffle[player] != 'vanilla' else 0x00)
+
+    if prevent_rain:
+        portals = [world.get_portal('Hyrule Castle East', player), world.get_portal('Hyrule Castle West', player)]
+        for idx, portal in enumerate(portals):
+            x = idx*2
+            room_idx = portal.door.roomIndex
+            room = world.get_room(room_idx, player)
+            rom.write_byte(0x13f0f0+x, room_idx & 0xff)
+            rom.write_byte(0x13f0f1+x, (room_idx >> 8) & 0xff)
+            rom.write_byte(0x13f0f6+x, room.position(portal.door).value)
+            rom.write_byte(0x13f0f7+x, room.kind(portal.door).value)
 
     rom.write_byte(0x18016A, 0x10 | ((0x01 if world.keyshuffle[player] else 0x00)
                                      | (0x02 if world.compassshuffle[player] else 0x00)
@@ -1415,9 +1430,11 @@ def patch_rom(world, rom, player, team, enemized):
 
     # fix trock doors for reverse entrances
     if world.fix_trock_doors[player]:
-        # do this unconditionally
-        world.get_room(0x23, player).change(0, DoorKind.CaveEntrance)
-        world.get_room(0xd5, player).change(0, DoorKind.CaveEntrance)
+        if world.get_door('TR Lazy Eyes SE', player).entranceFlag:
+            world.get_room(0x23, player).change(0, DoorKind.CaveEntrance)
+        if world.get_door('TR Eye Bridge SW', player).entranceFlag:
+            world.get_room(0xd5, player).change(0, DoorKind.CaveEntrance)
+        # do this unconditionally - gets overwritten by RoomData in doorShufflemodes
         rom.write_byte(0xFED31, 0x0E)  # preopen bombable exit
         rom.write_byte(0xFEE41, 0x0E)  # preopen bombable exit
 
