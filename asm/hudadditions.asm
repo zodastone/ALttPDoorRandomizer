@@ -95,7 +95,7 @@ DrHudDungeonItemsAdditions:
         	+ stx $00
         		txa : lsr : tax
         		lda.w #$24f5 : sta $1644, y
-        		lda.l GenericKeys : bne +
+        		lda.l GenericKeys : and #$00FF : bne +
         		lda.l $7ef37c, x : and #$00FF : beq +
         			jsr ConvertToDisplay2 : sta $1644, y
         		+ iny #2 : lda.w #$24f5 : sta $1644, y

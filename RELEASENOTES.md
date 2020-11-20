@@ -67,7 +67,7 @@ Redesign of Keysanity Menu complete for crossed dungeon and moved out of experim
 * Second screen about Maps / Compass
 	* 1st Column: indicate if you have foudn the map of not for that dungeon
 	* 2nd and 3rd Column: You must have the compass to see these columns. A two-digit display that show you how
-	 many chests are left in the dungeon. If -keydropshuffle is off, this does not count key drop. If on, it does. 
+	many chests are left in the dungeon. If -keydropshuffle is off, this does not count key drop. If on, it does. 
 
 ### Experimental features
 
@@ -80,6 +80,13 @@ Redesign of Keysanity Menu complete for crossed dungeon and moved out of experim
 
 # Bug Fixes
 
+* 2.0.13u
+	* Minor portal re-work for certain logic and spoiler information 
+	* Repaired certain exits wrongly affected by Sanctuary placement (ER crossed + intensity 3)
+	* Fix for inverted ER + intensity 3
+	* Fix for current small keys missing on keysanity menu
+	* Logic added for cases where you can flood Swamp Trench 1 before finding flippers and lock yourself out of getting
+	something behind the trench that leads to the flippers
 * 2.0.12u
 	* Another fix for animated tiles (fairy fountains)
 	* GT Big Key stat fixed on credits
@@ -91,7 +98,7 @@ Redesign of Keysanity Menu complete for crossed dungeon and moved out of experim
 	* Fix output path setting in settings.json
 	* Fix trock entrances when intensity <= 2
 * 2.0.10u
-	* Fix POD, TR, GT and SKULL 3 entrance if sanc ends up in that dungeon in crossed ER+
+	* Fix POD, TR, GT and SKULL 3 entrances if sanc ends up in that dungeon in crossed ER+
 	* TR Lobbies that need a bomb and can be entered before bombing should be pre-opened
 	* Animated tiles are loaded correctly in lobbies
 	* If a wallmaster grabs you and the lobby is dark, the lamp turns on now

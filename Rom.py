@@ -11,7 +11,7 @@ import subprocess
 import bps.apply
 import bps.io
 
-from BaseClasses import CollectionState, ShopType, Region, Location, DoorType, RegionType
+from BaseClasses import CollectionState, ShopType, Region, Location, Door, DoorType, RegionType
 from DoorShuffle import compass_data, DROptions, boss_indicator
 from Dungeons import dungeon_music_addresses
 from KeyDoorShuffle import count_locations_exclude_logic
@@ -26,7 +26,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '87fb1ec80d48487a84eac3a0a9bf9e04'
+RANDOMIZERBASEHASH = '55b2f851e5d643e1e72befc631ea3c6d'
 
 
 class JsonRom(object):
@@ -670,8 +670,9 @@ def patch_rom(world, rom, player, team, enemized):
     if world.doorShuffle[player] == 'basic':
         rom.write_byte(0x138002, 1)
     for door in world.doors:
-        if door.dest is not None and door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs,
-                                                                             DoorType.Open, DoorType.StraightStairs]:
+        if door.dest is not None and isinstance(door.dest, Door) and\
+             door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs,
+                                                     DoorType.Open, DoorType.StraightStairs]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door))
     for paired_door in world.paired_doors[player]:
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
@@ -715,14 +716,16 @@ def patch_rom(world, rom, player, team, enemized):
     world.force_fix[player]['sw'] |= world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla'
 
     # fix exits, if not fixed during exit patching
-    if world.force_fix[player]['sw']:
+    if world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla':
         write_int16(rom, 0x15DB5 + 2 * exit_ids['Skull Woods Final Section Exit'][1], 0x00F8)
+    elif world.force_fix[player]['sw']:
+        write_int16(rom, 0x15DB5 + world.force_fix[player]['sw'].exit_offset, 0x00F8)
     if world.force_fix[player]['pod']:
-        write_int16(rom, 0x15DB5 + 2 * exit_ids['Palace of Darkness Exit'][1], 0x0640)
+        write_int16(rom, 0x15DB5 + world.force_fix[player]['pod'].exit_offset, 0x0640)
     if world.force_fix[player]['tr']:
-        write_int16(rom, 0x15DB5 + 2 * exit_ids['Turtle Rock Exit (Front)'][1], 0x0134)
+        write_int16(rom, 0x15DB5 + world.force_fix[player]['tr'].exit_offset, 0x0134)
     if world.force_fix[player]['gt']:
-        write_int16(rom, 0x15DB5 + 2 * exit_ids['Ganons Tower Exit'][1], 0x00A4)
+        write_int16(rom, 0x15DB5 + world.force_fix[player]['gt'].exit_offset, 0x00A4)
 
     write_custom_shops(rom, world, player)
 
@@ -1294,8 +1297,7 @@ def patch_rom(world, rom, player, team, enemized):
             x = idx*2
             room_idx = portal.door.roomIndex
             room = world.get_room(room_idx, player)
-            rom.write_byte(0x13f0f0+x, room_idx & 0xff)
-            rom.write_byte(0x13f0f1+x, (room_idx >> 8) & 0xff)
+            write_int16(rom, 0x13f0f0+x, room_idx)
             rom.write_byte(0x13f0f6+x, room.position(portal.door).value)
             rom.write_byte(0x13f0f7+x, room.kind(portal.door).value)
 

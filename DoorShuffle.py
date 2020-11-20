@@ -7,7 +7,7 @@ from enum import unique, Flag
 from typing import DefaultDict, Dict, List
 
 from functools import reduce
-from BaseClasses import RegionType, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo
+from BaseClasses import RegionType, Region, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo
 from Dungeons import dungeon_regions, region_starts, standard_starts, split_region_starts
 from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
 from Items import ItemFactory
@@ -134,7 +134,7 @@ def create_door_spoiler(world, player):
                                               DoorType.StraightStairs] and door_a not in done:
                     done.add(door_a)
                     door_b = door_a.dest
-                    if door_b:
+                    if door_b and not isinstance(door_b, Region):
                         done.add(door_b)
                         if not door_a.blocked and not door_b.blocked:
                             world.spoiler.set_door(door_a.name, door_b.name, 'both', player, builder.name)
@@ -338,7 +338,7 @@ def choose_portals(world, player):
             reachable_portals = []
             inaccessible_portals = []
             for portal in portal_list:
-                placeholder = world.get_region(portal + ' Placeholder', player)
+                placeholder = world.get_region(portal + ' Portal', player)
                 portal_region = placeholder.exits[0].connected_region
                 name = portal_region.name
                 if portal_region.type == RegionType.LightWorld:
@@ -431,7 +431,7 @@ def analyze_portals(world, player):
         reachable_portals = []
         inaccessible_portals = []
         for portal in portal_list:
-            placeholder = world.get_region(portal + ' Placeholder', player)
+            placeholder = world.get_region(portal + ' Portal', player)
             portal_region = placeholder.exits[0].connected_region
             name = portal_region.name
             if portal_region.type == RegionType.LightWorld:
@@ -466,42 +466,37 @@ def analyze_portals(world, player):
 
 
 def connect_portal(portal, world, player):
-    ent, ext = portal_map[portal.name]
+    ent, ext, entrance_name = portal_map[portal.name]
     if world.mode[player] == 'inverted' and portal.name in ['Ganons Tower', 'Agahnims Tower']:
         ext = 'Inverted ' + ext
-        ent = 'Inverted ' + ent
+        # ent = 'Inverted ' + ent
     portal_entrance = world.get_entrance(portal.door.entrance.name, player)  # ensures I get the right one for copying
     target_exit = world.get_entrance(ext, player)
-    target_exit.parent_region = portal_entrance.parent_region
-    portal_entrance.connected_region = target_exit.connected_region
-    placeholder = world.get_region(portal.name + ' Placeholder', player)
-    if len(placeholder.entrances) > 0:
-        edit_entrance = placeholder.entrances[0]
-    else:
-        edit_entrance = world.get_entrance(ent, player)
-    entrance_region = portal_entrance.parent_region
-    old_region = edit_entrance.connected_region
-    edit_entrance.connected_region = entrance_region
-    entrance_region.exits.remove(portal_entrance)
-    entrance_region.exits.append(target_exit)
-    entrance_region.entrances.append(edit_entrance)
-    old_region.entrances.remove(edit_entrance)
-    world.regions.remove(placeholder)
+    portal_entrance.connected_region = target_exit.parent_region
+    portal_region = world.get_region(portal.name + ' Portal', player)
+    portal_region.entrances.append(portal_entrance)
+    edit_entrance = world.get_entrance(entrance_name, player)
+    edit_entrance.connected_region = portal_entrance.parent_region
+    chosen_door = world.get_door(portal_entrance.name, player)
+    chosen_door.blocked = False
+    connect_door_only(world, chosen_door, portal_region, player)
 
 
+#  todo: remove this?
 def connect_portal_copy(portal, world, player):
-    ent, ext = portal_map[portal.name]
+    ent, ext, entrance_name = portal_map[portal.name]
     if world.mode[player] == 'inverted' and portal.name in ['Ganons Tower', 'Agahnims Tower']:
         ext = 'Inverted ' + ext
     portal_entrance = world.get_entrance(portal.door.entrance.name, player)  # ensures I get the right one for copying
     target_exit = world.get_entrance(ext, player)
-    entrance_region = portal_entrance.parent_region
-    entrance_region.exits.remove(portal_entrance)
-    entrance_region.exits.append(target_exit)
-    target_exit.parent_region = entrance_region
-
-    placeholder = world.get_region(portal.name + ' Placeholder', player)
-    world.regions.remove(placeholder)
+    portal_entrance.connected_region = target_exit.parent_region
+    portal_region = world.get_region(portal.name + ' Portal', player)
+    portal_region.entrances.append(portal_entrance)
+    edit_entrance = world.get_entrance(entrance_name, player)
+    edit_entrance.connected_region = portal_entrance.parent_region
+    chosen_door = world.get_door(portal_entrance.name, player)
+    chosen_door.blocked = False
+    connect_door_only(world, chosen_door, portal_region, player)
 
 
 def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allowed=False, crossed=False, bk_shuffle=False):
@@ -760,7 +755,10 @@ def determine_entrance_list(world, player):
             portal = world.get_portal(portal_name, player)
             r_names[portal.door.entrance.parent_region.name] = portal
         for region_name, portal in r_names.items():
-            region = world.get_region(region_name, player)
+            if portal:
+                region = world.get_region(portal.name + ' Portal', player)
+            else:
+                region = world.get_region(region_name, player)
             for ent in region.entrances:
                 parent = ent.parent_region
                 if (parent.type != RegionType.Dungeon and parent.name != 'Menu') or parent.name == 'Sewer Drop':
@@ -821,7 +819,7 @@ def enable_new_entrances(region, connections, potentials, enabled, world, player
         if region_name in connections.keys() and connections[region_name] in potentials.keys():
             for potential in potentials.pop(connections[region_name]):
                 enabled[potential] = (region.name, region.dungeon)
-        if ext.connected_region.name in world.inaccessible_regions[player]:
+        if ext.connected_region.name in world.inaccessible_regions[player] or ext.connected_region.name.endswith(' Portal'):
             for new_exit in ext.connected_region.exits:
                 if new_exit not in visited:
                     queue.append(new_exit)
@@ -1062,10 +1060,17 @@ def check_entrance_fixes(world, player):
             del checks['Ganons Tower']
         for ent_name, key in checks.items():
             entrance = world.get_entrance(ent_name, player)
-            if entrance.connected_region.dungeon:
-                layout = world.dungeon_layouts[player][entrance.connected_region.dungeon.name]
+            dungeon = entrance.connected_region.dungeon
+            if dungeon:
+                layout = world.dungeon_layouts[player][dungeon.name]
                 if 'Sanctuary' in layout.master_sector.region_set():
-                    world.force_fix[player][key] = True
+                    portal = None
+                    for portal_name in dungeon_portals[dungeon.name]:
+                        test_portal = world.get_portal(portal_name, player)
+                        if entrance.connected_region == test_portal.door.entrance.connected_region:
+                            portal = test_portal
+                            break
+                    world.force_fix[player][key] = portal
 
 
 def palette_assignment(world, player):
@@ -1128,7 +1133,8 @@ def palette_assignment(world, player):
         room.palette = 0x1d
     for connection in ['Sanctuary S', 'Sanctuary N']:
         adjacent = world.get_entrance(connection, player)
-        if adjacent.door.dest and adjacent.door.dest.entrance.parent_region.type == RegionType.Dungeon:
+        adj_dest = adjacent.door.dest
+        if adj_dest and isinstance(adj_dest, Door) and adj_dest.entrance.parent_region.type == RegionType.Dungeon:
             if adjacent.door and adjacent.door.dest and adjacent.door.dest.roomIndex >= 0:
                 room = world.get_room(adjacent.door.dest.roomIndex, player)
                 room.palette = 0x1d
@@ -1767,13 +1773,19 @@ def valid_inaccessible_region(r):
 
 def add_inaccessible_doors(world, player):
     if world.mode[player] == 'standard':
-        create_door(world, player, 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge')
-        create_door(world, player, 'Hyrule Castle Entrance (West)', 'Hyrule Castle Ledge')
+        create_doors_for_inaccessible_region('Hyrule Castle Ledge', world, player)
     # todo: ignore standard mode hyrule castle ledge?
     for inaccessible_region in world.inaccessible_regions[player]:
-        region = world.get_region(inaccessible_region, player)
-        for ext in region.exits:
-            create_door(world, player, ext.name, region.name)
+        create_doors_for_inaccessible_region(inaccessible_region, world, player)
+
+
+def create_doors_for_inaccessible_region(inaccessible_region, world, player):
+    region = world.get_region(inaccessible_region, player)
+    for ext in region.exits:
+        create_door(world, player, ext.name, region.name)
+        if ext.connected_region.name.endswith(' Portal'):
+            for more_exts in ext.connected_region.exits:
+                create_door(world, player, more_exts.name, ext.connected_region.name)
 
 
 def create_door(world, player, entName, region_name):
@@ -2731,31 +2743,31 @@ palette_non_influencers = {
 
 
 portal_map = {
-    'Sanctuary': ('Sanctuary', 'Sanctuary Exit'),
-    'Hyrule Castle West': ('Hyrule Castle Entrance (West)', 'Hyrule Castle Exit (West)'),
-    'Hyrule Castle South': ('Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)'),
-    'Hyrule Castle East': ('Hyrule Castle Entrance (East)', 'Hyrule Castle Exit (East)'),
-    'Eastern': ('Eastern Palace', 'Eastern Palace Exit'),
-    'Desert West': ('Desert Palace Entrance (West)', 'Desert Palace Exit (West)'),
-    'Desert South': ('Desert Palace Entrance (South)', 'Desert Palace Exit (South)'),
-    'Desert East': ('Desert Palace Entrance (East)', 'Desert Palace Exit (East)'),
-    'Desert Back': ('Desert Palace Entrance (North)', 'Desert Palace Exit (North)'),
-    'Turtle Rock Lazy Eyes': ('Dark Death Mountain Ledge (West)', 'Turtle Rock Ledge Exit (West)'),
-    'Turtle Rock Eye Bridge': ('Turtle Rock Isolated Ledge Entrance', 'Turtle Rock Isolated Ledge Exit'),
-    'Turtle Rock Chest': ('Dark Death Mountain Ledge (East)', 'Turtle Rock Ledge Exit (East)'),
-    'Agahnims Tower': ('Agahnims Tower', 'Agahnims Tower Exit'),
-    'Swamp': ('Swamp Palace', 'Swamp Palace Exit'),
-    'Palace of Darkness': ('Palace of Darkness', 'Palace of Darkness Exit'),
-    'Mire': ('Misery Mire', 'Misery Mire Exit'),
-    'Skull 2 West': ('Skull Woods Second Section Door (West)', 'Skull Woods Second Section Exit (West)'),
-    'Skull 2 East': ('Skull Woods Second Section Door (East)', 'Skull Woods Second Section Exit (East)'),
-    'Skull 1': ('Skull Woods First Section Door', 'Skull Woods First Section Exit'),
-    'Skull 3': ('Skull Woods Final Section', 'Skull Woods Final Section Exit'),
-    'Ice': ('Ice Palace', 'Ice Palace Exit'),
-    'Hera': ('Tower of Hera', 'Tower of Hera Exit'),
-    'Thieves Town': ('Thieves Town', 'Thieves Town Exit'),
-    'Turtle Rock Main': ('Turtle Rock', 'Turtle Rock Exit (Front)'),
-    'Ganons Tower': ('Ganons Tower', 'Ganons Tower Exit'),
+    'Sanctuary': ('Sanctuary', 'Sanctuary Exit', 'Enter HC (Sanc)'),
+    'Hyrule Castle West': ('Hyrule Castle Entrance (West)', 'Hyrule Castle Exit (West)', 'Enter HC (West)'),
+    'Hyrule Castle South': ('Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)', 'Enter HC (South)'),
+    'Hyrule Castle East': ('Hyrule Castle Entrance (East)', 'Hyrule Castle Exit (East)', 'Enter HC (East)'),
+    'Eastern': ('Eastern Palace', 'Eastern Palace Exit', 'Enter Eastern Palace'),
+    'Desert West': ('Desert Palace Entrance (West)', 'Desert Palace Exit (West)', 'Enter Desert (West)'),
+    'Desert South': ('Desert Palace Entrance (South)', 'Desert Palace Exit (South)', 'Enter Desert (South)'),
+    'Desert East': ('Desert Palace Entrance (East)', 'Desert Palace Exit (East)', 'Enter Desert (East)'),
+    'Desert Back': ('Desert Palace Entrance (North)', 'Desert Palace Exit (North)', 'Enter Desert (North)'),
+    'Turtle Rock Lazy Eyes': ('Dark Death Mountain Ledge (West)', 'Turtle Rock Ledge Exit (West)', 'Enter Turtle Rock (Lazy Eyes)'),
+    'Turtle Rock Eye Bridge': ('Turtle Rock Isolated Ledge Entrance', 'Turtle Rock Isolated Ledge Exit', 'Enter Turtle Rock (Laser Bridge)'),
+    'Turtle Rock Chest': ('Dark Death Mountain Ledge (East)', 'Turtle Rock Ledge Exit (East)', 'Enter Turtle Rock (Chest)'),
+    'Agahnims Tower': ('Agahnims Tower', 'Agahnims Tower Exit', 'Enter Agahnims Tower'),
+    'Swamp': ('Swamp Palace', 'Swamp Palace Exit', 'Enter Swamp'),
+    'Palace of Darkness': ('Palace of Darkness', 'Palace of Darkness Exit', 'Enter Palace of Darkness'),
+    'Mire': ('Misery Mire', 'Misery Mire Exit', 'Enter Misery Mire'),
+    'Skull 2 West': ('Skull Woods Second Section Door (West)', 'Skull Woods Second Section Exit (West)', 'Enter Skull Woods 2 (West)'),
+    'Skull 2 East': ('Skull Woods Second Section Door (East)', 'Skull Woods Second Section Exit (East)', 'Enter Skull Woods 2 (East)'),
+    'Skull 1': ('Skull Woods First Section Door', 'Skull Woods First Section Exit', 'Enter Skull Woods 1'),
+    'Skull 3': ('Skull Woods Final Section', 'Skull Woods Final Section Exit', 'Enter Skull Woods 3'),
+    'Ice': ('Ice Palace', 'Ice Palace Exit', 'Enter Ice Palace'),
+    'Hera': ('Tower of Hera', 'Tower of Hera Exit', 'Enter Hera'),
+    'Thieves Town': ('Thieves Town', 'Thieves Town Exit', 'Enter Thieves Town'),
+    'Turtle Rock Main': ('Turtle Rock', 'Turtle Rock Exit (Front)', 'Enter Turtle Rock (Main)'),
+    'Ganons Tower': ('Ganons Tower', 'Ganons Tower Exit', 'Enter Ganons Tower'),
 }
 
 split_portals = {
