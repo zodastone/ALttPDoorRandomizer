@@ -7,8 +7,7 @@ from enum import Enum, unique
 try:
     from fast_enum import FastEnum
 except ImportError:
-    from enum import Flag
-    FastEnum = Flag
+    from enum import IntFlag as FastEnum
 
 
 from source.classes.BabelFish import BabelFish
