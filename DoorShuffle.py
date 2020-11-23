@@ -144,7 +144,7 @@ def create_door_spoiler(world, player):
                             world.spoiler.set_door(door_a.name, door_b.name, 'entrance', player, builder.name)
                         else:
                             logger.warning('This is a bug during door spoiler')
-                    else:
+                    elif not isinstance(door_b, Region):
                         logger.warning('Door not connected: %s', door_a.name)
                 if connect and connect.type == RegionType.Dungeon and connect not in visited:
                     visited.add(connect)
@@ -1071,6 +1071,8 @@ def check_entrance_fixes(world, player):
                             portal = test_portal
                             break
                     world.force_fix[player][key] = portal
+                elif dungeon.name in ['Hyrule Castle', 'Desert Palace', 'Skull Woods', 'Turtle Rock']:
+                    world.force_fix[player][key] = portal
 
 
 def palette_assignment(world, player):
@@ -1543,12 +1545,12 @@ def reassign_key_doors(builder, world, player):
                 else:
                     room.delete(d.doorListPos)
             d.smallKey = False
-        elif d.type is DoorType.Interior and d not in flat_proposal and d.dest not in flat_proposal:
+        elif d.type is DoorType.Interior and d not in flat_proposal and d.dest not in flat_proposal and not d.entranceFlag:
             world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)
             d.smallKey = False
             d.dest.smallKey = False
             queue.remove(d.dest)
-        elif d.type is DoorType.Normal and d not in flat_proposal:
+        elif d.type is DoorType.Normal and d not in flat_proposal and not d.entranceFlag:
             world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)
             d.smallKey = False
             for dp in world.paired_doors[player]:

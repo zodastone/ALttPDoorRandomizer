@@ -80,6 +80,9 @@ Redesign of Keysanity Menu complete for crossed dungeon and moved out of experim
 
 # Bug Fixes
 
+* 2.0.14u
+	* Removal of key doors no longer messes up certain lobbies
+	* Fixed ER entrances when Desert Back is a connector
 * 2.0.13u
 	* Minor portal re-work for certain logic and spoiler information 
 	* Repaired certain exits wrongly affected by Sanctuary placement (ER crossed + intensity 3)
