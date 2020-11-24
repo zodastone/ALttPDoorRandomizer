@@ -1,7 +1,4 @@
 {
-  "checkboxes": {
-    "potshuffle": { "type": "checkbox" }
-  },
   "leftEnemizerFrame": {
     "enemyshuffle": {
       "type": "selectbox",
