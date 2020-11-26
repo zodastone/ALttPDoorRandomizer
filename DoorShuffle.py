@@ -1063,15 +1063,13 @@ def check_entrance_fixes(world, player):
             dungeon = entrance.connected_region.dungeon
             if dungeon:
                 layout = world.dungeon_layouts[player][dungeon.name]
-                if 'Sanctuary' in layout.master_sector.region_set():
+                if 'Sanctuary' in layout.master_sector.region_set() or dungeon.name in ['Hyrule Castle', 'Desert Palace', 'Skull Woods', 'Turtle Rock']:
                     portal = None
                     for portal_name in dungeon_portals[dungeon.name]:
                         test_portal = world.get_portal(portal_name, player)
                         if entrance.connected_region == test_portal.door.entrance.connected_region:
                             portal = test_portal
                             break
-                    world.force_fix[player][key] = portal
-                elif dungeon.name in ['Hyrule Castle', 'Desert Palace', 'Skull Woods', 'Turtle Rock']:
                     world.force_fix[player][key] = portal
 
 

@@ -24,7 +24,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes, fill_specific_items
 from Utils import output_path, parse_player_names
 
-__version__ = '0.2.0.14u'
+__version__ = '0.2.0.15u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -56,6 +56,8 @@ def main(args, seed=None, fish=None):
     world.bigkeyshuffle = args.bigkeyshuffle.copy()
     world.crystals_needed_for_ganon = {player: random.randint(0, 7) if args.crystals_ganon[player] == 'random' else int(args.crystals_ganon[player]) for player in range(1, world.players + 1)}
     world.crystals_needed_for_gt = {player: random.randint(0, 7) if args.crystals_gt[player] == 'random' else int(args.crystals_gt[player]) for player in range(1, world.players + 1)}
+    world.crystals_ganon_orig = args.crystals_ganon.copy()
+    world.crystals_gt_orig = args.crystals_gt.copy()
     world.open_pyramid = args.openpyramid.copy()
     world.boss_shuffle = args.shufflebosses.copy()
     world.enemy_shuffle = args.shuffleenemies.copy()
@@ -374,6 +376,8 @@ def copy_world(world):
     ret.bigkeyshuffle = world.bigkeyshuffle.copy()
     ret.crystals_needed_for_ganon = world.crystals_needed_for_ganon.copy()
     ret.crystals_needed_for_gt = world.crystals_needed_for_gt.copy()
+    ret.crystals_ganon_orig = world.crystals_ganon_orig.copy()
+    ret.crystals_gt_orig = world.crystals_gt_orig.copy()
     ret.open_pyramid = world.open_pyramid.copy()
     ret.boss_shuffle = world.boss_shuffle.copy()
     ret.enemy_shuffle = world.enemy_shuffle.copy()
@@ -419,6 +423,10 @@ def copy_world(world):
         copied_region = ret.get_region(region.name, region.player)
         copied_region.is_light_world = region.is_light_world
         copied_region.is_dark_world = region.is_dark_world
+        copied_region.dungeon = region.dungeon
+        copied_region.locations = [copy.copy(location) for location in region.locations]
+        for location in copied_region.locations:
+            location.parent_region = copied_region
         for entrance in region.entrances:
             ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
 
@@ -598,7 +606,7 @@ def create_playthrough(world):
 
     old_world.spoiler.paths = dict()
     for player in range(1, world.players + 1):
-        old_world.spoiler.paths.update({ str(location) : get_path(state, location.parent_region) for sphere in collection_spheres for location in sphere if location.player == player})
+        old_world.spoiler.paths.update({location.gen_name(): get_path(state, location.parent_region) for sphere in collection_spheres for location in sphere if location.player == player})
         for _, path in dict(old_world.spoiler.paths).items():
             if any(exit == 'Pyramid Fairy' for (_, exit) in path):
                 if world.mode[player] != 'inverted':
@@ -609,4 +617,4 @@ def create_playthrough(world):
     # we can finally output our playthrough
     old_world.spoiler.playthrough = OrderedDict([("0", [str(item) for item in world.precollected_items if item.advancement])])
     for i, sphere in enumerate(collection_spheres):
-        old_world.spoiler.playthrough[str(i + 1)] = {str(location): str(location.item) for location in sphere}
+        old_world.spoiler.playthrough[str(i + 1)] = {location.gen_name(): str(location.item) for location in sphere}

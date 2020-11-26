@@ -713,8 +713,6 @@ def patch_rom(world, rom, player, team, enemized):
             if portal.boss_exit_idx > -1:
                 rom.write_byte(0x7939 + portal.boss_exit_idx, portal.current_room())
 
-    world.force_fix[player]['sw'] |= world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla'
-
     # fix exits, if not fixed during exit patching
     if world.fix_skullwoods_exit[player] and world.shuffle[player] == 'vanilla':
         write_int16(rom, 0x15DB5 + 2 * exit_ids['Skull Woods Final Section Exit'][1], 0x00F8)

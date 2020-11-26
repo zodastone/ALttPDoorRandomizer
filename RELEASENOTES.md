@@ -68,6 +68,18 @@ Redesign of Keysanity Menu complete for crossed dungeon and moved out of experim
 	* 1st Column: indicate if you have foudn the map of not for that dungeon
 	* 2nd and 3rd Column: You must have the compass to see these columns. A two-digit display that show you how
 	many chests are left in the dungeon. If -keydropshuffle is off, this does not count key drop. If on, it does. 
+	
+## Potshuffle by compiling
+
+Same flag as before but uses python logic written by compiling instead of the enemizer logic-less version. Needs some
+testing to verify logic is all good.
+
+## Other features
+
+### Spoiler log improvements
+
+* In crossed mode, the new dungeon is listed along with the location designated by a '@' sign
+* Random gt crystals and ganon crystal are noted in the settings for better reproduction of seeds
 
 ### Experimental features
 
@@ -80,6 +92,9 @@ Redesign of Keysanity Menu complete for crossed dungeon and moved out of experim
 
 # Bug Fixes
 
+* 2.0.15u
+	* Allow Aga Tower lobby door as a a paired keydoor (typo)
+	* Fix portal check for multi-entrance dungeons
 * 2.0.14u
 	* Removal of key doors no longer messes up certain lobbies
 	* Fixed ER entrances when Desert Back is a connector

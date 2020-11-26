@@ -123,6 +123,8 @@ class World(object):
             set_player_attr('escape_assist', [])
             set_player_attr('crystals_needed_for_ganon', 7)
             set_player_attr('crystals_needed_for_gt', 7)
+            set_player_attr('crystals_ganon_orig', {})
+            set_player_attr('crystals_gt_orig', {})
             set_player_attr('open_pyramid', False)
             set_player_attr('treasure_hunt_icon', 'Triforce Piece')
             set_player_attr('treasure_hunt_count', 0)
@@ -1654,6 +1656,15 @@ class Location(object):
                 return True
         return False
 
+    def gen_name(self):
+        name = self.name
+        world = self.parent_region.world if self.parent_region and self.parent_region.world else None
+        if self.parent_region.dungeon and world and world.doorShuffle[self.player] == 'crossed':
+            name += f' @ {self.parent_region.dungeon.name}'
+        if world and world.players > 1:
+            name += f' ({world.get_player_names(self.player)})'
+        return name
+
     def __str__(self):
         return str(self.__unicode__())
 
@@ -1833,25 +1844,25 @@ class Spoiler(object):
         listed_locations = set()
 
         lw_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.LightWorld]
-        self.locations['Light World'] = OrderedDict([(str(location), str(location.item) if location.item is not None else 'Nothing') for location in lw_locations])
+        self.locations['Light World'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in lw_locations])
         listed_locations.update(lw_locations)
 
         dw_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.DarkWorld]
-        self.locations['Dark World'] = OrderedDict([(str(location), str(location.item) if location.item is not None else 'Nothing') for location in dw_locations])
+        self.locations['Dark World'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in dw_locations])
         listed_locations.update(dw_locations)
 
         cave_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.Cave]
-        self.locations['Caves'] = OrderedDict([(str(location), str(location.item) if location.item is not None else 'Nothing') for location in cave_locations])
+        self.locations['Caves'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in cave_locations])
         listed_locations.update(cave_locations)
 
         for dungeon in self.world.dungeons:
             dungeon_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.dungeon == dungeon]
-            self.locations[str(dungeon)] = OrderedDict([(str(location), str(location.item) if location.item is not None else 'Nothing') for location in dungeon_locations])
+            self.locations[str(dungeon)] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in dungeon_locations])
             listed_locations.update(dungeon_locations)
 
         other_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations]
         if other_locations:
-            self.locations['Other Locations'] = OrderedDict([(str(location), str(location.item) if location.item is not None else 'Nothing') for location in other_locations])
+            self.locations['Other Locations'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in other_locations])
             listed_locations.update(other_locations)
 
         self.shops = []
@@ -1970,8 +1981,10 @@ class Spoiler(object):
                 outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'][player])
                 outfile.write('Door Shuffle:                    %s\n' % self.metadata['door_shuffle'][player])
                 outfile.write('Intensity:                       %s\n' % self.metadata['intensity'][player])
-                outfile.write('Crystals required for GT:        %s\n' % self.metadata['gt_crystals'][player])
-                outfile.write('Crystals required for Ganon:     %s\n' % self.metadata['ganon_crystals'][player])
+                addition = ' (Random)' if self.world.crystals_gt_orig[player] == 'random' else ''
+                outfile.write('Crystals required for GT:        %s\n' % (str(self.metadata['gt_crystals'][player]) + addition))
+                addition = ' (Random)' if self.world.crystals_ganon_orig[player] == 'random' else ''
+                outfile.write('Crystals required for Ganon:     %s\n' % (str(self.metadata['ganon_crystals'][player]) + addition))
                 outfile.write('Pyramid hole pre-opened:         %s\n' % ('Yes' if self.metadata['open_pyramid'][player] else 'No'))
                 outfile.write('Accessibility:                   %s\n' % self.metadata['accessibility'][player])
                 outfile.write('Map shuffle:                     %s\n' % ('Yes' if self.metadata['mapshuffle'][player] else 'No'))
@@ -2019,7 +2032,7 @@ class Spoiler(object):
             # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
             # items: Item names
             outfile.write('\n\nLocations:\n\n')
-            outfile.write('\n'.join(['%s: %s' % (self.world.fish.translate("meta","locations",location), self.world.fish.translate("meta","items",item)) for grouping in self.locations.values() for (location, item) in grouping.items()]))
+            outfile.write('\n'.join(['%s: %s' % (self.world.fish.translate("meta", "locations", location), self.world.fish.translate("meta", "items", item)) for grouping in self.locations.values() for (location, item) in grouping.items()]))
 
             # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
             # items: Item names
