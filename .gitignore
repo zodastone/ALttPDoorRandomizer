@@ -30,5 +30,7 @@ resources/user/*
 
 *.exe
 
+get-pip.py
+
 venv
 test
