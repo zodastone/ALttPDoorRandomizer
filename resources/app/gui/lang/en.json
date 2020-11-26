@@ -64,6 +64,7 @@
     "randomizer.dungeon.dungeonintensity.3": "3: Dungeon Lobbies",
     "randomizer.dungeon.dungeonintensity.random": "Random",
 
+    "randomizer.dungeon.potshuffle": "Pot Shuffle",
     "randomizer.dungeon.experimental": "Enable Experimental Features",
 
     "randomizer.dungeon.dungeon_counters": "Dungeon Chest Counters",
@@ -80,8 +81,6 @@
     "randomizer.dungeon.standardize_palettes": "Crossed Dungeon Palette ",
     "randomizer.dungeon.standardize_palettes.standardize": "Standardize Palettes",
     "randomizer.dungeon.standardize_palettes.original": "Keep Original Palettes",
-
-    "randomizer.enemizer.potshuffle": "Pot Shuffle",
 
     "randomizer.enemizer.enemyshuffle": "Enemy Shuffle",
     "randomizer.enemizer.enemyshuffle.none": "None",

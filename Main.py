@@ -11,6 +11,7 @@ import zlib
 from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
+from PotShuffle import shuffle_pots
 from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions, adjust_locations
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
 from EntranceShuffle import link_entrances, link_inverted_entrances
@@ -67,6 +68,7 @@ def main(args, seed=None, fish=None):
     world.intensity = {player: random.randint(1, 3) if args.intensity[player] == 'random' else int(args.intensity[player]) for player in range(1, world.players + 1)}
     world.experimental = args.experimental.copy()
     world.dungeon_counters = args.dungeon_counters.copy()
+    world.potshuffle = args.shufflepots.copy()
     world.fish = fish
     world.keydropshuffle = args.keydropshuffle.copy()
     world.mixed_travel = args.mixed_travel.copy()
@@ -111,6 +113,12 @@ def main(args, seed=None, fish=None):
         create_rooms(world, player)
         create_dungeons(world, player)
         adjust_locations(world, player)
+
+    if any(world.potshuffle):
+        logger.info(world.fish.translate("cli", "cli", "shuffling.pots"))
+        for player in range(1, world.players + 1):
+            if world.potshuffle[player]:
+                shuffle_pots(world, player)
 
     logger.info(world.fish.translate("cli","cli","shuffling.world"))
 
@@ -209,7 +217,10 @@ def main(args, seed=None, fish=None):
                 sprite_random_on_hit = type(args.sprite[player]) is str and args.sprite[player].lower() == 'randomonhit'
                 use_enemizer = (world.boss_shuffle[player] != 'none' or world.enemy_shuffle[player] != 'none'
                                 or world.enemy_health[player] != 'default' or world.enemy_damage[player] != 'default'
-                                or args.shufflepots[player] or sprite_random_on_hit)
+                                or sprite_random_on_hit)
+
+                if use_enemizer:
+                    base_patch = LocalRom(args.rom)  # update base2current.json
 
                 if use_enemizer:
                     base_patch = LocalRom(args.rom)  # update base2current.json
@@ -220,7 +231,7 @@ def main(args, seed=None, fish=None):
                     if args.rom and not(os.path.isfile(args.rom)):
                         raise RuntimeError("Could not find valid base rom for enemizing at expected path %s." % args.rom)
                     if os.path.exists(args.enemizercli):
-                        patch_enemizer(world, player, rom, args.rom, args.enemizercli, args.shufflepots[player], sprite_random_on_hit)
+                        patch_enemizer(world, player, rom, args.rom, args.enemizercli, sprite_random_on_hit)
                         enemized = True
                         if not args.jsonout:
                             rom = LocalRom.fromJsonRom(rom, args.rom, 0x400000)

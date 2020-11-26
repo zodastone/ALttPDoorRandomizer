@@ -7,8 +7,7 @@ from enum import Enum, unique
 try:
     from fast_enum import FastEnum
 except ImportError:
-    from enum import Flag
-    FastEnum = Flag
+    from enum import IntFlag as FastEnum
 
 
 from source.classes.BabelFish import BabelFish
@@ -128,6 +127,8 @@ class World(object):
             set_player_attr('open_pyramid', False)
             set_player_attr('treasure_hunt_icon', 'Triforce Piece')
             set_player_attr('treasure_hunt_count', 0)
+            set_player_attr('potshuffle', False)
+            set_player_attr('pot_contents', None)
 
             set_player_attr('keydropshuffle', False)
             set_player_attr('mixed_travel', 'prevent')
@@ -2083,3 +2084,48 @@ dungeon_names = [
     'Hyrule Castle', 'Eastern Palace', 'Desert Palace', 'Tower of Hera', 'Agahnims Tower', 'Palace of Darkness',
     'Swamp Palace', 'Skull Woods', 'Thieves Town', 'Ice Palace', 'Misery Mire', 'Turtle Rock', 'Ganons Tower'
 ]
+
+
+class PotItem(FastEnum):
+    Nothing = 0x0
+    OneRupee = 0x1
+    RockCrab = 0x2
+    Bee = 0x3
+    Random = 0x4
+    Bomb_0 = 0x5
+    Heart_0 = 0x6
+    FiveRupees = 0x7
+    Key = 0x8
+    FiveArrows = 0x9
+    Bomb = 0xA
+    Heart = 0xB
+    SmallMagic = 0xC
+    BigMagic = 0xD
+    Chicken = 0xE
+    GreenSoldier = 0xF
+    AliveRock = 0x10
+    BlueSoldier = 0x11
+    GroundBomb = 0x12
+    Heart_2 = 0x13
+    Fairy = 0x14
+    Heart_3 = 0x15
+    Hole = 0x80
+    Warp = 0x82
+    Staircase = 0x84
+    Bombable = 0x86
+    Switch = 0x88
+
+
+class PotFlags(FastEnum):
+    Normal = 0x0
+    NoSwitch = 0x1  # A switch should never go here
+    SwitchLogicChange = 0x2  # A switch can go here, but requires a logic change
+
+
+class Pot(object):
+    def __init__(self, x, y, item, room, flags = PotFlags.Normal):
+        self.x = x
+        self.y = y
+        self.item = item
+        self.room = room
+        self.flags = flags
