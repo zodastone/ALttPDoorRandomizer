@@ -126,7 +126,7 @@ KeyGet:
 		lda !MULTIWORLD_ITEM_PLAYER_ID : bne .receive
 		phx
 			lda $040c : lsr : tax
-			lda $00 : cmp KeyTable, x : bne +
+			lda $00 : CMP.l KeyTable, x : bne +
 					- JSL.l FullInventoryExternal : jsl CountChestKeyLong : plx : pla : rtl
 			+ cmp #$af : beq - ; universal key
 			cmp #$24 : beq -   ; small key for this dungeon

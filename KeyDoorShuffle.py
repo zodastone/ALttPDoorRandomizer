@@ -169,20 +169,10 @@ class KeyCounter(object):
         self.big_key_opened = False
         self.important_location = False
         self.other_locations = {}
+        self.important_locations = {}
 
     def used_smalls_loc(self, reserve=0):
         return max(self.used_keys + reserve - len(self.key_only_locations), 0)
-
-    def copy(self):
-        ret = KeyCounter(self.max_chests)
-        ret.free_locations.update(self.free_locations)
-        ret.key_only_locations.update(self.key_only_locations)
-        ret.child_doors.update(self.child_doors)
-        ret.used_keys = self.used_keys
-        ret.open_doors.update(self.open_doors)
-        ret.big_key_opened = self.big_key_opened
-        ret.important_location = self.important_location
-        return ret
 
 
 def build_key_layout(builder, start_regions, proposal, world, player):
@@ -540,6 +530,9 @@ def relative_empty_counter(odd_counter, key_counter):
         return False
     if len(set(odd_counter.free_locations).difference(key_counter.free_locations)) > 0:
         return False
+    # important only
+    if len(set(odd_counter.important_locations).difference(key_counter.important_locations)) > 0:
+        return False
     new_child_door = False
     for child in odd_counter.child_doors:
         if unique_child_door(child, key_counter):
@@ -554,6 +547,9 @@ def relative_empty_counter_2(odd_counter, key_counter):
     if len(set(odd_counter.key_only_locations).difference(key_counter.key_only_locations)) > 0:
         return False
     if len(set(odd_counter.free_locations).difference(key_counter.free_locations)) > 0:
+        return False
+    # important only
+    if len(set(odd_counter.important_locations).difference(key_counter.important_locations)) > 0:
         return False
     for child in odd_counter.child_doors:
         if unique_child_door_2(child, key_counter):
@@ -981,9 +977,13 @@ def filter_big_chest(locations):
 def count_locations_exclude_logic(locations, key_logic):
     cnt = 0
     for loc in locations:
-        if loc not in key_logic.bk_restricted and not loc.forced_item and not prize_or_event(loc):
-                cnt += 1
+        if not location_is_bk_locked(loc, key_logic) and not loc.forced_item and not prize_or_event(loc):
+            cnt += 1
     return cnt
+
+
+def location_is_bk_locked(loc, key_logic):
+    return loc in key_logic.bk_chests or loc in key_logic.bk_locked
 
 
 def prize_or_event(loc):
@@ -1417,6 +1417,7 @@ def create_key_counter(state, key_layout, world, player):
         if important_location(loc, world, player):
             key_counter.important_location = True
             key_counter.other_locations[loc] = None
+            key_counter.important_locations[loc] = None
         elif loc.forced_item and loc.item.name == key_layout.key_logic.small_key_name:
             key_counter.key_only_locations[loc] = None
         elif loc.forced_item and loc.item.name == key_layout.key_logic.bk_name:
@@ -1456,6 +1457,7 @@ def create_odd_key_counter(door, parent_counter, key_layout, world, player):
     odd_counter.key_only_locations = dict_difference(next_counter.key_only_locations, parent_counter.key_only_locations)
     odd_counter.child_doors = dict_difference(next_counter.child_doors, parent_counter.child_doors)
     odd_counter.other_locations = dict_difference(next_counter.other_locations, parent_counter.other_locations)
+    odd_counter.important_locations = dict_difference(next_counter.important_locations, parent_counter.important_locations)
     for loc in odd_counter.other_locations:
         if important_location(loc, world, player):
             odd_counter.important_location = True

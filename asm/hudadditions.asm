@@ -15,8 +15,9 @@ HudAdditions:
         LDX.b $07 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+14 ; draw 1's digit
     ++
 
-    ldx $040c : cpx #$ff : bne + : rts : +
-    lda.l DRMode : bne + : rts : +
+	LDX $1B : BNE + : RTS : + ; Skip if outdoors
+	ldx $040c : cpx #$ff : bne + : rts : + ; Skip if not in dungeon
+	lda.l DRMode : bne + : rts : + ; Skip if not door rando
         phb : phk : plb
         lda $7ef364 : and.l $0098c0, x : beq +
             lda.w CompassBossIndicator, x : and #$00ff : cmp $a0 : bne +

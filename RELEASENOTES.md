@@ -92,6 +92,13 @@ testing to verify logic is all good.
 
 # Bug Fixes
 
+* 2.0.16u
+	* Prevent HUD from showing key counter when in the overworld. (Aga 2 doesn't always clear the dungeon indicator)
+	* Fixed key logic regarding certain isolated "important" locations
+	* Fixed a problem with keydropshuffle thinking certain progression items are keys
+	* A couple of inverted rules fixed
+	* A more accurate count of which locations are blocked by teh big key in Ganon's Tower
+	* Updated base rom to 31.0.7 (includes potential hera basement cage fix)
 * 2.0.15u
 	* Allow Aga Tower lobby door as a a paired keydoor (typo)
 	* Fix portal check for multi-entrance dungeons
