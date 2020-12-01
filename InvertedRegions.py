@@ -1,12 +1,12 @@
 import collections
 from BaseClasses import RegionType
-from Regions import create_lw_region, create_dw_region, create_cave_region, create_dungeon_region
+from Regions import create_lw_region, create_dw_region, create_cave_region, create_dungeon_region, create_menu_region
 
 
 def create_inverted_regions(world, player):
 
     world.regions += [
-        create_dw_region(player, 'Menu', None, ['Links House S&Q', 'Dark Sanctuary S&Q', 'Old Man S&Q', 'Castle Ledge S&Q']),
+        create_menu_region(player, 'Menu', None, ['Links House S&Q', 'Dark Sanctuary S&Q', 'Old Man S&Q', 'Castle Ledge S&Q']),
         create_lw_region(player, 'Light World', ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'Purple Chest', 'Bombos Tablet'],
                          ["Blinds Hideout", "Hyrule Castle Secret Entrance Drop", 'Kings Grave Outer Rocks', 'Dam',
                           'Inverted Big Bomb Shop', 'Tavern North', 'Chicken House', 'Aginahs Cave', 'Sahasrahlas Hut', 'Kakariko Well Drop', 'Kakariko Well Cave',

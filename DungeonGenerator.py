@@ -2750,14 +2750,14 @@ def split_dungeon_builder(builder, split_list, builder_info):
             builder.split_dungeon_map[name].valid_proposal = proposal
         return builder.split_dungeon_map  # we made this earlier in gen, just use it
 
-    attempts, comb_w_replace, merge_attempt = 0, None, False
+    attempts, comb_w_replace, merge_attempt, merge_limit = 0, None, 0, len(split_list) - 1
     while attempts < 5:  # does not solve coin flips 3% of the time
         try:
             candidate_sectors = dict.fromkeys(builder.sectors)
             global_pole = GlobalPolarity(candidate_sectors)
 
             dungeon_map, sub_builder, merge_keys = {}, None, []
-            if merge_attempt:
+            if merge_attempt > 0:
                 candidates = []
                 for name, split_entrances in split_list.items():
                     if len(split_entrances) > 1:
@@ -2770,12 +2770,13 @@ def split_dungeon_builder(builder, split_list, builder_info):
                     p = next(x for x in world.dungeon_portals[player] if x.door.entrance.parent_region.name == r_name)
                     if not p.deadEnd:
                         candidates.append(name)
-                merge_keys = random.sample(candidates, 2) if len(candidates) >= 2 else []
+                merge_keys = random.sample(candidates, merge_attempt+1) if len(candidates) >= merge_attempt+1 else []
             for name, split_entrances in split_list.items():
                 key = builder.name + ' ' + name
                 if merge_keys and name in merge_keys:
-                    other_key = builder.name + ' ' + [x for x in merge_keys if x != name][0]
-                    if other_key in dungeon_map:
+                    other_keys = [builder.name + ' ' + x for x in merge_keys if x != name]
+                    other_key = next((x for x in other_keys if x in dungeon_map), None)
+                    if other_key:
                         key = other_key
                         sub_builder = dungeon_map[other_key]
                         sub_builder.all_entrances.extend(split_entrances)
@@ -2791,8 +2792,8 @@ def split_dungeon_builder(builder, split_list, builder_info):
                 attempts += 5  # all the combinations were tried already, no use repeating
             else:
                 attempts += 1
-        if attempts >= 5 and not merge_attempt:
-            merge_attempt, attempts = True, 0
+        if attempts >= 5 and merge_attempt < merge_limit:
+            merge_attempt, attempts = merge_attempt + 1, 0
 
     raise GenerationException('Unable to resolve in 5 attempts')
 

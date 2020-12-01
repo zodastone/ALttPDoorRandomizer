@@ -1,7 +1,5 @@
 import subprocess
 import sys
-import traceback
-import io
 import multiprocessing
 import concurrent.futures
 import argparse
@@ -42,6 +40,7 @@ def main(args=None):
                 task.success = False
                 task.name = testname
                 task.mode = mode[0]
+                task.cmd = basecommand + " " + command + mode[1]
                 task_mapping.append(task)
 
     test("Vanilla   ", "--shuffle vanilla")
@@ -61,14 +60,12 @@ def main(args=None):
             try:
                 result = task.result()
                 if result.returncode:
-                    raise Exception(result.stderr)
-            except:
-                error = io.StringIO()
-                traceback.print_exc(file=error)
-                errors.append([task.name + task.mode, error.getvalue()])
-            else:
-                alive += 1
-                task.success = True
+                    errors.append([task.name + task.mode, task.cmd, result.stderr])
+                else:
+                    alive += 1
+                    task.success = True
+            except Exception as e:
+                raise e
 
             progressbar.set_description(f"Success rate: {(alive/dead_or_alive)*100:.2f}% - {task.name}{task.mode}")
 
@@ -129,7 +126,8 @@ if __name__ == "__main__":
                 with open(f"{dr[0]}{(f'-{tense}' if dr[0] in ['basic', 'crossed'] else '')}-errors.txt", 'w') as stream:
                     for error in errors:
                         stream.write(error[0] + "\n")
-                        stream.write(error[1] + "\n\n")
+                        stream.write(error[1] + "\n")
+                        stream.write(error[2] + "\n\n")
 
     with open("success.txt", "w") as stream:
         stream.write(str.join("\n", successes))

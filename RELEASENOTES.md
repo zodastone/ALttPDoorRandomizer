@@ -92,6 +92,8 @@ testing to verify logic is all good.
 
 # Bug Fixes
 
+* 2.0.17u
+	* Generation improvements
 * 2.0.16u
 	* Prevent HUD from showing key counter when in the overworld. (Aga 2 doesn't always clear the dungeon indicator)
 	* Fixed key logic regarding certain isolated "important" locations

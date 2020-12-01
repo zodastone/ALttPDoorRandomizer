@@ -462,7 +462,12 @@ def analyze_portals(world, player):
             if len(possible_portals) == 1:
                 world.get_portal(possible_portals[0], player).destination = True
             elif len(possible_portals) > 1:
-                world.get_portal(random.choice(possible_portals), player).destination = True
+                dest_portal = random.choice(possible_portals)
+                access_portal = world.get_portal(dest_portal, player)
+                access_portal.destination = True
+                for other_portal in possible_portals:
+                    if other_portal != dest_portal:
+                        world.get_portal(dest_portal, player).dependent = access_portal
 
 
 def connect_portal(portal, world, player):
@@ -560,7 +565,7 @@ def create_dungeon_entrances(world, player):
     for key, portal_list in dungeon_portals.items():
         if key in dungeon_drops.keys():
             entrance_map[key].extend(dungeon_drops[key])
-        if key in split_portals.keys() and world.intensity[player] >= 3:
+        if key in split_portals.keys():
             dead_ends = []
             destinations = []
             the_rest = []
@@ -586,10 +591,12 @@ def create_dungeon_entrances(world, player):
                 p_entrance = portal.door.entrance
                 r_name = p_entrance.parent_region.name
                 split_map[key][choice].append(r_name)
-                originating[key][choice][p_entrance.connected_region.name] = None
+                entrance_region = find_entrance_region(portal)
+                originating[key][choice][entrance_region.name] = None
             dest_choices = [x for x in choices if len(split_map[key][x]) > 0]
             for portal in destinations:
-                restricted = portal.door.entrance.connected_region.name in world.inaccessible_regions[player]
+                entrance_region = find_entrance_region(portal)
+                restricted = entrance_region.name in world.inaccessible_regions[player]
                 if restricted:
                     filtered_choices = [x for x in choices if any(y not in world.inaccessible_regions[player] for y in originating[key][x].keys())]
                 else:
@@ -604,13 +611,14 @@ def create_dungeon_entrances(world, player):
                 portal = world.get_portal(portal_name, player)
                 r_name = portal.door.entrance.parent_region.name
                 entrance_map[key].append(r_name)
-                if key in split_portals.keys():
-                    for split_key in split_portals[key]:
-                        if split_key not in split_map[key]:
-                            split_map[key][split_key] = []
-                        if world.intensity[player] < 3:
-                            split_map[key][split_portal_defaults[key][r_name]].append(r_name)
     return entrance_map, split_map
+
+
+def find_entrance_region(portal):
+    for entrance in portal.door.entrance.connected_region.entrances:
+        if entrance.parent_region.type != RegionType.Dungeon:
+            return entrance.parent_region
+    return None
 
 
 # def unpair_all_doors(world, player):

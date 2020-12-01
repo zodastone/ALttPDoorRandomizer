@@ -25,7 +25,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes, fill_specific_items
 from Utils import output_path, parse_player_names
 
-__version__ = '0.2.0.16u'
+__version__ = '0.2.0.17u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -354,6 +354,7 @@ def main(args, seed=None, fish=None):
 
     return world
 
+
 def copy_world(world):
     # ToDo: Not good yet
     ret = World(world.players, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
@@ -443,15 +444,19 @@ def copy_world(world):
 
     # fill locations
     for location in world.get_locations():
+        new_location = ret.get_location(location.name, location.player)
         if location.item is not None:
             item = Item(location.item.name, location.item.advancement, location.item.priority, location.item.type, player = location.item.player)
-            ret.get_location(location.name, location.player).item = item
-            item.location = ret.get_location(location.name, location.player)
+            new_location.item = item
+            item.location = new_location
             item.world = ret
         if location.event:
-            ret.get_location(location.name, location.player).event = True
+            new_location.event = True
         if location.locked:
-            ret.get_location(location.name, location.player).locked = True
+            new_location.locked = True
+        # these need to be modified properly by set_rules
+        new_location.access_rule = lambda state: True
+        new_location.item_rule = lambda state: True
 
     # copy remaining itempool. No item in itempool should have an assigned location
     for item in world.itempool:
