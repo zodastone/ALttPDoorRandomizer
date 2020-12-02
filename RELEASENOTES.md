@@ -83,8 +83,9 @@ testing to verify logic is all good.
 
 ### Experimental features
 
-* Only the random bomb doors and the item counter are currently experimental
+* Only the item counter is currently experimental
 	* Item counter is suppressed in Triforce Hunt
+
 
 #### Temporary debug features
 
@@ -92,6 +93,9 @@ testing to verify logic is all good.
 
 # Bug Fixes
 
+* 2.0.18u
+	* Generation improvements
+	* Bombs/Dash doors more consistent with the amount in vanilla. 
 * 2.0.17u
 	* Generation improvements
 * 2.0.16u

@@ -60,9 +60,12 @@ def link_doors(world, player):
             if world.mode[player] == 'standard':
                 world.get_portal('Sanctuary', player).destination = True
             world.get_portal('Desert East', player).destination = True
-            world.get_portal('Skull 2 West', player).destination = True
-            world.get_portal('Turtle Rock Lazy Eyes', player).destination = True
-            world.get_portal('Turtle Rock Eye Bridge', player).destination = True
+            if world.mode[player] == 'inverted':
+                world.get_portal('Desert West', player).destination = True
+            if world.mode[player] == 'open':
+                world.get_portal('Skull 2 West', player).destination = True
+                world.get_portal('Turtle Rock Lazy Eyes', player).destination = True
+                world.get_portal('Turtle Rock Eye Bridge', player).destination = True
         else:
             analyze_portals(world, player)
         for portal in world.dungeon_portals[player]:
@@ -638,7 +641,7 @@ def within_dungeon(world, player):
         dungeon_builders[key].entrance_list = list(entrances_map[key])
     recombinant_builders = {}
     entrances, splits = create_dungeon_entrances(world, player)
-    builder_info = entrances, splits, world, player
+    builder_info = entrances, splits, connections_tuple, world, player
     handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info)
     main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player)
 
@@ -662,12 +665,12 @@ def within_dungeon(world, player):
 
 
 def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info):
-    dungeon_entrances, split_dungeon_entrances, world, player = builder_info
+    dungeon_entrances, split_dungeon_entrances, c_tuple, world, player = builder_info
     if dungeon_entrances is None:
         dungeon_entrances = default_dungeon_entrances
     if split_dungeon_entrances is None:
         split_dungeon_entrances = split_region_starts
-    builder_info = dungeon_entrances, split_dungeon_entrances, world, player
+    builder_info = dungeon_entrances, split_dungeon_entrances, c_tuple, world, player
 
     for name, split_list in split_dungeon_entrances.items():
         builder = dungeon_builders.pop(name)
@@ -886,7 +889,7 @@ def cross_dungeon(world, player):
                         key_name = dungeon_keys[builder.name] if loc.name != 'Hyrule Castle - Big Key Drop' else dungeon_bigs[builder.name]
                         loc.forced_item = loc.item = ItemFactory(key_name, player)
     recombinant_builders = {}
-    builder_info = entrances, splits, world, player
+    builder_info = entrances, splits, connections_tuple, world, player
     handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map, builder_info)
 
     main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player)
@@ -1609,6 +1612,7 @@ def change_door_to_small_key(d, world, player):
 def smooth_door_pairs(world, player):
     all_doors = [x for x in world.doors if x.player == player]
     skip = set()
+    bd_candidates, dashable_counts, bombable_counts = defaultdict(list), defaultdict(int), defaultdict(int)
     for door in all_doors:
         if door.type in [DoorType.Normal, DoorType.Interior] and door not in skip and not door.entranceFlag:
             partner = door.dest
@@ -1636,19 +1640,18 @@ def smooth_door_pairs(world, player):
                             remove_pair(door, world, player)
                 elif type_a in [DoorKind.Bombable, DoorKind.Dashable] or type_b in [DoorKind.Bombable, DoorKind.Dashable]:
                     if valid_pair:
-                        if type_a == type_b:
-                            add_pair(door, partner, world, player)
-                            spoiler_type = 'Bomb Door' if type_a == DoorKind.Bombable else 'Dash Door'
-                            world.spoiler.set_door_type(door.name + ' <-> ' + partner.name, spoiler_type, player)
-                        else:
+                        new_type = type_a
+                        if type_a != type_b:
                             new_type = DoorKind.Dashable if type_a == DoorKind.Dashable or type_b == DoorKind.Dashable else DoorKind.Bombable
                             if type_a != new_type:
                                 room_a.change(door.doorListPos, new_type)
                             if type_b != new_type:
                                 room_b.change(partner.doorListPos, new_type)
-                            add_pair(door, partner, world, player)
-                            spoiler_type = 'Bomb Door' if new_type == DoorKind.Bombable else 'Dash Door'
-                            world.spoiler.set_door_type(door.name + ' <-> ' + partner.name, spoiler_type, player)
+                        add_pair(door, partner, world, player)
+                        spoiler_type = 'Bomb Door' if new_type == DoorKind.Bombable else 'Dash Door'
+                        world.spoiler.set_door_type(door.name + ' <-> ' + partner.name, spoiler_type, player)
+                        counter = bombable_counts if new_type == DoorKind.Bombable else dashable_counts
+                        counter[door.entrance.parent_region.dungeon] += 1
                     else:
                         if type_a in [DoorKind.Bombable, DoorKind.Dashable]:
                             room_a.change(door.doorListPos, DoorKind.Normal)
@@ -1656,8 +1659,9 @@ def smooth_door_pairs(world, player):
                         elif type_b in [DoorKind.Bombable, DoorKind.Dashable]:
                             room_b.change(partner.doorListPos, DoorKind.Normal)
                             remove_pair(partner, world, player)
-            elif world.experimental[player] and valid_pair and type_a != DoorKind.SmallKey and type_b != DoorKind.SmallKey:
-                random_door_type(door, partner, world, player, type_a, type_b, room_a, room_b)
+            elif valid_pair and type_a != DoorKind.SmallKey and type_b != DoorKind.SmallKey:
+                bd_candidates[door.entrance.parent_region.dungeon].append(door)
+    shuffle_bombable_dashable(bd_candidates, bombable_counts, dashable_counts, world, player)
     world.paired_doors[player] = [x for x in world.paired_doors[player] if x.pair or x.original]
 
 
@@ -1694,17 +1698,61 @@ def stateful_door(door, kind):
     return False
 
 
-def random_door_type(door, partner, world, player, type_a, type_b, room_a, room_b):
-    r_kind = random.choices([DoorKind.Normal, DoorKind.Bombable, DoorKind.Dashable], [15, 4, 6], k=1)[0]
-    if r_kind != DoorKind.Normal:
-        if door.type == DoorType.Normal:
-            add_pair(door, partner, world, player)
-        if type_a != r_kind:
-            room_a.change(door.doorListPos, r_kind)
-        if type_b != r_kind:
-            room_b.change(partner.doorListPos, r_kind)
-        spoiler_type = 'Bomb Door' if r_kind == DoorKind.Bombable else 'Dash Door'
-        world.spoiler.set_door_type(door.name + ' <-> ' + partner.name, spoiler_type, player)
+def shuffle_bombable_dashable(bd_candidates, bombable_counts, dashable_counts, world, player):
+    if world.doorShuffle[player] == 'basic':
+        for dungeon, candidates in bd_candidates.items():
+            diff = bomb_dash_counts[dungeon.name][1] - dashable_counts[dungeon]
+            if diff > 0:
+                for chosen in random.sample(candidates, min(diff, len(candidates))):
+                    change_pair_type(chosen, DoorKind.Dashable, world, player)
+                    candidates.remove(chosen)
+            diff = bomb_dash_counts[dungeon.name][0] - bombable_counts[dungeon]
+            if diff > 0:
+                for chosen in random.sample(candidates, min(diff, len(candidates))):
+                    change_pair_type(chosen, DoorKind.Bombable, world, player)
+                    candidates.remove(chosen)
+            for excluded in candidates:
+                remove_pair_type_if_present(excluded, world, player)
+    elif world.doorShuffle[player] == 'crossed':
+        all_candidates = sum(bd_candidates.values(), [])
+        all_bomb_counts = sum(bombable_counts.values())
+        all_dash_counts = sum(dashable_counts.values())
+        if all_dash_counts < 8:
+            for chosen in random.sample(all_candidates, min(8 - all_dash_counts, len(all_candidates))):
+                change_pair_type(chosen, DoorKind.Dashable, world, player)
+                world.spoiler.set_door_type(chosen.name + ' <-> ' + chosen.dest.name, DoorKind.Dashable, player)
+                all_candidates.remove(chosen)
+        if all_bomb_counts < 12:
+            for chosen in random.sample(all_candidates, min(12 - all_bomb_counts, len(all_candidates))):
+                change_pair_type(chosen, DoorKind.Bombable, world, player)
+                world.spoiler.set_door_type(chosen.name + ' <-> ' + chosen.dest.name, DoorKind.Bombable, player)
+                all_candidates.remove(chosen)
+        for excluded in all_candidates:
+            remove_pair_type_if_present(excluded, world, player)
+
+
+def change_pair_type(door, new_type, world, player):
+    room_a = world.get_room(door.roomIndex, player)
+    room_a.change(door.doorListPos, new_type)
+    if door.type != DoorType.Interior:
+        room_b = world.get_room(door.dest.roomIndex, player)
+        room_b.change(door.dest.doorListPos, new_type)
+        add_pair(door, door.dest, world, player)
+    spoiler_type = 'Bomb Door' if new_type == DoorKind.Bombable else 'Dash Door'
+    world.spoiler.set_door_type(door.name + ' <-> ' + door.dest.name, spoiler_type, player)
+
+
+def remove_pair_type_if_present(door, world, player):
+    room_a = world.get_room(door.roomIndex, player)
+    if room_a.kind(door) in [DoorKind.Bombable, DoorKind.Dashable]:
+        room_a.change(door.doorListPos, DoorKind.Normal)
+        if door.type != DoorType.Interior:
+            remove_pair(door, world, player)
+    if door.type != DoorType.Interior:
+        room_b = world.get_room(door.dest.roomIndex, player)
+        if room_b.kind(door.dest) in [DoorKind.Bombable, DoorKind.Dashable]:
+            room_b.change(door.dest.doorListPos, DoorKind.Normal)
+            remove_pair(door.dest, world, player)
 
 
 def find_inaccessible_regions(world, player):
@@ -1727,8 +1775,9 @@ def find_inaccessible_regions(world, player):
                     queue.append(parent)
         for ext in next_region.exits:
             connect = ext.connected_region
-            if connect and connect.type is not RegionType.Dungeon and connect not in queue and connect not in visited_regions:
-                queue.append(connect)
+            if connect and connect not in queue and connect not in visited_regions:
+                if connect.type is not RegionType.Dungeon or connect.name.endswith(' Portal'):
+                    queue.append(connect)
     world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if valid_inaccessible_region(r)])
     logger = logging.getLogger('')
     logger.debug('Inaccessible Regions:')
@@ -2796,6 +2845,22 @@ split_portal_defaults = {
         'Skull 2 West Lobby': '2',
         'Skull 3 Lobby': '3'
     }
+}
+
+bomb_dash_counts = {
+    'Hyrule Castle': (0, 2),
+    'Eastern Palace': (0, 0),
+    'Desert Palace': (0, 0),
+    'Agahnims Tower': (0, 0),
+    'Swamp Palace': (2, 0),
+    'Palace of Darkness': (3, 2),
+    'Misery Mire': (2, 0),
+    'Skull Woods': (2, 0),
+    'Ice Palace': (0, 0),
+    'Tower of Hera': (0, 0),
+    'Thieves Town': (1, 1),
+    'Turtle Rock': (0, 2),  # 2 bombs kind of for entrances
+    'Ganons Tower': (2, 1)
 }
 
 
