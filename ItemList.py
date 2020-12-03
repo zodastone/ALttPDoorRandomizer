@@ -6,7 +6,8 @@ from BaseClasses import Region, RegionType, Shop, ShopType, Location
 from Bosses import place_bosses
 from Dungeons import get_dungeon_item_pool
 from EntranceShuffle import connect_entrance
-from Fill import FillError, fill_restrictive, fast_fill
+from Regions import shop_to_location_table, retro_shops
+from Fill import FillError, fill_restrictive
 from Items import ItemFactory
 
 import source.classes.constants as CONST
@@ -304,6 +305,13 @@ def generate_itempool(world, player):
         world.get_location(location, player).event = True
         world.get_location(location, player).locked = True
 
+    if world.shopsanity[player]:
+        for shop in world.shops[player]:
+            if shop.region.name in shop_to_location_table:
+                for index, slot in enumerate(shop.inventory):
+                    if slot:
+                        pool.append(slot['item'])
+
     items = ItemFactory(pool, player)
 
     world.lamps_needed_for_dark_rooms = lamps_needed_for_dark_rooms
@@ -371,6 +379,7 @@ take_any_locations = [
     'Palace of Darkness Hint', 'East Dark World Hint', 'Archery Game', 'Dark Lake Hylia Ledge Hint',
     'Dark Lake Hylia Ledge Spike Cave', 'Fortune Teller (Dark)', 'Dark Sanctuary Hint', 'Dark Desert Hint']
 
+
 def set_up_take_anys(world, player):
     if world.mode[player] == 'inverted' and 'Dark Sanctuary Hint' in take_any_locations:
         take_any_locations.remove('Dark Sanctuary Hint')
@@ -385,38 +394,43 @@ def set_up_take_anys(world, player):
     entrance = world.get_region(reg, player).entrances[0]
     connect_entrance(world, entrance, old_man_take_any, player)
     entrance.target = 0x58
-    old_man_take_any.shop = Shop(old_man_take_any, 0x0112, ShopType.TakeAny, 0xE2, True, True)
-    world.shops.append(old_man_take_any.shop)
+    old_man_take_any.shop = Shop(old_man_take_any, 0x0112, ShopType.TakeAny, 0xE2, True, not world.shopsanity[player])
+    world.shops[player].append(old_man_take_any.shop)
 
-    swords = [item for item in world.itempool if item.type == 'Sword' and item.player == player]
-    if swords:
-        sword = random.choice(swords)
-        world.itempool.remove(sword)
+    sword = next((item for item in world.itempool if item.type == 'Sword' and item.player == player), None)
+    if sword:
         world.itempool.append(ItemFactory('Rupees (20)', player))
+        if not world.shopsanity[player]:
+            world.itempool.remove(sword)
         old_man_take_any.shop.add_inventory(0, sword.name, 0, 0, create_location=True)
     else:
-        old_man_take_any.shop.add_inventory(0, 'Rupees (300)', 0, 0)
+        if world.shopsanity[player]:
+            world.itempool.append(ItemFactory('Rupees (300)', player))
+        old_man_take_any.shop.add_inventory(0, 'Rupees (300)', 0, 0, create_location=world.shopsanity[player])
 
+    take_any_type = ShopType.Shop if world.shopsanity[player] else ShopType.TakeAny
     for num in range(4):
         take_any = Region("Take-Any #{}".format(num+1), RegionType.Cave, 'a cave of choice', player)
         world.regions.append(take_any)
         world.dynamic_regions.append(take_any)
-
         target, room_id = random.choice([(0x58, 0x0112), (0x60, 0x010F), (0x46, 0x011F)])
         reg = regions.pop()
         entrance = world.get_region(reg, player).entrances[0]
         connect_entrance(world, entrance, take_any, player)
         entrance.target = target
-        take_any.shop = Shop(take_any, room_id, ShopType.TakeAny, 0xE3, True, True)
-        world.shops.append(take_any.shop)
-        take_any.shop.add_inventory(0, 'Blue Potion', 0, 0)
-        take_any.shop.add_inventory(1, 'Boss Heart Container', 0, 0)
+        take_any.shop = Shop(take_any, room_id, take_any_type, 0xE3, True, not world.shopsanity[player])
+        world.shops[player].append(take_any.shop)
+        take_any.shop.add_inventory(0, 'Blue Potion', 0, 0, create_location=world.shopsanity[player])
+        take_any.shop.add_inventory(1, 'Boss Heart Container', 0, 0, create_location=world.shopsanity[player])
+        if world.shopsanity[player]:
+            world.itempool.append(ItemFactory('Blue Potion', player))
+            world.itempool.append(ItemFactory('Boss Heart Container', player))
 
     world.initialize_regions()
 
 
 def create_dynamic_shop_locations(world, player):
-    for shop in world.shops:
+    for shop in world.shops[player]:
         if shop.region.player == player:
             for i, item in enumerate(shop.inventory):
                 if item is None:
@@ -428,9 +442,10 @@ def create_dynamic_shop_locations(world, player):
 
                     world.clear_location_cache()
 
-                    world.push_item(loc, ItemFactory(item['item'], player), False)
-                    loc.event = True
-                    loc.locked = True
+                    if not world.shopsanity[player]:
+                        world.push_item(loc, ItemFactory(item['item'], player), False)
+                        loc.event = True
+                        loc.locked = True
 
 
 def fill_prizes(world, attempts=15):
@@ -462,20 +477,125 @@ def fill_prizes(world, attempts=15):
 
 
 def set_up_shops(world, player):
-    # TODO: move hard+ mode changes for sheilds here, utilizing the new shops
-
     if world.retro[player]:
-        rss = world.get_region('Red Shield Shop', player).shop
-        if not rss.locked:
-            rss.custom = True
-            rss.add_inventory(2, 'Single Arrow', 80)
-        for shop in random.sample([s for s in world.shops if not s.locked and s.region.player == player], 5):
-            shop.custom = True
-            shop.locked = True
-            shop.add_inventory(0, 'Single Arrow', 80)
-            shop.add_inventory(1, 'Small Key (Universal)', 100)
-            shop.add_inventory(2, 'Bombs (10)', 50)
-        rss.locked = True
+        if world.shopsanity[player]:
+            removals = [next(item for item in world.itempool if item.name == 'Arrows (10)' and item.player == player)]
+            red_pots = [item for item in world.itempool if item.name == 'Red Potion' and item.player == player][:5]
+            shields_n_hearts = [item for item in world.itempool if item.name in ['Blue Shield', 'Small Heart'] and item.player == player]
+            removals.extend(red_pots)
+            removals.extend(random.sample(shields_n_hearts, 5))
+            for remove in removals:
+                world.itempool.remove(remove)
+            for i in range(6):
+                arrow_item = ItemFactory('Single Arrow', player)
+                arrow_item.advancement = True
+                world.itempool.append(arrow_item)
+            for i in range(5):
+                world.itempool.append(ItemFactory('Small Key (Universal)', player))
+        # TODO: move hard+ mode changes for shields here, utilizing the new shops
+        else:
+            rss = world.get_region('Red Shield Shop', player).shop
+            if not rss.locked:
+                rss.custom = True
+                rss.add_inventory(2, 'Single Arrow', 80)
+            for shop in random.sample([s for s in world.shops if not s.locked and s.region.player == player], 5):
+                shop.custom = True
+                shop.locked = True
+                shop.add_inventory(0, 'Single Arrow', 80)
+                shop.add_inventory(1, 'Small Key (Universal)', 100)
+                shop.add_inventory(2, 'Bombs (10)', 50)
+            rss.locked = True
+
+
+def customize_shops(world, player):
+    found_bomb_upgrade, found_arrow_upgrade = False, False
+    possible_replacements = []
+    shops_to_customize = shop_to_location_table.copy()
+    if world.retro[player]:
+        shops_to_customize.update(retro_shops)
+    for shop_name, loc_list in shops_to_customize.items():
+        shop = world.get_region(shop_name, player).shop
+        shop.custom = True
+        shop.clear_inventory()
+        for idx, loc in enumerate(loc_list):
+            location = world.get_location(loc, player)
+            item = location.item
+            max_repeat = 1
+            if shop_name not in retro_shops:
+                if item.name in repeatable_shop_items:
+                    max_repeat = 0
+                if item.name in ['Bomb Upgrade (+5)', 'Arrow Upgrade (+5)']:
+                    if item.name == 'Bomb Upgrade (+5)':
+                        found_bomb_upgrade = True
+                    if item.name == 'Arrow Upgrade (+5)':
+                        found_arrow_upgrade = True
+                    max_repeat = 7
+            if shop_name in retro_shops:
+                price = 0
+            else:
+                price = 120 if shop_name == 'Potion Shop' and item.name == 'Red Potion' else item.price
+                if world.retro[player] and item.name == 'Single Arrow':
+                    price = 80
+                # randomize price
+            shop.add_inventory(idx, item.name, randomize_price(price), max_repeat)
+            if item.name in cap_replacements and shop_name not in retro_shops:
+                possible_replacements.append((shop, idx, location, item))
+        # todo: randomize shopkeeper
+    # handle capacity upgrades - randomly choose a bomb bunch or arrow bunch to become capacity upgrades
+    if not found_bomb_upgrade and len(possible_replacements) > 0:
+        choices = []
+        for shop, idx, loc, item in possible_replacements:
+            if item.name in ['Bombs (3)', 'Bombs (10)']:
+                choices.append((shop, idx, loc, item))
+        if len(choices) > 0:
+            shop, idx, loc, item = random.choice(choices)
+            upgrade = ItemFactory('Bomb Upgrade (+5)', player)
+            shop.add_inventory(idx, upgrade.name, randomize_price(upgrade.price), 6,
+                               item.name, randomize_price(item.price))
+            loc.item = upgrade
+            upgrade.location = loc
+    if not found_arrow_upgrade and len(possible_replacements) > 0:
+        choices = []
+        for shop, idx, loc, item in possible_replacements:
+            if item.name == 'Arrows (10)' or (item.name == 'Single Arrow' and not world.retro[player]):
+                choices.append((shop, idx, loc, item))
+        if len(choices) > 0:
+            shop, idx, loc, item = random.choice(choices)
+            upgrade = ItemFactory('Arrow Upgrade (+5)', player)
+            shop.add_inventory(idx, upgrade.name, randomize_price(upgrade.price), 6,
+                               item.name, randomize_price(item.price))
+            loc.item = upgrade
+            upgrade.location = loc
+    change_shop_items_to_rupees(world, player, shops_to_customize)
+
+
+def randomize_price(price):
+    half_price = price // 2
+    max_price = price - half_price
+    if max_price % 5 == 0:
+        max_price //= 5
+        return random.randint(0, max_price) * 5 + half_price
+    else:
+        return price
+
+
+def change_shop_items_to_rupees(world, player, shops):
+    locations = world.get_filled_locations(player)
+    for location in locations:
+        if location.item.name in shop_transfer.keys() and location.parent_region not in shops:
+            new_item = ItemFactory(shop_transfer[location.item.name], location.item.player)
+            location.item = new_item
+
+
+repeatable_shop_items = ['Single Arrow', 'Arrows (10)', 'Bombs (3)', 'Bombs (10)', 'Red Potion', 'Small Heart',
+                         'Blue Shield', 'Red Shield', 'Bee', 'Small Key (Universal)']
+
+
+cap_replacements = ['Single Arrow', 'Arrows (10)', 'Bombs (3)', 'Bombs (10)']
+
+
+shop_transfer = {'Red Potion': 'Rupees (100)', 'Bee': 'Rupees (5)', 'Blue Potion': 'Rupees (100)',
+                 'Blue Shield': 'Rupees (50)', 'Red Shield': 'Rupees (300)'}
 
 
 def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, door_shuffle):

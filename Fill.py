@@ -2,6 +2,7 @@ import random
 import logging
 
 from BaseClasses import CollectionState
+from Regions import shop_to_location_table
 
 
 class FillError(RuntimeError):
@@ -373,6 +374,22 @@ def flood_items(world):
                 world.push_item(location, item_to_place, True)
                 itempool.remove(item_to_place)
                 break
+
+
+def sell_keys(world, player):
+    choices = []
+    shop_map = {}
+    for shop in world.shops[player]:
+        if shop.region.name in shop_to_location_table:
+            choices.append(shop.region.name)
+            shop_map[shop.region.name] = shop
+    key_seller = random.choice(choices)
+    location = random.choice(shop_to_location_table[key_seller])
+    universal_key = next(item for item in world.itempool if item.name == 'Small Key (Universal)' and item.player == player)
+    world.push_item(world.get_location(location, player), universal_key, collect=False)
+    shop_map[key_seller].add_inventory(0, 'Small Key (Universal)', 100)  # will be fixed later in customize shops
+    world.itempool.remove(universal_key)
+
 
 def balance_multiworld_progression(world):
     state = CollectionState(world)

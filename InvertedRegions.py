@@ -2,7 +2,7 @@ import collections
 from BaseClasses import RegionType
 from Regions import create_lw_region, create_dw_region, create_cave_region, create_dungeon_region, create_menu_region
 
-
+# todo: shopsanity locations
 def create_inverted_regions(world, player):
 
     world.regions += [

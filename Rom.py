@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '185a0f74ab0e2ce8899c8d7d309ca68c'
+RANDOMIZERBASEHASH = '7264ffb7c430dde5d6bfe6030b79a575'
 
 
 class JsonRom(object):
@@ -1493,7 +1493,7 @@ def patch_race_rom(rom):
         RaceRom.encrypt(rom)
 
 def write_custom_shops(rom, world, player):
-    shops = [shop for shop in world.shops if shop.custom and shop.region.player == player]
+    shops = [shop for shop in world.shops[player] if shop.custom and shop.region.player == player]
 
     shop_data = bytearray()
     items_data = bytearray()

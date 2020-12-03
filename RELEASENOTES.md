@@ -28,7 +28,13 @@
 * Known issues:
 	* Palettes aren't perfect 			
 		* Some ugly colors
-		* Invisible floors can be see in many palettes		
+		* Invisible floors can be see in many palettes
+		
+## Shopsanity
+
+--shopsanity added. This adds 29 shop locations (9 more in retro) to the general and location pool.
+
+** **Todo** **: add more info here.  		
 
 ## Key Drop Shuffle
 
