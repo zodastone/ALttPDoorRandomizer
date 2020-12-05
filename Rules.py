@@ -209,10 +209,9 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Swamp Barrier Ledge Hook Path', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Swamp Drain Right Switch', player), lambda state: state.has('Drained Swamp', player))
     set_rule(world.get_entrance('Swamp Drain WN', player), lambda state: state.has('Drained Swamp', player))
+    # this might be unnecesssary for an insanity style shuffle
     set_rule(world.get_entrance('Swamp Flooded Room WS', player), lambda state: state.has('Drained Swamp', player))
     set_rule(world.get_entrance('Swamp Flooded Room Ladder', player), lambda state: state.has('Drained Swamp', player))
-    set_rule(world.get_location('Swamp Palace - Flooded Room - Left', player), lambda state: state.has('Drained Swamp', player))
-    set_rule(world.get_location('Swamp Palace - Flooded Room - Right', player), lambda state: state.has('Drained Swamp', player))
     set_rule(world.get_entrance('Swamp Flooded Spot Ladder', player), lambda state: state.has('Flippers', player) or state.has('Drained Swamp', player))
     set_rule(world.get_entrance('Swamp Drain Left Up Stairs', player), lambda state: state.has('Flippers', player) or state.has('Drained Swamp', player))
     set_rule(world.get_entrance('Swamp Waterway NW', player), lambda state: state.has('Flippers', player))
