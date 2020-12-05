@@ -446,9 +446,9 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Swamp Right Elbow', 'Swamp Palace', None, ['Swamp Right Elbow SE', 'Swamp Right Elbow Down Stairs']),
         create_dungeon_region(player, 'Swamp Drain Left', 'Swamp Palace', None, ['Swamp Drain Left Up Stairs', 'Swamp Drain WN']),
         create_dungeon_region(player, 'Swamp Drain Right', 'Swamp Palace', ['Swamp Drain'], ['Swamp Drain Right Switch', 'Swamp Drain Right Up Stairs']),
-        # This is intentionally odd so I don't have to treat the WS door in the Flooded Room oddly (because of how it works when going backward)
-        create_dungeon_region(player, 'Swamp Flooded Room', 'Swamp Palace', None, ['Swamp Flooded Room Up Stairs', 'Swamp Flooded Room Ladder', 'Swamp Flooded Room WS']),
-        create_dungeon_region(player, 'Swamp Flooded Spot', 'Swamp Palace', ['Swamp Palace - Flooded Room - Left', 'Swamp Palace - Flooded Room - Right'], ['Swamp Flooded Spot Ladder']),
+        create_dungeon_region(player, 'Swamp Flooded Room', 'Swamp Palace', None, ['Swamp Flooded Room Up Stairs', 'Swamp Flooded Room Ladder']),
+        # this is more normal and allows getting the chests from doing this room backward in logic
+        create_dungeon_region(player, 'Swamp Flooded Spot', 'Swamp Palace', ['Swamp Palace - Flooded Room - Left', 'Swamp Palace - Flooded Room - Right'], ['Swamp Flooded Room WS', 'Swamp Flooded Spot Ladder']),
         create_dungeon_region(player, 'Swamp Basement Shallows', 'Swamp Palace', None, ['Swamp Basement Shallows NW', 'Swamp Basement Shallows EN', 'Swamp Basement Shallows ES']),
         create_dungeon_region(player, 'Swamp Waterfall Room', 'Swamp Palace', ['Swamp Palace - Waterfall Room'], ['Swamp Waterfall Room SW', 'Swamp Waterfall Room NW', 'Swamp Waterfall Room NE']),
         create_dungeon_region(player, 'Swamp Refill', 'Swamp Palace', None, ['Swamp Refill SW']),

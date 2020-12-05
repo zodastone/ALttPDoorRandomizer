@@ -1404,7 +1404,7 @@ def calc_allowance_and_dead_ends(builder, connections_tuple, world, player):
     builder.allowance = starting_allowance
     for entrance in needed_connections:
         sector = find_sector(entrance, builder.sectors)
-        if sector not in used_sectors:  # ignore things on same sector
+        if sector and sector not in used_sectors:  # ignore things on same sector
             is_destination = entrance in destination_entrances
             connect_able = False
             if entrance in connections.keys():
