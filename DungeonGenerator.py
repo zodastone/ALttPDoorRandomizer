@@ -2655,8 +2655,8 @@ def valid_entrance(builder, sector_list, builder_info):
             for sector in entrances:
                 for region in entrance_list:
                     if region in sector.region_set():
-                        portal = next((x for x in world.dungeon_portals[player] if x.door.entrance.parent_region.name == region))
-                        if not portal.deadEnd:
+                        portal = next((x for x in world.dungeon_portals[player] if x.door.entrance.parent_region.name == region), None)
+                        if portal and not portal.deadEnd:
                             all_dead = False
                         break
                 if not all_dead:
@@ -2776,8 +2776,8 @@ def split_dungeon_builder(builder, split_list, builder_info):
                         continue
                     ents, splits, c_tuple, world, player = builder_info
                     r_name = split_entrances[0]
-                    p = next(x for x in world.dungeon_portals[player] if x.door.entrance.parent_region.name == r_name)
-                    if not p.deadEnd:
+                    p = next((x for x in world.dungeon_portals[player] if x.door.entrance.parent_region.name == r_name), None)
+                    if p and not p.deadEnd:
                         candidates.append(name)
                 merge_keys = random.sample(candidates, merge_attempt+1) if len(candidates) >= merge_attempt+1 else []
             for name, split_entrances in split_list.items():
@@ -2950,12 +2950,13 @@ def check_for_forced_crystal_single(builder, candidate_sectors):
     for hook in builder_doors.keys():
         for door in builder_doors[hook].keys():
             opp = opposite_h_type(hook)
-            for d, sector in builder_doors[opp].items():
-                if d != door and (not sector.blue_barrier or sector.c_switch):
-                    return False
-            for d, sector in candidate_doors[opp].items():
-                if not sector.blue_barrier or sector.c_switch:
-                    return False
+            if opp in builder_doors.keys():
+                for d, sector in builder_doors[opp].items():
+                    if d != door and (not sector.blue_barrier or sector.c_switch):
+                        return False
+                for d, sector in candidate_doors[opp].items():
+                    if not sector.blue_barrier or sector.c_switch:
+                        return False
     return True
 
 
