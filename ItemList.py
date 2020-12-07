@@ -540,7 +540,10 @@ def customize_shops(world, player):
             shop.add_inventory(idx, item.name, randomize_price(price), max_repeat)
             if item.name in cap_replacements and shop_name not in retro_shops:
                 possible_replacements.append((shop, idx, location, item))
-        # todo: randomize shopkeeper
+        # randomize shopkeeper
+        if shop_name != 'Capacity Upgrade':
+            shopkeeper = random.choice([0xC1, 0xA0, 0xE2, 0xE3])
+            shop.shopkeeper_config = shopkeeper
     # handle capacity upgrades - randomly choose a bomb bunch or arrow bunch to become capacity upgrades
     if not found_bomb_upgrade and len(possible_replacements) > 0:
         choices = []
@@ -582,7 +585,7 @@ def randomize_price(price):
 def change_shop_items_to_rupees(world, player, shops):
     locations = world.get_filled_locations(player)
     for location in locations:
-        if location.item.name in shop_transfer.keys() and location.parent_region not in shops:
+        if location.item.name in shop_transfer.keys() and location.parent_region.name not in shops:
             new_item = ItemFactory(shop_transfer[location.item.name], location.item.player)
             location.item = new_item
 
