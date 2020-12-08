@@ -1861,12 +1861,12 @@ def check_required_paths(paths, world, player):
         if dungeon_name in world.dungeon_layouts[player].keys():
             builder = world.dungeon_layouts[player][dungeon_name]
             if len(paths[dungeon_name]) > 0:
-                states_to_explore = {}
+                states_to_explore = defaultdict(list)
                 for path in paths[dungeon_name]:
                     if type(path) is tuple:
                         states_to_explore[tuple([path[0]])] = path[1]
                     else:
-                        states_to_explore[tuple(builder.path_entrances)] = path
+                        states_to_explore[tuple(builder.path_entrances)].append(path)
                 cached_initial_state = None
                 for start_regs, dest_regs in states_to_explore.items():
                     if type(dest_regs) is not list:
@@ -1935,13 +1935,14 @@ def check_if_regions_visited(state, check_paths):
         if state.visited_at_all(region_target):
             valid = True
             break
-        else:
+        elif not breaking_region:
             breaking_region = region_target
     return valid, breaking_region
 
 
 def check_for_pinball_fix(state, bad_region, world, player):
     pinball_region = world.get_region('Skull Pinball', player)
+    # todo: lobby shuffle
     if bad_region.name == 'Skull 2 West Lobby' and state.visited_at_all(pinball_region):  # revisit this for entrance shuffle
         door = world.get_door('Skull Pinball WS', player)
         room = world.get_room(door.roomIndex, player)
