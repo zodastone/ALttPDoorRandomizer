@@ -1720,12 +1720,10 @@ def shuffle_bombable_dashable(bd_candidates, bombable_counts, dashable_counts, w
         if all_dash_counts < 8:
             for chosen in random.sample(all_candidates, min(8 - all_dash_counts, len(all_candidates))):
                 change_pair_type(chosen, DoorKind.Dashable, world, player)
-                world.spoiler.set_door_type(chosen.name + ' <-> ' + chosen.dest.name, DoorKind.Dashable, player)
                 all_candidates.remove(chosen)
         if all_bomb_counts < 12:
             for chosen in random.sample(all_candidates, min(12 - all_bomb_counts, len(all_candidates))):
                 change_pair_type(chosen, DoorKind.Bombable, world, player)
-                world.spoiler.set_door_type(chosen.name + ' <-> ' + chosen.dest.name, DoorKind.Bombable, player)
                 all_candidates.remove(chosen)
         for excluded in all_candidates:
             remove_pair_type_if_present(excluded, world, player)
