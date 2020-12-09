@@ -93,6 +93,10 @@ testing to verify logic is all good.
 
 # Bug Fixes
 
+* 2.0.19u
+	* Generation improvement
+	* Possible fix for shop vram corruption
+	* The Cane of Byrna does not count as a chest key anymore
 * 2.0.18u
 	* Generation improvements
 	* Bombs/Dash doors more consistent with the amount in vanilla. 
