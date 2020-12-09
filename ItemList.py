@@ -749,6 +749,12 @@ def fill_specific_items(world):
     all_state = world.get_all_state(True)
     fill_restrictive(world, all_state, [cage], [key_item])
 
+    location = world.get_location('Tower of Hera - Map Chest', 1)
+    key_item = next(x for x in world.itempool if 'Byrna' in x.name)
+    world.itempool.remove(key_item)
+    fast_fill(world, [key_item], [location])
+
+
     # somaria = next(item for item in world.itempool if item.name == 'Cane of Somaria')
     # shooter = world.get_location('Palace of Darkness - Shooter Room', 1)
     # world.itempool.remove(somaria)
