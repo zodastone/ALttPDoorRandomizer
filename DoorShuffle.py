@@ -488,6 +488,7 @@ def connect_portal(portal, world, player):
     chosen_door = world.get_door(portal_entrance.name, player)
     chosen_door.blocked = False
     connect_door_only(world, chosen_door, portal_region, player)
+    portal_entrance.parent_region.entrances.append(edit_entrance)
 
 
 #  todo: remove this?
@@ -505,6 +506,7 @@ def connect_portal_copy(portal, world, player):
     chosen_door = world.get_door(portal_entrance.name, player)
     chosen_door.blocked = False
     connect_door_only(world, chosen_door, portal_region, player)
+    portal_entrance.parent_region.entrances.append(edit_entrance)
 
 
 def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allowed=False, crossed=False, bk_shuffle=False):

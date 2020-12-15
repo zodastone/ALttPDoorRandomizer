@@ -619,7 +619,7 @@ def stonewall_valid(stonewall):
                 return False  # you can get stuck from an entrance
             else:
                 door = entrance.door
-                if door is not None and door != stonewall and not door.blocked and parent not in visited:
+                if (door is None or (door != stonewall and not door.blocked)) and parent not in visited:
                     visited.add(parent)
                     queue.append(parent)
     # we didn't find anything bad

@@ -93,6 +93,8 @@ testing to verify logic is all good.
 
 # Bug Fixes
 
+* 2.0.20u
+	* Problem with Desert Wall not being pre-opened in intensity 3 fixed 
 * 2.0.19u
 	* Generation improvement
 	* Possible fix for shop vram corruption
