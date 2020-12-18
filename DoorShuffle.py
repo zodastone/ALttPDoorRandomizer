@@ -488,6 +488,7 @@ def connect_portal(portal, world, player):
     chosen_door = world.get_door(portal_entrance.name, player)
     chosen_door.blocked = False
     connect_door_only(world, chosen_door, portal_region, player)
+    portal_entrance.parent_region.entrances.append(edit_entrance)
 
 
 #  todo: remove this?
@@ -505,6 +506,7 @@ def connect_portal_copy(portal, world, player):
     chosen_door = world.get_door(portal_entrance.name, player)
     chosen_door.blocked = False
     connect_door_only(world, chosen_door, portal_region, player)
+    portal_entrance.parent_region.entrances.append(edit_entrance)
 
 
 def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allowed=False, crossed=False, bk_shuffle=False):
@@ -1720,12 +1722,10 @@ def shuffle_bombable_dashable(bd_candidates, bombable_counts, dashable_counts, w
         if all_dash_counts < 8:
             for chosen in random.sample(all_candidates, min(8 - all_dash_counts, len(all_candidates))):
                 change_pair_type(chosen, DoorKind.Dashable, world, player)
-                world.spoiler.set_door_type(chosen.name + ' <-> ' + chosen.dest.name, DoorKind.Dashable, player)
                 all_candidates.remove(chosen)
         if all_bomb_counts < 12:
             for chosen in random.sample(all_candidates, min(12 - all_bomb_counts, len(all_candidates))):
                 change_pair_type(chosen, DoorKind.Bombable, world, player)
-                world.spoiler.set_door_type(chosen.name + ' <-> ' + chosen.dest.name, DoorKind.Bombable, player)
                 all_candidates.remove(chosen)
         for excluded in all_candidates:
             remove_pair_type_if_present(excluded, world, player)
@@ -1863,12 +1863,12 @@ def check_required_paths(paths, world, player):
         if dungeon_name in world.dungeon_layouts[player].keys():
             builder = world.dungeon_layouts[player][dungeon_name]
             if len(paths[dungeon_name]) > 0:
-                states_to_explore = {}
+                states_to_explore = defaultdict(list)
                 for path in paths[dungeon_name]:
                     if type(path) is tuple:
                         states_to_explore[tuple([path[0]])] = path[1]
                     else:
-                        states_to_explore[tuple(builder.path_entrances)] = path
+                        states_to_explore[tuple(builder.path_entrances)].append(path)
                 cached_initial_state = None
                 for start_regs, dest_regs in states_to_explore.items():
                     if type(dest_regs) is not list:
@@ -1937,13 +1937,14 @@ def check_if_regions_visited(state, check_paths):
         if state.visited_at_all(region_target):
             valid = True
             break
-        else:
+        elif not breaking_region:
             breaking_region = region_target
     return valid, breaking_region
 
 
 def check_for_pinball_fix(state, bad_region, world, player):
     pinball_region = world.get_region('Skull Pinball', player)
+    # todo: lobby shuffle
     if bad_region.name == 'Skull 2 West Lobby' and state.visited_at_all(pinball_region):  # revisit this for entrance shuffle
         door = world.get_door('Skull Pinball WS', player)
         room = world.get_room(door.roomIndex, player)

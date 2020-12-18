@@ -619,7 +619,7 @@ def stonewall_valid(stonewall):
                 return False  # you can get stuck from an entrance
             else:
                 door = entrance.door
-                if door is not None and door != stonewall and not door.blocked and parent not in visited:
+                if (door is None or (door != stonewall and not door.blocked)) and parent not in visited:
                     visited.add(parent)
                     queue.append(parent)
     # we didn't find anything bad
@@ -1575,6 +1575,8 @@ def assign_crystal_switch_sectors(dungeon_map, crystal_switches, crystal_barrier
                 valid = global_pole.is_valid_choice(dungeon_map, builder_choice, test_set)
             assign_sector(switch_choice, builder_choice, crystal_switches, global_pole)
         return crystal_switches
+    if len(crystal_switches) == 0:
+        raise GenerationException('No crystal switches to assign')
     sector_list = list(crystal_switches)
     choices = random.sample(sector_list, k=len(population))
     for i, choice in enumerate(choices):
