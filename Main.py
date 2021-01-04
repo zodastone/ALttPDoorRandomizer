@@ -114,7 +114,7 @@ def main(args, seed=None, fish=None):
         create_dungeons(world, player)
         adjust_locations(world, player)
 
-    if any(world.potshuffle):
+    if any(world.potshuffle.values()):
         logger.info(world.fish.translate("cli", "cli", "shuffling.pots"))
         for player in range(1, world.players + 1):
             if world.potshuffle[player]:
@@ -436,9 +436,7 @@ def copy_world(world):
         copied_region.is_light_world = region.is_light_world
         copied_region.is_dark_world = region.is_dark_world
         copied_region.dungeon = region.dungeon
-        copied_region.locations = [copy.copy(location) for location in region.locations]
-        for location in copied_region.locations:
-            location.parent_region = copied_region
+        copied_region.locations = [Location(location.player, location.name, parent=copied_region) for location in region.locations]
         for entrance in region.entrances:
             ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
 
