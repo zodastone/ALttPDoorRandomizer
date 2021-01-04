@@ -26,7 +26,7 @@
 	* Sewer palette comes back for part of Hyrule Castle for areas "near" the sewer dropdown
 	* There is a setting to keep original palettes (--standardize_palettes original)
 * Known issues:
-	* Palettes aren't perfect 			
+	* Palettes are not perfect 			
 		* Some ugly colors
 		* Invisible floors can be see in many palettes		
 
@@ -44,10 +44,11 @@ an entire pose and should be obtainable with the hookshot or boomerang as before
 ## --mixed_travel setting
 * Due to Hammerjump, Hovering in PoD Arena, and the Mire Big Key Chest bomb jump two sections of a supertile that are
 otherwise unconnected logically can be reach using these glitches. To prevent the player from unintentionally
-	* prevent: Rails are added the 3 spots to prevent this tricks. This setting is recommend for those learning
+	* prevent: Rails are added to the 3 spots to prevent these tricks. This setting is recommend for those learning
 	 crossed dungeon mode to learn what is dangerous and what is not. No logic seeds ignore this setting.
 	 * allow: The rooms are left alone and it is up to the discretion of the player whether to use these tricks or not.
-	 * force: The two disjointed sections are forced to be in the same dungeon but never logically required to complete that game.
+	 * force: The two disjointed sections are forced to be in the same dungeon but performing the glitches is never
+	  logically required to complete that game.
 
 ## Keysanity menu redesign
 
@@ -61,18 +62,17 @@ Redesign of Keysanity Menu complete for crossed dungeon and moved out of experim
 			--keydropshuffle)
 			* Blank if there a big key but you haven't found it yet
 	* 2nd Column displays the current number of keys for that dungeon. Suppressed in retro (always blank)
-	* 3rd Column only display if you have the map. It shows the number of keys left to collect for that dungeon. If
+	* 3rd Column only displays if you have the map. It shows the number of keys left to collect for that dungeon. If
 	--keydropshuffle is off, this does not count key drops. If on, it does.
-	* (Note: the key columns can display up to 36 using the letters A-Z after 9)
+	* (Note: the key columns can display up to 35 using the letters A-Z after 9)
 * Second screen about Maps / Compass
-	* 1st Column: indicate if you have foudn the map of not for that dungeon
-	* 2nd and 3rd Column: You must have the compass to see these columns. A two-digit display that show you how
-	many chests are left in the dungeon. If -keydropshuffle is off, this does not count key drop. If on, it does. 
+	* 1st Column: indicates if you have found the map or not for that dungeon
+	* 2nd and 3rd Column: You must have the compass to see these columns. A two-digit display that shows you how
+	many chests are left in the dungeon. If --keydropshuffle is off, this does not count key drops. If on, it does. 
 	
 ## Potshuffle by compiling
 
-Same flag as before but uses python logic written by compiling instead of the enemizer logic-less version. Needs some
-testing to verify logic is all good.
+Same flag as before but uses python logic written by compiling instead of the enemizer logic-less version.
 
 ## Other features
 
@@ -85,7 +85,6 @@ testing to verify logic is all good.
 
 * Only the item counter is currently experimental
 	* Item counter is suppressed in Triforce Hunt
-
 
 #### Temporary debug features
 
@@ -161,7 +160,6 @@ testing to verify logic is all good.
 
 # Known Issues
 
-* Multiworld = /missing command not working
 * Potenial keylocks in multi-entrance dungeons
 * Incorrect vanilla keylogic for Mire
 * ER - Potential for Skull Woods West to be completely inaccessible in non-beatable logic
