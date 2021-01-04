@@ -222,9 +222,6 @@ def main(args, seed=None, fish=None):
                 if use_enemizer:
                     base_patch = LocalRom(args.rom)  # update base2current.json
 
-                if use_enemizer:
-                    base_patch = LocalRom(args.rom)  # update base2current.json
-
                 rom = JsonRom() if args.jsonout or use_enemizer else LocalRom(args.rom)
 
                 if use_enemizer and (args.enemizercli or not args.jsonout):
