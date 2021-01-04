@@ -284,14 +284,23 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
     with open(options_path, 'w') as f:
         json.dump(options, f)
 
-    subprocess.check_call([os.path.abspath(enemizercli),
-                           '--rom', baserom_path,
-                           '--seed', str(world.rom_seeds[player]),
-                           '--base', basepatch_path,
-                           '--randomizer', randopatch_path,
-                           '--enemizer', options_path,
-                           '--output', enemizer_output_path],
-                          cwd=os.path.dirname(enemizercli), stdout=subprocess.DEVNULL)
+    try:
+        subprocess.run([os.path.abspath(enemizercli),
+                               '--rom', baserom_path,
+                               '--seed', str(world.rom_seeds[player]),
+                               '--base', basepatch_path,
+                               '--randomizer', randopatch_path,
+                               '--enemizer', options_path,
+                               '--output', enemizer_output_path],
+                              cwd=os.path.dirname(enemizercli),
+                              check=True,
+                              capture_output=True)
+    except subprocess.CalledProcessError as e:
+        from Main import EnemizerError
+        enemizerMsg  = world.fish.translate("cli","cli","Enemizer returned exit code: ") + str(e.returncode) + "\n"
+        enemizerMsg += world.fish.translate("cli","cli","enemizer.nothing.applied")
+        logging.error(f'Enemizer error output: {e.stderr.decode("utf-8")}\n')
+        raise EnemizerError(enemizerMsg)
 
     with open(enemizer_basepatch_path, 'r') as f:
         for patch in json.load(f):
