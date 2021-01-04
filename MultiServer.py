@@ -154,7 +154,8 @@ def send_new_items(ctx : Context):
             client.send_index = len(items)
 
 def forfeit_player(ctx : Context, team, slot):
-    all_locations = [values[0] for values in Regions.location_table.values() if type(values[0]) is int]
+    all_locations = {values[0] for values in Regions.location_table.values() if type(values[0]) is int}
+    all_locations.update({values[1] for values in Regions.key_drop_data.values()})
     notify_all(ctx, "%s (Team #%d) has forfeited" % (ctx.player_names[(team, slot)], team + 1))
     register_location_checks(ctx, team, slot, all_locations)
 
@@ -248,11 +249,11 @@ async def process_client_cmd(ctx : Context, client : Client, cmd, args):
             return
         locs = []
         for location in args:
-            if type(location) is not int or 0 >= location > len(Regions.location_table):
+            if type(location) is not int or 0 >= location > len(Regions.lookup_id_to_name.keys()):
                 await send_msgs(client.socket, [['InvalidArguments', 'LocationScouts']])
                 return
-            loc_name = list(Regions.location_table.keys())[location - 1]
-            target_item, target_player = ctx.locations[(Regions.location_table[loc_name][0], client.slot)]
+            loc_name = list(Regions.lookup_id_to_name.keys())[location - 1]
+            target_item, target_player = ctx.locations[(Regions.lookup_name_to_id[loc_name], client.slot)]
 
             replacements = {'SmallKey': 0xA2, 'BigKey': 0x9D, 'Compass': 0x8D, 'Map': 0x7D}
             item_type = [i[2] for i in Items.item_table.values() if type(i[3]) is int and i[3] == target_item]

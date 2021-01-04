@@ -80,7 +80,7 @@ def bottom_frame(self, parent, args=None):
         needEnemizer = False
         if hasEnemizer:
             falsey = ["none", "default", False, 0]
-            for enemizerOption in [ "shufflepots", "shuffleenemies", "enemy_damage", "shufflebosses", "enemy_health" ]:
+            for enemizerOption in ["shuffleenemies", "enemy_damage", "shufflebosses", "enemy_health"]:
                 if enemizerOption in argsDump:
                     if isinstance(argsDump[enemizerOption], dict):
                         for playerID,playerSetting in argsDump[enemizerOption].items():
@@ -268,7 +268,7 @@ def create_guiargs(parent):
     guiargs.randomSprite = parent.randomSprite.get()
 
     # Get output path
-    guiargs.outputpath = parent.outputPath.get()
+    guiargs.outputpath = parent.settings["outputpath"]
 
     guiargs = update_deprecated_args(guiargs)
 

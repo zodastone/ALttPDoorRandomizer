@@ -18,6 +18,8 @@ def link_entrances(world, player):
     for exitname, regionname in mandatory_connections:
         connect_simple(world, exitname, regionname, player)
 
+    connect_custom(world, player)
+
     # if we do not shuffle, set default connections
     if world.shuffle[player] == 'vanilla':
         for exitname, regionname in default_connections:
@@ -316,7 +318,7 @@ def link_entrances(world, player):
                 caves.remove(old_man_house[0])
             except ValueError:
                 pass
-            else: #if the cave wasn't placed we get here
+            else:  # if the cave wasn't placed we get here
                 connect_caves(world, lw_entrances, [], old_man_house, player)
         if world.mode[player] == 'standard':
             # rest of hyrule castle must be in light world
@@ -324,7 +326,6 @@ def link_entrances(world, player):
         # in full, Sanc must be in light world, so must all of HC if door shuffle is on
         elif world.doorShuffle[player] != 'vanilla':
             connect_caves(world, lw_entrances, [], [('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)', 'Hyrule Castle Exit (South)')], player)
-
 
         # place old man, has limited options
         # exit has to come from specific set of doors, the entrance is free to move about
@@ -711,7 +712,7 @@ def link_entrances(world, player):
 
         # handle remaining caves
         while caves:
-            # connect highest exit count caves first, prevent issue where we have 2 or 3 exits accross worlds left to fill
+            # connect highest exit count caves first, prevent issue where we have 2 or 3 exits across worlds left to fill
             cave_candidate = (None, 0)
             for i, cave in enumerate(caves):
                 if isinstance(cave, str):
@@ -1062,7 +1063,7 @@ def link_entrances(world, player):
         raise NotImplementedError('Shuffling not supported yet')
 
     # check for swamp palace fix
-    if world.get_entrance('Dam', player).connected_region.name != 'Dam' or world.get_entrance('Swamp Palace', player).connected_region.name != 'Swamp Lobby':
+    if world.get_entrance('Dam', player).connected_region.name != 'Dam' or world.get_entrance('Swamp Palace', player).connected_region.name != 'Swamp Portal':
         world.swamp_patch_required[player] = True
 
     # check for potion shop location
@@ -1074,7 +1075,7 @@ def link_entrances(world, player):
         world.ganon_at_pyramid[player] = False
 
     # check for Ganon's Tower location
-    if world.get_entrance('Ganons Tower', player).connected_region.name != 'GT Lobby':
+    if world.get_entrance('Ganons Tower', player).connected_region.name != 'Ganons Tower Portal':
         world.ganonstower_vanilla[player] = False
 
 def link_inverted_entrances(world, player):
@@ -1780,6 +1781,15 @@ def link_inverted_entrances(world, player):
     # check for Ganon's Tower location
     if world.get_entrance('Inverted Ganons Tower', player).connected_region.name != 'GT Lobby':
         world.ganonstower_vanilla[player] = False
+
+
+def connect_custom(world, player):
+    if hasattr(world, 'custom_entrances') and world.custom_entrances[player]:
+        for exit_name, region_name in world.custom_entrances[player]:
+            # doesn't actually change addresses
+            connect_simple(world, exit_name, region_name, player)
+    # this needs to remove custom connections from the pool
+
 
 def connect_simple(world, exitname, regionname, player):
     world.get_entrance(exitname, player).connect(world.get_region(regionname, player))
@@ -2864,6 +2874,7 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Spectacle Rock Cave Drop', 'Spectacle Rock Cave (Bottom)'),
                          ('Spectacle Rock Cave Peak Drop', 'Spectacle Rock Cave (Bottom)'),
                          ('Death Mountain Return Ledge Drop', 'Light World'),
+                         ('Old Man Cave Dropdown', 'Old Man Cave'),
                          ('Old Man House Front to Back', 'Old Man House Back'),
                          ('Old Man House Back to Front', 'Old Man House'),
                          ('Broken Bridge (West)', 'East Death Mountain (Bottom)'),
@@ -2973,6 +2984,7 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('Spectacle Rock Cave Drop', 'Spectacle Rock Cave (Bottom)'),
                                   ('Spectacle Rock Cave Peak Drop', 'Spectacle Rock Cave (Bottom)'),
                                   ('Death Mountain Return Ledge Drop', 'Light World'),
+                                  ('Old Man Cave Dropdown', 'Old Man Cave'),
                                   ('Old Man House Front to Back', 'Old Man House Back'),
                                   ('Old Man House Back to Front', 'Old Man House'),
                                   ('Broken Bridge (West)', 'East Death Mountain (Bottom)'),
@@ -3165,7 +3177,7 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Two Brothers House Exit (East)', 'Light World'),
                        ('Two Brothers House Exit (West)', 'Maze Race Ledge'),
 
-                       ('Sanctuary', 'Sanctuary'),
+                       ('Sanctuary', 'Sanctuary Portal'),
                        ('Sanctuary Grave', 'Sewer Drop'),
                        ('Sanctuary Exit', 'Light World'),
 
@@ -3400,114 +3412,114 @@ inverted_default_connections =  [('Waterfall of Wishing', 'Waterfall of Wishing'
                                  ('Inverted Pyramid Entrance', 'Bottom of Pyramid')]
 
 # non shuffled dungeons
-default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert Main Lobby'),
-                               ('Desert Palace Entrance (West)', 'Desert West Lobby'),
-                               ('Desert Palace Entrance (North)', 'Desert Back Lobby'),
-                               ('Desert Palace Entrance (East)', 'Desert East Lobby'),
+default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South Portal'),
+                               ('Desert Palace Entrance (West)', 'Desert West Portal'),
+                               ('Desert Palace Entrance (North)', 'Desert Back Portal'),
+                               ('Desert Palace Entrance (East)', 'Desert East Portal'),
                                ('Desert Palace Exit (South)', 'Desert Palace Stairs'),
                                ('Desert Palace Exit (West)', 'Desert Ledge'),
                                ('Desert Palace Exit (East)', 'Desert Palace Lone Stairs'),
                                ('Desert Palace Exit (North)', 'Desert Palace Entrance (North) Spot'),
 
-                               ('Eastern Palace', 'Eastern Lobby'),
+                               ('Eastern Palace', 'Eastern Portal'),
                                ('Eastern Palace Exit', 'Light World'),
-                               ('Tower of Hera', 'Hera Lobby'),
+                               ('Tower of Hera', 'Hera Portal'),
                                ('Tower of Hera Exit', 'Death Mountain (Top)'),
 
-                               ('Hyrule Castle Entrance (South)', 'Hyrule Castle Lobby'),
-                               ('Hyrule Castle Entrance (West)', 'Hyrule Castle West Lobby'),
-                               ('Hyrule Castle Entrance (East)', 'Hyrule Castle East Lobby'),
+                               ('Hyrule Castle Entrance (South)', 'Hyrule Castle South Portal'),
+                               ('Hyrule Castle Entrance (West)', 'Hyrule Castle West Portal'),
+                               ('Hyrule Castle Entrance (East)', 'Hyrule Castle East Portal'),
                                ('Hyrule Castle Exit (South)', 'Hyrule Castle Courtyard'),
                                ('Hyrule Castle Exit (West)', 'Hyrule Castle Ledge'),
                                ('Hyrule Castle Exit (East)', 'Hyrule Castle Ledge'),
-                               ('Agahnims Tower', 'Tower Lobby'),
+                               ('Agahnims Tower', 'Agahnims Tower Portal'),
                                ('Agahnims Tower Exit', 'Hyrule Castle Ledge'),
 
-                               ('Thieves Town', 'Thieves Lobby'),
+                               ('Thieves Town', 'Thieves Town Portal'),
                                ('Thieves Town Exit', 'West Dark World'),
                                ('Skull Woods First Section Hole (East)', 'Skull Pinball'),
                                ('Skull Woods First Section Hole (West)', 'Skull Left Drop'),
                                ('Skull Woods First Section Hole (North)', 'Skull Pot Circle'),
-                               ('Skull Woods First Section Door', 'Skull 1 Lobby'),
+                               ('Skull Woods First Section Door', 'Skull 1 Portal'),
                                ('Skull Woods First Section Exit', 'Skull Woods Forest'),
                                ('Skull Woods Second Section Hole', 'Skull Back Drop'),
-                               ('Skull Woods Second Section Door (East)', 'Skull 2 East Lobby'),
-                               ('Skull Woods Second Section Door (West)', 'Skull 2 West Lobby'),
+                               ('Skull Woods Second Section Door (East)', 'Skull 2 East Portal'),
+                               ('Skull Woods Second Section Door (West)', 'Skull 2 West Portal'),
                                ('Skull Woods Second Section Exit (East)', 'Skull Woods Forest'),
                                ('Skull Woods Second Section Exit (West)', 'Skull Woods Forest (West)'),
-                               ('Skull Woods Final Section', 'Skull 3 Lobby'),
+                               ('Skull Woods Final Section', 'Skull 3 Portal'),
                                ('Skull Woods Final Section Exit', 'Skull Woods Forest (West)'),
-                               ('Ice Palace', 'Ice Lobby'),
+                               ('Ice Palace', 'Ice Portal'),
                                ('Ice Palace Exit', 'Dark Lake Hylia Central Island'),
-                               ('Misery Mire', 'Mire Lobby'),
+                               ('Misery Mire', 'Mire Portal'),
                                ('Misery Mire Exit', 'Dark Desert'),
-                               ('Palace of Darkness', 'PoD Lobby'),
+                               ('Palace of Darkness', 'Palace of Darkness Portal'),
                                ('Palace of Darkness Exit', 'East Dark World'),
-                               ('Swamp Palace', 'Swamp Lobby'),  # requires additional patch for flooding moat if moved
+                               ('Swamp Palace', 'Swamp Portal'),  # requires additional patch for flooding moat if moved
                                ('Swamp Palace Exit', 'South Dark World'),
 
-                               ('Turtle Rock', 'TR Main Lobby'),
+                               ('Turtle Rock', 'Turtle Rock Main Portal'),
                                ('Turtle Rock Exit (Front)', 'Dark Death Mountain (Top)'),
                                ('Turtle Rock Ledge Exit (West)', 'Dark Death Mountain Ledge'),
                                ('Turtle Rock Ledge Exit (East)', 'Dark Death Mountain Ledge'),
-                               ('Dark Death Mountain Ledge (West)', 'TR Lazy Eyes'),
-                               ('Dark Death Mountain Ledge (East)', 'TR Big Chest Entrance'),
+                               ('Dark Death Mountain Ledge (West)', 'Turtle Rock Lazy Eyes Portal'),
+                               ('Dark Death Mountain Ledge (East)', 'Turtle Rock Chest Portal'),
                                ('Turtle Rock Isolated Ledge Exit', 'Dark Death Mountain Isolated Ledge'),
-                               ('Turtle Rock Isolated Ledge Entrance', 'TR Eye Bridge'),
+                               ('Turtle Rock Isolated Ledge Entrance', 'Turtle Rock Eye Bridge Portal'),
 
-                               ('Ganons Tower', 'GT Lobby'),
+                               ('Ganons Tower', 'Ganons Tower Portal'),
                                ('Ganons Tower Exit', 'Dark Death Mountain (Top)')
-                              ]
+                               ]
 
-inverted_default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert Main Lobby'),
-                               ('Desert Palace Entrance (West)', 'Desert West Lobby'),
-                               ('Desert Palace Entrance (North)', 'Desert Back Lobby'),
-                               ('Desert Palace Entrance (East)', 'Desert East Lobby'),
+inverted_default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South Portal'),
+                               ('Desert Palace Entrance (West)', 'Desert West Portal'),
+                               ('Desert Palace Entrance (North)', 'Desert Back Portal'),
+                               ('Desert Palace Entrance (East)', 'Desert East Portal'),
                                ('Desert Palace Exit (South)', 'Desert Palace Stairs'),
                                ('Desert Palace Exit (West)', 'Desert Ledge'),
                                ('Desert Palace Exit (East)', 'Desert Palace Lone Stairs'),
                                ('Desert Palace Exit (North)', 'Desert Palace Entrance (North) Spot'),
-                               ('Eastern Palace', 'Eastern Lobby'),
+                               ('Eastern Palace', 'Eastern Portal'),
                                ('Eastern Palace Exit', 'Light World'),
-                               ('Tower of Hera', 'Hera Lobby'),
+                               ('Tower of Hera', 'Hera Portal'),
                                ('Tower of Hera Exit', 'Death Mountain (Top)'),
-                               ('Hyrule Castle Entrance (South)', 'Hyrule Castle Lobby'),
-                               ('Hyrule Castle Entrance (West)', 'Hyrule Castle West Lobby'),
-                               ('Hyrule Castle Entrance (East)', 'Hyrule Castle East Lobby'),
+                               ('Hyrule Castle Entrance (South)', 'Hyrule Castle South Portal'),
+                               ('Hyrule Castle Entrance (West)', 'Hyrule Castle West Portal'),
+                               ('Hyrule Castle Entrance (East)', 'Hyrule Castle East Portal'),
                                ('Hyrule Castle Exit (South)', 'Light World'),
                                ('Hyrule Castle Exit (West)', 'Hyrule Castle Ledge'),
                                ('Hyrule Castle Exit (East)', 'Hyrule Castle Ledge'),
-                               ('Thieves Town', 'Thieves Lobby'),
+                               ('Thieves Town', 'Thieves Town Portal'),
                                ('Thieves Town Exit', 'West Dark World'),
                                ('Skull Woods First Section Hole (East)', 'Skull Pinball'),
                                ('Skull Woods First Section Hole (West)', 'Skull Left Drop'),
                                ('Skull Woods First Section Hole (North)', 'Skull Pot Circle'),
-                               ('Skull Woods First Section Door', 'Skull 1 Lobby'),
+                               ('Skull Woods First Section Door', 'Skull 1 Portal'),
                                ('Skull Woods First Section Exit', 'Skull Woods Forest'),
                                ('Skull Woods Second Section Hole', 'Skull Back Drop'),
-                               ('Skull Woods Second Section Door (East)', 'Skull 2 East Lobby'),
-                               ('Skull Woods Second Section Door (West)', 'Skull 2 West Lobby'),
+                               ('Skull Woods Second Section Door (East)', 'Skull 2 East Portal'),
+                               ('Skull Woods Second Section Door (West)', 'Skull 2 West Portal'),
                                ('Skull Woods Second Section Exit (East)', 'Skull Woods Forest'),
                                ('Skull Woods Second Section Exit (West)', 'Skull Woods Forest (West)'),
-                               ('Skull Woods Final Section', 'Skull 3 Lobby'),
+                               ('Skull Woods Final Section', 'Skull 3 Portal'),
                                ('Skull Woods Final Section Exit', 'Skull Woods Forest (West)'),
-                               ('Ice Palace', 'Ice Lobby'),
-                               ('Misery Mire', 'Mire Lobby'),
+                               ('Ice Palace', 'Ice Portal'),
+                               ('Misery Mire', 'Mire Portal'),
                                ('Misery Mire Exit', 'Dark Desert'),
-                               ('Palace of Darkness', 'PoD Lobby'),
+                               ('Palace of Darkness', 'Palace of Darkness Portal'),
                                ('Palace of Darkness Exit', 'East Dark World'),
-                               ('Swamp Palace', 'Swamp Lobby'),  # requires additional patch for flooding moat if moved
+                               ('Swamp Palace', 'Swamp Portal'),  # requires additional patch for flooding moat if moved
                                ('Swamp Palace Exit', 'South Dark World'),
-                               ('Turtle Rock', 'TR Main Lobby'),
+                               ('Turtle Rock', 'Turtle Rock Main Portal'),
                                ('Turtle Rock Ledge Exit (West)', 'Dark Death Mountain Ledge'),
                                ('Turtle Rock Ledge Exit (East)', 'Dark Death Mountain Ledge'),
-                               ('Dark Death Mountain Ledge (West)', 'TR Lazy Eyes'),
-                               ('Dark Death Mountain Ledge (East)', 'TR Big Chest Entrance'),
+                               ('Dark Death Mountain Ledge (West)', 'Turtle Rock Lazy Eyes Portal'),
+                               ('Dark Death Mountain Ledge (East)', 'Turtle Rock Chest Portal'),
                                ('Turtle Rock Isolated Ledge Exit', 'Dark Death Mountain Isolated Ledge'),
-                               ('Turtle Rock Isolated Ledge Entrance', 'TR Eye Bridge'),
-                               ('Inverted Ganons Tower', 'GT Lobby'),
+                               ('Turtle Rock Isolated Ledge Entrance', 'Turtle Rock Eye Bridge Portal'),
+                               ('Inverted Ganons Tower', 'Ganons Tower Portal'),
                                ('Inverted Ganons Tower Exit', 'Hyrule Castle Ledge'),
-                               ('Inverted Agahnims Tower', 'Tower Lobby'),
+                               ('Inverted Agahnims Tower', 'Agahnims Tower Portal'),
                                ('Inverted Agahnims Tower Exit', 'Dark Death Mountain'),
                                ('Turtle Rock Exit (Front)', 'Dark Death Mountain'),
                                ('Ice Palace Exit', 'Dark Lake Hylia')

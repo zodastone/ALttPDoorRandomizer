@@ -33,6 +33,23 @@ GfxFixer:
     rtl
 }
 
+FixAnimatedTiles:
+	LDA.L DRMode : CMP #$02 : BNE +
+	LDA $040C : CMP.b #$FF : BEQ +
+		PHX
+			LDX $A0 : LDA.l TilesetTable, x
+			CMP $0AA1 : beq ++
+				TAX : PLA : BRA +
+			++
+		PLX
+	+ LDA $02802E, X ; what we wrote over
+	RTL
+
+FixWallmasterLamp:
+ORA $0458
+STY $1C : STA $1D : RTL ; what we wrote over
+
+
 CgramAuxToMain: ; ripped this from bank02 because it ended with rts
 {
     rep #$20
@@ -55,3 +72,14 @@ CgramAuxToMain: ; ripped this from bank02 because it ended with rts
     inc $15
     rts
 }
+
+OverridePaletteHeader:
+	lda.l DRMode : cmp #$02 : bne +
+	lda.l DRFlags : and #$20 : bne +
+	cpx #$01c2 : !bge +
+		rep #$20
+		txa : lsr : tax
+		lda.l PaletteTable, x
+		iny : rtl
+	+ rep #$20 : iny : lda [$0D], Y ; what we wrote over
+rtl

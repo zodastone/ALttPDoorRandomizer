@@ -14,7 +14,11 @@ Please just DM me on discord for now. I (Aerinon) can be found at the [ALTTP Ran
 
 # Installation
 
-Clone this repository and then run ```DungeonRandomizer.py``` (requires Python 3).
+Install Python 3
+
+Run ```pip install python-bps-continued```.  On Linux, you should use pip3.  On Windows, you may need to run ```python -m pip install python-bps-continued``` or ```py -m pip install python-bps-continued```.
+
+Clone this repository then run ```DungeonRandomizer.py```.
 
 Alternatively, run ```Gui.py``` for a simple graphical user interface. (WIP)
 
@@ -22,7 +26,7 @@ Alternatively, run ```Gui.py``` for a simple graphical user interface. (WIP)
 
 Only extra settings are found here. All entrance randomizer settings are supported. See their [readme](https://github.com/KevinCathcart/ALttPEntranceRandomizer/blob/master/README.md)
 
-## Door Shuffle
+## Door Shuffle (--doorShuffle)
 
 ### Basic
 
@@ -36,14 +40,51 @@ Doors are shuffled between dungeons as well.
 
 Doors are not shuffled.
 
-## Intensity
+## Intensity (--intensity number)
 
 #### Level 1
 Normal door and spiral staircases are shuffled
 #### Level 2
 Same as Level 1 plus open edges and straight staircases are shuffled.
-#### Level 3 (Coming soon)
+#### Level 3
 Same as Level 2 plus Dungeon Lobbies are shuffled
+
+## KeyDropShuffle (--keydropshuffle)
+
+Adds 33 new locations to the randomization pool. The 32 small keys found under pots and dropped by enemies and the Big
+Key drop location are added to the pool. The keys normally found there are added to the item pool. Retro adds 
+32 generic keys to the pool instead.
+
+## Crossed Dungeon Specific Settings
+
+### Mixed Travel (--mixed_travel value)
+
+Due to Hammerjump, Hovering in PoD Arena, and the Mire Big Key Chest bomb jump two sections of a supertile that are
+otherwise unconnected logically can be reached using these glitches. To prevent the player from unintentionally changing
+dungeons while doing these tricks, you may use one of the following options.
+
+#### Prevent (default)
+
+Rails are added the 3 spots to prevent this tricks. This setting is recommend for those learning crossed dungeon mode to
+learn what is dangerous and what is not. No logic seeds ignore this setting.
+
+#### Allow
+
+The rooms are left alone and it is up to the discretion of the player whether to use these tricks or not.
+
+#### Force
+
+The two disjointed sections are forced to be in the same dungeon but the glitches are never logically required to complete that game.
+
+### Standardize Palettes (--standardize_palettes)
+No effect if door shuffle is not on crossed
+
+#### Standardize (default)
+Rooms in the same dungeon have their palettes changed to match. Hyrule Castle is split between Sewer and HC palette.
+Rooms adjacent to sanctuary get their coloring to match the Sanctuary's original palette.
+
+#### Original
+Rooms/supertiles keep their original palettes.
 
 
 ## Map/Compass/Small Key/Big Key shuffle (aka Keysanity)
@@ -81,13 +122,31 @@ Use to batch generate multiple seeds with same settings. If a seed number is pro
 Show the help message and exit.
 
 ```
---door_shuffle      
+--door_shuffle <mode>     
 ```
 
 For specifying the door shuffle you want as above. (default: basic)
 
 ```
---intensity      
+--intensity <number>     
 ```
 
 For specifying the door shuffle intensity level you want as above. (default: 2)
+
+```
+--keydropshuffle      
+```
+
+Include mobs and pots drop in the item pool. (default: not enabled)
+
+```
+--mixed_travel <mode>      
+```
+
+How to handle certain glitches in crossed dungeon mode. (default: prevent)
+
+```
+--standardize_palettes (mode)
+```
+
+Whether to standardize dungeon palettes in crossed dungeon mode. (default: standardize)

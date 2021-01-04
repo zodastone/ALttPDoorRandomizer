@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from collections import defaultdict
 
 def int16_as_bytes(value):
     value = value & 0xFFFF
@@ -225,6 +226,47 @@ def read_entrance_data(old_rom='Zelda no Densetsu - Kamigami no Triforce (Japan)
         print(string)
 
 
+def room_palette_data(old_rom):
+    with open(old_rom, 'rb') as stream:
+        old_rom_data = bytearray(stream.read())
+
+    offset = defaultdict(list)
+    for i in range(0, 256):
+        pointer_offset = 0x0271e2+i*2
+        header_offset = old_rom_data[pointer_offset + 1] << 8
+        header_offset += old_rom_data[pointer_offset]
+        header_offset -= 0x8000
+        header_offset += 0x020000
+        offset[header_offset].append(i)
+        # print(f'{hex(i)}: {hex(old_rom_data[header_offset+1])}')
+    for header_offset, rooms in offset.items():
+        print(f'{hex(header_offset)}: {[hex(x) for x in rooms]}')
+
+
+
+# Palette notes:
+# HC: 0
+# Sewer/Dungeon: 1
+# AT: 0xc near boss, 0x0 (other) 26 (f4, f1)
+# Sanc: 0x1d
+# Hera: 0x6
+# Desert: 0x4 (boss and near boss), 0x9 (desert tiles 1 + desert main)
+# Eastern: 0xb
+# Pod: 0xf, x10 (boss)
+# Swamp: 0x8 (boss), 0xa (other)
+# Skull: 0xe (boss), 0xd (other)
+# TT: 0x17, 0x23 (attic)
+# Ice: 0x13, 0x14 (boss)
+# Mire: 0x11 (other) , 0x12 (boss/preroom)
+# TR: 0x18, 0x19 (boss+pre)
+# GT: 0x28 (entrance + B1), 0x1a (other) 0x24 (Gauntlet - Lanmo) 0x25 (conveyor-torch-wizzrode moldorm pit f5?)
+# Aga2: 0x1b, 0x1b (Pre aga2)
+# Caves: 0x7, 0x20
+# Uncle: 0x1
+# Ganon: 0x21
+# Houses: 0x2
+
+
 def print_wiki_doors_by_region(d_regions, world, player):
     for d, region_list in d_regions.items():
         tile_map = {}
@@ -415,7 +457,202 @@ def print_graph(world):
     ET.dump(root)
 
 
+def extract_data_from_us_rom(rom):
+    with open(rom, 'rb') as stream:
+        rom_data = bytearray(stream.read())
+
+    rooms = [0x9a, 0x69, 0x78, 0x79, 0x7a, 0x88, 0x8a, 0xad]
+    for room in rooms:
+        b2idx = room*2
+        b3idx = room*3
+        headerptr = 0x110000 + b2idx  # zscream specific
+        headerloc = rom_data[headerptr] + rom_data[headerptr+1]*0x100 + 0x108000  # zscream specific
+        header, objectdata, spritedata, secretdata = [], [], [], []
+        for i in range(0, 14):
+            header.append(rom_data[headerloc+i])
+        objectptr = 0xF8000 + b3idx
+        objectloc = rom_data[objectptr] + rom_data[objectptr+1]*0x100 + rom_data[objectptr+2]*0x10000
+        objectloc -= 0x100000
+        stop, idx = False,  0
+        ffcnt = 0
+        mode = 0
+        while ffcnt < 2:
+            b1 = rom_data[objectloc+idx]
+            b2 = rom_data[objectloc+idx+1]
+            b3 = rom_data[objectloc+idx+2]
+            objectdata.append(b1)
+            objectdata.append(b2)
+            if b1 == 0xff and b2 == 0xff:
+                ffcnt += 1
+                mode = 0
+            if b1 == 0xf0 and b2 == 0xff:
+                mode = 1
+            if not mode and ffcnt < 2:
+                objectdata.append(b3)
+                idx += 3
+            else:
+                idx += 2
+        spriteptr = 0x4d62e + b2idx
+        spriteloc = rom_data[spriteptr] + rom_data[spriteptr+1]*0x100 + 0x40000
+        done, idx = False, 0
+        while not done:
+            b1 = rom_data[spriteloc+idx]
+            spritedata.append(b1)
+            if b1 == 0xff:
+                done = True
+            idx += 1
+        secretptr = 0xdb69 + b2idx
+        secretloc = rom_data[secretptr] + rom_data[secretptr+1]*0x100
+        done, idx = False, 0
+        while not done:
+            b1 = rom_data[secretloc+idx]
+            b2 = rom_data[secretloc+idx+1]
+            b3 = rom_data[secretloc+idx+2]
+            secretdata.append(b1)
+            secretdata.append(b2)
+            if b1 == 0xff and b2 == 0xff:
+                done = True
+            else:
+                secretdata.append(b3)
+            idx += 3
+
+        print(f'Room {room:02x}')
+        print(f'db {",".join([f"${x:02x}" for x in header])}')
+        print(f'Obj Length: {len(objectdata)}')
+        print_data_block(objectdata)
+        print('Sprites')
+        print_data_block(spritedata)
+        print('Secrets')
+        print_data_block(secretdata)
+
+    blockdata, torchdata = [], []
+    blockloc = 0x271de
+    for i in range(0, 128):
+        idx = i*4
+        b1 = rom_data[blockloc+idx]
+        b2 = rom_data[blockloc+idx+1]
+        room_idx = b1 + b2*0x100
+        if room_idx in rooms:
+            blockdata.append(b1)
+            blockdata.append(b2)
+            blockdata.append(rom_data[blockloc+idx+2])
+            blockdata.append(rom_data[blockloc+idx+3])
+    torchloc = 0x2736A
+    nomatch = False
+    append = False
+    for i in range(0, 192):
+        idx = i*2
+        b1 = rom_data[torchloc+idx]
+        b2 = rom_data[torchloc+idx+1]
+        if nomatch:
+            if b1 == 0xff and b2 == 0xff:
+                nomatch = False
+        elif not append:
+            room_idx = b1 + b2*0x100
+            if room_idx in rooms:
+                append = True
+            else:
+                nomatch = True
+        if append:
+            torchdata.append(b1)
+            torchdata.append(b2)
+            if b1 == 0xff and b2 == 0xff:
+                append = False
+    print('Blocks')
+    print_data_block(blockdata)
+    print('Torches')
+    print_data_block(torchdata)
+    print()
+
+
+def print_data_block(block):
+    for i in range(0, len(block)//16 + 1):
+        slice = block[i*16:i*16+16]
+        print(f'db {",".join([f"${x:02x}" for x in slice])}')
+
+
+def extract_data_from_jp_rom(rom):
+    with open(rom, 'rb') as stream:
+        rom_data = bytearray(stream.read())
+
+    # rooms = [0x7b, 0x7c, 0x7d, 0x8b, 0x8c, 0x8d, 0x9b, 0x9c, 0x9d]
+    rooms = [0x1a, 0x2a, 0xd1]
+    for room in rooms:
+        b2idx = room*2
+        b3idx = room*3
+        headerptr = 0x271e2 + b2idx
+        headerloc = rom_data[headerptr] + rom_data[headerptr+1]*0x100 + 0x18000
+        header, objectdata, spritedata, secretdata = [], [], [], []
+        for i in range(0, 14):
+            header.append(rom_data[headerloc+i])
+        objectptr = 0xF8000 + b3idx
+        objectloc = rom_data[objectptr] + rom_data[objectptr+1]*0x100 + rom_data[objectptr+2]*0x10000
+        objectloc -= 0x100000
+        stop, idx = False,  0
+        ffcnt = 0
+        mode = 0
+        while ffcnt < 2:
+            b1 = rom_data[objectloc+idx]
+            b2 = rom_data[objectloc+idx+1]
+            b3 = rom_data[objectloc+idx+2]
+            objectdata.append(b1)
+            objectdata.append(b2)
+            if b1 == 0xff and b2 == 0xff:
+                ffcnt += 1
+                mode = 0
+            if b1 == 0xf0 and b2 == 0xff:
+                mode = 1
+            if not mode and ffcnt < 2:
+                objectdata.append(b3)
+                idx += 3
+            else:
+                idx += 2
+        spriteptr = 0x4d62e + b2idx
+        spriteloc = rom_data[spriteptr] + rom_data[spriteptr+1]*0x100 + 0x40000
+        secretptr = 0xdb67 + b2idx
+        secretloc = rom_data[secretptr] + rom_data[secretptr+1]*0x100
+        done, idx = False, 0
+        while not done:
+            b1 = rom_data[spriteloc+idx]
+            spritedata.append(b1)
+            if b1 == 0xff:
+                done = True
+            idx += 1
+        done, idx = False, 0
+        while not done:
+            b1 = rom_data[secretloc+idx]
+            b2 = rom_data[secretloc+idx+1]
+            b3 = rom_data[secretloc+idx+2]
+            secretdata.append(b1)
+            secretdata.append(b2)
+            if b1 == 0xff and b2 == 0xff:
+                done = True
+            else:
+                secretdata.append(b3)
+            idx += 3
+        print(f'Room {room:02x}')
+        print(f'HeaderPtr {headerptr:06x}')
+        print(f'HeaderLoc {headerloc:06x}')
+        print(f'db {",".join([f"${x:02x}" for x in header])}')
+        print(f'Obj Length: {len(objectdata)}')
+        print(f'ObjectPtr {objectptr:06x}')
+        print(f'ObjectLoc {objectloc:06x}')
+        for i in range(0, len(objectdata)//16 + 1):
+            slice = objectdata[i*16:i*16+16]
+            print(f'db {",".join([f"${x:02x}" for x in slice])}')
+        print(f'SpritePtr {spriteptr:06x}')
+        print(f'SpriteLoc {spriteloc:06x}')
+        print_data_block(spritedata)
+        print(f'SecretPtr {secretptr:06x}')
+        print(f'SecretLoc {secretloc:06x}')
+        print_data_block(secretdata)
+        print()
+
+
 if __name__ == '__main__':
     # make_new_base2current()
     # read_entrance_data(old_rom=sys.argv[1])
-    read_layout_data(old_rom=sys.argv[1])
+    # room_palette_data(old_rom=sys.argv[1])
+    # extract_data_from_us_rom(sys.argv[1])
+    extract_data_from_jp_rom(sys.argv[1])
+

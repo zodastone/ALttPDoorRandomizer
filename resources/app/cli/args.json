@@ -59,6 +59,23 @@
       "expert"
     ]
   },
+  "keydropshuffle" : {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "mixed_travel" : {
+    "choices": [
+      "prevent",
+      "allow",
+      "force"
+    ]
+  },
+  "standardize_palettes" : {
+    "choices": [
+      "standardize",
+      "original"
+    ]
+  },
   "timer": {
     "choices": [
       "none",

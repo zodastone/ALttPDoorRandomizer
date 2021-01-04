@@ -19,9 +19,10 @@
         "random"
       ],
       "config": {
-        "width": 40
+        "width": 35
       }
     },
+    "potshuffle": { "type": "checkbox" },
     "experimental": { "type": "checkbox" },
     "dungeon_counters": {
       "type": "selectbox",
@@ -32,6 +33,29 @@
         "on",
         "pickup"
       ]
+    },
+    "mixed_travel": {
+      "type" : "selectbox",
+      "default": "prevent",
+      "options": [
+        "prevent",
+        "allow",
+        "force"
+      ],
+      "config": {
+        "width": 35
+      }
+    },
+    "standardize_palettes" : {
+      "type": "selectbox",
+      "default": "standardize",
+      "options": [
+        "standardize",
+        "original"
+      ],
+      "config": {
+        "width": 35
+      }
     }
   }
 }

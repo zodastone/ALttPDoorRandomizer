@@ -1,12 +1,12 @@
 import collections
 from BaseClasses import RegionType
-from Regions import create_lw_region, create_dw_region, create_cave_region, create_dungeon_region
+from Regions import create_lw_region, create_dw_region, create_cave_region, create_dungeon_region, create_menu_region
 
 
 def create_inverted_regions(world, player):
 
     world.regions += [
-        create_dw_region(player, 'Menu', None, ['Links House S&Q', 'Dark Sanctuary S&Q', 'Old Man S&Q', 'Castle Ledge S&Q']),
+        create_menu_region(player, 'Menu', None, ['Links House S&Q', 'Dark Sanctuary S&Q', 'Old Man S&Q', 'Castle Ledge S&Q']),
         create_lw_region(player, 'Light World', ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'Purple Chest', 'Bombos Tablet'],
                          ["Blinds Hideout", "Hyrule Castle Secret Entrance Drop", 'Kings Grave Outer Rocks', 'Dam',
                           'Inverted Big Bomb Shop', 'Tavern North', 'Chicken House', 'Aginahs Cave', 'Sahasrahlas Hut', 'Kakariko Well Drop', 'Kakariko Well Cave',
@@ -107,7 +107,8 @@ def create_inverted_regions(world, player):
         create_lw_region(player, 'Master Sword Meadow', ['Master Sword Pedestal']),
         create_cave_region(player, 'Lost Woods Gamble', 'a game of chance'),
         create_lw_region(player, 'Hyrule Castle Ledge', None, ['Hyrule Castle Entrance (East)', 'Hyrule Castle Entrance (West)', 'Inverted Ganons Tower', 'Hyrule Castle Ledge Courtyard Drop', 'Inverted Pyramid Hole']),
-        create_cave_region(player, 'Old Man Cave', 'a connector', ['Old Man'], ['Old Man Cave Exit (East)', 'Old Man Cave Exit (West)']),
+        create_cave_region(player, 'Old Man Cave', 'a connector', ['Old Man'], ['Old Man Cave Exit (East)']),
+        create_cave_region(player, 'Old Man Cave Ledge', 'a connector', None, ['Old Man Cave Exit (West)', 'Old Man Cave Dropdown']),
         create_cave_region(player, 'Old Man House', 'a connector', None, ['Old Man House Exit (Bottom)', 'Old Man House Front to Back']),
         create_cave_region(player, 'Old Man House Back', 'a connector', None, ['Old Man House Exit (Top)', 'Old Man House Back to Front']),
         create_lw_region(player, 'Death Mountain', None, ['Old Man Cave (East)', 'Old Man House (Bottom)', 'Old Man House (Top)', 'Death Mountain Return Cave (East)', 'Spectacle Rock Cave', 

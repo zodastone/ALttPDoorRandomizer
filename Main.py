@@ -11,20 +11,21 @@ import zlib
 from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
-from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions
+from PotShuffle import shuffle_pots
+from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions, adjust_locations
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
 from EntranceShuffle import link_entrances, link_inverted_entrances
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, JsonRom, get_hash_string
 from Doors import create_doors
-from DoorShuffle import link_doors
+from DoorShuffle import link_doors, connect_portal_copy
 from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, balance_multiworld_progression
-from ItemList import generate_itempool, difficulties, fill_prizes
+from ItemList import generate_itempool, difficulties, fill_prizes, fill_specific_items
 from Utils import output_path, parse_player_names
 
-__version__ = '0.1.1-dev'
+__version__ = '0.2.0-dev'
 
 class EnemizerError(RuntimeError):
     pass
@@ -56,6 +57,8 @@ def main(args, seed=None, fish=None):
     world.bigkeyshuffle = args.bigkeyshuffle.copy()
     world.crystals_needed_for_ganon = {player: random.randint(0, 7) if args.crystals_ganon[player] == 'random' else int(args.crystals_ganon[player]) for player in range(1, world.players + 1)}
     world.crystals_needed_for_gt = {player: random.randint(0, 7) if args.crystals_gt[player] == 'random' else int(args.crystals_gt[player]) for player in range(1, world.players + 1)}
+    world.crystals_ganon_orig = args.crystals_ganon.copy()
+    world.crystals_gt_orig = args.crystals_gt.copy()
     world.open_pyramid = args.openpyramid.copy()
     world.boss_shuffle = args.shufflebosses.copy()
     world.enemy_shuffle = args.shuffleenemies.copy()
@@ -65,7 +68,11 @@ def main(args, seed=None, fish=None):
     world.intensity = {player: random.randint(1, 3) if args.intensity[player] == 'random' else int(args.intensity[player]) for player in range(1, world.players + 1)}
     world.experimental = args.experimental.copy()
     world.dungeon_counters = args.dungeon_counters.copy()
+    world.potshuffle = args.shufflepots.copy()
     world.fish = fish
+    world.keydropshuffle = args.keydropshuffle.copy()
+    world.mixed_travel = args.mixed_travel.copy()
+    world.standardize_palettes = args.standardize_palettes.copy()
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
@@ -105,6 +112,13 @@ def main(args, seed=None, fish=None):
         create_doors(world, player)
         create_rooms(world, player)
         create_dungeons(world, player)
+        adjust_locations(world, player)
+
+    if any(world.potshuffle.values()):
+        logger.info(world.fish.translate("cli", "cli", "shuffling.pots"))
+        for player in range(1, world.players + 1):
+            if world.potshuffle[player]:
+                shuffle_pots(world, player)
 
     logger.info(world.fish.translate("cli","cli","shuffling.world"))
 
@@ -123,6 +137,7 @@ def main(args, seed=None, fish=None):
         else:
             mark_dark_world_regions(world, player)
     logger.info(world.fish.translate("cli","cli","generating.itempool"))
+    logger.info(world.fish.translate("cli","cli","generating.itempool"))
 
     for player in range(1, world.players + 1):
         generate_itempool(world, player)
@@ -135,6 +150,9 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
 
     fill_prizes(world)
+
+    # used for debugging
+    # fill_specific_items(world)
 
     logger.info(world.fish.translate("cli","cli","placing.dungeon.items"))
 
@@ -199,7 +217,10 @@ def main(args, seed=None, fish=None):
                 sprite_random_on_hit = type(args.sprite[player]) is str and args.sprite[player].lower() == 'randomonhit'
                 use_enemizer = (world.boss_shuffle[player] != 'none' or world.enemy_shuffle[player] != 'none'
                                 or world.enemy_health[player] != 'default' or world.enemy_damage[player] != 'default'
-                                or args.shufflepots[player] or sprite_random_on_hit)
+                                or sprite_random_on_hit)
+
+                if use_enemizer:
+                    base_patch = LocalRom(args.rom)  # update base2current.json
 
                 rom = JsonRom() if args.jsonout or use_enemizer else LocalRom(args.rom)
 
@@ -207,7 +228,7 @@ def main(args, seed=None, fish=None):
                     if args.rom and not(os.path.isfile(args.rom)):
                         raise RuntimeError("Could not find valid base rom for enemizing at expected path %s." % args.rom)
                     if os.path.exists(args.enemizercli):
-                        patch_enemizer(world, player, rom, args.rom, args.enemizercli, args.shufflepots[player], sprite_random_on_hit)
+                        patch_enemizer(world, player, rom, args.rom, args.enemizercli, sprite_random_on_hit)
                         enemized = True
                         if not args.jsonout:
                             rom = LocalRom.fromJsonRom(rom, args.rom, 0x400000)
@@ -330,6 +351,7 @@ def main(args, seed=None, fish=None):
 
     return world
 
+
 def copy_world(world):
     # ToDo: Not good yet
     ret = World(world.players, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
@@ -363,6 +385,8 @@ def copy_world(world):
     ret.bigkeyshuffle = world.bigkeyshuffle.copy()
     ret.crystals_needed_for_ganon = world.crystals_needed_for_ganon.copy()
     ret.crystals_needed_for_gt = world.crystals_needed_for_gt.copy()
+    ret.crystals_ganon_orig = world.crystals_ganon_orig.copy()
+    ret.crystals_gt_orig = world.crystals_gt_orig.copy()
     ret.open_pyramid = world.open_pyramid.copy()
     ret.boss_shuffle = world.boss_shuffle.copy()
     ret.enemy_shuffle = world.enemy_shuffle.copy()
@@ -371,6 +395,9 @@ def copy_world(world):
     ret.beemizer = world.beemizer.copy()
     ret.intensity = world.intensity.copy()
     ret.experimental = world.experimental.copy()
+    ret.keydropshuffle = world.keydropshuffle.copy()
+    ret.mixed_travel = world.mixed_travel.copy()
+    ret.standardize_palettes = world.standardize_palettes.copy()
 
     for player in range(1, world.players + 1):
         if world.mode[player] != 'inverted':
@@ -405,20 +432,26 @@ def copy_world(world):
         copied_region = ret.get_region(region.name, region.player)
         copied_region.is_light_world = region.is_light_world
         copied_region.is_dark_world = region.is_dark_world
+        copied_region.dungeon = region.dungeon
+        copied_region.locations = [Location(location.player, location.name, parent=copied_region) for location in region.locations]
         for entrance in region.entrances:
             ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
 
     # fill locations
     for location in world.get_locations():
+        new_location = ret.get_location(location.name, location.player)
         if location.item is not None:
             item = Item(location.item.name, location.item.advancement, location.item.priority, location.item.type, player = location.item.player)
-            ret.get_location(location.name, location.player).item = item
-            item.location = ret.get_location(location.name, location.player)
+            new_location.item = item
+            item.location = new_location
             item.world = ret
         if location.event:
-            ret.get_location(location.name, location.player).event = True
+            new_location.event = True
         if location.locked:
-            ret.get_location(location.name, location.player).locked = True
+            new_location.locked = True
+        # these need to be modified properly by set_rules
+        new_location.access_rule = lambda state: True
+        new_location.item_rule = lambda state: True
 
     # copy remaining itempool. No item in itempool should have an assigned location
     for item in world.itempool:
@@ -441,6 +474,11 @@ def copy_world(world):
     ret.inaccessible_regions = world.inaccessible_regions
     ret.dungeon_layouts = world.dungeon_layouts
     ret.key_logic = world.key_logic
+    ret.dungeon_portals = world.dungeon_portals
+    for player, portals in world.dungeon_portals.items():
+        for portal in portals:
+            connect_portal_copy(portal, ret, player)
+    ret.sanc_portal = world.sanc_portal
 
     for player in range(1, world.players + 1):
         set_rules(ret, player)
@@ -502,11 +540,11 @@ def create_playthrough(world):
 
         state_cache.append(state.copy())
 
-        logging.getLogger('').debug(world.fish.translate("cli","cli","building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations))
+        logging.getLogger('').debug(world.fish.translate("cli", "cli", "building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations))
         if not sphere:
-            logging.getLogger('').error(world.fish.translate("cli","cli","cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
+            logging.getLogger('').error(world.fish.translate("cli", "cli", "cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
             if any([world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
-                raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.progression"))
+                raise RuntimeError(world.fish.translate("cli", "cli", "cannot.reach.progression"))
             else:
                 old_world.spoiler.unreachables = sphere_candidates.copy()
                 break
@@ -579,7 +617,7 @@ def create_playthrough(world):
 
     old_world.spoiler.paths = dict()
     for player in range(1, world.players + 1):
-        old_world.spoiler.paths.update({ str(location) : get_path(state, location.parent_region) for sphere in collection_spheres for location in sphere if location.player == player})
+        old_world.spoiler.paths.update({location.gen_name(): get_path(state, location.parent_region) for sphere in collection_spheres for location in sphere if location.player == player})
         for _, path in dict(old_world.spoiler.paths).items():
             if any(exit == 'Pyramid Fairy' for (_, exit) in path):
                 if world.mode[player] != 'inverted':
@@ -590,4 +628,4 @@ def create_playthrough(world):
     # we can finally output our playthrough
     old_world.spoiler.playthrough = OrderedDict([("0", [str(item) for item in world.precollected_items if item.advancement])])
     for i, sphere in enumerate(collection_spheres):
-        old_world.spoiler.playthrough[str(i + 1)] = {str(location): str(location.item) for location in sphere}
+        old_world.spoiler.playthrough[str(i + 1)] = {location.gen_name(): str(location.item) for location in sphere}

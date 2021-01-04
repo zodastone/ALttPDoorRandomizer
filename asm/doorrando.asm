@@ -1,4 +1,5 @@
 !add = "clc : adc"
+!addl = "clc : adc.l"
 !sub = "sec : sbc"
 !bge = "bcs"
 !blt = "bcc"
@@ -33,6 +34,11 @@ incsrc overrides.asm
 incsrc edges.asm
 incsrc math.asm
 incsrc hudadditions.asm
+incsrc dr_lobby.asm
 warnpc $279700
 
 incsrc doortables.asm
+warnpc $288000
+
+; deals with own hooks
+incsrc keydropshuffle.asm

@@ -1,5 +1,5 @@
 
-from BaseClasses import Door, DoorType, Direction, CrystalBarrier
+from BaseClasses import Door, DoorType, Direction, CrystalBarrier, Portal
 from RoomData import PairedDoor
 
 # constants
@@ -46,18 +46,21 @@ def create_doors(world, player):
         create_door(player, 'Hyrule Castle Lobby W', Nrml).dir(We, 0x61, Mid, High).toggler().pos(0),
         create_door(player, 'Hyrule Castle Lobby E', Nrml).dir(Ea, 0x61, Mid, High).toggler().pos(2),
         create_door(player, 'Hyrule Castle Lobby WN', Nrml).dir(We, 0x61, Top, High).pos(1),
+        create_door(player, 'Hyrule Castle Lobby S', Nrml).dir(So, 0x61, Mid, High).pos(4).portal(Z, 0x22, 1),
         create_door(player, 'Hyrule Castle Lobby North Stairs', StrS).dir(No, 0x61, Mid, High),
         create_door(player, 'Hyrule Castle West Lobby E', Nrml).dir(Ea, 0x60, Mid, Low).toggler().pos(1),
         create_door(player, 'Hyrule Castle West Lobby N', Nrml).dir(No, 0x60, Right, Low).pos(0),
         create_door(player, 'Hyrule Castle West Lobby EN', Nrml).dir(Ea, 0x60, Top, High).pos(3),
+        create_door(player, 'Hyrule Castle West Lobby S', Nrml).dir(So, 0x60, Right, High).pos(2).portal(X, 0x02),
         create_door(player, 'Hyrule Castle East Lobby W', Nrml).dir(We, 0x62, Mid, Low).toggler().pos(0),
         create_door(player, 'Hyrule Castle East Lobby N', Nrml).dir(No, 0x62, Mid, High).pos(3),
         create_door(player, 'Hyrule Castle East Lobby NW', Nrml).dir(No, 0x62, Left, Low).pos(2),
+        create_door(player, 'Hyrule Castle East Lobby S', Nrml).dir(So, 0x62, Left, High).pos(1).portal(Z, 0x22),
         create_door(player, 'Hyrule Castle East Hall W', Nrml).dir(We, 0x52, Top, Low).pos(0),
-        create_door(player, 'Hyrule Castle East Hall S', Nrml).dir(So, 0x52, Mid, High).pos(2),
-        create_door(player, 'Hyrule Castle East Hall SW', Nrml).dir(So, 0x52, Left, Low).pos(1),
+        create_door(player, 'Hyrule Castle East Hall S', Nrml).dir(So, 0x52, Mid, High).pos(2).portal(Z, 0x22),
+        create_door(player, 'Hyrule Castle East Hall SW', Nrml).dir(So, 0x52, Left, Low).pos(1).portal(Z, 0x22, 1),
         create_door(player, 'Hyrule Castle West Hall E', Nrml).dir(Ea, 0x50, Top, Low).pos(0),
-        create_door(player, 'Hyrule Castle West Hall S', Nrml).dir(So, 0x50, Right, Low).pos(1),
+        create_door(player, 'Hyrule Castle West Hall S', Nrml).dir(So, 0x50, Right, Low).pos(1).portal(X, 0x02, 1),
         create_door(player, 'Hyrule Castle Back Hall W', Nrml).dir(We, 0x01, Top, Low).pos(0),
         create_door(player, 'Hyrule Castle Back Hall E', Nrml).dir(Ea, 0x01, Top, Low).pos(1),
         create_door(player, 'Hyrule Castle Back Hall Down Stairs', Sprl).dir(Dn, 0x01, 0, HTL).ss(A, 0x2a, 0x00),
@@ -80,7 +83,7 @@ def create_doors(world, player):
         create_door(player, 'Hyrule Dungeon Guardroom Catwalk Edge', Open).dir(Ea, 0x81, None, High).edge(3, S, 0x10),
         create_door(player, 'Hyrule Dungeon Guardroom Abyss Edge', Open).dir(Ea, 0x81, None, Low).edge(4, X, 0x18),
         create_door(player, 'Hyrule Dungeon Guardroom N', Nrml).dir(No, 0x81, Left, Low).pos(0),
-        create_door(player, 'Hyrule Dungeon Armory S', Nrml).dir(So, 0x71, Left, Low).trap(0x2).pos(1),
+        create_door(player, 'Hyrule Dungeon Armory S', Nrml).dir(So, 0x71, Left, Low).trap(0x2).pos(1).portal(Z, 0x00, 1),
         create_door(player, 'Hyrule Dungeon Armory ES', Intr).dir(Ea, 0x71, Left, Low).pos(2),
         create_door(player, 'Hyrule Dungeon Armory Boomerang WS', Intr).dir(We, 0x71, Left, Low).pos(2),
         create_door(player, 'Hyrule Dungeon Armory Interior Key Door N', Intr).dir(No, 0x71, Left, High).small_key().pos(0),
@@ -89,19 +92,21 @@ def create_doors(world, player):
         create_door(player, 'Hyrule Dungeon Staircase Up Stairs', Sprl).dir(Up, 0x70, 2, LTH).ss(A, 0x32, 0x94, True),
         create_door(player, 'Hyrule Dungeon Staircase Down Stairs', Sprl).dir(Dn, 0x70, 1, HTH).ss(A, 0x11, 0x58),
         create_door(player, 'Hyrule Dungeon Cellblock Up Stairs', Sprl).dir(Up, 0x80, 0, HTH).ss(A, 0x1a, 0x44),
+        create_door(player, 'Hyrule Dungeon Cellblock Door', Lgcl).big_key(),
+        create_door(player, 'Hyrule Dungeon Cell Exit', Lgcl),
 
         # sewers
-        create_door(player, 'Sewers Behind Tapestry S', Nrml).dir(So, 0x41, Mid, High).no_exit().trap(0x4).pos(0),
+        create_door(player, 'Sewers Behind Tapestry S', Nrml).dir(So, 0x41, Mid, High).no_exit().trap(0x4).pos(0).portal(Z, 0x22),
         create_door(player, 'Sewers Behind Tapestry Down Stairs', Sprl).dir(Dn, 0x41, 0, HTH).ss(S, 0x12, 0xb0),
         create_door(player, 'Sewers Rope Room Up Stairs', Sprl).dir(Up, 0x42, 0, HTH).ss(S, 0x1b, 0x9c),
         create_door(player, 'Sewers Rope Room North Stairs', StrS).dir(No, 0x42, Mid, High),
         create_door(player, 'Sewers Dark Cross South Stairs', StrS).dir(So, 0x32, Mid, High),
         create_door(player, 'Sewers Dark Cross Key Door N', Nrml).dir(No, 0x32, Mid, High).small_key().pos(0),
-        create_door(player, 'Sewers Water S', Nrml).dir(So, 0x22, Mid, High).small_key().pos(0),
+        create_door(player, 'Sewers Water S', Nrml).dir(So, 0x22, Mid, High).small_key().pos(0).portal(Z, 0x22),
         create_door(player, 'Sewers Water W', Nrml).dir(We, 0x22, Bot, High).pos(1),
         create_door(player, 'Sewers Key Rat E', Nrml).dir(Ea, 0x21, Bot, High).pos(1),
         create_door(player, 'Sewers Key Rat Key Door N', Nrml).dir(No, 0x21, Right, High).small_key().pos(0),
-        create_door(player, 'Sewers Secret Room Key Door S', Nrml).dir(So, 0x11, Right, High).small_key().pos(2),
+        create_door(player, 'Sewers Secret Room Key Door S', Nrml).dir(So, 0x11, Right, High).small_key().pos(2).portal(X, 0x02),
         create_door(player, 'Sewers Rat Path WS', Intr).dir(We, 0x11, Bot, High).pos(1),
         create_door(player, 'Sewers Rat Path WN', Intr).dir(We, 0x11, Top, High).pos(0),
         create_door(player, 'Sewers Secret Room ES', Intr).dir(Ea, 0x11, Bot, High).pos(1),
@@ -111,11 +116,14 @@ def create_doors(world, player):
         create_door(player, 'Sewers Pull Switch Down Stairs', Sprl).dir(Dn, 0x02, 0, HTL).ss(S, 0x12, 0x80),
         create_door(player, 'Sewers Yet More Rats S', Intr).dir(So, 0x02, Mid, Low).pos(1),
         create_door(player, 'Sewers Pull Switch N', Intr).dir(No, 0x02, Mid, Low).pos(1),
-        create_door(player, 'Sewers Pull Switch S', Nrml).dir(So, 0x02, Mid, Low).trap(0x4).toggler().pos(0),
+        create_door(player, 'Sewers Pull Switch S', Nrml).dir(So, 0x02, Mid, Low).trap(0x4).toggler().pos(0).portal(Z, 0x20, 1),
         # logically one way the sanc, but should be linked - also toggle
         create_door(player, 'Sanctuary N', Nrml).dir(No, 0x12, Mid, High).no_exit().toggler().pos(0),
+        create_door(player, 'Sanctuary S', Nrml).dir(So, 0x12, Mid, High).pos(2).portal(Z, 0x22, 1),
+        create_door(player, 'Sanctuary Mirror Route', Lgcl),
 
         # Eastern Palace
+        create_door(player, 'Eastern Lobby S', Nrml).dir(So, 0xc9, Mid, High).pos(4).portal(Z, 0x20),
         create_door(player, 'Eastern Lobby N', Intr).dir(No, 0xc9, Mid, High).pos(0),
         create_door(player, 'Eastern Lobby Bridge S', Intr).dir(So, 0xc9, Mid, High).pos(0),
         create_door(player, 'Eastern Lobby NW', Intr).dir(No, 0xc9, Left, High).pos(2),
@@ -123,11 +131,11 @@ def create_doors(world, player):
         create_door(player, 'Eastern Lobby NE', Intr).dir(No, 0xc9, Right, High).pos(3),
         create_door(player, 'Eastern Lobby Right Ledge SE', Intr).dir(So, 0xc9, Right, High).pos(3),
         create_door(player, 'Eastern Lobby Bridge N', Nrml).dir(No, 0xc9, Mid, High).pos(1).trap(0x2),
-        create_door(player, 'Eastern Cannonball S', Nrml).dir(So, 0xb9, Mid, High).pos(2),
+        create_door(player, 'Eastern Cannonball S', Nrml).dir(So, 0xb9, Mid, High).pos(2).portal(Z, 0x22),
         create_door(player, 'Eastern Cannonball N', Nrml).dir(No, 0xb9, Mid, High).pos(1),
         create_door(player, 'Eastern Cannonball Ledge WN', Nrml).dir(We, 0xb9, Top, High).pos(3),
         create_door(player, 'Eastern Cannonball Ledge Key Door EN', Nrml).dir(Ea, 0xb9, Top, High).small_key().pos(0),
-        create_door(player, 'Eastern Courtyard Ledge S', Nrml).dir(So, 0xa9, Mid, High).pos(5),
+        create_door(player, 'Eastern Courtyard Ledge S', Nrml).dir(So, 0xa9, Mid, High).pos(5).portal(Z, 0x22),
         create_door(player, 'Eastern Courtyard Ledge W', Nrml).dir(We, 0xa9, Mid, High).trap(0x4).pos(0),
         create_door(player, 'Eastern Courtyard Ledge E', Nrml).dir(Ea, 0xa9, Mid, High).trap(0x2).pos(1),
         create_door(player, 'Eastern East Wing W', Nrml).dir(We, 0xaa, Mid, High).pos(4),
@@ -147,7 +155,7 @@ def create_doors(world, player):
         create_door(player, 'Eastern Compass Room EN', Intr).dir(Ea, 0xa8, Top, High).pos(3),
         create_door(player, 'Eastern Hint Tile WN', Intr).dir(We, 0xa8, Top, High).pos(3),
         create_door(player, 'Eastern Hint Tile EN', Nrml).dir(Ea, 0xa8, Top, Low).pos(4),
-        create_door(player, 'Eastern Hint Tile Blocked Path SE', Nrml).dir(So, 0xa8, Right, High).small_key().pos(2).kill(),
+        create_door(player, 'Eastern Hint Tile Blocked Path SE', Nrml).dir(So, 0xa8, Right, High).small_key().pos(2).kill().portal(X, 0x02),
         create_door(player, 'Eastern Hint Tile Push Block', Lgcl),
         create_door(player, 'Eastern Courtyard WN', Nrml).dir(We, 0xa9, Top, Low).pos(3),
         create_door(player, 'Eastern Courtyard EN', Nrml).dir(Ea, 0xa9, Top, Low).pos(4),
@@ -155,14 +163,14 @@ def create_doors(world, player):
         create_door(player, 'Eastern Courtyard Potholes', Hole),
         create_door(player, 'Eastern Fairies\' Warp', Warp),
         create_door(player, 'Eastern Map Valley WN', Nrml).dir(We, 0xaa, Top, Low).pos(1),
-        create_door(player, 'Eastern Map Valley SW', Nrml).dir(So, 0xaa, Left, High).pos(5),
+        create_door(player, 'Eastern Map Valley SW', Nrml).dir(So, 0xaa, Left, High).pos(5).portal(Z, 0x02),
         create_door(player, 'Eastern Dark Square NW', Nrml).dir(No, 0xba, Left, High).trap(0x2).pos(1),
         create_door(player, 'Eastern Dark Square Key Door WN', Nrml).dir(We, 0xba, Top, High).small_key().pos(0),
         create_door(player, 'Eastern Dark Square EN', Intr).dir(Ea, 0xba, Top, High).pos(2),
         create_door(player, 'Eastern Dark Pots WN', Intr).dir(We, 0xba, Top, High).pos(2),
         create_door(player, 'Eastern Big Key EN', Nrml).dir(Ea, 0xb8, Top, High).pos(1),
         create_door(player, 'Eastern Big Key NE', Nrml).dir(No, 0xb8, Right, High).big_key().pos(0),
-        create_door(player, 'Eastern Darkness S', Nrml).dir(So, 0x99, Mid, High).small_key().pos(1),
+        create_door(player, 'Eastern Darkness S', Nrml).dir(So, 0x99, Mid, High).small_key().pos(1).portal(Z, 0x20),
         create_door(player, 'Eastern Darkness NE', Intr).dir(No, 0x99, Right, High).pos(2),
         create_door(player, 'Eastern Rupees SE', Intr).dir(So, 0x99, Right, High).pos(2),
         # Up is a keydoor and down is not. Only the up stairs should be considered a key door for now.
@@ -180,6 +188,7 @@ def create_doors(world, player):
         create_door(player, 'Eastern Boss SE', Nrml).dir(So, 0xc8, Right, High).no_exit().trap(0x4).pos(0),
 
         # Desert Palace
+        create_door(player, 'Desert Main Lobby S', Nrml).dir(So, 0x84, Mid, High).pos(0).portal(Z, 0x22),
         create_door(player, 'Desert Main Lobby NW Edge', Open).dir(No, 0x84, None, High).edge(3, A, 0x20),
         create_door(player, 'Desert Main Lobby N Edge', Open).dir(No, 0x84, None, High).edge(4, A, 0xa0),
         create_door(player, 'Desert Main Lobby NE Edge', Open).dir(No, 0x84, None, High).edge(5, S, 0x20),
@@ -191,12 +200,13 @@ def create_doors(world, player):
         create_door(player, 'Desert Dead End Edge', Open).dir(So, 0x74, None, High).edge(4, Z, 0xa0),
         create_door(player, 'Desert East Wing W Edge', Open).dir(We, 0x85, None, High).edge(5, A, 0xa0),
         create_door(player, 'Desert East Wing N Edge', Open).dir(No, 0x85, None, High).edge(6, A, 0x20),
+        create_door(player, 'Desert East Lobby S', Nrml).dir(So, 0x85, Right, High).pos(2).portal(X, 0x00),
         create_door(player, 'Desert East Lobby WS', Intr).dir(We, 0x85, Bot, High).pos(3),
         create_door(player, 'Desert East Wing ES', Intr).dir(Ea, 0x85, Bot, High).pos(3),
         create_door(player, 'Desert East Wing Key Door EN', Intr).dir(Ea, 0x85, Top, High).small_key().pos(1),
         create_door(player, 'Desert Compass Key Door WN', Intr).dir(We, 0x85, Top, High).small_key().pos(1),
         create_door(player, 'Desert Compass NW', Nrml).dir(No, 0x85, Right, High).trap(0x4).pos(0),
-        create_door(player, 'Desert Cannonball S', Nrml).dir(So, 0x75, Right, High).pos(1),
+        create_door(player, 'Desert Cannonball S', Nrml).dir(So, 0x75, Right, High).pos(1).portal(Z, 0x02),
         create_door(player, 'Desert Arrow Pot Corner S Edge', Open).dir(So, 0x75, None, High).edge(6, Z, 0x20),
         create_door(player, 'Desert Arrow Pot Corner W Edge', Open).dir(We, 0x75, None, High).edge(2, Z, 0x20),
         create_door(player, 'Desert Arrow Pot Corner NW', Intr).dir(No, 0x75, Left, High).pos(0),
@@ -219,10 +229,12 @@ def create_doors(world, player):
         create_door(player, 'Desert Big Chest SW', Intr).dir(So, 0x73, Left, High).pos(0),
         create_door(player, 'Desert West Wing N Edge', Open).dir(No, 0x83, None, High).edge(2, S, 0x20),
         create_door(player, 'Desert West Wing WS', Intr).dir(We, 0x83, Bot, High).pos(2),
+        create_door(player, 'Desert West S', Nrml).dir(So, 0x83, Left, High).pos(1).portal(Z, 0x00),
         create_door(player, 'Desert West Lobby ES', Intr).dir(Ea, 0x83, Bot, High).pos(2),
         create_door(player, 'Desert West Lobby NW', Intr).dir(No, 0x83, Left, High).pos(0),
         create_door(player, 'Desert Fairy Fountain SW', Intr).dir(So, 0x83, Left, High).pos(0),
         # Desert Back
+        create_door(player, 'Desert Back Lobby S', Nrml).dir(So, 0x63, Left, High).pos(2).portal(Z, 0x00),
         create_door(player, 'Desert Back Lobby NW', Intr).dir(No, 0x63, Left, High).pos(1),
         create_door(player, 'Desert Tiles 1 SW', Intr).dir(So, 0x63, Left, High).pos(1),
         create_door(player, 'Desert Tiles 1 Up Stairs', Sprl).dir(Up, 0x63, 0, HTH).ss(A, 0x1b, 0x6c, True).small_key().pos(0),
@@ -232,13 +244,14 @@ def create_doors(world, player):
         create_door(player, 'Desert Four Statues ES', Intr).dir(Ea, 0x53, Bot, High).pos(1),
         create_door(player, 'Desert Beamos Hall WS', Intr).dir(We, 0x53, Bot, High).pos(1),
         create_door(player, 'Desert Beamos Hall NE', Nrml).dir(No, 0x53, Right, High).small_key().pos(2),
-        create_door(player, 'Desert Tiles 2 SE', Nrml).dir(So, 0x43, Right, High).small_key().pos(2).kill(),
+        create_door(player, 'Desert Tiles 2 SE', Nrml).dir(So, 0x43, Right, High).small_key().pos(2).kill().portal(X, 0x00),
         create_door(player, 'Desert Tiles 2 NE', Intr).dir(No, 0x43, Right, High).small_key().pos(1),
         create_door(player, 'Desert Wall Slide SE', Intr).dir(So, 0x43, Right, High).small_key().pos(1),
         create_door(player, 'Desert Wall Slide NW', Nrml).dir(No, 0x43, Left, High).big_key().pos(0).no_entrance(),
-        create_door(player, 'Desert Boss SW', Nrml).dir(So, 0x33, Left, High).no_exit().trap(0x4).pos(0),
+        create_door(player, 'Desert Boss SW', Nrml).dir(So, 0x33, Left, High).no_exit().trap(0x4).pos(0),  # .portal(Z, 0x00), problem with enemizer
 
         # Hera
+        create_door(player, 'Hera Lobby S', Nrml).dir(So, 0x77, Mid, Low).pos(0).portal(Z, 0x22, 1),
         create_door(player, 'Hera Lobby Down Stairs', Sprl).dir(Dn, 0x77, 3, HTL).ss(Z, 0x21, 0x90, False, True),
         create_door(player, 'Hera Lobby Key Stairs', Sprl).dir(Dn, 0x77, 1, HTL).ss(A, 0x12, 0x80).small_key().pos(1),
         create_door(player, 'Hera Lobby Up Stairs', Sprl).dir(Up, 0x77, 2, HTL).ss(X, 0x2b, 0x5c, False, True),
@@ -275,6 +288,7 @@ def create_doors(world, player):
         create_door(player, 'Hera Boss Inner Hole', Hole),
 
         # Castle Tower
+        create_door(player, 'Tower Lobby S', Nrml).dir(So, 0xe0, Left, High).pos(3).portal(Z, 0x00),
         create_door(player, 'Tower Lobby NW', Intr).dir(No, 0xe0, Left, High).pos(1),
         create_door(player, 'Tower Gold Knights SW', Intr).dir(So, 0xe0, Left, High).pos(1),
         create_door(player, 'Tower Gold Knights EN', Intr).dir(Ea, 0xe0, Top, High).pos(0),
@@ -311,6 +325,7 @@ def create_doors(world, player):
         create_door(player, 'Tower Agahnim 1 SW', Nrml).dir(So, 0x20, Left, High).no_exit().trap(0x4).pos(0),
 
         # Palace of Darkness
+        create_door(player, 'PoD Lobby S', Nrml).dir(So, 0x4a, Mid, High).pos(4).portal(Z, 0x20),
         create_door(player, 'PoD Lobby N', Intr).dir(No, 0x4a, Mid, High).pos(3),
         create_door(player, 'PoD Lobby NW', Intr).dir(No, 0x4a, Left, High).pos(0),
         create_door(player, 'PoD Lobby NE', Intr).dir(No, 0x4a, Right, High).pos(1),
@@ -323,7 +338,7 @@ def create_doors(world, player):
         create_door(player, 'PoD Shooter Room Up Stairs', Sprl).dir(Up, 0x09, 1, HTH).ss(A, 0x1b, 0x6c, True, True),
         create_door(player, 'PoD Warp Room Up Stairs', Sprl).dir(Up, 0x09, 0, HTH).ss(S, 0x1a, 0x6c, True, True),
         create_door(player, 'PoD Warp Room Warp', Warp),
-        create_door(player, 'PoD Pit Room S', Nrml).dir(So, 0x3a, Mid, High).small_key().pos(0),
+        create_door(player, 'PoD Pit Room S', Nrml).dir(So, 0x3a, Mid, High).small_key().pos(0).portal(Z, 0x22),
         create_door(player, 'PoD Pit Room NW', Nrml).dir(No, 0x3a, Left, High).pos(1),
         create_door(player, 'PoD Pit Room NE', Nrml).dir(No, 0x3a, Right, High).pos(2),
         create_door(player, 'PoD Pit Room Freefall', Hole),
@@ -335,8 +350,8 @@ def create_doors(world, player):
         create_door(player, 'PoD Basement Ledge Up Stairs', Sprl).dir(Up, 0x0a, 0, HTH).ss(A, 0x1a, 0xec).small_key().pos(0),
         create_door(player, 'PoD Basement Ledge Drop Down', Lgcl),
         create_door(player, 'PoD Stalfos Basement Warp', Warp),
-        create_door(player, 'PoD Arena Main SW', Nrml).dir(So, 0x2a, Left, High).pos(4),
-        create_door(player, 'PoD Arena Bridge SE', Nrml).dir(So, 0x2a, Right, High).pos(5),
+        create_door(player, 'PoD Arena Main SW', Nrml).dir(So, 0x2a, Left, High).pos(4).portal(Z, 0x22),
+        create_door(player, 'PoD Arena Bridge SE', Nrml).dir(So, 0x2a, Right, High).pos(5).portal(X, 0x22),
         create_door(player, 'PoD Arena Main NW', Nrml).dir(No, 0x2a, Left, High).small_key().pos(1),
         create_door(player, 'PoD Arena Main NE', Nrml).dir(No, 0x2a, Right, High).no_exit().trap(0x4).pos(0),
         create_door(player, 'PoD Arena Main Crystal Path', Lgcl),
@@ -353,14 +368,14 @@ def create_doors(world, player):
         create_door(player, 'PoD Map Balcony WS', Nrml).dir(We, 0x2b, Bot, High).pos(1),
         create_door(player, 'PoD Map Balcony South Stairs', StrS).dir(So, 0x2b, Left, High),
         create_door(player, 'PoD Conveyor North Stairs', StrS).dir(No, 0x3b, Left, High),
-        create_door(player, 'PoD Conveyor SW', Nrml).dir(So, 0x3b, Left, High).pos(0),
+        create_door(player, 'PoD Conveyor SW', Nrml).dir(So, 0x3b, Left, High).pos(0).portal(Z, 0x02),
         create_door(player, 'PoD Mimics 1 NW', Nrml).dir(No, 0x4b, Left, High).trap(0x4).pos(0),
         create_door(player, 'PoD Mimics 1 SW', Intr).dir(So, 0x4b, Left, High).pos(1),
         create_door(player, 'PoD Jelly Hall NW', Intr).dir(No, 0x4b, Left, High).pos(1),
         create_door(player, 'PoD Jelly Hall NE', Intr).dir(No, 0x4b, Right, High).pos(2),
         create_door(player, 'PoD Warp Hint SE', Intr).dir(So, 0x4b, Right, High).pos(2),
         create_door(player, 'PoD Warp Hint Warp', Warp),
-        create_door(player, 'PoD Falling Bridge SW', Nrml).dir(So, 0x1a, Left, High).small_key().pos(3),
+        create_door(player, 'PoD Falling Bridge SW', Nrml).dir(So, 0x1a, Left, High).small_key().pos(3).portal(Z, 0x02),
         create_door(player, 'PoD Falling Bridge WN', Nrml).dir(We, 0x1a, Top, High).small_key().pos(1),
         create_door(player, 'PoD Falling Bridge EN', Intr).dir(Ea, 0x1a, Top, High).pos(4),
         create_door(player, 'PoD Falling Bridge Path N', Lgcl),
@@ -371,13 +386,13 @@ def create_doors(world, player):
         create_door(player, 'PoD Compass Room WN', Intr).dir(We, 0x1a, Top, High).pos(4),
         create_door(player, 'PoD Compass Room SE', Intr).dir(So, 0x1a, Mid, High).small_key().pos(0),
         create_door(player, 'PoD Harmless Hellway NE', Intr).dir(No, 0x1a, Right, High).small_key().pos(0),
-        create_door(player, 'PoD Harmless Hellway SE', Nrml).dir(So, 0x1a, Right, High).pos(5),
+        create_door(player, 'PoD Harmless Hellway SE', Nrml).dir(So, 0x1a, Right, High).pos(5).portal(X, 0x00),
         create_door(player, 'PoD Compass Room W Down Stairs', Sprl).dir(Dn, 0x1a, 0, HTH).ss(S, 0x12, 0x50, True, True),
         create_door(player, 'PoD Compass Room E Down Stairs', Sprl).dir(Dn, 0x1a, 1, HTH).ss(S, 0x11, 0xb0, True, True),
         create_door(player, 'PoD Dark Basement W Up Stairs', Sprl).dir(Up, 0x6a, 0, HTH).ss(S, 0x1b, 0x3c, True),
         create_door(player, 'PoD Dark Basement E Up Stairs', Sprl).dir(Up, 0x6a, 1, HTH).ss(S, 0x1b, 0x9c, True),
         create_door(player, 'PoD Dark Alley NE', Nrml).dir(No, 0x6a, Right, High).big_key().pos(0),
-        create_door(player, 'PoD Mimics 2 SW', Nrml).dir(So, 0x1b, Left, High).pos(1).kill(),
+        create_door(player, 'PoD Mimics 2 SW', Nrml).dir(So, 0x1b, Left, High).pos(1).kill().portal(Z, 0x00),
         create_door(player, 'PoD Mimics 2 NW', Intr).dir(No, 0x1b, Left, High).pos(0),
         create_door(player, 'PoD Bow Statue SW', Intr).dir(So, 0x1b, Left, High).pos(0),
         create_door(player, 'PoD Bow Statue Down Ladder', Lddr).no_entrance(),
@@ -391,6 +406,7 @@ def create_doors(world, player):
         create_door(player, 'PoD Callback Warp', Warp),
         create_door(player, 'PoD Boss SE', Nrml).dir(So, 0x5a, Right, High).no_exit().trap(0x4).pos(0),
 
+        create_door(player, 'Swamp Lobby S', Nrml).dir(So, 0x28, Mid, High).pos(1).portal(Z, 0x22),
         create_door(player, 'Swamp Lobby Moat', Lgcl),
         create_door(player, 'Swamp Entrance Down Stairs', Sprl).dir(Dn, 0x28, 0, HTH).ss(A, 0x11, 0x80).small_key().pos(0),
         create_door(player, 'Swamp Entrance Moat', Lgcl),
@@ -417,7 +433,7 @@ def create_doors(world, player):
         create_door(player, 'Swamp Hammer Switch SW', Intr).dir(So, 0x37, Left, High).small_key().pos(2),
         create_door(player, 'Swamp Hammer Switch WN', Nrml).dir(We, 0x37, Top, High).pos(0),
         create_door(player, 'Swamp Hub ES', Nrml).dir(Ea, 0x36, Bot, High).pos(4),
-        create_door(player, 'Swamp Hub S', Nrml).dir(So, 0x36, Mid, High).pos(5),
+        create_door(player, 'Swamp Hub S', Nrml).dir(So, 0x36, Mid, High).pos(5),  # .portal(Z, 0x22, 1), couldn't figure this out
         create_door(player, 'Swamp Hub WS', Nrml).dir(We, 0x36, Bot, High).pos(3),
         create_door(player, 'Swamp Hub WN', Nrml).dir(We, 0x36, Top, High).small_key().pos(2),
         create_door(player, 'Swamp Hub Hook Path', Lgcl),
@@ -458,7 +474,7 @@ def create_doors(world, player):
         create_door(player, 'Swamp Attic Down Stairs', Sprl).dir(Dn, 0x54, 0, HTH).ss(Z, 0x12, 0x80).kill(),
         create_door(player, 'Swamp Attic Left Pit', Hole),
         create_door(player, 'Swamp Attic Right Pit', Hole),
-        create_door(player, 'Swamp Push Statue S', Nrml).dir(So, 0x26, Mid, High).small_key().pos(0),
+        create_door(player, 'Swamp Push Statue S', Nrml).dir(So, 0x26, Mid, High).small_key().pos(0).portal(Z, 0x20),
         create_door(player, 'Swamp Push Statue NW', Intr).dir(No, 0x26, Left, High).pos(1),
         create_door(player, 'Swamp Push Statue NE', Intr).dir(No, 0x26, Right, High).pos(2),
         create_door(player, 'Swamp Push Statue Down Stairs', Sprl).dir(Dn, 0x26, 2, HTH).ss(X, 0x12, 0xc0, False, True),
@@ -479,7 +495,7 @@ def create_doors(world, player):
         create_door(player, 'Swamp Basement Shallows NW', Nrml).dir(No, 0x76, Left, High).toggler().pos(2),
         create_door(player, 'Swamp Basement Shallows EN', Intr).dir(Ea, 0x76, Top, High).pos(0),
         create_door(player, 'Swamp Basement Shallows ES', Intr).dir(Ea, 0x76, Bot, High).pos(1),
-        create_door(player, 'Swamp Waterfall Room SW', Nrml).dir(So, 0x66, Left, Low).toggler().pos(1),
+        create_door(player, 'Swamp Waterfall Room SW', Nrml).dir(So, 0x66, Left, Low).toggler().pos(1).portal(Z, 0x20, 1),
         create_door(player, 'Swamp Waterfall Room NW', Intr).dir(No, 0x66, Left, Low).pos(3),
         create_door(player, 'Swamp Waterfall Room NE', Intr).dir(No, 0x66, Right, Low).pos(0),
         create_door(player, 'Swamp Refill SW', Intr).dir(So, 0x66, Left, Low).pos(3),
@@ -495,10 +511,11 @@ def create_doors(world, player):
         create_door(player, 'Swamp T NW', Nrml).dir(No, 0x16, Left, High).pos(3),
         create_door(player, 'Swamp Boss SW', Nrml).dir(So, 0x06, Left, High).no_exit().trap(0x4).pos(0),
 
+        create_door(player, 'Skull 1 Lobby S', Nrml).dir(So, 0x58, Left, High).pos(4).portal(Z, 0x00),
         create_door(player, 'Skull 1 Lobby WS', Nrml).dir(We, 0x58, Bot, High).small_key().pos(1),
         create_door(player, 'Skull 1 Lobby ES', Intr).dir(Ea, 0x58, Bot, High).pos(5),
         create_door(player, 'Skull Map Room WS', Intr).dir(We, 0x58, Bot, High).pos(5),
-        create_door(player, 'Skull Map Room SE', Nrml).dir(So, 0x58, Right, High).small_key().pos(2),
+        create_door(player, 'Skull Map Room SE', Nrml).dir(So, 0x58, Right, High).small_key().pos(2).portal(X, 0x02),
         create_door(player, 'Skull Pot Circle WN', Intr).dir(We, 0x58, Top, High).pos(3),
         create_door(player, 'Skull Pull Switch EN', Intr).dir(Ea, 0x58, Top, High).pos(3),
         create_door(player, 'Skull Pot Circle Star Path', Lgcl),
@@ -512,7 +529,8 @@ def create_doors(world, player):
         create_door(player, 'Skull Left Drop ES', Intr).dir(Ea, 0x67, Bot, High).pos(1),
         create_door(player, 'Skull Compass Room WS', Intr).dir(We, 0x67, Bot, High).pos(1),
         create_door(player, 'Skull Pot Prison ES', Nrml).dir(Ea, 0x57, Bot, High).small_key().pos(2),
-        create_door(player, 'Skull Pot Prison SE', Nrml).dir(So, 0x57, Right, High).pos(5),
+        create_door(player, 'Skull Pot Prison SE', Nrml).dir(So, 0x57, Right, High).pos(5).portal(X, 0x00),
+        create_door(player, 'Skull 2 East Lobby SW', Nrml).dir(So, 0x57, Left, High).pos(3).portal(Z, 0x00),
         create_door(player, 'Skull 2 East Lobby WS', Nrml).dir(We, 0x57, Bot, High).pos(4),
         create_door(player, 'Skull 2 East Lobby NW', Intr).dir(No, 0x57, Left, High).pos(1),
         create_door(player, 'Skull Big Key SW', Intr).dir(So, 0x57, Left, High).pos(1),
@@ -520,26 +538,29 @@ def create_doors(world, player):
         create_door(player, 'Skull Lone Pot EN', Intr).dir(Ea, 0x57, Top, High).pos(0),
         create_door(player, 'Skull Small Hall ES', Nrml).dir(Ea, 0x56, Bot, High).pos(3),
         create_door(player, 'Skull Small Hall WS', Intr).dir(We, 0x56, Bot, High).pos(2),
+        create_door(player, 'Skull 2 West Lobby S', Nrml).dir(So, 0x56, Left, High).pos(1).portal(Z, 0x00),
         create_door(player, 'Skull 2 West Lobby ES', Intr).dir(Ea, 0x56, Bot, High).pos(2),
         create_door(player, 'Skull 2 West Lobby NW', Intr).dir(No, 0x56, Left, High).small_key().pos(0),
         create_door(player, 'Skull X Room SW', Intr).dir(So, 0x56, Left, High).small_key().pos(0),
         create_door(player, 'Skull Back Drop Star Path', Lgcl),
+        create_door(player, 'Skull 3 Lobby SW', Nrml).dir(So, 0x59, Left, High).pos(1).portal(Z, 0x02),
         create_door(player, 'Skull 3 Lobby NW', Nrml).dir(No, 0x59, Left, High).small_key().pos(0),
         create_door(player, 'Skull 3 Lobby EN', Intr).dir(Ea, 0x59, Top, High).pos(2),
         create_door(player, 'Skull East Bridge WN', Intr).dir(We, 0x59, Top, High).pos(2),
         create_door(player, 'Skull East Bridge WS', Intr).dir(We, 0x59, Bot, High).pos(3),
         create_door(player, 'Skull West Bridge Nook ES', Intr).dir(Ea, 0x59, Bot, High).pos(3),
-        create_door(player, 'Skull Star Pits SW', Nrml).dir(So, 0x49, Left, High).small_key().pos(2),
+        create_door(player, 'Skull Star Pits SW', Nrml).dir(So, 0x49, Left, High).small_key().pos(2).portal(Z, 0x00),
         create_door(player, 'Skull Star Pits ES', Intr).dir(Ea, 0x49, Bot, High).pos(3),
         create_door(player, 'Skull Torch Room WS', Intr).dir(We, 0x49, Bot, High).pos(3),
         create_door(player, 'Skull Torch Room WN', Intr).dir(We, 0x49, Top, High).pos(1),
         create_door(player, 'Skull Vines EN', Intr).dir(Ea, 0x49, Top, High).pos(1),
         create_door(player, 'Skull Vines NW', Nrml).dir(No, 0x49, Left, High).pos(0),
-        create_door(player, 'Skull Spike Corner SW', Nrml).dir(So, 0x39, Left, High).no_exit().trap(0x4).pos(0),
+        create_door(player, 'Skull Spike Corner SW', Nrml).dir(So, 0x39, Left, High).no_exit().trap(0x4).pos(0).portal(Z, 0x00),
         create_door(player, 'Skull Spike Corner ES', Intr).dir(Ea, 0x39, Bot, High).small_key().pos(1),
         create_door(player, 'Skull Final Drop WS', Intr).dir(We, 0x39, Bot, High).small_key().pos(1),
         create_door(player, 'Skull Final Drop Hole', Hole),
 
+        create_door(player, 'Thieves Lobby S', Nrml).dir(So, 0xdb, Mid, High).pos(1).portal(Z, 0x22),
         create_door(player, 'Thieves Lobby N Edge', Open).dir(No, 0xdb, None, Low).edge(7, A, 0x10),
         create_door(player, 'Thieves Lobby NE Edge', Open).dir(No, 0xdb, None, Low).edge(8, S, 0x18),
         create_door(player, 'Thieves Lobby E', Nrml).dir(Ea, 0xdb, Mid, High).no_exit().trap(0x4).pos(0),
@@ -561,10 +582,10 @@ def create_doors(world, player):
         create_door(player, 'Thieves Compass Room N Edge', Open).dir(No, 0xdc, None, Low).edge(10, A, 0x10),
         create_door(player, 'Thieves Compass Room WS Edge', Open).dir(We, 0xdc, None, Low).edge(8, Z, 0x50),
         create_door(player, 'Thieves Compass Room W', Nrml).dir(We, 0xdc, Mid, High).pos(0),
-        create_door(player, 'Thieves Hallway SE', Nrml).dir(So, 0xbc, Right, High).small_key().pos(1),
+        create_door(player, 'Thieves Hallway SE', Nrml).dir(So, 0xbc, Right, High).small_key().pos(1).portal(X, 0x02),
         create_door(player, 'Thieves Hallway NE', Nrml).dir(No, 0xbc, Right, High).pos(7),
         create_door(player, 'Thieves Pot Alcove Mid WS', Nrml).dir(We, 0xbc, Bot, High).pos(5),
-        create_door(player, 'Thieves Pot Alcove Bottom SW', Nrml).dir(So, 0xbc, Left, High).pos(3),
+        create_door(player, 'Thieves Pot Alcove Bottom SW', Nrml).dir(So, 0xbc, Left, High).pos(3).portal(Z, 0x00),
         create_door(player, 'Thieves Conveyor Maze WN', Nrml).dir(We, 0xbc, Top, High).pos(4),
         create_door(player, 'Thieves Hallway WS', Intr).dir(We, 0xbc, Bot, High).small_key().pos(0),
         create_door(player, 'Thieves Pot Alcove Mid ES', Intr).dir(Ea, 0xbc, Bot, High).small_key().pos(0),
@@ -587,7 +608,7 @@ def create_doors(world, player):
         create_door(player, 'Thieves Triple Bypass SE', Intr).dir(So, 0xbb, Right, High).pos(3),
         create_door(player, 'Thieves Hellway Crystal EN', Intr).dir(Ea, 0xbb, Top, High).pos(1),
         create_door(player, 'Thieves Triple Bypass WN', Intr).dir(We, 0xbb, Top, High).pos(1),
-        create_door(player, 'Thieves Spike Switch SW', Nrml).dir(So, 0xab, Left, High).pos(1),
+        create_door(player, 'Thieves Spike Switch SW', Nrml).dir(So, 0xab, Left, High).pos(1).portal(Z, 0x00),
         create_door(player, 'Thieves Spike Switch Up Stairs', Sprl).dir(Up, 0xab, 0, HTH).ss(Z, 0x1a, 0x6c, True, True).small_key().pos(0),
         create_door(player, 'Thieves Attic Down Stairs', Sprl).dir(Dn, 0x64, 0, HTH).ss(Z, 0x11, 0x80, True, True),
         create_door(player, 'Thieves Attic ES', Intr).dir(Ea, 0x64, Bot, High).pos(0),
@@ -607,6 +628,8 @@ def create_doors(world, player):
         create_door(player, 'Thieves Lonely Zazak NW', Intr).dir(No, 0x45, Left, High).pos(1),
         create_door(player, 'Thieves Lonely Zazak ES', Intr).dir(Ea, 0x45, Right, High).pos(3),
         create_door(player, 'Thieves Blind\'s Cell WS', Intr).dir(We, 0x45, Right, High).pos(3),
+        create_door(player, "Thieves Blind's Cell Door", Lgcl).big_key(),
+        create_door(player, "Thieves Blind's Cell Exit", Lgcl),
         create_door(player, 'Thieves Conveyor Bridge EN', Nrml).dir(Ea, 0x44, Top, High).pos(2),
         create_door(player, 'Thieves Conveyor Bridge ES', Nrml).dir(Ea, 0x44, Bot, High).pos(3),
         create_door(player, 'Thieves Conveyor Bridge Block Path', Lgcl),
@@ -616,6 +639,7 @@ def create_doors(world, player):
         create_door(player, 'Thieves Conveyor Block WN', Intr).dir(We, 0x44, Top, High).pos(0),
         create_door(player, 'Thieves Trap EN', Intr).dir(Ea, 0x44, Left, Top).pos(0),
 
+        create_door(player, 'Ice Lobby SE', Nrml).dir(So, 0x0e, Right, High).pos(2).portal(X, 0x00),
         create_door(player, 'Ice Lobby WS', Intr).dir(We, 0x0e, Bot, High).pos(1),
         create_door(player, 'Ice Jelly Key ES', Intr).dir(Ea, 0x0e, Bot, High).pos(1),
         create_door(player, 'Ice Jelly Key Down Stairs', Sprl).dir(Dn, 0x0e, 0, HTH).ss(Z, 0x11, 0x80, True, True).small_key().pos(0),
@@ -631,7 +655,7 @@ def create_doors(world, player):
         create_door(player, 'Ice Cross Right Push Block Bottom', Lgcl),  # dynamic
         create_door(player, 'Ice Cross Top Push Block Bottom', Lgcl),  # dynamic
         create_door(player, 'Ice Cross Top Push Block Right', Lgcl),  # dynamic
-        create_door(player, 'Ice Cross Bottom SE', Nrml).dir(So, 0x1e, Right, High).pos(3),
+        create_door(player, 'Ice Cross Bottom SE', Nrml).dir(So, 0x1e, Right, High).pos(3).portal(X, 0x00),
         create_door(player, 'Ice Cross Right ES', Nrml).dir(Ea, 0x1e, Bot, High).trap(0x4).pos(0),
         create_door(player, 'Ice Bomb Drop Hole', Hole),
         create_door(player, 'Ice Compass Room NE', Nrml).dir(No, 0x2e, Right, High).pos(0),
@@ -642,7 +666,7 @@ def create_doors(world, player):
         create_door(player, 'Ice Big Key Down Ladder', Lddr),
         create_door(player, 'Ice Stalfos Hint SE', Intr).dir(So, 0x3e, Right, High).pos(0),
         create_door(player, 'Ice Conveyor NE', Intr).dir(No, 0x3e, Right, High).no_exit().pos(0),
-        create_door(player, 'Ice Conveyor SW', Nrml).dir(So, 0x3e, Left, High).small_key().pos(1),
+        create_door(player, 'Ice Conveyor SW', Nrml).dir(So, 0x3e, Left, High).small_key().pos(1).portal(Z, 0x20),
         create_door(player, 'Ice Bomb Jump NW', Nrml).dir(No, 0x4e, Left, High).small_key().pos(1),
         create_door(player, 'Ice Bomb Jump Ledge Orange Barrier', Lgcl),
         create_door(player, 'Ice Bomb Jump Catwalk Orange Barrier', Lgcl),
@@ -651,7 +675,7 @@ def create_doors(world, player):
         create_door(player, 'Ice Narrow Corridor Down Stairs', Sprl).dir(Dn, 0x4e, 0, HTH).ss(S, 0x52, 0xc0, True, True),
         create_door(player, 'Ice Pengator Trap Up Stairs', Sprl).dir(Up, 0x6e, 0, HTH).ss(S, 0x5a, 0xac, True, True),
         create_door(player, 'Ice Pengator Trap NE', Nrml).dir(No, 0x6e, Right, High).trap(0x4).pos(0),
-        create_door(player, 'Ice Spike Cross SE', Nrml).dir(So, 0x5e, Right, High).pos(2),
+        create_door(player, 'Ice Spike Cross SE', Nrml).dir(So, 0x5e, Right, High).pos(2).portal(X, 0x00),
         create_door(player, 'Ice Spike Cross ES', Nrml).dir(Ea, 0x5e, Bot, High).small_key().pos(0),
         create_door(player, 'Ice Spike Cross WS', Intr).dir(We, 0x5e, Bot, High).pos(3),
         create_door(player, 'Ice Firebar ES', Intr).dir(Ea, 0x5e, Bot, High).pos(3),
@@ -673,7 +697,7 @@ def create_doors(world, player):
         create_door(player, 'Ice Freezors Ledge ES', Intr).dir(Ea, 0x7e, Bot, High).pos(2),
         create_door(player, 'Ice Tall Hint WS', Intr).dir(We, 0x7e, Bot, High).pos(1),
         create_door(player, 'Ice Tall Hint EN', Nrml).dir(Ea, 0x7e, Top, High).pos(2),
-        create_door(player, 'Ice Tall Hint SE', Nrml).dir(So, 0x7e, Right, High).small_key().pos(0),
+        create_door(player, 'Ice Tall Hint SE', Nrml).dir(So, 0x7e, Right, High).small_key().pos(0).portal(X, 0x02),
         create_door(player, 'Ice Hookshot Ledge WN', Nrml).dir(We, 0x7f, Top, High).no_exit().trap(0x4).pos(0).kill(),
         create_door(player, 'Ice Hookshot Ledge Path', Lgcl),
         create_door(player, 'Ice Hookshot Balcony Path', Lgcl),
@@ -686,7 +710,7 @@ def create_doors(world, player):
         create_door(player, 'Iced T Up Stairs', Sprl).dir(Up, 0xae, 0, HTH).ss(S, 0x1a, 0x3c, True, True),
         create_door(player, 'Ice Catwalk WN', Nrml).dir(We, 0xaf, Top, High).pos(1),
         create_door(player, 'Ice Catwalk NW', Nrml).dir(No, 0xaf, Left, High).pos(0),
-        create_door(player, 'Ice Many Pots SW', Nrml).dir(So, 0x9f, Left, High).trap(0x2).pos(1),
+        create_door(player, 'Ice Many Pots SW', Nrml).dir(So, 0x9f, Left, High).trap(0x2).pos(1).portal(Z, 0x00),
         create_door(player, 'Ice Many Pots WS', Nrml).dir(We, 0x9f, Bot, High).trap(0x4).pos(0),
         create_door(player, 'Ice Crystal Right ES', Nrml).dir(Ea, 0x9e, Bot, High).pos(3),
         create_door(player, 'Ice Crystal Right Orange Barrier', Lgcl),
@@ -706,18 +730,19 @@ def create_doors(world, player):
         create_door(player, 'Ice Anti-Fairy SE', Intr).dir(So, 0xbe, Right, High).pos(2),
         create_door(player, 'Ice Switch Room NE', Intr).dir(No, 0xbe, Right, High).pos(2),
         create_door(player, 'Ice Switch Room ES', Nrml).dir(Ea, 0xbe, Bot, High).small_key().pos(1),
-        create_door(player, 'Ice Switch Room SE', Nrml).dir(So, 0xbe, Right, High).trap(0x4).pos(0),
+        create_door(player, 'Ice Switch Room SE', Nrml).dir(So, 0xbe, Right, High).trap(0x4).pos(0).portal(X, 0x00),
         create_door(player, 'Ice Refill WS', Nrml).dir(We, 0xbf, Bot, High).small_key().pos(0),
         create_door(player, 'Ice Fairy Warp', Warp),
         create_door(player, 'Ice Antechamber NE', Nrml).dir(No, 0xce, Right, High).trap(0x4).pos(0),
         create_door(player, 'Ice Antechamber Hole', Hole),
 
+        create_door(player, 'Mire Lobby S', Nrml).dir(So, 0x98, Left, High).pos(0).portal(Z, 0x20),
         create_door(player, 'Mire Lobby Gap', Lgcl),
         create_door(player, 'Mire Post-Gap Gap', Lgcl),
         create_door(player, 'Mire Post-Gap Down Stairs', Sprl).dir(Dn, 0x98, 0, HTH).ss(X, 0x11, 0x90, False, True),
         create_door(player, 'Mire 2 Up Stairs', Sprl).dir(Up, 0xd2, 0, HTH).ss(X, 0x1a, 0x7c, False, True),
         create_door(player, 'Mire 2 NE', Nrml).dir(No, 0xd2, Right, High).trap(0x4).pos(0),
-        create_door(player, 'Mire Hub SE', Nrml).dir(So, 0xc2, Right, High).pos(5),
+        create_door(player, 'Mire Hub SE', Nrml).dir(So, 0xc2, Right, High).pos(5).portal(X, 0x22),
         create_door(player, 'Mire Hub ES', Nrml).dir(Ea, 0xc2, Bot, High).pos(6),
         create_door(player, 'Mire Hub E', Nrml).dir(Ea, 0xc2, Mid, High).pos(4),
         create_door(player, 'Mire Hub NE', Nrml).dir(No, 0xc2, Right, High).pos(7),
@@ -746,7 +771,7 @@ def create_doors(world, player):
         create_door(player, 'Mire Map Spot Blue Barrier', Lgcl),
         create_door(player, 'Mire Crystal Dead End Left Barrier', Lgcl),
         create_door(player, 'Mire Crystal Dead End Right Barrier', Lgcl),
-        create_door(player, 'Mire Hidden Shooters SE', Nrml).dir(So, 0xb2, Right, High).pos(6),
+        create_door(player, 'Mire Hidden Shooters SE', Nrml).dir(So, 0xb2, Right, High).pos(6).portal(X, 0x00),
         create_door(player, 'Mire Hidden Shooters ES', Nrml).dir(Ea, 0xb2, Bot, High).pos(7),
         create_door(player, 'Mire Hidden Shooters WS', Intr).dir(We, 0xb2, Bot, High).pos(1),
         create_door(player, 'Mire Cross ES', Intr).dir(Ea, 0xb2, Bot, High).pos(1),
@@ -754,22 +779,22 @@ def create_doors(world, player):
         create_door(player, 'Mire Hidden Shooters Block Path N', Lgcl),
         create_door(player, 'Mire Hidden Shooters NE', Intr).dir(No, 0xb2, Right, High).pos(2),
         create_door(player, 'Mire Minibridge SE', Intr).dir(So, 0xb2, Right, High).pos(2),
-        create_door(player, 'Mire Cross SW', Nrml).dir(So, 0xb2, Left, High).pos(5),
+        create_door(player, 'Mire Cross SW', Nrml).dir(So, 0xb2, Left, High).pos(5).portal(Z, 0x00),
         create_door(player, 'Mire Minibridge NE', Nrml).dir(No, 0xb2, Right, High).pos(4),
         create_door(player, 'Mire BK Door Room EN', Nrml).dir(Ea, 0xb2, Top, Low).pos(3),
         create_door(player, 'Mire BK Door Room N', Nrml).dir(No, 0xb2, Mid, High).big_key().pos(0),
         create_door(player, 'Mire Spikes WS', Nrml).dir(We, 0xb3, Bot, High).pos(3),
-        create_door(player, 'Mire Spikes SW', Nrml).dir(So, 0xb3, Left, High).pos(4),
+        create_door(player, 'Mire Spikes SW', Nrml).dir(So, 0xb3, Left, High).pos(4).portal(Z, 0x00),
         create_door(player, 'Mire Spikes NW', Intr).dir(No, 0xb3, Left, High).small_key().pos(0),
         create_door(player, 'Mire Ledgehop SW', Intr).dir(So, 0xb3, Left, High).small_key().pos(0),
         create_door(player, 'Mire Ledgehop WN', Nrml).dir(We, 0xb3, Top, Low).pos(1),
         create_door(player, 'Mire Ledgehop NW', Nrml).dir(No, 0xb3, Left, High).pos(2),
-        create_door(player, 'Mire Bent Bridge SW', Nrml).dir(So, 0xa3, Left, High).pos(1),
+        create_door(player, 'Mire Bent Bridge SW', Nrml).dir(So, 0xa3, Left, High).pos(1).portal(Z, 0x02),
         create_door(player, 'Mire Bent Bridge W', Nrml).dir(We, 0xa3, Mid, High).pos(0),
         create_door(player, 'Mire Over Bridge E', Nrml).dir(Ea, 0xa2, Mid, High).pos(2),
         create_door(player, 'Mire Over Bridge W', Nrml).dir(We, 0xa2, Mid, High).pos(1),
-        create_door(player, 'Mire Right Bridge SE', Nrml).dir(So, 0xa2, Right, High).pos(3),
-        create_door(player, 'Mire Left Bridge S', Nrml).dir(So, 0xa2, Mid, High).small_key().pos(0),
+        create_door(player, 'Mire Right Bridge SE', Nrml).dir(So, 0xa2, Right, High).pos(3).portal(X, 0x22),
+        create_door(player, 'Mire Left Bridge S', Nrml).dir(So, 0xa2, Mid, High).small_key().pos(0).portal(Z, 0x22),
         create_door(player, 'Mire Left Bridge Hook Path', Lgcl),
         create_door(player, 'Mire Left Bridge Down Stairs', Sprl).dir(Dn, 0xa2, 0, HTL).ss(A, 0x12, 0x00),
         create_door(player, 'Mire Fishbone E', Nrml).dir(Ea, 0xa1, Mid, High).pos(1),
@@ -777,7 +802,7 @@ def create_doors(world, player):
         create_door(player, 'Mire South Fish Blue Barrier', Lgcl),
         create_door(player, 'Mire Fishbone SE', Nrml).dir(So, 0xa1, Right, High).small_key().pos(0),
         create_door(player, 'Mire Spike Barrier NE', Nrml).dir(No, 0xb1, Right, High).small_key().pos(1),
-        create_door(player, 'Mire Spike Barrier SE', Nrml).dir(So, 0xb1, Right, High).pos(2),
+        create_door(player, 'Mire Spike Barrier SE', Nrml).dir(So, 0xb1, Right, High).pos(2).portal(X, 0x02),
         create_door(player, 'Mire Spike Barrier ES', Intr).dir(Ea, 0xb1, Bot, High).pos(3),
         create_door(player, 'Mire Square Rail WS', Intr).dir(We, 0xb1, Bot, High).pos(3),
         create_door(player, 'Mire Square Rail NW', Intr).dir(No, 0xb1, Left, High).big_key().pos(0),
@@ -786,10 +811,10 @@ def create_doors(world, player):
         create_door(player, 'Mire Wizzrobe Bypass EN', Nrml).dir(Ea, 0xc1, Top, High).pos(5),
         create_door(player, 'Mire Wizzrobe Bypass NE', Nrml).dir(No, 0xc1, Right, High).pos(6),
         create_door(player, 'Mire Conveyor Crystal ES', Nrml).dir(Ea, 0xc1, Bot, High).small_key().pos(1),
-        create_door(player, 'Mire Conveyor Crystal SE', Nrml).dir(So, 0xc1, Right, High).pos(7),
+        create_door(player, 'Mire Conveyor Crystal SE', Nrml).dir(So, 0xc1, Right, High).pos(7).portal(X, 0x00),
         create_door(player, 'Mire Conveyor Crystal WS', Intr).dir(We, 0xc1, Bot, High).small_key().pos(0),
         create_door(player, 'Mire Tile Room ES', Intr).dir(Ea, 0xc1, Bot, High).small_key().pos(0),
-        create_door(player, 'Mire Tile Room SW', Nrml).dir(So, 0xc1, Left, High).pos(4),
+        create_door(player, 'Mire Tile Room SW', Nrml).dir(So, 0xc1, Left, High).pos(4).portal(Z, 0x00),
         create_door(player, 'Mire Tile Room NW', Intr).dir(No, 0xc1, Left, High).pos(3),
         create_door(player, 'Mire Compass Room SW', Intr).dir(So, 0xc1, Left, High).pos(3),
         create_door(player, 'Mire Compass Room EN', Intr).dir(Ea, 0xc1, Top, High).pos(2),
@@ -838,12 +863,13 @@ def create_doors(world, player):
         create_door(player, 'Mire Antechamber NW', Nrml).dir(No, 0xa0, Left, High).big_key().pos(0),
         create_door(player, 'Mire Boss SW', Nrml).dir(So, 0x90, Left, High).no_exit().trap(0x4).pos(0),
 
+        create_door(player, 'TR Main Lobby SE', Nrml).dir(So, 0xd6, Right, High).pos(1).portal(X, 0x02),
         create_door(player, 'TR Lobby Ledge NE', Nrml).dir(No, 0xd6, Right, High).pos(2),
         create_door(player, 'TR Main Lobby Gap', Lgcl),
         create_door(player, 'TR Lobby Ledge Gap', Lgcl),
         create_door(player, 'TR Compass Room NW', Nrml).dir(No, 0xd6, Left, High).pos(0),
-        create_door(player, 'TR Hub SW', Nrml).dir(So, 0xc6, Left, High).pos(4),
-        create_door(player, 'TR Hub SE', Nrml).dir(So, 0xc6, Right, High).pos(5),
+        create_door(player, 'TR Hub SW', Nrml).dir(So, 0xc6, Left, High).pos(4).portal(Z, 0x22),
+        create_door(player, 'TR Hub SE', Nrml).dir(So, 0xc6, Right, High).pos(5).portal(X, 0x22),
         create_door(player, 'TR Hub ES', Nrml).dir(Ea, 0xc6, Bot, High).pos(3),
         create_door(player, 'TR Hub EN', Nrml).dir(Ea, 0xc6, Top, High).pos(2),
         create_door(player, 'TR Hub NW', Nrml).dir(No, 0xc6, Left, High).small_key().pos(0),
@@ -851,9 +877,9 @@ def create_doors(world, player):
         create_door(player, 'TR Torches Ledge WS', Nrml).dir(We, 0xc7, Bot, High).pos(2),
         create_door(player, 'TR Torches WN', Nrml).dir(We, 0xc7, Top, High).pos(1),
         create_door(player, 'TR Torches NW', Nrml).dir(No, 0xc7, Left, High).trap(0x4).pos(0),
-        create_door(player, 'TR Roller Room SW', Nrml).dir(So, 0xb7, Left, High).pos(0),
-        create_door(player, 'TR Pokey 1 SW', Nrml).dir(So, 0xb6, Left, High).small_key().pos(2),
-        create_door(player, 'TR Tile Room SE', Nrml).dir(So, 0xb6, Right, High).pos(4),
+        create_door(player, 'TR Roller Room SW', Nrml).dir(So, 0xb7, Left, High).pos(0).portal(Z, 0x02),
+        create_door(player, 'TR Pokey 1 SW', Nrml).dir(So, 0xb6, Left, High).small_key().pos(2).portal(Z, 0x00),
+        create_door(player, 'TR Tile Room SE', Nrml).dir(So, 0xb6, Right, High).pos(4).portal(X, 0x00),
         create_door(player, 'TR Tile Room NE', Intr).dir(No, 0xb6, Right, High).pos(1),
         create_door(player, 'TR Refill SE', Intr).dir(So, 0xb6, Right, High).pos(1),
         create_door(player, 'TR Pokey 1 NW', Intr).dir(No, 0xb6, Left, High).small_key().pos(3),
@@ -865,7 +891,7 @@ def create_doors(world, player):
         create_door(player, 'TR Pipe Ledge Drop Down', Lgcl),
         create_door(player, 'TR Lava Dual Pipes EN', Nrml).dir(Ea, 0x14, Top, High).pos(5),
         create_door(player, 'TR Lava Dual Pipes WN', Nrml).dir(We, 0x14, Top, High).pos(3),
-        create_door(player, 'TR Lava Dual Pipes SW', Nrml).dir(So, 0x14, Left, High).pos(4),
+        create_door(player, 'TR Lava Dual Pipes SW', Nrml).dir(So, 0x14, Left, High).pos(4).portal(Z, 0x22),
         create_door(player, 'TR Lava Island WS', Nrml).dir(We, 0x14, Bot, High).small_key().pos(1),
         create_door(player, 'TR Lava Island ES', Nrml).dir(Ea, 0x14, Bot, High).pos(6),
         create_door(player, 'TR Lava Escape SE', Nrml).dir(So, 0x14, Right, High).small_key().pos(0),
@@ -881,12 +907,14 @@ def create_doors(world, player):
         create_door(player, 'TR Hallway ES', Intr).dir(Ea, 0x24, Bot, High).pos(7),
         create_door(player, 'TR Big View WS', Intr).dir(We, 0x24, Bot, High).pos(7),
         create_door(player, 'TR Big Chest Gap', Lgcl),
+        create_door(player, 'TR Big Chest Entrance SE', Nrml).dir(So, 0x24, Right, High).pos(4).kill().portal(X, 0x00),
         create_door(player, 'TR Big Chest Entrance Gap', Lgcl),
         create_door(player, 'TR Big Chest NE', Intr).dir(No, 0x24, Right, High).pos(3),
         create_door(player, 'TR Dodgers SE', Intr).dir(So, 0x24, Right, High).no_exit().pos(3),
         create_door(player, 'TR Dodgers NE', Nrml).dir(No, 0x24, Right, High).big_key().pos(0),
+        create_door(player, 'TR Lazy Eyes SE', Nrml).dir(So, 0x23, Right, High).pos(0).portal(X, 0x00),
         create_door(player, 'TR Lazy Eyes ES', Nrml).dir(Ea, 0x23, Bot, High).pos(1),
-        create_door(player, 'TR Dash Room SW', Nrml).dir(So, 0x04, Left, High).pos(4),
+        create_door(player, 'TR Dash Room SW', Nrml).dir(So, 0x04, Left, High).pos(4).portal(Z, 0x00),
         create_door(player, 'TR Dash Room ES', Intr).dir(Ea, 0x04, Bot, High).pos(2),
         create_door(player, 'TR Tongue Pull WS', Intr).dir(We, 0x04, Bot, High).pos(2),
         create_door(player, 'TR Tongue Pull NE', Intr).dir(No, 0x04, Right, High).pos(3),
@@ -895,11 +923,12 @@ def create_doors(world, player):
         create_door(player, 'TR Crystaroller SW', Intr).dir(So, 0x04, Left, High).pos(1),
         create_door(player, 'TR Crystaroller Down Stairs', Sprl).dir(Dn, 0x04, 0, HTH).ss(A, 0x12, 0x80, True, True).small_key().pos(0),
         create_door(player, 'TR Dark Ride Up Stairs', Sprl).dir(Up, 0xb5, 0, HTH).ss(A, 0x1b, 0x6c),
-        create_door(player, 'TR Dark Ride SW', Nrml).dir(So, 0xb5, Left, High).trap(0x4).pos(0),
+        create_door(player, 'TR Dark Ride SW', Nrml).dir(So, 0xb5, Left, High).trap(0x4).pos(0).portal(Z, 0x22),
         create_door(player, 'TR Dash Bridge NW', Nrml).dir(No, 0xc5, Left, High).pos(1),
-        create_door(player, 'TR Dash Bridge SW', Nrml).dir(So, 0xc5, Left, High).pos(2),
+        create_door(player, 'TR Dash Bridge SW', Nrml).dir(So, 0xc5, Left, High).pos(2).portal(Z, 0x02),
         create_door(player, 'TR Dash Bridge WS', Nrml).dir(We, 0xc5, Bot, High).small_key().pos(0),
         create_door(player, 'TR Eye Bridge NW', Nrml).dir(No, 0xd5, Left, High).pos(1),
+        create_door(player, 'TR Eye Bridge SW', Nrml).dir(So, 0xd5, Left, High).pos(0).portal(Z, 0x02),
         create_door(player, 'TR Crystal Maze ES', Nrml).dir(Ea, 0xc4, Bot, High).small_key().pos(0),
         create_door(player, 'TR Crystal Maze Forwards Path', Lgcl),
         create_door(player, 'TR Crystal Maze Blue Path', Lgcl),
@@ -907,8 +936,9 @@ def create_doors(world, player):
         create_door(player, 'TR Crystal Maze North Stairs', StrS).dir(No, 0xc4, Mid, High),
         create_door(player, 'TR Final Abyss South Stairs', StrS).dir(So, 0xb4, Mid, High),
         create_door(player, 'TR Final Abyss NW', Nrml).dir(No, 0xb4, Left, High).big_key().pos(0),
-        create_door(player, 'TR Boss SW', Nrml).dir(So, 0xa4, Left, High).no_exit().trap(0x4).pos(0),
+        create_door(player, 'TR Boss SW', Nrml).dir(So, 0xa4, Left, High).no_exit().trap(0x4).pos(0),  # .portal(Z, 0x00), -enemizer doesn't work
 
+        create_door(player, 'GT Lobby S', Nrml).dir(So, 0x0c, Mid, High).pos(0).portal(Z, 0x22),
         create_door(player, 'GT Lobby Left Down Stairs', Sprl).dir(Dn, 0x0c, 1, HTL).ss(A, 0x0f, 0x80),
         create_door(player, 'GT Lobby Up Stairs', Sprl).dir(Up, 0x0c, 2, HTH).ss(A, 0x1b, 0xec),
         create_door(player, 'GT Lobby Right Down Stairs', Sprl).dir(Dn, 0x0c, 0, HTL).ss(S, 0x12, 0x80),
@@ -922,8 +952,8 @@ def create_doors(world, player):
         create_door(player, 'GT Big Chest NW', Intr).dir(No, 0x8c, Left, High).pos(1),
         create_door(player, 'GT Blocked Stairs Down Stairs', Sprl).dir(Dn, 0x8c, 3, HTH).ss(Z, 0x12, 0x40, True, True).kill(),
         create_door(player, 'GT Blocked Stairs Block Path', Lgcl),
-        create_door(player, 'GT Big Chest SW', Nrml).dir(So, 0x8c, Left, High).pos(4),
-        create_door(player, 'GT Bob\'s Room SE', Nrml).dir(So, 0x8c, Right, High).pos(5).kill(),
+        create_door(player, 'GT Big Chest SW', Nrml).dir(So, 0x8c, Left, High).pos(4).portal(Z, 0x00),
+        create_door(player, 'GT Bob\'s Room SE', Nrml).dir(So, 0x8c, Right, High).pos(5).kill().portal(X, 0x00),
         create_door(player, 'GT Bob\'s Room Hole', Hole),
         create_door(player, 'GT Tile Room WN', Nrml).dir(We, 0x8d, Top, High).pos(2),
         create_door(player, 'GT Tile Room EN', Intr).dir(Ea, 0x8d, Top, High).small_key().pos(1),
@@ -933,7 +963,7 @@ def create_doors(world, player):
         create_door(player, 'GT Speed Torch North Path', Lgcl),
         create_door(player, 'GT Speed Torch WS', Intr).dir(We, 0x8d, Bot, High).pos(4),
         create_door(player, 'GT Pots n Blocks ES', Intr).dir(Ea, 0x8d, Bot, High).pos(4),
-        create_door(player, 'GT Speed Torch SE', Nrml).dir(So, 0x8d, Right, High).trap(0x4).pos(0),
+        create_door(player, 'GT Speed Torch SE', Nrml).dir(So, 0x8d, Right, High).trap(0x4).pos(0).portal(X, 0x02),
         create_door(player, 'GT Crystal Conveyor NE', Nrml).dir(No, 0x9d, Right, High).pos(0).kill(),
         create_door(player, 'GT Crystal Conveyor WN', Intr).dir(We, 0x9d, Top, High).pos(2),
         create_door(player, 'GT Compass Room EN', Intr).dir(Ea, 0x9d, Top, High).pos(2),
@@ -954,10 +984,11 @@ def create_doors(world, player):
         create_door(player, 'GT Hookshot South-North Path', Lgcl),
         create_door(player, 'GT Hookshot Platform Blue Barrier', Lgcl),
         create_door(player, 'GT Hookshot Entry Blue Barrier', Lgcl),
+        create_door(player, 'GT Hookshot Entry Boomerang Path', Lgcl),
         create_door(player, 'GT Hookshot NW', Nrml).dir(No, 0x8b, Left, High).pos(4),
         create_door(player, 'GT Hookshot ES', Intr).dir(Ea, 0x8b, Bot, High).small_key().pos(1),
         create_door(player, 'GT Map Room WS', Intr).dir(We, 0x8b, Bot, High).small_key().pos(1),
-        create_door(player, 'GT Hookshot SW', Nrml).dir(So, 0x8b, Left, High).pos(3),
+        create_door(player, 'GT Hookshot SW', Nrml).dir(So, 0x8b, Left, High).pos(3).portal(Z, 0x02),
         create_door(player, 'GT Double Switch NW', Nrml).dir(No, 0x9b, Left, High).pos(1).kill(),
         create_door(player, 'GT Double Switch Orange Barrier', Lgcl),
         create_door(player, 'GT Double Switch Orange Barrier 2', Lgcl),
@@ -991,11 +1022,11 @@ def create_doors(world, player):
         create_door(player, 'GT Warp Maze - Main Rails Right Mid Warp', Warp),
         create_door(player, 'GT Warp Maze - Pot Rail Warp', Warp),
         create_door(player, 'GT Warp Maze (Rails) WS', Nrml).dir(We, 0x7d, Bot, High).pos(1),
-        create_door(player, 'GT Petting Zoo SE', Nrml).dir(So, 0x7d, Right, High).trap(0x4).pos(0),
+        create_door(player, 'GT Petting Zoo SE', Nrml).dir(So, 0x7d, Right, High).trap(0x4).pos(0).portal(X, 0x00),
         create_door(player, 'GT Conveyor Star Pits EN', Nrml).dir(Ea, 0x7b, Top, High).small_key().pos(1),
         create_door(player, 'GT Hidden Star ES', Nrml).dir(Ea, 0x7b, Bot, High).pos(2).kill(),
         create_door(player, 'GT Hidden Star Warp', Warp),
-        create_door(player, 'GT DMs Room SW', Nrml).dir(So, 0x7b, Left, High).trap(0x4).pos(0),
+        create_door(player, 'GT DMs Room SW', Nrml).dir(So, 0x7b, Left, High).trap(0x4).pos(0).portal(Z, 0x00),
         create_door(player, 'GT Falling Bridge WN', Nrml).dir(We, 0x7c, Top, High).small_key().pos(2),
         create_door(player, 'GT Falling Bridge WS', Nrml).dir(We, 0x7c, Bot, High).pos(3),
         create_door(player, 'GT Randomizer Room ES', Nrml).dir(Ea, 0x7c, Bot, High).pos(1),
@@ -1014,7 +1045,7 @@ def create_doors(world, player):
         create_door(player, 'GT Mimics 2 NE', Intr).dir(No, 0x6b, Right, High).pos(1),
         create_door(player, 'GT Dash Hall SE', Intr).dir(So, 0x6b, Right, High).pos(1),
         create_door(player, 'GT Dash Hall NE', Nrml).dir(No, 0x6b, Right, High).big_key().pos(0),
-        create_door(player, 'GT Hidden Spikes SE', Nrml).dir(So, 0x5b, Right, High).small_key().pos(0),
+        create_door(player, 'GT Hidden Spikes SE', Nrml).dir(So, 0x5b, Right, High).small_key().pos(0).portal(X, 0x02),
         create_door(player, 'GT Hidden Spikes EN', Nrml).dir(Ea, 0x5b, Top, High).trap(0x2).pos(1),
         create_door(player, 'GT Cannonball Bridge WN', Nrml).dir(We, 0x5c, Top, High).pos(1),
         create_door(player, 'GT Cannonball Bridge SE', Intr).dir(So, 0x5c, Right, High).pos(0),
@@ -1025,7 +1056,7 @@ def create_doors(world, player):
         create_door(player, 'GT Gauntlet 2 EN', Intr).dir(Ea, 0x5d, Top, High).pos(2),
         create_door(player, 'GT Gauntlet 2 SW', Intr).dir(So, 0x5d, Left, High).pos(0),
         create_door(player, 'GT Gauntlet 3 NW', Intr).dir(No, 0x5d, Left, High).pos(0),
-        create_door(player, 'GT Gauntlet 3 SW', Nrml).dir(So, 0x5d, Left, High).trap(0x2).pos(1),
+        create_door(player, 'GT Gauntlet 3 SW', Nrml).dir(So, 0x5d, Left, High).trap(0x2).pos(1).portal(Z, 0x00),
         create_door(player, 'GT Gauntlet 4 NW', Nrml).dir(No, 0x6d, Left, High).trap(0x4).pos(0),
         create_door(player, 'GT Gauntlet 4 SW', Intr).dir(So, 0x6d, Left, High).pos(1),
         create_door(player, 'GT Gauntlet 5 NW', Intr).dir(No, 0x6d, Left, High).pos(1),
@@ -1042,7 +1073,7 @@ def create_doors(world, player):
         create_door(player, 'GT Dashing Bridge NE', Intr).dir(No, 0xa5, Right, High).pos(1),
         create_door(player, 'GT Wizzrobes 2 SE', Intr).dir(So, 0xa5, Right, High).pos(1),
         create_door(player, 'GT Wizzrobes 2 NE', Nrml).dir(No, 0xa5, Right, High).trap(0x4).pos(0),
-        create_door(player, 'GT Conveyor Bridge SE', Nrml).dir(So, 0x95, Right, High).pos(0),
+        create_door(player, 'GT Conveyor Bridge SE', Nrml).dir(So, 0x95, Right, High).pos(0).portal(X, 0x02),
         create_door(player, 'GT Conveyor Bridge EN', Nrml).dir(Ea, 0x95, Top, High).pos(1),
         create_door(player, 'GT Torch Cross WN', Nrml).dir(We, 0x96, Top, High).pos(1),
         create_door(player, 'GT Torch Cross ES', Intr).dir(Ea, 0x96, Bot, High).pos(0),
@@ -1056,7 +1087,7 @@ def create_doors(world, player):
         create_door(player, 'GT Bomb Conveyor EN', Intr).dir(Ea, 0x3d, Top, High).small_key().pos(1),
         create_door(player, 'GT Bomb Conveyor SW', Intr).dir(So, 0x3d, Left, High).pos(3),
         create_door(player, 'GT Crystal Circles NW', Intr).dir(No, 0x3d, Left, High).pos(3),
-        create_door(player, 'GT Crystal Circles SW', Nrml).dir(So, 0x3d, Left, High).small_key().pos(2),
+        create_door(player, 'GT Crystal Circles SW', Nrml).dir(So, 0x3d, Left, High).small_key().pos(2).portal(Z, 0x00),
         create_door(player, 'GT Left Moldorm Ledge NW', Nrml).dir(No, 0x4d, Left, High).small_key().pos(0).kill(),
         create_door(player, 'GT Left Moldorm Ledge Drop Down', Lgcl),
         create_door(player, 'GT Right Moldorm Ledge Drop Down', Lgcl),
@@ -1209,6 +1240,7 @@ def create_doors(world, player):
     world.get_door('GT Hookshot South-East Path', player).c_switch()
     world.get_door('GT Hookshot ES', player).c_switch()
     world.get_door('GT Hookshot Platform Blue Barrier', player).c_switch()
+    world.get_door('GT Hookshot Entry Boomerang Path', player).c_switch()
     world.get_door('GT Double Switch Orange Path', player).c_switch()
     world.get_door('GT Double Switch Blue Path', player).c_switch()
     world.get_door('GT Spike Crystals WN', player).c_switch()
@@ -1238,6 +1270,70 @@ def create_doors(world, player):
     controller_door(east_controller, world.get_door('Ice Cross Top Push Block Right', player))
 
     assign_entrances(world, player)
+
+    dungeon_portals = [
+        create_portal(player, 'Sanctuary', world.get_door('Sanctuary S', player), 0x02, 0x02),
+        create_portal(player, 'Hyrule Castle West', world.get_door('Hyrule Castle West Lobby S', player), 0x03, 0x04),
+        create_portal(player, 'Hyrule Castle South', world.get_door('Hyrule Castle Lobby S', player), 0x04, 0x06),
+        create_portal(player, 'Hyrule Castle East', world.get_door('Hyrule Castle East Lobby S', player), 0x05, 0x08),
+        create_portal(player, 'Eastern', world.get_door('Eastern Lobby S', player), 0x08, 0x12, 0),
+        create_portal(player, 'Desert South', world.get_door('Desert Main Lobby S', player), 0x09, 0x14),
+        create_portal(player, 'Desert East', world.get_door('Desert East Lobby S', player), 0x0a, 0x16),
+        create_portal(player, 'Desert West', world.get_door('Desert West S', player), 0x0b, 0x18),
+        create_portal(player, 'Desert Back', world.get_door('Desert Back Lobby S', player), 0x0c, 0x1a, 1),
+        create_portal(player, 'Turtle Rock Lazy Eyes', world.get_door('TR Lazy Eyes SE', player), 0x15, 0x2c),
+        create_portal(player, 'Turtle Rock Eye Bridge', world.get_door('TR Eye Bridge SW', player), 0x18, 0x32),
+        create_portal(player, 'Turtle Rock Chest', world.get_door('TR Big Chest Entrance SE', player), 0x19, 0x34),
+        create_portal(player, 'Agahnims Tower', world.get_door('Tower Lobby S', player), 0x24, 0x4a),
+        create_portal(player, 'Swamp', world.get_door('Swamp Lobby S', player), 0x25, 0x4c, 4),
+        create_portal(player, 'Palace of Darkness', world.get_door('PoD Lobby S', player), 0x26, 0x4e, 5),
+        create_portal(player, 'Mire', world.get_door('Mire Lobby S', player), 0x27, 0x50, 7),
+        create_portal(player, 'Skull 2 West', world.get_door('Skull 2 West Lobby S', player), 0x28, 0x52),
+        create_portal(player, 'Skull 2 East', world.get_door('Skull 2 East Lobby SW', player), 0x29, 0x54),
+        create_portal(player, 'Skull 1', world.get_door('Skull 1 Lobby S', player), 0x2a, 0x56),
+        create_portal(player, 'Skull 3', world.get_door('Skull 3 Lobby SW', player), 0x2b, 0x58, 6),
+        create_portal(player, 'Ice', world.get_door('Ice Lobby SE', player), 0x2d, 0x5c, 8),
+        create_portal(player, 'Hera', world.get_door('Hera Lobby S', player), 0x33, 0x5a, 2),
+        create_portal(player, 'Thieves Town', world.get_door('Thieves Lobby S', player), 0x34, 0x6a, 10),
+        create_portal(player, 'Turtle Rock Main', world.get_door('TR Main Lobby SE', player), 0x35, 0x68, 9),
+        create_portal(player, 'Ganons Tower', world.get_door('GT Lobby S', player), 0x37, 0x70),
+    ]
+    world.dungeon_portals[player] += dungeon_portals
+
+    world.get_door('Sanctuary S', player).dead_end(allowPassage=True)
+    world.get_door('TR Big Chest Entrance SE', player).passage = False
+    world.get_door('Sewers Secret Room Key Door S', player).dungeonLink = 'Hyrule Castle'
+    world.get_door('Desert Cannonball S', player).dead_end()
+    # world.get_door('Desert Boss SW', player).dead_end()
+    # world.get_door('Desert Boss SW', player).dungeonLink = 'Desert Palace'
+    world.get_door('Skull 1 Lobby S', player).dungeonLink = 'Skull Woods'
+    world.get_door('Skull Map Room SE', player).dungeonLink = 'Skull Woods'
+    world.get_door('Skull Spike Corner SW', player).dungeonLink = 'Skull Woods'
+    world.get_door('Skull Spike Corner SW', player).dead_end()
+    world.get_door('Thieves Pot Alcove Bottom SW', player).dead_end()
+    world.get_door('Ice Conveyor SW', player).dead_end(allowPassage=True)
+    world.get_door('Mire Right Bridge SE', player).dead_end(allowPassage=True)
+    world.get_door('TR Roller Room SW', player).dead_end()
+    world.get_door('TR Tile Room SE', player).dead_end()
+    # world.get_door('TR Boss SW', player).dead_end()
+    # world.get_door('TR Boss SW', player).dungeonLink = 'Turtle Rock'
+    world.get_door('GT Petting Zoo SE', player).dead_end()
+    world.get_door('GT DMs Room SW', player).dead_end()
+    world.get_door("GT Bob\'s Room SE", player).passage = False
+    world.get_door('PoD Mimics 2 SW', player).bk_shuffle_req = True
+    world.get_door('Desert Tiles 2 SE', player).bk_shuffle_req = True  # key-drop note (todo)
+
+    # can't unlink from boss right now
+    world.get_door('Hera Lobby S', player).dungeonLink = 'Tower of Hera'
+    # can't unlink from skull woods right now
+    world.get_door('Skull 2 West Lobby S', player).dungeonLink = 'Skull Woods'
+
+    world.get_door('Ice Spike Cross SE', player).dungeonLink = 'linkIceFalls'
+    world.get_door('Ice Tall Hint SE', player).dungeonLink = 'linkIceFalls'
+    world.get_door('Ice Switch Room SE', player).dungeonLink = 'linkIceFalls'
+
+    world.get_door('Ice Cross Bottom SE', player).dungeonLink = 'linkIceFalls2'
+    world.get_door('Ice Conveyor SW', player).dungeonLink = 'linkIceFalls2'
 
 
 def create_paired_doors(world, player):
@@ -1304,3 +1400,8 @@ def create_door(player, name, door_type):
 def ugly_door(door):
     door.ugly = True
     return door
+
+
+def create_portal(player, name, door, ent, ext, boss_exit_idx=-1):
+    door.entranceFlag = True
+    return Portal(player, name, door, ent, ext, boss_exit_idx)

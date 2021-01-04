@@ -2,8 +2,6 @@ import argparse
 import copy
 import json
 import os
-import logging
-import random
 import textwrap
 import shlex
 import sys
@@ -95,7 +93,7 @@ def parse_cli(argv, no_defaults=False):
                          'retro', 'accessibility', 'hints', 'beemizer', 'experimental', 'dungeon_counters',
                          'shufflebosses', 'shuffleenemies', 'enemy_health', 'enemy_damage', 'shufflepots',
                          'ow_palettes', 'uw_palettes', 'sprite', 'disablemusic', 'quickswap', 'fastmenu', 'heartcolor', 'heartbeep',
-                         'remote_items']:
+                         'remote_items', 'keydropshuffle', 'mixed_travel', 'standardize_palettes']:
                 value = getattr(defaults, name) if getattr(playerargs, name) is None else getattr(playerargs, name)
                 if player == 1:
                     setattr(ret, name, {1: value})
@@ -135,6 +133,7 @@ def parse_settings():
         "enemy_health": "default",
         "enemizercli": os.path.join(".", "EnemizerCLI", "EnemizerCLI.Core"),
 
+        "keydropshuffle": False,
         "mapshuffle": False,
         "compassshuffle": False,
         "keyshuffle": False,
@@ -144,6 +143,8 @@ def parse_settings():
         "intensity": 2,
         "experimental": False,
         "dungeon_counters": "default",
+        "mixed_travel": "prevent",
+        "standardize_palettes": "standardize",
 
         "multi": 1,
         "names": "",
