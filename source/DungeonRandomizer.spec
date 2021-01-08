@@ -30,7 +30,7 @@ def recurse_for_py_files(names_so_far):
 hiddenimports = []
 binaries = []
 
-a = Analysis([f"./{BINARY_SLUG}.py"],
+a = Analysis([f"../{BINARY_SLUG}.py"],
              pathex=[],
              binaries=binaries,
              datas=[],
