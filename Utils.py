@@ -36,6 +36,9 @@ def is_bundled():
     return getattr(sys, 'frozen', False)
 
 def local_path(path):
+    # just do stuff here and bail
+    return os.path.join(".", path)
+
     if local_path.cached_path is not None:
         return os.path.join(local_path.cached_path, path)
 
@@ -51,6 +54,9 @@ def local_path(path):
 local_path.cached_path = None
 
 def output_path(path):
+    # just do stuff here and bail
+    return os.path.join(".", path)
+
     if output_path.cached_path is not None:
         return os.path.join(output_path.cached_path, path)
 
