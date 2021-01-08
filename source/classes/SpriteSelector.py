@@ -231,23 +231,19 @@ class SpriteSelector(object):
 
     @property
     def official_sprite_dir(self):
-        if is_bundled():
-            return output_path(os.path.join("sprites","official"))
         return self.local_official_sprite_dir
 
     @property
     def local_official_sprite_dir(self):
-        return local_path(os.path.join("data","sprites","official"))
+        return local_path(os.path.join("resources","app","meta","sprites","official"))
 
     @property
     def unofficial_sprite_dir(self):
-        if is_bundled():
-            return output_path(os.path.join("sprites","unofficial"))
         return self.local_unofficial_sprite_dir
 
     @property
     def local_unofficial_sprite_dir(self):
-        return local_path(os.path.join("data","sprites","unofficial"))
+        return local_path(os.path.join("resources","app","meta","sprites","unofficial"))
 
 
 def get_image_for_sprite(sprite):
