@@ -342,7 +342,7 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
 _sprite_table = {}
 def _populate_sprite_table():
     if not _sprite_table:
-        for dir in [local_path(os.path.join(".","resources","app","meta","sprites","official")), local_path(os.path.join(".","resources","app","meta","sprites","unofficial"))]:
+        for dir in [local_path(os.path.join(".","data","sprites","official")), local_path(os.path.join(".","data","sprites","unofficial"))]:
             for file in os.listdir(dir):
                 filepath = os.path.join(dir, file)
                 if not os.path.isfile(filepath):
