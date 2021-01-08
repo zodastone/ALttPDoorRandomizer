@@ -3,7 +3,7 @@
 import sys
 
 block_cipher = None
-console = False   #   <--- change this to True to enable command prompt when the app runs
+console = True   #   <--- change this to True to enable command prompt when the app runs
 
 if sys.platform.find("mac") or sys.platform.find("osx"):
   console = False
