@@ -1301,6 +1301,7 @@ def create_doors(world, player):
     world.dungeon_portals[player] += dungeon_portals
 
     world.get_door('Sanctuary S', player).dead_end(allowPassage=True)
+    world.get_door('Eastern Hint Tile Blocked Path SE', player).passage = False
     world.get_door('TR Big Chest Entrance SE', player).passage = False
     world.get_door('Sewers Secret Room Key Door S', player).dungeonLink = 'Hyrule Castle'
     world.get_door('Desert Cannonball S', player).dead_end()

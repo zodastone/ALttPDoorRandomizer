@@ -153,9 +153,10 @@ class World(object):
             self._door_cache[(door.name, door.player)] = door
 
     def remove_door(self, door, player):
-        if (door, player) in self._door_cache.keys():
-            del self._door_cache[(door, player)]
-        self.doors.remove(door)
+        if (door.name, player) in self._door_cache.keys():
+            del self._door_cache[(door.name, player)]
+        if door in self.doors:
+            self.doors.remove(door)
 
     def get_regions(self, player=None):
         return self.regions if player is None else self._region_cache[player].values()
@@ -1219,6 +1220,7 @@ class Door(object):
         # self.connected = False  # combine with Dest?
         self.dest = None
         self.blocked = False  # Indicates if the door is normally blocked off as an exit. (Sanc door or always closed)
+        self.blocked_orig = False
         self.stonewall = False  # Indicate that the door cannot be enter until exited (Desert Torches, PoD Eye Statue)
         self.smallKey = False  # There's a small key door on this side
         self.bigKey = False  # There's a big key door on this side
@@ -1230,7 +1232,7 @@ class Door(object):
         self.dead = False
 
         self.entrance = entrance
-        if entrance is not None:
+        if entrance is not None and not entrance.door:
             entrance.door = self
 
     def getAddress(self):
@@ -1316,7 +1318,7 @@ class Door(object):
         return self
 
     def no_exit(self):
-        self.blocked = True
+        self.blocked = self.blocked_orig = True
         return self
 
     def no_entrance(self):

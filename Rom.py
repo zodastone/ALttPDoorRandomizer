@@ -699,7 +699,7 @@ def patch_rom(world, rom, player, team, enemized):
         for name, pair in boss_indicator.items():
             dungeon_id, boss_door = pair
             opposite_door = world.get_door(boss_door, player).dest
-            if opposite_door and opposite_door.roomIndex > -1:
+            if opposite_door and isinstance(opposite_door, Door) and opposite_door.roomIndex > -1:
                 dungeon_name = opposite_door.entrance.parent_region.dungeon.name
                 dungeon_id = boss_indicator[dungeon_name][0]
                 rom.write_byte(0x13f000+dungeon_id, opposite_door.roomIndex)
