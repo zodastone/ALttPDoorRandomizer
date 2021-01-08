@@ -235,7 +235,7 @@ class SpriteSelector(object):
 
     @property
     def local_official_sprite_dir(self):
-        return local_path(os.path.join(".","data","sprites","official"))
+        return local_path(os.path.join("data","sprites","official"))
 
     @property
     def unofficial_sprite_dir(self):
@@ -243,7 +243,7 @@ class SpriteSelector(object):
 
     @property
     def local_unofficial_sprite_dir(self):
-        return local_path(os.path.join(".","data","sprites","unofficial"))
+        return local_path(os.path.join("data","sprites","unofficial"))
 
 
 def get_image_for_sprite(sprite):
