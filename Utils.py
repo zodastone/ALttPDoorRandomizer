@@ -61,15 +61,7 @@ def output_path(path):
         # has been packaged, so cannot use CWD for output.
         if sys.platform == 'win32':
             #windows
-            import ctypes.wintypes
-            CSIDL_PERSONAL = 5       # My Documents
-            SHGFP_TYPE_CURRENT = 0   # Get current, not default value
-
-            buf = ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
-            ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
-
-            documents = buf.value
-
+            documents = os.path.join(os.path.expanduser("~"),"Documents")
         elif sys.platform == 'darwin':
             from AppKit import NSSearchPathForDirectoriesInDomains # pylint: disable=import-error
             # http://developer.apple.com/DOCUMENTATION/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Functions/Reference/reference.html#//apple_ref/c/func/NSSearchPathForDirectoriesInDomains
@@ -655,4 +647,3 @@ if __name__ == '__main__':
     # room_palette_data(old_rom=sys.argv[1])
     # extract_data_from_us_rom(sys.argv[1])
     extract_data_from_jp_rom(sys.argv[1])
-
