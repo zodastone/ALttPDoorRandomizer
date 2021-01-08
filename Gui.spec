@@ -3,10 +3,11 @@
 import sys
 
 block_cipher = None
-console = True
+console = False   #   <--- change this to True to enable command prompt when the app runs
 
 if sys.platform.find("mac") or sys.platform.find("osx"):
   console = False
+
 BINARY_SLUG = "Gui"
 
 def recurse_for_py_files(names_so_far):
@@ -29,9 +30,6 @@ def recurse_for_py_files(names_so_far):
 hiddenimports = []
 binaries = []
 
-#if sys.platform.find("windows"):
-#  binaries.append(("ucrtbase.dll","."))
-
 a = Analysis([f"./{BINARY_SLUG}.py"],
              pathex=[],
              binaries=binaries,
@@ -48,6 +46,7 @@ a = Analysis([f"./{BINARY_SLUG}.py"],
 # https://stackoverflow.com/questions/17034434/how-to-remove-exclude-modules-and-files-from-pyinstaller
 excluded_binaries = [
         'VCRUNTIME140.dll',
+        'ucrtbase.dll',
         'msvcp140.dll',
         'mfc140u.dll']
 a.binaries = TOC([x for x in a.binaries if x[0] not in excluded_binaries])
@@ -66,4 +65,4 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           runtime_tmpdir=None,
-          console=console )   #   <--- change this to True to enable command prompt when the app runs
+          console=console )
