@@ -4,7 +4,7 @@ import shutil
 import sys
 
 # Spec file
-SPEC_FILE = os.path.join("DungeonRandomizer.spec")
+SPEC_FILE = os.path.join(".", "source", "DungeonRandomizer.spec")
 
 # Destination is current dir
 DEST_DIRECTORY = '.'
