@@ -221,7 +221,7 @@ jobs:
         body: ${{ steps.release_notes.outputs.body }}
         draft: true
         prerelease: true
-    if: contains(github.ref, 'master') || contains(github.ref, 'stable') || contains(github.ref, 'dev') || contains(github.ref, 'DoorRelease')
+      if: contains(github.ref, 'master') || contains(github.ref, 'stable') || contains(github.ref, 'dev') || contains(github.ref, 'DoorRelease')
     # upload linux archive asset
     - name: Upload Linux Archive Asset
       id: upload-linux-asset
