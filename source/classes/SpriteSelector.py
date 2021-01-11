@@ -31,6 +31,11 @@ class SpriteSelector(object):
         def open_official_sprite_listing(_evt):
             webbrowser.open("http://alttpr.com/sprite_preview")
 
+        def open_official_sprite_dir(_evt):
+            if not os.path.isdir(self.official_sprite_dir):
+                os.makedirs(self.official_sprite_dir)
+            open_file(self.official_sprite_dir)
+
         def open_unofficial_sprite_dir(_evt):
             if not os.path.isdir(self.unofficial_sprite_dir):
                 os.makedirs(self.unofficial_sprite_dir)
@@ -42,14 +47,17 @@ class SpriteSelector(object):
 
         official_frametitle = Frame(self.window)
         official_title_text = Label(official_frametitle, text="Official Sprites")
-        official_title_link = Label(official_frametitle, text="(open)", fg="blue", cursor="hand2")
         official_title_text.pack(side=LEFT)
+        official_local_title_link = Label(official_frametitle, text="(open local)", fg="blue", cursor="hand2")
+        official_local_title_link.pack(side=LEFT)
+        official_local_title_link.bind("<Button-1>", open_official_sprite_dir)
+        official_title_link = Label(official_frametitle, text="(ALttPR)", fg="blue", cursor="hand2")
         official_title_link.pack(side=LEFT)
         official_title_link.bind("<Button-1>", open_official_sprite_listing)
 
         unofficial_frametitle = Frame(self.window)
         unofficial_title_text = Label(unofficial_frametitle, text="Unofficial Sprites")
-        unofficial_title_link = Label(unofficial_frametitle, text="(open)", fg="blue", cursor="hand2")
+        unofficial_title_link = Label(unofficial_frametitle, text="(open local)", fg="blue", cursor="hand2")
         unofficial_title_text.pack(side=LEFT)
         unofficial_title_link.pack(side=LEFT)
         unofficial_title_link.bind("<Button-1>", open_unofficial_sprite_dir)
@@ -231,8 +239,6 @@ class SpriteSelector(object):
 
     @property
     def official_sprite_dir(self):
-#        if is_bundled():
-#            return output_path(os.path.join("sprites","official"))
         return self.local_official_sprite_dir
 
     @property
@@ -241,8 +247,6 @@ class SpriteSelector(object):
 
     @property
     def unofficial_sprite_dir(self):
-#        if is_bundled():
-#            return output_path(os.path.join("sprites","unofficial"))
         return self.local_unofficial_sprite_dir
 
     @property
