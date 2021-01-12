@@ -433,7 +433,7 @@ def copy_world(world):
         copied_region.is_light_world = region.is_light_world
         copied_region.is_dark_world = region.is_dark_world
         copied_region.dungeon = region.dungeon
-        copied_region.locations = [Location(location.player, location.name, parent=copied_region) for location in region.locations]
+        copied_region.locations = [ret.get_location(location.name, location.player) for location in region.locations]
         for entrance in region.entrances:
             ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
 

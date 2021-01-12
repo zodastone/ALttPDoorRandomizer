@@ -8,10 +8,11 @@ from typing import DefaultDict, Dict, List
 
 from functools import reduce
 from BaseClasses import RegionType, Region, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo
+from Doors import reset_portals
 from Dungeons import dungeon_regions, region_starts, standard_starts, split_region_starts
 from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
 from Items import ItemFactory
-from RoomData import DoorKind, PairedDoor
+from RoomData import DoorKind, PairedDoor, reset_rooms
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths, drop_entrances
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from DungeonGenerator import dungeon_portals, dungeon_drops, GenerationException
@@ -32,12 +33,15 @@ def link_doors(world, player):
             for door in world.doors:
                 if door.player == player:
                     door.dest = None
+                    door.entranceFlag = False
                     ent = door.entrance
                     if door.type != DoorType.Logical and ent.connected_region is not None:
                         ent.connected_region.entrances = [x for x in ent.connected_region.entrances if x != ent]
                         ent.connected_region = None
             for portal in world.dungeon_portals[player]:
                 disconnect_portal(portal, world, player)
+            reset_portals(world, player)
+            reset_rooms(world, player)
 
 
 def link_doors_main(world, player):
@@ -527,6 +531,7 @@ def disconnect_portal(portal, world, player):
     if edit_entrance in portal_entrance.parent_region.entrances:
         portal_entrance.parent_region.entrances.remove(edit_entrance)
     chosen_door.blocked = chosen_door.blocked_orig
+    chosen_door.entranceFlag = False
 
 
 def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allowed=False, crossed=False, bk_shuffle=False):
@@ -734,7 +739,7 @@ def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_
         if len(origin_list) <= 0 or not pre_validate(builder, origin_list, split_dungeon, world, player):
             if last_key == builder.name or loops > 1000:
                 origin_name = world.get_region(origin_list[0], player).entrances[0].parent_region.name if len(origin_list) > 0 else 'no origin'
-                raise Exception('Infinite loop detected for "%s" located at %s' % (builder.name, origin_name))
+                raise GenerationException(f'Infinite loop detected for "{builder.name}" located at {origin_name}')
             sector_queue.append(builder)
             last_key = builder.name
             loops += 1
