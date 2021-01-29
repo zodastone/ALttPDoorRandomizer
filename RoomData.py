@@ -254,6 +254,12 @@ def create_rooms(world, player):
         world.get_room(0xc0, player).change(0, DoorKind.Normal)  # fix this kill room if enemizer is on
 
 
+def reset_rooms(world, player):
+    world.rooms = [x for x in world.rooms if x.player != player]
+    world._room_cache.clear()
+    create_rooms(world, player)
+
+
 class Room(object):
     def __init__(self, player, index, address):
         self.player = player

@@ -60,9 +60,10 @@ Key drop location are added to the pool. The keys normally found there are added
 ### Mixed Travel (--mixed_travel value)
 
 Due to Hammerjump, Hovering in PoD Arena, and the Mire Big Key Chest bomb jump two sections of a supertile that are
-otherwise unconnected logically can be reach using these glitches. To prevent the player from unintentionally
+otherwise unconnected logically can be reached using these glitches. To prevent the player from unintentionally changing
+dungeons while doing these tricks, you may use one of the following options.
 
-#### Prevent
+#### Prevent (default)
 
 Rails are added the 3 spots to prevent this tricks. This setting is recommend for those learning crossed dungeon mode to
 learn what is dangerous and what is not. No logic seeds ignore this setting.
@@ -73,17 +74,17 @@ The rooms are left alone and it is up to the discretion of the player whether to
 
 #### Force
 
-The two disjointed sections are forced to be in the same dungeon but never logically required to complete that game.
+The two disjointed sections are forced to be in the same dungeon but the glitches are never logically required to complete that game.
 
 ### Standardize Palettes (--standardize_palettes)
 No effect if door shuffle is not on crossed
 
-#### Standardize
+#### Standardize (default)
 Rooms in the same dungeon have their palettes changed to match. Hyrule Castle is split between Sewer and HC palette.
-Rooms adjacent to sanctuary get their coloring to match sanc.
+Rooms adjacent to sanctuary get their coloring to match the Sanctuary's original palette.
 
 #### Original
-Room keep their original palettes.
+Rooms/supertiles keep their original palettes.
 
 
 ## Map/Compass/Small Key/Big Key shuffle (aka Keysanity)
@@ -121,13 +122,31 @@ Use to batch generate multiple seeds with same settings. If a seed number is pro
 Show the help message and exit.
 
 ```
---door_shuffle      
+--door_shuffle <mode>     
 ```
 
 For specifying the door shuffle you want as above. (default: basic)
 
 ```
---intensity      
+--intensity <number>     
 ```
 
 For specifying the door shuffle intensity level you want as above. (default: 2)
+
+```
+--keydropshuffle      
+```
+
+Include mobs and pots drop in the item pool. (default: not enabled)
+
+```
+--mixed_travel <mode>      
+```
+
+How to handle certain glitches in crossed dungeon mode. (default: prevent)
+
+```
+--standardize_palettes (mode)
+```
+
+Whether to standardize dungeon palettes in crossed dungeon mode. (default: standardize)

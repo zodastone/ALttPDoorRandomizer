@@ -17,7 +17,7 @@ from InvertedRegions import create_inverted_regions, mark_dark_world_regions
 from EntranceShuffle import link_entrances, link_inverted_entrances
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, JsonRom, get_hash_string
 from Doors import create_doors
-from DoorShuffle import link_doors, connect_portal_copy
+from DoorShuffle import link_doors, connect_portal
 from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
@@ -25,8 +25,7 @@ from Fill import distribute_items_cutoff, distribute_items_staleness, distribute
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.2.1.0-u'
-
+__version__ = '0.3.1.0-u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -116,7 +115,7 @@ def main(args, seed=None, fish=None):
         create_dungeons(world, player)
         adjust_locations(world, player)
 
-    if any(world.potshuffle):
+    if any(world.potshuffle.values()):
         logger.info(world.fish.translate("cli", "cli", "shuffling.pots"))
         for player in range(1, world.players + 1):
             if world.potshuffle[player]:
@@ -228,9 +227,6 @@ def main(args, seed=None, fish=None):
                 use_enemizer = (world.boss_shuffle[player] != 'none' or world.enemy_shuffle[player] != 'none'
                                 or world.enemy_health[player] != 'default' or world.enemy_damage[player] != 'default'
                                 or sprite_random_on_hit)
-
-                if use_enemizer:
-                    base_patch = LocalRom(args.rom)  # update base2current.json
 
                 if use_enemizer:
                     base_patch = LocalRom(args.rom)  # update base2current.json
@@ -448,9 +444,7 @@ def copy_world(world):
         copied_region.is_light_world = region.is_light_world
         copied_region.is_dark_world = region.is_dark_world
         copied_region.dungeon = region.dungeon
-        copied_region.locations = [copy.copy(location) for location in region.locations]
-        for location in copied_region.locations:
-            location.parent_region = copied_region
+        copied_region.locations = [ret.get_location(location.name, location.player) for location in region.locations]
         for entrance in region.entrances:
             ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
 
@@ -494,7 +488,7 @@ def copy_world(world):
     ret.dungeon_portals = world.dungeon_portals
     for player, portals in world.dungeon_portals.items():
         for portal in portals:
-            connect_portal_copy(portal, ret, player)
+            connect_portal(portal, ret, player)
     ret.sanc_portal = world.sanc_portal
 
     for player in range(1, world.players + 1):

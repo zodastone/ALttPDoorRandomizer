@@ -335,8 +335,9 @@ def adjust_locations_rules(key_logic, rule, accessible_loc, key_layout, key_coun
         test_set = None
         needed = rule.needed_keys_w_bk
     if needed > 0:
-        accessible_loc.update(key_counter.other_locations)
-        blocked_loc = key_layout.all_locations-accessible_loc
+        all_accessible = set(accessible_loc)
+        all_accessible.update(key_counter.other_locations)
+        blocked_loc = key_layout.all_locations-all_accessible
         for location in blocked_loc:
             if location not in key_logic.location_rules.keys():
                 loc_rule = LocationRule()
@@ -373,11 +374,16 @@ def refine_placement_rules(key_layout, max_ctr):
                     rule.needed_keys_w_bk -= len(key_onlys)
                 if rule.needed_keys_w_bk == 0:
                     rules_to_remove.append(rule)
-                if rule.bk_relevant and len(rule.check_locations_w_bk) == rule.needed_keys_w_bk + 1:
-                    new_restricted = set(max_ctr.free_locations) - rule.check_locations_w_bk
-                    if len(new_restricted - key_logic.bk_restricted) > 0:
-                        key_logic.bk_restricted.update(new_restricted)  # bk must be in one of the check_locations
-                        changed = True
+                # todo: evaluate this usage
+                # if rule.bk_relevant and len(rule.check_locations_w_bk) == rule.needed_keys_w_bk + 1:
+                #     new_restricted = set(max_ctr.free_locations) - rule.check_locations_w_bk
+                #     if len(new_restricted | key_logic.bk_restricted) < len(key_layout.all_chest_locations):
+                #         if len(new_restricted - key_logic.bk_restricted) > 0:
+                #             key_logic.bk_restricted.update(new_restricted)  # bk must be in one of the check_locations
+                #             changed = True
+                #     else:
+                #         rules_to_remove.append(rule)
+                #         changed = True
                 if rule.needed_keys_w_bk > key_layout.max_chests or len(rule.check_locations_w_bk) < rule.needed_keys_w_bk:
                     logging.getLogger('').warning('Invalid rule - what went wrong here??')
                     rules_to_remove.append(rule)
@@ -501,6 +507,8 @@ def find_bk_locked_sections(key_layout, world, player):
         key_layout.all_chest_locations.update(counter.free_locations)
         key_layout.item_locations.update(counter.free_locations)
         key_layout.item_locations.update(counter.key_only_locations)
+        key_layout.all_locations.update(key_layout.item_locations)
+        key_layout.all_locations.update(counter.other_locations)
         if counter.big_key_opened and counter.important_location:
             big_chest_allowed_big_key = False
         if not counter.big_key_opened:

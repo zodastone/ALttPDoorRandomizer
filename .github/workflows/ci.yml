@@ -26,8 +26,8 @@ jobs:
     #  os & python versions
     strategy:
       matrix:
-        os-name: [ ubuntu-latest, ubuntu-16.04, macOS-latest, windows-latest ]
-        python-version: [ 3.7 ]
+        os-name: [ ubuntu-latest, ubuntu-18.04, macOS-latest, windows-latest ]
+        python-version: [ 3.8 ]
 #    needs: [ install-test ]
     steps:
     # checkout commit
@@ -57,11 +57,11 @@ jobs:
     # run build-gui.py
     - name: Build GUI
       run: |
-        python ./build-gui.py
+        python ./source/meta/build-gui.py
     # run build-dr.py
     - name: Build DungeonRandomizer
       run: |
-        python ./build-dr.py
+        python ./source/meta/build-dr.py
     # prepare binary artifacts for later step
     - name: Prepare Binary Artifacts
       env:
@@ -88,8 +88,8 @@ jobs:
     strategy:
       matrix:
         # install/release on not xenial
-        os-name: [ ubuntu-latest, macOS-latest, windows-latest ]
-        python-version: [ 3.7 ]
+        os-name: [ ubuntu-latest, ubuntu-18.04, macOS-latest, windows-latest ]
+        python-version: [ 3.8 ]
 
     needs: [ install-build ]
     steps:
@@ -150,9 +150,9 @@ jobs:
     #  os & python versions
     strategy:
       matrix:
-        # release only on bionic
+        # release only on focal/bionic
         os-name: [ ubuntu-latest ]
-        python-version: [ 3.7 ]
+        python-version: [ 3.8 ]
 
     needs: [ install-prepare-release ]
     steps:

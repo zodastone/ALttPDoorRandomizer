@@ -284,14 +284,23 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
     with open(options_path, 'w') as f:
         json.dump(options, f)
 
-    subprocess.check_call([os.path.abspath(enemizercli),
-                           '--rom', baserom_path,
-                           '--seed', str(world.rom_seeds[player]),
-                           '--base', basepatch_path,
-                           '--randomizer', randopatch_path,
-                           '--enemizer', options_path,
-                           '--output', enemizer_output_path],
-                          cwd=os.path.dirname(enemizercli), stdout=subprocess.DEVNULL)
+    try:
+        subprocess.run([os.path.abspath(enemizercli),
+                               '--rom', baserom_path,
+                               '--seed', str(world.rom_seeds[player]),
+                               '--base', basepatch_path,
+                               '--randomizer', randopatch_path,
+                               '--enemizer', options_path,
+                               '--output', enemizer_output_path],
+                              cwd=os.path.dirname(enemizercli),
+                              check=True,
+                              capture_output=True)
+    except subprocess.CalledProcessError as e:
+        from Main import EnemizerError
+        enemizerMsg  = world.fish.translate("cli","cli","Enemizer returned exit code: ") + str(e.returncode) + "\n"
+        enemizerMsg += world.fish.translate("cli","cli","enemizer.nothing.applied")
+        logging.error(f'Enemizer error output: {e.stderr.decode("utf-8")}\n')
+        raise EnemizerError(enemizerMsg)
 
     with open(enemizer_basepatch_path, 'r') as f:
         for patch in json.load(f):
@@ -690,7 +699,7 @@ def patch_rom(world, rom, player, team, enemized):
         for name, pair in boss_indicator.items():
             dungeon_id, boss_door = pair
             opposite_door = world.get_door(boss_door, player).dest
-            if opposite_door and opposite_door.roomIndex > -1:
+            if opposite_door and isinstance(opposite_door, Door) and opposite_door.roomIndex > -1:
                 dungeon_name = opposite_door.entrance.parent_region.dungeon.name
                 dungeon_id = boss_indicator[dungeon_name][0]
                 rom.write_byte(0x13f000+dungeon_id, opposite_door.roomIndex)
