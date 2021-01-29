@@ -395,8 +395,15 @@ def create_doors(world, player):
         create_door(player, 'PoD Mimics 2 SW', Nrml).dir(So, 0x1b, Left, High).pos(1).kill().portal(Z, 0x00),
         create_door(player, 'PoD Mimics 2 NW', Intr).dir(No, 0x1b, Left, High).pos(0),
         create_door(player, 'PoD Bow Statue SW', Intr).dir(So, 0x1b, Left, High).pos(0),
-        create_door(player, 'PoD Bow Statue Down Ladder', Lddr).no_entrance(),
-        create_door(player, 'PoD Dark Pegs Up Ladder', Lddr),
+        create_door(player, 'PoD Bow Statue Crystal Path', Lgcl),
+        create_door(player, 'PoD Bow Statue Moving Wall Path', Lgcl),
+        create_door(player, 'PoD Bow Statue Moving Wall Cane Path', Lgcl),
+        create_door(player, 'PoD Bow Statue Down Ladder', Lddr).dir(So, 0x1b, 1, High).no_entrance(),
+        create_door(player, 'PoD Dark Pegs Up Ladder', Lddr).dir(No, 0x0b, 0, High),
+        create_door(player, 'PoD Dark Pegs Hammer Path', Lgcl),
+        create_door(player, 'PoD Dark Pegs Ladder Hammer Path', Lgcl),
+        create_door(player, 'PoD Dark Pegs Ladder Cane Path', Lgcl),
+        create_door(player, 'PoD Dark Pegs Switch Path', Lgcl),
         create_door(player, 'PoD Dark Pegs WN', Intr).dir(We, 0x0b, Mid, High).small_key().pos(2),
         create_door(player, 'PoD Lonely Turtle SW', Intr).dir(So, 0x0b, Mid, High).pos(0),
         create_door(player, 'PoD Lonely Turtle EN', Intr).dir(Ea, 0x0b, Mid, High).small_key().pos(2),
@@ -663,7 +670,7 @@ def create_doors(world, player):
         create_door(player, 'Ice Pengator Switch ES', Intr).dir(Ea, 0x1f, Bot, High).pos(1),
         create_door(player, 'Ice Dead End WS', Intr).dir(We, 0x1f, Bot, High).pos(1),
         create_door(player, 'Ice Big Key Push Block', Lgcl),
-        create_door(player, 'Ice Big Key Down Ladder', Lddr),
+        create_door(player, 'Ice Big Key Down Ladder', Lddr).dir(So, 0x1f, 3, High),
         create_door(player, 'Ice Stalfos Hint SE', Intr).dir(So, 0x3e, Right, High).pos(0),
         create_door(player, 'Ice Conveyor NE', Intr).dir(No, 0x3e, Right, High).no_exit().pos(0),
         create_door(player, 'Ice Conveyor SW', Nrml).dir(So, 0x3e, Left, High).small_key().pos(1).portal(Z, 0x20),
@@ -679,7 +686,7 @@ def create_doors(world, player):
         create_door(player, 'Ice Spike Cross ES', Nrml).dir(Ea, 0x5e, Bot, High).small_key().pos(0),
         create_door(player, 'Ice Spike Cross WS', Intr).dir(We, 0x5e, Bot, High).pos(3),
         create_door(player, 'Ice Firebar ES', Intr).dir(Ea, 0x5e, Bot, High).pos(3),
-        create_door(player, 'Ice Firebar Down Ladder', Lddr),
+        create_door(player, 'Ice Firebar Down Ladder', Lddr).dir(So, 0x5e, 5, High),
         create_door(player, 'Ice Spike Cross NE', Intr).dir(No, 0x5e, Right, High).pos(1),
         create_door(player, 'Ice Falling Square SE', Intr).dir(So, 0x5e, Right, High).no_exit().pos(1),
         create_door(player, 'Ice Falling Square Hole', Hole),
@@ -689,8 +696,8 @@ def create_doors(world, player):
         create_door(player, 'Ice Hammer Block Down Stairs', Sprl).dir(Dn, 0x3f, 0, HTH).ss(Z, 0x11, 0xb8, True, True).kill(),
         create_door(player, 'Ice Hammer Block ES', Intr).dir(Ea, 0x3f, Bot, High).pos(0),
         create_door(player, 'Ice Tongue Pull WS', Intr).dir(We, 0x3f, Bot, High).pos(0),
-        create_door(player, 'Ice Tongue Pull Up Ladder', Lddr),
-        create_door(player, 'Ice Freezors Up Ladder', Lddr),
+        create_door(player, 'Ice Tongue Pull Up Ladder', Lddr).dir(No, 0x3f, 2, High),
+        create_door(player, 'Ice Freezors Up Ladder', Lddr).dir(No, 0x7e, 4, High),
         create_door(player, 'Ice Freezors Hole', Hole),
         create_door(player, 'Ice Freezors Bomb Hole', Hole), # combine these two? -- they have to lead to the same spot
         create_door(player, 'Ice Freezors Ledge Hole', Hole),
@@ -1078,8 +1085,8 @@ def create_doors(world, player):
         create_door(player, 'GT Torch Cross WN', Nrml).dir(We, 0x96, Top, High).pos(1),
         create_door(player, 'GT Torch Cross ES', Intr).dir(Ea, 0x96, Bot, High).pos(0),
         create_door(player, 'GT Staredown WS', Intr).dir(We, 0x96, Bot, High).pos(0),
-        create_door(player, 'GT Staredown Up Ladder', Lddr),
-        create_door(player, 'GT Falling Torches Down Ladder', Lddr),
+        create_door(player, 'GT Staredown Up Ladder', Lddr).dir(No, 0x96, 6, High),
+        create_door(player, 'GT Falling Torches Down Ladder', Lddr).dir(So, 0x3d, 7, High),
         create_door(player, 'GT Falling Torches NE', Intr).dir(No, 0x3d, Right, High).pos(0),
         create_door(player, 'GT Mini Helmasaur Room SE', Intr).dir(So, 0x3d, Right, High).pos(0),
         create_door(player, 'GT Falling Torches Hole', Hole),
@@ -1156,9 +1163,11 @@ def create_doors(world, player):
     world.get_door('PoD Map Balcony WS', player).c_switch()
     world.get_door('PoD Map Balcony South Stairs', player).c_switch()
     world.get_door('PoD Bow Statue SW', player).c_switch()
-    world.get_door('PoD Bow Statue Down Ladder', player).c_switch()
-    world.get_door('PoD Dark Pegs Up Ladder', player).c_switch()
+    world.get_door('PoD Bow Statue Moving Wall Path', player).barrier(CrystalBarrier.Orange)
+    world.get_door('PoD Bow Statue Crystal Path', player).c_switch()
     world.get_door('PoD Dark Pegs WN', player).c_switch()
+    world.get_door('PoD Dark Pegs Switch Path', player).c_switch()
+    world.get_door('PoD Dark Pegs Hammer Path', player).c_switch()
 
     world.get_door('Swamp Crystal Switch EN', player).c_switch()
     world.get_door('Swamp Crystal Switch SE', player).c_switch()

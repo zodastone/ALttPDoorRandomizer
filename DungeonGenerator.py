@@ -55,19 +55,21 @@ def pre_validate(builder, entrance_region_names, split_dungeon, world, player):
 
 
 def generate_dungeon(builder, entrance_region_names, split_dungeon, world, player):
-    stonewall = check_for_stonewall(builder)
+    stonewalls = check_for_stonewalls(builder)
     sector = generate_dungeon_main(builder, entrance_region_names, split_dungeon, world, player)
-    if stonewall and not stonewall_valid(stonewall):
-        builder.pre_open_stonewall = stonewall
+    for stonewall in stonewalls:
+        if not stonewall_valid(stonewall):
+            builder.pre_open_stonewalls.add(stonewall)
     return sector
 
 
-def check_for_stonewall(builder):
+def check_for_stonewalls(builder):
+    stonewalls = set()
     for sector in builder.sectors:
         for door in sector.outstanding_doors:
             if door.stonewall:
-                return door
-    return None
+                stonewalls.add(door)
+    return stonewalls
 
 
 def generate_dungeon_main(builder, entrance_region_names, split_dungeon, world, player):
@@ -418,8 +420,7 @@ def check_valid(name, dungeon, hangers, hooks, proposed_map, doors_to_connect, a
         true_origin_hooks = [x for x in dungeon['Origin'].hooks.keys() if not x.bigKey or possible_bks > 0 or not bk_needed]
         if len(true_origin_hooks) == 0 and len(proposed_map.keys()) < len(doors_to_connect):
             return False
-        if len(true_origin_hooks) == 0 and bk_needed and possible_bks == 0 and len(proposed_map.keys()) == len(
-             doors_to_connect):
+        if len(true_origin_hooks) == 0 and bk_needed and possible_bks == 0 and len(proposed_map.keys()) == len(doors_to_connect):
             return False
     for key in hangers.keys():
         if len(hooks[key]) > 0 and len(hangers[key]) == 0:
@@ -694,17 +695,17 @@ hang_dir_map = {
 def hanger_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
-    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs]:
+    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs, DoorType.Ladder]:
         return hang_dir_map[door.direction]
     return None
 
 
 def connect_doors(a, b):
     # Return on unsupported types.
-    if a.type in [DoorType.Hole, DoorType.Warp, DoorType.Ladder, DoorType.Interior, DoorType.Logical]:
+    if a.type in [DoorType.Hole, DoorType.Warp, DoorType.Interior, DoorType.Logical]:
         return
     # Connect supported types
-    if a.type in [DoorType.Normal, DoorType.SpiralStairs, DoorType.Open, DoorType.StraightStairs]:
+    if a.type in [DoorType.Normal, DoorType.SpiralStairs, DoorType.Open, DoorType.StraightStairs, DoorType.Ladder]:
         if a.blocked:
             connect_one_way(b.entrance, a.entrance)
         elif b.blocked:
@@ -1171,7 +1172,7 @@ class DungeonBuilder(object):
         self.path_entrances = None  # used for pathing/key doors, I think
         self.split_flag = False
 
-        self.pre_open_stonewall = None  # used by stonewall system
+        self.pre_open_stonewalls = set()  # used by stonewall system
 
         self.candidates = None
         self.key_doors_num = None

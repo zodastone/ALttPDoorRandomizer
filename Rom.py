@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '30147375153cc57197805eddf38c2a23'
+RANDOMIZERBASEHASH = 'bffd4e834049ca5f5295601436fc6009'
 
 
 class JsonRom(object):
@@ -685,7 +685,7 @@ def patch_rom(world, rom, player, team, enemized):
     for door in world.doors:
         if door.dest is not None and isinstance(door.dest, Door) and\
              door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs,
-                                                     DoorType.Open, DoorType.StraightStairs]:
+                                                     DoorType.Open, DoorType.StraightStairs, DoorType.Ladder]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door))
     for paired_door in world.paired_doors[player]:
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
@@ -693,9 +693,11 @@ def patch_rom(world, rom, player, team, enemized):
     if world.doorShuffle[player] != 'vanilla':
 
         for builder in world.dungeon_layouts[player].values():
-            if builder.pre_open_stonewall:
-                if builder.pre_open_stonewall.name == 'Desert Wall Slide NW':
+            for stonewall in builder.pre_open_stonewalls:
+                if stonewall.name == 'Desert Wall Slide NW':
                     dr_flags |= DROptions.Open_Desert_Wall
+                elif stonewall.name == 'PoD Bow Statue Down Ladder':
+                    dr_flags |= DROptions.Open_PoD_Wall
         for name, pair in boss_indicator.items():
             dungeon_id, boss_door = pair
             opposite_door = world.get_door(boss_door, player).dest

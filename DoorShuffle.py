@@ -58,13 +58,13 @@ def link_doors_main(world, player):
         connect_simple_door(world, exitName, regionName, player)
     for exitName, regionName in dungeon_warps:
         connect_simple_door(world, exitName, regionName, player)
-    for ent, ext in ladders:
-        connect_two_way(world, ent, ext, player)
 
     if world.intensity[player] < 2:
         for entrance, ext in open_edges:
             connect_two_way(world, entrance, ext, player)
         for entrance, ext in straight_staircases:
+            connect_two_way(world, entrance, ext, player)
+        for entrance, ext in ladders:
             connect_two_way(world, entrance, ext, player)
 
     if world.intensity[player] < 3 or world.doorShuffle == 'vanilla':
@@ -106,6 +106,8 @@ def link_doors_main(world, player):
         for exitName, regionName in vanilla_logical_connections:
             connect_simple_door(world, exitName, regionName, player)
         for entrance, ext in spiral_staircases:
+            connect_two_way(world, entrance, ext, player)
+        for entrance, ext in ladders:
             connect_two_way(world, entrance, ext, player)
         for entrance, ext in default_door_connections:
             connect_two_way(world, entrance, ext, player)
@@ -161,7 +163,7 @@ def create_door_spoiler(world, player):
                 door_a = ext.door
                 connect = ext.connected_region
                 if door_a and door_a.type in [DoorType.Normal, DoorType.SpiralStairs, DoorType.Open,
-                                              DoorType.StraightStairs] and door_a not in done:
+                                              DoorType.StraightStairs, DoorType.Ladder] and door_a not in done:
                     done.add(door_a)
                     door_b = door_a.dest
                     if door_b and not isinstance(door_b, Region):
@@ -1324,11 +1326,10 @@ def combine_layouts(recombinant_builders, dungeon_builders, entrances_map):
                 if recombine.master_sector is None:
                     recombine.master_sector = builder.master_sector
                     recombine.master_sector.name = recombine.name
-                    recombine.pre_open_stonewall = builder.pre_open_stonewall
+                    recombine.pre_open_stonewalls = builder.pre_open_stonewalls
                 else:
                     recombine.master_sector.regions.extend(builder.master_sector.regions)
-                    if builder.pre_open_stonewall:
-                        recombine.pre_open_stonewall = builder.pre_open_stonewall
+                    recombine.pre_open_stonewalls.update(builder.pre_open_stonewalls)
         recombine.layout_starts = list(entrances_map[recombine.name])
         dungeon_builders[recombine.name] = recombine
 
@@ -2009,7 +2010,7 @@ class DROptions(Flag):
     Debug = 0x08
     Rails = 0x10  # If on, draws rails
     OriginalPalettes = 0x20
-    Reserved = 0x40  # Reserved for PoD sliding wall?
+    Open_PoD_Wall = 0x40  # If on, pre opens the PoD wall, no bow required
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
 
 
@@ -2042,6 +2043,13 @@ logical_connections = [
     ('PoD Basement Ledge Drop Down', 'PoD Stalfos Basement'),
     ('PoD Falling Bridge Path N', 'PoD Falling Bridge Ledge'),
     ('PoD Falling Bridge Path S', 'PoD Falling Bridge'),
+    ('PoD Bow Statue Crystal Path', 'PoD Bow Statue Moving Wall'),
+    ('PoD Bow Statue Moving Wall Path', 'PoD Bow Statue'),
+    ('PoD Bow Statue Moving Wall Cane Path', 'PoD Bow Statue'),
+    ('PoD Dark Pegs Hammer Path', 'PoD Dark Pegs Ladder'),
+    ('PoD Dark Pegs Ladder Hammer Path', 'PoD Dark Pegs'),
+    ('PoD Dark Pegs Ladder Cane Path', 'PoD Dark Pegs Switch'),
+    ('PoD Dark Pegs Switch Path', 'PoD Dark Pegs Ladder'),
     ('Swamp Lobby Moat', 'Swamp Entrance'),
     ('Swamp Entrance Moat', 'Swamp Lobby'),
     ('Swamp Trench 1 Approach Dry', 'Swamp Trench 1 Nexus'),
