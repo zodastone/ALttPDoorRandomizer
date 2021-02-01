@@ -8,7 +8,7 @@ DrHudOverride:
 HudAdditions:
 {
     lda.l DRFlags : and #$0008 : beq ++
-        lda $7EF423 : and #$00ff
+        lda $7EF423
         jsr HudHexToDec4DigitCopy
         LDX.b $05 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+10 ; draw 100's digit
         LDX.b $06 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+12 ; draw 10's digit

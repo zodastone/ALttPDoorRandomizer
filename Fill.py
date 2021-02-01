@@ -2,7 +2,7 @@ import random
 import logging
 
 from BaseClasses import CollectionState
-from Regions import shop_to_location_table
+from Regions import shop_to_location_table, retro_shops
 
 
 class FillError(RuntimeError):
@@ -376,18 +376,33 @@ def flood_items(world):
                 break
 
 
-def sell_keys(world, player):
-    choices = []
-    shop_map = {}
+def sell_potions(world, player):
+    loc_choices = []
     for shop in world.shops[player]:
-        if shop.region.name in shop_to_location_table:
-            choices.append(shop.region.name)
-            shop_map[shop.region.name] = shop
-    key_seller = random.choice(choices)
-    location = random.choice(shop_to_location_table[key_seller])
-    universal_key = next(item for item in world.itempool if item.name == 'Small Key (Universal)' and item.player == player)
-    world.push_item(world.get_location(location, player), universal_key, collect=False)
-    shop_map[key_seller].add_inventory(0, 'Small Key (Universal)', 100)  # will be fixed later in customize shops
+        # potions are excluded from the cap fairy due to visual problem
+        if shop.region.name in shop_to_location_table and shop.region.name != 'Capacity Upgrade':
+            loc_choices += [world.get_location(loc, player) for loc in shop_to_location_table[shop.region.name]]
+        if world.retro[player] and shop.region.name in retro_shops:
+            loc_choices += [world.get_location(loc, player) for loc in retro_shops[shop.region.name]]
+    locations = [loc for loc in loc_choices if not loc.item]
+    for potion in ['Green Potion', 'Blue Potion', 'Red Potion']:
+        location = random.choice(locations)
+        locations.remove(location)
+        p_item = next(item for item in world.itempool if item.name == potion and item.player == player)
+        world.push_item(location, p_item, collect=False)
+        world.itempool.remove(p_item)
+
+
+def sell_keys(world, player):
+    # exclude the old man or take any caves because free keys are too good
+    shop_names = [shop.region.name for shop in world.shops[player] if shop.region.name in shop_to_location_table]
+    choices = [world.get_location(loc, player) for shop in shop_names for loc in shop_to_location_table[shop]]
+    locations = [loc for loc in choices if not loc.item]
+    location = random.choice(locations)
+    universal_key = next(i for i in world.itempool if i.name == 'Small Key (Universal)' and i.player == player)
+    world.push_item(location, universal_key, collect=False)
+    # seems unnecessary
+    # shop_map[key_seller].add_inventory(0, 'Small Key (Universal)', 100)  # will be fixed later in customize shops
     world.itempool.remove(universal_key)
 
 

@@ -1,5 +1,6 @@
 from collections import namedtuple
 import logging
+import math
 import random
 
 from BaseClasses import Region, RegionType, Shop, ShopType, Location
@@ -394,7 +395,7 @@ def set_up_take_anys(world, player):
     entrance = world.get_region(reg, player).entrances[0]
     connect_entrance(world, entrance, old_man_take_any, player)
     entrance.target = 0x58
-    old_man_take_any.shop = Shop(old_man_take_any, 0x0112, ShopType.TakeAny, 0xE2, True, not world.shopsanity[player])
+    old_man_take_any.shop = Shop(old_man_take_any, 0x0112, ShopType.TakeAny, 0xE2, True, not world.shopsanity[player], 32)
     world.shops[player].append(old_man_take_any.shop)
 
     sword = next((item for item in world.itempool if item.type == 'Sword' and item.player == player), None)
@@ -418,7 +419,7 @@ def set_up_take_anys(world, player):
         entrance = world.get_region(reg, player).entrances[0]
         connect_entrance(world, entrance, take_any, player)
         entrance.target = target
-        take_any.shop = Shop(take_any, room_id, take_any_type, 0xE3, True, not world.shopsanity[player])
+        take_any.shop = Shop(take_any, room_id, take_any_type, 0xE3, True, not world.shopsanity[player], 33 + num*2)
         world.shops[player].append(take_any.shop)
         take_any.shop.add_inventory(0, 'Blue Potion', 0, 0, create_location=world.shopsanity[player])
         take_any.shop.add_inventory(1, 'Boss Heart Container', 0, 0, create_location=world.shopsanity[player])
@@ -524,7 +525,7 @@ def customize_shops(world, player):
             if shop_name not in retro_shops:
                 if item.name in repeatable_shop_items:
                     max_repeat = 0
-                if item.name in ['Bomb Upgrade (+5)', 'Arrow Upgrade (+5)']:
+                if item.name in ['Bomb Upgrade (+5)', 'Arrow Upgrade (+5)'] and item.player == player:
                     if item.name == 'Bomb Upgrade (+5)':
                         found_bomb_upgrade = True
                     if item.name == 'Arrow Upgrade (+5)':
@@ -536,8 +537,8 @@ def customize_shops(world, player):
                 price = 120 if shop_name == 'Potion Shop' and item.name == 'Red Potion' else item.price
                 if world.retro[player] and item.name == 'Single Arrow':
                     price = 80
-                # randomize price
-            shop.add_inventory(idx, item.name, randomize_price(price), max_repeat)
+            # randomize price
+            shop.add_inventory(idx, item.name, randomize_price(price), max_repeat, player=item.player)
             if item.name in cap_replacements and shop_name not in retro_shops:
                 possible_replacements.append((shop, idx, location, item))
         # randomize shopkeeper
@@ -554,7 +555,7 @@ def customize_shops(world, player):
             shop, idx, loc, item = random.choice(choices)
             upgrade = ItemFactory('Bomb Upgrade (+5)', player)
             shop.add_inventory(idx, upgrade.name, randomize_price(upgrade.price), 6,
-                               item.name, randomize_price(item.price))
+                               item.name, randomize_price(item.price), player=item.player)
             loc.item = upgrade
             upgrade.location = loc
     if not found_arrow_upgrade and len(possible_replacements) > 0:
@@ -566,10 +567,11 @@ def customize_shops(world, player):
             shop, idx, loc, item = random.choice(choices)
             upgrade = ItemFactory('Arrow Upgrade (+5)', player)
             shop.add_inventory(idx, upgrade.name, randomize_price(upgrade.price), 6,
-                               item.name, randomize_price(item.price))
+                               item.name, randomize_price(item.price), player=item.player)
             loc.item = upgrade
             upgrade.location = loc
     change_shop_items_to_rupees(world, player, shops_to_customize)
+    todays_discounts(world, player)
 
 
 def randomize_price(price):
@@ -579,7 +581,13 @@ def randomize_price(price):
         max_price //= 5
         return random.randint(0, max_price) * 5 + half_price
     else:
-        return price
+        if price <= 10:
+            return price
+        else:
+            half_price = int(math.ceil(half_price / 10.0)) * 10
+            max_price = price - half_price
+            max_price //= 5
+            return random.randint(0, max_price) * 5 + half_price
 
 
 def change_shop_items_to_rupees(world, player, shops):
@@ -588,17 +596,38 @@ def change_shop_items_to_rupees(world, player, shops):
         if location.item.name in shop_transfer.keys() and location.parent_region.name not in shops:
             new_item = ItemFactory(shop_transfer[location.item.name], location.item.player)
             location.item = new_item
+        if location.parent_region.name == 'Capacity Upgrade' and location.item.name in cap_blacklist:
+            new_item = ItemFactory('Rupees (300)', location.item.player)
+            location.item = new_item
+            shop = world.get_region('Capacity Upgrade', player).shop
+            slot = shop_to_location_table['Capacity Upgrade'].index(location.name)
+            shop.add_inventory(slot, new_item.name, randomize_price(new_item.price), 1, player=new_item.player)
+
+
+def todays_discounts(world, player):
+    locs = []
+    for shop, locations in shop_to_location_table.items():
+        for slot, loc in enumerate(locations):
+            locs.append((world.get_location(loc, player), shop, slot))
+    discount_number = random.randint(4, 7)
+    chosen_locations = random.choices(locs, k=discount_number)
+    for location, shop_name, slot in chosen_locations:
+        shop = world.get_region(shop_name, player).shop
+        orig = location.item.price
+        shop.inventory[slot]['price'] = randomize_price(orig // 10)
 
 
 repeatable_shop_items = ['Single Arrow', 'Arrows (10)', 'Bombs (3)', 'Bombs (10)', 'Red Potion', 'Small Heart',
-                         'Blue Shield', 'Red Shield', 'Bee', 'Small Key (Universal)']
+                         'Blue Shield', 'Red Shield', 'Bee', 'Small Key (Universal)', 'Blue Potion', 'Green Potion']
 
 
 cap_replacements = ['Single Arrow', 'Arrows (10)', 'Bombs (3)', 'Bombs (10)']
 
 
+cap_blacklist = ['Green Potion', 'Red Potion', 'Blue Potion']
+
 shop_transfer = {'Red Potion': 'Rupees (100)', 'Bee': 'Rupees (5)', 'Blue Potion': 'Rupees (100)',
-                 'Blue Shield': 'Rupees (50)', 'Red Shield': 'Rupees (300)'}
+                 'Blue Shield': 'Rupees (50)', 'Red Shield': 'Rupees (300)', 'Green Potion': 'Rupees (50)'}
 
 
 def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, door_shuffle):

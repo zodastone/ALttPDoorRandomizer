@@ -21,7 +21,8 @@ from DoorShuffle import link_doors, connect_portal
 from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
-from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, sell_keys, balance_multiworld_progression
+from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items
+from Fill import sell_potions, sell_keys, balance_multiworld_progression
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
@@ -149,8 +150,10 @@ def main(args, seed=None, fish=None):
         set_rules(world, player)
 
     for player in range(1, world.players + 1):
-        if world.retro[player] and world.shopsanity[player]:
-            sell_keys(world, player)
+        if world.shopsanity[player]:
+            sell_potions(world, player)
+            if world.retro[player]:
+                sell_keys(world, player)
 
     logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
 
@@ -507,7 +510,8 @@ def copy_dynamic_regions_and_locations(world, ret):
         # Note: ideally exits should be copied here, but the current use case (Take anys) do not require this
 
         if region.shop:
-            new_reg.shop = Shop(new_reg, region.shop.room_id, region.shop.type, region.shop.shopkeeper_config, region.shop.custom, region.shop.locked)
+            new_reg.shop = Shop(new_reg, region.shop.room_id, region.shop.type, region.shop.shopkeeper_config,
+                                region.shop.custom, region.shop.locked, region.shop.sram_address)
             ret.shops[region.player].append(new_reg.shop)
 
     for location in world.dynamic_locations:

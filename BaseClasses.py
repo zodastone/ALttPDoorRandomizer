@@ -1739,7 +1739,7 @@ class ShopType(Enum):
     UpgradeShop = 2
 
 class Shop(object):
-    def __init__(self, region, room_id, type, shopkeeper_config, custom, locked):
+    def __init__(self, region, room_id, type, shopkeeper_config, custom, locked, sram_address):
         self.region = region
         self.room_id = room_id
         self.type = type
@@ -1747,6 +1747,7 @@ class Shop(object):
         self.shopkeeper_config = shopkeeper_config
         self.custom = custom
         self.locked = locked
+        self.sram_address = sram_address
 
     @property
     def item_count(self):
@@ -1763,11 +1764,11 @@ class Shop(object):
             door_id = door_addresses[entrances[0].name][0]+1
         else:
             door_id = 0
-            config |= 0x40 # ignore door id
+            config |= 0x40  # ignore door id
         if self.type == ShopType.TakeAny:
             config |= 0x80
         if self.type == ShopType.UpgradeShop:
-            config |= 0x10 # Alt. VRAM
+            config |= 0x10  # Alt. VRAM
         return [0x00]+int16_as_bytes(self.room_id)+[door_id, 0x00, config, self.shopkeeper_config, 0x00]
 
     def has_unlimited(self, item):
@@ -1783,14 +1784,16 @@ class Shop(object):
     def clear_inventory(self):
         self.inventory = [None, None, None]
 
-    def add_inventory(self, slot, item, price, max=0, replacement=None, replacement_price=0, create_location=False):
+    def add_inventory(self, slot: int, item, price, max=0, replacement=None, replacement_price=0,
+                      create_location=False, player=0):
         self.inventory[slot] = {
             'item': item,
             'price': price,
             'max': max,
             'replacement': replacement,
             'replacement_price': replacement_price,
-            'create_location': create_location
+            'create_location': create_location,
+            'player': player
         }
 
 
@@ -1885,8 +1888,10 @@ class Spoiler(object):
                 for index, item in enumerate(shop.inventory):
                     if item is None:
                         continue
-                    # todo: indicate player? might be fine
-                    shopdata[f'item_{index}'] = f"{item['item']} — {item['price']}" if item['price'] else item['item']
+                    if self.world.players == 1:
+                        shopdata[f'item_{index}'] = f"{item['item']} — {item['price']}" if item['price'] else item['item']
+                    else:
+                        shopdata[f'item_{index}'] = f"{item['item']} (Player {item['player']}) — {item['price']}"
                 self.shops.append(shopdata)
 
         for player in range(1, self.world.players + 1):
