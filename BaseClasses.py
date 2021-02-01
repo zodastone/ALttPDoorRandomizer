@@ -1072,7 +1072,7 @@ hook_dir_map = {
 def hook_from_door(door):
     if door.type == DoorType.SpiralStairs:
         return Hook.Stairs
-    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs]:
+    if door.type in [DoorType.Normal, DoorType.Open, DoorType.StraightStairs, DoorType.Ladder]:
         return hook_dir_map[door.direction]
     return None
 
@@ -1190,7 +1190,8 @@ class Door(object):
 
         # rom properties
         self.roomIndex = -1
-        # 0,1,2 + Direction (N:0, W:3, S:6, E:9) for normal
+        # 0,1,2 for normal
+        # 0-7 for ladder
         # 0-4 for spiral offset thing
         self.doorIndex = -1
         self.layer = -1  # 0 for normal floor, 1 for the inset layer
@@ -1241,6 +1242,8 @@ class Door(object):
             return 0x13A000 + normal_offset_table[self.roomIndex] * 24 + (self.doorIndex + self.direction.value * 3) * 2
         elif self.type == DoorType.SpiralStairs:
             return 0x13B000 + (spiral_offset_table[self.roomIndex] + self.doorIndex) * 4
+        elif self.type == DoorType.Ladder:
+            return 0x13C700 + self.doorIndex * 2
         elif self.type == DoorType.Open:
             base_address = {
                 Direction.North: 0x13C500,
@@ -1257,6 +1260,12 @@ class Door(object):
             if src.type == DoorType.StraightStairs:
                 bitmask += 0x40
             return [self.roomIndex, bitmask + self.doorIndex]
+        if self.type == DoorType.Ladder:
+            bitmask = 4 * (self.layer ^ 1 if src.toggle else self.layer)
+            bitmask += 0x08 * self.doorIndex
+            if src.type == DoorType.StraightStairs:
+                bitmask += 0x40
+            return [self.roomIndex, bitmask + 0x03]
         if self.type == DoorType.SpiralStairs:
             bitmask = int(self.layer) << 2
             bitmask += 0x10 * int(self.zeroHzCam)

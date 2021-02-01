@@ -402,8 +402,11 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'PoD Dark Basement', 'Palace of Darkness', ['Palace of Darkness - Dark Basement - Left', 'Palace of Darkness - Dark Basement - Right'], ['PoD Dark Basement W Up Stairs', 'PoD Dark Basement E Up Stairs']),
         create_dungeon_region(player, 'PoD Harmless Hellway', 'Palace of Darkness', ['Palace of Darkness - Harmless Hellway'], ['PoD Harmless Hellway NE', 'PoD Harmless Hellway SE']),
         create_dungeon_region(player, 'PoD Mimics 2', 'Palace of Darkness', None, ['PoD Mimics 2 SW', 'PoD Mimics 2 NW']),
-        create_dungeon_region(player, 'PoD Bow Statue', 'Palace of Darkness', None, ['PoD Bow Statue SW', 'PoD Bow Statue Down Ladder']),
-        create_dungeon_region(player, 'PoD Dark Pegs', 'Palace of Darkness', None, ['PoD Dark Pegs Up Ladder', 'PoD Dark Pegs WN']),
+        create_dungeon_region(player, 'PoD Bow Statue', 'Palace of Darkness', None, ['PoD Bow Statue SW', 'PoD Bow Statue Crystal Path']),
+        create_dungeon_region(player, 'PoD Bow Statue Moving Wall', 'Palace of Darkness', None, ['PoD Bow Statue Moving Wall Path', 'PoD Bow Statue Down Ladder', 'PoD Bow Statue Moving Wall Cane Path']),
+        create_dungeon_region(player, 'PoD Dark Pegs', 'Palace of Darkness', None, ['PoD Dark Pegs Hammer Path', 'PoD Dark Pegs WN']),
+        create_dungeon_region(player, 'PoD Dark Pegs Ladder', 'Palace of Darkness', None, ['PoD Dark Pegs Up Ladder', 'PoD Dark Pegs Ladder Hammer Path', 'PoD Dark Pegs Ladder Cane Path']),
+        create_dungeon_region(player, 'PoD Dark Pegs Switch', 'Palace of Darkness', None, ['PoD Dark Pegs Switch Path']),
         create_dungeon_region(player, 'PoD Lonely Turtle', 'Palace of Darkness', None, ['PoD Lonely Turtle SW', 'PoD Lonely Turtle EN']),
         create_dungeon_region(player, 'PoD Turtle Party', 'Palace of Darkness', None, ['PoD Turtle Party ES', 'PoD Turtle Party NW']),
         create_dungeon_region(player, 'PoD Dark Alley', 'Palace of Darkness', None, ['PoD Dark Alley NE']),
@@ -763,7 +766,8 @@ def create_dungeon_regions(world, player):
     world.get_region('PoD Arena Main', player).crystal_switch = True
     world.get_region('PoD Arena Bridge', player).crystal_switch = True  # RANGED Weapon Required
     world.get_region('PoD Sexy Statue', player).crystal_switch = True
-    world.get_region('PoD Bow Statue', player).crystal_switch = True  # LADDER not accessible (maybe with cane)
+    world.get_region('PoD Bow Statue', player).crystal_switch = True
+    world.get_region('PoD Dark Pegs Switch', player).crystal_switch = True
     world.get_region('PoD Dark Pegs', player).crystal_switch = True
     world.get_region('Swamp Crystal Switch', player).crystal_switch = True
     world.get_region('Thieves Spike Switch', player).crystal_switch = True

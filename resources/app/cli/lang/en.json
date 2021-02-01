@@ -202,7 +202,7 @@
     "intensity" : [
       "Door Shuffle Intensity Level (default: %(default)s)",
       "1:       Shuffles normal doors and spiral staircases",
-      "2:       And shuffles open edges and straight staircases",
+      "2:       And shuffles open edges and both types of straight staircases",
       "3:       And shuffles dungeon lobbies",
       "random:  Picks one of those at random"
     ],
