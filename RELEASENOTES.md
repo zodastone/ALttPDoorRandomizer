@@ -1,6 +1,11 @@
 # New Features
 
-None Yet
+## In-Room Staircases/Ladders
+
+In intensity level 2 and higher the in-floor staircases/ladders that take you between tiles can now be shuffled with
+any N/S connections. (those that appear to go up one floor are North connection and those that go down are South ones)
+
+Big thanks to Catobat for doing all the hard work.
 
 # Bug Fixes
 
