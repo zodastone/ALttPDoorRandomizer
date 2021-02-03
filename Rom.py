@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'bffd4e834049ca5f5295601436fc6009'
+RANDOMIZERBASEHASH = '932e67ddea0800d1415f34e7de3bc1af'
 
 
 class JsonRom(object):
@@ -535,7 +535,7 @@ def patch_rom(world, rom, player, team, enemized):
 
         itemid = location.item.code if location.item is not None else 0x5A
 
-        if location.address is None:
+        if location.address is None or (type(location.address) is int and location.address >= 0x400000):
             continue
 
         if not location.crystal:
@@ -745,14 +745,24 @@ def patch_rom(world, rom, player, team, enemized):
     def credits_digit(num):
         # top: $54 is 1, 55 2, etc , so 57=4, 5C=9
         # bot: $7A is 1, 7B is 2, etc so 7D=4, 82=9 (zero unknown...)
-        return 0x53+num, 0x79+num
+        return 0x53+int(num), 0x79+int(num)
+
+    credits_total = 216
+    if world.keydropshuffle[player]:
+        credits_total += 33
+    if world.shopsanity[player]:
+        credits_total += 32
+    if world.retro[player]:
+        credits_total += 9 if world.shopsanity[player] else 5
 
     if world.keydropshuffle[player]:
         rom.write_byte(0x140000, 1)
-        rom.write_byte(0x187010, 249)  # dynamic credits
+
+    write_int16(rom, 0x187010, credits_total)  # dynamic credits
+    if credits_total != 216:
         # collection rate address: 238C37
-        mid_top, mid_bot = credits_digit(4)
-        last_top, last_bot = credits_digit(9)
+        mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
+        last_top, last_bot = credits_digit(credits_total % 10)
         # top half
         rom.write_byte(0x118C53, mid_top)
         rom.write_byte(0x118C54, last_top)
@@ -1504,28 +1514,31 @@ def patch_race_rom(rom):
         RaceRom.encrypt(rom)
 
 def write_custom_shops(rom, world, player):
-    shops = [shop for shop in world.shops if shop.custom and shop.region.player == player]
+    shops = [shop for shop in world.shops[player] if shop.custom and shop.region.player == player]
 
     shop_data = bytearray()
     items_data = bytearray()
-    sram_offset = 0
 
     for shop_id, shop in enumerate(shops):
         if shop_id == len(shops) - 1:
             shop_id = 0xFF
         bytes = shop.get_bytes()
         bytes[0] = shop_id
-        bytes[-1] = sram_offset
-        if shop.type == ShopType.TakeAny:
-            sram_offset += 1
-        else:
-            sram_offset += shop.item_count
+        bytes[-1] = shop.sram_address
         shop_data.extend(bytes)
-        # [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high]
-        for item in shop.inventory:
+        # [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high][player][sram]
+        for index, item in enumerate(shop.inventory):
             if item is None:
                 break
-            item_data = [shop_id, ItemFactory(item['item'], player).code] + int16_as_bytes(item['price']) + [item['max'], ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF] + int16_as_bytes(item['replacement_price'])
+            if world.shopsanity[player] or shop.type == ShopType.TakeAny:
+                slot = 0 if shop.type == ShopType.TakeAny else index
+                rom.write_byte(0x186560 + shop.sram_address + slot, 1)
+            item_id = ItemFactory(item['item'], player).code
+            price = int16_as_bytes(item['price'])
+            replace = ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF
+            replace_price = int16_as_bytes(item['replacement_price'])
+            item_player = 0 if item['player'] == player else item['player']
+            item_data = [shop_id,  item_id] + price + [item['max'], replace] + replace_price + [item_player]
             items_data.extend(item_data)
 
     rom.write_bytes(0x184800, shop_data)

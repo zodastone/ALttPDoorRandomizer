@@ -36,7 +36,7 @@ class World(object):
         self.algorithm = algorithm
         self.dungeons = []
         self.regions = []
-        self.shops = []
+        self.shops = {}
         self.itempool = []
         self.seed = None
         self.precollected_items = []
@@ -130,6 +130,7 @@ class World(object):
             set_player_attr('potshuffle', False)
             set_player_attr('pot_contents', None)
 
+            set_player_attr('shopsanity', False)
             set_player_attr('keydropshuffle', False)
             set_player_attr('mixed_travel', 'prevent')
             set_player_attr('standardize_palettes', 'standardize')
@@ -611,7 +612,7 @@ class CollectionState(object):
         return self.prog_items[item, player] >= count
 
     def can_buy_unlimited(self, item, player):
-        for shop in self.world.shops:
+        for shop in self.world.shops[player]:
             if shop.region.player == player and shop.has_unlimited(item) and shop.region.can_reach(self):
                 return True
         return False
@@ -675,7 +676,7 @@ class CollectionState(object):
     def can_shoot_arrows(self, player):
         if self.world.retro[player]:
             #todo: Non-progressive silvers grant wooden arrows, but progressive bows do not.  Always require shop arrows to be safe
-            return self.has('Bow', player) and self.can_buy_unlimited('Single Arrow', player)
+            return self.has('Bow', player) and (self.can_buy_unlimited('Single Arrow', player) or self.has('Single Arrow', player))
         return self.has('Bow', player)
 
     def can_get_good_bee(self, player):
@@ -1651,6 +1652,7 @@ class Location(object):
         self.access_rule = lambda state: True
         self.item_rule = lambda item: True
         self.player = player
+        self.skip = False
 
     def can_fill(self, state, item, check_access=True):
         return self.always_allow(state, item) or (self.parent_region.can_fill(item) and self.item_rule(item) and (not check_access or self.can_reach(state)))
@@ -1688,7 +1690,9 @@ class Location(object):
 
 class Item(object):
 
-    def __init__(self, name='', advancement=False, priority=False, type=None, code=None, pedestal_hint=None, pedestal_credit=None, sickkid_credit=None, zora_credit=None, witch_credit=None, fluteboy_credit=None, hint_text=None, player=None):
+    def __init__(self, name='', advancement=False, priority=False, type=None, code=None, price=999, pedestal_hint=None,
+                 pedestal_credit=None, sickkid_credit=None, zora_credit=None, witch_credit=None, fluteboy_credit=None,
+                 hint_text=None, player=None):
         self.name = name
         self.advancement = advancement
         self.priority = priority
@@ -1701,6 +1705,7 @@ class Item(object):
         self.fluteboy_credit_text = fluteboy_credit
         self.hint_text = hint_text
         self.code = code
+        self.price = price
         self.location = None
         self.world = None
         self.player = player
@@ -1743,7 +1748,7 @@ class ShopType(Enum):
     UpgradeShop = 2
 
 class Shop(object):
-    def __init__(self, region, room_id, type, shopkeeper_config, custom, locked):
+    def __init__(self, region, room_id, type, shopkeeper_config, custom, locked, sram_address):
         self.region = region
         self.room_id = room_id
         self.type = type
@@ -1751,6 +1756,7 @@ class Shop(object):
         self.shopkeeper_config = shopkeeper_config
         self.custom = custom
         self.locked = locked
+        self.sram_address = sram_address
 
     @property
     def item_count(self):
@@ -1767,11 +1773,11 @@ class Shop(object):
             door_id = door_addresses[entrances[0].name][0]+1
         else:
             door_id = 0
-            config |= 0x40 # ignore door id
+            config |= 0x40  # ignore door id
         if self.type == ShopType.TakeAny:
             config |= 0x80
         if self.type == ShopType.UpgradeShop:
-            config |= 0x10 # Alt. VRAM
+            config |= 0x10  # Alt. VRAM
         return [0x00]+int16_as_bytes(self.room_id)+[door_id, 0x00, config, self.shopkeeper_config, 0x00]
 
     def has_unlimited(self, item):
@@ -1787,14 +1793,16 @@ class Shop(object):
     def clear_inventory(self):
         self.inventory = [None, None, None]
 
-    def add_inventory(self, slot, item, price, max=0, replacement=None, replacement_price=0, create_location=False):
+    def add_inventory(self, slot: int, item, price, max=0, replacement=None, replacement_price=0,
+                      create_location=False, player=0):
         self.inventory[slot] = {
             'item': item,
             'price': price,
             'max': max,
             'replacement': replacement,
             'replacement_price': replacement_price,
-            'create_location': create_location
+            'create_location': create_location,
+            'player': player
         }
 
 
@@ -1864,12 +1872,12 @@ class Spoiler(object):
         self.locations['Dark World'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in dw_locations])
         listed_locations.update(dw_locations)
 
-        cave_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.Cave]
+        cave_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.Cave and not loc.skip]
         self.locations['Caves'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in cave_locations])
         listed_locations.update(cave_locations)
 
         for dungeon in self.world.dungeons:
-            dungeon_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.dungeon == dungeon]
+            dungeon_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.dungeon == dungeon and not loc.forced_item]
             self.locations[str(dungeon)] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in dungeon_locations])
             listed_locations.update(dungeon_locations)
 
@@ -1879,17 +1887,21 @@ class Spoiler(object):
             listed_locations.update(other_locations)
 
         self.shops = []
-        for shop in self.world.shops:
-            if not shop.custom:
-                continue
-            shopdata = {'location': str(shop.region),
-                        'type': 'Take Any' if shop.type == ShopType.TakeAny else 'Shop'
-                       }
-            for index, item in enumerate(shop.inventory):
-                if item is None:
+        for player in range(1, self.world.players + 1):
+            for shop in self.world.shops[player]:
+                if not shop.custom:
                     continue
-                shopdata['item_{}'.format(index)] = "{} - {}".format(item['item'], item['price']) if item['price'] else item['item']
-            self.shops.append(shopdata)
+                shopdata = {'location': str(shop.region),
+                            'type': 'Take Any' if shop.type == ShopType.TakeAny else 'Shop'
+                            }
+                for index, item in enumerate(shop.inventory):
+                    if item is None:
+                        continue
+                    if self.world.players == 1:
+                        shopdata[f'item_{index}'] = f"{item['item']} — {item['price']}" if item['price'] else item['item']
+                    else:
+                        shopdata[f'item_{index}'] = f"{item['item']} (Player {item['player']}) — {item['price']}"
+                self.shops.append(shopdata)
 
         for player in range(1, self.world.players + 1):
             self.bosses[str(player)] = OrderedDict()

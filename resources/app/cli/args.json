@@ -59,6 +59,10 @@
       "expert"
     ]
   },
+  "shopsanity" : {
+    "action": "store_true",
+    "type": "bool"
+  },
   "keydropshuffle" : {
     "action": "store_true",
     "type": "bool"

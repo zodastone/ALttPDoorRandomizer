@@ -21,11 +21,12 @@ from DoorShuffle import link_doors, connect_portal
 from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
-from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items, balance_multiworld_progression
-from ItemList import generate_itempool, difficulties, fill_prizes, fill_specific_items
+from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items
+from Fill import sell_potions, sell_keys, balance_multiworld_progression, balance_money_progression
+from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.3.0.2-u'
+__version__ = '0.3.1.0-u'
 
 class EnemizerError(RuntimeError):
     pass
@@ -70,6 +71,7 @@ def main(args, seed=None, fish=None):
     world.dungeon_counters = args.dungeon_counters.copy()
     world.potshuffle = args.shufflepots.copy()
     world.fish = fish
+    world.shopsanity = args.shopsanity.copy()
     world.keydropshuffle = args.keydropshuffle.copy()
     world.mixed_travel = args.mixed_travel.copy()
     world.standardize_palettes = args.standardize_palettes.copy()
@@ -147,6 +149,12 @@ def main(args, seed=None, fish=None):
     for player in range(1, world.players + 1):
         set_rules(world, player)
 
+    for player in range(1, world.players + 1):
+        if world.shopsanity[player]:
+            sell_potions(world, player)
+            if world.retro[player]:
+                sell_keys(world, player)
+
     logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
 
     fill_prizes(world)
@@ -204,6 +212,11 @@ def main(args, seed=None, fish=None):
     # if we only check for beatable, we can do this sanity check first before creating the rom
     if not world.can_beat_game():
         raise RuntimeError(world.fish.translate("cli","cli","cannot.beat.game"))
+
+    for player in range(1, world.players+1):
+        if world.shopsanity[player]:
+            customize_shops(world, player)
+    balance_money_progression(world)
 
     outfilebase = 'DR_%s' % (args.outputname if args.outputname else world.seed)
 
@@ -395,6 +408,7 @@ def copy_world(world):
     ret.beemizer = world.beemizer.copy()
     ret.intensity = world.intensity.copy()
     ret.experimental = world.experimental.copy()
+    ret.shopsanity = world.shopsanity.copy()
     ret.keydropshuffle = world.keydropshuffle.copy()
     ret.mixed_travel = world.mixed_travel.copy()
     ret.standardize_palettes = world.standardize_palettes.copy()
@@ -423,9 +437,10 @@ def copy_world(world):
         for level, boss in dungeon.bosses.items():
             ret.get_dungeon(dungeon.name, dungeon.player).bosses[level] = boss
 
-    for shop in world.shops:
-        copied_shop = ret.get_region(shop.region.name, shop.region.player).shop
-        copied_shop.inventory = copy.copy(shop.inventory)
+    for player in range(1, world.players + 1):
+        for shop in world.shops[player]:
+            copied_shop = ret.get_region(shop.region.name, shop.region.player).shop
+            copied_shop.inventory = copy.copy(shop.inventory)
 
     # connect copied world
     for region in world.regions:
@@ -485,6 +500,7 @@ def copy_world(world):
 
     return ret
 
+
 def copy_dynamic_regions_and_locations(world, ret):
     for region in world.dynamic_regions:
         new_reg = Region(region.name, region.type, region.hint_text, region.player)
@@ -495,8 +511,9 @@ def copy_dynamic_regions_and_locations(world, ret):
         # Note: ideally exits should be copied here, but the current use case (Take anys) do not require this
 
         if region.shop:
-            new_reg.shop = Shop(new_reg, region.shop.room_id, region.shop.type, region.shop.shopkeeper_config, region.shop.custom, region.shop.locked)
-            ret.shops.append(new_reg.shop)
+            new_reg.shop = Shop(new_reg, region.shop.room_id, region.shop.type, region.shop.shopkeeper_config,
+                                region.shop.custom, region.shop.locked, region.shop.sram_address)
+            ret.shops[region.player].append(new_reg.shop)
 
     for location in world.dynamic_locations:
         new_reg = ret.get_region(location.parent_region.name, location.parent_region.player)
