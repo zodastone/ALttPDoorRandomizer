@@ -7,7 +7,7 @@ from BaseClasses import Region, RegionType, Shop, ShopType, Location
 from Bosses import place_bosses
 from Dungeons import get_dungeon_item_pool
 from EntranceShuffle import connect_entrance
-from Regions import shop_to_location_table, retro_shops
+from Regions import shop_to_location_table, retro_shops, shop_table_by_location
 from Fill import FillError, fill_restrictive
 from Items import ItemFactory
 
@@ -437,7 +437,10 @@ def create_dynamic_shop_locations(world, player):
                 if item is None:
                     continue
                 if item['create_location']:
-                    loc = Location(player, "{} Item {}".format(shop.region.name, i+1), parent=shop.region)
+                    slot_name = "{} Item {}".format(shop.region.name, i+1)
+                    address = shop_table_by_location[slot_name] if world.shopsanity[player] else None
+                    loc = Location(player, slot_name, address=address,
+                                   parent=shop.region, hint_text='in an old-fashioned cave')
                     shop.region.locations.append(loc)
                     world.dynamic_locations.append(loc)
 
@@ -483,16 +486,18 @@ def set_up_shops(world, player):
             removals = [next(item for item in world.itempool if item.name == 'Arrows (10)' and item.player == player)]
             red_pots = [item for item in world.itempool if item.name == 'Red Potion' and item.player == player][:5]
             shields_n_hearts = [item for item in world.itempool if item.name in ['Blue Shield', 'Small Heart'] and item.player == player]
+            removals.extend([item for item in world.itempool if item.name == 'Arrow Upgrade (+5)' and item.player == player])
             removals.extend(red_pots)
             removals.extend(random.sample(shields_n_hearts, 5))
             for remove in removals:
                 world.itempool.remove(remove)
-            for i in range(6):
+            for i in range(6):  # replace the Arrows (10) and randomly selected hearts/blue shield
                 arrow_item = ItemFactory('Single Arrow', player)
                 arrow_item.advancement = True
                 world.itempool.append(arrow_item)
-            for i in range(5):
+            for i in range(5):  # replace the red potions
                 world.itempool.append(ItemFactory('Small Key (Universal)', player))
+            world.itempool.append(ItemFactory('Rupees (50)', player))  # replaces the arrow upgrade
         # TODO: move hard+ mode changes for shields here, utilizing the new shops
         else:
             rss = world.get_region('Red Shield Shop', player).shop
@@ -509,7 +514,7 @@ def set_up_shops(world, player):
 
 
 def customize_shops(world, player):
-    found_bomb_upgrade, found_arrow_upgrade = False, False
+    found_bomb_upgrade, found_arrow_upgrade = False, world.retro[player]
     possible_replacements = []
     shops_to_customize = shop_to_location_table.copy()
     if world.retro[player]:
@@ -584,7 +589,7 @@ def randomize_price(price):
         if price <= 10:
             return price
         else:
-            half_price = int(math.ceil(half_price / 10.0)) * 10
+            half_price = int(math.ceil(half_price / 5.0)) * 5
             max_price = price - half_price
             max_price //= 5
             return random.randint(0, max_price) * 5 + half_price

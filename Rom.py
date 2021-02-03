@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'bffd4e834049ca5f5295601436fc6009'
+RANDOMIZERBASEHASH = '05128f2ed347479abb5f3149463bb06d'
 
 
 class JsonRom(object):
@@ -535,7 +535,7 @@ def patch_rom(world, rom, player, team, enemized):
 
         itemid = location.item.code if location.item is not None else 0x5A
 
-        if location.address is None:
+        if location.address is None or (type(location.address) is int and location.address >= 0x400000):
             continue
 
         if not location.crystal:

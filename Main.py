@@ -22,7 +22,7 @@ from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items
-from Fill import sell_potions, sell_keys, balance_multiworld_progression
+from Fill import sell_potions, sell_keys, balance_multiworld_progression, balance_money_progression
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
@@ -216,6 +216,7 @@ def main(args, seed=None, fish=None):
     for player in range(1, world.players+1):
         if world.shopsanity[player]:
             customize_shops(world, player)
+    balance_money_progression(world)
 
     outfilebase = 'DR_%s' % (args.outputname if args.outputname else world.seed)
 

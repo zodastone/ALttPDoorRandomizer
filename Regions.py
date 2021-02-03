@@ -902,6 +902,13 @@ def adjust_locations(world, player):
                 dungeon.small_keys.append(key_item)
             elif key_item.bigkey:
                 dungeon.big_key = key_item
+    if world.shopsanity[player]:
+        index = 0
+        for shop, location_list in shop_to_location_table.items():
+            for location in location_list:
+                world.get_location(location, player).address = 0x400000 + index
+                # player address? it is in the shop table
+                index += 1
 
 
 # (type, room_id, shopkeeper, custom, locked, [items])
