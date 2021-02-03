@@ -1927,7 +1927,7 @@ class Spoiler(object):
             self.bosses = self.bosses["1"]
 
         for player in range(1, self.world.players + 1):
-            if self.world.intensity[player] >= 3:
+            if self.world.intensity[player] >= 3 and self.world.doorShuffle[player] != 'vanilla':
                 for portal in self.world.dungeon_portals[player]:
                     self.set_lobby(portal.name, portal.door.name, player)
 

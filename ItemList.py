@@ -504,7 +504,7 @@ def set_up_shops(world, player):
             if not rss.locked:
                 rss.custom = True
                 rss.add_inventory(2, 'Single Arrow', 80)
-            for shop in random.sample([s for s in world.shops if not s.locked and s.region.player == player], 5):
+            for shop in random.sample([s for s in world.shops[player] if not s.locked and s.region.player == player], 5):
                 shop.custom = True
                 shop.locked = True
                 shop.add_inventory(0, 'Single Arrow', 80)
@@ -528,7 +528,7 @@ def customize_shops(world, player):
             item = location.item
             max_repeat = 1
             if shop_name not in retro_shops:
-                if item.name in repeatable_shop_items:
+                if item.name in repeatable_shop_items and item.player == player:
                     max_repeat = 0
                 if item.name in ['Bomb Upgrade (+5)', 'Arrow Upgrade (+5)'] and item.player == player:
                     if item.name == 'Bomb Upgrade (+5)':
@@ -544,7 +544,7 @@ def customize_shops(world, player):
                     price = 80
             # randomize price
             shop.add_inventory(idx, item.name, randomize_price(price), max_repeat, player=item.player)
-            if item.name in cap_replacements and shop_name not in retro_shops:
+            if item.name in cap_replacements and shop_name not in retro_shops and item.player == player:
                 possible_replacements.append((shop, idx, location, item))
         # randomize shopkeeper
         if shop_name != 'Capacity Upgrade':

@@ -566,9 +566,10 @@ def balance_money_progression(world):
                 slot = shop_to_location_table[location.parent_region.name].index(location.name)
                 shop = location.parent_region.shop
                 shop_item = shop.inventory[slot]
-                sphere_costs[loc_player] += shop_item['price']
-                location_free = False
-                locked_by_money[loc_player].add(location)
+                if interesting_item(location, location.item, world, location.item.player):
+                    sphere_costs[loc_player] += shop_item['price']
+                    location_free = False
+                    locked_by_money[loc_player].add(location)
             elif location.name in pay_for_locations:
                 sphere_costs[loc_player] += pay_for_locations[location.name]
                 location_free = False
