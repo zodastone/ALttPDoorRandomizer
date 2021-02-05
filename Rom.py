@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '932e67ddea0800d1415f34e7de3bc1af'
+RANDOMIZERBASEHASH = '6a4096235f682b7e4e1a65f274c7037b'
 
 
 class JsonRom(object):
@@ -710,6 +710,12 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_byte(0x138004, dr_flags.value)
     if dr_flags & DROptions.Town_Portal and world.mode[player] == 'inverted':
         rom.write_byte(0x138006, 1)
+
+    # swap in non-ER Lobby Shuffle Inverted - but only then
+    if world.mode[player] == 'inverted' and world.intensity[player] >= 3 and world.doorShuffle[player] != 'vanilla' and world.shuffle[player] == 'vanilla':
+        aga_portal = world.get_portal('Agahnims Tower', player)
+        gt_portal = world.get_portal('Ganons Tower', player)
+        aga_portal.exit_offset, gt_portal.exit_offset = gt_portal.exit_offset, aga_portal.exit_offset
 
     for portal in world.dungeon_portals[player]:
         if not portal.default:
@@ -2106,8 +2112,9 @@ def set_inverted_mode(world, player, rom):
     if world.shuffle[player] == 'vanilla':
         rom.write_byte(0xDBB73 + 0x23, 0x37)  # switch AT and GT
         rom.write_byte(0xDBB73 + 0x36, 0x24)
-        write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
-        write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
+        if world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
+            write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
+            write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
         rom.write_byte(0x15B8C, 0x6C)
         rom.write_byte(0xDBB73 + 0x00, 0x53)  # switch bomb shop and links house
