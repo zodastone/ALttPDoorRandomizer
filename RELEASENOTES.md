@@ -9,6 +9,12 @@ Big thanks to Catobat for doing all the hard work.
 
 # Bug Fixes
 
+* 0.3.0.2-u
+	* Disallowed Swamp Lobby in Hyrule Castle in Standard mode
+	* Prevent defeating Aga 1 before Zelda is delivered to the Sanctuary. (He can't take damage)
+	* Fix for Ice Jelly room when going backward and enemizer is on
+	* Fix for inverted - don't start as a bunny in Dark Sanctuary
+	* Fix for non-ER Inverted with Lobby shuffle. Aga Tower's exit works properly now.
 * 0.3.0.1-u
 	* Problem with lobbies on re-rolls corrected
 	* Potential playthrough problem addressed
