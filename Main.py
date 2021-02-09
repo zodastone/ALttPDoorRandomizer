@@ -8,7 +8,7 @@ import random
 import time
 import zlib
 
-from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance
+from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance, Settings
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
 from PotShuffle import shuffle_pots
@@ -28,6 +28,7 @@ from Utils import output_path, parse_player_names
 
 __version__ = '0.3.1.1-u'
 
+
 class EnemizerError(RuntimeError):
     pass
 
@@ -40,6 +41,10 @@ def main(args, seed=None, fish=None):
     start = time.perf_counter()
 
     # initialize the world
+    if args.code:
+        for player, code in args.code.items():
+            if code:
+                Settings.adjust_args_from_code(code, player, args)
     world = World(args.multi, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
                   args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm,
                   args.accessibility, args.shuffleganon, args.retro, args.custom, args.customitemarray, args.hints)
@@ -218,7 +223,7 @@ def main(args, seed=None, fish=None):
             customize_shops(world, player)
     balance_money_progression(world)
 
-    outfilebase = 'DR_%s' % (args.outputname if args.outputname else world.seed)
+    outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
 
     rom_names = []
     jsonout = {}
@@ -264,59 +269,12 @@ def main(args, seed=None, fish=None):
                 if args.jsonout:
                     jsonout[f'patch_t{team}_p{player}'] = rom.patches
                 else:
-                    mcsb_name = ''
-                    if all([world.mapshuffle[player], world.compassshuffle[player], world.keyshuffle[player], world.bigkeyshuffle[player]]):
-                        mcsb_name = '-keysanity'
-                    elif [world.mapshuffle[player], world.compassshuffle[player], world.keyshuffle[player], world.bigkeyshuffle[player]].count(True) == 1:
-                        mcsb_name = '-mapshuffle' if world.mapshuffle[player] else '-compassshuffle' if world.compassshuffle[player] else '-keyshuffle' if world.keyshuffle[player] else '-bigkeyshuffle'
-                    elif any([world.mapshuffle[player], world.compassshuffle[player], world.keyshuffle[player], world.bigkeyshuffle[player]]):
-                        mcsb_name = '-%s%s%s%sshuffle' % (
-                        'M' if world.mapshuffle[player] else '', 'C' if world.compassshuffle[player] else '',
-                        'S' if world.keyshuffle[player] else '', 'B' if world.bigkeyshuffle[player] else '')
-
                     outfilepname = f'_T{team+1}' if world.teams > 1 else ''
                     if world.players > 1:
                         outfilepname += f'_P{player}'
                     if world.players > 1 or world.teams > 1:
                         outfilepname += f"_{world.player_names[player][team].replace(' ', '_')}" if world.player_names[player][team] != 'Player %d' % player else ''
-                    outfilestuffs = {
-                      "logic": world.logic[player],                                   # 0
-                      "difficulty": world.difficulty[player],                         # 1
-                      "difficulty_adjustments": world.difficulty_adjustments[player], # 2
-                      "mode": world.mode[player],                                     # 3
-                      "goal": world.goal[player],                                     # 4
-                      "timer": str(world.timer),                                      # 5
-                      "shuffle": world.shuffle[player],                               # 6
-                      "doorShuffle": world.doorShuffle[player],                       # 7
-                      "algorithm": world.algorithm,                                   # 8
-                      "mscb": mcsb_name,                                              # 9
-                      "retro": world.retro[player],                                   # A
-                      "progressive": world.progressive,                               # B
-                      "hints": 'True' if world.hints[player] else 'False'             # C
-                    }
-                    #                  0  1  2  3  4 5  6  7  8 9 A B C
-                    outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s_%s-%s%s%s%s%s' % (
-                      #  0          1      2      3    4     5    6      7     8        9         A     B           C
-                      # _noglitches_normal-normal-open-ganon-ohko_simple_basic-balanced-keysanity-retro-prog_swords-nohints
-                      # _noglitches_normal-normal-open-ganon     _simple_basic-balanced-keysanity-retro
-                      # _noglitches_normal-normal-open-ganon     _simple_basic-balanced-keysanity      -prog_swords
-                      # _noglitches_normal-normal-open-ganon     _simple_basic-balanced-keysanity                  -nohints
-                      outfilestuffs["logic"], # 0
-
-                      outfilestuffs["difficulty"],             # 1
-                      outfilestuffs["difficulty_adjustments"], # 2
-                      outfilestuffs["mode"],                   # 3
-                      outfilestuffs["goal"],                   # 4
-                      "" if outfilestuffs["timer"] in ['False', 'none', 'display'] else "-" + outfilestuffs["timer"], # 5
-
-                      outfilestuffs["shuffle"],     # 6
-                      outfilestuffs["doorShuffle"], # 7
-                      outfilestuffs["algorithm"],   # 8
-                      outfilestuffs["mscb"],        # 9
-
-                      "-retro" if outfilestuffs["retro"] == "True" else "", # A
-                      "-prog_" + outfilestuffs["progressive"] if outfilestuffs["progressive"] in ['off', 'random'] else "", # B
-                      "-nohints" if not outfilestuffs["hints"] == "True" else "")) if not args.outputname else '' # C
+                    outfilesuffix = f'_{Settings.make_code(world, player)}' if not args.outputname else ''
                     rom.write_to_file(output_path(f'{outfilebase}{outfilepname}{outfilesuffix}.sfc'))
 
         if world.players > 1:

@@ -619,7 +619,7 @@ def todays_discounts(world, player):
     for location, shop_name, slot in chosen_locations:
         shop = world.get_region(shop_name, player).shop
         orig = location.item.price
-        shop.inventory[slot]['price'] = randomize_price(orig // 10)
+        shop.inventory[slot]['price'] = randomize_price(orig // 5)
 
 
 repeatable_shop_items = ['Single Arrow', 'Arrows (10)', 'Bombs (3)', 'Bombs (10)', 'Red Potion', 'Small Heart',

@@ -1,3 +1,4 @@
+import base64
 import copy
 import json
 import logging
@@ -134,7 +135,7 @@ class World(object):
             set_player_attr('keydropshuffle', False)
             set_player_attr('mixed_travel', 'prevent')
             set_player_attr('standardize_palettes', 'standardize')
-            set_player_attr('force_fix', {'gt': False, 'sw': False, 'pod': False, 'tr': False});
+            set_player_attr('force_fix', {'gt': False, 'sw': False, 'pod': False, 'tr': False})
 
     def get_name_string_for_object(self, obj):
         return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_names(obj.player)})'
@@ -1961,6 +1962,8 @@ class Spoiler(object):
                          'teams': self.world.teams,
                          'experimental': self.world.experimental,
                          'keydropshuffle': self.world.keydropshuffle,
+                         'shopsanity': self.world.shopsanity,
+                         'code': {p: Settings.make_code(self.world, p) for p in range(1, self.world.players + 1)}
                          }
 
     def to_json(self):
@@ -1997,6 +2000,7 @@ class Spoiler(object):
                 if len(self.hashes) > 0:
                     for team in range(self.world.teams):
                         outfile.write('%s%s\n' % (f"Hash - {self.world.player_names[player][team]} (Team {team+1}): " if self.world.teams > 1 else 'Hash: ', self.hashes[player, team]))
+                outfile.write(f'Settings Code:                   {self.metadata["code"][player]}\n')
                 outfile.write('Logic:                           %s\n' % self.metadata['logic'][player])
                 outfile.write('Mode:                            %s\n' % self.metadata['mode'][player])
                 outfile.write('Retro:                           %s\n' % ('Yes' if self.metadata['retro'][player] else 'No'))
@@ -2024,6 +2028,7 @@ class Spoiler(object):
                 outfile.write('Hints:                           %s\n' % ('Yes' if self.metadata['hints'][player] else 'No'))
                 outfile.write('Experimental:                    %s\n' % ('Yes' if self.metadata['experimental'][player] else 'No'))
                 outfile.write('Key Drops shuffled:              %s\n' % ('Yes' if self.metadata['keydropshuffle'][player] else 'No'))
+                outfile.write(f"Shopsanity:                      {'Yes' if self.metadata['shopsanity'][player] else 'No'}\n")
             if self.doors:
                 outfile.write('\n\nDoors:\n\n')
                 outfile.write('\n'.join(
@@ -2154,3 +2159,109 @@ class Pot(object):
         self.item = item
         self.room = room
         self.flags = flags
+
+
+# byte 0: DDDE EEEE (DR, ER)
+dr_mode = {"basic": 1, "crossed": 2, "vanilla": 0}
+er_mode = {"vanilla": 0, "simple": 1, "restricted": 2, "full": 3, "crossed": 4, "insanity": 5, "restricted_legacy": 8,
+           "full_legacy": 9, "madness_legacy": 10, "insanity_legacy": 11, "dungeonsfull": 7, "dungeonssimple": 6}
+
+# byte 1: LLLW WSSR (logic, mode, sword, retro)
+logic_mode = {"noglitches": 0, "minorglitches": 1, "nologic": 2, "owg": 3, "majorglitches": 4}
+world_mode = {"open": 0, "standard": 1, "inverted": 2}
+sword_mode = {"random": 0,  "assured": 1, "swordless": 2, "vanilla": 3}
+
+# byte 2: GGGD DFFH (goal, diff, item_func, hints)
+goal_mode = {"ganon": 0, "pedestal": 1, "dungeons": 2, "triforcehunt": 3, "crystals": 4}
+diff_mode = {"normal": 0, "hard": 1, "expert": 2}
+func_mode = {"normal": 0, "hard": 1, "expert": 2}
+
+# byte 3: SKMM PIII (shop, keydrop, mixed, palettes, intensity)
+mixed_travel_mode = {"prevent": 0, "allow": 1, "force": 2}
+# intensity is 3 bits (reserves 4-7 levels)
+
+# byte 4: CCCC CTTX (crystals gt, ctr2, experimental)
+counter_mode = {"default": 0, "off": 1, "on": 2, "pickup": 3}
+
+# byte 5: CCCC CPAA (crystals ganon, pyramid, access
+access_mode = {"items": 0, "locations": 1, "none": 2}
+
+# byte 6: BSMC BBEE (big, small, maps, compass, bosses, enemies)
+boss_mode = {"none": 0, "simple": 1, "full": 2, "random": 3}
+enemy_mode = {"none": 0, "shuffled": 1, "random": 2}
+
+# byte 7: HHHD DP?? (enemy_health, enemy_dmg, potshuffle, ?)
+e_health = {"default": 0, "easy": 1, "normal": 2, "hard": 3, "expert": 4}
+e_dmg = {"default": 0, "shuffled": 1, "random": 2}
+
+class Settings(object):
+
+    @staticmethod
+    def make_code(w, p):
+        code = bytes([
+            (dr_mode[w.doorShuffle[p]] << 5) | er_mode[w.shuffle[p]],
+
+            (logic_mode[w.logic[p]] << 5) | (world_mode[w.mode[p]] << 3)
+            | (sword_mode[w.swords[p]] << 1) | (1 if w.retro[p] else 0),
+
+            (goal_mode[w.goal[p]] << 5) | (diff_mode[w.difficulty[p]] << 3)
+            | (func_mode[w.difficulty_adjustments[p]] << 1) | (1 if w.hints[p] else 0),
+
+            (0x80 if w.shopsanity[p] else 0) | (0x40 if w.keydropshuffle[p] else 0)
+            | (mixed_travel_mode[w.mixed_travel[p]] << 4) | (0x8 if w.standardize_palettes[p] == "original" else 0)
+            | (0 if w.intensity[p] == "random" else w.intensity[p]),
+
+            ((8 if w.crystals_gt_orig[p] == "random" else int(w.crystals_gt_orig[p])) << 3)
+            | (counter_mode[w.dungeon_counters[p]] << 1) | (1 if w.experimental[p] else 0),
+
+            ((8 if w.crystals_ganon_orig[p] == "random" else int(w.crystals_ganon_orig[p])) << 3)
+            | (0x4 if w.open_pyramid[p] else 0) | access_mode[w.accessibility[p]],
+
+            (0x80 if w.bigkeyshuffle[p] else 0) | (0x40 if w.keyshuffle[p] else 0)
+            | (0x20 if w.mapshuffle[p] else 0) | (0x10 if w.compassshuffle[p] else 0)
+            | (boss_mode[w.boss_shuffle[p]] << 2) | (enemy_mode[w.enemy_shuffle[p]]),
+
+            (e_health[w.enemy_health[p]] << 5) | (e_dmg[w.enemy_damage[p]] << 3) | (0x4 if w.potshuffle[p] else 0)])
+        return base64.b64encode(code, "+-".encode()).decode()
+
+    @staticmethod
+    def adjust_args_from_code(code, player, args):
+        settings, p = base64.b64decode(code.encode(), "+-".encode()), player
+
+        def r(d):
+            return {y: x for x, y in d.items()}
+
+        args.shuffle[p] = r(er_mode)[settings[0] & 0x1F]
+        args.door_shuffle[p] = r(dr_mode)[(settings[0] & 0xE0) >> 5]
+        args.logic[p] = r(logic_mode)[(settings[1] & 0xE0) >> 5]
+        args.mode[p] = r(world_mode)[(settings[1] & 0x18) >> 3]
+        args.swords[p] = r(sword_mode)[(settings[1] & 0x6) >> 1]
+        args.difficulty[p] = r(diff_mode)[(settings[2] & 0x18) >> 3]
+        args.item_functionality[p] = r(func_mode)[(settings[2] & 0x6) >> 1]
+        args.goal[p] = r(goal_mode)[(settings[2] & 0xE0) >> 5]
+        args.accessibility[p] = r(access_mode)[settings[5] & 0x3]
+        args.retro[p] = True if settings[1] & 0x01 else False
+        args.hints[p] = True if settings[2] & 0x01 else False
+        args.retro[p] = True if settings[1] & 0x01 else False
+        args.shopsanity[p] = True if settings[3] & 0x80 else False
+        args.keydropshuffle[p] = True if settings[3] & 0x40 else False
+        args.mixed_travel[p] = r(mixed_travel_mode)[(settings[3] & 0x30) >> 4]
+        args.standardize_palettes[p] = "original" if settings[3] & 0x8 else "standardize"
+        intensity = settings[3] & 0x7
+        args.intensity[p] = "random" if intensity == 0 else intensity
+        args.dungeon_counters[p] = r(counter_mode)[(settings[4] & 0x6) >> 1]
+        cgt = (settings[4] & 0xf8) >> 3
+        args.crystals_gt[p] = "random" if cgt == 8 else cgt
+        args.experimental[p] = True if settings[4] & 0x1 else False
+        cgan = (settings[5] & 0xf8) >> 3
+        args.crystals_ganon[p] = "random" if cgan == 8 else cgan
+        args.openpyramid[p] = True if settings[5] & 0x4 else False
+        args.bigkeyshuffle[p] = True if settings[6] & 0x80 else False
+        args.keyshuffle[p] = True if settings[6] & 0x40 else False
+        args.mapshuffle[p] = True if settings[6] & 0x20 else False
+        args.compassshuffle[p] = True if settings[6] & 0x10 else False
+        args.shufflebosses[p] = r(boss_mode)[(settings[6] & 0xc) >> 2]
+        args.shuffleenemies[p] = r(enemy_mode)[settings[6] & 0x3]
+        args.enemy_health[p] = r(e_health)[(settings[7] & 0xE0) >> 5]
+        args.enemy_damage[p] = r(e_dmg)[(settings[7] & 0x18) >> 3]
+        args.shufflepots[p] = True if settings[7] & 0x4 else False

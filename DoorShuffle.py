@@ -89,7 +89,7 @@ def link_doors_main(world, player):
             world.get_portal('Desert East', player).destination = True
             if world.mode[player] == 'inverted':
                 world.get_portal('Desert West', player).destination = True
-            if world.mode[player] == 'open':
+            else:
                 world.get_portal('Skull 2 West', player).destination = True
                 world.get_portal('Turtle Rock Lazy Eyes', player).destination = True
                 world.get_portal('Turtle Rock Eye Bridge', player).destination = True

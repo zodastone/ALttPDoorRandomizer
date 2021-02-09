@@ -310,6 +310,13 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
         for patch in json.load(f):
             rom.write_bytes(patch["address"], patch["patchData"])
 
+    if world.get_dungeon("Thieves Town", player).boss.enemizer_name == "Blind":
+        rom.write_byte(0x04DE81, 0x6)  # maiden spawn
+        # restore blind spawn code
+        rom.write_bytes(0xEA081, [0xaf, 0xcc, 0xf3, 0x7e, 0xc9, 0x6, 0xf0, 0x24,
+                                  0xad, 0x3, 0x4, 0x29, 0x20, 0xf0, 0x1d])
+        rom.write_byte(0x200101, 0)  # Do not close boss room door on entry.
+
     if random_sprite_on_hit:
         _populate_sprite_table()
         sprites = list(_sprite_table.values())
@@ -1537,8 +1544,7 @@ def write_custom_shops(rom, world, player):
             if item is None:
                 break
             if world.shopsanity[player] or shop.type == ShopType.TakeAny:
-                slot = 0 if shop.type == ShopType.TakeAny else index
-                rom.write_byte(0x186560 + shop.sram_address + slot, 1)
+                rom.write_byte(0x186560 + shop.sram_address + index, 1)
             item_id = ItemFactory(item['item'], player).code
             price = int16_as_bytes(item['price'])
             replace = ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF
