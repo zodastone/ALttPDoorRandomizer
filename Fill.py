@@ -394,14 +394,14 @@ def sell_potions(world, player):
 
 def sell_keys(world, player):
     # exclude the old man or take any caves because free keys are too good
-    shop_names = [shop.region.name for shop in world.shops[player] if shop.region.name in shop_to_location_table]
-    choices = [world.get_location(loc, player) for shop in shop_names for loc in shop_to_location_table[shop]]
-    locations = [loc for loc in choices if not loc.item]
-    location = random.choice(locations)
+    shop_names = {shop.region.name: shop for shop in world.shops[player] if shop.region.name in shop_to_location_table}
+    choices = [(world.get_location(loc, player), shop) for shop in shop_names for loc in shop_to_location_table[shop]]
+    locations = [(loc, shop) for loc, shop in choices if not loc.item]
+    location, shop = random.choice(locations)
     universal_key = next(i for i in world.itempool if i.name == 'Small Key (Universal)' and i.player == player)
     world.push_item(location, universal_key, collect=False)
-    # seems unnecessary
-    # shop_map[key_seller].add_inventory(0, 'Small Key (Universal)', 100)  # will be fixed later in customize shops
+    idx = shop_to_location_table[shop_names[shop].region.name].index(location.name)
+    shop_names[shop].add_inventory(idx, 'Small Key (Universal)', 100)
     world.itempool.remove(universal_key)
 
 
