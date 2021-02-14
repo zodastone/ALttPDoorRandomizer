@@ -15,11 +15,14 @@ HudAdditions:
 		LDX.b $06 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+4 ; draw 10's digit
 		LDX.b $07 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+6 ; draw 1's digit
 		LDA.w #$2830 : STA !GOAL_DRAW_ADDRESS+8 ; draw slash
-        lda $7EF33E
-		jsr HudHexToDec4DigitCopy
-		LDX.b $05 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+10 ; draw 100's digit
-		LDX.b $06 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+12 ; draw 10's digit
-		LDX.b $07 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+14 ; draw 1's digit
+		LDA.l DRFlags : AND #$0100 : BNE +
+        	lda $7EF33E
+			jsr HudHexToDec4DigitCopy
+			LDX.b $05 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+10 ; draw 100's digit
+			LDX.b $06 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+12 ; draw 10's digit
+			LDX.b $07 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+14 ; draw 1's digit
+			BRA ++
+		+ LDA.w #$2405 : STA !GOAL_DRAW_ADDRESS+10 : STA !GOAL_DRAW_ADDRESS+12 : STA !GOAL_DRAW_ADDRESS+14
     ++
 
 	LDX $1B : BNE + : RTS : + ; Skip if outdoors

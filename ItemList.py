@@ -753,6 +753,11 @@ def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, r
         pool = [item.replace('Arrow Upgrade (+5)','Rupees (5)') for item in pool]
         pool = [item.replace('Arrow Upgrade (+10)','Rupees (5)') for item in pool]
         pool.extend(diff.retro)
+        if door_shuffle != 'vanilla':  # door shuffle needs more keys for retro
+            replace = 'Rupees (20)' if difficulty == 'normal' else 'Rupees (5)'
+            indices = [i for i, x in enumerate(pool) if x == replace]
+            for i in range(0, min(10, len(indices))):
+                pool[indices[i]] = 'Small Key (Universal)'
         if mode == 'standard':
             if door_shuffle == 'vanilla':
                 key_location = random.choice(['Secret Passage', 'Hyrule Castle - Boomerang Chest', 'Hyrule Castle - Map Chest', 'Hyrule Castle - Zelda\'s Chest', 'Sewers - Dark Cross'])
