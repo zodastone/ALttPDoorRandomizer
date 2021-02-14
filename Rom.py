@@ -518,7 +518,8 @@ class Sprite(object):
         # split into palettes of 15 colors
         return array_chunk(palette_as_colors, 15)
 
-def patch_rom(world, rom, player, team, enemized):
+
+def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     random.seed(world.rom_seeds[player])
 
     # progressive bow silver arrow hint hack
@@ -707,7 +708,10 @@ def patch_rom(world, rom, player, team, enemized):
                 rom.write_byte(0x13f000+dungeon_id, opposite_door.roomIndex)
             elif not opposite_door:
                 rom.write_byte(0x13f000+dungeon_id, 0)  # no supertile preceeding boss
-    rom.write_byte(0x138004, dr_flags.value)
+    if is_mystery:
+        dr_flags |= DROptions.Hide_Total
+    rom.write_byte(0x138004, dr_flags.value & 0xff)
+    rom.write_byte(0x138005, (dr_flags.value & 0xff00) >> 8)
     if dr_flags & DROptions.Town_Portal and world.mode[player] == 'inverted':
         rom.write_byte(0x138006, 1)
 

@@ -35,7 +35,7 @@ def link_doors(world, player):
                     door.dest = None
                     door.entranceFlag = False
                     ent = door.entrance
-                    if door.type != DoorType.Logical and ent.connected_region is not None:
+                    if (door.type != DoorType.Logical or door.controller) and ent.connected_region is not None:
                         ent.connected_region.entrances = [x for x in ent.connected_region.entrances if x != ent]
                         ent.connected_region = None
             for portal in world.dungeon_portals[player]:
@@ -2012,6 +2012,7 @@ class DROptions(Flag):
     OriginalPalettes = 0x20
     Open_PoD_Wall = 0x40  # If on, pre opens the PoD wall, no bow required
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
+    Hide_Total = 0x100
 
 
 # DATA GOES DOWN HERE
