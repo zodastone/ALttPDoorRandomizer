@@ -9,7 +9,7 @@ Big thanks to Catobat for doing all the hard work.
 
 ## Experimental Item Counter
 
-New item counter modified to show total?
+New item counter modified to show total
 
 # Bug Fixes
 
@@ -22,7 +22,10 @@ New item counter modified to show total?
 	* Fix for In-Room Stairs with Trap Doors
 	* Key logic fix
 	* Fix for door gen re-start
-	* More lenient keys in DR+Retro	
+	* More lenient keys in DR+Retro
+	* Fix for shufflepots option
+* 0.3.0.2-u
+	* Introduced in-room staircases/ladders
 * 0.3.0.1-u
 	* Problem with lobbies on re-rolls corrected
 	* Potential playthrough problem addressed

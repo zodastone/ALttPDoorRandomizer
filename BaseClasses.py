@@ -146,7 +146,9 @@ class World(object):
             region.world = self
             self._region_cache[region.player][region.name] = region
             for exit in region.exits:
-                self._entrance_cache[(exit.name, exit.player)] = exit
+                self._entrance_cache[exit.name, exit.player] = exit
+            for r_location in region.locations:
+                self._location_cache[r_location.name, r_location.player] = r_location
 
     def initialize_doors(self, doors):
         for door in doors:
