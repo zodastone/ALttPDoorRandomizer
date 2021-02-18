@@ -2,7 +2,7 @@
 
 ## Shopsanity
 
---shopsanity added. This adds 32 shop locations (9 more in retro) to the general and location pool.
+--shopsanity added. This adds 32 shop locations (9 more in retro) to the general location pool.
 
 Multi-world supported. Thanks go to Pepper and CaitSith2 for figuring out several items related to this major feature.
 
@@ -35,12 +35,12 @@ Item Pool changes: To accommodate the new locations, new items are added to the 
 
 1. Initially, 1 of each type of potion refill is shuffled to the shops. (the Capacity Fairy is excluded from this, see step 4). This ensures that potions can be bought somewhere.
 2. The rest of the shop pool is shuffled with the rest of the item pool. 
-3. At this time, only Ten Bombs, Ten Arrows, Capacity upgrades, and Small Hearts can appear outside of shops. Any other shop items are replaced with rupees of various amounts. This is because of two reasons: First, potion refills and the Bee are indistinguishable from Bottles with that item in them. Receiving those items without a bottle or empty bottle is essentially a nothing item but looks like a bottle. Second, the non-progressive Shields interact fine with Progressive Shields but are usually also a nothing item most of the time.
+3. At this time, only Ten Bombs, Ten Arrows, Capacity upgrades, Small Hearts, and the non-progressive shields can appear outside of shops. Any other shop items are replaced with rupees of various amounts. This is because of one reason: potion refills and the Bee are indistinguishable from Bottles with that item in them. Receiving those items without a bottle or empty bottle is essentially a nothing item but looks like a bottle. Note, the non-progressive Shields interact fine with Progressive Shields (you never get downgraded) but are usually also a nothing item most of the time.
 4. The Capacity Fairy cannot sell Potion Refills because the graphics are incompatible. 300 Rupees will replace any potion refill that ends up there.
-5. For capacity upgrades, if any shop sells capacity upgrades, then it will sell all seven of that type. Otherwise, if plain bombs or arrows are sold somewhere, then the other six capacity upgrades will be purchasable first at those locations and then replaced by the underlying ammo. If no suitable spot is found, then no more capacity upgrades will not be available for that seed. (There is always one somewhere in the pool.)
-6. Any shop item that is originally sold by shops can be bought indefinitely but only the first purchase counts toward total checks on the credits screen & item counter. All other items can be bought only once.
+5. For capacity upgrades, if any shop sells capacity upgrades, then it will sell all seven of that type. Otherwise, if plain bombs or arrows are sold somewhere, then the other six capacity upgrades will be purchasable first at those locations and then replaced by the underlying ammo. If no suitable spot is found, then no more capacity upgrades will be available for that seed. (There is always one somewhere in the pool.)
+6. Any shop item that is originally sold by shops can be bought indefinitely, but only the first purchase counts toward total checks on the credits screen & item counter. All other items can be bought only once.
 
-All items in the item pool may appear in shops.
+All items in the general item pool may appear in shops. This includes normal progression items and dungeon items in the appropriate keysanity settings.
 
 #### Pricing Guide
 
@@ -115,21 +115,23 @@ The attic/maiden sequence is now active and required when Blind is the boss of T
 
 File names have changed with a settings code instead of listing major settings chosen. Mystery games omit this for obvious reasons. Also found in the spoiler.
 
-Added to CLI only now.  
+Added to CLI only now. With more testing, this will be added to the GUI to be able to save use settings codes for generation. 
 
 ## Mystery fixes
 
 The Mystery.py file has been updated for those who like to use that for generating games. Supports keydropshuffle, 
-shopsanity, and other settings that have been included.
+shopsanity, and other settings that have been added.
 
 ## Experimental Item Counter
 
 New item counter modified to show total
 
-# Bug Fixes
+# Bug Fixes and Notes.
 
 * 0.3.1.0-u
 	* Shopsanity introduced
+	* Blind sequence restored when Blind is in Theives Town in boss shuffle
+	* Settings code added to file name
 	* Minor fix to Standard generation
 * 0.3.0.4-u
 	* QoL fixes from Mike

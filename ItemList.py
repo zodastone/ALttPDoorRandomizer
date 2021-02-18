@@ -632,7 +632,10 @@ cap_replacements = ['Single Arrow', 'Arrows (10)', 'Bombs (3)', 'Bombs (10)']
 cap_blacklist = ['Green Potion', 'Red Potion', 'Blue Potion']
 
 shop_transfer = {'Red Potion': 'Rupees (100)', 'Bee': 'Rupees (5)', 'Blue Potion': 'Rupees (100)',
-                 'Blue Shield': 'Rupees (50)', 'Red Shield': 'Rupees (300)', 'Green Potion': 'Rupees (50)'}
+                 'Green Potion': 'Rupees (50)',
+                 # money seems a bit too generous with these on
+                 # 'Blue Shield': 'Rupees (50)', 'Red Shield': 'Rupees (300)',
+                 }
 
 
 def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, door_shuffle):
