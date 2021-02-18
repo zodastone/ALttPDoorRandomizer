@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '6a4096235f682b7e4e1a65f274c7037b'
+RANDOMIZERBASEHASH = '0a34dc667a29125f09b10aeb1e06b83c'
 
 
 class JsonRom(object):
@@ -942,8 +942,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     if difficulty.progressive_bow_limit < 2 and world.swords == 'swordless':
         rom.write_bytes(0x180098, [2, overflow_replacement])
-        rom.write_byte(0x180181, 0x01) # Make silver arrows work only on ganon
-        rom.write_byte(0x180182, 0x00) # Don't auto equip silvers on pickup
 
     # set up game internal RNG seed
     for i in range(1024):

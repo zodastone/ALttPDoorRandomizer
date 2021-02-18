@@ -401,12 +401,13 @@ def copy_world(world):
             copied_shop.inventory = copy.copy(shop.inventory)
 
     # connect copied world
+    copied_locations = {(loc.name, loc.player): loc for loc in ret.get_locations()}  # caches all locations
     for region in world.regions:
         copied_region = ret.get_region(region.name, region.player)
         copied_region.is_light_world = region.is_light_world
         copied_region.is_dark_world = region.is_dark_world
         copied_region.dungeon = region.dungeon
-        copied_region.locations = [ret.get_location(location.name, location.player) for location in region.locations]
+        copied_region.locations = [copied_locations[(location.name, location.player)] for location in region.locations]
         for entrance in region.entrances:
             ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
 

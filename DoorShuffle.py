@@ -2418,7 +2418,7 @@ interior_doors = [
     ('Skull Pull Switch S', 'Skull Big Chest N'),
     ('Skull Left Drop ES', 'Skull Compass Room WS'),
     ('Skull 2 East Lobby NW', 'Skull Big Key SW'),
-    ('Skull Big Key WN', 'Skull Lone Pot EN'),
+    ('Skull Big Key EN', 'Skull Lone Pot WN'),
     ('Skull Small Hall WS', 'Skull 2 West Lobby ES'),
     ('Skull 2 West Lobby NW', 'Skull X Room SW'),
     ('Skull 3 Lobby EN', 'Skull East Bridge WN'),

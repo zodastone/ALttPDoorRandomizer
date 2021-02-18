@@ -122,15 +122,32 @@ Added to CLI only now.
 The Mystery.py file has been updated for those who like to use that for generating games. Supports keydropshuffle, 
 shopsanity, and other settings that have been included.
 
+## Experimental Item Counter
+
+New item counter modified to show total
+
 # Bug Fixes
 
-* 0.3.1.1-u
+* 0.3.1.0-u
+	* Shopsanity introduced
+	* Minor fix to Standard generation
+* 0.3.0.4-u
+	* QoL fixes from Mike
+	* Allow PoD Mimics 2 as a lobby in non-keysanity seeds (Thanks @Catobat)
+	* Fix for double-counting Hera key in keydropshuffle
+* 0.3.0.3-u
 	* Disallowed Swamp Lobby in Hyrule Castle in Standard mode
 	* Prevent defeating Aga 1 before Zelda is delivered to the Sanctuary. (He can't take damage)
 	* Fix for Ice Jelly room when going backward and enemizer is on
 	* Fix for inverted - don't start as a bunny in Dark Sanctuary
 	* Fix for non-ER Inverted with Lobby shuffle. Aga Tower's exit works properly now.
-	* Minor fix to Standard generation
+	* Fix for In-Room Stairs with Trap Doors
+	* Key logic fix
+	* Fix for door gen re-start
+	* More lenient keys in DR+Retro
+	* Fix for shufflepots option
+* 0.3.0.2-u
+	* Introduced in-room staircases/ladders
 * 0.3.0.1-u
 	* Problem with lobbies on re-rolls corrected
 	* Potential playthrough problem addressed
