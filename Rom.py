@@ -608,6 +608,8 @@ def patch_rom(world, player, rom):
         rom.write_int16(0x180036, world.rupoor_cost)
         # Set stun items
         rom.write_byte(0x180180, 0x02) # Hookshot only
+        # Make silver arrows work only on ganon
+        rom.write_byte(0x180181, 0x01) 
     elif world.difficulty_adjustments == 'expert':
         # Powdered Fairies Prize
         rom.write_byte(0x36DD0, 0xD8)  # One Heart
@@ -626,6 +628,8 @@ def patch_rom(world, player, rom):
         rom.write_int16(0x180036, world.rupoor_cost)
         # Set stun items
         rom.write_byte(0x180180, 0x00) # Nothing
+        # Make silver arrows work only on ganon
+        rom.write_byte(0x180181, 0x01) 
     else:
         # Powdered Fairies Prize
         rom.write_byte(0x36DD0, 0xE3)  # fairy
@@ -643,13 +647,14 @@ def patch_rom(world, player, rom):
         rom.write_int16(0x180036, world.rupoor_cost)
         # Set stun items
         rom.write_byte(0x180180, 0x03) # All standard items
+        # Make silver arrows freely usable
+        rom.write_byte(0x180181, 0x00)
         #Set overflow items for progressive equipment
         if world.timer in ['timed', 'timed-countdown', 'timed-ohko']:
             overflow_replacement = GREEN_CLOCK
         else:
             overflow_replacement = GREEN_TWENTY_RUPEES
 
-    rom.write_byte(0x180181, 0x00) # Make silver arrows freely usable
     rom.write_byte(0x180182, 0x01) # auto equip silvers on pickup
 
     #Byrna residual magic cost
@@ -669,7 +674,6 @@ def patch_rom(world, player, rom):
     
     if difficulty.progressive_bow_limit < 2 and world.swords == 'swordless':
         rom.write_bytes(0x180098, [2, overflow_replacement])
-        rom.write_byte(0x180181, 0x01) # Make silver arrows work only on ganon
 
     # set up game internal RNG seed
     for i in range(1024):
