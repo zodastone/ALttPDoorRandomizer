@@ -1323,7 +1323,18 @@ def write_strings(rom, world, player):
     tt['sahasrahla_bring_courage'] = 'I lost my family heirloom in %s' % greenpendant.hint_text
 
     tt['sign_ganons_tower'] = ('You need %d crystal to enter.' if world.crystals_needed_for_gt == 1 else 'You need %d crystals to enter.') % world.crystals_needed_for_gt
-    tt['sign_ganon'] = ('You need %d crystal to beat Ganon.' if world.crystals_needed_for_ganon == 1 else 'You need %d crystals to beat Ganon.') % world.crystals_needed_for_ganon
+    
+
+    ganon_crystals_singular = 'You need %d crystal to beat Ganon.'
+    ganon_crystals_plural = 'You need %d crystals to beat Ganon.'
+
+    if world.goal == 'ganon':
+        ganon_crystals_singular = 'To beat Ganon you must collect %d crystal and defeat his minion at the top of his tower.'
+        ganon_crystals_plural = 'To beat Ganon you must collect %d crystals and defeat his minion at the top of his tower.'
+
+    tt['sign_ganon'] = (ganon_crystals_singular if world.crystals_needed_for_ganon == 1 else ganon_crystals_plural) % world.crystals_needed_for_ganon
+
+    
 
     if world.goal in ['dungeons']:
         tt['sign_ganon'] = 'You need to complete all the dungeons.'
