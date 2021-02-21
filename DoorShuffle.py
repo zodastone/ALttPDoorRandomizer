@@ -398,7 +398,8 @@ def choose_portals(world, player):
         master_door_list = [x for x in world.doors if x.player == player and x.portalAble]
         portal_assignment = defaultdict(list)
         shuffled_info = list(info_map.items())
-        random.shuffle(shuffled_info)
+        if cross_flag:
+            random.shuffle(shuffled_info)
         for dungeon, info in shuffled_info:
             outstanding_portals = list(dungeon_portals[dungeon])
             hc_flag = std_flag and dungeon == 'Hyrule Castle'
