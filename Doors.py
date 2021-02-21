@@ -1312,12 +1312,7 @@ def create_doors(world, player):
     # can't unlink from skull woods right now
     world.get_door('Skull 2 West Lobby S', player).dungeonLink = 'Skull Woods'
 
-    world.get_door('Ice Spike Cross SE', player).dungeonLink = 'linkIceFalls'
-    world.get_door('Ice Tall Hint SE', player).dungeonLink = 'linkIceFalls'
-    world.get_door('Ice Switch Room SE', player).dungeonLink = 'linkIceFalls'
-
-    world.get_door('Ice Cross Bottom SE', player).dungeonLink = 'linkIceFalls2'
-    world.get_door('Ice Conveyor SW', player).dungeonLink = 'linkIceFalls2'
+    set_special_dungeon_links(world, player)
 
 
 def create_portals(world, player):
@@ -1351,10 +1346,21 @@ def create_portals(world, player):
     world.dungeon_portals[player] += dungeon_portals
 
 
+def set_special_dungeon_links(world, player):
+    world.get_door('Ice Spike Cross SE', player).dungeonLink = 'linkIceFalls'
+    world.get_door('Ice Tall Hint SE', player).dungeonLink = 'linkIceFalls'
+    world.get_door('Ice Switch Room SE', player).dungeonLink = 'linkIceFalls'
+
+    world.get_door('Ice Cross Bottom SE', player).dungeonLink = 'linkIceFalls2'
+    world.get_door('Ice Conveyor SW', player).dungeonLink = 'linkIceFalls2'
+
+
 def reset_portals(world, player):
     world.dungeon_portals[player].clear()
     world._portal_cache.clear()
     create_portals(world, player)
+    set_special_dungeon_links(world, player)
+
 
 def create_paired_doors(world, player):
     world.paired_doors[player] = [
