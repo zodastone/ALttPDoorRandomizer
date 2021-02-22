@@ -128,6 +128,8 @@ New item counter modified to show total
 
 # Bug Fixes and Notes.
 
+* 0.3.1.1-u
+	* Potion shop crash in non-keysanity
 * 0.3.1.0-u
 	* Shopsanity introduced
 	* Blind sequence restored when Blind is in Theives Town in boss shuffle
