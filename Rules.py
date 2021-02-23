@@ -180,8 +180,10 @@ def global_rules(world, player):
     set_rule(world.get_entrance('PoD Mimics 2 NW', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Bow Statue Down Ladder', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Map Balcony Drop Down', player), lambda state: state.has('Hammer', player))
-    set_rule(world.get_entrance('PoD Dark Pegs WN', player), lambda state: state.has('Hammer', player))
-    set_rule(world.get_entrance('PoD Dark Pegs Up Ladder', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('PoD Dark Pegs Hammer Path', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('PoD Dark Pegs Ladder Hammer Path', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('PoD Dark Pegs Ladder Cane Path', player), lambda state: state.has('Cane of Somaria', player))
+    set_rule(world.get_entrance('PoD Bow Statue Moving Wall Cane Path', player), lambda state: state.has('Cane of Somaria', player))
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Prize', player))
 
@@ -723,7 +725,9 @@ def no_glitches_rules(world, player):
         'PoD Callback': {'sewer': False, 'entrances': ['PoD Callback WS', 'PoD Callback Warp'], 'locations': []},
         'PoD Turtle Party': {'sewer': False, 'entrances': ['PoD Turtle Party ES', 'PoD Turtle Party NW'], 'locations': []},
         'PoD Lonely Turtle': {'sewer': False, 'entrances': ['PoD Lonely Turtle SW', 'PoD Lonely Turtle EN'], 'locations': []},
-        'PoD Dark Pegs': {'sewer': False, 'entrances': ['PoD Dark Pegs Up Ladder', 'PoD Dark Pegs WN'], 'locations': []},
+        'PoD Dark Pegs': {'sewer': False, 'entrances': ['PoD Dark Pegs Hammer Path', 'PoD Dark Pegs WN'], 'locations': []},
+        'PoD Dark Pegs Ladder': {'sewer': False, 'entrances': ['PoD Dark Pegs Up Ladder', 'PoD Dark Pegs Ladder Hammer Path', 'PoD Dark Pegs Ladder Cane Path'], 'locations': []},
+        'PoD Dark Pegs Switch': {'sewer': False, 'entrances': ['PoD Dark Pegs Switch Path'], 'locations': []},
         'PoD Dark Basement': {'sewer': False, 'entrances': ['PoD Dark Basement W Up Stairs', 'PoD Dark Basement E Up Stairs'], 'locations': ['Palace of Darkness - Dark Basement - Left', 'Palace of Darkness - Dark Basement - Right']},
         'PoD Dark Maze': {'sewer': False, 'entrances': ['PoD Dark Maze EN', 'PoD Dark Maze E'], 'locations': ['Palace of Darkness - Dark Maze - Top', 'Palace of Darkness - Dark Maze - Bottom']},
         'Eastern Dark Square': {'sewer': False, 'entrances': ['Eastern Dark Square NW', 'Eastern Dark Square Key Door WN', 'Eastern Dark Square EN'], 'locations': []},
@@ -1588,6 +1592,7 @@ def add_key_logic_rules(world, player):
                 if keys.opposite:
                     rule = or_rule(rule, create_advanced_key_rule(d_logic, player, keys.opposite))
                 add_rule(spot, rule)
+
         for location in d_logic.bk_restricted:
             if not location.forced_item:
                 forbid_item(location, d_logic.bk_name, player)
@@ -1597,6 +1602,11 @@ def add_key_logic_rules(world, player):
             add_rule(world.get_entrance(door.name, player), create_rule(d_logic.bk_name, player))
         for chest in d_logic.bk_chests:
             add_rule(world.get_location(chest.name, player), create_rule(d_logic.bk_name, player))
+    if world.retro[player]:
+        for d_name, layout in world.key_layout[player].items():
+            for door in layout.flat_prop:
+                if world.mode[player] != 'standard' or not retro_in_hc(door.entrance):
+                    add_rule(door.entrance, create_key_rule('Small Key (Universal)', player, 1))
 
 
 def retro_in_hc(spot):

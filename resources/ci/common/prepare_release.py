@@ -29,6 +29,11 @@ for dirname in ["resources","user","meta","manifests"]:
 	if os.path.isdir(dirpath):
 		os.chmod(dirpath,0o755)
 
+# nuke git files
+for git in [ os.path.join(".", ".gitattrubutes"), os.path.join(".", ".gitignore") ]:
+  if os.path.isfile(git):
+    os.remove(git)
+
 # nuke travis file if it exists
 for travis in [ os.path.join(".", ".travis.yml"), os.path.join(".", ".travis.off") ]:
   if os.path.isfile(travis):
@@ -95,7 +100,10 @@ if len(BUILD_FILENAMES) > 0:
 
 	# .zip if windows
 	# .tar.gz otherwise
-  ZIP_FILENAME = os.path.join("..","deploy",env["REPO_NAME"]) if len(BUILD_FILENAMES) > 1 else os.path.join("..","deploy",os.path.splitext(BUILD_FILENAME)[0])
+  if len(BUILD_FILENAMES) > 1:
+    ZIP_FILENAME = os.path.join("..","deploy",env["REPO_NAME"])
+  else:
+    ZIP_FILENAME = os.path.join("..","deploy",os.path.splitext(BUILD_FILENAME)[0])
   if env["OS_NAME"] == "windows":
     make_archive(ZIP_FILENAME,"zip")
     ZIP_FILENAME += ".zip"
@@ -125,3 +133,6 @@ else:
   print("No Zip to prepare: " + ZIP_FILENAME)
 
 print("Git tag:        " + env["GITHUB_TAG"])
+
+if (len(BUILD_FILENAMES) == 0) or (ZIP_FILENAME == ""):
+  exit(1)

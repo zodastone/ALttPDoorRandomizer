@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '30147375153cc57197805eddf38c2a23'
+RANDOMIZERBASEHASH = '633051ea43b6f6f971a32ed3e0a1bf5e'
 
 
 class JsonRom(object):
@@ -310,6 +310,13 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
         for patch in json.load(f):
             rom.write_bytes(patch["address"], patch["patchData"])
 
+    if world.get_dungeon("Thieves Town", player).boss.enemizer_name == "Blind":
+        rom.write_byte(0x04DE81, 0x6)  # maiden spawn
+        # restore blind spawn code
+        rom.write_bytes(0xEA081, [0xaf, 0xcc, 0xf3, 0x7e, 0xc9, 0x6, 0xf0, 0x24,
+                                  0xad, 0x3, 0x4, 0x29, 0x20, 0xf0, 0x1d])
+        rom.write_byte(0x200101, 0)  # Do not close boss room door on entry.
+
     if random_sprite_on_hit:
         _populate_sprite_table()
         sprites = list(_sprite_table.values())
@@ -518,7 +525,8 @@ class Sprite(object):
         # split into palettes of 15 colors
         return array_chunk(palette_as_colors, 15)
 
-def patch_rom(world, rom, player, team, enemized):
+
+def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     random.seed(world.rom_seeds[player])
 
     # progressive bow silver arrow hint hack
@@ -535,7 +543,7 @@ def patch_rom(world, rom, player, team, enemized):
 
         itemid = location.item.code if location.item is not None else 0x5A
 
-        if location.address is None:
+        if location.address is None or (type(location.address) is int and location.address >= 0x400000):
             continue
 
         if not location.crystal:
@@ -685,7 +693,7 @@ def patch_rom(world, rom, player, team, enemized):
     for door in world.doors:
         if door.dest is not None and isinstance(door.dest, Door) and\
              door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs,
-                                                     DoorType.Open, DoorType.StraightStairs]:
+                                                     DoorType.Open, DoorType.StraightStairs, DoorType.Ladder]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door))
     for paired_door in world.paired_doors[player]:
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
@@ -693,21 +701,32 @@ def patch_rom(world, rom, player, team, enemized):
     if world.doorShuffle[player] != 'vanilla':
 
         for builder in world.dungeon_layouts[player].values():
-            if builder.pre_open_stonewall:
-                if builder.pre_open_stonewall.name == 'Desert Wall Slide NW':
+            for stonewall in builder.pre_open_stonewalls:
+                if stonewall.name == 'Desert Wall Slide NW':
                     dr_flags |= DROptions.Open_Desert_Wall
+                elif stonewall.name == 'PoD Bow Statue Down Ladder':
+                    dr_flags |= DROptions.Open_PoD_Wall
         for name, pair in boss_indicator.items():
             dungeon_id, boss_door = pair
             opposite_door = world.get_door(boss_door, player).dest
-            if opposite_door and opposite_door.roomIndex > -1:
+            if opposite_door and isinstance(opposite_door, Door) and opposite_door.roomIndex > -1:
                 dungeon_name = opposite_door.entrance.parent_region.dungeon.name
                 dungeon_id = boss_indicator[dungeon_name][0]
                 rom.write_byte(0x13f000+dungeon_id, opposite_door.roomIndex)
             elif not opposite_door:
                 rom.write_byte(0x13f000+dungeon_id, 0)  # no supertile preceeding boss
-    rom.write_byte(0x138004, dr_flags.value)
+    if is_mystery:
+        dr_flags |= DROptions.Hide_Total
+    rom.write_byte(0x138004, dr_flags.value & 0xff)
+    rom.write_byte(0x138005, (dr_flags.value & 0xff00) >> 8)
     if dr_flags & DROptions.Town_Portal and world.mode[player] == 'inverted':
         rom.write_byte(0x138006, 1)
+
+    # swap in non-ER Lobby Shuffle Inverted - but only then
+    if world.mode[player] == 'inverted' and world.intensity[player] >= 3 and world.doorShuffle[player] != 'vanilla' and world.shuffle[player] == 'vanilla':
+        aga_portal = world.get_portal('Agahnims Tower', player)
+        gt_portal = world.get_portal('Ganons Tower', player)
+        aga_portal.exit_offset, gt_portal.exit_offset = gt_portal.exit_offset, aga_portal.exit_offset
 
     for portal in world.dungeon_portals[player]:
         if not portal.default:
@@ -743,14 +762,27 @@ def patch_rom(world, rom, player, team, enemized):
     def credits_digit(num):
         # top: $54 is 1, 55 2, etc , so 57=4, 5C=9
         # bot: $7A is 1, 7B is 2, etc so 7D=4, 82=9 (zero unknown...)
-        return 0x53+num, 0x79+num
+        return 0x53+int(num), 0x79+int(num)
+
+    credits_total = 216
+    if world.keydropshuffle[player]:
+        credits_total += 33
+    if world.shopsanity[player]:
+        credits_total += 32
+    if world.retro[player]:
+        credits_total += 9 if world.shopsanity[player] else 5
 
     if world.keydropshuffle[player]:
         rom.write_byte(0x140000, 1)
-        rom.write_byte(0x187010, 249)  # dynamic credits
+    multiClientFlags = ((0x1 if world.keydropshuffle[player] else 0) | (0x2 if world.shopsanity[player] else 0)
+                        | (0x4 if world.retro[player] else 0))
+    rom.write_byte(0x140001, multiClientFlags)
+
+    write_int16(rom, 0x187010, credits_total)  # dynamic credits
+    if credits_total != 216:
         # collection rate address: 238C37
-        mid_top, mid_bot = credits_digit(4)
-        last_top, last_bot = credits_digit(9)
+        mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
+        last_top, last_bot = credits_digit(credits_total % 10)
         # top half
         rom.write_byte(0x118C53, mid_top)
         rom.write_byte(0x118C54, last_top)
@@ -913,8 +945,6 @@ def patch_rom(world, rom, player, team, enemized):
 
     if difficulty.progressive_bow_limit < 2 and world.swords == 'swordless':
         rom.write_bytes(0x180098, [2, overflow_replacement])
-        rom.write_byte(0x180181, 0x01) # Make silver arrows work only on ganon
-        rom.write_byte(0x180182, 0x00) # Don't auto equip silvers on pickup
 
     # set up game internal RNG seed
     for i in range(1024):
@@ -1502,28 +1532,30 @@ def patch_race_rom(rom):
         RaceRom.encrypt(rom)
 
 def write_custom_shops(rom, world, player):
-    shops = [shop for shop in world.shops if shop.custom and shop.region.player == player]
+    shops = [shop for shop in world.shops[player] if shop.custom and shop.region.player == player]
 
     shop_data = bytearray()
     items_data = bytearray()
-    sram_offset = 0
 
     for shop_id, shop in enumerate(shops):
         if shop_id == len(shops) - 1:
             shop_id = 0xFF
         bytes = shop.get_bytes()
         bytes[0] = shop_id
-        bytes[-1] = sram_offset
-        if shop.type == ShopType.TakeAny:
-            sram_offset += 1
-        else:
-            sram_offset += shop.item_count
+        bytes[-1] = shop.sram_address
         shop_data.extend(bytes)
-        # [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high]
-        for item in shop.inventory:
+        # [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high][player][sram]
+        for index, item in enumerate(shop.inventory):
             if item is None:
                 break
-            item_data = [shop_id, ItemFactory(item['item'], player).code] + int16_as_bytes(item['price']) + [item['max'], ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF] + int16_as_bytes(item['replacement_price'])
+            if world.shopsanity[player] or shop.type == ShopType.TakeAny:
+                rom.write_byte(0x186560 + shop.sram_address + index, 1)
+            item_id = ItemFactory(item['item'], player).code
+            price = int16_as_bytes(item['price'])
+            replace = ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF
+            replace_price = int16_as_bytes(item['replacement_price'])
+            item_player = 0 if item['player'] == player else item['player']
+            item_data = [shop_id,  item_id] + price + [item['max'], replace] + replace_price + [item_player]
             items_data.extend(item_data)
 
     rom.write_bytes(0x184800, shop_data)
@@ -2091,8 +2123,9 @@ def set_inverted_mode(world, player, rom):
     if world.shuffle[player] == 'vanilla':
         rom.write_byte(0xDBB73 + 0x23, 0x37)  # switch AT and GT
         rom.write_byte(0xDBB73 + 0x36, 0x24)
-        write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
-        write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
+        if world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
+            write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
+            write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
         rom.write_byte(0x15B8C, 0x6C)
         rom.write_byte(0xDBB73 + 0x00, 0x53)  # switch bomb shop and links house
