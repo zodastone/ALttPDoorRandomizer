@@ -1,6 +1,7 @@
 from tkinter import ttk, filedialog, messagebox, StringVar, Button, Entry, Frame, Label, E, W, LEFT, RIGHT, X, BOTTOM
 from AdjusterMain import adjust
 from argparse import Namespace
+from source.classes.Empty import Empty
 from source.classes.SpriteSelector import SpriteSelector
 import source.gui.widgets as widgets
 import json
@@ -44,49 +45,101 @@ def adjust_page(top, parent, settings):
 
     # Sprite Selection
     # This one's more-complicated, build it and stuff it
-    self.spriteNameVar2 = StringVar()
-    spriteDialogFrame2 = Frame(self.frames["leftAdjustFrame"])
-    baseSpriteLabel2 = Label(spriteDialogFrame2, text='Sprite:')
-    spriteEntry2 = Label(spriteDialogFrame2, textvariable=self.spriteNameVar2)
+    # widget ID
+    widget = "sprite"
+
+    # Empty object
+    self.widgets[widget] = Empty()
+    # pieces
+    self.widgets[widget].pieces = {}
+
+    # frame
+    self.widgets[widget].pieces["frame"] = Frame(self.frames["leftAdjustFrame"])
+    # frame: label
+    self.widgets[widget].pieces["frame"].label = Label(self.widgets[widget].pieces["frame"], text='Sprite: ')
+    # spritename: label
+    self.widgets[widget].pieces["frame"].spritename = Label(self.widgets[widget].pieces["frame"], text='(unchanged)')
+    # storage var
+    self.widgets[widget].storageVar = StringVar()
+    self.widgets[widget].storageVar.set(settings["sprite"])
+
+		# store sprite
     self.sprite = None
 
     def set_sprite(sprite_param, random_sprite=False):
+        top.randomSprite.set(random_sprite)
+
+        widget = "sprite"
+        sprite = {}
+        sprite["object"] = sprite_param
+        sprite["label"] = {
+          "show": "(unchanged)",
+          "store": "(unchanged)"
+        }
         if sprite_param is None or not sprite_param.valid:
             self.sprite = None
-            self.spriteNameVar2.set('(unchanged)')
         else:
             self.sprite = sprite_param
-            self.spriteNameVar2.set(self.sprite.name)
-        top.randomSprite.set(random_sprite)
+            sprite["label"]["store"] = sprite_param.name
+            sprite["label"]["show"] = sprite_param.name if not random_sprite else "(random)"
+        self.widgets[widget].storageVar.set(sprite["label"]["store"])
+        self.widgets[widget].pieces["frame"].spritename.config(text=sprite["label"]["show"])
+
+        print(top.randomSprite.get(),sprite["label"])
 
     def SpriteSelectAdjuster():
         SpriteSelector(parent, set_sprite, adjuster=True)
 
-    spriteSelectButton2 = Button(spriteDialogFrame2, text='...', command=SpriteSelectAdjuster)
+    # dialog button
+    self.widgets[widget].pieces["button"] = Button(self.widgets[widget].pieces["frame"], text='...', command=SpriteSelectAdjuster)
 
-    baseSpriteLabel2.pack(side=LEFT)
-    spriteEntry2.pack(side=LEFT)
-    spriteSelectButton2.pack(side=LEFT)
-    spriteDialogFrame2.pack(anchor=E)
+    # frame label: pack
+    self.widgets[widget].pieces["frame"].label.pack(side=LEFT)
+    # spritename: pack
+    self.widgets[widget].pieces["frame"].spritename.pack(side=LEFT)
+    # button: pack
+    self.widgets[widget].pieces["button"].pack(side=LEFT)
+    # frame: pack
+    self.widgets[widget].pieces["frame"].pack(anchor=E)
 
+    self.frames["adjustrom"] = Frame(self.frames["bottomAdjustFrame"])
+    self.frames["adjustrom"].pack(anchor=W, fill=X)
     # Path to game file to Adjust
     # This one's more-complicated, build it and stuff it
-    adjustRomFrame = Frame(self.frames["bottomAdjustFrame"])
-    adjustRomLabel = Label(adjustRomFrame, text='Rom to adjust: ')
-    self.romVar2 = StringVar(value=settings["rom"])
-    romEntry2 = Entry(adjustRomFrame, textvariable=self.romVar2)
+    # widget ID
+    widget = "adjustrom"
 
-    def RomSelect2():
-        rom = filedialog.askopenfilename(filetypes=[("Rom Files", (".sfc", ".smc")), ("All Files", "*")])
-        if rom:
-            settings["rom"] = rom
-            self.romVar2.set(rom)
-    romSelectButton2 = Button(adjustRomFrame, text='Select Rom', command=RomSelect2)
+    # Empty object
+    self.widgets[widget] = Empty()
+    # pieces
+    self.widgets[widget].pieces = {}
 
-    adjustRomLabel.pack(side=LEFT)
-    romEntry2.pack(side=LEFT, fill=X, expand=True)
-    romSelectButton2.pack(side=LEFT)
-    adjustRomFrame.pack(fill=X)
+    # frame
+    self.widgets[widget].pieces["frame"] = Frame(self.frames["adjustrom"])
+    # frame: label
+    self.widgets[widget].pieces["frame"].label = Label(self.widgets[widget].pieces["frame"], text='Rom to Adjust: ')
+    # storage var
+    self.widgets[widget].storageVar = StringVar()
+    # textbox
+    self.widgets[widget].pieces["textbox"] = Entry(self.widgets[widget].pieces["frame"], textvariable=self.widgets[widget].storageVar)
+    self.widgets[widget].storageVar.set(settings["rom"])
+
+    # FIXME: Translate these
+    def RomSelect():
+        widget = "adjustrom"
+        rom = filedialog.askopenfilename(filetypes=[("Rom Files", (".sfc", ".smc")), ("All Files", "*")], initialdir=os.path.join("."))
+        self.widgets[widget].storageVar.set(rom)
+    # dialog button
+    self.widgets[widget].pieces["button"] = Button(self.widgets[widget].pieces["frame"], text='Select Rom', command=RomSelect)
+
+    # frame label: pack
+    self.widgets[widget].pieces["frame"].label.pack(side=LEFT)
+    # textbox: pack
+    self.widgets[widget].pieces["textbox"].pack(side=LEFT, fill=X, expand=True)
+    # button: pack
+    self.widgets[widget].pieces["button"].pack(side=LEFT)
+    # frame: pack
+    self.widgets[widget].pieces["frame"].pack(fill=X)
 
     # These are the options to Adjust
     def adjustRom():

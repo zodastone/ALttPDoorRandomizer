@@ -65,6 +65,7 @@ def generation_page(parent,settings):
 
     # FIXME: Translate these
     def RomSelect():
+        widget = "rom"
         rom = filedialog.askopenfilename(filetypes=[("Rom Files", (".sfc", ".smc")), ("All Files", "*")], initialdir=os.path.join("."))
         self.widgets[widget].storageVar.set(rom)
     # dialog button
@@ -94,7 +95,6 @@ def generation_page(parent,settings):
     self.frames["diags"].pack()
     self.widgets[widget].pieces["frame"] = Frame(self.frames["diags"])
 
-
     def diags():
         # Debugging purposes
         dims = {
@@ -106,7 +106,7 @@ def generation_page(parent,settings):
                 "width": 120,
                 "height": 50
             }
-		    }
+        }
         diag = Tk()
         diag.title("Door Shuffle " + __version__)
         diag.geometry(str(dims["window"]["width"]) + 'x' + str(dims["window"]["height"]))
