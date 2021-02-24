@@ -1,6 +1,7 @@
 from tkinter import ttk, StringVar, Button, Entry, Frame, Label, E, W, LEFT, RIGHT
 from functools import partial
-import source.classes.SpriteSelector as spriteSelector
+from source.classes.Empty import Empty
+from source.classes.SpriteSelector import SpriteSelector
 import source.gui.widgets as widgets
 import json
 import os
@@ -39,46 +40,79 @@ def gameoptions_page(top, parent):
                     packAttrs["anchor"] = W
                 self.widgets[key].pack(packAttrs)
 
-    ## Sprite selection
+    # Sprite Selection
     # This one's more-complicated, build it and stuff it
-    spriteDialogFrame = Frame(self.frames["leftRomOptionsFrame"])
-    baseSpriteLabel = Label(spriteDialogFrame, text='Sprite:')
+    # widget ID
+    widget = "sprite"
 
-    self.widgets["sprite"] = {}
-    self.widgets["sprite"]["spriteObject"] = None
-    self.widgets["sprite"]["spriteNameVar"] = StringVar()
+    # Empty object
+    self.widgets[widget] = Empty()
+    # pieces
+    self.widgets[widget].pieces = {}
 
-    self.widgets["sprite"]["spriteNameVar"].set('(unchanged)')
-    spriteEntry = Label(spriteDialogFrame, textvariable=self.widgets["sprite"]["spriteNameVar"])
+    # frame
+    self.widgets[widget].pieces["frame"] = Frame(self.frames["leftRomOptionsFrame"])
+    # frame: label
+    self.widgets[widget].pieces["frame"].label = Label(self.widgets[widget].pieces["frame"], text='Sprite: ')
+    # spritename: label
+    self.widgets[widget].pieces["frame"].spritename = Label(self.widgets[widget].pieces["frame"], text='(unchanged)')
+    # storage var
+    self.widgets[widget].storageVar = StringVar()
 
-    def sprite_setter(spriteObject):
-        self.widgets["sprite"]["spriteObject"] = spriteObject
+    # store sprite
+    self.sprite = None
 
-    def sprite_select():
-        spriteSelector.SpriteSelector(parent, partial(set_sprite, spriteSetter=sprite_setter,
-                                                      spriteNameVar=self.widgets["sprite"]["spriteNameVar"],
-                                                      randomSpriteVar=top.randomSprite))
+    def SpriteSetter(spriteObject):
+        sprite = {}
+        sprite["object"] = spriteObject
+        sprite["label"] = {
+          "show": "(unchanged)",
+          "store": "(unchanged)"
+        }
+        sprite["label"]["store"] = sprite["object"].name
+        sprite["label"]["show"] = sprite["object"].name if not top.randomSprite.get() else "(random)"
 
-    spriteSelectButton = Button(spriteDialogFrame, text='...', command=sprite_select)
+        print(top.randomSprite.get(),sprite["label"])
 
-    baseSpriteLabel.pack(side=LEFT)
-    spriteEntry.pack(side=LEFT)
-    spriteSelectButton.pack(side=LEFT)
-    spriteDialogFrame.pack(anchor=E)
+        self.sprite = sprite["object"]
+        self.widgets[widget].pieces["frame"].spritename.config(text=sprite["label"]["show"])
+    def SpriteSelect():
+        SpriteSelector(parent, partial(set_sprite, spriteSetter=SpriteSetter,spriteNameVar=self.widgets[widget].storageVar,randomSpriteVar=top.randomSprite))
+
+    # dialog button
+    self.widgets[widget].pieces["button"] = Button(self.widgets[widget].pieces["frame"], text='...', command=SpriteSelect)
+
+    # frame label: pack
+    self.widgets[widget].pieces["frame"].label.pack(side=LEFT)
+    # spritename: pack
+    self.widgets[widget].pieces["frame"].spritename.pack(side=LEFT)
+    # button: pack
+    self.widgets[widget].pieces["button"].pack(side=LEFT)
+    # frame: pack
+    self.widgets[widget].pieces["frame"].pack(anchor=E)
 
     return self
 
-
 def set_sprite(sprite_param, random_sprite=False, spriteSetter=None, spriteNameVar=None, randomSpriteVar=None):
-    if sprite_param is None or not sprite_param.valid:
+    if randomSpriteVar:
+        randomSpriteVar.set(random_sprite)
+
+    widget = "sprite"
+    sprite = {}
+    sprite["object"] = sprite_param
+    sprite["label"] = {
+        "show": "(unchanged)",
+        "store": "(unchanged)"
+    }
+    if sprite["object"] is None or not sprite["object"].valid:
         if spriteSetter:
             spriteSetter(None)
         if spriteNameVar is not None:
-            spriteNameVar.set('(unchanged)')
+            spriteNameVar.set(sprite["store"])
     else:
         if spriteSetter:
-            spriteSetter(sprite_param)
+            spriteSetter(sprite["object"])
         if spriteNameVar is not None:
-            spriteNameVar.set(sprite_param.name)
-    if randomSpriteVar:
-        randomSpriteVar.set(random_sprite)
+            spriteNameVar.set(sprite["label"]["store"])
+        sprite["label"]["store"] = sprite["object"].name
+        sprite["label"]["show"] = sprite["object"].name if not random_sprite else "(random)"
