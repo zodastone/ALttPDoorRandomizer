@@ -170,7 +170,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has_beam_sword(player) or state.has('Beat Agahnim 1', player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
     set_rule(world.get_entrance('Agahnim 1', player), lambda state: state.has_sword(player) and state.has_key('Small Key (Agahnims Tower)', player, 2))
     set_defeat_dungeon_boss_rule(world.get_location('Agahnim 1', player))
-    set_rule(world.get_location('Castle Tower - Dark Maze', player), lambda state: state.has_key('Small Key (Agahnims Tower)', player))
+    set_rule(world.get_location('Castle Tower - Room 03', player), lambda state: state.can_kill_most_things(player, 8))
+    set_rule(world.get_location('Castle Tower - Dark Maze', player), lambda state: state.can_kill_most_things(player, 8) and state.has_key('Small Key (Agahnims Tower)', player))
     set_rule(world.get_entrance('Top of Pyramid', player), lambda state: state.has('Beat Agahnim 1', player))
     set_rule(world.get_entrance('Old Man Cave Exit (West)', player), lambda state: False)  # drop cannot be climbed up
     set_rule(world.get_entrance('Broken Bridge (West)', player), lambda state: state.has('Hookshot', player))
@@ -209,7 +210,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('East Dark World Bridge', player), lambda state: state.has_Pearl(player) and state.has('Hammer', player))
     set_rule(world.get_entrance('Lake Hylia Island Mirror Spot', player), lambda state: state.has_Pearl(player) and state.has_Mirror(player) and state.has('Flippers', player))
     set_rule(world.get_entrance('Lake Hylia Central Island Mirror Spot', player), lambda state: state.has_Mirror(player))
-    set_rule(world.get_entrance('East Dark World River Pier', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # ToDo any fake flipper set up?
+    set_rule(world.get_entrance('East Dark World River Pier', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Graveyard Ledge Mirror Spot', player), lambda state: state.has_Pearl(player) and state.has_Mirror(player))
     set_rule(world.get_entrance('Bumper Cave Entrance Rock', player), lambda state: state.has_Pearl(player) and state.can_lift_rocks(player))
     set_rule(world.get_entrance('Bumper Cave Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -274,6 +275,10 @@ def global_rules(world, player):
 
     for location in ['Desert Palace - Boss', 'Desert Palace - Big Key Chest', 'Desert Palace - Compass Chest']:
         forbid_item(world.get_location(location, player), 'Small Key (Desert Palace)', player)
+
+    # logic patch to prevent placing a crystal in Desert that's required to reach the required keys
+    if not world.keysanity:
+        add_rule(world.get_location('Desert Palace - Prize', player), lambda state: state.world.get_region('Desert Palace Main (Outer)', 1).can_reach(state))
 
     set_rule(world.get_entrance('Tower of Hera Small Key Door', player), lambda state: state.has_key('Small Key (Tower of Hera)', player) or item_name(state, 'Tower of Hera - Big Key Chest', player) == ('Small Key (Tower of Hera)', player))
     set_rule(world.get_entrance('Tower of Hera Big Key Door', player), lambda state: state.has('Big Key (Tower of Hera)', player))
@@ -346,8 +351,7 @@ def global_rules(world, player):
     # you can squander the free small key from the pot by opening the south door to the north west switch room, locking you out of accessing a color switch ...
     # big key gives backdoor access to that from the teleporter in the north west
     set_rule(world.get_location('Misery Mire - Map Chest', player), lambda state: state.has_key('Small Key (Misery Mire)', player, 1) or state.has('Big Key (Misery Mire)', player))
-    # in addition, you can open the door to the map room before getting access to a color switch, so this is locked behing 2 small keys or the big key...
-    set_rule(world.get_location('Misery Mire - Main Lobby', player), lambda state: state.has_key('Small Key (Misery Mire)', player, 2) or state.has_key('Big Key (Misery Mire)', player))
+    set_rule(world.get_location('Misery Mire - Main Lobby', player), lambda state: state.has_key('Small Key (Misery Mire)', player, 1) or state.has_key('Big Key (Misery Mire)', player))
     # we can place a small key in the West wing iff it also contains/blocks the Big Key, as we cannot reach and softlock with the basement key door yet
     set_rule(world.get_entrance('Misery Mire (West)', player), lambda state: state.has_key('Small Key (Misery Mire)', player, 2) if ((item_name(state, 'Misery Mire - Compass Chest', player) in [('Big Key (Misery Mire)', player)]) or
                                                                                                                  (item_name(state, 'Misery Mire - Big Key Chest', player) in [('Big Key (Misery Mire)', player)])) else state.has_key('Small Key (Misery Mire)', player, 3))
@@ -414,14 +418,14 @@ def global_rules(world, player):
     else:
         forbid_item(world.get_location('Ganons Tower - Map Chest', player), 'Small Key (Ganons Tower)', player)
 
-    # It is possible to need more than 2 keys to get through this entance if you spend keys elsewhere. We reflect this in the chest requirements.
+    # It is possible to need more than 2 keys to get through this entrance if you spend keys elsewhere. We reflect this in the chest requirements.
     # However we need to leave these at the lower values to derive that with 3 keys it is always possible to reach Bob and Ice Armos.
     set_rule(world.get_entrance('Ganons Tower (Double Switch Room)', player), lambda state: state.has_key('Small Key (Ganons Tower)', player, 2))
     # It is possible to need more than 3 keys ....
     set_rule(world.get_entrance('Ganons Tower (Firesnake Room)', player), lambda state: state.has_key('Small Key (Ganons Tower)', player, 3))
 
     #The actual requirements for these rooms to avoid key-lock
-    set_rule(world.get_location('Ganons Tower - Firesnake Room', player), lambda state: state.has_key('Small Key (Ganons Tower)', player, 3) or (item_in_locations(state, 'Big Key (Ganons Tower)', player, zip(randomizer_room_chests, [player] * len(randomizer_room_chests))) and state.has_key('Small Key (Ganons Tower)', player, 2)))
+    set_rule(world.get_location('Ganons Tower - Firesnake Room', player), lambda state: state.has_key('Small Key (Ganons Tower)', player, 3) or ((item_in_locations(state, 'Big Key (Ganons Tower)', player, zip(randomizer_room_chests, [player] * len(randomizer_room_chests))) or item_in_locations(state, 'Small Key (Ganons Tower)', player, [('Ganons Tower - Firesnake Room', player)])) and state.has_key('Small Key (Ganons Tower)', player, 2)))
     for location in randomizer_room_chests:
         set_rule(world.get_location(location, player), lambda state: state.has_key('Small Key (Ganons Tower)', player, 4) or (item_in_locations(state, 'Big Key (Ganons Tower)', player, zip(randomizer_room_chests, [player] * len(randomizer_room_chests))) and state.has_key('Small Key (Ganons Tower)', player, 3)))
 
@@ -474,13 +478,14 @@ def inverted_rules(world, player):
     world.get_region('Inverted Links House', player).entrances[0].can_reach = lambda state: True
     world.get_region('Inverted Dark Sanctuary', player).entrances[0].parent_region.can_reach_private = lambda state: True
 
-    old_rule = world.get_region('Old Man House', player).can_reach_private
-    world.get_region('Old Man House', player).can_reach_private = lambda state: state.can_reach('Old Man', 'Location', player) or old_rule(state)
+    old_rule_old_man = world.get_region('Old Man House', player).can_reach_private
+    world.get_region('Old Man House', player).can_reach_private = lambda state: state.can_reach('Old Man', 'Location', player) or old_rule_old_man(state)
 
-    old_rule = world.get_region('Hyrule Castle Ledge', player).can_reach_private
-    world.get_region('Hyrule Castle Ledge', player).can_reach_private = lambda state: (state.has_Mirror(player) and state.has('Beat Agahnim 1', player) and state.can_reach_light_world(player)) or old_rule(state)
+    old_rule_castle_ledge = world.get_region('Hyrule Castle Ledge', player).can_reach_private
+    world.get_region('Hyrule Castle Ledge', player).can_reach_private = lambda state: (state.has_Mirror(player) and state.has('Beat Agahnim 1', player) and state.can_reach_light_world(player)) or old_rule_castle_ledge(state)
 
     # overworld requirements 
+    set_rule(world.get_entrance('Ice Rod Cave', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_location('Maze Race', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Mini Moldorm Cave', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Light Hype Fairy', player), lambda state: state.has_Pearl(player))
@@ -521,7 +526,7 @@ def inverted_rules(world, player):
 
     set_rule(world.get_location('Zora\'s Ledge', player), lambda state: state.has('Flippers', player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Waterfall of Wishing', player), lambda state: state.has('Flippers', player) and state.has_Pearl(player))  # can be fake flippered into, but is in weird state inside that might prevent you from doing things. Can be improved in future Todo
-    set_rule(world.get_location('Frog', player), lambda state: state.can_lift_heavy_rocks(player) or (state.can_reach('Light World', 'Region', player) and state.has_Mirror(player)))
+    set_rule(world.get_location('Frog', player), lambda state: state.can_lift_heavy_rocks(player) and (state.has_Pearl(player) or state.has('Beat Agahnim 1', player)) or (state.can_reach('Light World', 'Region', player) and state.has_Mirror(player))) # Need LW access using Mirror or Portal
     set_rule(world.get_location('Missing Smith', player), lambda state: state.has('Get Frog', player) and state.can_reach('Blacksmiths Hut', 'Region', player)) # Can't S&Q with smith
     set_rule(world.get_location('Blacksmith', player), lambda state: state.has('Return Smith', player))
     set_rule(world.get_location('Magic Bat', player), lambda state: state.has('Magic Powder', player) and state.has_Pearl(player))
@@ -571,7 +576,6 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Village of Outcasts Heavy Rock', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('East Dark World Bridge', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Lake Hylia Central Island Mirror Spot', player), lambda state: state.has_Mirror(player))
-    set_rule(world.get_entrance('East Dark World River Pier', player), lambda state: state.has('Flippers', player))  # ToDo any fake flipper set up? (Qirn Jump)
     set_rule(world.get_entrance('Bumper Cave Entrance Rock', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Bumper Cave Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Hammer Peg Area Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -663,6 +667,10 @@ def inverted_rules(world, player):
 
     for location in ['Desert Palace - Boss', 'Desert Palace - Big Key Chest', 'Desert Palace - Compass Chest']:
         forbid_item(world.get_location(location, player), 'Small Key (Desert Palace)', player)
+
+    # logic patch to prevent placing a crystal in Desert that's required to reach the required keys
+    if not world.keysanity:
+        add_rule(world.get_location('Desert Palace - Prize', player), lambda state: state.world.get_region('Desert Palace Main (Outer)', 1).can_reach(state))
 
     set_rule(world.get_entrance('Tower of Hera Small Key Door', player), lambda state: state.has_key('Small Key (Tower of Hera)', player) or item_name(state, 'Tower of Hera - Big Key Chest', player) == ('Small Key (Tower of Hera)', player))
     set_rule(world.get_entrance('Tower of Hera Big Key Door', player), lambda state: state.has('Big Key (Tower of Hera)', player))
@@ -859,13 +867,19 @@ def no_glitches_rules(world, player):
         set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
         set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))
         set_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+        add_rule(world.get_entrance('East Dark World River Pier', player), lambda state: state.has('Flippers', player))
     else:
         set_rule(world.get_entrance('Zoras River', player), lambda state: state.has_Pearl(player) and (state.has('Flippers', player) or state.can_lift_rocks(player)))
         set_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # can be fake flippered to
+        set_rule(world.get_entrance('Lake Hylia Island Pier', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # can be fake flippered to
+        set_rule(world.get_entrance('Lake Hylia Warp', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # can be fake flippered to
+        set_rule(world.get_entrance('Northeast Light World Warp', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # can be fake flippered to
         set_rule(world.get_entrance('Hobo Bridge', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
         set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has('Flippers', player))
         set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has('Flippers', player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))
         set_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: state.has('Flippers', player))
+        set_rule(world.get_entrance('East Dark World Pier', player), lambda state: state.has('Flippers', player))
+        set_rule(world.get_entrance('East Dark World River Pier', player), lambda state: state.has('Flippers', player))
 
     add_rule(world.get_entrance('Ganons Tower (Hookshot Room)', player), lambda state: state.has('Hookshot', player) or state.has_Boots(player))
     add_rule(world.get_entrance('Ganons Tower (Double Switch Room)', player), lambda state: state.has('Hookshot', player))
@@ -1308,6 +1322,7 @@ def set_big_bomb_rules(world, player):
         # -> (M and Mitts) or ((Mitts or Flute or (M and P and West Dark World access)) and BR)
         add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: (state.can_lift_heavy_rocks(player) and state.has_Mirror(player)) or ((state.can_lift_heavy_rocks(player) or state.has('Ocarina', player) or (state.can_reach('West Dark World', 'Region', player) and state.has_Pearl(player) and state.has_Mirror(player))) and basic_routes(state)))
 
+
 def set_inverted_big_bomb_rules(world, player):
     bombshop_entrance = world.get_region('Inverted Big Bomb Shop', player).entrances[0]
     Normal_LW_entrances = ['Blinds Hideout',
@@ -1325,9 +1340,7 @@ def set_inverted_big_bomb_rules(world, player):
                            'Fortune Teller (Light)',
                            'Snitch Lady (East)',
                            'Snitch Lady (West)',
-                           'Bush Covered House',
                            'Tavern (Front)',
-                           'Light World Bomb Hut',
                            'Kakariko Shop',
                            'Mini Moldorm Cave',
                            'Long Fairy Cave',
@@ -1338,7 +1351,6 @@ def set_inverted_big_bomb_rules(world, player):
                            'Bonk Rock Cave',
                            'Library',
                            'Potion Shop',
-                           'Waterfall of Wishing',
                            'Dam',
                            'Lumberjack House',
                            'Lake Hylia Fortune Teller',
@@ -1354,22 +1366,42 @@ def set_inverted_big_bomb_rules(world, player):
                            'Two Brothers House (East)',
                            'Sanctuary',
                            'Hyrule Castle Entrance (South)',
-                           'Hyrule Castle Secret Entrance Stairs']
-    LW_walkable_entrances = ['Dark Lake Hylia Ledge Fairy',
-                             'Dark Lake Hylia Ledge Spike Cave',
-                             'Dark Lake Hylia Ledge Hint',
-                             'Mire Shed',
-                             'Dark Desert Hint',
-                             'Dark Desert Fairy',
-                             'Misery Mire']
+                           'Hyrule Castle Secret Entrance Stairs',
+                           'Hyrule Castle Entrance (West)',
+                           'Hyrule Castle Entrance (East)',
+                           'Inverted Ganons Tower',
+                           'Cave 45',
+                           'Checkerboard Cave',
+                           'Inverted Big Bomb Shop']
+    Isolated_LW_entrances = ['Old Man Cave (East)',
+                             'Old Man House (Bottom)',
+                             'Old Man House (Top)',
+                             'Death Mountain Return Cave (East)',
+                             'Spectacle Rock Cave Peak',
+                             'Tower of Hera',
+                             'Death Mountain Return Cave (West)',
+                             'Paradox Cave (Top)',
+                             'Fairy Ascension Cave (Top)',
+                             'Spiral Cave',
+                             'Paradox Cave (Bottom)',
+                             'Paradox Cave (Middle)',
+                             'Hookshot Fairy',
+                             'Spiral Cave (Bottom)',
+                             'Mimic Cave',
+                             'Fairy Ascension Cave (Bottom)',
+                             'Desert Palace Entrance (West)',
+                             'Desert Palace Entrance (North)',
+                             'Desert Palace Entrance (South)']
+    Eastern_DW_entrances = ['Palace of Darkness',
+                            'Palace of Darkness Hint',
+                            'Dark Lake Hylia Fairy',
+                            'East Dark World Hint']
     Northern_DW_entrances = ['Brewery',
                              'C-Shaped House',
                              'Chest Game',
                              'Dark World Hammer Peg Cave',
-                             'Red Shield Shop',
-                             'Dark Sanctuary Hint',
+                             'Inverted Dark Sanctuary',
                              'Fortune Teller (Dark)',
-                             'Dark World Shop',
                              'Dark World Lumberjack Shop',
                              'Thieves Town',
                              'Skull Woods First Section Door',
@@ -1377,16 +1409,14 @@ def set_inverted_big_bomb_rules(world, player):
     Southern_DW_entrances = ['Hype Cave',
                              'Bonk Fairy (Dark)',
                              'Archery Game',
-                             'Inverted Big Bomb Shop',
+                             'Inverted Links House',
                              'Dark Lake Hylia Shop',
                              'Swamp Palace']
     Isolated_DW_entrances = ['Spike Cave',
                              'Cave Shop (Dark Death Mountain)',
                              'Dark Death Mountain Fairy',
-                             'Mimic Cave',
                              'Skull Woods Second Section Door (West)',
                              'Skull Woods Final Section',
-                             'Ice Palace',
                              'Turtle Rock',
                              'Dark Death Mountain Ledge (West)',
                              'Dark Death Mountain Ledge (East)',
@@ -1397,42 +1427,23 @@ def set_inverted_big_bomb_rules(world, player):
                              'Turtle Rock Isolated Ledge Entrance',
                              'Hookshot Cave Back Entrance',
                              'Inverted Agahnims Tower']
-    Isolated_LW_entrances = ['Capacity Upgrade',
-                             'Tower of Hera',
-                             'Death Mountain Return Cave (West)',
-                             'Paradox Cave (Top)',
-                             'Fairy Ascension Cave (Top)',
-                             'Spiral Cave',
-                             'Desert Palace Entrance (East)']
-    West_LW_DM_entrances = ['Old Man Cave (East)',
-                            'Old Man House (Bottom)',
-                            'Old Man House (Top)',
-                            'Death Mountain Return Cave (East)',
-                            'Spectacle Rock Cave Peak',
-                            'Spectacle Rock Cave',
-                            'Spectacle Rock Cave (Bottom)']
-    East_LW_DM_entrances = ['Paradox Cave (Bottom)',
-                            'Paradox Cave (Middle)',
-                            'Hookshot Fairy',
-                            'Spiral Cave (Bottom)']
-    Mirror_from_SDW_entrances = ['Two Brothers House (West)',
-                                 'Cave 45']
-    Castle_ledge_entrances = ['Hyrule Castle Entrance (West)',
-                              'Hyrule Castle Entrance (East)',
-                              'Inverted Ganons Tower']
-    Desert_mirrorable_ledge_entrances = ['Desert Palace Entrance (West)',
-                                         'Desert Palace Entrance (North)',
-                                         'Desert Palace Entrance (South)',
-                                         'Checkerboard Cave',]
-    Desert_ledge_entrances = ['Desert Palace Entrance (West)',
-                              'Desert Palace Entrance (North)',
-                              'Desert Palace Entrance (South)']
-    
-    set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_reach('East Dark World', 'Region', player) and state.can_reach('Inverted Big Bomb Shop', 'Region', player) and state.has('Crystal 5', player) and state.has('Crystal 6', player))
+    LW_walkable_entrances = ['Dark Lake Hylia Ledge Fairy',
+                             'Dark Lake Hylia Ledge Spike Cave',
+                             'Dark Lake Hylia Ledge Hint',
+                             'Mire Shed',
+                             'Dark Desert Hint',
+                             'Dark Desert Fairy',
+                             'Misery Mire',
+                             'Red Shield Shop']
+    LW_bush_entrances = ['Bush Covered House',
+                         'Light World Bomb Hut',
+                         'Graveyard Cave']
+    LW_inaccessible_entrances = ['Desert Palace Entrance (East)',
+                                 'Spectacle Rock Cave',
+                                 'Spectacle Rock Cave (Bottom)']
 
-    #crossing peg bridge starting from the southern dark world
-    def cross_peg_bridge(state):
-        return state.has('Hammer', player)
+    set_rule(world.get_entrance('Pyramid Fairy', player),
+             lambda state: state.can_reach('East Dark World', 'Region', player) and state.can_reach('Inverted Big Bomb Shop', 'Region', player) and state.has('Crystal 5', player) and state.has('Crystal 6', player))
 
     # Key for below abbreviations:
     # P = pearl
@@ -1440,42 +1451,66 @@ def set_inverted_big_bomb_rules(world, player):
     # H = hammer
     # M = Mirror
     # G = Glove
-    if bombshop_entrance.name in Normal_LW_entrances:
+    if bombshop_entrance.name in Eastern_DW_entrances:
+        # Just walk to the pyramid
+        pass
+    elif bombshop_entrance.name in Normal_LW_entrances:
+        # Just walk to the castle and mirror.
         add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has_Mirror(player))
-    elif bombshop_entrance.name in LW_walkable_entrances:
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute(player))
-    elif bombshop_entrance.name in Northern_DW_entrances:
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute or (state.can_lift_heavy_rocks(player) and (cross_peg_bridge(state) or (state.has_Mirror(player) and state.has('Beat Agahnim 1', player)))))
-    elif bombshop_entrance.name == 'Bumper Cave (Bottom)':
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute or (state.can_lift_heavy_rocks(player) and (cross_peg_bridge(state) or state.has_Mirror(player) and state.has('Beat Agahnim 1', player))))
-    elif bombshop_entrance.name in Southern_DW_entrances:
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: cross_peg_bridge(state) or state.can_flute(player) or (state.has_Mirror(player) and state.has('Beat Agahnim 1', player)))
-    elif bombshop_entrance.name in Isolated_DW_entrances:
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute(player))
     elif bombshop_entrance.name in Isolated_LW_entrances:
+        # For these entrances, you cannot walk to the castle/pyramid and thus must use Mirror and then Flute.
         add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute(player) and state.has_Mirror(player))
-    elif bombshop_entrance.name in West_LW_DM_entrances:
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute(player) and state.has_Mirror(player))
-    elif bombshop_entrance.name in East_LW_DM_entrances:
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute(player) and state.has_Mirror(player))
-    elif bombshop_entrance.name == 'Fairy Ascension Cave (Bottom)':
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute(player) and state.has_Mirror(player))
-    elif bombshop_entrance.name in Castle_ledge_entrances:
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has_Mirror(player))
-    elif bombshop_entrance.name in Desert_ledge_entrances:
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has_Mirror(player) and state.can_flute(player))
-    elif bombshop_entrance.name == 'Checkerboard Cave':
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has_Mirror(player))
+    elif bombshop_entrance.name in Northern_DW_entrances:
+        # You can just fly with the Flute, you can take a long walk with Mitts and Hammer,
+        # or you can leave a Mirror portal nearby and then walk to the castle to Mirror again.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute or (state.can_lift_heavy_rocks(player) and state.has('Hammer', player)) or (state.has_Mirror(player) and state.can_reach('Light World', 'Region', player)))
+    elif bombshop_entrance.name in Southern_DW_entrances:
+        # This is the same as north DW without the Mitts rock present.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has('Hammer', player) or state.can_flute(player) or (state.has_Mirror(player) and state.can_reach('Light World', 'Region', player)))
+    elif bombshop_entrance.name in Isolated_DW_entrances:
+        # There's just no way to escape these places with the bomb and no Flute.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute(player))
+    elif bombshop_entrance.name in LW_walkable_entrances:
+        # You can fly with the flute, or leave a mirror portal and walk through the light world
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute(player) or (state.has_Mirror(player) and state.can_reach('Light World', 'Region', player)))
+    elif bombshop_entrance.name in LW_bush_entrances:
+        # These entrances are behind bushes in LW so you need either Pearl or the tools to solve NDW bomb shop locations.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has_Mirror(player) and (state.can_flute(player) or state.has_Pearl(player) or (state.can_lift_heavy_rocks(player) and state.has('Hammer', player))))
+    elif bombshop_entrance.name == 'Dark World Shop':
+        # This is mostly the same as NDW but the Mirror path requires the Pearl, or using the Hammer
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute or (state.can_lift_heavy_rocks(player) and state.has('Hammer', player)) or (state.has_Mirror(player) and state.can_reach('Light World', 'Region', player) and (state.has_Pearl(player) or state.has('Hammer', player))))
+    elif bombshop_entrance.name == 'Bumper Cave (Bottom)':
+        # This is mostly the same as NDW but the Mirror path requires being able to lift a rock.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute or (state.can_lift_heavy_rocks(player) and state.has('Hammer', player)) or (state.has_Mirror(player) and state.can_lift_rocks(player) and state.can_reach('Light World', 'Region', player)))
     elif bombshop_entrance.name == 'Old Man Cave (West)':
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has_Mirror(player) and ((state.can_lift_rocks(player) and cross_peg_bridge(state)) or state.can_flute(player)))
-    elif bombshop_entrance.name == 'Graveyard Cave':
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has_Mirror(player))
-    elif bombshop_entrance.name in Mirror_from_SDW_entrances:
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has_Mirror(player) and (state.can_flute(player) or cross_peg_bridge(state)))
+        # The three paths back are Mirror and DW walk, Mirror and Flute, or LW walk and then Mirror.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has_Mirror(player) and ((state.can_lift_heavy_rocks(player) and state.has('Hammer', player)) or (state.can_lift_rocks(player) and state.has_Pearl(player)) or state.can_flute(player)))
     elif bombshop_entrance.name == 'Dark World Potion Shop':
+        # You either need to Flute to 5 or cross the rock/hammer choice pass to the south.
         add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_flute(player) or state.has('Hammer', player) or state.can_lift_rocks(player))
     elif bombshop_entrance.name == 'Kings Grave':
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_lift_heavy_rocks(player) and state.has_Mirror(player))
+        # Either lift the rock and walk to the castle to Mirror or Mirror immediately and Flute.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: (state.can_flute(player) or (state.has_Pearl(player) and state.can_lift_heavy_rocks(player))) and state.has_Mirror(player))
+    elif bombshop_entrance.name == 'Two Brothers House (West)':
+        # First you must Mirror. Then you can either Flute, cross the peg bridge, or use the Agah 1 portal to Mirror again.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: (state.can_flute(player) or state.has('Hammer', player) or state.has('Beat Agahnim 1', player)) and state.has_Mirror(player))
+    elif bombshop_entrance.name == 'Waterfall of Wishing':
+        # You absolutely must be able to swim to return it from here.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has('Flippers', player) and state.has_Pearl(player) and state.has_Mirror(player))
+    elif bombshop_entrance.name == 'Ice Palace':
+        # You can swim to the dock or use the Flute to get off the island.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has('Flippers', player) or state.can_flute(player))
+    elif bombshop_entrance.name == 'Capacity Upgrade':
+        # You must Mirror but then can use either Ice Palace return path.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: (state.has('Flippers', player) or state.can_flute(player)) and state.has_Mirror(player))
+    elif bombshop_entrance.name in LW_inaccessible_entrances:
+        # You can't get to the pyramid from these entrances without bomb duping.
+        raise Exception('No valid path to open Pyramid Fairy. (Could not route from %s)' % bombshop_entrance.name)
+    elif bombshop_entrance.name == 'Pyramid Fairy':
+        # Self locking.  The shuffles don't put the bomb shop here, but doesn't lock anything important.
+        set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: False)
+    else:
+        raise Exception('No logic found for routing from %s to the pyramid.' % bombshop_entrance.name)
 
 
 def set_bunny_rules(world, player):
