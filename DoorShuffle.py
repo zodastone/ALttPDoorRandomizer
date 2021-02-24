@@ -67,7 +67,7 @@ def link_doors_main(world, player):
         for entrance, ext in ladders:
             connect_two_way(world, entrance, ext, player)
 
-    if world.intensity[player] < 3 or world.doorShuffle == 'vanilla':
+    if world.intensity[player] < 3 or world.doorShuffle[player] == 'vanilla':
         mirror_route = world.get_entrance('Sanctuary Mirror Route', player)
         mr_door = mirror_route.door
         sanctuary = mirror_route.parent_region
@@ -397,7 +397,10 @@ def choose_portals(world, player):
 
         master_door_list = [x for x in world.doors if x.player == player and x.portalAble]
         portal_assignment = defaultdict(list)
-        for dungeon, info in info_map.items():
+        shuffled_info = list(info_map.items())
+        if cross_flag:
+            random.shuffle(shuffled_info)
+        for dungeon, info in shuffled_info:
             outstanding_portals = list(dungeon_portals[dungeon])
             hc_flag = std_flag and dungeon == 'Hyrule Castle'
             if hc_flag:
@@ -543,7 +546,7 @@ def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allo
                            bk_shuffle=False, standard=False):
     ret = [x for x in door_list if bk_shuffle or not x.bk_shuffle_req]
     if crossed:
-        ret = [x for x in ret if not x.dungeonLink or x.entrance.parent_region.dungeon.name == dungeon]
+        ret = [x for x in ret if not x.dungeonLink or x.dungeonLink == dungeon or x.dungeonLink.startswith('link')]
     else:
         ret = [x for x in ret if x.entrance.parent_region.dungeon.name == dungeon]
     if need_passage:
