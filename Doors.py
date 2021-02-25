@@ -206,7 +206,7 @@ def create_doors(world, player):
         create_door(player, 'Desert East Wing Key Door EN', Intr).dir(Ea, 0x85, Top, High).small_key().pos(1),
         create_door(player, 'Desert Compass Key Door WN', Intr).dir(We, 0x85, Top, High).small_key().pos(1),
         create_door(player, 'Desert Compass NW', Nrml).dir(No, 0x85, Right, High).trap(0x4).pos(0),
-        create_door(player, 'Desert Cannonball S', Nrml).dir(So, 0x75, Right, High).pos(1).portal(Z, 0x02),
+        create_door(player, 'Desert Cannonball S', Nrml).dir(So, 0x75, Right, High).pos(1).portal(X, 0x02),
         create_door(player, 'Desert Arrow Pot Corner S Edge', Open).dir(So, 0x75, None, High).edge(6, Z, 0x20),
         create_door(player, 'Desert Arrow Pot Corner W Edge', Open).dir(We, 0x75, None, High).edge(2, Z, 0x20),
         create_door(player, 'Desert Arrow Pot Corner NW', Intr).dir(No, 0x75, Left, High).pos(0),

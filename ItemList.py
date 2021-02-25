@@ -512,6 +512,8 @@ def set_up_shops(world, player):
                 shop.add_inventory(1, 'Small Key (Universal)', 100)
                 shop.add_inventory(2, 'Bombs (10)', 50)
             rss.locked = True
+            cap_shop = world.get_region('Capacity Upgrade', player).shop
+            cap_shop.inventory[1] = None  # remove arrow capacity upgrades in retro
 
 
 def customize_shops(world, player):
@@ -599,7 +601,7 @@ def randomize_price(price):
 def change_shop_items_to_rupees(world, player, shops):
     locations = world.get_filled_locations(player)
     for location in locations:
-        if location.item.name in shop_transfer.keys() and location.parent_region.name not in shops:
+        if location.item.name in shop_transfer.keys() and (location.parent_region.name not in shops or location.name == 'Potion Shop'):
             new_item = ItemFactory(shop_transfer[location.item.name], location.item.player)
             location.item = new_item
         if location.parent_region.name == 'Capacity Upgrade' and location.item.name in cap_blacklist:

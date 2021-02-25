@@ -128,8 +128,16 @@ New item counter modified to show total
 
 # Bug Fixes and Notes.
 
+* 0.3.1.2-u
+	* Include base ER updates
+		* Goal sign should now indicate whether Aga 2 is required or not
+		* Inverted logic fixes
+	* Potion shop (powder) item not properly replaced with rupees
+	* Removed Arrow Capacity upgrades in retro
+	* Intensity level 3 fixes courtesy of Catobat
+	* Scrolling issue in Desert Cannonball
 * 0.3.1.1-u
-	* Potion shop crash in non-keysanity
+	* Potion shop crash in non-shopsanity
 * 0.3.1.0-u
 	* Shopsanity introduced
 	* Blind sequence restored when Blind is in Theives Town in boss shuffle

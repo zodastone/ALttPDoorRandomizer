@@ -151,6 +151,7 @@ def parse_settings():
         "code": "",
         "multi": 1,
         "names": "",
+        "securerandom": False,
 
         # Hints default to TRUE
         "hints": True,
