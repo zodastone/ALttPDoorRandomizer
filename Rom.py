@@ -5,7 +5,7 @@ import json
 import hashlib
 import logging
 import os
-import random
+import RaceRandom as random
 import struct
 import sys
 import subprocess
@@ -1342,6 +1342,14 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             rom.write_byte(0x13f0f6+x, room.position(portal.door).value)
             rom.write_byte(0x13f0f7+x, room.kind(portal.door).value)
 
+    # Bitfield - enable text box to show with free roaming items
+    #
+    # ---o bmcs
+    # o - enabled for outside dungeon items
+    # b - enabled for inside big keys
+    # m - enabled for inside maps
+    # c - enabled for inside compasses
+    # s - enabled for inside small keys
     rom.write_byte(0x18016A, 0x10 | ((0x01 if world.keyshuffle[player] else 0x00)
                                      | (0x02 if world.compassshuffle[player] else 0x00)
                                      | (0x04 if world.mapshuffle[player] else 0x00)
@@ -1358,6 +1366,14 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     else:
         rom.write_byte(0x18003C, 0x00)
 
+     # Bitfield - enable free items to show up in menu
+     #
+     # ----dcba
+     # d - Compass
+     # c - Map
+     # b - Big Key
+     # a - Small Key
+     #
     rom.write_byte(0x180045, ((0x01 if world.keyshuffle[player] else 0x00)
                               | (0x02 if world.bigkeyshuffle[player] else 0x00)
                               | (0x04 if world.mapshuffle[player] else 0x00)
@@ -1459,7 +1475,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x02F539, [0xEA, 0xEA, 0xEA, 0xEA, 0xEA] if world.powder_patch_required[player] else [0xAD, 0xBF, 0x0A, 0xF0, 0x4F])
 
     # allow smith into multi-entrance caves in appropriate shuffles
-    if world.shuffle[player] in ['restricted', 'full', 'crossed', 'insanity']:
+    if world.shuffle[player] in ['restricted', 'full', 'crossed', 'insanity'] or (world.shuffle[player] == 'simple' and world.mode[player] == 'inverted'):
         rom.write_byte(0x18004C, 0x01)
 
     # set correct flag for hera basement item
@@ -1998,15 +2014,15 @@ def write_strings(rom, world, player, team):
 
     prog_bow_locs = world.find_items('Progressive Bow', player)
     distinguished_prog_bow_loc = next((location for location in prog_bow_locs if location.item.code == 0x65), None)
+    progressive_silvers = world.difficulty_requirements.progressive_bow_limit >= 2 or world.swords == 'swordless'
     if distinguished_prog_bow_loc:
         prog_bow_locs.remove(distinguished_prog_bow_loc)
-        silverarrow_hint = (' %s?' % hint_text(distinguished_prog_bow_loc).replace('Ganon\'s', 'my'))
+        silverarrow_hint = (' %s?' % hint_text(distinguished_prog_bow_loc).replace('Ganon\'s', 'my')) if progressive_silvers else '?\nI think not!'
         tt['ganon_phase_3_no_silvers'] = 'Did you find the silver arrows%s' % silverarrow_hint
 
     if any(prog_bow_locs):
-        silverarrow_hint = (' %s?' % hint_text(random.choice(prog_bow_locs)).replace('Ganon\'s', 'my'))
+        silverarrow_hint = (' %s?' % hint_text(random.choice(prog_bow_locs)).replace('Ganon\'s', 'my')) if progressive_silvers else '?\nI think not!'
         tt['ganon_phase_3_no_silvers_alt'] = 'Did you find the silver arrows%s' % silverarrow_hint
-
 
     crystal5 = world.find_items('Crystal 5', player)[0]
     crystal6 = world.find_items('Crystal 6', player)[0]
@@ -2016,7 +2032,15 @@ def write_strings(rom, world, player, team):
     tt['sahasrahla_bring_courage'] = 'I lost my family heirloom in %s' % greenpendant.hint_text
 
     tt['sign_ganons_tower'] = ('You need %d crystal to enter.' if world.crystals_needed_for_gt[player] == 1 else 'You need %d crystals to enter.') % world.crystals_needed_for_gt[player]
-    tt['sign_ganon'] = ('You need %d crystal to beat Ganon.' if world.crystals_needed_for_ganon[player] == 1 else 'You need %d crystals to beat Ganon.') % world.crystals_needed_for_ganon[player]
+
+    ganon_crystals_singular = 'You need %d crystal to beat Ganon.'
+    ganon_crystals_plural = 'You need %d crystals to beat Ganon.'
+
+    if world.goal[player] == 'ganon':
+        ganon_crystals_singular = 'To beat Ganon you must collect %d crystal and defeat his minion at the top of his tower.'
+        ganon_crystals_plural = 'To beat Ganon you must collect %d crystals and defeat his minion at the top of his tower.'
+
+    tt['sign_ganon'] = (ganon_crystals_singular if world.crystals_needed_for_ganon[player] == 1 else ganon_crystals_plural) % world.crystals_needed_for_ganon[player]
 
     if world.goal[player] in ['dungeons']:
         tt['sign_ganon'] = 'You need to complete all the dungeons.'

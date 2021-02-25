@@ -1,4 +1,4 @@
-import random
+import RaceRandom as random
 
 from BaseClasses import Dungeon
 from Bosses import BossFactory

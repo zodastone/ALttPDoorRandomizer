@@ -4,7 +4,7 @@ from itertools import zip_longest
 import json
 import logging
 import os
-import random
+import RaceRandom as random
 import time
 import zlib
 
@@ -40,6 +40,9 @@ def main(args, seed=None, fish=None):
 
     start = time.perf_counter()
 
+    if args.securerandom:
+        random.use_secure()
+
     # initialize the world
     if args.code:
         for player, code in args.code.items():
@@ -55,6 +58,9 @@ def main(args, seed=None, fish=None):
     else:
         world.seed = int(seed)
     random.seed(world.seed)
+
+    if args.securerandom:
+        world.seed = None
 
     world.remote_items = args.remote_items.copy()
     world.mapshuffle = args.mapshuffle.copy()
