@@ -206,7 +206,7 @@ def create_doors(world, player):
         create_door(player, 'Desert East Wing Key Door EN', Intr).dir(Ea, 0x85, Top, High).small_key().pos(1),
         create_door(player, 'Desert Compass Key Door WN', Intr).dir(We, 0x85, Top, High).small_key().pos(1),
         create_door(player, 'Desert Compass NW', Nrml).dir(No, 0x85, Right, High).trap(0x4).pos(0),
-        create_door(player, 'Desert Cannonball S', Nrml).dir(So, 0x75, Right, High).pos(1).portal(Z, 0x02),
+        create_door(player, 'Desert Cannonball S', Nrml).dir(So, 0x75, Right, High).pos(1).portal(X, 0x02),
         create_door(player, 'Desert Arrow Pot Corner S Edge', Open).dir(So, 0x75, None, High).edge(6, Z, 0x20),
         create_door(player, 'Desert Arrow Pot Corner W Edge', Open).dir(We, 0x75, None, High).edge(2, Z, 0x20),
         create_door(player, 'Desert Arrow Pot Corner NW', Intr).dir(No, 0x75, Left, High).pos(0),
@@ -1312,12 +1312,7 @@ def create_doors(world, player):
     # can't unlink from skull woods right now
     world.get_door('Skull 2 West Lobby S', player).dungeonLink = 'Skull Woods'
 
-    world.get_door('Ice Spike Cross SE', player).dungeonLink = 'linkIceFalls'
-    world.get_door('Ice Tall Hint SE', player).dungeonLink = 'linkIceFalls'
-    world.get_door('Ice Switch Room SE', player).dungeonLink = 'linkIceFalls'
-
-    world.get_door('Ice Cross Bottom SE', player).dungeonLink = 'linkIceFalls2'
-    world.get_door('Ice Conveyor SW', player).dungeonLink = 'linkIceFalls2'
+    set_special_dungeon_links(world, player)
 
 
 def create_portals(world, player):
@@ -1351,10 +1346,21 @@ def create_portals(world, player):
     world.dungeon_portals[player] += dungeon_portals
 
 
+def set_special_dungeon_links(world, player):
+    world.get_door('Ice Spike Cross SE', player).dungeonLink = 'linkIceFalls'
+    world.get_door('Ice Tall Hint SE', player).dungeonLink = 'linkIceFalls'
+    world.get_door('Ice Switch Room SE', player).dungeonLink = 'linkIceFalls'
+
+    world.get_door('Ice Cross Bottom SE', player).dungeonLink = 'linkIceFalls2'
+    world.get_door('Ice Conveyor SW', player).dungeonLink = 'linkIceFalls2'
+
+
 def reset_portals(world, player):
     world.dungeon_portals[player].clear()
     world._portal_cache.clear()
     create_portals(world, player)
+    set_special_dungeon_links(world, player)
+
 
 def create_paired_doors(world, player):
     world.paired_doors[player] = [
