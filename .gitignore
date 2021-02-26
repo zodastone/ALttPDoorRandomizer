@@ -25,6 +25,8 @@ weights/
 /Players/
 /QUsb2Snes/
 
+base2current.json
+
 resources/user/*
 !resources/user/.gitkeep
 

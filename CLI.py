@@ -165,10 +165,10 @@ def parse_settings():
         "ow_palettes": "default",
         "uw_palettes": "default",
 
-        # Spoiler     defaults to FALSE
+        # Spoiler     defaults to TRUE
         # Playthrough defaults to TRUE
         # ROM         defaults to TRUE
-        "create_spoiler": False,
+        "create_spoiler": True,
         "calc_playthrough": True,
         "create_rom": True,
         "usestartinventory": False,

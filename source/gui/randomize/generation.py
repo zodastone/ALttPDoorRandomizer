@@ -66,7 +66,7 @@ def generation_page(parent,settings):
     # FIXME: Translate these
     def RomSelect():
         rom = filedialog.askopenfilename(filetypes=[("Rom Files", (".sfc", ".smc")), ("All Files", "*")], initialdir=os.path.join("."))
-        self.widgets[widget].storageVar.set(rom)
+        self.widgets["rom"].storageVar.set(rom)
     # dialog button
     self.widgets[widget].pieces["button"] = Button(self.widgets[widget].pieces["frame"], text='Select Rom', command=RomSelect)
 
