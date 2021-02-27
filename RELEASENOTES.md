@@ -128,6 +128,10 @@ New item counter modified to show total
 
 # Bug Fixes and Notes.
 
+* 0.3.1.4-u
+	* Fix for Blind when shuffled to TT and another dungeon
+	* Remove use of RaceRandom
+	* Minor update to GameType field
 * 0.3.1.3-u
 	* Fix for the Rom field on the GUI
 * 0.3.1.2-u

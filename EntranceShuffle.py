@@ -1,4 +1,4 @@
-import RaceRandom as random
+import random
 
 # ToDo: With shuffle_ganon option, prevent gtower from linking to an exit only location through a 2 entrance cave.
 from collections import defaultdict

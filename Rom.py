@@ -5,7 +5,7 @@ import json
 import hashlib
 import logging
 import os
-import RaceRandom as random
+import random
 import struct
 import sys
 import subprocess
@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '633051ea43b6f6f971a32ed3e0a1bf5e'
+RANDOMIZERBASEHASH = '2a9cd9b95c0ad118a3d58a77b7197eab'
 
 
 class JsonRom(object):
@@ -312,8 +312,10 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
 
     if world.get_dungeon("Thieves Town", player).boss.enemizer_name == "Blind":
         rom.write_byte(0x04DE81, 0x6)  # maiden spawn
-        # restore blind spawn code
-        rom.write_bytes(0xEA081, [0xaf, 0xcc, 0xf3, 0x7e, 0xc9, 0x6, 0xf0, 0x24,
+        # restore blind spawn code - necessary because the old enemizer clobbers this stuff
+        # this line could be commented out if ijwu's enemizer is used exclusively
+        # if keeping this line, note the jump to the dr_baserom's enemizer section
+        rom.write_bytes(0xEA081, [0x5c, 0x00, 0x80, 0xb7, 0xc9, 0x6, 0xf0, 0x24,
                                   0xad, 0x3, 0x4, 0x29, 0x20, 0xf0, 0x1d])
         rom.write_byte(0x200101, 0)  # Do not close boss room door on entry.
 
@@ -1119,11 +1121,11 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x180213, [0x00, 0x01]) # Not a Tournament Seed
 
     gametype = 0x04 # item
-    if world.shuffle[player] != 'vanilla':
-        gametype |= 0x02 # entrance
+    if world.shuffle[player] != 'vanilla' or world.doorShuffle[player] != 'vanilla' or world.keydropshuffle[player]:
+        gametype |= 0x02  # entrance/door
     if enemized:
-        gametype |= 0x01 # enemizer
-    rom.write_byte(0x180211, gametype) # Game type
+        gametype |= 0x01  # enemizer
+    rom.write_byte(0x180211, gametype)  # Game type
 
     # assorted fixes
     rom.write_byte(0x1800A2, 0x01)  # remain in real dark world when dying in dark world dungeon before killing aga1

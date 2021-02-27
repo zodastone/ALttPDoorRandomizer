@@ -3,7 +3,7 @@ import argparse
 import hashlib
 import logging
 import os
-import RaceRandom as random
+import random
 import time
 import sys
 
