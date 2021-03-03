@@ -604,6 +604,25 @@ def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, r
                 pool.extend(['Small Key (Universal)'])
         else:
             pool.extend(['Small Key (Universal)'])
+
+    if futuro:
+        magic_count = 0
+        bomb_count = 0
+        for item in pool:
+            if item == 'Magic Upgrade (1/2)':
+                magic_count += 1
+            if item == 'Bomb Upgrade (+10)':
+                bomb_count += 1
+        if magic_count == 0:
+            pool.append('Magic Upgrade (1/2)')
+        if 'Magic Upgrade (1/4)' not in pool and magic_count < 2:
+            pool.append('Magic Upgrade (1/2)')
+        if bomb_count == 0:
+            pool.append('Bomb Upgrade (+10)')
+            pool.append('Bomb Upgrade (+10)')
+        elif bomb_count == 1:
+            pool.append('Bomb Upgrade (+10)')
+    
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms)
 
 def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, futuro, customitemarray):

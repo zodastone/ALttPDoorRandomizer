@@ -92,6 +92,9 @@ class World(object):
                 self.retro[player] = True
             def set_player_attr(attr, val):
                 self.__dict__.setdefault(attr, {})[player] = val
+            # Futuro doesn't support standard start
+            if self.futuro[player] and self.mode[player] == "standard":
+                self.mode[player] == "open" 
             set_player_attr('_region_cache', {})
             set_player_attr('player_names', [])
             set_player_attr('remote_items', False)
@@ -451,6 +454,9 @@ class World(object):
         return False
 
 
+# Items to test for ability to use magic in has()
+magic_items = ['Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Cane of Somaria', 'Cane of Byrna', 'Cape']
+
 class CollectionState(object):
 
     def __init__(self, parent):
@@ -597,6 +603,9 @@ class CollectionState(object):
         return True
 
     def has(self, item, player, count=1):
+        if self.world.futuro[player]:
+            if item in magic_items and self.prog_items['Magic Upgrade (1/2)', player] == 0 and self.prog_items['Magic Upgrade (1/4)', player] == 0:
+                return False
         if count == 1:
             return (item, player) in self.prog_items
         return self.prog_items[item, player] >= count
@@ -650,11 +659,17 @@ class CollectionState(object):
         return self.has('Titans Mitts', player)
 
     def can_extend_magic(self, player, smallmagic=16, fullrefill=False): #This reflects the total magic Link has, not the total extra he has.
-        basemagic = 8
         if self.has('Magic Upgrade (1/4)', player):
             basemagic = 32
         elif self.has('Magic Upgrade (1/2)', player):
             basemagic = 16
+        else:
+            basemagic = 8
+        if self.world.futuro[player]:
+            if basemagic == 8:
+                basemagic = 0
+            else:
+                basemagic = int(basemagic/2)
         if self.can_buy_unlimited('Green Potion', player) or self.can_buy_unlimited('Blue Potion', player):
             if self.world.difficulty_adjustments[player] == 'hard' and not fullrefill:
                 basemagic = basemagic + int(basemagic * 0.5 * self.bottle_count(player))
@@ -670,7 +685,23 @@ class CollectionState(object):
                 or (self.has('Cane of Byrna', player) and (enemies < 6 or self.can_extend_magic(player)))
                 or self.can_shoot_arrows(player)
                 or self.has('Fire Rod', player)
+                or (self.can_use_bombs(player) and enemies < 6)
                )
+
+    def can_use_bombs(self, player):
+        return (self.has('Bomb Upgrade (+10)', player) or not self.world.futuro[player])
+
+    def can_hit_switch(self, player):
+        return (self.can_use_bombs(player)
+                or self.can_shoot_arrows(player)
+                or self.has_blunt_weapon(player)
+                or self.has('Blue Boomerang', player)
+                or self.has('Red Boomerang', player)
+                or self.has('Hookshot', player)
+                or self.has('Fire Rod', player)
+                or self.has('Ice Rod', player)
+                or self.has('Cane of Somaria', player)
+                or self.has('Cane of Byrna', player))
 
     def can_shoot_arrows(self, player):
         if self.world.retro[player]:
