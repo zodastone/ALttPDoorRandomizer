@@ -6,7 +6,6 @@ import textwrap
 import shlex
 import sys
 
-import source.classes.constants as CONST
 from source.classes.BabelFish import BabelFish
 
 from Utils import update_deprecated_args
