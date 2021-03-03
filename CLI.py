@@ -28,9 +28,14 @@ def parse_cli(argv, no_defaults=False):
     fish = BabelFish(lang=lang)
 
     # we need to know how many players we have first
+    # also if we're loading our own settings file, we should do that now
     parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--settingsfile', help="input json file of settings", type=str)
     parser.add_argument('--multi', default=defval(settings["multi"]), type=lambda value: min(max(int(value), 1), 255))
     multiargs, _ = parser.parse_known_args(argv)
+
+    if multiargs.settingsfile:
+        settings = apply_settings_file(settings, multiargs.settingsfile)
 
     parser = argparse.ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 
@@ -72,6 +77,7 @@ def parse_cli(argv, no_defaults=False):
     parser.add_argument('--beemizer', default=defval(settings["beemizer"]), type=lambda value: min(max(int(value), 0), 4))
     parser.add_argument('--multi', default=defval(settings["multi"]), type=lambda value: min(max(int(value), 1), 255))
     parser.add_argument('--teams', default=defval(1), type=lambda value: max(int(value), 1))
+    parser.add_argument('--settingsfile', dest="filename", help="input json file of settings", type=str)
 
     if multiargs.multi:
         for player in range(1, multiargs.multi + 1):
@@ -101,6 +107,15 @@ def parse_cli(argv, no_defaults=False):
                     getattr(ret, name)[player] = value
 
     return ret
+
+
+def apply_settings_file(settings, settings_path):
+    if os.path.exists(settings_path):
+        with open(settings_path) as json_file:
+            data = json.load(json_file)
+            for k, v in data.items():
+                settings[k] = v
+    return settings
 
 
 def parse_settings():
@@ -262,11 +277,7 @@ def parse_settings():
 
     # read saved settings file if it exists and set these
     settings_path = os.path.join(".", "resources", "user", "settings.json")
-    if os.path.exists(settings_path):
-        with(open(settings_path)) as json_file:
-            data = json.load(json_file)
-            for k, v in data.items():
-                settings[k] = v
+    settings = apply_settings_file(settings, settings_path)
     return settings
 
 # Priority fallback is:
