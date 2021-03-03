@@ -19,7 +19,7 @@ from RoomData import Room
 class World(object):
 
     def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
-                 timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
+                 timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, futuro, custom, customitemarray, hints):
         self.players = players
         self.teams = 1
         self.shuffle = shuffle.copy()
@@ -61,6 +61,7 @@ class World(object):
         self.shuffle_ganon = shuffle_ganon
         self.fix_gtower_exit = self.shuffle_ganon
         self.retro = retro.copy()
+        self.futuro = futuro.copy()
         self.custom = custom
         self.customitemarray = customitemarray
         self.can_take_damage = True
@@ -1913,6 +1914,7 @@ class Spoiler(object):
                          'logic': self.world.logic,
                          'mode': self.world.mode,
                          'retro': self.world.retro,
+                         'futuro': self.world.futuro,
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'shuffle': self.world.shuffle,
@@ -1976,6 +1978,7 @@ class Spoiler(object):
                 outfile.write('Logic:                           %s\n' % self.metadata['logic'][player])
                 outfile.write('Mode:                            %s\n' % self.metadata['mode'][player])
                 outfile.write('Retro:                           %s\n' % ('Yes' if self.metadata['retro'][player] else 'No'))
+                outfile.write('Futuro:                          %s\n' % ('Yes' if self.metadata['futuro'][player] else 'No'))
                 outfile.write('Swords:                          %s\n' % self.metadata['weapons'][player])
                 outfile.write('Goal:                            %s\n' % self.metadata['goal'][player])
                 outfile.write('Difficulty:                      %s\n' % self.metadata['item_pool'][player])

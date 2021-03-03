@@ -210,6 +210,10 @@
     "action": "store_true",
     "type": "bool"
   },
+  "futuro": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "startinventory": {},
   "usestartinventory": {
     "type": "bool"

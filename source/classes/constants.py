@@ -56,6 +56,7 @@ SETTINGSTOPROCESS = {
   "randomizer": {
     "item": {
       "retro": "retro",
+      "futuro": "futuro",
       "worldstate": "mode",
       "logiclevel": "logic",
       "goal": "goal",
