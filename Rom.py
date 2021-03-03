@@ -1295,7 +1295,7 @@ def patch_rom(world, rom, player, team, enemized):
     if world.futuro[player]:
         rom.write_byte(0x18008D, 0x00)
     else:
-        rom.write_byte(0x18008E, 0x01)
+        rom.write_byte(0x18008D, 0x01)
 
     equip[0x343] = min(equip[0x343], starting_max_bombs)
     rom.write_byte(0x180034, starting_max_bombs)
