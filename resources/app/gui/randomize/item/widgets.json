@@ -1,6 +1,7 @@
 {
   "checkboxes": {
-    "retro": { "type": "checkbox" }
+    "retro": { "type": "checkbox" },
+    "futuro": { "type": "checkbox" }
   },
   "leftItemFrame": {
     "worldstate": {

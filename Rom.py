@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '30147375153cc57197805eddf38c2a23'
+RANDOMIZERBASEHASH = '8350a310f10293f2ef2b84305bad489e'
 
 
 class JsonRom(object):
@@ -1293,9 +1293,9 @@ def patch_rom(world, rom, player, team, enemized):
 
     # Set basepatch switches for the futuro mode
     if world.futuro[player]:
-        rom.write_byte(0x18008D, 0x00)
-    else:
         rom.write_byte(0x18008D, 0x01)
+    else:
+        rom.write_byte(0x18008D, 0x00)
 
     equip[0x343] = min(equip[0x343], starting_max_bombs)
     rom.write_byte(0x180034, starting_max_bombs)

@@ -34,3 +34,5 @@ get-pip.py
 
 venv
 test
+*.zspr
+data/base2current.json
