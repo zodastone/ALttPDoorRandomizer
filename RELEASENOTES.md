@@ -128,6 +128,8 @@ New item counter modified to show total
 
 # Bug Fixes and Notes.
 
+* 0.3.1.5-u
+	* Ganon hints fixed for shops
 * 0.3.1.4-u
 	* Fix for Blind when shuffled to TT and another dungeon
 	* Remove use of RaceRandom
