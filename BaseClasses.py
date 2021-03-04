@@ -685,8 +685,7 @@ class CollectionState(object):
                 or (self.has('Cane of Byrna', player) and (enemies < 6 or self.can_extend_magic(player)))
                 or self.can_shoot_arrows(player)
                 or self.has('Fire Rod', player)
-                or (self.can_use_bombs(player) and enemies < 6)
-               )
+                )
 
     def can_use_bombs(self, player):
         return (self.has('Bomb Upgrade (+10)', player) or not self.world.futuro[player])
