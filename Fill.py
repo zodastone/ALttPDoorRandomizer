@@ -1,4 +1,4 @@
-import RaceRandom as random
+import random
 import logging
 
 from BaseClasses import CollectionState

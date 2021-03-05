@@ -128,12 +128,18 @@ New item counter modified to show total
 
 # Bug Fixes and Notes.
 
+* 0.3.1.4-u
+	* Fix for Blind when shuffled to TT and another dungeon
+	* Remove use of RaceRandom
+	* Minor update to GameType field
+* 0.3.1.3-u
+	* Fix for the Rom field on the GUI
 * 0.3.1.2-u
 	* Include base ER updates
 		* Goal sign should now indicate whether Aga 2 is required or not
 		* Inverted logic fixes
-	* Potion shop (powder) item not properly replaced with rupees
-	* Removed Arrow Capacity upgrades in retro
+	* Potion shop (powder) item now properly replaced with rupees
+	* Removed Arrow Capacity upgrades in retro (non-shopsanity)
 	* Intensity level 3 fixes courtesy of Catobat
 	* Scrolling issue in Desert Cannonball
 * 0.3.1.1-u

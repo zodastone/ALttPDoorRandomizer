@@ -2,7 +2,6 @@ from collections import namedtuple
 import logging
 import math
 import random
-import RaceRandom as random
 
 from BaseClasses import Region, RegionType, Shop, ShopType, Location
 from Bosses import place_bosses

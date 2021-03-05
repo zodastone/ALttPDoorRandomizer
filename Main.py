@@ -4,7 +4,7 @@ from itertools import zip_longest
 import json
 import logging
 import os
-import RaceRandom as random
+import random
 import time
 import zlib
 
@@ -26,7 +26,7 @@ from Fill import sell_potions, sell_keys, balance_multiworld_progression, balanc
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.3.1.2-u'
+__version__ = '0.3.1.4-u'
 
 
 class EnemizerError(RuntimeError):
@@ -40,8 +40,8 @@ def main(args, seed=None, fish=None):
 
     start = time.perf_counter()
 
-    if args.securerandom:
-        random.use_secure()
+    # if args.securerandom:
+    #     random.use_secure()
 
     # initialize the world
     if args.code:
