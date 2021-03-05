@@ -176,6 +176,11 @@ def global_rules(world, player):
     set_defeat_dungeon_boss_rule(world.get_location('Agahnim 1', player))
 
     set_rule(world.get_entrance('PoD Arena Bonk Path', player), lambda state: state.has_Boots(player))
+    for entrance in ['PoD Warp Hint SE', 'PoD Jelly Hall NW', 'PoD Jelly Hall NE', 'PoD Mimics 1 SW']:
+        set_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player))
+    for entrance in ['PoD Pit Room Bomb Hole', 'PoD Map Balcony WS', 'PoD Arena Ledge ES', 'PoD Dark Maze E', 'PoD Big Chest Balcony W']:
+        set_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player))
+
     set_rule(world.get_entrance('PoD Mimics 1 NW', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Mimics 2 NW', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('PoD Bow Statue Down Ladder', player), lambda state: state.can_shoot_arrows(player))
@@ -221,6 +226,7 @@ def global_rules(world, player):
     set_defeat_dungeon_boss_rule(world.get_location('Swamp Palace - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Swamp Palace - Prize', player))
 
+    set_rule(world.get_entrance('Skull Pot Circle WN', player), lambda state: state.can_use_bombs(player))
     set_rule(world.get_entrance('Skull Big Chest Hookpath', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Skull Torch Room WN', player), lambda state: state.has('Fire Rod', player))
     set_rule(world.get_entrance('Skull Vines NW', player), lambda state: state.has_sword(player))
@@ -229,6 +235,7 @@ def global_rules(world, player):
 
     # blind can't have the small key? - not necessarily true anymore - but likely still
     set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_location('Attic Cracked Floor', player), lambda state: state.can_use_bombs(player))
     for entrance in ['Thieves Basement Block Path', 'Thieves Blocked Entry Path', 'Thieves Conveyor Block Path', 'Thieves Conveyor Bridge Block Path']:
         set_rule(world.get_entrance(entrance, player), lambda state: state.can_lift_rocks(player))
     for location in ['Thieves\' Town - Blind\'s Cell', 'Thieves\' Town - Boss']:
@@ -241,6 +248,7 @@ def global_rules(world, player):
     set_rule(world.get_location('Thieves\' Town - Prize', player), lambda state: state.has('Maiden Unmasked', player) and world.get_location('Thieves\' Town - Prize', player).parent_region.dungeon.boss.can_defeat(state))
 
     set_rule(world.get_entrance('Ice Lobby WS', player), lambda state: state.can_melt_things(player))
+    set_rule(world.get_entrance('Ice Bomb Drop Hole', player), lambda state: state.can_use_bombs(player))
     set_rule(world.get_entrance('Ice Hammer Block ES', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
     set_rule(world.get_location('Ice Palace - Hammer Block Key Drop', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
     set_rule(world.get_location('Ice Palace - Map Chest', player), lambda state: state.can_lift_rocks(player) and state.has('Hammer', player))
@@ -267,6 +275,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Mire Tile Room NW', player), lambda state: state.has_fire_source(player))
     set_rule(world.get_entrance('Mire Attic Hint Hole', player), lambda state: state.has_fire_source(player))
     set_rule(world.get_entrance('Mire Dark Shooters SW', player), lambda state: state.has('Cane of Somaria', player))
+    set_rule(world.get_entrance('Mire Crystal Mid NW', player), lambda state: state.can_use_bombs(player))
+
     set_defeat_dungeon_boss_rule(world.get_location('Misery Mire - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Misery Mire - Prize', player))
 
@@ -279,8 +289,12 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Hub NW', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Hub NE', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Torches NW', player), lambda state: state.has('Cane of Somaria', player) and state.has('Fire Rod', player))
+    set_rule(world.get_entrance('TR Lazy Eyes SE', player), lambda state: state.can_use_bombs(player)) # ToDo: Add always true for inverted, cross-entrance, and door-variants and so on.
     set_rule(world.get_entrance('TR Big Chest Entrance Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('TR Big Chest Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has_Boots(player))
+    set_rule(world.get_entrance('TR Dash Room NW', player), lambda state: state.can_use_bombs(player) or state.has_Boots(player)) 
+    set_rule(world.get_entrance('TR Crystaroller SW', player), lambda state: state.can_use_bombs(player) or state.has_Boots(player))
+    set_rule(world.get_entrance('TR Dash Room ES', player), lambda state: state.can_use_bombs(player) or state.has_Boots(player))
     set_rule(world.get_entrance('TR Dark Ride Up Stairs', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Dark Ride SW', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Crystal Maze Cane Path', player), lambda state: state.has('Cane of Somaria', player))
@@ -307,6 +321,9 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Hookshot North-South Path', player), lambda state: state.has('Hookshot', player) or state.has_Boots(player))
     set_rule(world.get_entrance('GT Hookshot Entry Boomerang Path', player), lambda state: state.has('Blue Boomerang', player) or state.has('Red Boomerang', player))
     set_rule(world.get_entrance('GT Firesnake Room Hook Path', player), lambda state: state.has('Hookshot', player))
+    for entrance in ['GT Warp Maze (Rails) WS', 'GT Bob\'s Room Hole', 'GT Randomizer Room ES', 'GT Bomb Conveyor SW', 'GT Crystal Circles NW']:
+        set_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player))
+
     # I am tempted to stick an invincibility rule for getting across falling bridge
     set_rule(world.get_entrance('GT Ice Armos NE', player), lambda state: world.get_region('GT Ice Armos', player).dungeon.bosses['bottom'].can_defeat(state))
     set_rule(world.get_entrance('GT Ice Armos WS', player), lambda state: world.get_region('GT Ice Armos', player).dungeon.bosses['bottom'].can_defeat(state))
@@ -398,7 +415,6 @@ def global_rules(world, player):
     set_rule(world.get_location('Ganon', player), lambda state: state.has_beam_sword(player) and state.has_fire_source(player) and state.has_crystals(world.crystals_needed_for_ganon[player], player)
                                                                 and (state.has('Tempered Sword', player) or state.has('Golden Sword', player) or (state.has('Silver Arrows', player) and state.can_shoot_arrows(player)) or state.has('Lamp', player) or state.can_extend_magic(player, 12)))  # need to light torch a sufficient amount of times
     set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has_beam_sword(player))  # need to damage ganon to get tiles to drop
-
 
 def default_rules(world, player):
     # overworld requirements
@@ -864,7 +880,7 @@ def standard_rules(world, player):
         return loc.item and loc.item.name == 'Bombs (10)'
 
     def standard_escape_rule(state):
-        return state.can_kill_most_things(player) or bomb_escape_rule()
+        return state.can_kill_most_things(player) or state.can_use_bombs(player) or bomb_escape_rule() 
 
     add_item_rule(world.get_location('Link\'s Uncle', player), uncle_item_rule)
 
