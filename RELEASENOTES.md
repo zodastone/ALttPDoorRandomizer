@@ -130,6 +130,7 @@ New item counter modified to show total
 
 * 0.3.1.5-u
 	* Ganon hints fixed for shops
+	* Added support for a settings file so SahasrahBot and the main website can use it easier. (Thanks Synack)
 * 0.3.1.4-u
 	* Fix for Blind when shuffled to TT and another dungeon
 	* Remove use of RaceRandom
