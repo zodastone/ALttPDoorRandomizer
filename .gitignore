@@ -36,3 +36,5 @@ get-pip.py
 
 venv
 test
+data/sprites/official/selan.1.zspr
+*.zspr
