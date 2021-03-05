@@ -1334,6 +1334,11 @@ class Door(object):
         self.edge_width = width
         return self
 
+    def kind(self, world):
+        if self.roomIndex != -1 and self.doorListPos != -1:
+            return world.get_room(self.roomIndex, self.player).kind(self)
+        return None
+
     def small_key(self):
         self.smallKey = True
         return self
