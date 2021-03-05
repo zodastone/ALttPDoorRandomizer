@@ -419,13 +419,13 @@ def bomb_rules(world, player):
                         'Paradox Cave Upper - Left', 'Paradox Cave Upper - Right',
                         'Hype Cave - Top', 'Hype Cave - Middle Right', 'Hype Cave - Middle Left', 'Hype Cave - Bottom']
     for location in bonkable_items:
-        add_rule(world.get_location(entrance, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player)) 
+        add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player)) 
     for location in bombable_items:
-        add_rule(world.get_location(entrance, player), lambda state: state.can_use_bombs(player)) 
+        add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player)) 
 
     cave_kill_locations = ['Mini Moldorm Cave - Far Left', 'Mini Moldorm Cave - Far Right', 'Mini Moldorm Cave - Left', 'Mini Moldorm Cave - Right', 'Mini Moldorm Cave - Generous Guy']
     for location in cave_kill_locations:
-        add_rule(world.get_location(entrance, player), lambda state: state.can_kill_most_things(player) or state.can_use_bombs(player))
+        add_rule(world.get_location(location, player), lambda state: state.can_kill_most_things(player) or state.can_use_bombs(player))
 
     paradox_switch_chests = ['Paradox Cave Lower - Far Left', 'Paradox Cave Lower - Left', 'Paradox Cave Lower - Right', 'Paradox Cave Lower - Far Right', 'Paradox Cave Lower - Middle']
     for location in paradox_switch_chests:
@@ -471,7 +471,7 @@ def bomb_rules(world, player):
         for door in doors_to_bomb_check:
             if door.kind(world) in [DoorKind.Dashable]:
                 add_rule(door.entrance, lambda state: state.can_use_bombs(player) or state.has_Boots(player))
-            elif door.kind(door) in [DoorKind.Bombable]:
+            elif door.kind(world) in [DoorKind.Bombable]:
                 add_rule(door.entrance, lambda state: state.can_use_bombs(player))
 
 def default_rules(world, player):

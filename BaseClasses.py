@@ -578,10 +578,10 @@ class CollectionState(object):
 
 
     def can_reach_blue(self, region, player):
-        return region in self.reachable_regions[player] and self.reachable_regions[player][region] in [CrystalBarrier.Blue, CrystalBarrier.Either]
+        return region in self.reachable_regions[player] and self.reachable_regions[player][region] in [CrystalBarrier.Blue, CrystalBarrier.Either] and self.can_hit_switch(player)
 
     def can_reach_orange(self, region, player):
-        return region in self.reachable_regions[player] and self.reachable_regions[player][region] in [CrystalBarrier.Orange, CrystalBarrier.Either]
+        return region in self.reachable_regions[player] and self.reachable_regions[player][region] in [CrystalBarrier.Orange, CrystalBarrier.Either] and self.can_hit_switch(player)
 
     def _do_not_flood_the_keys(self, reachable_events):
         adjusted_checks = list(reachable_events)
