@@ -187,7 +187,8 @@ def create_regions(world, player):
                            ['Superbunny Cave Exit (Top)', 'Superbunny Cave Exit (Bottom)']),
         create_cave_region(player, 'Spike Cave', 'Spike Cave', ['Spike Cave']),
         create_cave_region(player, 'Hookshot Cave', 'a connector', ['Hookshot Cave - Top Right', 'Hookshot Cave - Top Left', 'Hookshot Cave - Bottom Right', 'Hookshot Cave - Bottom Left'],
-                           ['Hookshot Cave Exit (South)', 'Hookshot Cave Exit (North)']),
+                           ['Hookshot Cave Exit (South)', 'Hookshot Cave Bombable Wall']),
+        create_cave_region(player, 'Hookshot Cave Back', 'a connector', None, ['Hookshot Cave Back Exit', 'Hookshot Cave Back Bombable Wall']),
         create_dw_region(player, 'Death Mountain Floating Island (Dark World)', None, ['Floating Island Drop', 'Hookshot Cave Back Entrance', 'Floating Island Mirror Spot']),
         create_lw_region(player, 'Death Mountain Floating Island (Light World)', ['Floating Island']),
         create_dw_region(player, 'Turtle Rock (Top)', None, ['Turtle Rock Drop']),
@@ -337,13 +338,17 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Desert Boss', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize'], ['Desert Boss SW']),
 
         # Hera
-        create_dungeon_region(player, 'Hera Lobby', 'Tower of Hera', ['Tower of Hera - Map Chest'], ['Hera Lobby Down Stairs', 'Hera Lobby Key Stairs', 'Hera Lobby Up Stairs', 'Hera Lobby S']),
+        create_dungeon_region(player, 'Hera Lobby', 'Tower of Hera', None, ['Hera Lobby S', 'Hera Lobby to Front Barrier - Blue']),
+        create_dungeon_region(player, 'Hera Front', 'Tower of Hera', None, ['Hera Front to Lobby Barrier - Blue', 'Hera Front to Down Stairs Barrier - Blue', 'Hera Front to Up Stairs Barrier - Orange', 'Hera Front to Back Barrier - Orange']),
+        create_dungeon_region(player, 'Hera Down Stairs Landing', 'Tower of Hera', None, ['Hera Lobby Down Stairs', 'Hera Down Stairs to Front Barrier - Blue']),
+        create_dungeon_region(player, 'Hera Up Stairs Landing', 'Tower of Hera', None, ['Hera Up Stairs to Front Barrier - Orange', 'Hera Lobby Up Stairs']),
+        create_dungeon_region(player, 'Hera Back', 'Tower of Hera', ['Tower of Hera - Map Chest'], ['Hera Back to Front Barrier - Orange', 'Hera Lobby Key Stairs']),
         create_dungeon_region(player, 'Hera Basement Cage', 'Tower of Hera', ['Tower of Hera - Basement Cage'], ['Hera Basement Cage Up Stairs']),
         create_dungeon_region(player, 'Hera Tile Room', 'Tower of Hera', None, ['Hera Tile Room Up Stairs', 'Hera Tile Room EN']),
         create_dungeon_region(player, 'Hera Tridorm', 'Tower of Hera', None, ['Hera Tridorm WN', 'Hera Tridorm SE']),
         create_dungeon_region(player, 'Hera Torches', 'Tower of Hera', ['Tower of Hera - Big Key Chest'], ['Hera Torches NE']),
-        create_dungeon_region(player, 'Hera Beetles', 'Tower of Hera', None, ['Hera Beetles Down Stairs', 'Hera Beetles WS', 'Hera Beetles Holes']),
-        create_dungeon_region(player, 'Hera Startile Corner', 'Tower of Hera', None, ['Hera Startile Corner ES', 'Hera Startile Corner NW', 'Hera Startile Corner Holes']),
+        create_dungeon_region(player, 'Hera Beetles', 'Tower of Hera', None, ['Hera Beetles Down Stairs', 'Hera Beetles WS', 'Hera Beetles Holes Front', 'Hera Beetles Holes Landing']),
+        create_dungeon_region(player, 'Hera Startile Corner', 'Tower of Hera', None, ['Hera Startile Corner ES', 'Hera Startile Corner NW', 'Hera Startile Corner Holes Front', 'Hera Startile Corner Holes Landing']),
         create_dungeon_region(player, 'Hera Startile Wide', 'Tower of Hera', None, ['Hera Startile Wide SW', 'Hera Startile Wide Up Stairs', 'Hera Startile Wide Holes']),
         create_dungeon_region(player, 'Hera 4F', 'Tower of Hera', ['Tower of Hera - Compass Chest'], ['Hera 4F Down Stairs', 'Hera 4F Up Stairs', 'Hera Big Chest Hook Path', 'Hera 4F Holes']),
         create_dungeon_region(player, 'Hera Big Chest Landing', 'Tower of Hera', ['Tower of Hera - Big Chest'], ['Hera Big Chest Landing Exit', 'Hera Big Chest Landing Holes']),
@@ -755,6 +760,7 @@ def create_dungeon_regions(world, player):
 
     world.initialize_regions()
     world.get_region('Hera Lobby', player).crystal_switch = True
+    world.get_region('Hera Front', player).crystal_switch = True
     world.get_region('Hera Basement Cage', player).crystal_switch = True
     world.get_region('Hera Tile Room', player).crystal_switch = True  # INTERIOR not accessible (maybe with cane)
     world.get_region('Hera Tridorm', player).crystal_switch = True

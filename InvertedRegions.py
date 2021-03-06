@@ -197,7 +197,8 @@ def create_inverted_regions(world, player):
                            ['Superbunny Cave Exit (Top)', 'Superbunny Cave Exit (Bottom)']),
         create_cave_region(player, 'Spike Cave', 'Spike Cave', ['Spike Cave']),
         create_cave_region(player, 'Hookshot Cave', 'a connector', ['Hookshot Cave - Top Right', 'Hookshot Cave - Top Left', 'Hookshot Cave - Bottom Right', 'Hookshot Cave - Bottom Left'],
-                           ['Hookshot Cave Exit (South)', 'Hookshot Cave Exit (North)']),
+                           ['Hookshot Cave Exit (South)', 'Hookshot Cave Bombable Wall']),
+        create_cave_region(player, 'Hookshot Cave Back', 'a connector', None, ['Hookshot Cave Back Exit', 'Hookshot Cave Back Bombable Wall']),
         create_dw_region(player, 'Death Mountain Floating Island (Dark World)', None, ['Floating Island Drop', 'Hookshot Cave Back Entrance']),
         create_cave_region(player, 'Mimic Cave', 'Mimic Cave', ['Mimic Cave']),
 

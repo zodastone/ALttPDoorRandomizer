@@ -349,6 +349,14 @@ def global_rules(world, player):
     else:
         set_rule(world.get_entrance('Thieves Attic ES', player), lambda state: state.can_reach_orange(world.get_region('Thieves Attic', player), player))
 
+    set_rule(world.get_entrance('Hera Lobby to Front Barrier - Blue', player), lambda state: state.can_hit_switch(player))
+    set_rule(world.get_entrance('Hera Front to Lobby Barrier - Blue', player), lambda state: state.can_hit_switch(player))
+    set_rule(world.get_entrance('Hera Front to Down Stairs Barrier - Blue', player), lambda state: lambda state: state.can_hit_switch(player))
+    set_rule(world.get_entrance('Hera Down Stairs to Front Barrier - Blue', player), lambda state: lambda state: state.can_hit_switch_through_barrier(player) or state.can_reach_blue(world.get_region('Hera Down Stairs Landing', player), player))
+    set_rule(world.get_entrance('Hera Front to Up Stairs Barrier - Orange', player), lambda state: lambda state: state.can_hit_switch(player))
+    set_rule(world.get_entrance('Hera Up Stairs to Front Barrier - Orange', player), lambda state: lambda state: state.can_hit_switch_through_barrier(player) or state.can_reach_orange(world.get_region('Hera Up Stairs Landing', player), player))
+    set_rule(world.get_entrance('Hera Front to Back Barrier - Orange', player), lambda state: lambda state: state.can_hit_switch(player))
+    set_rule(world.get_entrance('Hera Back to Front Barrier - Orange', player), lambda state: state.has_beam_sword(player) or state.can_shoot_arrows(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player) or state.can_reach_orange(world.get_region('Hera Back', player), player))
     set_rule(world.get_entrance('PoD Arena Crystal Path', player), lambda state: state.can_reach_blue(world.get_region('PoD Arena Crystal', player), player))
     set_rule(world.get_entrance('Swamp Trench 2 Pots Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Swamp Trench 2 Pots', player), player))
     set_rule(world.get_entrance('Swamp Shortcut Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Swamp Shortcut', player), player))
@@ -407,17 +415,17 @@ def global_rules(world, player):
 
 def bomb_rules(world, player):
     bonkable_doors = ['Two Brothers House Exit (West)', 'Two Brothers House Exit (East)'] # Technically this is incorrectly defined, but functionally the same as what is intended.
-    bombable_doors = ['Ice Rod Cave', 'Light World Bomb Hut', 'Light World Death Mountain Shop', 'Hookshot Cave Exit (North)', 'Mini Moldorm Cave',
-                    'Dark Lake Hylia Ledge Fairy', 'Hype Cave', 'Brewery']
+    bombable_doors = ['Ice Rod Cave', 'Light World Bomb Hut', 'Light World Death Mountain Shop', 'Mini Moldorm Cave',
+                      'Hookshot Cave Bombable Wall', 'Hookshot Cave Back Bombable Wall', 'Dark Lake Hylia Ledge Fairy', 'Hype Cave', 'Brewery']
     for entrance in bonkable_doors:
         add_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player)) 
     for entrance in bombable_doors:
         add_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player)) 
 
-    bonkable_items = ["Sahasrahla's Hut - Left", "Sahasrahla's Hut - Middle", "Sahasrahla's Hut - Right"]
-    bombable_items = ["Blind's Hideout - Top", "Kakariko Well - Top", 'Chicken House', "Aginah's Cave", 'Graveyard Cave',
-                        'Paradox Cave Upper - Left', 'Paradox Cave Upper - Right',
-                        'Hype Cave - Top', 'Hype Cave - Middle Right', 'Hype Cave - Middle Left', 'Hype Cave - Bottom']
+    bonkable_items = ['Sahasrahla\'s Hut - Left', 'Sahasrahla\'s Hut - Middle', 'Sahasrahla\'s Hut - Right']
+    bombable_items = ['Blind\'s Hideout - Top', 'Kakariko Well - Top', 'Chicken House', 'Aginah\'s Cave', 'Graveyard Cave',
+                      'Paradox Cave Upper - Left', 'Paradox Cave Upper - Right',
+                      'Hype Cave - Top', 'Hype Cave - Middle Right', 'Hype Cave - Middle Left', 'Hype Cave - Bottom']
     for location in bonkable_items:
         add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player)) 
     for location in bombable_items:
@@ -429,10 +437,7 @@ def bomb_rules(world, player):
 
     paradox_switch_chests = ['Paradox Cave Lower - Far Left', 'Paradox Cave Lower - Left', 'Paradox Cave Lower - Right', 'Paradox Cave Lower - Far Right', 'Paradox Cave Lower - Middle']
     for location in paradox_switch_chests:
-        add_rule(world.get_location(location, player), lambda state: \
-                state.can_use_bombs(player) or state.can_shoot_arrows(player) or state.has_beam_sword(player) \
-                or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player) \
-                or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
+        add_rule(world.get_location(location, player), lambda state: state.can_hit_switch_through_barrier(player))
 
     # Dungeon bomb logic
     for _,entrances in std_kill_rooms.items():
@@ -1591,8 +1596,10 @@ bunny_impassible_doors = {
     'Eastern Attic Start WS', 'Eastern Single Eyegore NE', 'Eastern Duo Eyegores NE', 'Desert Main Lobby Left Path',
     'Desert Main Lobby Right Path', 'Desert Left Alcove Path', 'Desert Right Alcove Path', 'Desert Compass NW',
     'Desert West Lobby NW', 'Desert Back Lobby NW', 'Desert Four Statues NW',  'Desert Four Statues ES',
-    'Desert Beamos Hall WS', 'Desert Beamos Hall NE', 'Desert Wall Slide NW', 'Hera Lobby Down Stairs',
-    'Hera Lobby Key Stairs', 'Hera Lobby Up Stairs', 'Hera Tile Room EN', 'Hera Tridorm SE', 'Hera Beetles WS',
+    'Desert Beamos Hall WS', 'Desert Beamos Hall NE', 'Desert Wall Slide NW',
+    'Hera Lobby to Front Barrier - Blue', 'Hera Front to Lobby Barrier - Blue', 'Hera Front to Down Stairs Barrier - Blue',
+    'Hera Front to Up Stairs Barrier - Orange', 'Hera Front to Back Barrier - Orange', 'Hera Down Stairs to Front Barrier - Blue',
+    'Hera Up Stairs to Front Barrier - Orange', 'Hera Back to Front Barrier - Orange', 'Hera Tile Room EN', 'Hera Tridorm SE', 'Hera Beetles WS',
     'Hera 4F Down Stairs', 'Tower Gold Knights SW', 'Tower Dark Maze EN', 'Tower Dark Pits ES', 'Tower Dark Archers WN',
     'Tower Red Spears WN', 'Tower Red Guards EN', 'Tower Red Guards SW', 'Tower Circle of Pots NW', 'Tower Altar NW',
     'PoD Left Cage SW', 'PoD Middle Cage SE', 'PoD Pit Room Bomb Hole', 'PoD Pit Room Block Path N',

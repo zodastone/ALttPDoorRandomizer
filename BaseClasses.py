@@ -701,6 +701,16 @@ class CollectionState(object):
                 or self.has('Ice Rod', player)
                 or self.has('Cane of Somaria', player)
                 or self.has('Cane of Byrna', player))
+    
+    def can_hit_switch_through_barrier(self, player):
+        return (self.can_use_bombs(player)
+            or self.can_shoot_arrows(player)
+            or self.has_beam_sword(player)
+            or self.has('Blue Boomerang', player)
+            or self.has('Red Boomerang', player)
+            or self.has('Fire Rod', player)
+            or self.has('Ice Rod', player)
+            or self.has('Cane of Somaria', player))
 
     def can_shoot_arrows(self, player):
         if self.world.retro[player]:

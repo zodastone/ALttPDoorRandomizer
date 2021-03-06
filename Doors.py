@@ -252,6 +252,14 @@ def create_doors(world, player):
 
         # Hera
         create_door(player, 'Hera Lobby S', Nrml).dir(So, 0x77, Mid, Low).pos(0).portal(Z, 0x22, 1),
+        create_door(player, 'Hera Lobby to Front Barrier - Blue', Lgcl),
+        create_door(player, 'Hera Front to Lobby Barrier - Blue', Lgcl),
+        create_door(player, 'Hera Front to Down Stairs Barrier - Blue', Lgcl),
+        create_door(player, 'Hera Down Stairs to Front Barrier - Blue', Lgcl),
+        create_door(player, 'Hera Front to Up Stairs Barrier - Orange', Lgcl),
+        create_door(player, 'Hera Up Stairs to Front Barrier - Orange', Lgcl),
+        create_door(player, 'Hera Front to Back Barrier - Orange', Lgcl),
+        create_door(player, 'Hera Back to Front Barrier - Orange', Lgcl),
         create_door(player, 'Hera Lobby Down Stairs', Sprl).dir(Dn, 0x77, 3, HTL).ss(Z, 0x21, 0x90, False, True),
         create_door(player, 'Hera Lobby Key Stairs', Sprl).dir(Dn, 0x77, 1, HTL).ss(A, 0x12, 0x80).small_key().pos(1),
         create_door(player, 'Hera Lobby Up Stairs', Sprl).dir(Up, 0x77, 2, HTL).ss(X, 0x2b, 0x5c, False, True),
@@ -263,10 +271,12 @@ def create_doors(world, player):
         create_door(player, 'Hera Torches NE', Intr).dir(No, 0x87, Right, High).pos(1),
         create_door(player, 'Hera Beetles Down Stairs', Sprl).dir(Dn, 0x31, 2, LTH).ss(X, 0x3a, 0x70, True, True),
         create_door(player, 'Hera Beetles WS', Intr).dir(We, 0x31, Bot, High).pos(1),
-        create_door(player, 'Hera Beetles Holes', Hole),
+        create_door(player, 'Hera Beetles Holes Front', Hole),
+        create_door(player, 'Hera Beetles Holes Landing', Hole),
         create_door(player, 'Hera Startile Corner ES', Intr).dir(Ea, 0x31, Bot, High).pos(1),
         create_door(player, 'Hera Startile Corner NW', Intr).dir(No, 0x31, Left, High).big_key().pos(0),
-        create_door(player, 'Hera Startile Corner Holes', Hole),
+        create_door(player, 'Hera Startile Corner Holes Front', Hole),
+        create_door(player, 'Hera Startile Corner Holes Landing', Hole),
         # technically ugly but causes lots of failures in basic
         create_door(player, 'Hera Startile Wide SW', Intr).dir(So, 0x31, Left, High).pos(0),
         create_door(player, 'Hera Startile Wide Up Stairs', Sprl).dir(Up, 0x31, 0, HTH).ss(S, 0x6b, 0xac, False, True),
@@ -1128,9 +1138,14 @@ def create_doors(world, player):
         world.get_door('Hyrule Castle Tapestry Backwards', player).event('Zelda Pickup')
 
     # crystal switches and barriers
-    world.get_door('Hera Lobby Down Stairs', player).c_switch()
-    world.get_door('Hera Lobby Key Stairs', player).c_switch()
-    world.get_door('Hera Lobby Up Stairs', player).c_switch()
+    world.get_door('Hera Lobby to Front Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Hera Front to Lobby Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Hera Front to Down Stairs Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Hera Down Stairs to Front Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Hera Front to Up Stairs Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Hera Up Stairs to Front Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Hera Front to Back Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Hera Back to Front Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('Hera Basement Cage Up Stairs', player).c_switch()
     world.get_door('Hera Tile Room Up Stairs', player).c_switch()
     world.get_door('Hera Tile Room EN', player).c_switch()
@@ -1138,7 +1153,8 @@ def create_doors(world, player):
     world.get_door('Hera Tridorm SE', player).c_switch()
     world.get_door('Hera Beetles Down Stairs', player).c_switch()
     world.get_door('Hera Beetles WS', player).c_switch()
-    world.get_door('Hera Beetles Holes', player).c_switch()
+    world.get_door('Hera Beetles Holes Front', player).c_switch()
+    world.get_door('Hera Beetles Holes Landing', player).c_switch()
     world.get_door('Hera Startile Wide SW', player).c_switch()
     world.get_door('Hera Startile Wide Up Stairs', player).c_switch()
     world.get_door('Hera Startile Wide Holes', player).c_switch()

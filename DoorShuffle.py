@@ -1986,6 +1986,16 @@ logical_connections = [
     ('Desert Main Lobby Right Path', 'Desert Right Alcove'),
     ('Desert Left Alcove Path', 'Desert Main Lobby'),
     ('Desert Right Alcove Path', 'Desert Main Lobby'),
+
+    ('Hera Lobby to Front Barrier - Blue', 'Hera Front'),
+    ('Hera Front to Lobby Barrier - Blue', 'Hera Lobby'),
+    ('Hera Front to Down Stairs Barrier - Blue', 'Hera Down Stairs Landing'),
+    ('Hera Front to Up Stairs Barrier - Orange', 'Hera Up Stairs Landing'),
+    ('Hera Front to Back Barrier - Orange', 'Hera Back'),
+    ('Hera Down Stairs to Front Barrier - Blue', 'Hera Front'),
+    ('Hera Up Stairs to Front Barrier - Orange', 'Hera Front'),
+    ('Hera Back to Front Barrier - Orange', 'Hera Front'),
+
     ('Hera Big Chest Hook Path', 'Hera Big Chest Landing'),
     ('Hera Big Chest Landing Exit', 'Hera 4F'),
     ('PoD Pit Room Block Path N', 'PoD Pit Room Blocked'),
@@ -2217,10 +2227,12 @@ open_edges = [
 
 falldown_pits = [
     ('Eastern Courtyard Potholes', 'Eastern Fairies'),
-    ('Hera Beetles Holes', 'Hera Lobby'),
-    ('Hera Startile Corner Holes', 'Hera Lobby'),
-    ('Hera Startile Wide Holes', 'Hera Lobby'),
-    ('Hera 4F Holes', 'Hera Lobby'),  # failed bomb jump
+    ('Hera Beetles Holes Front', 'Hera Front'),
+    ('Hera Beetles Holes Landing', 'Hera Up Stairs Landing'),
+    ('Hera Startile Corner Holes Front', 'Hera Front'),
+    ('Hera Startile Corner Holes Landing', 'Hera Down Stairs Landing'),
+    ('Hera Startile Wide Holes', 'Hera Back'),
+    ('Hera 4F Holes', 'Hera Back'),  # failed bomb jump
     ('Hera Big Chest Landing Holes', 'Hera Startile Wide'),  # the other holes near big chest
     ('Hera 5F Star Hole', 'Hera Big Chest Landing'),
     ('Hera 5F Pothole Chain', 'Hera Fairies'),
