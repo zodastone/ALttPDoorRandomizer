@@ -253,11 +253,11 @@ def create_doors(world, player):
         # Hera
         create_door(player, 'Hera Lobby S', Nrml).dir(So, 0x77, Mid, Low).pos(0).portal(Z, 0x22, 1),
         create_door(player, 'Hera Lobby to Front Barrier - Blue', Lgcl),
-        create_door(player, 'Hera Lobby - Crystal', Lgcl),
-        create_door(player, 'Hera Lobby - Crystal Exit', Lgcl),
+        create_door(player, 'Hera Lobby to Crystal', Lgcl),
+        create_door(player, 'Hera Lobby Crystal Exit', Lgcl),
         create_door(player, 'Hera Front to Lobby Barrier - Blue', Lgcl),
-        create_door(player, 'Hera Front - Crystal', Lgcl),
-        create_door(player, 'Hera Front - Crystal Exit', Lgcl),
+        create_door(player, 'Hera Front to Crystal', Lgcl),
+        create_door(player, 'Hera Front Crystal Exit', Lgcl),
         create_door(player, 'Hera Front to Down Stairs Barrier - Blue', Lgcl),
         create_door(player, 'Hera Down Stairs to Front Barrier - Blue', Lgcl),
         create_door(player, 'Hera Front to Up Stairs Barrier - Orange', Lgcl),
@@ -1142,10 +1142,10 @@ def create_doors(world, player):
         world.get_door('Hyrule Castle Tapestry Backwards', player).event('Zelda Pickup')
 
     # crystal switches and barriers
-    world.get_door('Hera Lobby - Crystal Exit', player).c_switch()
+    world.get_door('Hera Lobby Crystal Exit', player).c_switch()
     world.get_door('Hera Lobby to Front Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('Hera Front to Lobby Barrier - Blue', player).barrier(CrystalBarrier.Blue)
-    world.get_door('Hera Front - Crystal Exit', player).c_switch()
+    world.get_door('Hera Front Crystal Exit', player).c_switch()
     world.get_door('Hera Front to Down Stairs Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('Hera Down Stairs to Front Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('Hera Front to Up Stairs Barrier - Orange', player).barrier(CrystalBarrier.Orange)
