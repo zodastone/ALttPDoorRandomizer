@@ -338,8 +338,10 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Desert Boss', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize'], ['Desert Boss SW']),
 
         # Hera
-        create_dungeon_region(player, 'Hera Lobby', 'Tower of Hera', None, ['Hera Lobby S', 'Hera Lobby to Front Barrier - Blue']),
-        create_dungeon_region(player, 'Hera Front', 'Tower of Hera', None, ['Hera Front to Lobby Barrier - Blue', 'Hera Front to Down Stairs Barrier - Blue', 'Hera Front to Up Stairs Barrier - Orange', 'Hera Front to Back Barrier - Orange']),
+        create_dungeon_region(player, 'Hera Lobby', 'Tower of Hera', None, ['Hera Lobby S', 'Hera Lobby to Crystal', 'Hera Lobby to Front Barrier - Blue']),
+        create_dungeon_region(player, 'Hera Lobby Crystal', 'Tower of Hera', None, ['Hera Lobby Crystal Exit']),
+        create_dungeon_region(player, 'Hera Front', 'Tower of Hera', None, ['Hera Front to Crystal', 'Hera Front to Lobby Barrier - Blue', 'Hera Front to Down Stairs Barrier - Blue', 'Hera Front to Up Stairs Barrier - Orange', 'Hera Front to Back Barrier - Orange']),
+        create_dungeon_region(player, 'Hera Front Crystal', 'Tower of Hera', None, ['Hera Front Crystal Exit']),
         create_dungeon_region(player, 'Hera Down Stairs Landing', 'Tower of Hera', None, ['Hera Lobby Down Stairs', 'Hera Down Stairs to Front Barrier - Blue']),
         create_dungeon_region(player, 'Hera Up Stairs Landing', 'Tower of Hera', None, ['Hera Up Stairs to Front Barrier - Orange', 'Hera Lobby Up Stairs']),
         create_dungeon_region(player, 'Hera Back', 'Tower of Hera', ['Tower of Hera - Map Chest'], ['Hera Back to Front Barrier - Orange', 'Hera Lobby Key Stairs']),
@@ -759,8 +761,8 @@ def create_dungeon_regions(world, player):
     ]
 
     world.initialize_regions()
-    world.get_region('Hera Lobby', player).crystal_switch = True
-    world.get_region('Hera Front', player).crystal_switch = True
+    world.get_region('Hera Lobby Crystal', player).crystal_switch = True
+    world.get_region('Hera Front Crystal', player).crystal_switch = True
     world.get_region('Hera Basement Cage', player).crystal_switch = True
     world.get_region('Hera Tile Room', player).crystal_switch = True  # INTERIOR not accessible (maybe with cane)
     world.get_region('Hera Tridorm', player).crystal_switch = True

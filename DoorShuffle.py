@@ -1989,6 +1989,10 @@ logical_connections = [
 
     ('Hera Lobby to Front Barrier - Blue', 'Hera Front'),
     ('Hera Front to Lobby Barrier - Blue', 'Hera Lobby'),
+    ('Hera Lobby to Crystal', 'Hera Lobby Crystal'),
+    ('Hera Lobby Crystal Exit', 'Hera Lobby'),
+    ('Hera Front to Crystal', 'Hera Front Crystal'),
+    ('Hera Front Crystal Exit', 'Hera Front'),
     ('Hera Front to Down Stairs Barrier - Blue', 'Hera Down Stairs Landing'),
     ('Hera Front to Up Stairs Barrier - Orange', 'Hera Up Stairs Landing'),
     ('Hera Front to Back Barrier - Orange', 'Hera Back'),

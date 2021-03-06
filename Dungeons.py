@@ -195,7 +195,7 @@ desert_regions = [
 ]
 
 hera_regions = [
-    'Hera Lobby', 'Hera Front', 'Hera Back', 'Hera Down Stairs Landing', 'Hera Up Stairs Landing',
+    'Hera Lobby', 'Hera Lobby Crystal', 'Hera Front', 'Hera Back', 'Hera Front Crystal', 'Hera Down Stairs Landing', 'Hera Up Stairs Landing',
     'Hera Basement Cage', 'Hera Tile Room', 'Hera Tridorm', 'Hera Torches', 'Hera Beetles',
     'Hera Startile Corner', 'Hera Startile Wide', 'Hera 4F', 'Hera Big Chest Landing', 'Hera 5F',
     'Hera Fairies', 'Hera Boss', 'Hera Portal'
