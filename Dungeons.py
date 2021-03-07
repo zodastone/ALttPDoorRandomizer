@@ -210,12 +210,13 @@ tower_regions = [
 
 pod_regions = [
     'PoD Lobby', 'PoD Left Cage', 'PoD Middle Cage', 'PoD Shooter Room', 'PoD Pit Room', 'PoD Pit Room Blocked',
-    'PoD Arena Main', 'PoD Arena North', 'PoD Arena Crystal', 'PoD Arena Bridge', 'PoD Arena Ledge', 'PoD Sexy Statue',
-    'PoD Map Balcony', 'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room',
+    'PoD Arena Main', 'PoD Arena Main - Ranged Crystal', 'PoD Arena North', 'PoD Arena Bridge', 'PoD Arena Bridge - Ranged Crystal',
+    'PoD Arena Landing', 'PoD Arena Landing - Ranged Crystal', 'PoD Arena Right', 'PoD Arena Ledge', 'PoD Sexy Statue',
+    'PoD Map Balcony', 'PoD Map Balcony - Ranged Crystal', 'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room',
     'PoD Stalfos Basement', 'PoD Basement Ledge', 'PoD Big Key Landing', 'PoD Falling Bridge',
     'PoD Falling Bridge Ledge', 'PoD Dark Maze', 'PoD Big Chest Balcony', 'PoD Compass Room', 'PoD Dark Basement',
-    'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue', 'PoD Dark Pegs Landing', 'PoD Dark Pegs Right',
-    'PoD Dark Pegs Middle', 'PoD Dark Pegs Left', 'PoD Dark Pegs Landing - Ranged Crystal',
+    'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue Left', 'PoD Bow Statue Right', 'PoD Bow Statue Right - Ranged Crystal',
+    'PoD Dark Pegs Landing', 'PoD Dark Pegs Right', 'PoD Dark Pegs Middle', 'PoD Dark Pegs Left', 'PoD Dark Pegs Landing - Ranged Crystal',
     'PoD Dark Pegs Middle - Ranged Crystal', 'PoD Dark Pegs Left - Ranged Crystal', 'PoD Lonely Turtle', 'PoD Turtle Party',
     'PoD Dark Alley', 'PoD Callback', 'PoD Boss', 'Palace of Darkness Portal'
 ]
@@ -274,15 +275,15 @@ mire_regions = [
     'Mire Wizzrobe Bypass', 'Mire Conveyor Crystal', 'Mire Tile Room', 'Mire Compass Room', 'Mire Compass Chest',
     'Mire Neglected Room', 'Mire Chest View', 'Mire Conveyor Barrier', 'Mire BK Chest Ledge', 'Mire Warping Pool',
     'Mire Torches Top', 'Mire Torches Bottom', 'Mire Attic Hint', 'Mire Dark Shooters', 'Mire Key Rupees',
-    'Mire Block X', 'Mire Tall Dark and Roomy', 'Mire Crystal Right', 'Mire Crystal Mid', 'Mire Crystal Left',
+    'Mire Block X', 'Mire Tall Dark and Roomy', 'Mire Tall Dark and Roomy - Ranged Crystal', 'Mire Crystal Right', 'Mire Crystal Mid', 'Mire Crystal Left',
     'Mire Crystal Top', 'Mire Shooter Rupees', 'Mire Falling Foes', 'Mire Firesnake Skip', 'Mire Antechamber',
     'Mire Boss', 'Mire Portal'
 ]
 
 tr_regions = [
     'TR Main Lobby', 'TR Lobby Ledge', 'TR Compass Room', 'TR Hub', 'TR Torches Ledge', 'TR Torches', 'TR Roller Room',
-    'TR Tile Room', 'TR Refill', 'TR Pokey 1', 'TR Chain Chomps', 'TR Pipe Pit', 'TR Pipe Ledge', 'TR Lava Dual Pipes',
-    'TR Lava Island', 'TR Lava Escape', 'TR Pokey 2', 'TR Twin Pokeys', 'TR Hallway', 'TR Dodgers', 'TR Big View',
+    'TR Tile Room', 'TR Refill', 'TR Pokey 1', 'TR Chain Chomps Top', 'TR Chain Chomps Bottom', 'TR Chain Chomps Bottom - Ranged Crystal', 'TR Pipe Pit', 'TR Pipe Ledge', 'TR Lava Dual Pipes',
+    'TR Lava Island', 'TR Lava Escape', 'TR Pokey 2 Top', 'TR Pokey 2 Bottom', 'TR Pokey 2 Bottom - Ranged Crystal', 'TR Twin Pokeys', 'TR Hallway', 'TR Dodgers', 'TR Big View',
     'TR Big Chest', 'TR Big Chest Entrance', 'TR Lazy Eyes', 'TR Dash Room', 'TR Tongue Pull', 'TR Rupees',
     'TR Crystaroller Bottom', 'TR Crystaroller Middle', 'TR Crystaroller Top', 'TR Crystaroller Chest', 'TR Crystaroller Middle - Ranged Crystal', 'TR Crystaroller Bottom - Ranged Crystal', 
     'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge', 'TR Crystal Maze', 'TR Crystal Maze End',
