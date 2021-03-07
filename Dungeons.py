@@ -214,7 +214,9 @@ pod_regions = [
     'PoD Map Balcony', 'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room',
     'PoD Stalfos Basement', 'PoD Basement Ledge', 'PoD Big Key Landing', 'PoD Falling Bridge',
     'PoD Falling Bridge Ledge', 'PoD Dark Maze', 'PoD Big Chest Balcony', 'PoD Compass Room', 'PoD Dark Basement',
-    'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue', 'PoD Dark Pegs', 'PoD Lonely Turtle', 'PoD Turtle Party',
+    'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue', 'PoD Dark Pegs Landing', 'PoD Dark Pegs Right',
+    'PoD Dark Pegs Middle', 'PoD Dark Pegs Left', 'PoD Dark Pegs Landing - Ranged Crystal',
+    'PoD Dark Pegs Middle - Ranged Crystal', 'PoD Dark Pegs Left - Ranged Crystal', 'PoD Lonely Turtle', 'PoD Turtle Party',
     'PoD Dark Alley', 'PoD Callback', 'PoD Boss', 'Palace of Darkness Portal'
 ]
 
@@ -282,7 +284,8 @@ tr_regions = [
     'TR Tile Room', 'TR Refill', 'TR Pokey 1', 'TR Chain Chomps', 'TR Pipe Pit', 'TR Pipe Ledge', 'TR Lava Dual Pipes',
     'TR Lava Island', 'TR Lava Escape', 'TR Pokey 2', 'TR Twin Pokeys', 'TR Hallway', 'TR Dodgers', 'TR Big View',
     'TR Big Chest', 'TR Big Chest Entrance', 'TR Lazy Eyes', 'TR Dash Room', 'TR Tongue Pull', 'TR Rupees',
-    'TR Crystaroller', 'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge', 'TR Crystal Maze', 'TR Crystal Maze End',
+    'TR Crystaroller Bottom', 'TR Crystaroller Middle', 'TR Crystaroller Top', 'TR Crystaroller Chest', 'TR Crystaroller Middle - Ranged Crystal', 'TR Crystaroller Bottom - Ranged Crystal', 
+    'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge', 'TR Crystal Maze', 'TR Crystal Maze End',
     'TR Final Abyss', 'TR Boss', 'Turtle Rock Main Portal', 'Turtle Rock Lazy Eyes Portal', 'Turtle Rock Chest Portal',
     'Turtle Rock Eye Bridge Portal'
 ]

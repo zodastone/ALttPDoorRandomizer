@@ -24,7 +24,7 @@ vanilla_pots = {
     9: [Pot(12, 4, PotItem.OneRupee, 'PoD Shooter Room'), Pot(48, 4, PotItem.Heart, 'PoD Shooter Room'), Pot(12, 12, PotItem.Switch, 'PoD Shooter Room')],
     10: [Pot(96, 8, PotItem.Heart, 'PoD Stalfos Basement'), Pot(104, 8, PotItem.Heart, 'PoD Stalfos Basement'), Pot(204, 11, PotItem.Switch, 'PoD Stalfos Basement'), Pot(100, 9, PotItem.Nothing, 'PoD Stalfos Basement'),
          Pot(156, 17, PotItem.Bomb, 'PoD Basement Ledge', PotFlags.SwitchLogicChange), Pot(160, 17, PotItem.FiveArrows, 'PoD Basement Ledge', PotFlags.SwitchLogicChange)],
-    11: [Pot(202, 3, PotItem.Bomb, 'PoD Dark Pegs'), Pot(202, 12, PotItem.Bomb, 'PoD Dark Pegs')],
+    11: [Pot(202, 3, PotItem.Bomb, 'PoD Dark Pegs Left'), Pot(202, 12, PotItem.Bomb, 'PoD Dark Pegs Left')],
     17: [Pot(152, 19, PotItem.Nothing, 'Sewers Secret Room'), Pot(152, 15, PotItem.Nothing, 'Sewers Secret Room'), Pot(144, 15, PotItem.Heart, 'Sewers Secret Room'), Pot(160, 15, PotItem.Heart, 'Sewers Secret Room'),
          Pot(144, 19, PotItem.Heart, 'Sewers Secret Room'), Pot(160, 19, PotItem.Heart, 'Sewers Secret Room')],
     21: [Pot(96, 4, PotItem.Bomb, 'TR Pipe Pit'), Pot(100, 4, PotItem.SmallMagic, 'TR Pipe Pit'), Pot(104, 4, PotItem.Heart, 'TR Pipe Pit'), Pot(108, 4, PotItem.SmallMagic, 'TR Pipe Pit'), Pot(112, 4, PotItem.FiveArrows, 'TR Pipe Pit'),
