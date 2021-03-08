@@ -27,8 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '8350a310f10293f2ef2b84305bad489e'
-
+RANDOMIZERBASEHASH = '30147375153cc57197805eddf38c2a23'
 
 class JsonRom(object):
 
@@ -913,8 +912,9 @@ def patch_rom(world, rom, player, team, enemized):
 
     difficulty = world.difficulty_requirements[player]
 
-    #Shift magic consumption costs if futuro
-    if world.futuro[player]:
+    #Shift magic consumption costs if not starting with magic
+    StartingMagic = True
+    if not StartingMagic:
         for item in magic_cost:
             magic_cost[item][1][2] = magic_cost[item][1][1]
             magic_cost[item][1][1] = magic_cost[item][1][0]
@@ -1015,7 +1015,7 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_bytes(0x184000, [
         # original_item, limit, replacement_item, filler
         0x12, 0x01, 0x35, 0xFF, # lamp -> 5 rupees
-        0x51, 0x00 if world.futuro[player] else 0x06, 0x31 if world.futuro[player] else 0x52, 0xFF, # 6 +5 bomb upgrades -> +10 bomb upgrade. If bomb-futuro, turns into Bombs (10)
+        0x51, 0x06, 0x52, 0xFF, # 6 +5 bomb upgrades -> +10 bomb upgrade.
         0x53, 0x06, 0x54, 0xFF, # 6 +5 arrow upgrades -> +10 arrow upgrade
         0x58, 0x01, 0x36 if world.retro[player] else 0x43, 0xFF, # silver arrows -> single arrow (red 20 in retro mode)
         0x3E, difficulty.boss_heart_container_limit, 0x47, 0xff, # boss heart -> green 20
@@ -1128,7 +1128,7 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_byte(0x180171, 0x01 if world.ganon_at_pyramid[player] else 0x00)  # Enable respawning on pyramid after ganon death
     rom.write_byte(0x180173, 0x01) # Bob is enabled
     rom.write_byte(0x180168, 0x08)  # Spike Cave Damage
-    if world.futuro[player]:
+    if not StartingMagic:
         rom.write_bytes(0x18016B, [0x81, 0x04, 0x02])  # Set spike cave and MM spike room Byrna usage
         rom.write_bytes(0x18016E, [0x01, 0x04, 0x08])  # Set spike cave and MM spike room Cape usage
     else:
@@ -1152,10 +1152,7 @@ def patch_rom(world, rom, player, team, enemized):
     equip[0x36C] = 0x18
     equip[0x36D] = 0x18
     equip[0x379] = 0x68
-    if world.futuro[player]:
-        starting_max_bombs = 0
-    else:
-        starting_max_bombs = 10
+    starting_max_bombs = 10
     starting_max_arrows = 30
 
     startingstate = CollectionState(world)
@@ -1290,12 +1287,6 @@ def patch_rom(world, rom, player, team, enemized):
                 equip[0x36D] = min(equip[0x36D] + 0x08, 0xA0)
         else:
             raise RuntimeError(f'Unsupported item in starting equipment: {item.name}')
-
-    # Set basepatch switches for the futuro mode
-    if world.futuro[player]:
-        rom.write_byte(0x18008D, 0x01)
-    else:
-        rom.write_byte(0x18008D, 0x00)
 
     equip[0x343] = min(equip[0x343], starting_max_bombs)
     rom.write_byte(0x180034, starting_max_bombs)

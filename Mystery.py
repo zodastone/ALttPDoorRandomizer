@@ -174,8 +174,6 @@ def roll_settings(weights):
         ret.mode = 'open'
         ret.retro = True
 
-    ret.futuro = get_choice('futuro', weights)
-
     ret.hints = get_choice('hints') == 'on'
 
     ret.swords = {'randomized': 'random',

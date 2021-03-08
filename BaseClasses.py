@@ -19,7 +19,7 @@ from RoomData import Room
 class World(object):
 
     def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
-                 timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, futuro, custom, customitemarray, hints):
+                 timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
         self.players = players
         self.teams = 1
         self.shuffle = shuffle.copy()
@@ -61,7 +61,6 @@ class World(object):
         self.shuffle_ganon = shuffle_ganon
         self.fix_gtower_exit = self.shuffle_ganon
         self.retro = retro.copy()
-        self.futuro = futuro.copy()
         self.custom = custom
         self.customitemarray = customitemarray
         self.can_take_damage = True
@@ -92,9 +91,6 @@ class World(object):
                 self.retro[player] = True
             def set_player_attr(attr, val):
                 self.__dict__.setdefault(attr, {})[player] = val
-            # Futuro doesn't support standard start
-            if self.futuro[player] and self.mode[player] == "standard":
-                self.mode[player] == "open" 
             set_player_attr('_region_cache', {})
             set_player_attr('player_names', [])
             set_player_attr('remote_items', False)
@@ -453,10 +449,6 @@ class World(object):
 
         return False
 
-
-# Items to test for ability to use magic in has()
-magic_items = ['Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Cane of Somaria', 'Cane of Byrna', 'Cape']
-
 class CollectionState(object):
 
     def __init__(self, parent):
@@ -578,10 +570,10 @@ class CollectionState(object):
 
 
     def can_reach_blue(self, region, player):
-        return region in self.reachable_regions[player] and self.reachable_regions[player][region] in [CrystalBarrier.Blue, CrystalBarrier.Either] and self.can_hit_switch(player)
+        return region in self.reachable_regions[player] and self.reachable_regions[player][region] in [CrystalBarrier.Blue, CrystalBarrier.Either] and self.can_hit_crystal(player)
 
     def can_reach_orange(self, region, player):
-        return region in self.reachable_regions[player] and self.reachable_regions[player][region] in [CrystalBarrier.Orange, CrystalBarrier.Either] and self.can_hit_switch(player)
+        return region in self.reachable_regions[player] and self.reachable_regions[player][region] in [CrystalBarrier.Orange, CrystalBarrier.Either] and self.can_hit_crystal(player)
 
     def _do_not_flood_the_keys(self, reachable_events):
         adjusted_checks = list(reachable_events)
@@ -603,9 +595,6 @@ class CollectionState(object):
         return True
 
     def has(self, item, player, count=1):
-        if self.world.futuro[player]:
-            if item in magic_items and self.prog_items['Magic Upgrade (1/2)', player] == 0 and self.prog_items['Magic Upgrade (1/4)', player] == 0:
-                return False
         if count == 1:
             return (item, player) in self.prog_items
         return self.prog_items[item, player] >= count
@@ -665,11 +654,6 @@ class CollectionState(object):
             basemagic = 16
         else:
             basemagic = 8
-        if self.world.futuro[player]:
-            if basemagic == 8:
-                basemagic = 0
-            else:
-                basemagic = int(basemagic/2)
         if self.can_buy_unlimited('Green Potion', player) or self.can_buy_unlimited('Blue Potion', player):
             if self.world.difficulty_adjustments[player] == 'hard' and not fullrefill:
                 basemagic = basemagic + int(basemagic * 0.5 * self.bottle_count(player))
@@ -687,10 +671,12 @@ class CollectionState(object):
                 or self.has('Fire Rod', player)
                 )
 
+    # In the future, this can be used to check if the player starts without bombs
     def can_use_bombs(self, player):
-        return (self.has('Bomb Upgrade (+10)', player) or not self.world.futuro[player])
+        StartingBombs = True
+        return (StartingBombs or self.has('Bomb Upgrade (+10)', player))
 
-    def can_hit_switch(self, player):
+    def can_hit_crystal(self, player):
         return (self.can_use_bombs(player)
                 or self.can_shoot_arrows(player)
                 or self.has_blunt_weapon(player)
@@ -702,7 +688,7 @@ class CollectionState(object):
                 or self.has('Cane of Somaria', player)
                 or self.has('Cane of Byrna', player))
     
-    def can_hit_switch_through_barrier(self, player):
+    def can_hit_crystal_through_barrier(self, player):
         return (self.can_use_bombs(player)
             or self.can_shoot_arrows(player)
             or self.has_beam_sword(player)
@@ -1959,7 +1945,6 @@ class Spoiler(object):
                          'logic': self.world.logic,
                          'mode': self.world.mode,
                          'retro': self.world.retro,
-                         'futuro': self.world.futuro,
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'shuffle': self.world.shuffle,
@@ -2023,7 +2008,6 @@ class Spoiler(object):
                 outfile.write('Logic:                           %s\n' % self.metadata['logic'][player])
                 outfile.write('Mode:                            %s\n' % self.metadata['mode'][player])
                 outfile.write('Retro:                           %s\n' % ('Yes' if self.metadata['retro'][player] else 'No'))
-                outfile.write('Futuro:                          %s\n' % ('Yes' if self.metadata['futuro'][player] else 'No'))
                 outfile.write('Swords:                          %s\n' % self.metadata['weapons'][player])
                 outfile.write('Goal:                            %s\n' % self.metadata['goal'][player])
                 outfile.write('Difficulty:                      %s\n' % self.metadata['item_pool'][player])

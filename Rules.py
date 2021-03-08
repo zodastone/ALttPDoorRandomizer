@@ -28,8 +28,7 @@ def set_rules(world, player):
     else:
         raise NotImplementedError('Not implemented yet')
 
-    if world.futuro[player]:
-        bomb_rules(world, player)
+    bomb_rules(world, player)
 
     if world.logic[player] == 'noglitches':
         no_glitches_rules(world, player)
@@ -284,7 +283,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Hub EN', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Hub NW', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Hub NE', player), lambda state: state.has('Cane of Somaria', player))
-    set_rule(world.get_location('Turtle Rock - Chain Chomps', player), lambda state: state.can_hit_switch_through_barrier(player))
+    set_rule(world.get_location('Turtle Rock - Chain Chomps', player), lambda state: state.can_hit_crystal_through_barrier(player))
     set_rule(world.get_entrance('TR Torches NW', player), lambda state: state.has('Cane of Somaria', player) and state.has('Fire Rod', player))
     set_rule(world.get_entrance('TR Big Chest Entrance Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('TR Big Chest Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has_Boots(player))
@@ -352,15 +351,15 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Hera Front to Lobby Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('Hera Front', player), player))
     set_rule(world.get_entrance('Hera Front to Down Stairs Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('Hera Front', player), player))
     set_rule(world.get_entrance('Hera Down Stairs to Front Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('Hera Down Stairs Landing', player), player))
-    set_rule(world.get_entrance('Hera Down Stairs Landing to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player))
+    set_rule(world.get_entrance('Hera Down Stairs Landing to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player))
     set_rule(world.get_entrance('Hera Front to Up Stairs Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Front', player), player))
     set_rule(world.get_entrance('Hera Up Stairs to Front Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Up Stairs Landing', player), player))
-    set_rule(world.get_entrance('Hera Up Stairs Landing to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player))
+    set_rule(world.get_entrance('Hera Up Stairs Landing to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player))
     set_rule(world.get_entrance('Hera Front to Back Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Front', player), player))
     set_rule(world.get_entrance('Hera Back to Front Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Back', player), player))
     set_rule(world.get_entrance('Hera Back to Ranged Crystal', player), lambda state: state.has_beam_sword(player) or state.can_shoot_arrows(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player))
 
-    set_rule(world.get_entrance('PoD Arena Main to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player) or state.has('Hookshot', player))
+    set_rule(world.get_entrance('PoD Arena Main to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('PoD Arena Bridge to Ranged Crystal', player), lambda state: state.has_beam_sword(player) or state.can_shoot_arrows(player) or state.has('Red Boomerang', player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('PoD Arena Landing to Ranged Crystal', player), lambda state: state.has('Red Boomerang', player) or (state.has('Cane of Somaria', player) and state.has_Boots(player)))
     set_rule(world.get_entrance('PoD Arena Main to North Ranged Barrier - Orange', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria', player))
@@ -407,23 +406,23 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Mire Crystal Dead End Right Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Crystal Dead End', player), player))
     set_rule(world.get_entrance('Mire South Fish Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire South Fish', player), player))
     set_rule(world.get_entrance('Mire Compass Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Compass Room', player), player))
-    set_rule(world.get_entrance('Mire Tall Dark and Roomy to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player) or state.has('Hookshot', player) or state.has_Boots(player))
+    set_rule(world.get_entrance('Mire Tall Dark and Roomy to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player) or state.has('Hookshot', player) or state.has_Boots(player))
     set_rule(world.get_entrance('Mire Crystal Mid Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Crystal Mid', player), player))
     set_rule(world.get_entrance('Mire Crystal Left Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Crystal Left', player), player))
 
     set_rule(world.get_entrance('TR Chain Chomps Top to Bottom Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('TR Chain Chomps Top', player), player))
     set_rule(world.get_entrance('TR Chain Chomps Bottom to Top Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('TR Chain Chomps Bottom', player), player))
-    set_rule(world.get_entrance('TR Chain Chomps Bottom to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player))
+    set_rule(world.get_entrance('TR Chain Chomps Bottom to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player))
     set_rule(world.get_entrance('TR Pokey 2 Top to Bottom Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Pokey 2 Top', player), player))
     set_rule(world.get_entrance('TR Pokey 2 Bottom to Top Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Pokey 2 Bottom', player), player))
-    set_rule(world.get_entrance('TR Pokey 2 Bottom to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player))
+    set_rule(world.get_entrance('TR Pokey 2 Bottom to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player))
 
     set_rule(world.get_entrance('TR Crystaroller Bottom to Middle Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('TR Crystaroller Bottom', player), player))
     set_rule(world.get_entrance('TR Crystaroller Bottom to Ranged Crystal', player), lambda state: state.has_beam_sword(player) or state.can_shoot_arrows(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Crystaroller Middle to Bottom Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('TR Crystaroller Middle', player), player))
     set_rule(world.get_entrance('TR Crystaroller Middle to Chest Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Crystaroller Middle', player), player))
     set_rule(world.get_entrance('TR Crystaroller Middle to Top Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('TR Crystaroller Middle', player), player))
-    set_rule(world.get_entrance('TR Crystaroller Middle to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player))
+    set_rule(world.get_entrance('TR Crystaroller Middle to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player))
     set_rule(world.get_entrance('TR Crystaroller Top to Middle Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('TR Crystaroller Top', player), player))
     set_rule(world.get_entrance('TR Crystaroller Chest to Middle Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Crystaroller Chest', player), player))
 
@@ -463,7 +462,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Mire Firesnake Skip Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Mire Firesnake Skip', player), player))
     set_rule(world.get_entrance('Mire Antechamber Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Mire Antechamber', player), player))
     set_rule(world.get_entrance('GT Crystal Circles Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('GT Crystal Circles', player), player))
-    set_rule(world.get_entrance('GT Crystal Circles to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player) or state.has_blunt_weapon(player) or state.has('Cane of Byrna', player))
+    set_rule(world.get_entrance('GT Crystal Circles to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player) or state.has_blunt_weapon(player) or state.has('Cane of Byrna', player))
 
 
     add_key_logic_rules(world, player)
@@ -498,7 +497,7 @@ def bomb_rules(world, player):
 
     paradox_switch_chests = ['Paradox Cave Lower - Far Left', 'Paradox Cave Lower - Left', 'Paradox Cave Lower - Right', 'Paradox Cave Lower - Far Right', 'Paradox Cave Lower - Middle']
     for location in paradox_switch_chests:
-        add_rule(world.get_location(location, player), lambda state: state.can_hit_switch_through_barrier(player))
+        add_rule(world.get_location(location, player), lambda state: state.can_hit_crystal_through_barrier(player))
 
     # Dungeon bomb logic
     for _,entrances in std_kill_rooms.items():
