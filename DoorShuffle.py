@@ -2466,7 +2466,7 @@ interior_doors = [
     ('Skull Star Pits ES', 'Skull Torch Room WS'),
     ('Skull Torch Room WN', 'Skull Vines EN'),
     ('Skull Spike Corner ES', 'Skull Final Drop WS'),
-    ('Thieves Hallway WS', 'Thieves Pot Alcove Mid ES'w),
+    ('Thieves Hallway WS', 'Thieves Pot Alcove Mid ES'),
     ('Thieves Conveyor Maze SW', 'Thieves Pot Alcove Top NW'),
     ('Thieves Conveyor Maze EN', 'Thieves Hallway WN'),
     ('Thieves Spike Track NE', 'Thieves Triple Bypass SE'),
