@@ -500,7 +500,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Skull Big Key', 'Skull Woods', ['Skull Woods - Big Key Chest'], ['Skull Big Key SW', 'Skull Big Key WN']),
         create_dungeon_region(player, 'Skull Lone Pot', 'Skull Woods', None, ['Skull Lone Pot EN']),
         create_dungeon_region(player, 'Skull Small Hall', 'Skull Woods', None, ['Skull Small Hall ES', 'Skull Small Hall WS']),
-        create_dungeon_region(player, 'Skull Back Drop', 'Skull Woods', None, ['Skull Back Drop Star Path', ]),
+        create_dungeon_region(player, 'Skull Back Drop', 'Skull Woods', None, ['Skull Back Drop Star Path']),
         create_dungeon_region(player, 'Skull 2 West Lobby', 'Skull Woods', ['Skull Woods - West Lobby Pot Key'], ['Skull 2 West Lobby ES', 'Skull 2 West Lobby NW', 'Skull 2 West Lobby S']),
         create_dungeon_region(player, 'Skull X Room', 'Skull Woods', None, ['Skull X Room SW']),
         create_dungeon_region(player, 'Skull 3 Lobby', 'Skull Woods', None, ['Skull 3 Lobby NW', 'Skull 3 Lobby EN', 'Skull 3 Lobby SW']),

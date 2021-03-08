@@ -1910,6 +1910,7 @@ def determine_init_crystal(initial, state, start_regions):
         return CrystalBarrier.Orange
     else:
         raise Exception(f'Can\'t get to {start_region.name} from initial state')
+#        raise Exception(f'Can\'t get to {start_region.name} from initial state\n{state.dungeon}\n{state.found_locations}')
 
 
 def explore_state(state, world, player):
@@ -2401,11 +2402,11 @@ interior_doors = [
     ('Desert Sandworm Corner NE', 'Desert Bonk Torch SE'),
     ('Desert Sandworm Corner WS', 'Desert Circle of Pots ES'),
     ('Desert Circle of Pots NW', 'Desert Big Chest SW'),
-    ('Desert West Wing WS', 'Desert West Lobby ES',),
+    ('Desert West Wing WS', 'Desert West Lobby ES'),
     ('Desert Fairy Fountain SW', 'Desert West Lobby NW'),
     ('Desert Back Lobby NW', 'Desert Tiles 1 SW'),
     ('Desert Bridge SW', 'Desert Four Statues NW'),
-    ('Desert Four Statues ES', 'Desert Beamos Hall WS',),
+    ('Desert Four Statues ES', 'Desert Beamos Hall WS'),
     ('Desert Tiles 2 NE', 'Desert Wall Slide SE'),
     ('Hera Tile Room EN', 'Hera Tridorm WN'),
     ('Hera Tridorm SE', 'Hera Torches NE'),
