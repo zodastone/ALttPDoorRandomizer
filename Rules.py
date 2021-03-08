@@ -354,10 +354,13 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Hera Front to Lobby Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('Hera Front', player), player))
     set_rule(world.get_entrance('Hera Front to Down Stairs Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('Hera Front', player), player))
     set_rule(world.get_entrance('Hera Down Stairs to Front Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('Hera Down Stairs Landing', player), player))
+    set_rule(world.get_entrance('Hera Down Stairs Landing to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player))
     set_rule(world.get_entrance('Hera Front to Up Stairs Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Front', player), player))
     set_rule(world.get_entrance('Hera Up Stairs to Front Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Up Stairs Landing', player), player))
+    set_rule(world.get_entrance('Hera Up Stairs Landing to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player))
     set_rule(world.get_entrance('Hera Front to Back Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Front', player), player))
     set_rule(world.get_entrance('Hera Back to Front Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Back', player), player))
+    set_rule(world.get_entrance('Hera Back to Ranged Crystal', player), lambda state: state.has_beam_sword(player) or state.can_shoot_arrows(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player))
 
     set_rule(world.get_entrance('PoD Arena Main to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('PoD Arena Bridge to Ranged Crystal', player), lambda state: state.has_beam_sword(player) or state.can_shoot_arrows(player) or state.has('Red Boomerang', player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
@@ -406,7 +409,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Mire Crystal Dead End Right Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Crystal Dead End', player), player))
     set_rule(world.get_entrance('Mire South Fish Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire South Fish', player), player))
     set_rule(world.get_entrance('Mire Compass Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Compass Room', player), player))
-    set_rule(world.get_entrance('Mire Tall Dark and Roomy to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player) or state.has('Hookshot') or state.has_Boots(player))
+    set_rule(world.get_entrance('Mire Tall Dark and Roomy to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player) or state.has('Hookshot', player) or state.has_Boots(player))
     set_rule(world.get_entrance('Mire Crystal Mid Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Crystal Mid', player), player))
     set_rule(world.get_entrance('Mire Crystal Left Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Crystal Left', player), player))
 
@@ -460,7 +463,7 @@ def global_rules(world, player):
 def bomb_rules(world, player):
     bonkable_doors = ['Two Brothers House Exit (West)', 'Two Brothers House Exit (East)'] # Technically this is incorrectly defined, but functionally the same as what is intended.
     bombable_doors = ['Ice Rod Cave', 'Light World Bomb Hut', 'Light World Death Mountain Shop', 'Mini Moldorm Cave',
-                      'Hookshot Cave Bombable Wall', 'Hookshot Cave Back Bombable Wall', 'Dark Lake Hylia Ledge Fairy', 'Hype Cave', 'Brewery']
+                      'Hookshot Cave Exit (South)', 'Hookshot Cave Exit (North)', 'Dark Lake Hylia Ledge Fairy', 'Hype Cave', 'Brewery']
     for entrance in bonkable_doors:
         add_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player)) 
     for entrance in bombable_doors:

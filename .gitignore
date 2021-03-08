@@ -24,6 +24,7 @@ weights/
 /MultiMystery/
 /Players/
 /QUsb2Snes/
+/tests
 
 resources/user/*
 !resources/user/.gitkeep

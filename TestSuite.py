@@ -29,7 +29,7 @@ def main(args=None):
                      ['Std ', ' --mode standard'],
                      ['Inv ', ' --mode inverted']]:
 
-            basecommand = f"python3.8 DungeonRandomizer.py --door_shuffle {args.dr} --intensity {args.tense} --suppress_rom --suppress_spoiler"
+            basecommand = f"py -3.8 DungeonRandomizer.py --door_shuffle {args.dr} --intensity {args.tense} --suppress_rom --suppress_spoiler"
 
             def gen_seed():
                 taskcommand = basecommand + " " + command + mode[1]

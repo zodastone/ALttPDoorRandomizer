@@ -2271,7 +2271,7 @@ Cave_Exits_Base = [['Elder House Exit (East)', 'Elder House Exit (West)'],
               ['Death Mountain Return Cave Exit (West)', 'Death Mountain Return Cave Exit (East)'],
               ['Fairy Ascension Cave Exit (Bottom)', 'Fairy Ascension Cave Exit (Top)'],
               ['Bumper Cave Exit (Top)', 'Bumper Cave Exit (Bottom)'],
-              ['Hookshot Cave Exit (South)', 'Hookshot Cave Back Exit']]
+              ['Hookshot Cave Exit (South)', 'Hookshot Cave Exit (North)']]
 
 Cave_Exits_Base += [('Superbunny Cave Exit (Bottom)', 'Superbunny Cave Exit (Top)'),
               ('Spiral Cave Exit (Top)', 'Spiral Cave Exit')]
@@ -3254,10 +3254,8 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Superbunny Cave Exit (Bottom)', 'Dark Death Mountain (East Bottom)'),
 
                        ('Hookshot Cave Exit (South)', 'Dark Death Mountain (Top)'),
-                       ('Hookshot Cave Bombable Wall', 'Hookshot Cave Back'),
-                       ('Hookshot Cave Back Exit', 'Death Mountain Floating Island (Dark World)'),
-                       ('Hookshot Cave Back Bombable Wall', 'Hookshot Cave'),
-                       ('Hookshot Cave Back Entrance', 'Hookshot Cave Back'),
+                       ('Hookshot Cave Exit (North)', 'Death Mountain Floating Island (Dark World)'),
+                       ('Hookshot Cave Back Entrance', 'Hookshot Cave'),
 
                        ('Mimic Cave', 'Mimic Cave'),
 
@@ -3388,10 +3386,8 @@ inverted_default_connections =  [('Waterfall of Wishing', 'Waterfall of Wishing'
                                  ('Cave Shop (Dark Death Mountain)', 'Cave Shop (Dark Death Mountain)'),
                                  ('Superbunny Cave (Bottom)', 'Superbunny Cave'),
                                  ('Superbunny Cave Exit (Bottom)', 'Dark Death Mountain (East Bottom)'),
-                                 ('Hookshot Cave Bombable Wall', 'Hookshot Cave Back'),
-                                 ('Hookshot Cave Back Bombable Wall', 'Hookshot Cave'),
-                                 ('Hookshot Cave Back Exit', 'Death Mountain Floating Island (Dark World'),
-                                 ('Hookshot Cave Back Entrance', 'Hookshot Cave Back'),
+                                 ('Hookshot Cave Exit (North)', 'Death Mountain Floating Island (Dark World)'),
+                                 ('Hookshot Cave Back Entrance', 'Hookshot Cave'),
                                  ('Mimic Cave', 'Mimic Cave'),
                                  ('Inverted Pyramid Hole', 'Pyramid'),
                                  ('Inverted Links House', 'Inverted Links House'),
@@ -3761,7 +3757,7 @@ exit_ids = {'Links House Exit': (0x01, 0x00),
             'Superbunny Cave Exit (Top)': (0x14, 0x15),
             'Superbunny Cave Exit (Bottom)': (0x13, 0x14),
             'Hookshot Cave Exit (South)': (0x3A, 0x3B),
-            'Hookshot Cave Back Exit': (0x3B, 0x3C),
+            'Hookshot Cave Exit (North)': (0x3B, 0x3C),
             'Ganons Tower Exit': (0x37, 0x38),
             'Inverted Ganons Tower Exit': (0x37, 0x38),
             'Pyramid Exit': (0x36, 0x37),

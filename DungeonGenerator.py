@@ -1631,7 +1631,7 @@ def ensure_crystal_switches_reachable(dungeon_map, crystal_switches, polarized_s
                     valid, sector, which_list = False, None, None
                     while not valid:
                         if len(candidates) <= 0:
-                            raise GenerationException(f'need to provide more sophisticatedted crystal connection for {entrance_sector}')
+                            raise GenerationException(f'need to provide more sophisticated crystal connection for {entrance_sector}')
                         sector, which_list = random.choice(list(candidates.items()))
                         del candidates[sector]
                         valid = global_pole.is_valid_choice(dungeon_map, builder, [sector])

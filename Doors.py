@@ -260,10 +260,16 @@ def create_doors(world, player):
         create_door(player, 'Hera Front Crystal Exit', Lgcl),
         create_door(player, 'Hera Front to Down Stairs Barrier - Blue', Lgcl),
         create_door(player, 'Hera Down Stairs to Front Barrier - Blue', Lgcl),
+        create_door(player, 'Hera Down Stairs Landing to Ranged Crystal', Lgcl),
+        create_door(player, 'Hera Down Stairs Landing Ranged Crystal Exit', Lgcl),
         create_door(player, 'Hera Front to Up Stairs Barrier - Orange', Lgcl),
         create_door(player, 'Hera Up Stairs to Front Barrier - Orange', Lgcl),
+        create_door(player, 'Hera Up Stairs Landing to Ranged Crystal', Lgcl),
+        create_door(player, 'Hera Up Stairs Landing Ranged Crystal Exit', Lgcl),
         create_door(player, 'Hera Front to Back Barrier - Orange', Lgcl),
         create_door(player, 'Hera Back to Front Barrier - Orange', Lgcl),
+        create_door(player, 'Hera Back to Ranged Crystal', Lgcl),
+        create_door(player, 'Hera Back Ranged Crystal Exit', Lgcl),
         create_door(player, 'Hera Lobby Down Stairs', Sprl).dir(Dn, 0x77, 3, HTL).ss(Z, 0x21, 0x90, False, True),
         create_door(player, 'Hera Lobby Key Stairs', Sprl).dir(Dn, 0x77, 1, HTL).ss(A, 0x12, 0x80).small_key().pos(1),
         create_door(player, 'Hera Lobby Up Stairs', Sprl).dir(Up, 0x77, 2, HTL).ss(X, 0x2b, 0x5c, False, True),
@@ -1198,10 +1204,13 @@ def create_doors(world, player):
     world.get_door('Hera Front Crystal Exit', player).c_switch()
     world.get_door('Hera Front to Down Stairs Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('Hera Down Stairs to Front Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Hera Down Stairs Landing Ranged Crystal Exit', player).c_switch()
     world.get_door('Hera Front to Up Stairs Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('Hera Up Stairs to Front Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Hera Up Stairs Landing Ranged Crystal Exit', player).c_switch()
     world.get_door('Hera Front to Back Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('Hera Back to Front Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Hera Back Ranged Crystal Exit', player).c_switch()
     world.get_door('Hera Basement Cage Up Stairs', player).c_switch()
     world.get_door('Hera Tile Room Up Stairs', player).c_switch()
     world.get_door('Hera Tile Room EN', player).c_switch()
@@ -1258,7 +1267,6 @@ def create_doors(world, player):
     world.get_door('Thieves Triple Bypass WN', player).barrier(CrystalBarrier.Blue)
     world.get_door('Thieves Triple Bypass EN', player).barrier(CrystalBarrier.Blue)
     world.get_door('Thieves Hellway Orange Barrier', player).barrier(CrystalBarrier.Orange)
-    world.get_door('Thieves Hellway Crystal Orange Barrier', player).barrier(CrystalBarrier.Orange)
     world.get_door('Thieves Hellway Crystal Orange Barrier', player).barrier(CrystalBarrier.Orange)
     world.get_door('Thieves Attic Orange Barrier', player).barrier(CrystalBarrier.Orange)
     world.get_door('Thieves Attic Hint Orange Barrier', player).barrier(CrystalBarrier.Orange)

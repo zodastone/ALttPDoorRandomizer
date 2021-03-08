@@ -187,8 +187,7 @@ def create_regions(world, player):
                            ['Superbunny Cave Exit (Top)', 'Superbunny Cave Exit (Bottom)']),
         create_cave_region(player, 'Spike Cave', 'Spike Cave', ['Spike Cave']),
         create_cave_region(player, 'Hookshot Cave', 'a connector', ['Hookshot Cave - Top Right', 'Hookshot Cave - Top Left', 'Hookshot Cave - Bottom Right', 'Hookshot Cave - Bottom Left'],
-                           ['Hookshot Cave Exit (South)', 'Hookshot Cave Bombable Wall']),
-        create_cave_region(player, 'Hookshot Cave Back', 'a connector', None, ['Hookshot Cave Back Exit', 'Hookshot Cave Back Bombable Wall']),
+                           ['Hookshot Cave Exit (South)', 'Hookshot Cave Exit (North)']),
         create_dw_region(player, 'Death Mountain Floating Island (Dark World)', None, ['Floating Island Drop', 'Hookshot Cave Back Entrance', 'Floating Island Mirror Spot']),
         create_lw_region(player, 'Death Mountain Floating Island (Light World)', ['Floating Island']),
         create_dw_region(player, 'Turtle Rock (Top)', None, ['Turtle Rock Drop']),
@@ -342,9 +341,12 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Hera Lobby Crystal', 'Tower of Hera', None, ['Hera Lobby Crystal Exit']),
         create_dungeon_region(player, 'Hera Front', 'Tower of Hera', None, ['Hera Front to Crystal', 'Hera Front to Lobby Barrier - Blue', 'Hera Front to Down Stairs Barrier - Blue', 'Hera Front to Up Stairs Barrier - Orange', 'Hera Front to Back Barrier - Orange']),
         create_dungeon_region(player, 'Hera Front Crystal', 'Tower of Hera', None, ['Hera Front Crystal Exit']),
-        create_dungeon_region(player, 'Hera Down Stairs Landing', 'Tower of Hera', None, ['Hera Lobby Down Stairs', 'Hera Down Stairs to Front Barrier - Blue']),
-        create_dungeon_region(player, 'Hera Up Stairs Landing', 'Tower of Hera', None, ['Hera Up Stairs to Front Barrier - Orange', 'Hera Lobby Up Stairs']),
-        create_dungeon_region(player, 'Hera Back', 'Tower of Hera', ['Tower of Hera - Map Chest'], ['Hera Back to Front Barrier - Orange', 'Hera Lobby Key Stairs']),
+        create_dungeon_region(player, 'Hera Down Stairs Landing', 'Tower of Hera', None, ['Hera Lobby Down Stairs', 'Hera Down Stairs to Front Barrier - Blue', 'Hera Down Stairs Landing to Ranged Crystal']),
+        create_dungeon_region(player, 'Hera Down Stairs Landing - Ranged Crystal', 'Tower of Hera', None, ['Hera Down Stairs Landing Ranged Crystal Exit']),
+        create_dungeon_region(player, 'Hera Up Stairs Landing', 'Tower of Hera', None, ['Hera Up Stairs to Front Barrier - Orange', 'Hera Lobby Up Stairs', 'Hera Up Stairs Landing to Ranged Crystal']),
+        create_dungeon_region(player, 'Hera Up Stairs Landing - Ranged Crystal', 'Tower of Hera', None, ['Hera Up Stairs Landing Ranged Crystal Exit']),
+        create_dungeon_region(player, 'Hera Back', 'Tower of Hera', ['Tower of Hera - Map Chest'], ['Hera Back to Front Barrier - Orange', 'Hera Lobby Key Stairs', 'Hera Back to Ranged Crystal']),
+        create_dungeon_region(player, 'Hera Back - Ranged Crystal', 'Tower of Hera', None, ['Hera Back Ranged Crystal Exit']),
         create_dungeon_region(player, 'Hera Basement Cage', 'Tower of Hera', ['Tower of Hera - Basement Cage'], ['Hera Basement Cage Up Stairs']),
         create_dungeon_region(player, 'Hera Tile Room', 'Tower of Hera', None, ['Hera Tile Room Up Stairs', 'Hera Tile Room EN']),
         create_dungeon_region(player, 'Hera Tridorm', 'Tower of Hera', None, ['Hera Tridorm WN', 'Hera Tridorm SE']),
@@ -793,6 +795,9 @@ def create_dungeon_regions(world, player):
     world.initialize_regions()
     world.get_region('Hera Lobby Crystal', player).crystal_switch = True
     world.get_region('Hera Front Crystal', player).crystal_switch = True
+    world.get_region('Hera Down Stairs Landing - Ranged Crystal', player).crystal_switch = True
+    world.get_region('Hera Up Stairs Landing - Ranged Crystal', player).crystal_switch = True
+    world.get_region('Hera Back - Ranged Crystal', player).crystal_switch = True
     world.get_region('Hera Basement Cage', player).crystal_switch = True
     world.get_region('Hera Tile Room', player).crystal_switch = True  # INTERIOR not accessible (maybe with cane)
     world.get_region('Hera Tridorm', player).crystal_switch = True
