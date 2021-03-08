@@ -25,9 +25,11 @@ def main(args=None):
 
     def test(testname: str, command: str):
         tests[testname] = [command]
-        for mode in [['Open', ''],
-                     ['Std ', ' --mode standard'],
-                     ['Inv ', ' --mode inverted']]:
+#        testmodes = [['Open', ''],
+#                     ['Std ', ' --mode standard'],
+#                     ['Inv ', ' --mode inverted']]
+        testmodes = [['Open', '']]
+        for mode in testmodes:
 
             basecommand = f"py -3.8 DungeonRandomizer.py --door_shuffle {args.dr} --intensity {args.tense} --suppress_rom --suppress_spoiler"
 
@@ -44,13 +46,13 @@ def main(args=None):
                 task_mapping.append(task)
 
     test("Vanilla   ", "--shuffle vanilla")
-    test("Retro     ", "--retro --shuffle vanilla")
+#    test("Retro     ", "--retro --shuffle vanilla")
 #    test("Futuro    ", "--futuro --shuffle vanilla")
-    test("Keysanity ", "--shuffle vanilla --keydropshuffle --keysanity")
-    test("Simple    ", "--shuffle simple")
-    test("Full      ", "--shuffle full")
-    test("Crossed   ", "--shuffle crossed")
-    test("Insanity  ", "--shuffle insanity")
+#    test("Keysanity ", "--shuffle vanilla --keydropshuffle --keysanity")
+#    test("Simple    ", "--shuffle simple")
+#    test("Full      ", "--shuffle full")
+#    test("Crossed   ", "--shuffle crossed")
+#    test("Insanity  ", "--shuffle insanity")
 
     from tqdm import tqdm
     with tqdm(concurrent.futures.as_completed(task_mapping),
@@ -72,7 +74,8 @@ def main(args=None):
 
     def get_results(testname: str):
         result = ""
-        for mode in ['Open', 'Std ', 'Inv ']:
+#        for mode in ['Open', 'Std ', 'Inv ']:
+        for mode in ['Open']:
             dead_or_alive = [task.success for task in task_mapping if task.name == testname and task.mode == mode]
             alive = [x for x in dead_or_alive if x]
             success = f"{testname}{mode} Rate: {(len(alive) / len(dead_or_alive)) * 100:.2f}%"
