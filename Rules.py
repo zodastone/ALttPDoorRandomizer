@@ -290,7 +290,6 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Big Chest Gap', player), lambda state: state.has('Cane of Somaria', player) or state.has_Boots(player))
     set_rule(world.get_entrance('TR Dark Ride Up Stairs', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Dark Ride SW', player), lambda state: state.has('Cane of Somaria', player))
-    set_rule(world.get_entrance('TR Crystal Maze Cane Path', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Final Abyss South Stairs', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Final Abyss NW', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_location('Turtle Rock - Eye Bridge - Bottom Left', player), lambda state: state.has('Cane of Byrna', player) or state.has('Cape', player) or state.has('Mirror Shield', player))
@@ -427,7 +426,12 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Crystaroller Middle to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player))
     set_rule(world.get_entrance('TR Crystaroller Top to Middle Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('TR Crystaroller Top', player), player))
     set_rule(world.get_entrance('TR Crystaroller Chest to Middle Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Crystaroller Chest', player), player))
-    set_rule(world.get_entrance('TR Crystal Maze Blue Path', player), lambda state: state.can_reach_blue(world.get_region('TR Crystal Maze End', player), player))
+
+    set_rule(world.get_entrance('TR Crystal Maze Start to Interior Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Crystal Maze Start', player), player))
+    set_rule(world.get_entrance('TR Crystal Maze Interior to End Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Crystal Maze Interior', player), player))
+    set_rule(world.get_entrance('TR Crystal Maze Interior to Start Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Crystal Maze Interior', player), player))
+    set_rule(world.get_entrance('TR Crystal Maze End to Interior Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Crystal Maze End', player), player))
+    set_rule(world.get_entrance('TR Crystal Maze End to Ranged Crystal', player), lambda state: state.has('Cane of Somaria', player))
 
     set_rule(world.get_entrance('GT Hookshot Platform Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('GT Hookshot South Platform', player), player))
     set_rule(world.get_entrance('GT Hookshot South Entry to Ranged Crystal', player), lambda state: state.can_use_bombs(player) or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player) or state.has('Cane of Somaria', player))
@@ -1668,7 +1672,7 @@ bunny_impassible_doors = {
     'PoD Turtle Party ES', 'PoD Turtle Party NW', 'PoD Callback Warp', 'Swamp Lobby Moat', 'Swamp Entrance Moat',
     'Swamp Trench 1 Approach Swim Depart', 'Swamp Trench 1 Approach Key', 'Swamp Trench 1 Key Approach',
     'Swamp Trench 1 Key Ledge Depart', 'Swamp Trench 1 Departure Approach', 'Swamp Trench 1 Departure Key',
-    'Swamp Hub Hook Path', 'Swamp Compass Donut Push Block', 'Swamp Shortcut Blue Barrier', 'Swamp Trench 2 Pots Blue Barrier',
+    'Swamp Hub Hook Path', 'Swamp Shortcut Blue Barrier', 'Swamp Trench 2 Pots Blue Barrier',
     'Swamp Trench 2 Pots Wet', 'Swamp Trench 2 Departure Wet', 'Swamp West Ledge Hook Path', 'Swamp Barrier Ledge Hook Path',
     'Swamp Attic Left Pit', 'Swamp Attic Right Pit', 'Swamp Push Statue NW', 'Swamp Push Statue NE',
     'Swamp Drain Right Switch', 'Swamp Waterway NE', 'Swamp Waterway N', 'Swamp Waterway NW', 
@@ -1694,7 +1698,7 @@ bunny_impassible_doors = {
     'TR Lobby Ledge Gap', 'TR Hub SW', 'TR Hub SE', 'TR Hub ES', 'TR Hub EN', 'TR Hub NW', 'TR Hub NE', 'TR Torches NW',
     'TR Pokey 2 Bottom to Top Barrier - Blue', 'TR Pokey 2 Top to Bottom Barrier - Blue', 'TR Twin Pokeys SW', 'TR Twin Pokeys EN', 'TR Big Chest Gap',
     'TR Big Chest Entrance Gap', 'TR Lazy Eyes ES', 'TR Tongue Pull WS', 'TR Tongue Pull NE', 'TR Dark Ride Up Stairs',
-    'TR Dark Ride SW', 'TR Crystal Maze Forwards Path', 'TR Crystal Maze Blue Path', 'TR Crystal Maze Cane Path',
+    'TR Dark Ride SW', 'TR Crystal Maze Start to Interior Barrier - Blue', 'TR Crystal Maze End to Interior Barrier - Blue',
     'TR Final Abyss South Stairs', 'TR Final Abyss NW', 'GT Hope Room EN', 'GT Blocked Stairs Block Path',
     'GT Bob\'s Room Hole', 'GT Speed Torch SE', 'GT Speed Torch South Path', 'GT Speed Torch North Path',
     'GT Crystal Conveyor NE', 'GT Crystal Conveyor WN', 'GT Conveyor Cross EN', 'GT Conveyor Cross WN',

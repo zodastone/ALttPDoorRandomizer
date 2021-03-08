@@ -111,10 +111,10 @@ if __name__ == "__main__":
 
     cpu_threads = args.cpu_threads
 
-#    for dr in [['vanilla', args.count if args.count else 2, 1],
-#               ['basic', args.count if args.count else 5, 3],
-#               ['crossed', args.count if args.count else 10, 3]]:
-    for dr in [['crossed', args.count if args.count else 10, 3]]:
+    for dr in [['vanilla', args.count if args.count else 2, 1],
+               ['basic', args.count if args.count else 5, 3],
+               ['crossed', args.count if args.count else 10, 3]]:
+#    for dr in [['crossed', args.count if args.count else 10, 3]]:
 
         for tense in range(1, dr[2] + 1):
             args = argparse.Namespace()

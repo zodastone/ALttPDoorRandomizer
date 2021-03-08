@@ -287,7 +287,7 @@ tr_regions = [
     'TR Lava Island', 'TR Lava Escape', 'TR Pokey 2 Top', 'TR Pokey 2 Bottom', 'TR Pokey 2 Bottom - Ranged Crystal', 'TR Twin Pokeys', 'TR Hallway', 'TR Dodgers', 'TR Big View',
     'TR Big Chest', 'TR Big Chest Entrance', 'TR Lazy Eyes', 'TR Dash Room', 'TR Tongue Pull', 'TR Rupees',
     'TR Crystaroller Bottom', 'TR Crystaroller Middle', 'TR Crystaroller Top', 'TR Crystaroller Chest', 'TR Crystaroller Middle - Ranged Crystal', 'TR Crystaroller Bottom - Ranged Crystal', 
-    'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge', 'TR Crystal Maze', 'TR Crystal Maze End',
+    'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge', 'TR Crystal Maze Start', 'TR Crystal Maze Interior', 'TR Crystal Maze End', 'TR Crystal Maze End - Ranged Crystal',
     'TR Final Abyss', 'TR Boss', 'Turtle Rock Main Portal', 'Turtle Rock Lazy Eyes Portal', 'Turtle Rock Chest Portal',
     'Turtle Rock Eye Bridge Portal'
 ]

@@ -699,8 +699,13 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'TR Eye Bridge', 'Turtle Rock', ['Turtle Rock - Eye Bridge - Bottom Left', 'Turtle Rock - Eye Bridge - Bottom Right',
                                                                        'Turtle Rock - Eye Bridge - Top Left', 'Turtle Rock - Eye Bridge - Top Right'],
                                                                       ['TR Eye Bridge SW', 'TR Eye Bridge NW']),
-        create_dungeon_region(player, 'TR Crystal Maze', 'Turtle Rock', None, ['TR Crystal Maze ES', 'TR Crystal Maze Forwards Path']),
-        create_dungeon_region(player, 'TR Crystal Maze End', 'Turtle Rock', None, ['TR Crystal Maze Blue Path', 'TR Crystal Maze Cane Path', 'TR Crystal Maze North Stairs']),
+
+        create_dungeon_region(player, 'TR Crystal Maze Start', 'Turtle Rock', None, ['TR Crystal Maze ES', 'TR Crystal Maze Start to Interior Barrier - Blue']),
+        create_dungeon_region(player, 'TR Crystal Maze Interior', 'Turtle Rock', None, ['TR Crystal Maze Interior to End Barrier - Blue', 'TR Crystal Maze Interior to Start Barrier - Blue']),
+        create_dungeon_region(player, 'TR Crystal Maze End', 'Turtle Rock', None, ['TR Crystal Maze North Stairs', 'TR Crystal Maze End to Interior Barrier - Blue', 'TR Crystal Maze End to Ranged Crystal']),
+        create_dungeon_region(player, 'TR Crystal Maze End - Ranged Crystal', 'Turtle Rock', None, ['TR Crystal Maze End Ranged Crystal Exit']),
+
+
         create_dungeon_region(player, 'TR Final Abyss', 'Turtle Rock', None, ['TR Final Abyss South Stairs', 'TR Final Abyss NW']),
         create_dungeon_region(player, 'TR Boss', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize'], ['TR Boss SW']),
 
@@ -845,7 +850,9 @@ def create_dungeon_regions(world, player):
     world.get_region('TR Crystaroller Bottom - Ranged Crystal', player).crystal_switch = True
     world.get_region('TR Crystaroller Middle - Ranged Crystal', player).crystal_switch = True
     world.get_region('TR Crystaroller Bottom - Ranged Crystal', player).crystal_switch = True
-    world.get_region('TR Crystal Maze', player).crystal_switch = True
+    world.get_region('TR Crystal Maze Start', player).crystal_switch = True
+    world.get_region('TR Crystal Maze Interior', player).crystal_switch = True
+    world.get_region('TR Crystal Maze End - Ranged Crystal', player).crystal_switch = True
     world.get_region('GT Crystal Conveyor - Ranged Crystal', player).crystal_switch = True
     world.get_region('GT Crystal Conveyor Corner - Ranged Crystal', player).crystal_switch = True
     world.get_region('GT Crystal Conveyor Left - Ranged Crystal', player).crystal_switch = True

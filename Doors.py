@@ -1000,9 +1000,12 @@ def create_doors(world, player):
         create_door(player, 'TR Eye Bridge NW', Nrml).dir(No, 0xd5, Left, High).pos(1),
         create_door(player, 'TR Eye Bridge SW', Nrml).dir(So, 0xd5, Left, High).pos(0).portal(Z, 0x02),
         create_door(player, 'TR Crystal Maze ES', Nrml).dir(Ea, 0xc4, Bot, High).small_key().pos(0),
-        create_door(player, 'TR Crystal Maze Forwards Path', Lgcl),
-        create_door(player, 'TR Crystal Maze Blue Path', Lgcl),
-        create_door(player, 'TR Crystal Maze Cane Path', Lgcl),
+        create_door(player, 'TR Crystal Maze Start to Interior Barrier - Blue', Lgcl),
+        create_door(player, 'TR Crystal Maze Interior to Start Barrier - Blue', Lgcl),
+        create_door(player, 'TR Crystal Maze Interior to End Barrier - Blue', Lgcl),
+        create_door(player, 'TR Crystal Maze End to Interior Barrier - Blue', Lgcl),
+        create_door(player, 'TR Crystal Maze End to Ranged Crystal', Lgcl),
+        create_door(player, 'TR Crystal Maze End Ranged Crystal Exit', Lgcl),
         create_door(player, 'TR Crystal Maze North Stairs', StrS).dir(No, 0xc4, Mid, High),
         create_door(player, 'TR Final Abyss South Stairs', StrS).dir(So, 0xb4, Mid, High),
         create_door(player, 'TR Final Abyss NW', Nrml).dir(No, 0xb4, Left, High).big_key().pos(0),
@@ -1342,9 +1345,11 @@ def create_doors(world, player):
     world.get_door('TR Crystaroller Bottom Ranged Crystal Exit', player).c_switch()
     world.get_door('TR Crystaroller Down Stairs', player).c_switch()
     world.get_door('TR Crystal Maze ES', player).c_switch()
-    world.get_door('TR Crystal Maze Forwards Path', player).c_switch()
-    world.get_door('TR Crystal Maze Cane Path', player).c_switch()
-    world.get_door('TR Crystal Maze Blue Path', player).barrier(CrystalBarrier.Blue)
+    world.get_door('TR Crystal Maze Start to Interior Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('TR Crystal Maze Interior to Start Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('TR Crystal Maze Interior to End Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('TR Crystal Maze End to Interior Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('TR Crystal Maze End Ranged Crystal Exit', player).c_switch()
 
     world.get_door('GT Crystal Conveyor to Corner Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT Crystal Conveyor Corner to Barrier - Blue', player).barrier(CrystalBarrier.Blue)

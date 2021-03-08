@@ -37,4 +37,5 @@ venv
 test
 *.zspr
 data/base2current.json
-data/base2current.json
+TestSuite.py
+
