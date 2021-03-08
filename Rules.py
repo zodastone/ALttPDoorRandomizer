@@ -312,7 +312,6 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Hookshot East-South Path', player), lambda state: state.has('Hookshot', player) or state.has_Boots(player))
     set_rule(world.get_entrance('GT Hookshot North-East Path', player), lambda state: state.has('Hookshot', player) or state.has_Boots(player))
     set_rule(world.get_entrance('GT Hookshot North-South Path', player), lambda state: state.has('Hookshot', player) or state.has_Boots(player))
-    set_rule(world.get_entrance('GT Hookshot Entry Boomerang Path', player), lambda state: state.has('Blue Boomerang', player) or state.has('Red Boomerang', player))
     set_rule(world.get_entrance('GT Firesnake Room Hook Path', player), lambda state: state.has('Hookshot', player))
 
     # I am tempted to stick an invincibility rule for getting across falling bridge
@@ -430,10 +429,22 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Crystaroller Chest to Middle Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Crystaroller Chest', player), player))
     set_rule(world.get_entrance('TR Crystal Maze Blue Path', player), lambda state: state.can_reach_blue(world.get_region('TR Crystal Maze End', player), player))
 
+    set_rule(world.get_entrance('GT Hookshot Platform Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('GT Hookshot South Platform', player), player))
+    set_rule(world.get_entrance('GT Hookshot South Entry to Ranged Crystal', player), lambda state: state.can_use_bombs(player) or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player) or state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('GT Hookshot Entry Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('GT Hookshot South Entry', player), player))
-    set_rule(world.get_entrance('GT Double Switch Key Blue Path', player), lambda state: state.can_reach_blue(world.get_region('GT Double Switch Key Spot', player), player))
-    set_rule(world.get_entrance('GT Double Switch Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('GT Double Switch Switches', player), player))
-    set_rule(world.get_entrance('GT Double Switch Transition Blue', player), lambda state: state.can_reach_blue(world.get_region('GT Double Switch Transition', player), player))
+    set_rule(world.get_entrance('GT Double Switch to Pot Corners Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Entry', player), player))
+    set_rule(world.get_entrance('GT Double Switch Pot Corners to Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Pot Corners', player), player))
+    set_rule(world.get_entrance('GT Double Switch Pot Corners to Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('GT Double Switch Pot Corners', player), player))
+    set_rule(world.get_entrance('GT Double Switch Pot Corners to Ranged Switches', player), lambda state: (state.has('Blue Boomerang', player) and state.has('Hookshot', player)) or state.has('Red Boomerang', player) or state.has('Cane of Somaria', player) or state.can_use_bombs(player))
+    set_rule(world.get_entrance('GT Double Switch Exit to Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('GT Double Switch Exit', player), player))
+
+    set_rule(world.get_entrance('GT Crystal Conveyor to Corner Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('GT Crystal Conveyor', player), player))
+    set_rule(world.get_entrance('GT Crystal Conveyor to Ranged Crystal', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria', player))
+    set_rule(world.get_entrance('GT Crystal Conveyor Corner to Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('GT Crystal Conveyor Corner', player), player))
+    set_rule(world.get_entrance('GT Crystal Conveyor Corner to Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('GT Crystal Conveyor Corner', player), player))
+    set_rule(world.get_entrance('GT Crystal Conveyor Corner to Ranged Crystal', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria', player))
+    set_rule(world.get_entrance('GT Crystal Conveyor Left to Corner Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('GT Crystal Conveyor Left', player), player))
+    set_rule(world.get_entrance('GT Crystal Conveyor Left to Ranged Crystal', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria', player))
 
     set_rule(world.get_entrance('Swamp Barrier Ledge - Orange', player), lambda state: state.can_reach_orange(world.get_region('Swamp Barrier Ledge', player), player))
     set_rule(world.get_entrance('Swamp Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Swamp Barrier', player), player))
@@ -447,10 +458,9 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Mire Crystal Mid Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Mire Crystal Mid', player), player))
     set_rule(world.get_entrance('Mire Firesnake Skip Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Mire Firesnake Skip', player), player))
     set_rule(world.get_entrance('Mire Antechamber Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Mire Antechamber', player), player))
-    set_rule(world.get_entrance('GT Double Switch Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Entry', player), player))
-    set_rule(world.get_entrance('GT Double Switch Orange Barrier 2', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Entry', player), player))
-    set_rule(world.get_entrance('GT Double Switch Orange Path', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Switches', player), player))
-    set_rule(world.get_entrance('GT Double Switch Key Orange Path', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Key Spot', player), player))
+    set_rule(world.get_entrance('GT Crystal Circles Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('GT Crystal Circles', player), player))
+    set_rule(world.get_entrance('GT Crystal Circles to Ranged Crystal', player), lambda state: state.can_hit_switch_through_barrier(player) or state.has_blunt_weapon(player) or state.has('Cane of Byrna', player))
+
 
     add_key_logic_rules(world, player)
     # End of door rando rules.
@@ -1637,33 +1647,31 @@ def set_inverted_bunny_rules(world, player):
 
 
 bunny_impassible_doors = {
-    'Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory ES', 'Sewers Secret Room Push Block', 'Sewers Pull Switch S',
+    'Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory ES', 'Sewers Pull Switch S',
     'Eastern Lobby N', 'Eastern Courtyard Ledge W', 'Eastern Courtyard Ledge E', 'Eastern Pot Switch SE',
-    'Eastern Map Balcony Hook Path',     'Eastern Stalfos Spawn ES', 'Eastern Stalfos Spawn NW',
-    'Eastern Hint Tile Push Block', 'Eastern Darkness S', 'Eastern Darkness NE', 'Eastern Darkness Up Stairs',
+    'Eastern Map Balcony Hook Path', 'Eastern Stalfos Spawn ES', 'Eastern Stalfos Spawn NW',
+    'Eastern Darkness S', 'Eastern Darkness NE', 'Eastern Darkness Up Stairs',
     'Eastern Attic Start WS', 'Eastern Single Eyegore NE', 'Eastern Duo Eyegores NE', 'Desert Main Lobby Left Path',
     'Desert Main Lobby Right Path', 'Desert Left Alcove Path', 'Desert Right Alcove Path', 'Desert Compass NW',
     'Desert West Lobby NW', 'Desert Back Lobby NW', 'Desert Four Statues NW',  'Desert Four Statues ES',
     'Desert Beamos Hall WS', 'Desert Beamos Hall NE', 'Desert Wall Slide NW',
     'Hera Lobby to Front Barrier - Blue', 'Hera Front to Lobby Barrier - Blue', 'Hera Front to Down Stairs Barrier - Blue',
-    'Hera Front to Up Stairs Barrier - Orange', 'Hera Front to Back Barrier - Orange', 'Hera Down Stairs to Front Barrier - Blue',
-    'Hera Up Stairs to Front Barrier - Orange', 'Hera Back to Front Barrier - Orange', 'Hera Tile Room EN', 'Hera Tridorm SE', 'Hera Beetles WS',
+    'Hera Down Stairs to Front Barrier - Blue', 'Hera Tile Room EN', 'Hera Tridorm SE', 'Hera Beetles WS',
     'Hera 4F Down Stairs', 'Tower Gold Knights SW', 'Tower Dark Maze EN', 'Tower Dark Pits ES', 'Tower Dark Archers WN',
     'Tower Red Spears WN', 'Tower Red Guards EN', 'Tower Red Guards SW', 'Tower Circle of Pots NW', 'Tower Altar NW',
-    'PoD Left Cage SW', 'PoD Middle Cage SE', 'PoD Pit Room Bomb Hole', 'PoD Stalfos Basement Warp', 'PoD Arena Main SW', 
+    'PoD Left Cage SW', 'PoD Middle Cage SE', 'PoD Pit Room Bomb Hole', 'PoD Stalfos Basement Warp',  
     'PoD Arena Main to Ranged Crystal', 'PoD Arena Bridge to Ranged Crystal', 'PoD Arena Landing to Ranged Crystal',
     'PoD Arena Landing Bonk Path', 'PoD Sexy Statue NW', 'PoD Map Balcony Drop Down',
-    'PoD Mimics 1 NW', 'PoD Warp Hint Warp', 'PoD Falling Bridge Path N', 'PoD Falling Bridge Path S',
+    'PoD Mimics 1 NW', 'PoD Falling Bridge Path N', 'PoD Falling Bridge Path S',
     'PoD Mimics 2 NW', 'PoD Bow Statue Down Ladder', 'PoD Dark Pegs Landing to Right', 'PoD Dark Pegs Landing to Ranged Crystal',
     'PoD Dark Pegs Left to Middle Barrier - Blue', 'PoD Dark Pegs Left to Ranged Crystal', 
     'PoD Turtle Party ES', 'PoD Turtle Party NW', 'PoD Callback Warp', 'Swamp Lobby Moat', 'Swamp Entrance Moat',
     'Swamp Trench 1 Approach Swim Depart', 'Swamp Trench 1 Approach Key', 'Swamp Trench 1 Key Approach',
     'Swamp Trench 1 Key Ledge Depart', 'Swamp Trench 1 Departure Approach', 'Swamp Trench 1 Departure Key',
-    'Swamp Hub Hook Path', 'Swamp Compass Donut Push Block',
-    'Swamp Shortcut Blue Barrier', 'Swamp Trench 2 Pots Blue Barrier', 'Swamp Trench 2 Pots Wet',
-    'Swamp Trench 2 Departure Wet', 'Swamp West Shallows Push Blocks', 'Swamp West Ledge Hook Path',
-    'Swamp Barrier Ledge Hook Path', 'Swamp Attic Left Pit', 'Swamp Attic Right Pit', 'Swamp Push Statue NW',
-    'Swamp Push Statue NE', 'Swamp Drain Right Switch', 'Swamp Waterway NE', 'Swamp Waterway N', 'Swamp Waterway NW',
+    'Swamp Hub Hook Path', 'Swamp Compass Donut Push Block', 'Swamp Shortcut Blue Barrier', 'Swamp Trench 2 Pots Blue Barrier',
+    'Swamp Trench 2 Pots Wet', 'Swamp Trench 2 Departure Wet', 'Swamp West Ledge Hook Path', 'Swamp Barrier Ledge Hook Path',
+    'Swamp Attic Left Pit', 'Swamp Attic Right Pit', 'Swamp Push Statue NW', 'Swamp Push Statue NE',
+    'Swamp Drain Right Switch', 'Swamp Waterway NE', 'Swamp Waterway N', 'Swamp Waterway NW',
     'Skull Pot Circle WN', 'Skull Pot Circle Star Path', 'Skull Pull Switch S', 'Skull Big Chest N',
     'Skull Big Chest Hookpath', 'Skull 2 East Lobby NW', 'Skull Back Drop Star Path', 'Skull 2 West Lobby NW',
     'Skull 3 Lobby EN', 'Skull Star Pits SW', 'Skull Star Pits ES', 'Skull Torch Room WN', 'Skull Vines NW',
@@ -1671,9 +1679,7 @@ bunny_impassible_doors = {
     'Thieves Hellway Blue Barrier', 'Thieves Hellway Crystal Blue Barrier', 'Thieves Attic ES',
     'Thieves Basement Block Path', 'Thieves Blocked Entry Path', 'Thieves Conveyor Bridge Block Path',
     'Thieves Conveyor Block Path', 'Ice Lobby WS', 'Ice Cross Left Push Block', 'Ice Cross Bottom Push Block Left',
-    'Ice Cross Bottom Push Block Right', 'Ice Cross Right Push Block Top', 'Ice Cross Right Push Block Bottom',
-    'Ice Cross Top Push Block Bottom', 'Ice Cross Top Push Block Right', 'Ice Bomb Drop Hole', 'Ice Pengator Switch WS',
-    'Ice Pengator Switch ES', 'Ice Big Key Push Block',  'Ice Stalfos Hint SE', 'Ice Bomb Jump EN',
+    'Ice Bomb Drop Hole', 'Ice Pengator Switch WS', 'Ice Pengator Switch ES', 'Ice Big Key Push Block', 'Ice Stalfos Hint SE', 'Ice Bomb Jump EN',
     'Ice Pengator Trap NE', 'Ice Hammer Block ES', 'Ice Tongue Pull WS', 'Ice Freezors Bomb Hole', 'Ice Tall Hint WS',
     'Ice Hookshot Ledge Path', 'Ice Hookshot Balcony Path', 'Ice Many Pots SW', 'Ice Many Pots WS',
     'Ice Crystal Right Blue Hole', 'Ice Crystal Left Blue Barrier', 'Ice Big Chest Landing Push Blocks',
@@ -1682,8 +1688,7 @@ bunny_impassible_doors = {
     'Mire Hub Right Blue Barrier', 'Mire Hub Top Blue Barrier', 'Mire Hub Switch Blue Barrier N',
     'Mire Hub Switch Blue Barrier S', 'Mire Falling Bridge WN', 'Mire Map Spike Side Blue Barrier',
     'Mire Map Spot Blue Barrier', 'Mire Crystal Dead End Left Barrier', 'Mire Crystal Dead End Right Barrier',
-    'Mire Cross ES', 'Mire Hidden Shooters Block Path S', 'Mire Hidden Shooters Block Path N',
-    'Mire Left Bridge Hook Path', 'Mire Fishbone Blue Barrier',
+    'Mire Cross ES', 'Mire Left Bridge Hook Path', 'Mire Fishbone Blue Barrier',
     'Mire South Fish Blue Barrier', 'Mire Tile Room NW', 'Mire Compass Blue Barrier', 'Mire Attic Hint Hole',
     'Mire Dark Shooters SW', 'Mire Crystal Mid Blue Barrier', 'Mire Crystal Left Blue Barrier', 'TR Main Lobby Gap',
     'TR Lobby Ledge Gap', 'TR Hub SW', 'TR Hub SE', 'TR Hub ES', 'TR Hub EN', 'TR Hub NW', 'TR Hub NE', 'TR Torches NW',
@@ -1695,9 +1700,8 @@ bunny_impassible_doors = {
     'GT Crystal Conveyor NE', 'GT Crystal Conveyor WN', 'GT Conveyor Cross EN', 'GT Conveyor Cross WN',
     'GT Hookshot East-North Path', 'GT Hookshot East-South Path', 'GT Hookshot North-East Path',
     'GT Hookshot North-South Path', 'GT Hookshot South-East Path', 'GT Hookshot South-North Path',
-    'GT Hookshot Platform Blue Barrier', 'GT Hookshot Entry Blue Barrier', 'GT Hookshot Entry Boomerang Path',
-    'GT Double Switch Blue Path', 'GT Double Switch Key Blue Path', 'GT Double Switch Blue Barrier',
-    'GT Double Switch Transition Blue', 'GT Firesnake Room Hook Path', 'GT Falling Bridge WN', 'GT Falling Bridge WS',
+    'GT Hookshot Platform Blue Barrier', 'GT Hookshot Entry Blue Barrier', 'GT Double Switch Pot Corners to Barrier - Blue',
+    'GT Double Switch Exit to Blue Barrier', 'GT Firesnake Room Hook Path', 'GT Falling Bridge WN', 'GT Falling Bridge WS',
     'GT Ice Armos NE', 'GT Ice Armos WS', 'GT Crystal Paths SW', 'GT Mimics 1 NW', 'GT Mimics 1 ES', 'GT Mimics 2 WS',
     'GT Mimics 2 NE', 'GT Hidden Spikes EN', 'GT Cannonball Bridge SE', 'GT Gauntlet 1 WN', 'GT Gauntlet 2 EN',
     'GT Gauntlet 2 SW', 'GT Gauntlet 3 NW',  'GT Gauntlet 3 SW', 'GT Gauntlet 4 NW', 'GT Gauntlet 4 SW',

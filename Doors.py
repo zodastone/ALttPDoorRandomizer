@@ -1035,6 +1035,16 @@ def create_doors(world, player):
         create_door(player, 'GT Pots n Blocks ES', Intr).dir(Ea, 0x8d, Bot, High).pos(4),
         create_door(player, 'GT Speed Torch SE', Nrml).dir(So, 0x8d, Right, High).trap(0x4).pos(0).portal(X, 0x02),
         create_door(player, 'GT Crystal Conveyor NE', Nrml).dir(No, 0x9d, Right, High).pos(0).kill(),
+        create_door(player, 'GT Crystal Conveyor to Corner Barrier - Blue', Lgcl),
+        create_door(player, 'GT Crystal Conveyor to Ranged Crystal', Lgcl),
+        create_door(player, 'GT Crystal Conveyor Corner to Barrier - Blue', Lgcl),
+        create_door(player, 'GT Crystal Conveyor Corner to Barrier - Orange', Lgcl),
+        create_door(player, 'GT Crystal Conveyor Corner to Ranged Crystal', Lgcl),
+        create_door(player, 'GT Crystal Conveyor Left to Corner Barrier - Orange', Lgcl),
+        create_door(player, 'GT Crystal Conveyor Left to Ranged Crystal', Lgcl),
+        create_door(player, 'GT Crystal Conveyor Ranged Crystal Exit', Lgcl),
+        create_door(player, 'GT Crystal Conveyor Corner Ranged Crystal Exit', Lgcl),
+        create_door(player, 'GT Crystal Conveyor Left Ranged Crystal Exit', Lgcl),
         create_door(player, 'GT Crystal Conveyor WN', Intr).dir(We, 0x9d, Top, High).pos(2),
         create_door(player, 'GT Compass Room EN', Intr).dir(Ea, 0x9d, Top, High).pos(2),
         create_door(player, 'GT Compass Room Warp', Warp),
@@ -1054,20 +1064,19 @@ def create_doors(world, player):
         create_door(player, 'GT Hookshot South-North Path', Lgcl),
         create_door(player, 'GT Hookshot Platform Blue Barrier', Lgcl),
         create_door(player, 'GT Hookshot Entry Blue Barrier', Lgcl),
-        create_door(player, 'GT Hookshot Entry Boomerang Path', Lgcl),
+        create_door(player, 'GT Hookshot South Entry to Ranged Crystal', Lgcl),
+        create_door(player, 'GT HookShot South Entry Ranged Crystal Exit', Lgcl),
         create_door(player, 'GT Hookshot NW', Nrml).dir(No, 0x8b, Left, High).pos(4),
         create_door(player, 'GT Hookshot ES', Intr).dir(Ea, 0x8b, Bot, High).small_key().pos(1),
         create_door(player, 'GT Map Room WS', Intr).dir(We, 0x8b, Bot, High).small_key().pos(1),
         create_door(player, 'GT Hookshot SW', Nrml).dir(So, 0x8b, Left, High).pos(3).portal(Z, 0x02),
         create_door(player, 'GT Double Switch NW', Nrml).dir(No, 0x9b, Left, High).pos(1).kill(),
-        create_door(player, 'GT Double Switch Orange Barrier', Lgcl),
-        create_door(player, 'GT Double Switch Orange Barrier 2', Lgcl),
-        create_door(player, 'GT Double Switch Blue Path', Lgcl),
-        create_door(player, 'GT Double Switch Orange Path', Lgcl),
-        create_door(player, 'GT Double Switch Key Blue Path', Lgcl),
-        create_door(player, 'GT Double Switch Key Orange Path', Lgcl),
-        create_door(player, 'GT Double Switch Blue Barrier', Lgcl),
-        create_door(player, 'GT Double Switch Transition Blue', Lgcl),
+        create_door(player, 'GT Double Switch to Pot Corners Barrier - Orange', Lgcl),
+        create_door(player, 'GT Double Switch Pot Corners to Barrier - Orange', Lgcl),
+        create_door(player, 'GT Double Switch Pot Corners to Barrier - Blue', Lgcl),
+        create_door(player, 'GT Double Switch Pot Corners to Ranged Switches', Lgcl),
+        create_door(player, 'GT Double Switch Pot Corners Ranged Switches Exit', Lgcl),
+        create_door(player, 'GT Double Switch Exit to Blue Barrier', Lgcl),
         create_door(player, 'GT Double Switch EN', Intr).dir(Ea, 0x9b, Top, High).small_key().pos(0),
         create_door(player, 'GT Spike Crystals WN', Intr).dir(We, 0x9b, Top, High).small_key().pos(0),
         create_door(player, 'GT Spike Crystals Warp', Warp),
@@ -1157,6 +1166,10 @@ def create_doors(world, player):
         create_door(player, 'GT Bomb Conveyor EN', Intr).dir(Ea, 0x3d, Top, High).small_key().pos(1),
         create_door(player, 'GT Bomb Conveyor SW', Intr).dir(So, 0x3d, Left, High).pos(3),
         create_door(player, 'GT Crystal Circles NW', Intr).dir(No, 0x3d, Left, High).pos(3),
+        create_door(player, 'GT Crystal Circles Barrier - Orange', Lgcl),
+        create_door(player, 'GT Crystal Inner Circle Barrier - Orange', Lgcl),
+        create_door(player, 'GT Crystal Circles to Ranged Crystal', Lgcl),
+        create_door(player, 'GT Crystal Circles Ranged Crystal Exit', Lgcl),
         create_door(player, 'GT Crystal Circles SW', Nrml).dir(So, 0x3d, Left, High).small_key().pos(2).portal(Z, 0x00),
         create_door(player, 'GT Left Moldorm Ledge NW', Nrml).dir(No, 0x4d, Left, High).small_key().pos(0).kill(),
         create_door(player, 'GT Left Moldorm Ledge Drop Down', Lgcl),
@@ -1333,31 +1346,36 @@ def create_doors(world, player):
     world.get_door('TR Crystal Maze Cane Path', player).c_switch()
     world.get_door('TR Crystal Maze Blue Path', player).barrier(CrystalBarrier.Blue)
 
-    world.get_door('GT Crystal Conveyor NE', player).c_switch()
-    world.get_door('GT Crystal Conveyor WN', player).c_switch()
+    world.get_door('GT Crystal Conveyor to Corner Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Crystal Conveyor Corner to Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Crystal Conveyor Corner to Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Crystal Conveyor Left to Corner Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Crystal Conveyor Ranged Crystal Exit', player).c_switch()
+    world.get_door('GT Crystal Conveyor Corner Ranged Crystal Exit', player).c_switch()
+    world.get_door('GT Crystal Conveyor Left Ranged Crystal Exit', player).c_switch()
+
     world.get_door('GT Hookshot South-North Path', player).c_switch()
     world.get_door('GT Hookshot South-East Path', player).c_switch()
     world.get_door('GT Hookshot ES', player).c_switch()
-    world.get_door('GT Hookshot Platform Blue Barrier', player).c_switch()
-    world.get_door('GT Hookshot Entry Boomerang Path', player).c_switch()
-    world.get_door('GT Double Switch Orange Path', player).c_switch()
-    world.get_door('GT Double Switch Blue Path', player).c_switch()
+    world.get_door('GT Hookshot Platform Blue Barrier', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT HookShot South Entry Ranged Crystal Exit', player).c_switch()
     world.get_door('GT Spike Crystals WN', player).c_switch()
     world.get_door('GT Spike Crystals Warp', player).c_switch()
     world.get_door('GT Crystal Paths Down Stairs', player).c_switch()
     world.get_door('GT Crystal Paths SW', player).c_switch()
     world.get_door('GT Hidden Spikes SE', player).c_switch()
     world.get_door('GT Hidden Spikes EN', player).c_switch()
-    world.get_door('GT Crystal Circles NW', player).c_switch()
-    world.get_door('GT Crystal Circles SW', player).c_switch()
+
+    world.get_door('GT Crystal Circles Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Crystal Inner Circle Barrier - Orange', player).c_switch()
+    world.get_door('GT Crystal Circles Ranged Crystal Exit', player).c_switch()
+
     world.get_door('GT Hookshot Entry Blue Barrier', player).barrier(CrystalBarrier.Blue)
-    world.get_door('GT Double Switch Orange Barrier', player).barrier(CrystalBarrier.Orange)
-    world.get_door('GT Double Switch Orange Barrier 2', player).barrier(CrystalBarrier.Orange)
-    world.get_door('GT Double Switch Orange Path', player).barrier(CrystalBarrier.Orange)
-    world.get_door('GT Double Switch Key Orange Path', player).barrier(CrystalBarrier.Orange)
-    world.get_door('GT Double Switch Key Blue Path', player).barrier(CrystalBarrier.Blue)
-    world.get_door('GT Double Switch Blue Barrier', player).barrier(CrystalBarrier.Blue)
-    world.get_door('GT Double Switch Transition Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Double Switch to Pot Corners Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Pot Corners to Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Pot Corners to Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Double Switch Pot Corners Ranged Switches Exit', player).c_switch()
+    world.get_door('GT Double Switch Exit to Blue Barrier', player).barrier(CrystalBarrier.Blue)
 
     # nifty dynamic logical doors:
     south_controller = world.get_door('Ice Cross Bottom SE', player)

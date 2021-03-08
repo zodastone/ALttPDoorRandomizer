@@ -295,9 +295,11 @@ tr_regions = [
 gt_regions = [
     'GT Lobby', 'GT Bob\'s Torch', 'GT Hope Room', 'GT Big Chest', 'GT Blocked Stairs', 'GT Bob\'s Room',
     'GT Tile Room', 'GT Speed Torch', 'GT Speed Torch Upper', 'GT Pots n Blocks', 'GT Crystal Conveyor',
+    'GT Crystal Conveyor Corner', 'GT Crystal Conveyor Left', 'GT Crystal Conveyor - Ranged Crystal',
+    'GT Crystal Conveyor Corner - Ranged Crystal', 'GT Crystal Conveyor Left - Ranged Crystal',
     'GT Compass Room', 'GT Invisible Bridges', 'GT Invisible Catwalk', 'GT Conveyor Cross', 'GT Hookshot East Platform',
-    'GT Hookshot North Platform', 'GT Hookshot South Platform', 'GT Hookshot South Entry', 'GT Map Room',
-    'GT Double Switch Entry', 'GT Double Switch Switches', 'GT Double Switch Transition', 'GT Double Switch Key Spot',
+    'GT Hookshot North Platform', 'GT Hookshot South Platform', 'GT Hookshot South Entry', 'GT Hookshot South Entry - Ranged Crystal', 'GT Map Room',
+    'GT Double Switch Entry', 'GT Double Switch Pot Corners - Ranged Switches', 'GT Double Switch Pot Corners',
     'GT Double Switch Exit', 'GT Spike Crystals', 'GT Warp Maze - Left Section', 'GT Warp Maze - Mid Section',
     'GT Warp Maze - Right Section', 'GT Warp Maze - Pit Section', 'GT Warp Maze - Pit Exit Warp Spot',
     'GT Warp Maze Exit Section', 'GT Firesnake Room', 'GT Firesnake Room Ledge', 'GT Warp Maze - Rail Choice',
@@ -307,9 +309,9 @@ gt_regions = [
     'GT Dash Hall', 'GT Hidden Spikes', 'GT Cannonball Bridge', 'GT Refill', 'GT Gauntlet 1', 'GT Gauntlet 2',
     'GT Gauntlet 3', 'GT Gauntlet 4', 'GT Gauntlet 5', 'GT Beam Dash', 'GT Lanmolas 2', 'GT Quad Pot', 'GT Wizzrobes 1',
     'GT Dashing Bridge', 'GT Wizzrobes 2', 'GT Conveyor Bridge', 'GT Torch Cross', 'GT Staredown', 'GT Falling Torches',
-    'GT Mini Helmasaur Room', 'GT Bomb Conveyor', 'GT Crystal Circles', 'GT Left Moldorm Ledge',
-    'GT Right Moldorm Ledge', 'GT Moldorm', 'GT Moldorm Pit', 'GT Validation', 'GT Validation Door', 'GT Frozen Over',
-    'GT Brightly Lit Hall', 'GT Agahnim 2', 'Ganons Tower Portal'
+    'GT Mini Helmasaur Room', 'GT Bomb Conveyor', 'GT Crystal Circles', 'GT Crystal Inner Circle', 'GT Crystal Circles - Ranged Crystal',
+    'GT Left Moldorm Ledge', 'GT Right Moldorm Ledge', 'GT Moldorm', 'GT Moldorm Pit', 'GT Validation', 'GT Validation Door',
+    'GT Frozen Over', 'GT Brightly Lit Hall', 'GT Agahnim 2', 'Ganons Tower Portal'
 ]
 
 
