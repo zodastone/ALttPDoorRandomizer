@@ -22,7 +22,7 @@ from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items
-from Fill import sell_potions, sell_keys, balance_multiworld_progression, balance_money_progression
+from Fill import sell_potions, sell_keys, balance_multiworld_progression, balance_money_progression, lock_shop_locations
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
@@ -165,6 +165,9 @@ def main(args, seed=None, fish=None):
             sell_potions(world, player)
             if world.retro[player]:
                 sell_keys(world, player)
+        else:
+            lock_shop_locations(world, player)
+
 
     logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
 
