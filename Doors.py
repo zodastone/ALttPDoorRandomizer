@@ -388,8 +388,6 @@ def create_doors(world, player):
         create_door(player, 'PoD Arena Landing to Main Barrier - Blue', Lgcl),
         create_door(player, 'PoD Arena Landing to Right Barrier - Blue', Lgcl),
         create_door(player, 'PoD Arena Landing to North Barrier - Orange', Lgcl),
-        create_door(player, 'PoD Arena Landing to Ranged Crystal', Lgcl),
-        create_door(player, 'PoD Arena Landing Ranged Crystal Exit', Lgcl),
         create_door(player, 'PoD Arena Right to Landing Barrier - Blue', Lgcl),
         create_door(player, 'PoD Arena Ledge ES', Nrml).dir(Ea, 0x2a, Bot, High).pos(2),
         create_door(player, 'PoD Sexy Statue W', Nrml).dir(We, 0x2b, Mid, High).pos(3),
@@ -1247,7 +1245,6 @@ def create_doors(world, player):
     world.get_door('PoD Arena Landing to Main Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Arena Landing to Right Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Arena Landing to North Barrier - Orange', player).barrier(CrystalBarrier.Orange)
-    world.get_door('PoD Arena Landing Ranged Crystal Exit', player).c_switch()
     world.get_door('PoD Arena Right to Landing Barrier - Blue', player).barrier(CrystalBarrier.Blue)
 
     world.get_door('PoD Sexy Statue W', player).c_switch()

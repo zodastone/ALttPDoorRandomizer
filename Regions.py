@@ -393,8 +393,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'PoD Arena North', 'Palace of Darkness', None, ['PoD Arena Main NW', 'PoD Arena Main NE', 'PoD Arena North Drop Down', 'PoD Arena North to Landing Barrier - Orange']),
         create_dungeon_region(player, 'PoD Arena Bridge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Bridge'], ['PoD Arena Bridge SE', 'PoD Arena Bridge Drop Down', 'PoD Arena Bridge to Ranged Crystal']),
         create_dungeon_region(player, 'PoD Arena Bridge - Ranged Crystal', 'Palace of Darkness', None, ['PoD Arena Bridge Ranged Crystal Exit']),
-        create_dungeon_region(player, 'PoD Arena Landing', 'Palace of Darkness', None, ['PoD Arena Landing to Main Barrier - Blue', 'PoD Arena Landing to Right Barrier - Blue', 'PoD Arena Landing to North Barrier - Orange', 'PoD Arena Landing to Ranged Crystal', 'PoD Arena Landing Bonk Path']),
-        create_dungeon_region(player, 'PoD Arena Landing - Ranged Crystal', 'Palace of Darkness', None, ['PoD Arena Landing Ranged Crystal Exit']),
+        create_dungeon_region(player, 'PoD Arena Landing', 'Palace of Darkness', None, ['PoD Arena Landing to Main Barrier - Blue', 'PoD Arena Landing to Right Barrier - Blue', 'PoD Arena Landing to North Barrier - Orange', 'PoD Arena Landing Bonk Path']),
         create_dungeon_region(player, 'PoD Arena Right', 'Palace of Darkness', None, ['PoD Arena Crystals E', 'PoD Arena Right to Landing Barrier - Blue']),
 
         create_dungeon_region(player, 'PoD Arena Ledge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Ledge'], ['PoD Arena Ledge ES']),
@@ -821,7 +820,6 @@ def create_dungeon_regions(world, player):
     world.get_region('Hera Startile Wide', player).crystal_switch = True
     world.get_region('PoD Arena Main - Ranged Crystal', player).crystal_switch = True
     world.get_region('PoD Arena Bridge - Ranged Crystal', player).crystal_switch = True
-    world.get_region('PoD Arena Landing - Ranged Crystal', player).crystal_switch = True
     world.get_region('PoD Map Balcony - Ranged Crystal', player).crystal_switch = True
     world.get_region('PoD Sexy Statue', player).crystal_switch = True
     world.get_region('PoD Bow Statue Left', player).crystal_switch = True

@@ -2024,8 +2024,6 @@ logical_connections = [
     ('PoD Arena Landing to Main Barrier - Blue', 'PoD Arena Main'),
     ('PoD Arena Landing to Right Barrier - Blue', 'PoD Arena Right'),
     ('PoD Arena Landing to North Barrier - Orange', 'PoD Arena North'),
-    ('PoD Arena Landing to Ranged Crystal', 'PoD Arena Landing - Ranged Crystal'),
-    ('PoD Arena Landing Ranged Crystal Exit', 'PoD Arena Landing'),
     ('PoD Arena Right to Landing Barrier - Blue', 'PoD Arena Landing'),
 
     ('PoD Map Balcony Drop Down', 'PoD Sexy Statue'),

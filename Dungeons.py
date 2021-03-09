@@ -212,7 +212,7 @@ tower_regions = [
 pod_regions = [
     'PoD Lobby', 'PoD Left Cage', 'PoD Middle Cage', 'PoD Shooter Room', 'PoD Pit Room', 'PoD Pit Room Blocked',
     'PoD Arena Main', 'PoD Arena Main - Ranged Crystal', 'PoD Arena North', 'PoD Arena Bridge', 'PoD Arena Bridge - Ranged Crystal',
-    'PoD Arena Landing', 'PoD Arena Landing - Ranged Crystal', 'PoD Arena Right', 'PoD Arena Ledge', 'PoD Sexy Statue',
+    'PoD Arena Landing', 'PoD Arena Right', 'PoD Arena Ledge', 'PoD Sexy Statue',
     'PoD Map Balcony', 'PoD Map Balcony - Ranged Crystal', 'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room',
     'PoD Stalfos Basement', 'PoD Basement Ledge', 'PoD Big Key Landing', 'PoD Falling Bridge',
     'PoD Falling Bridge Ledge', 'PoD Dark Maze', 'PoD Big Chest Balcony', 'PoD Compass Room', 'PoD Dark Basement',
