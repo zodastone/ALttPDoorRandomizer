@@ -42,6 +42,7 @@ def link_doors(world, player):
                 disconnect_portal(portal, world, player)
             reset_portals(world, player)
             reset_rooms(world, player)
+            world.get_door("Skull Pinball WS", player).no_exit()
 
 
 def link_doors_main(world, player):
