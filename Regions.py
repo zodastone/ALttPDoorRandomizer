@@ -720,12 +720,11 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'GT Speed Torch', 'Ganon\'s Tower', None, ['GT Speed Torch WS', 'GT Speed Torch SE', 'GT Speed Torch North Path']),
         create_dungeon_region(player, 'GT Speed Torch Upper', 'Ganon\'s Tower', None, ['GT Speed Torch WN', 'GT Speed Torch NE', 'GT Speed Torch South Path']),
         create_dungeon_region(player, 'GT Pots n Blocks', 'Ganon\'s Tower', None, ['GT Pots n Blocks ES']),
-        create_dungeon_region(player, 'GT Crystal Conveyor', 'Ganon\'s Tower', None, ['GT Crystal Conveyor NE', 'GT Crystal Conveyor to Corner Barrier - Blue', 'GT Crystal Conveyor to Ranged Crystal']),
+        create_dungeon_region(player, 'GT Crystal Conveyor', 'Ganon\'s Tower', None, ['GT Crystal Conveyor NE', 'GT Crystal Conveyor to Corner Barrier - Blue', 'GT Crystal Conveyor to Ranged Crystal', 'GT Crystal Conveyor to Left Bypass']),
         create_dungeon_region(player, 'GT Crystal Conveyor Corner', 'Ganon\'s Tower', None, ['GT Crystal Conveyor Corner to Barrier - Blue', 'GT Crystal Conveyor Corner to Barrier - Orange', 'GT Crystal Conveyor Corner to Ranged Crystal']),
-        create_dungeon_region(player, 'GT Crystal Conveyor Left', 'Ganon\'s Tower', None, ['GT Crystal Conveyor WN', 'GT Crystal Conveyor Left to Corner Barrier - Orange', 'GT Crystal Conveyor Left to Ranged Crystal']),
+        create_dungeon_region(player, 'GT Crystal Conveyor Left', 'Ganon\'s Tower', None, ['GT Crystal Conveyor WN', 'GT Crystal Conveyor Left to Corner Barrier - Orange']),
         create_dungeon_region(player, 'GT Crystal Conveyor - Ranged Crystal', 'Ganon\'s Tower', None, ['GT Crystal Conveyor Ranged Crystal Exit']),
         create_dungeon_region(player, 'GT Crystal Conveyor Corner - Ranged Crystal', 'Ganon\'s Tower', None, ['GT Crystal Conveyor Corner Ranged Crystal Exit']),
-        create_dungeon_region(player, 'GT Crystal Conveyor Left - Ranged Crystal', 'Ganon\'s Tower', None, ['GT Crystal Conveyor Left Ranged Crystal Exit']),
 
         create_dungeon_region(player, 'GT Compass Room', 'Ganon\'s Tower', ['Ganons Tower - Compass Room - Top Left', 'Ganons Tower - Compass Room - Top Right', 'Ganons Tower - Compass Room - Bottom Left', 'Ganons Tower - Compass Room - Bottom Right'],
                               ['GT Compass Room EN', 'GT Compass Room Warp']),
@@ -743,7 +742,6 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'GT Double Switch Pot Corners', 'Ganon\'s Tower', ['Ganons Tower - Double Switch Pot Key'], ['GT Double Switch Pot Corners to Barrier - Orange', 'GT Double Switch Pot Corners to Barrier - Blue', 'GT Double Switch Pot Corners to Ranged Switches']),
         create_dungeon_region(player, 'GT Double Switch Pot Corners - Ranged Switches', 'Ganon\'s Tower', None, ['GT Double Switch Pot Corners Ranged Switches Exit']),
         create_dungeon_region(player, 'GT Double Switch Exit', 'Ganon\'s Tower', None, ['GT Double Switch EN', 'GT Double Switch Exit to Blue Barrier']),
-
         create_dungeon_region(player, 'GT Spike Crystals', 'Ganon\'s Tower', None, ['GT Spike Crystals WN', 'GT Spike Crystals Warp']),
         create_dungeon_region(player, 'GT Warp Maze - Left Section', 'Ganon\'s Tower', None, ['GT Warp Maze - Left Section Warp']),
         create_dungeon_region(player, 'GT Warp Maze - Mid Section', 'Ganon\'s Tower', None, ['GT Warp Maze - Mid Section Left Warp', 'GT Warp Maze - Mid Section Right Warp']),
@@ -855,7 +853,6 @@ def create_dungeon_regions(world, player):
     world.get_region('TR Crystal Maze End - Ranged Crystal', player).crystal_switch = True
     world.get_region('GT Crystal Conveyor - Ranged Crystal', player).crystal_switch = True
     world.get_region('GT Crystal Conveyor Corner - Ranged Crystal', player).crystal_switch = True
-    world.get_region('GT Crystal Conveyor Left - Ranged Crystal', player).crystal_switch = True
     world.get_region('GT Hookshot South Platform', player).crystal_switch = True
     world.get_region('GT Hookshot South Entry - Ranged Crystal', player).crystal_switch = True
     # Relevant to indicate north door can access c_switch

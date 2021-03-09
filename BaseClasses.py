@@ -691,7 +691,6 @@ class CollectionState(object):
     def can_hit_crystal_through_barrier(self, player):
         return (self.can_use_bombs(player)
             or self.can_shoot_arrows(player)
-            or self.has_beam_sword(player)
             or self.has('Blue Boomerang', player)
             or self.has('Red Boomerang', player)
             or self.has('Fire Rod', player)

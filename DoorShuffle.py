@@ -2194,14 +2194,13 @@ logical_connections = [
 
     ('GT Crystal Conveyor to Corner Barrier - Blue', 'GT Crystal Conveyor Corner'),
     ('GT Crystal Conveyor to Ranged Crystal', 'GT Crystal Conveyor - Ranged Crystal'),
+    ('GT Crystal Conveyor to Left Bypass', 'GT Crystal Conveyor Left'),
     ('GT Crystal Conveyor Corner to Barrier - Blue', 'GT Crystal Conveyor Left'),
     ('GT Crystal Conveyor Corner to Barrier - Orange', 'GT Crystal Conveyor'),
     ('GT Crystal Conveyor Corner to Ranged Crystal', 'GT Crystal Conveyor Corner - Ranged Crystal'),
     ('GT Crystal Conveyor Left to Corner Barrier - Orange', 'GT Crystal Conveyor Corner'),
-    ('GT Crystal Conveyor Left to Ranged Crystal',  'GT Crystal Conveyor Left - Ranged Crystal'),
     ('GT Crystal Conveyor Ranged Crystal Exit', 'GT Crystal Conveyor'),
     ('GT Crystal Conveyor Corner Ranged Crystal Exit', 'GT Crystal Conveyor Corner'),
-    ('GT Crystal Conveyor Left Ranged Crystal Exit', 'GT Crystal Conveyor Left'),
 
     ('GT Left Moldorm Ledge Drop Down', 'GT Moldorm'),
     ('GT Right Moldorm Ledge Drop Down', 'GT Moldorm'),
