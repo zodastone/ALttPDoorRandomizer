@@ -358,9 +358,9 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Hera Back to Front Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Back', player), player))
     set_rule(world.get_entrance('Hera Back to Ranged Crystal', player), lambda state:state.can_shoot_arrows(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player))
 
-    set_rule(world.get_entrance('PoD Arena Main to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player) or state.has('Hookshot', player))
+    set_rule(world.get_entrance('PoD Arena Main to Ranged Crystal', player), lambda state: True) # Can always throw pots here
     set_rule(world.get_entrance('PoD Arena Bridge to Ranged Crystal', player), lambda state: state.can_shoot_arrows(player) or state.has('Red Boomerang', player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player))
-    set_rule(world.get_entrance('PoD Arena Landing to Ranged Crystal', player), lambda state: state.has('Red Boomerang', player) or (state.has('Cane of Somaria', player) and state.has_Boots(player)))
+    set_rule(world.get_entrance('PoD Arena Landing to Ranged Crystal', player), lambda state: state.has('Red Boomerang', player))
     set_rule(world.get_entrance('PoD Arena Main to North Ranged Barrier - Orange', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('PoD Arena North to Landing Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('PoD Arena North', player), player))
     set_rule(world.get_entrance('PoD Arena Landing to North Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('PoD Arena Landing', player), player))
