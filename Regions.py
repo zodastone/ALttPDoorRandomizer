@@ -339,7 +339,7 @@ def create_dungeon_regions(world, player):
         # Hera
         create_dungeon_region(player, 'Hera Lobby', 'Tower of Hera', None, ['Hera Lobby S', 'Hera Lobby to Crystal', 'Hera Lobby to Front Barrier - Blue']),
         create_dungeon_region(player, 'Hera Lobby Crystal', 'Tower of Hera', None, ['Hera Lobby Crystal Exit']),
-        create_dungeon_region(player, 'Hera Front', 'Tower of Hera', None, ['Hera Front to Crystal', 'Hera Front to Lobby Barrier - Blue', 'Hera Front to Down Stairs Barrier - Blue', 'Hera Front to Up Stairs Barrier - Orange', 'Hera Front to Back Barrier - Orange']),
+        create_dungeon_region(player, 'Hera Front', 'Tower of Hera', None, ['Hera Front to Crystal', 'Hera Front to Lobby Barrier - Blue', 'Hera Front to Down Stairs Barrier - Blue', 'Hera Front to Up Stairs Barrier - Orange', 'Hera Front to Back Barrier - Orange', 'Hera Front to Back Bypass']),
         create_dungeon_region(player, 'Hera Front Crystal', 'Tower of Hera', None, ['Hera Front Crystal Exit']),
         create_dungeon_region(player, 'Hera Down Stairs Landing', 'Tower of Hera', None, ['Hera Lobby Down Stairs', 'Hera Down Stairs to Front Barrier - Blue', 'Hera Down Stairs Landing to Ranged Crystal']),
         create_dungeon_region(player, 'Hera Down Stairs Landing - Ranged Crystal', 'Tower of Hera', None, ['Hera Down Stairs Landing Ranged Crystal Exit']),
@@ -388,15 +388,17 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'PoD Pit Room', 'Palace of Darkness', None, ['PoD Pit Room S', 'PoD Pit Room NW', 'PoD Pit Room Bomb Hole', 'PoD Pit Room Block Path N']),
         create_dungeon_region(player, 'PoD Pit Room Blocked', 'Palace of Darkness', None, ['PoD Pit Room NE', 'PoD Pit Room Freefall', 'PoD Pit Room Block Path S']),
 
-        create_dungeon_region(player, 'PoD Arena Main', 'Palace of Darkness', None, ['PoD Arena Main SW', 'PoD Arena Main to Ranged Crystal', 'PoD Arena Main to Landing Barrier - Blue', 'PoD Arena Main to North Ranged Barrier - Orange']),
+        create_dungeon_region(player, 'PoD Arena Main', 'Palace of Darkness', None, ['PoD Arena Main SW', 'PoD Arena Main to Ranged Crystal', 'PoD Arena Main to Landing Barrier - Blue', 'PoD Arena Main to Landing Bypass', 'PoD Arena Main to Right Bypass']),
         create_dungeon_region(player, 'PoD Arena Main - Ranged Crystal', 'Palace of Darkness', None, ['PoD Arena Main Ranged Crystal Exit']),
         create_dungeon_region(player, 'PoD Arena North', 'Palace of Darkness', None, ['PoD Arena Main NW', 'PoD Arena Main NE', 'PoD Arena North Drop Down', 'PoD Arena North to Landing Barrier - Orange']),
         create_dungeon_region(player, 'PoD Arena Bridge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Bridge'], ['PoD Arena Bridge SE', 'PoD Arena Bridge Drop Down', 'PoD Arena Bridge to Ranged Crystal']),
         create_dungeon_region(player, 'PoD Arena Bridge - Ranged Crystal', 'Palace of Darkness', None, ['PoD Arena Bridge Ranged Crystal Exit']),
         create_dungeon_region(player, 'PoD Arena Landing', 'Palace of Darkness', None, ['PoD Arena Landing to Main Barrier - Blue', 'PoD Arena Landing to Right Barrier - Blue', 'PoD Arena Landing to North Barrier - Orange', 'PoD Arena Landing Bonk Path']),
-        create_dungeon_region(player, 'PoD Arena Right', 'Palace of Darkness', None, ['PoD Arena Crystals E', 'PoD Arena Right to Landing Barrier - Blue']),
+        create_dungeon_region(player, 'PoD Arena Right', 'Palace of Darkness', None, ['PoD Arena Crystals E', 'PoD Arena Right to Landing Barrier - Blue', 'PoD Arena Right to Ranged Crystal']),
+        create_dungeon_region(player, 'PoD Arena Right - Ranged Crystal', 'Palace of Darkness', None, ['PoD Arena Right Ranged Crystal Exit']),
+        create_dungeon_region(player, 'PoD Arena Ledge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Ledge'], ['PoD Arena Ledge ES', 'PoD Arena Ledge to Ranged Crystal']),
+        create_dungeon_region(player, 'PoD Arena Ledge - Ranged Crystal', 'Palace of Darkness', None, ['PoD Arena Ledge Ranged Crystal Exit']),
 
-        create_dungeon_region(player, 'PoD Arena Ledge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Ledge'], ['PoD Arena Ledge ES']),
         create_dungeon_region(player, 'PoD Sexy Statue', 'Palace of Darkness', None, ['PoD Sexy Statue W', 'PoD Sexy Statue NW']),
         create_dungeon_region(player, 'PoD Map Balcony', 'Palace of Darkness', ['Palace of Darkness - Map Chest'], ['PoD Map Balcony to Ranged Crystal', 'PoD Map Balcony WS', 'PoD Map Balcony South Stairs', 'PoD Map Balcony Drop Down']),
         create_dungeon_region(player, 'PoD Map Balcony - Ranged Crystal', 'Palace of Darkness', None, ['PoD Map Balcony Ranged Crystal Exit']),
@@ -418,7 +420,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'PoD Mimics 2', 'Palace of Darkness', None, ['PoD Mimics 2 SW', 'PoD Mimics 2 NW']),
         create_dungeon_region(player, 'PoD Bow Statue', 'Palace of Darkness', None, ['PoD Bow Statue SW', 'PoD Bow Statue Down Ladder']),
 
-        create_dungeon_region(player, 'PoD Bow Statue Left', 'Palace of Darkness', None, ['PoD Bow Statue SW', 'PoD Bow Statue Left to Right Barrier - Orange']),
+        create_dungeon_region(player, 'PoD Bow Statue Left', 'Palace of Darkness', None, ['PoD Bow Statue SW', 'PoD Bow Statue Left to Right Barrier - Orange', 'PoD Bow Statue Left to Right Bypass']),
         create_dungeon_region(player, 'PoD Bow Statue Right', 'Palace of Darkness', None, ['PoD Bow Statue Right to Left Barrier - Orange', 'PoD Bow Statue Right to Ranged Crystal', 'PoD Bow Statue Down Ladder']),
         create_dungeon_region(player, 'PoD Bow Statue Right - Ranged Crystal', 'Palace of Darkness', None, ['PoD Bow Statue Ranged Crystal Exit']),
 
@@ -732,15 +734,18 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'GT Conveyor Cross', 'Ganon\'s Tower', ['Ganons Tower - Conveyor Cross Pot Key'], ['GT Conveyor Cross EN', 'GT Conveyor Cross WN']),
         create_dungeon_region(player, 'GT Hookshot East Platform', 'Ganon\'s Tower', None, ['GT Hookshot EN', 'GT Hookshot East-North Path', 'GT Hookshot East-South Path']),
         create_dungeon_region(player, 'GT Hookshot North Platform', 'Ganon\'s Tower', None, ['GT Hookshot NW', 'GT Hookshot North-East Path', 'GT Hookshot North-South Path']),
-        create_dungeon_region(player, 'GT Hookshot South Platform', 'Ganon\'s Tower', None, ['GT Hookshot ES', 'GT Hookshot South-East Path', 'GT Hookshot South-North Path', 'GT Hookshot Platform Blue Barrier']),
+        create_dungeon_region(player, 'GT Hookshot South Platform', 'Ganon\'s Tower', None, ['GT Hookshot ES', 'GT Hookshot South-East Path', 'GT Hookshot South-North Path', 'GT Hookshot Platform Blue Barrier', 'GT Hookshot Platform Barrier Bypass']),
         create_dungeon_region(player, 'GT Hookshot South Entry', 'Ganon\'s Tower', None, ['GT Hookshot SW', 'GT Hookshot Entry Blue Barrier', 'GT Hookshot South Entry to Ranged Crystal']),
         create_dungeon_region(player, 'GT Hookshot South Entry - Ranged Crystal', 'Ganon\'s Tower', None, ['GT HookShot South Entry Ranged Crystal Exit']),
         create_dungeon_region(player, 'GT Map Room', 'Ganon\'s Tower', ['Ganons Tower - Map Chest'], ['GT Map Room WS']),
 
-        create_dungeon_region(player, 'GT Double Switch Entry', 'Ganon\'s Tower', None, ['GT Double Switch NW', 'GT Double Switch to Pot Corners Barrier - Orange']),
-        create_dungeon_region(player, 'GT Double Switch Pot Corners', 'Ganon\'s Tower', ['Ganons Tower - Double Switch Pot Key'], ['GT Double Switch Pot Corners to Barrier - Orange', 'GT Double Switch Pot Corners to Barrier - Blue', 'GT Double Switch Pot Corners to Ranged Switches']),
+        create_dungeon_region(player, 'GT Double Switch Entry', 'Ganon\'s Tower', None, ['GT Double Switch NW', 'GT Double Switch Entry to Left Barrier - Orange', 'GT Double Switch Entry to Pot Corners Barrier - Orange', 'GT Double Switch Entry to Ranged Switches']),
+        create_dungeon_region(player, 'GT Double Switch Entry - Ranged Switches', 'Ganon\'s Tower', None, ['GT Double Switch Entry Ranged Switches Exit']),
+        create_dungeon_region(player, 'GT Double Switch Left', 'Ganon\'s Tower', None, ['GT Double Switch Left to Entry Barrier - Orange', 'GT Double Switch Left to Entry Bypass', 'GT Double Switch Left to Pot Corners Bypass']),
+        create_dungeon_region(player, 'GT Double Switch Pot Corners', 'Ganon\'s Tower', ['Ganons Tower - Double Switch Pot Key'], ['GT Double Switch Pot Corners to Entry Barrier - Orange', 'GT Double Switch Pot Corners to Exit Barrier - Blue', 'GT Double Switch Pot Corners to Ranged Switches']),
         create_dungeon_region(player, 'GT Double Switch Pot Corners - Ranged Switches', 'Ganon\'s Tower', None, ['GT Double Switch Pot Corners Ranged Switches Exit']),
         create_dungeon_region(player, 'GT Double Switch Exit', 'Ganon\'s Tower', None, ['GT Double Switch EN', 'GT Double Switch Exit to Blue Barrier']),
+
         create_dungeon_region(player, 'GT Spike Crystals', 'Ganon\'s Tower', None, ['GT Spike Crystals WN', 'GT Spike Crystals Warp']),
         create_dungeon_region(player, 'GT Warp Maze - Left Section', 'Ganon\'s Tower', None, ['GT Warp Maze - Left Section Warp']),
         create_dungeon_region(player, 'GT Warp Maze - Mid Section', 'Ganon\'s Tower', None, ['GT Warp Maze - Mid Section Left Warp', 'GT Warp Maze - Mid Section Right Warp']),
@@ -820,6 +825,8 @@ def create_dungeon_regions(world, player):
     world.get_region('Hera Startile Wide', player).crystal_switch = True
     world.get_region('PoD Arena Main - Ranged Crystal', player).crystal_switch = True
     world.get_region('PoD Arena Bridge - Ranged Crystal', player).crystal_switch = True
+    world.get_region('PoD Arena Right - Ranged Crystal', player).crystal_switch = True
+    world.get_region('PoD Arena Ledge - Ranged Crystal', player).crystal_switch = True
     world.get_region('PoD Map Balcony - Ranged Crystal', player).crystal_switch = True
     world.get_region('PoD Sexy Statue', player).crystal_switch = True
     world.get_region('PoD Bow Statue Left', player).crystal_switch = True
@@ -854,6 +861,8 @@ def create_dungeon_regions(world, player):
     world.get_region('GT Hookshot South Platform', player).crystal_switch = True
     world.get_region('GT Hookshot South Entry - Ranged Crystal', player).crystal_switch = True
     # Relevant to indicate north door can access c_switch
+    world.get_region('GT Double Switch Left', player).crystal_switch = True
+    world.get_region('GT Double Switch Entry - Ranged Switches', player).crystal_switch = True
     world.get_region('GT Double Switch Pot Corners - Ranged Switches', player).crystal_switch = True
     world.get_region('GT Spike Crystals', player).crystal_switch = True
     world.get_region('GT Crystal Paths', player).crystal_switch = True

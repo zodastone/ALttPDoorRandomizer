@@ -212,7 +212,7 @@ tower_regions = [
 pod_regions = [
     'PoD Lobby', 'PoD Left Cage', 'PoD Middle Cage', 'PoD Shooter Room', 'PoD Pit Room', 'PoD Pit Room Blocked',
     'PoD Arena Main', 'PoD Arena Main - Ranged Crystal', 'PoD Arena North', 'PoD Arena Bridge', 'PoD Arena Bridge - Ranged Crystal',
-    'PoD Arena Landing', 'PoD Arena Right', 'PoD Arena Ledge', 'PoD Sexy Statue',
+    'PoD Arena Landing', 'PoD Arena Right', 'PoD Arena Right - Ranged Crystal', 'PoD Arena Ledge', 'PoD Arena Ledge - Ranged Crystal', 'PoD Sexy Statue',
     'PoD Map Balcony', 'PoD Map Balcony - Ranged Crystal', 'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room',
     'PoD Stalfos Basement', 'PoD Basement Ledge', 'PoD Big Key Landing', 'PoD Falling Bridge',
     'PoD Falling Bridge Ledge', 'PoD Dark Maze', 'PoD Big Chest Balcony', 'PoD Compass Room', 'PoD Dark Basement',
@@ -299,7 +299,8 @@ gt_regions = [
     'GT Crystal Conveyor Corner - Ranged Crystal',
     'GT Compass Room', 'GT Invisible Bridges', 'GT Invisible Catwalk', 'GT Conveyor Cross', 'GT Hookshot East Platform',
     'GT Hookshot North Platform', 'GT Hookshot South Platform', 'GT Hookshot South Entry', 'GT Hookshot South Entry - Ranged Crystal', 'GT Map Room',
-    'GT Double Switch Entry', 'GT Double Switch Pot Corners - Ranged Switches', 'GT Double Switch Pot Corners',
+    'GT Double Switch Entry', 'GT Double Switch Pot Corners - Ranged Switches', 'GT Double Switch Pot Corners', 'GT Double Switch Left',
+    'GT Double Switch Entry - Ranged Switches',
     'GT Double Switch Exit', 'GT Spike Crystals', 'GT Warp Maze - Left Section', 'GT Warp Maze - Mid Section',
     'GT Warp Maze - Right Section', 'GT Warp Maze - Pit Section', 'GT Warp Maze - Pit Exit Warp Spot',
     'GT Warp Maze Exit Section', 'GT Firesnake Room', 'GT Firesnake Room Ledge', 'GT Warp Maze - Rail Choice',

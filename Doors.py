@@ -267,6 +267,7 @@ def create_doors(world, player):
         create_door(player, 'Hera Up Stairs Landing to Ranged Crystal', Lgcl),
         create_door(player, 'Hera Up Stairs Landing Ranged Crystal Exit', Lgcl),
         create_door(player, 'Hera Front to Back Barrier - Orange', Lgcl),
+        create_door(player, 'Hera Front to Back Bypass', Lgcl),
         create_door(player, 'Hera Back to Front Barrier - Orange', Lgcl),
         create_door(player, 'Hera Back to Ranged Crystal', Lgcl),
         create_door(player, 'Hera Back Ranged Crystal Exit', Lgcl),
@@ -381,7 +382,8 @@ def create_doors(world, player):
         create_door(player, 'PoD Arena North to Landing Barrier - Orange', Lgcl),
         create_door(player, 'PoD Arena Main to Ranged Crystal', Lgcl),
         create_door(player, 'PoD Arena Main to Landing Barrier - Blue', Lgcl),
-        create_door(player, 'PoD Arena Main to North Ranged Barrier - Orange', Lgcl),
+        create_door(player, 'PoD Arena Main to Landing Bypass', Lgcl),
+        create_door(player, 'PoD Arena Main to Right Bypass', Lgcl),
         create_door(player, 'PoD Arena Main Ranged Crystal Exit', Lgcl),
         create_door(player, 'PoD Arena Bridge to Ranged Crystal', Lgcl),
         create_door(player, 'PoD Arena Bridge Ranged Crystal Exit', Lgcl),
@@ -389,6 +391,10 @@ def create_doors(world, player):
         create_door(player, 'PoD Arena Landing to Right Barrier - Blue', Lgcl),
         create_door(player, 'PoD Arena Landing to North Barrier - Orange', Lgcl),
         create_door(player, 'PoD Arena Right to Landing Barrier - Blue', Lgcl),
+        create_door(player, 'PoD Arena Right to Ranged Crystal', Lgcl),
+        create_door(player, 'PoD Arena Right Ranged Crystal Exit', Lgcl),
+        create_door(player, 'PoD Arena Ledge to Ranged Crystal', Lgcl),
+        create_door(player, 'PoD Arena Ledge Ranged Crystal Exit', Lgcl),
         create_door(player, 'PoD Arena Ledge ES', Nrml).dir(Ea, 0x2a, Bot, High).pos(2),
         create_door(player, 'PoD Sexy Statue W', Nrml).dir(We, 0x2b, Mid, High).pos(3),
         create_door(player, 'PoD Sexy Statue NW', Nrml).dir(No, 0x2b, Left, High).trap(0x1).pos(2),
@@ -426,6 +432,7 @@ def create_doors(world, player):
         create_door(player, 'PoD Mimics 2 NW', Intr).dir(No, 0x1b, Left, High).pos(0),
         create_door(player, 'PoD Bow Statue SW', Intr).dir(So, 0x1b, Left, High).pos(0),
         create_door(player, 'PoD Bow Statue Left to Right Barrier - Orange', Lgcl),
+        create_door(player, 'PoD Bow Statue Left to Right Bypass', Lgcl),
         create_door(player, 'PoD Bow Statue Right to Left Barrier - Orange', Lgcl),
         create_door(player, 'PoD Bow Statue Right to Ranged Crystal', Lgcl),
         create_door(player, 'PoD Bow Statue Ranged Crystal Exit', Lgcl),
@@ -1064,6 +1071,7 @@ def create_doors(world, player):
         create_door(player, 'GT Hookshot South-North Path', Lgcl),
         create_door(player, 'GT Hookshot Platform Blue Barrier', Lgcl),
         create_door(player, 'GT Hookshot Entry Blue Barrier', Lgcl),
+        create_door(player, 'GT Hookshot Platform Barrier Bypass', Lgcl),
         create_door(player, 'GT Hookshot South Entry to Ranged Crystal', Lgcl),
         create_door(player, 'GT HookShot South Entry Ranged Crystal Exit', Lgcl),
         create_door(player, 'GT Hookshot NW', Nrml).dir(No, 0x8b, Left, High).pos(4),
@@ -1071,9 +1079,15 @@ def create_doors(world, player):
         create_door(player, 'GT Map Room WS', Intr).dir(We, 0x8b, Bot, High).small_key().pos(1),
         create_door(player, 'GT Hookshot SW', Nrml).dir(So, 0x8b, Left, High).pos(3).portal(Z, 0x02),
         create_door(player, 'GT Double Switch NW', Nrml).dir(No, 0x9b, Left, High).pos(1).kill(),
-        create_door(player, 'GT Double Switch to Pot Corners Barrier - Orange', Lgcl),
-        create_door(player, 'GT Double Switch Pot Corners to Barrier - Orange', Lgcl),
-        create_door(player, 'GT Double Switch Pot Corners to Barrier - Blue', Lgcl),
+        create_door(player, 'GT Double Switch Entry to Pot Corners Barrier - Orange', Lgcl),
+        create_door(player, 'GT Double Switch Entry to Left Barrier - Orange', Lgcl),
+        create_door(player, 'GT Double Switch Entry to Ranged Switches', Lgcl),
+        create_door(player, 'GT Double Switch Entry Ranged Switches Exit', Lgcl),
+        create_door(player, 'GT Double Switch Left to Entry Barrier - Orange', Lgcl),
+        create_door(player, 'GT Double Switch Left to Pot Corners Bypass', Lgcl),
+        create_door(player, 'GT Double Switch Left to Entry Bypass', Lgcl),
+        create_door(player, 'GT Double Switch Pot Corners to Entry Barrier - Orange', Lgcl),
+        create_door(player, 'GT Double Switch Pot Corners to Exit Barrier - Blue', Lgcl),
         create_door(player, 'GT Double Switch Pot Corners to Ranged Switches', Lgcl),
         create_door(player, 'GT Double Switch Pot Corners Ranged Switches Exit', Lgcl),
         create_door(player, 'GT Double Switch Exit to Blue Barrier', Lgcl),
@@ -1221,6 +1235,7 @@ def create_doors(world, player):
     world.get_door('Hera Front to Up Stairs Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('Hera Up Stairs to Front Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('Hera Up Stairs Landing Ranged Crystal Exit', player).c_switch()
+    world.get_door('Hera Front to Back Bypass', player).barrier(CrystalBarrier.Blue)
     world.get_door('Hera Front to Back Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('Hera Back to Front Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('Hera Back Ranged Crystal Exit', player).c_switch()
@@ -1239,18 +1254,22 @@ def create_doors(world, player):
 
     world.get_door('PoD Arena North to Landing Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('PoD Arena Main to Landing Barrier - Blue', player).barrier(CrystalBarrier.Blue)
-    world.get_door('PoD Arena Main to North Ranged Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('PoD Arena Main to Landing Bypass', player).barrier(CrystalBarrier.Orange)
+    world.get_door('PoD Arena Main to Right Bypass', player).barrier(CrystalBarrier.Orange)
     world.get_door('PoD Arena Main Ranged Crystal Exit', player).c_switch()
     world.get_door('PoD Arena Bridge Ranged Crystal Exit', player).c_switch()
     world.get_door('PoD Arena Landing to Main Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Arena Landing to Right Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Arena Landing to North Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('PoD Arena Right to Landing Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('PoD Arena Right Ranged Crystal Exit', player).c_switch()
+    world.get_door('PoD Arena Ledge Ranged Crystal Exit', player).c_switch()
 
     world.get_door('PoD Sexy Statue W', player).c_switch()
     world.get_door('PoD Sexy Statue NW', player).c_switch()
     world.get_door('PoD Map Balcony Ranged Crystal Exit', player).c_switch()
     world.get_door('PoD Bow Statue SW', player).c_switch()
+    world.get_door('PoD Bow Statue Left to Right Bypass', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Bow Statue Left to Right Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('PoD Bow Statue Right to Left Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('PoD Bow Statue Ranged Crystal Exit', player).c_switch()
@@ -1356,6 +1375,7 @@ def create_doors(world, player):
     world.get_door('GT Hookshot South-North Path', player).c_switch()
     world.get_door('GT Hookshot South-East Path', player).c_switch()
     world.get_door('GT Hookshot ES', player).c_switch()
+    world.get_door('GT Hookshot Platform Barrier Bypass', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Hookshot Platform Blue Barrier', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT HookShot South Entry Ranged Crystal Exit', player).c_switch()
     world.get_door('GT Spike Crystals WN', player).c_switch()
@@ -1369,9 +1389,14 @@ def create_doors(world, player):
     world.get_door('GT Crystal Inner Circle Barrier - Orange', player).c_switch()
     world.get_door('GT Crystal Circles Ranged Crystal Exit', player).c_switch()
     world.get_door('GT Hookshot Entry Blue Barrier', player).barrier(CrystalBarrier.Blue)
-    world.get_door('GT Double Switch to Pot Corners Barrier - Orange', player).barrier(CrystalBarrier.Orange)
-    world.get_door('GT Double Switch Pot Corners to Barrier - Orange', player).barrier(CrystalBarrier.Orange)
-    world.get_door('GT Double Switch Pot Corners to Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Double Switch Entry to Pot Corners Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Entry to Left Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Entry Ranged Switches Exit', player).c_switch()
+    world.get_door('GT Double Switch Left to Entry Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Left to Entry Bypass', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Double Switch Left to Pot Corners Bypass', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Double Switch Pot Corners to Entry Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('GT Double Switch Pot Corners to Exit Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT Double Switch Pot Corners Ranged Switches Exit', player).c_switch()
     world.get_door('GT Double Switch Exit to Blue Barrier', player).barrier(CrystalBarrier.Blue)
 
