@@ -2194,8 +2194,8 @@ counter_mode = {"default": 0, "off": 1, "on": 2, "pickup": 3}
 access_mode = {"items": 0, "locations": 1, "none": 2}
 
 # byte 6: BSMC BBEE (big, small, maps, compass, bosses, enemies)
-boss_mode = {"none": 0, "simple": 1, "full": 2, "random": 3}
-enemy_mode = {"none": 0, "shuffled": 1, "random": 2}
+boss_mode = {"none": 0, "simple": 1, "full": 2, "random": 3, "chaos": 3}
+enemy_mode = {"none": 0, "shuffled": 1, "random": 2, "chaos": 2}
 
 # byte 7: HHHD DP?? (enemy_health, enemy_dmg, potshuffle, ?)
 e_health = {"default": 0, "easy": 1, "normal": 2, "hard": 3, "expert": 4}
