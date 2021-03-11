@@ -438,20 +438,20 @@ def create_doors(world, player):
         create_door(player, 'PoD Bow Statue Ranged Crystal Exit', Lgcl),
         create_door(player, 'PoD Bow Statue Down Ladder', Lddr).no_entrance(),
         create_door(player, 'PoD Dark Pegs Up Ladder', Lddr),
-
         create_door(player, 'PoD Dark Pegs Landing to Right', Lgcl),
         create_door(player, 'PoD Dark Pegs Landing to Ranged Crystal', Lgcl),
         create_door(player, 'PoD Dark Pegs Right to Landing', Lgcl),
         create_door(player, 'PoD Dark Pegs Right to Middle Barrier - Orange', Lgcl),
+        create_door(player, 'PoD Dark Pegs Right to Middle Bypass', Lgcl),
         create_door(player, 'PoD Dark Pegs Middle to Right Barrier - Orange', Lgcl),
         create_door(player, 'PoD Dark Pegs Middle to Left Barrier - Blue', Lgcl),
         create_door(player, 'PoD Dark Pegs Middle to Ranged Crystal', Lgcl),
+        create_door(player, 'PoD Dark Pegs Middle to Left Bypass', Lgcl),
         create_door(player, 'PoD Dark Pegs Left to Middle Barrier - Blue', Lgcl),
         create_door(player, 'PoD Dark Pegs Left to Ranged Crystal', Lgcl),
         create_door(player, 'PoD Dark Pegs Landing Ranged Crystal Exit', Lgcl),
         create_door(player, 'PoD Dark Pegs Middle Ranged Crystal Exit', Lgcl),
         create_door(player, 'PoD Dark Pegs Left Ranged Crystal Exit', Lgcl),
-
         create_door(player, 'PoD Dark Pegs WN', Intr).dir(We, 0x0b, Mid, High).small_key().pos(2),
         create_door(player, 'PoD Lonely Turtle SW', Intr).dir(So, 0x0b, Mid, High).pos(0),
         create_door(player, 'PoD Lonely Turtle EN', Intr).dir(Ea, 0x0b, Mid, High).small_key().pos(2),
@@ -989,6 +989,7 @@ def create_doors(world, player):
         create_door(player, 'TR Crystaroller Bottom to Middle Barrier - Orange', Lgcl),
         create_door(player, 'TR Crystaroller Bottom to Ranged Crystal', Lgcl),
         create_door(player, 'TR Crystaroller Middle to Bottom Barrier - Orange', Lgcl),
+        create_door(player, 'TR Crystaroller Middle to Bottom Bypass', Lgcl),
         create_door(player, 'TR Crystaroller Middle to Chest Barrier - Blue', Lgcl),
         create_door(player, 'TR Crystaroller Middle to Top Barrier - Orange', Lgcl),
         create_door(player, 'TR Crystaroller Middle to Ranged Crystal', Lgcl),
@@ -1008,6 +1009,7 @@ def create_doors(world, player):
         create_door(player, 'TR Crystal Maze Start to Interior Barrier - Blue', Lgcl),
         create_door(player, 'TR Crystal Maze Interior to Start Barrier - Blue', Lgcl),
         create_door(player, 'TR Crystal Maze Interior to End Barrier - Blue', Lgcl),
+        create_door(player, 'TR Crystal Maze Interior to End Bypass', Lgcl),
         create_door(player, 'TR Crystal Maze End to Interior Barrier - Blue', Lgcl),
         create_door(player, 'TR Crystal Maze End to Ranged Crystal', Lgcl),
         create_door(player, 'TR Crystal Maze End Ranged Crystal Exit', Lgcl),
@@ -1045,7 +1047,7 @@ def create_doors(world, player):
         create_door(player, 'GT Crystal Conveyor NE', Nrml).dir(No, 0x9d, Right, High).pos(0).kill(),
         create_door(player, 'GT Crystal Conveyor to Corner Barrier - Blue', Lgcl),
         create_door(player, 'GT Crystal Conveyor to Ranged Crystal', Lgcl),
-        create_door(player, 'GT Crystal Conveyor to Left Bypass', Lgcl),
+        create_door(player, 'GT Crystal Conveyor Corner to Left Bypass', Lgcl),
         create_door(player, 'GT Crystal Conveyor Corner to Barrier - Blue', Lgcl),
         create_door(player, 'GT Crystal Conveyor Corner to Barrier - Orange', Lgcl),
         create_door(player, 'GT Crystal Conveyor Corner to Ranged Crystal', Lgcl),
@@ -1274,8 +1276,10 @@ def create_doors(world, player):
     world.get_door('PoD Bow Statue Right to Left Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('PoD Bow Statue Ranged Crystal Exit', player).c_switch()
     world.get_door('PoD Dark Pegs Right to Middle Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('PoD Dark Pegs Right to Middle Bypass', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Dark Pegs Middle to Right Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('PoD Dark Pegs Middle to Left Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('PoD Dark Pegs Middle to Left Bypass', player).barrier(CrystalBarrier.Orange)
     world.get_door('PoD Dark Pegs Left to Middle Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('PoD Dark Pegs Landing Ranged Crystal Exit', player).c_switch()
     world.get_door('PoD Dark Pegs Middle Ranged Crystal Exit', player).c_switch()
@@ -1350,6 +1354,7 @@ def create_doors(world, player):
     world.get_door('TR Pokey 2 Bottom to Top Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('TR Pokey 2 Bottom Ranged Crystal Exit', player).c_switch()
     world.get_door('TR Crystaroller Bottom to Middle Barrier - Orange', player).barrier(CrystalBarrier.Orange)
+    world.get_door('TR Crystaroller Middle to Bottom Bypass', player).barrier(CrystalBarrier.Blue)
     world.get_door('TR Crystaroller Middle to Bottom Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('TR Crystaroller Middle to Chest Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('TR Crystaroller Chest to Middle Barrier - Blue', player).barrier(CrystalBarrier.Blue)
@@ -1362,6 +1367,7 @@ def create_doors(world, player):
     world.get_door('TR Crystal Maze Start to Interior Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('TR Crystal Maze Interior to Start Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('TR Crystal Maze Interior to End Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('TR Crystal Maze Interior to End Bypass', player).barrier(CrystalBarrier.Orange)
     world.get_door('TR Crystal Maze End to Interior Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('TR Crystal Maze End Ranged Crystal Exit', player).c_switch()
 
@@ -1371,7 +1377,7 @@ def create_doors(world, player):
     world.get_door('GT Crystal Conveyor Left to Corner Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Crystal Conveyor Ranged Crystal Exit', player).c_switch()
     world.get_door('GT Crystal Conveyor Corner Ranged Crystal Exit', player).c_switch()
-    world.get_door('GT Crystal Conveyor to Left Bypass', player).c_switch()
+    world.get_door('GT Crystal Conveyor Corner to Left Bypass', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT Hookshot South-North Path', player).c_switch()
     world.get_door('GT Hookshot South-East Path', player).c_switch()
     world.get_door('GT Hookshot ES', player).c_switch()

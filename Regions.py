@@ -387,7 +387,6 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'PoD Shooter Room', 'Palace of Darkness', ['Palace of Darkness - Shooter Room'], ['PoD Shooter Room Up Stairs']),
         create_dungeon_region(player, 'PoD Pit Room', 'Palace of Darkness', None, ['PoD Pit Room S', 'PoD Pit Room NW', 'PoD Pit Room Bomb Hole', 'PoD Pit Room Block Path N']),
         create_dungeon_region(player, 'PoD Pit Room Blocked', 'Palace of Darkness', None, ['PoD Pit Room NE', 'PoD Pit Room Freefall', 'PoD Pit Room Block Path S']),
-
         create_dungeon_region(player, 'PoD Arena Main', 'Palace of Darkness', None, ['PoD Arena Main SW', 'PoD Arena Main to Ranged Crystal', 'PoD Arena Main to Landing Barrier - Blue', 'PoD Arena Main to Landing Bypass', 'PoD Arena Main to Right Bypass']),
         create_dungeon_region(player, 'PoD Arena Main - Ranged Crystal', 'Palace of Darkness', None, ['PoD Arena Main Ranged Crystal Exit']),
         create_dungeon_region(player, 'PoD Arena North', 'Palace of Darkness', None, ['PoD Arena Main NW', 'PoD Arena Main NE', 'PoD Arena North Drop Down', 'PoD Arena North to Landing Barrier - Orange']),
@@ -398,7 +397,6 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'PoD Arena Right - Ranged Crystal', 'Palace of Darkness', None, ['PoD Arena Right Ranged Crystal Exit']),
         create_dungeon_region(player, 'PoD Arena Ledge', 'Palace of Darkness', ['Palace of Darkness - The Arena - Ledge'], ['PoD Arena Ledge ES', 'PoD Arena Ledge to Ranged Crystal']),
         create_dungeon_region(player, 'PoD Arena Ledge - Ranged Crystal', 'Palace of Darkness', None, ['PoD Arena Ledge Ranged Crystal Exit']),
-
         create_dungeon_region(player, 'PoD Sexy Statue', 'Palace of Darkness', None, ['PoD Sexy Statue W', 'PoD Sexy Statue NW']),
         create_dungeon_region(player, 'PoD Map Balcony', 'Palace of Darkness', ['Palace of Darkness - Map Chest'], ['PoD Map Balcony to Ranged Crystal', 'PoD Map Balcony WS', 'PoD Map Balcony South Stairs', 'PoD Map Balcony Drop Down']),
         create_dungeon_region(player, 'PoD Map Balcony - Ranged Crystal', 'Palace of Darkness', None, ['PoD Map Balcony Ranged Crystal Exit']),
@@ -419,19 +417,16 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'PoD Harmless Hellway', 'Palace of Darkness', ['Palace of Darkness - Harmless Hellway'], ['PoD Harmless Hellway NE', 'PoD Harmless Hellway SE']),
         create_dungeon_region(player, 'PoD Mimics 2', 'Palace of Darkness', None, ['PoD Mimics 2 SW', 'PoD Mimics 2 NW']),
         create_dungeon_region(player, 'PoD Bow Statue', 'Palace of Darkness', None, ['PoD Bow Statue SW', 'PoD Bow Statue Down Ladder']),
-
         create_dungeon_region(player, 'PoD Bow Statue Left', 'Palace of Darkness', None, ['PoD Bow Statue SW', 'PoD Bow Statue Left to Right Barrier - Orange', 'PoD Bow Statue Left to Right Bypass']),
         create_dungeon_region(player, 'PoD Bow Statue Right', 'Palace of Darkness', None, ['PoD Bow Statue Right to Left Barrier - Orange', 'PoD Bow Statue Right to Ranged Crystal', 'PoD Bow Statue Down Ladder']),
         create_dungeon_region(player, 'PoD Bow Statue Right - Ranged Crystal', 'Palace of Darkness', None, ['PoD Bow Statue Ranged Crystal Exit']),
-
         create_dungeon_region(player, 'PoD Dark Pegs Landing', 'Palace of Darkness', None, ['PoD Dark Pegs Up Ladder', 'PoD Dark Pegs Landing to Right', 'PoD Dark Pegs Landing to Ranged Crystal']),
-        create_dungeon_region(player, 'PoD Dark Pegs Right', 'Palace of Darkness', None, ['PoD Dark Pegs Right to Landing', 'PoD Dark Pegs Right to Middle Barrier - Orange']),
-        create_dungeon_region(player, 'PoD Dark Pegs Middle', 'Palace of Darkness', None, ['PoD Dark Pegs Middle to Right Barrier - Orange', 'PoD Dark Pegs Middle to Left Barrier - Blue', 'PoD Dark Pegs Middle to Ranged Crystal']),
+        create_dungeon_region(player, 'PoD Dark Pegs Right', 'Palace of Darkness', None, ['PoD Dark Pegs Right to Landing', 'PoD Dark Pegs Right to Middle Barrier - Orange', 'PoD Dark Pegs Right to Middle Bypass']),
+        create_dungeon_region(player, 'PoD Dark Pegs Middle', 'Palace of Darkness', None, ['PoD Dark Pegs Middle to Right Barrier - Orange', 'PoD Dark Pegs Middle to Left Barrier - Blue', 'PoD Dark Pegs Middle to Ranged Crystal', 'PoD Dark Pegs Middle to Left Bypass']),
         create_dungeon_region(player, 'PoD Dark Pegs Left', 'Palace of Darkness', None, ['PoD Dark Pegs WN', 'PoD Dark Pegs Left to Middle Barrier - Blue', 'PoD Dark Pegs Left to Ranged Crystal']),
         create_dungeon_region(player, 'PoD Dark Pegs Landing - Ranged Crystal', 'Palace of Darkness', None, ['PoD Dark Pegs Landing Ranged Crystal Exit']),
         create_dungeon_region(player, 'PoD Dark Pegs Middle - Ranged Crystal', 'Palace of Darkness', None, ['PoD Dark Pegs Middle Ranged Crystal Exit']),
         create_dungeon_region(player, 'PoD Dark Pegs Left - Ranged Crystal', 'Palace of Darkness', None, ['PoD Dark Pegs Left Ranged Crystal Exit']),
-
         create_dungeon_region(player, 'PoD Lonely Turtle', 'Palace of Darkness', None, ['PoD Lonely Turtle SW', 'PoD Lonely Turtle EN']),
         create_dungeon_region(player, 'PoD Turtle Party', 'Palace of Darkness', None, ['PoD Turtle Party ES', 'PoD Turtle Party NW']),
         create_dungeon_region(player, 'PoD Dark Alley', 'Palace of Darkness', None, ['PoD Dark Alley NE']),
@@ -670,7 +665,6 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'TR Chain Chomps Top', 'Turtle Rock', ['Turtle Rock - Chain Chomps'], ['TR Chain Chomps Down Stairs', 'TR Chain Chomps Top to Bottom Barrier - Orange']),
         create_dungeon_region(player, 'TR Chain Chomps Bottom', 'Turtle Rock', None, ['TR Chain Chomps SW', 'TR Chain Chomps Bottom to Top Barrier - Orange', 'TR Chain Chomps Bottom to Ranged Crystal']),
         create_dungeon_region(player, 'TR Chain Chomps Bottom - Ranged Crystal', 'Turtle Rock', None, ['TR Chain Chomps Bottom Ranged Crystal Exit']),
-
         create_dungeon_region(player, 'TR Pipe Pit', 'Turtle Rock', None, ['TR Pipe Pit Up Stairs', 'TR Pipe Pit WN']),
         create_dungeon_region(player, 'TR Pipe Ledge', 'Turtle Rock', None, ['TR Pipe Ledge WS', 'TR Pipe Ledge Drop Down']),
         create_dungeon_region(player, 'TR Lava Dual Pipes', 'Turtle Rock', None, ['TR Lava Dual Pipes EN', 'TR Lava Dual Pipes WN', 'TR Lava Dual Pipes SW']),
@@ -690,7 +684,7 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'TR Tongue Pull', 'Turtle Rock', None, ['TR Tongue Pull WS', 'TR Tongue Pull NE']),
         create_dungeon_region(player, 'TR Rupees', 'Turtle Rock', None, ['TR Rupees SE']),
         create_dungeon_region(player, 'TR Crystaroller Bottom' , 'Turtle Rock', None, ['TR Crystaroller Bottom to Middle Barrier - Orange', 'TR Crystaroller Bottom to Ranged Crystal', 'TR Crystaroller SW']),
-        create_dungeon_region(player, 'TR Crystaroller Middle', 'Turtle Rock', None, ['TR Crystaroller Middle to Bottom Barrier - Orange', 'TR Crystaroller Middle to Chest Barrier - Blue', 'TR Crystaroller Middle to Top Barrier - Orange', 'TR Crystaroller Middle to Ranged Crystal']),
+        create_dungeon_region(player, 'TR Crystaroller Middle', 'Turtle Rock', None, ['TR Crystaroller Middle to Bottom Barrier - Orange', 'TR Crystaroller Middle to Chest Barrier - Blue', 'TR Crystaroller Middle to Top Barrier - Orange', 'TR Crystaroller Middle to Ranged Crystal', 'TR Crystaroller Middle to Bottom Bypass']),
         create_dungeon_region(player, 'TR Crystaroller Top', 'Turtle Rock', None, ['TR Crystaroller Top to Middle Barrier - Orange', 'TR Crystaroller Down Stairs']),
         create_dungeon_region(player, 'TR Crystaroller Chest', 'Turtle Rock', ['Turtle Rock - Crystaroller Room'], ['TR Crystaroller Chest to Middle Barrier - Blue']),
         create_dungeon_region(player, 'TR Crystaroller Middle - Ranged Crystal', 'Turtle Rock', None, ['TR Crystaroller Middle Ranged Crystal Exit']),
@@ -700,13 +694,10 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'TR Eye Bridge', 'Turtle Rock', ['Turtle Rock - Eye Bridge - Bottom Left', 'Turtle Rock - Eye Bridge - Bottom Right',
                                                                        'Turtle Rock - Eye Bridge - Top Left', 'Turtle Rock - Eye Bridge - Top Right'],
                                                                       ['TR Eye Bridge SW', 'TR Eye Bridge NW']),
-
         create_dungeon_region(player, 'TR Crystal Maze Start', 'Turtle Rock', None, ['TR Crystal Maze ES', 'TR Crystal Maze Start to Interior Barrier - Blue']),
-        create_dungeon_region(player, 'TR Crystal Maze Interior', 'Turtle Rock', None, ['TR Crystal Maze Interior to End Barrier - Blue', 'TR Crystal Maze Interior to Start Barrier - Blue']),
+        create_dungeon_region(player, 'TR Crystal Maze Interior', 'Turtle Rock', None, ['TR Crystal Maze Interior to End Barrier - Blue', 'TR Crystal Maze Interior to Start Barrier - Blue', 'TR Crystal Maze Interior to End Bypass']),
         create_dungeon_region(player, 'TR Crystal Maze End', 'Turtle Rock', None, ['TR Crystal Maze North Stairs', 'TR Crystal Maze End to Interior Barrier - Blue', 'TR Crystal Maze End to Ranged Crystal']),
         create_dungeon_region(player, 'TR Crystal Maze End - Ranged Crystal', 'Turtle Rock', None, ['TR Crystal Maze End Ranged Crystal Exit']),
-
-
         create_dungeon_region(player, 'TR Final Abyss', 'Turtle Rock', None, ['TR Final Abyss South Stairs', 'TR Final Abyss NW']),
         create_dungeon_region(player, 'TR Boss', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize'], ['TR Boss SW']),
 
@@ -721,8 +712,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'GT Speed Torch', 'Ganon\'s Tower', None, ['GT Speed Torch WS', 'GT Speed Torch SE', 'GT Speed Torch North Path']),
         create_dungeon_region(player, 'GT Speed Torch Upper', 'Ganon\'s Tower', None, ['GT Speed Torch WN', 'GT Speed Torch NE', 'GT Speed Torch South Path']),
         create_dungeon_region(player, 'GT Pots n Blocks', 'Ganon\'s Tower', None, ['GT Pots n Blocks ES']),
-        create_dungeon_region(player, 'GT Crystal Conveyor', 'Ganon\'s Tower', None, ['GT Crystal Conveyor NE', 'GT Crystal Conveyor to Corner Barrier - Blue', 'GT Crystal Conveyor to Ranged Crystal', 'GT Crystal Conveyor to Left Bypass']),
-        create_dungeon_region(player, 'GT Crystal Conveyor Corner', 'Ganon\'s Tower', None, ['GT Crystal Conveyor Corner to Barrier - Blue', 'GT Crystal Conveyor Corner to Barrier - Orange', 'GT Crystal Conveyor Corner to Ranged Crystal']),
+        create_dungeon_region(player, 'GT Crystal Conveyor', 'Ganon\'s Tower', None, ['GT Crystal Conveyor NE', 'GT Crystal Conveyor to Corner Barrier - Blue', 'GT Crystal Conveyor to Ranged Crystal']),
+        create_dungeon_region(player, 'GT Crystal Conveyor Corner', 'Ganon\'s Tower', None, ['GT Crystal Conveyor Corner to Barrier - Blue', 'GT Crystal Conveyor Corner to Barrier - Orange', 'GT Crystal Conveyor Corner to Ranged Crystal', 'GT Crystal Conveyor Corner to Left Bypass']),
         create_dungeon_region(player, 'GT Crystal Conveyor Left', 'Ganon\'s Tower', None, ['GT Crystal Conveyor WN', 'GT Crystal Conveyor Left to Corner Barrier - Orange']),
         create_dungeon_region(player, 'GT Crystal Conveyor - Ranged Crystal', 'Ganon\'s Tower', None, ['GT Crystal Conveyor Ranged Crystal Exit']),
         create_dungeon_region(player, 'GT Crystal Conveyor Corner - Ranged Crystal', 'Ganon\'s Tower', None, ['GT Crystal Conveyor Corner Ranged Crystal Exit']),
@@ -852,7 +843,6 @@ def create_dungeon_regions(world, player):
     world.get_region('TR Crystaroller Top', player).crystal_switch = True
     world.get_region('TR Crystaroller Bottom - Ranged Crystal', player).crystal_switch = True
     world.get_region('TR Crystaroller Middle - Ranged Crystal', player).crystal_switch = True
-    world.get_region('TR Crystaroller Bottom - Ranged Crystal', player).crystal_switch = True
     world.get_region('TR Crystal Maze Start', player).crystal_switch = True
     world.get_region('TR Crystal Maze Interior', player).crystal_switch = True
     world.get_region('TR Crystal Maze End - Ranged Crystal', player).crystal_switch = True
@@ -860,7 +850,6 @@ def create_dungeon_regions(world, player):
     world.get_region('GT Crystal Conveyor Corner - Ranged Crystal', player).crystal_switch = True
     world.get_region('GT Hookshot South Platform', player).crystal_switch = True
     world.get_region('GT Hookshot South Entry - Ranged Crystal', player).crystal_switch = True
-    # Relevant to indicate north door can access c_switch
     world.get_region('GT Double Switch Left', player).crystal_switch = True
     world.get_region('GT Double Switch Entry - Ranged Switches', player).crystal_switch = True
     world.get_region('GT Double Switch Pot Corners - Ranged Switches', player).crystal_switch = True
