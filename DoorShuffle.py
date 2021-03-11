@@ -2198,6 +2198,7 @@ logical_connections = [
     ('GT Double Switch Left to Entry Barrier - Orange', 'GT Double Switch Entry'),
     ('GT Double Switch Left to Entry Bypass', 'GT Double Switch Entry'),
     ('GT Double Switch Left to Pot Corners Bypass', 'GT Double Switch Pot Corners'),
+    ('GT Double Switch Left to Exit Bypass', 'GT Double Switch Exit'),
     ('GT Double Switch Pot Corners to Entry Barrier - Orange', 'GT Double Switch Entry'),
     ('GT Double Switch Pot Corners to Exit Barrier - Blue', 'GT Double Switch Exit'),
     ('GT Double Switch Pot Corners to Ranged Switches', 'GT Double Switch Pot Corners - Ranged Switches'),

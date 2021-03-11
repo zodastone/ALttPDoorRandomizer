@@ -732,7 +732,7 @@ def create_dungeon_regions(world, player):
 
         create_dungeon_region(player, 'GT Double Switch Entry', 'Ganon\'s Tower', None, ['GT Double Switch NW', 'GT Double Switch Entry to Left Barrier - Orange', 'GT Double Switch Entry to Pot Corners Barrier - Orange', 'GT Double Switch Entry to Ranged Switches']),
         create_dungeon_region(player, 'GT Double Switch Entry - Ranged Switches', 'Ganon\'s Tower', None, ['GT Double Switch Entry Ranged Switches Exit']),
-        create_dungeon_region(player, 'GT Double Switch Left', 'Ganon\'s Tower', None, ['GT Double Switch Left to Entry Barrier - Orange', 'GT Double Switch Left to Entry Bypass', 'GT Double Switch Left to Pot Corners Bypass']),
+        create_dungeon_region(player, 'GT Double Switch Left', 'Ganon\'s Tower', None, ['GT Double Switch Left to Entry Barrier - Orange', 'GT Double Switch Left to Entry Bypass', 'GT Double Switch Left to Pot Corners Bypass', 'GT Double Switch Left to Exit Bypass']),
         create_dungeon_region(player, 'GT Double Switch Pot Corners', 'Ganon\'s Tower', ['Ganons Tower - Double Switch Pot Key'], ['GT Double Switch Pot Corners to Entry Barrier - Orange', 'GT Double Switch Pot Corners to Exit Barrier - Blue', 'GT Double Switch Pot Corners to Ranged Switches']),
         create_dungeon_region(player, 'GT Double Switch Pot Corners - Ranged Switches', 'Ganon\'s Tower', None, ['GT Double Switch Pot Corners Ranged Switches Exit']),
         create_dungeon_region(player, 'GT Double Switch Exit', 'Ganon\'s Tower', None, ['GT Double Switch EN', 'GT Double Switch Exit to Blue Barrier']),

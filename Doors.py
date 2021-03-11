@@ -1088,6 +1088,7 @@ def create_doors(world, player):
         create_door(player, 'GT Double Switch Left to Entry Barrier - Orange', Lgcl),
         create_door(player, 'GT Double Switch Left to Pot Corners Bypass', Lgcl),
         create_door(player, 'GT Double Switch Left to Entry Bypass', Lgcl),
+        create_door(player, 'GT Double Switch Left to Exit Bypass', Lgcl),
         create_door(player, 'GT Double Switch Pot Corners to Entry Barrier - Orange', Lgcl),
         create_door(player, 'GT Double Switch Pot Corners to Exit Barrier - Blue', Lgcl),
         create_door(player, 'GT Double Switch Pot Corners to Ranged Switches', Lgcl),
@@ -1401,6 +1402,7 @@ def create_doors(world, player):
     world.get_door('GT Double Switch Left to Entry Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Left to Entry Bypass', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT Double Switch Left to Pot Corners Bypass', player).barrier(CrystalBarrier.Blue)
+    world.get_door('GT Double Switch Left to Exit Bypass', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Pot Corners to Entry Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Pot Corners to Exit Barrier - Blue', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT Double Switch Pot Corners Ranged Switches Exit', player).c_switch()
