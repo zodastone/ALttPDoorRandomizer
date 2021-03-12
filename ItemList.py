@@ -37,7 +37,7 @@ Difficulty = namedtuple('Difficulty',
                         ['baseitems', 'bottles', 'bottle_count', 'same_bottle', 'progressiveshield',
                          'basicshield', 'progressivearmor', 'basicarmor', 'swordless',
                          'progressivesword', 'basicsword', 'basicbow', 'timedohko', 'timedother',
-                         'triforcehunt', 'triforce_pieces_required', 'retro',
+                         'retro',
                          'extras', 'progressive_sword_limit', 'progressive_shield_limit',
                          'progressive_armor_limit', 'progressive_bottle_limit',
                          'progressive_bow_limit', 'heart_piece_limit', 'boss_heart_container_limit'])
@@ -60,8 +60,6 @@ difficulties = {
         basicbow = ['Bow', 'Silver Arrows'],
         timedohko = ['Green Clock'] * 25,
         timedother = ['Green Clock'] * 20 + ['Blue Clock'] * 10 + ['Red Clock'] * 10,
-        triforcehunt = ['Triforce Piece'] * 30,
-        triforce_pieces_required = 20,
         retro = ['Small Key (Universal)'] * 18 + ['Rupees (20)'] * 10,
         extras = [normalfirst15extra, normalsecond15extra, normalthird10extra, normalfourth5extra, normalfinal25extra],
         progressive_sword_limit = 4,
@@ -87,8 +85,6 @@ difficulties = {
         basicbow = ['Bow'] * 2,
         timedohko = ['Green Clock'] * 25,
         timedother = ['Green Clock'] * 20 + ['Blue Clock'] * 10 + ['Red Clock'] * 10,
-        triforcehunt = ['Triforce Piece'] * 30,
-        triforce_pieces_required = 20,
         retro = ['Small Key (Universal)'] * 13 + ['Rupees (5)'] * 15,
         extras = [normalfirst15extra, normalsecond15extra, normalthird10extra, normalfourth5extra, normalfinal25extra],
         progressive_sword_limit = 3,
@@ -114,8 +110,6 @@ difficulties = {
         basicbow = ['Bow'] * 2,
         timedohko = ['Green Clock'] * 20 + ['Red Clock'] * 5,
         timedother = ['Green Clock'] * 20 + ['Blue Clock'] * 10 + ['Red Clock'] * 10,
-        triforcehunt = ['Triforce Piece'] * 30,
-        triforce_pieces_required = 20,
         retro = ['Small Key (Universal)'] * 13 + ['Rupees (5)'] * 15,
         extras = [normalfirst15extra, normalsecond15extra, normalthird10extra, normalfourth5extra, normalfinal25extra],
         progressive_sword_limit = 2,
@@ -262,7 +256,7 @@ def generate_itempool(world, player):
         (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = make_custom_item_pool(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.customitemarray)
         world.rupoor_cost = min(world.customitemarray[player]["rupoorcost"], 9999)
     else:
-        (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = get_pool_core(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.doorShuffle[player])
+        (pool, placed_items, precollected_items, clock_mode, lamps_needed_for_dark_rooms) = get_pool_core(world.progressive, world.shuffle[player], world.difficulty[player], world.treasure_hunt_total[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.doorShuffle[player])
 
     if player in world.pool_adjustment.keys():
         amt = world.pool_adjustment[player]
@@ -320,10 +314,10 @@ def generate_itempool(world, player):
     if clock_mode is not None:
         world.clock_mode = clock_mode
 
-    if treasure_hunt_count is not None:
-        world.treasure_hunt_count[player] = treasure_hunt_count
-    if treasure_hunt_icon is not None:
-        world.treasure_hunt_icon[player] = treasure_hunt_icon
+    if world.goal[player] == 'triforcehunt':
+        world.treasure_hunt_icon[player] = 'Triforce Piece'
+        if world.custom:
+            world.treasure_hunt_count[player] = treasure_hunt_count
 
     world.itempool.extend([item for item in get_dungeon_item_pool(world) if item.player == player
                            and ((item.smallkey and world.keyshuffle[player])
@@ -640,13 +634,12 @@ shop_transfer = {'Red Potion': 'Rupees (100)', 'Bee': 'Rupees (5)', 'Blue Potion
                  }
 
 
-def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, door_shuffle):
+def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, goal, mode, swords, retro, door_shuffle):
     pool = []
     placed_items = {}
     precollected_items = []
     clock_mode = None
-    treasure_hunt_count = None
-    treasure_hunt_icon = None
+    triforcepool = ['Triforce Piece'] * treasure_hunt_total
 
     pool.extend(alwaysitems)
 
@@ -740,10 +733,8 @@ def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, r
         extraitems -= len(diff.timedohko)
         clock_mode = 'countdown-ohko'
     if goal == 'triforcehunt':
-        pool.extend(diff.triforcehunt)
-        extraitems -= len(diff.triforcehunt)
-        treasure_hunt_count = diff.triforce_pieces_required
-        treasure_hunt_icon = 'Triforce Piece'
+        pool.extend(triforcepool)
+        extraitems -= len(triforcepool)
 
     for extra in diff.extras:
         if extraitems > 0:
@@ -771,7 +762,7 @@ def get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, r
                 pool.extend(['Small Key (Universal)'])
         else:
             pool.extend(['Small Key (Universal)'])
-    return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms)
+    return (pool, placed_items, precollected_items, clock_mode, lamps_needed_for_dark_rooms)
 
 def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, customitemarray):
     if isinstance(customitemarray,dict) and 1 in customitemarray:

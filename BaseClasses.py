@@ -128,6 +128,7 @@ class World(object):
             set_player_attr('open_pyramid', False)
             set_player_attr('treasure_hunt_icon', 'Triforce Piece')
             set_player_attr('treasure_hunt_count', 0)
+            set_player_attr('treasure_hunt_total', 0)
             set_player_attr('potshuffle', False)
             set_player_attr('pot_contents', None)
 
@@ -1376,11 +1377,6 @@ class Door(object):
             self.passage = True
         else:
             self.passage = False
-
-    def kind(self, world):
-        if self.roomIndex != -1 and self.doorListPos != -1:
-            return world.get_room(self.roomIndex, self.player).kind(self)
-        return None
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.name == other.name
