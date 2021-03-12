@@ -26,7 +26,7 @@ from Fill import sell_potions, sell_keys, balance_multiworld_progression, balanc
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.3.1.4-u'
+__version__ = '0.3.1.5-u'
 
 
 class EnemizerError(RuntimeError):
@@ -167,6 +167,9 @@ def main(args, seed=None, fish=None):
             sell_potions(world, player)
             if world.retro[player]:
                 sell_keys(world, player)
+        else:
+            lock_shop_locations(world, player)
+
 
     logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
 

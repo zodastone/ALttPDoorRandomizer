@@ -171,6 +171,7 @@ def roll_settings(weights):
     ret.openpyramid = goal == 'fast_ganon' if ret.shuffle in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
 
     ret.crystals_gt = get_choice('tower_open')
+
     ret.crystals_ganon = get_choice('ganon_open')
     
     if ret.goal == 'triforcehunt':
@@ -215,8 +216,7 @@ def roll_settings(weights):
     ret.shufflepots = get_choice('pot_shuffle') == 'on'
 
     ret.beemizer = int(get_choice('beemizer')) if 'beemizer' in weights else 0
-	
-	
+
     inventoryweights = weights.get('startinventory', {})
     startitems = []
     for item in inventoryweights.keys():
