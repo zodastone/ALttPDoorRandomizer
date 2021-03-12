@@ -450,7 +450,10 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Swamp Donut Top', 'Swamp Palace', None, ['Swamp Donut Top N', 'Swamp Donut Top SE']),
         create_dungeon_region(player, 'Swamp Donut Bottom', 'Swamp Palace', None, ['Swamp Donut Bottom NE', 'Swamp Donut Bottom NW']),
         create_dungeon_region(player, 'Swamp Compass Donut', 'Swamp Palace', ['Swamp Palace - Compass Chest'], ['Swamp Compass Donut SW', 'Swamp Compass Donut Push Block']),
-        create_dungeon_region(player, 'Swamp Crystal Switch', 'Swamp Palace', ['Trench 2 Switch'], ['Swamp Crystal Switch EN', 'Swamp Crystal Switch SE']),
+        create_dungeon_region(player, 'Swamp Crystal Switch Outer', 'Swamp Palace', None, ['Swamp Crystal Switch EN', 'Swamp Crystal Switch SE', 'Swamp Crystal Switch Outer to Inner Barrier - Blue', 'Swamp Crystal Switch Outer to Ranged Crystal', 'Swamp Crystal Switch Outer to Inner Bypass']),
+        create_dungeon_region(player, 'Swamp Crystal Switch Outer - Ranged Crystal', 'Swamp Palace', None, ['Swamp Crystal Switch Outer Ranged Crystal Exit']),
+        create_dungeon_region(player, 'Swamp Crystal Switch Inner', 'Swamp Palace', ['Trench 2 Switch'], ['Swamp Crystal Switch Inner to Outer Bypass', 'Swamp Crystal Switch Inner to Outer Barrier - Blue']),
+        
         create_dungeon_region(player, 'Swamp Shortcut', 'Swamp Palace', None, ['Swamp Shortcut NE', 'Swamp Shortcut Blue Barrier']),
         create_dungeon_region(player, 'Swamp Trench 2 Pots', 'Swamp Palace', None, ['Swamp Trench 2 Pots ES', 'Swamp Trench 2 Pots Blue Barrier', 'Swamp Trench 2 Pots Dry', 'Swamp Trench 2 Pots Wet']),
         create_dungeon_region(player, 'Swamp Trench 2 Blocks', 'Swamp Palace', None, ['Swamp Trench 2 Blocks Pots', 'Swamp Trench 2 Blocks N']),
@@ -826,7 +829,8 @@ def create_dungeon_regions(world, player):
     world.get_region('PoD Dark Pegs Right', player).crystal_switch = True
     world.get_region('PoD Dark Pegs Middle - Ranged Crystal', player).crystal_switch = True
     world.get_region('PoD Dark Pegs Left - Ranged Crystal', player).crystal_switch = True
-    world.get_region('Swamp Crystal Switch', player).crystal_switch = True
+    world.get_region('Swamp Crystal Switch Inner', player).crystal_switch = True
+    world.get_region('Swamp Crystal Switch Outer - Ranged Crystal', player).crystal_switch = True
     world.get_region('Thieves Spike Switch', player).crystal_switch = True
     world.get_region('Ice Bomb Drop', player).crystal_switch = True
     world.get_region('Ice Conveyor', player).crystal_switch = True

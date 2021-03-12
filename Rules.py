@@ -388,10 +388,16 @@ def global_rules(world, player):
     set_rule(world.get_entrance('PoD Dark Pegs Right to Middle Bypass', player), lambda state: state.has('Blue Boomerang', player))
     set_rule(world.get_entrance('PoD Dark Pegs Middle to Left Bypass', player), lambda state: state.can_use_bombs(player))
 
+    set_rule(world.get_entrance('Swamp Crystal Switch Outer to Inner Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('Swamp Trench 2 Pots', player), player))
+    set_rule(world.get_entrance('Swamp Crystal Switch Inner to Outer Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('Swamp Trench 2 Pots', player), player))
     set_rule(world.get_entrance('Swamp Trench 2 Pots Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Swamp Trench 2 Pots', player), player))
     set_rule(world.get_entrance('Swamp Shortcut Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Swamp Shortcut', player), player))
     set_rule(world.get_entrance('Swamp Barrier Ledge - Orange', player), lambda state: state.can_reach_orange(world.get_region('Swamp Barrier Ledge', player), player))
     set_rule(world.get_entrance('Swamp Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Swamp Barrier', player), player))
+
+    set_rule(world.get_entrance('Swamp Crystal Switch Outer to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player) or state.has_beam_sword(player)) # It is the length of the sword, not the beam itself that allows this
+    set_rule(world.get_entrance('Swamp Crystal Switch Outer to Inner Bypass', player), lambda state: state.world.can_take_damage or state.has('Cape', player) or state.has('Cane of Byrna', player))
+    set_rule(world.get_entrance('Swamp Crystal Switch Inner to Outer Bypass', player), lambda state: state.world.can_take_damage or state.has('Cape', player) or state.has('Cane of Byrna', player))
 
     set_rule(world.get_entrance('Thieves Hellway Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Thieves Hellway', player), player))
     set_rule(world.get_entrance('Thieves Hellway Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Thieves Hellway', player), player))

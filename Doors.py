@@ -503,6 +503,12 @@ def create_doors(world, player):
         create_door(player, 'Swamp Compass Donut Push Block', Lgcl),
         create_door(player, 'Swamp Crystal Switch EN', Nrml).dir(Ea, 0x35, Top, High).small_key().pos(0),
         create_door(player, 'Swamp Crystal Switch SE', Intr).dir(So, 0x35, Right, High).pos(3),
+        create_door(player, 'Swamp Crystal Switch Outer to Inner Barrier - Blue', Lgcl),
+        create_door(player, 'Swamp Crystal Switch Outer to Ranged Crystal', Lgcl),
+        create_door(player, 'Swamp Crystal Switch Outer to Inner Bypass', Lgcl),
+        create_door(player, 'Swamp Crystal Switch Outer Ranged Crystal Exit', Lgcl),
+        create_door(player, 'Swamp Crystal Switch Inner to Outer Barrier - Blue', Lgcl),
+        create_door(player, 'Swamp Crystal Switch Inner to Outer Bypass', Lgcl),
         create_door(player, 'Swamp Shortcut NE', Intr).dir(No, 0x35, Right, High).pos(3),
         create_door(player, 'Swamp Shortcut Blue Barrier', Lgcl),
         create_door(player, 'Swamp Trench 2 Pots ES', Nrml).dir(Ea, 0x35, Bot, High).pos(4),
@@ -1286,8 +1292,11 @@ def create_doors(world, player):
     world.get_door('PoD Dark Pegs Middle Ranged Crystal Exit', player).c_switch()
     world.get_door('PoD Dark Pegs Left Ranged Crystal Exit', player).c_switch()
 
-    world.get_door('Swamp Crystal Switch EN', player).c_switch()
-    world.get_door('Swamp Crystal Switch SE', player).c_switch()
+    world.get_door('Swamp Crystal Switch Outer to Inner Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Swamp Crystal Switch Outer to Inner Bypass', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Swamp Crystal Switch Inner to Outer Barrier - Blue', player).barrier(CrystalBarrier.Blue)
+    world.get_door('Swamp Crystal Switch Inner to Outer Bypass', player).barrier(CrystalBarrier.Orange)
+    world.get_door('Swamp Crystal Switch Outer Ranged Crystal Exit', player).c_switch()
     world.get_door('Swamp Shortcut Blue Barrier', player).barrier(CrystalBarrier.Blue)
     world.get_door('Swamp Trench 2 Pots Blue Barrier', player).barrier(CrystalBarrier.Blue)
     world.get_door('Swamp Barrier Ledge - Orange', player).barrier(CrystalBarrier.Orange)
