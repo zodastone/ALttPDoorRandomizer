@@ -185,6 +185,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('PoD Map Balcony Drop Down', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('PoD Dark Pegs Landing to Right', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('PoD Dark Pegs Right to Landing', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('PoD Turtle Party NW', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('PoD Turtle Party ES', player), lambda state: state.has('Hammer', player))
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Prize', player))
 
@@ -544,12 +546,54 @@ def bomb_rules(world, player):
         add_rule(world.get_location(location, player), lambda state: state.can_hit_crystal_through_barrier(player))
 
     # Dungeon bomb logic
-    for _,entrances in std_kill_rooms.items():
-        for entrance in entrances:
-            add_rule(world.get_entrance(entrance, player), lambda state: (state.can_use_bombs(player) or state.can_kill_most_things(player)))
+    easy_kill_rooms = [ # Door, bool-bombable
+        ('Hyrule Dungeon Armory S', True), # One green guard
+        ('Hyrule Dungeon Armory ES', True), # One green guard
+        ('Hyrule Dungeon Armory Boomerang WS', True), # One blue guard
+        ('Desert Compass NW', True), # Three popos
+        ('Desert Four Statues NW', True), # Four popos
+        ('Desert Four Statues ES', True), # Four popos
+        ('Hera Beetles WS', False), # Three blue beetles and only two pots, and bombs don't work.
+        ('Thieves Basement Block WN', True), # One blue and one red zazak and one Stalfos. Two pots. Need to kill the third enemy somehow.
+        ('Ice Pengator Trap NE', False), # Five pengators. Bomb-doable?
+        ('TR Twin Pokeys EN', False), # Two pokeys
+        ('TR Twin Pokeys SW', False), # Two pokeys
+        ('GT Petting Zoo SE', False), # Dont make anyone do this room with bombs and/or pots.
+        ('GT DMs Room SW', False) # Four red stalfos
+    ]
+    for killdoor,bombable in easy_kill_rooms:
+        if bombable:
+            add_rule(world.get_entrance(killdoor, player), lambda state: (state.can_use_bombs(player) or state.can_kill_most_things(player)))
+        else:
+            add_rule(world.get_entrance(killdoor, player), lambda state: state.can_kill_most_things(player))
+    add_rule(world.get_entrance('Ice Stalfos Hint SE', player), lambda state: state.can_use_bombs(player)) # Need bombs for big stalfos knights
+    add_rule(world.get_entrance('Mire Cross ES', player), lambda state: state.can_kill_most_things(player)) # 4 Sluggulas. Bombs don't work // or (state.can_use_bombs(player) and state.has('Magic Powder'), player) 
+
+    enemy_kill_drops = [ # Location, bool-bombable
+        ('Hyrule Castle - Map Guard Key Drop', True),
+        ('Hyrule Castle - Boomerang Guard Key Drop', True),
+        ('Hyrule Castle - Key Rat Key Drop', True),
+#        ('Hyrule Castle - Big Key Drop', True), # Pots are available
+#        ('Eastern Palace - Dark Eyegore Key Drop', True), # Pots are available
+        ('Castle Tower - Dark Archer Key Drop', True),
+#        ('Castle Tower - Circle of Pots Key Drop', True), # Pots are available 
+#        ('Skull Woods - Spike Corner Key Drop', True), # Pots are available
+        ('Ice Palace - Jelly Key Drop', True),
+        ('Ice Palace - Conveyor Key Drop', True),
+        ('Misery Mire - Conveyor Crystal Key Drop', True),
+        ('Turtle Rock - Pokey 1 Key Drop', True),
+        ('Turtle Rock - Pokey 2 Key Drop', True),
+#        ('Ganons Tower - Mini Helmasaur Key Drop', True) # Pots are available
+        ('Castle Tower - Room 03', True), # Two spring soliders
+        ('Ice Palace - Compass Chest', True) # Pengators
+    ]
+    for location,bombable in enemy_kill_drops:
+        if bombable:
+            add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player) or state.can_kill_most_things(player)) 
+        else:
+            add_rule(world.get_location(location, player), lambda state: state.can_kill_most_things(player))
 
     add_rule(world.get_location('Attic Cracked Floor', player), lambda state: state.can_use_bombs(player)) 
-
     bombable_floors = ['PoD Pit Room Bomb Hole', 'Ice Bomb Drop Hole', 'Ice Freezors Bomb Hole', 'GT Bob\'s Room Hole']
     for entrance in bombable_floors:
         add_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player)) 
@@ -983,33 +1027,33 @@ def swordless_rules(world, player):
 
 
 std_kill_rooms = {
-    'Hyrule Dungeon Armory Main': ['Hyrule Dungeon Armory S'],
-    'Hyrule Dungeon Armory Boomerang': ['Hyrule Dungeon Armory Boomerang WS'],
-    'Eastern Stalfos Spawn': ['Eastern Stalfos Spawn ES', 'Eastern Stalfos Spawn NW'],
-    'Desert Compass Room': ['Desert Compass NW'],
-    'Desert Four Statues': ['Desert Four Statues NW', 'Desert Four Statues ES'],
-    'Hera Beetles': ['Hera Beetles WS'],
-    'Tower Gold Knights': ['Tower Gold Knights SW', 'Tower Gold Knights EN'],
-    'Tower Dark Archers': ['Tower Dark Archers WN'],
-    'Tower Red Spears': ['Tower Red Spears WN'],
-    'Tower Red Guards': ['Tower Red Guards EN', 'Tower Red Guards SW'],
-    'Tower Circle of Pots': ['Tower Circle of Pots NW'],
-    'PoD Turtle Party': ['PoD Turtle Party ES', 'PoD Turtle Party NW'],  # todo: hammer req. in main rules
-    'Thieves Basement Block': ['Thieves Basement Block WN'],
-    'Ice Stalfos Hint': ['Ice Stalfos Hint SE'],
-    'Ice Pengator Trap': ['Ice Pengator Trap NE'],
-    'Mire 2': ['Mire 2 NE'],
-    'Mire Cross': ['Mire Cross ES'],
-    'TR Twin Pokeys': ['TR Twin Pokeys EN', 'TR Twin Pokeys SW'],
-    'GT Petting Zoo': ['GT Petting Zoo SE'],
-    'GT DMs Room': ['GT DMs Room SW'],
-    'GT Gauntlet 1': ['GT Gauntlet 1 WN'],
-    'GT Gauntlet 2': ['GT Gauntlet 2 EN', 'GT Gauntlet 2 SW'],
-    'GT Gauntlet 3': ['GT Gauntlet 3 NW', 'GT Gauntlet 3 SW'],
-    'GT Gauntlet 4': ['GT Gauntlet 4 NW', 'GT Gauntlet 4 SW'],
-    'GT Gauntlet 5': ['GT Gauntlet 5 NW', 'GT Gauntlet 5 WS'],
-    'GT Wizzrobes 1': ['GT Wizzrobes 1 SW'],
-    'GT Wizzrobes 2': ['GT Wizzrobes 2 SE', 'GT Wizzrobes 2 NE']
+    'Hyrule Dungeon Armory Main': ['Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory ES'], # One green guard
+    'Hyrule Dungeon Armory Boomerang': ['Hyrule Dungeon Armory Boomerang WS'], # One blue guard
+    'Eastern Stalfos Spawn': ['Eastern Stalfos Spawn ES', 'Eastern Stalfos Spawn NW'], # Can use pots
+    'Desert Compass Room': ['Desert Compass NW'], # Three popos
+    'Desert Four Statues': ['Desert Four Statues NW', 'Desert Four Statues ES'], # Four popos
+    'Hera Beetles': ['Hera Beetles WS'], # Three blue beetles and only two pots, and bombs don't work.
+    'Tower Gold Knights': ['Tower Gold Knights SW', 'Tower Gold Knights EN'], # Two ball and chain 
+    'Tower Dark Archers': ['Tower Dark Archers WN'],  # Not a kill room
+    'Tower Red Spears': ['Tower Red Spears WN'],  # Two spear soldiers 
+    'Tower Red Guards': ['Tower Red Guards EN', 'Tower Red Guards SW'], # Two usain bolts
+    'Tower Circle of Pots': ['Tower Circle of Pots NW'], # Two spear soldiers. Plenty of pots.
+    'PoD Turtle Party': ['PoD Turtle Party ES', 'PoD Turtle Party NW'],  # Lots of turtles.
+    'Thieves Basement Block': ['Thieves Basement Block WN'], # One blue and one red zazak and one Stalfos. Two pots. Need weapon. 
+    'Ice Stalfos Hint': ['Ice Stalfos Hint SE'], # Need bombs for big stalfos knights
+    'Ice Pengator Trap': ['Ice Pengator Trap NE'], # Five pengators. Bomb-doable?
+    'Mire 2': ['Mire 2 NE'], # Wizzrobes. Bombs dont work.
+    'Mire Cross': ['Mire Cross ES'], # 4 Sluggulas. Bombs don't work
+    'TR Twin Pokeys': ['TR Twin Pokeys EN', 'TR Twin Pokeys SW'], # Two pokeys
+    'GT Petting Zoo': ['GT Petting Zoo SE'], # Dont make anyone do this room with bombs.
+    'GT DMs Room': ['GT DMs Room SW'], # Four red stalfos
+    'GT Gauntlet 1': ['GT Gauntlet 1 WN'], # Stalfos/zazaks
+    'GT Gauntlet 2': ['GT Gauntlet 2 EN', 'GT Gauntlet 2 SW'], # Red stalfos
+    'GT Gauntlet 3': ['GT Gauntlet 3 NW', 'GT Gauntlet 3 SW'], # Blue zazaks
+    'GT Gauntlet 4': ['GT Gauntlet 4 NW', 'GT Gauntlet 4 SW'], # Red zazaks
+    'GT Gauntlet 5': ['GT Gauntlet 5 NW', 'GT Gauntlet 5 WS'], # Stalfos and zazak
+    'GT Wizzrobes 1': ['GT Wizzrobes 1 SW'], # Wizzrobes. Bombs don't work
+    'GT Wizzrobes 2': ['GT Wizzrobes 2 SE', 'GT Wizzrobes 2 NE'] # Wizzrobes. Bombs don't work
 }  # all trap rooms?
 
 def add_connection(parent_name, target_name, entrance_name, world, player):
