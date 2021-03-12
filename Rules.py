@@ -354,11 +354,20 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Hera Up Stairs to Front Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Up Stairs Landing', player), player))
     set_rule(world.get_entrance('Hera Front to Back Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Front', player), player))
     set_rule(world.get_entrance('Hera Back to Front Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Hera Back', player), player))
+    set_rule(world.get_location('Tower of Hera - Basement Cage', player), lambda state: state.can_reach_orange(world.get_region('Hera Basement Cage', player), player))
+    set_rule(world.get_entrance('Hera Tridorm WN', player), lambda state: state.can_reach_blue(world.get_region('Hera Tridorm', player), player))
+    set_rule(world.get_entrance('Hera Tridorm SE', player), lambda state: state.can_reach_orange(world.get_region('Hera Tridorm', player), player))
+    set_rule(world.get_entrance('Hera Tile Room EN', player), lambda state: state.can_reach_blue(world.get_region('Hera Tile Room', player), player))
 
+    set_rule(world.get_entrance('Hera Lobby to Crystal', player), lambda state: state.can_hit_crystal(player))
+    set_rule(world.get_entrance('Hera Front to Crystal', player), lambda state: state.can_hit_crystal(player))
     set_rule(world.get_entrance('Hera Down Stairs Landing to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player) or (state.has('Hookshot', player) and state.can_reach_blue(world.get_region('Hera Down Stairs Landing', player), player))) # or state.has_beam_sword(player)
     set_rule(world.get_entrance('Hera Up Stairs Landing to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player) or (state.has('Hookshot', player) and state.can_reach_orange(world.get_region('Hera Up Stairs Landing', player), player))) # or state.has_beam_sword(player)
     set_rule(world.get_entrance('Hera Back to Ranged Crystal', player), lambda state: False) # state.can_shoot_arrows(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player) or state.has_beam_sword(player) or (state.has('Hookshot', player) and state.has('Red Boomerang', player))
     set_rule(world.get_entrance('Hera Front to Back Bypass', player), lambda state: state.can_use_bombs(player) or state.can_use_arrows(player) or state.has('Red Boomerang', player) or state.has('Blue Boomerang', player) or state.has('Cane of Somaria', player) or state.has('Fire Rod', player) or state.has('Ice Rod', player)) # or state.has_beam_sword(player)
+    set_rule(world.get_entrance('Hera Basement Cage to Crystal', player), lambda state: state.can_hit_crystal(player))
+    set_rule(world.get_entrance('Hera Tridorm to Crystal', player), lambda state: state.can_hit_crystal(player))
+    set_rule(world.get_entrance('Hera Startile Wide to Crystal', player), lambda state: state.can_hit_crystal(player))
 
     set_rule(world.get_entrance('PoD Arena North to Landing Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('PoD Arena North', player), player))
     set_rule(world.get_entrance('PoD Arena Landing to North Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('PoD Arena Landing', player), player))
@@ -380,6 +389,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('PoD Arena Right to Ranged Crystal', player), lambda state: False) # (state.has('Cane of Somaria', player) and state.has_Boots(player))
     set_rule(world.get_entrance('PoD Arena Ledge to Ranged Crystal', player), lambda state: False) # state.has('Cane of Somaria', player) or state.has_beam_sword(player)
     set_rule(world.get_entrance('PoD Map Balcony to Ranged Crystal', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria', player)) # or state.has('Red Boomerang', player)
+    set_rule(world.get_entrance('PoD Bow Statue Left to Crystal', player), lambda state: state.can_hit_switch(player))
     set_rule(world.get_entrance('PoD Bow Statue Right to Ranged Crystal', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('PoD Bow Statue Left to Right Bypass', player), lambda state: state.has('Cane of Somaria', player)) # or state.can_use_bombs(player) or state.can_shoot_arrows(player) or state.has_beam_sword(player) or state.has('Red Boomrang', player) or state.has('Ice Rod', player) or state.has('Fire Rod', player)
     set_rule(world.get_entrance('PoD Dark Pegs Landing to Ranged Crystal', player), lambda state: state.has('Cane of Somaria', player)) # or state.can_use_bombs(player) or state.has('Blue boomerang', player) or state.has('Red boomerang', player)
@@ -395,6 +405,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Swamp Barrier Ledge - Orange', player), lambda state: state.can_reach_orange(world.get_region('Swamp Barrier Ledge', player), player))
     set_rule(world.get_entrance('Swamp Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('Swamp Barrier', player), player))
 
+    set_rule(world.get_entrance('Swamp Crystal Switch Inner to Crystal', player), lambda state: state.can_hit_crystal(player))
     set_rule(world.get_entrance('Swamp Crystal Switch Outer to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player) or state.has_beam_sword(player) or (state.has('Hookshot', player) and state.can_reach_blue(world.get_region('Swamp Crystal Switch Outer', player), player))) # It is the length of the sword, not the beam itself that allows this
     set_rule(world.get_entrance('Swamp Crystal Switch Outer to Inner Bypass', player), lambda state: state.world.can_take_damage or state.has('Cape', player) or state.has('Cane of Byrna', player))
     set_rule(world.get_entrance('Swamp Crystal Switch Inner to Outer Bypass', player), lambda state: state.world.can_take_damage or state.has('Cape', player) or state.has('Cane of Byrna', player))
@@ -415,6 +426,9 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Ice Bomb Jump Ledge Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Ice Bomb Jump Ledge', player), player))
     set_rule(world.get_entrance('Ice Bomb Jump Catwalk Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Ice Bomb Jump Catwalk', player), player))
 
+    set_rule(world.get_entrance('Ice Conveyor to Crystal', player), lambda state: state.can_hit_crystal(player))
+    set_rule(world.get_entrance('Ice Refill to Crystal', player), lambda state: state.can_hit_crystal(player) or state.can_reach_blue(world.get_region('Ice Refill', player), player))
+
     set_rule(world.get_entrance('Mire Crystal Right Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Mire Crystal Right', player), player))
     set_rule(world.get_entrance('Mire Crystal Mid Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Mire Crystal Mid', player), player))
     set_rule(world.get_entrance('Mire Firesnake Skip Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Mire Firesnake Skip', player), player))
@@ -434,6 +448,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Mire Crystal Mid Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Crystal Mid', player), player))
     set_rule(world.get_entrance('Mire Crystal Left Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Mire Crystal Left', player), player))
 
+    set_rule(world.get_entrance('Mire Conveyor to Crystal', player), lambda state: state.can_hit_crystal(player))
     set_rule(world.get_entrance('Mire Tall Dark and Roomy to Ranged Crystal', player), lambda state: True) # Can always throw pots
 
     set_rule(world.get_location('Turtle Rock - Chain Chomps', player), lambda state: state.can_reach('TR Chain Chomps Top', 'Region', player) and state.can_hit_crystal_through_barrier(player))
@@ -452,6 +467,10 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Crystal Maze Interior to Start Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Crystal Maze Interior', player), player))
     set_rule(world.get_entrance('TR Crystal Maze End to Interior Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('TR Crystal Maze End', player), player))
 
+    set_rule(world.get_entrance('TR Chain Chomps Top to Crystal', player), lambda state: state.can_hit_crystal(player))
+    set_rule(world.get_entrance('TR Pokey 2 Top to Crystal', player), lambda state: state.can_hit_crystal(player))
+    set_rule(world.get_entrance('TR Crystaroller Top to Crystal', player), lambda state: state.can_hit_crystal(player))
+    set_rule(world.get_entrance('TR Crystal Maze Start to Crystal', player), lambda state: state.can_hit_crystal(player))
     set_rule(world.get_entrance('TR Chain Chomps Bottom to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player) or (state.has('Hookshot', player) and state.can_reach_orange(world.get_region('TR Chain Chomps Bottom', player), player))) # or state.has_beam_sword(player)
     set_rule(world.get_entrance('TR Pokey 2 Bottom to Ranged Crystal', player), lambda state: state.can_hit_crystal_through_barrier(player) or (state.has('Hookshot', player) and state.can_reach_blue(world.get_region('TR Pokey 2', player), player))) # or state.has_beam_sword(player)
     set_rule(world.get_entrance('TR Crystaroller Bottom to Ranged Crystal', player), lambda state: state.can_shoot_arrows(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player) or (state.has('Hookshot', player) and state.can_reach_orange(world.get_region('TR Crystaroller Bottom', player), player))) # or state.has_beam_sword(player)
@@ -459,6 +478,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('TR Crystaroller Middle to Bottom Bypass', player), lambda state: state.can_use_bombs(player) or state.has('Blue Boomerang', player))
     set_rule(world.get_entrance('TR Crystal Maze End to Ranged Crystal', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Crystal Maze Interior to End Bypass', player), lambda state: state.can_use_bombs(player) or state.can_use_arrows(player) or state.has('Red Boomerang', player) or state.has('Blue Boomerang', player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Cane of Somaria', player)) # Beam sword does NOT work
+    set_rule(world.get_entrance('TR Crystal Maze Interior to Start Bypass', player), lambda state: True) # Can always grab a pot from the interior and walk it to the start region and throw it there
 
     set_rule(world.get_entrance('GT Hookshot Platform Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('GT Hookshot South Platform', player), player))
     set_rule(world.get_entrance('GT Hookshot Entry Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('GT Hookshot South Entry', player), player))
@@ -468,6 +488,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Double Switch Pot Corners to Entry Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('GT Double Switch Pot Corners', player), player))
     set_rule(world.get_entrance('GT Double Switch Pot Corners to Exit Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('GT Double Switch Pot Corners', player), player))
     set_rule(world.get_entrance('GT Double Switch Exit to Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('GT Double Switch Exit', player), player))
+    set_rule(world.get_entrance('GT Spike Crystal Left to Right Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('GT Spike Crystal Left', player), player))
+    set_rule(world.get_entrance('GT Spike Crystal Right to Left Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('GT Spike Crystal Right', player), player))
     set_rule(world.get_entrance('GT Crystal Conveyor to Corner Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('GT Crystal Conveyor', player), player))
     set_rule(world.get_entrance('GT Crystal Conveyor Corner to Barrier - Blue', player), lambda state: state.can_reach_blue(world.get_region('GT Crystal Conveyor Corner', player), player))
     set_rule(world.get_entrance('GT Crystal Conveyor Corner to Barrier - Orange', player), lambda state: state.can_reach_orange(world.get_region('GT Crystal Conveyor Corner', player), player))
@@ -481,6 +503,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Double Switch Left to Pot Corners Bypass', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria') or state.has('Red Boomerang', player)) # or (state.has('Blue Boomerang', player) and state.has('Hookshot', player)) or (state.has('Ice Rod', player) and state.has('Hookshot', player)) or state.has('Hookshot', player) /// You can do this with just a pot and a hookshot
     set_rule(world.get_entrance('GT Double Switch Left to Exit Bypass', player), lambda state: False) # state.can_use_bombs(player) or (state.has('Cane of Somaria', player) and (state.has('Red Boomerang', player) or (state.has('Hookshot', player) and state.has('Blue Boomerang', player)) or (state.has('Hookshot', player) and state.has('Ice Rod', player))))
     set_rule(world.get_entrance('GT Double Switch Pot Corners to Ranged Switches', player), lambda state: False) # state.can_use_bombs(player) or state.has('Cane of Somaria', player) or (state.has('Cane of Somaria', player) and state.has_Boots(player)) /// There's two ways to interact with the switch. Somaria bounce at the top corner, or timed throws at the bottom corner.
+    set_rule(world.get_entrance('GT Spike Crystal Left to Right Bypass', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria', player) or state.has('Red Boomerang', player) or state.has('Blue Boomerang', player)) # or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.can_use_beam_sword(player)
     set_rule(world.get_entrance('GT Crystal Conveyor to Ranged Crystal', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('GT Crystal Conveyor Corner to Ranged Crystal', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('GT Crystal Conveyor Corner to Left Bypass', player), lambda state: state.can_use_bombs(player) or state.has('Cane of Somaria', player))
