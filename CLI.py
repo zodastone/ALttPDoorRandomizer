@@ -16,6 +16,7 @@ class ArgumentDefaultsHelpFormatter(argparse.RawTextHelpFormatter):
     def _get_help_string(self, action):
         return textwrap.dedent(action.help)
 
+
 def parse_cli(argv, no_defaults=False):
     def defval(value):
         return value if not no_defaults else None
@@ -109,8 +110,8 @@ def parse_cli(argv, no_defaults=False):
                     getattr(ret, name)[player] = value
 
     return ret
-	
-	
+
+
 def apply_settings_file(settings, settings_path):
     if os.path.exists(settings_path):
         with open(settings_path) as json_file:
@@ -118,7 +119,6 @@ def apply_settings_file(settings, settings_path):
             for k, v in data.items():
                 settings[k] = v
     return settings
-
 
 
 def parse_settings():
