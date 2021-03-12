@@ -1378,6 +1378,11 @@ class Door(object):
         else:
             self.passage = False
 
+    def kind(self, world):
+        if self.roomIndex != -1 and self.doorListPos != -1:
+            return world.get_room(self.roomIndex, self.player).kind(self)
+        return None
+
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.name == other.name
 
