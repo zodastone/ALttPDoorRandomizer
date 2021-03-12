@@ -619,10 +619,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Mire Over Bridge', 'Misery Mire', None, ['Mire Over Bridge E', 'Mire Over Bridge W']),
         create_dungeon_region(player, 'Mire Right Bridge', 'Misery Mire', ['Misery Mire - Bridge Chest'], ['Mire Right Bridge SE']),
         create_dungeon_region(player, 'Mire Left Bridge', 'Misery Mire', None, ['Mire Left Bridge S', 'Mire Left Bridge Down Stairs', 'Mire Left Bridge Hook Path']),
-
         create_dungeon_region(player, 'Mire Fishbone', 'Misery Mire', ['Misery Mire - Fishbone Pot Key'], ['Mire Fishbone E', 'Mire Fishbone Blue Barrier']),
         create_dungeon_region(player, 'Mire South Fish', 'Misery Mire', None, ['Mire South Fish Blue Barrier', 'Mire Fishbone SE']),
-
         create_dungeon_region(player, 'Mire Spike Barrier', 'Misery Mire', None, ['Mire Spike Barrier NE', 'Mire Spike Barrier SE', 'Mire Spike Barrier ES']),
         create_dungeon_region(player, 'Mire Square Rail', 'Misery Mire', None, ['Mire Square Rail WS', 'Mire Square Rail NW']),
         create_dungeon_region(player, 'Mire Lone Warp', 'Misery Mire', None, ['Mire Lone Warp SW', 'Mire Lone Warp Warp']),
@@ -815,6 +813,7 @@ def create_dungeon_regions(world, player):
     world.get_region('Hera Back - Ranged Crystal', player).crystal_switch = True
     world.get_region('Hera Basement Cage', player).crystal_switch = True
     world.get_region('Hera Tile Room', player).crystal_switch = True  # INTERIOR not accessible (maybe with cane)
+    world.get_region('Hera Beetles', player).crystal_switch = True
     world.get_region('Hera Tridorm', player).crystal_switch = True
     world.get_region('Hera Startile Wide', player).crystal_switch = True
     world.get_region('PoD Arena Main - Ranged Crystal', player).crystal_switch = True
