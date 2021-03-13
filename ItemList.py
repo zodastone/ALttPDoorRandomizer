@@ -315,6 +315,8 @@ def generate_itempool(world, player):
         world.clock_mode = clock_mode
 
     if world.goal[player] == 'triforcehunt':
+        if world.treasure_hunt_count[player] == 0:
+            world.treasure_hunt_count[player] = 20
         world.treasure_hunt_icon[player] = 'Triforce Piece'
         if world.custom:
             world.treasure_hunt_count[player] = treasure_hunt_count
@@ -639,6 +641,9 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
     placed_items = {}
     precollected_items = []
     clock_mode = None
+    if goal == 'triforcehunt':
+        if treasure_hunt_total == 0:
+            treasure_hunt_total = 30
     triforcepool = ['Triforce Piece'] * treasure_hunt_total
 
     pool.extend(alwaysitems)
