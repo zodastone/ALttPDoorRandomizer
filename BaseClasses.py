@@ -449,6 +449,7 @@ class World(object):
 
         return False
 
+
 class CollectionState(object):
 
     def __init__(self, parent):

@@ -283,7 +283,7 @@ def main(args, seed=None, fish=None):
                     }
                     #                  0  1  2  3  4 5  6  7  8 9 A B C
                     outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s_%s-%s%s%s%s%s' % (
-                      #  0          1      2      3    4     5    6      7     8        9         A     B        C         D
+                      #  0          1      2      3    4     5    6      7     8        9         A     B        C
                       # _noglitches_normal-normal-open-ganon-ohko_simple_basic-balanced-keysanity-retro-prog_swords-nohints
                       # _noglitches_normal-normal-open-ganon     _simple_basic-balanced-keysanity-retro
                       # _noglitches_normal-normal-open-ganon     _simple_basic-balanced-keysanity      -prog_swords

@@ -3252,11 +3252,9 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Superbunny Cave (Bottom)', 'Superbunny Cave'),
                        ('Superbunny Cave Exit (Top)', 'Dark Death Mountain (Top)'),
                        ('Superbunny Cave Exit (Bottom)', 'Dark Death Mountain (East Bottom)'),
-
                        ('Hookshot Cave Exit (South)', 'Dark Death Mountain (Top)'),
                        ('Hookshot Cave Exit (North)', 'Death Mountain Floating Island (Dark World)'),
                        ('Hookshot Cave Back Entrance', 'Hookshot Cave'),
-
                        ('Mimic Cave', 'Mimic Cave'),
 
                        ('Pyramid Hole', 'Pyramid'),
