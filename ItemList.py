@@ -190,9 +190,8 @@ def generate_itempool(world, player):
 
     if world.goal[player] in ['triforcehunt']:
         region = world.get_region('Light World',player)
-
         loc = Location(player, "Murahdahla", parent=region)
-        loc.access_rule = lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) >= state.world.treasure_hunt_count[player]
+        loc.access_rule = lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) >= int(state.world.treasure_hunt_count[player])
         region.locations.append(loc)
         world.dynamic_locations.append(loc)
 
@@ -644,7 +643,7 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
     if goal == 'triforcehunt':
         if treasure_hunt_total == 0:
             treasure_hunt_total = 30
-    triforcepool = ['Triforce Piece'] * treasure_hunt_total
+    triforcepool = ['Triforce Piece'] * int(treasure_hunt_total)
 
     pool.extend(alwaysitems)
 
