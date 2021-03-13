@@ -127,8 +127,8 @@ class World(object):
             set_player_attr('crystals_gt_orig', {})
             set_player_attr('open_pyramid', False)
             set_player_attr('treasure_hunt_icon', 'Triforce Piece')
-            set_player_attr('treasure_hunt_count', 0)
-            set_player_attr('treasure_hunt_total', 0)
+            set_player_attr('treasure_hunt_count', 20)
+            set_player_attr('treasure_hunt_total', 30)
             set_player_attr('potshuffle', False)
             set_player_attr('pot_contents', None)
 
@@ -2195,8 +2195,8 @@ counter_mode = {"default": 0, "off": 1, "on": 2, "pickup": 3}
 access_mode = {"items": 0, "locations": 1, "none": 2}
 
 # byte 6: BSMC BBEE (big, small, maps, compass, bosses, enemies)
-boss_mode = {"none": 0, "simple": 1, "full": 2, "random": 3}
-enemy_mode = {"none": 0, "shuffled": 1, "random": 2}
+boss_mode = {"none": 0, "simple": 1, "full": 2, "random": 3, "chaos": 3}
+enemy_mode = {"none": 0, "shuffled": 1, "random": 2, "chaos": 2}
 
 # byte 7: HHHD DP?? (enemy_health, enemy_dmg, potshuffle, ?)
 e_health = {"default": 0, "easy": 1, "normal": 2, "hard": 3, "expert": 4}
