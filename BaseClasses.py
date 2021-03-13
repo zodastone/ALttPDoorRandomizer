@@ -1971,6 +1971,8 @@ class Spoiler(object):
                          'experimental': self.world.experimental,
                          'keydropshuffle': self.world.keydropshuffle,
                          'shopsanity': self.world.shopsanity,
+						 'triforcegoal': self.world.treasure_hunt_count,
+						 'triforcepool': self.world.treasure_hunt_total,
                          'code': {p: Settings.make_code(self.world, p) for p in range(1, self.world.players + 1)}
                          }
 
@@ -2014,6 +2016,9 @@ class Spoiler(object):
                 outfile.write('Retro:                           %s\n' % ('Yes' if self.metadata['retro'][player] else 'No'))
                 outfile.write('Swords:                          %s\n' % self.metadata['weapons'][player])
                 outfile.write('Goal:                            %s\n' % self.metadata['goal'][player])
+                if self.metadata['goal'][player] == 'triforcehunt':
+                    outfile.write('Triforce Pieces Required:        %s\n' % self.metadata['triforcegoal'][player])
+                    outfile.write('Triforce Pieces Total:           %s\n' % self.metadata['triforcepool'][player])
                 outfile.write('Difficulty:                      %s\n' % self.metadata['item_pool'][player])
                 outfile.write('Item Functionality:              %s\n' % self.metadata['item_functionality'][player])
                 outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'][player])

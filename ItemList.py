@@ -316,6 +316,8 @@ def generate_itempool(world, player):
     if world.goal[player] == 'triforcehunt':
         if world.treasure_hunt_count[player] == 0:
             world.treasure_hunt_count[player] = 20
+        if world.treasure_hunt_total[player] == 0:
+            world.treasure_hunt_total[player] = 30
         world.treasure_hunt_icon[player] = 'Triforce Piece'
         if world.custom:
             world.treasure_hunt_count[player] = treasure_hunt_count
