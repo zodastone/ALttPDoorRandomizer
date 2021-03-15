@@ -94,7 +94,8 @@ def main(args, seed=None, fish=None):
     logger.info(
       world.fish.translate("cli","cli","app.title") + "\n",
       __version__,
-      world.seed
+      world.seed,
+      Settings.make_code(world, 1) if world.players == 1 else ''
     )
 
     parsed_names = parse_player_names(args.names, world.players, args.teams)

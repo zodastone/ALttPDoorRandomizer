@@ -2,7 +2,7 @@
   "cli": {
     "yes": "Yes",
     "no": "No",
-    "app.title": "ALttP Door Randomizer Version %s - Seed: %d",
+    "app.title": "ALttP Door Randomizer Version %s - Seed: %d, Code: %s",
     "version": "Version",
     "seed": "Seed",
     "player": "Player",
