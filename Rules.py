@@ -609,7 +609,7 @@ def bomb_rules(world, player):
                             ]
         dungeon_bombable = ['PoD Map Balcony WS', 'PoD Arena Ledge ES', 'PoD Dark Maze E', 'PoD Big Chest Balcony W',
                             'Swamp Pot Row WN','Swamp Map Ledge EN', 'Swamp Hammer Switch WN', 'Swamp Hub Dead Ledge EN', 'Swamp Waterway N', 'Swamp I S',
-                            'Skull Pot Circle WN', 'Skull Pull Switch EN', 'Skull Big Key WN', 'Skull Lone Pot EN',
+                            'Skull Pot Circle WN', 'Skull Pull Switch EN', 'Skull Big Key EN', 'Skull Lone Pot WN',
                             'Thieves Rail Ledge NW', 'Thieves Pot Alcove Bottom SW',
                             'Ice Bomb Drop Hole', 'Ice Freezors Bomb Hole',
                             'Mire Crystal Mid NW', 'Mire Tall Dark and Roomy WN', 'Mire Shooter Rupees EN', 'Mire Crystal Top SW',
