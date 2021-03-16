@@ -377,6 +377,19 @@ def flood_items(world):
                 break
 
 
+def lock_shop_locations(world, player):
+    for shop, loc_names in shop_to_location_table.items():
+        for loc in loc_names:
+            world.get_location(loc, player).event = True
+            world.get_location(loc, player).locked = True
+    # I don't believe these locations exist in non-shopsanity
+    # if world.retro[player]:
+    #     for shop, loc_names in retro_shops.items():
+    #         for loc in loc_names:
+    #             world.get_location(loc, player).event = True
+    #             world.get_location(loc, player).locked = True
+
+
 def sell_potions(world, player):
     loc_choices = []
     for shop in world.shops[player]:

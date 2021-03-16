@@ -128,6 +128,11 @@ New item counter modified to show total
 
 # Bug Fixes and Notes.
 
+* 0.3.1.5-u
+	* Ganon hints fixed for shops
+	* Added support for a settings file so SahasrahBot and the main website can use it easier. (Thanks Synack)
+	* Fix for Skull Pinball during re-generation attempts (thank compiling)
+	* Fix for multiworld progression balancing and shopsanity
 * 0.3.1.4-u
 	* Fix for Blind when shuffled to TT and another dungeon
 	* Remove use of RaceRandom
