@@ -1,5 +1,6 @@
 import os   # for env vars
 import stat # file statistics
+import sys  # default system info
 
 global UBUNTU_VERSIONS
 global DEFAULT_EVENT
@@ -75,9 +76,18 @@ def prepare_env():
   env["BUILD_NUMBER"] = os.getenv("TRAVIS_BUILD_NUMBER",env["GITHUB_RUN_NUMBER"])
 
   GITHUB_TAG = os.getenv("TRAVIS_TAG",os.getenv("GITHUB_TAG",""))
-  OS_NAME = os.getenv("TRAVIS_OS_NAME",os.getenv("OS_NAME","")).replace("macOS","osx")
+  OS_NAME = os.getenv("TRAVIS_OS_NAME",os.getenv("OS_NAME",sys.platform)).replace("macOS","osx")
   OS_DIST = os.getenv("TRAVIS_DIST","notset")
   OS_VERSION = ""
+
+  if "win32" in OS_NAME or \
+    "cygwin" in OS_NAME or \
+    "msys" in OS_NAME:
+    OS_NAME = "windows"
+  elif "darwin" in OS_NAME:
+    OS_NAME = "osx"
+  elif "linux2" in OS_NAME:
+    OS_NAME = "linux"
 
   if '-' in OS_NAME:
     OS_VERSION = OS_NAME[OS_NAME.find('-')+1:]

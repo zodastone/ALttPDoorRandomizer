@@ -13,3 +13,7 @@
 |Platform|Command line|Image|
 | :----: |------------|-----|
 |Windows |`resources/ci/common/local_install.py`|![Windows](https://raw.githubusercontent.com/miketrethewey/ALttPDoorRandomizer/DoorDevUnstable/docs/images/cli-windows.png)
+|`py` Launcher: 3.9 |`resources/ci/common/local_install.py --py 3.9`|
+|`py` Launcher: 3.8 |`resources/ci/common/local_install.py --py 3.8`|
+|`py` Launcher: 3.7 |`resources/ci/common/local_install.py --py 3.7`|
+|`py` Launcher: 3.6 |`resources/ci/common/local_install.py --py 3.6`|

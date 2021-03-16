@@ -1,10 +1,14 @@
 import common
+import argparse
 import urllib.request, ssl
 import subprocess # do stuff at the shell level
 
 env = common.prepare_env()
 
-def get_get_pip():
+def get_get_pip(PY_VERSION):
+ try:
+   import pip
+ except ImportError:
   print("Getting pip getter!")
   #make the request!
   url = "https://bootstrap.pypa.io/get-pip.py"
@@ -29,11 +33,26 @@ def get_get_pip():
   #   linux/windows: python
   #   macosx:        python3
   PYTHON_EXECUTABLE = "python3" if "osx" in env["OS_NAME"] else "python"
+  if PY_VERSION == None:
+    PY_VERSION = 0
+
+  if float(PY_VERSION) > 0:
+    PYTHON_EXECUTABLE = "py"
+
   print("Getting pip!")
-  subprocess.check_call([PYTHON_EXECUTABLE,"get-pip.py"])
+  args = [
+    PYTHON_EXECUTABLE,
+    '-' + str(PY_VERSION),
+    "get-pip.py"
+  ]
+  if PY_VERSION == 0:
+    del args[1]
+  subprocess.check_call(args)
 
 if __name__ == "__main__":
- try:
-   import pip
- except ImportError:
-    get_get_pip()
+  parser = argparse.ArgumentParser(add_help=False)
+  parser.add_argument('--py', default=0)
+  command_line_args = parser.parse_args()
+  PY_VERSION = vars(command_line_args)["py"]
+
+  get_get_pip(PY_VERSION)

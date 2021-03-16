@@ -1,9 +1,10 @@
 import common
+import argparse
 import subprocess # do stuff at the shell level
 
 env = common.prepare_env()
 
-def run_install():
+def run_install(PY_VERSION,USER):
   # get executables
   #  python
   #   linux/windows: python
@@ -15,16 +16,66 @@ def run_install():
   PIP_EXECUTABLE = "pip" if "windows" in env["OS_NAME"] else "pip3"
   PIP_EXECUTABLE = "pip" if "osx" in env["OS_NAME"] and "actions" in env["CI_SYSTEM"] else PIP_EXECUTABLE
 
+  if PY_VERSION == None:
+    PY_VERSION = 0
+  if USER == None:
+    USER = False
+
+  if float(PY_VERSION) > 0:
+    PYTHON_EXECUTABLE = "py"
+    print("Installing to Python %.1f" % float(PY_VERSION))
+    if USER:
+      print("Installing packages at User level")
+
   # upgrade pip
-  subprocess.check_call([PYTHON_EXECUTABLE,"-m","pip","install","--upgrade","pip"])
+  args = [
+    PYTHON_EXECUTABLE,
+    '-' + str(PY_VERSION),
+    "-m",
+    "pip",
+    "install",
+    "--upgrade",
+    "--user",
+    "pip"
+  ]
+  if not USER:
+    args.remove("--user")
+  if PY_VERSION == 0:
+    del args[1]
+  subprocess.check_call(args)
 
   # pip version
   subprocess.check_call([PIP_EXECUTABLE,"--version"])
   # if pip3, install wheel
   if PIP_EXECUTABLE == "pip3":
-  	subprocess.check_call([PIP_EXECUTABLE,"install","-U","wheel"])
+    args = [
+      PIP_EXECUTABLE,
+      "install",
+      "--user",
+      "-U",
+      "wheel"
+    ]
+    if not USER:
+      args.remove("--user")
+    subprocess.check_call(args)
   # install listed dependencies
-  subprocess.check_call([PIP_EXECUTABLE,"install","-r","./resources/app/meta/manifests/pip_requirements.txt"])
+  args = [
+    PIP_EXECUTABLE,
+    "install",
+    "--user",
+    "-r",
+    "./resources/app/meta/manifests/pip_requirements.txt"
+  ]
+  if not USER:
+    args.remove("--user")
+  subprocess.check_call(args)
 
 if __name__ == "__main__":
-  run_install()
+  parser = argparse.ArgumentParser(add_help=False)
+  parser.add_argument('--py', default=0)
+  parser.add_argument('--user', default=False, action="store_true")
+  command_line_args = parser.parse_args()
+  PY_VERSION = vars(command_line_args)["py"]
+  USER = vars(command_line_args)["user"]
+
+  run_install(PY_VERSION,USER)
