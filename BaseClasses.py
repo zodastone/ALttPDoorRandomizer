@@ -654,11 +654,12 @@ class CollectionState(object):
         return self.has('Titans Mitts', player)
 
     def can_extend_magic(self, player, smallmagic=16, fullrefill=False): #This reflects the total magic Link has, not the total extra he has.
-        basemagic = 8
         if self.has('Magic Upgrade (1/4)', player):
             basemagic = 32
         elif self.has('Magic Upgrade (1/2)', player):
             basemagic = 16
+        else:
+            basemagic = 8
         if self.can_buy_unlimited('Green Potion', player) or self.can_buy_unlimited('Blue Potion', player):
             if self.world.difficulty_adjustments[player] == 'hard' and not fullrefill:
                 basemagic = basemagic + int(basemagic * 0.5 * self.bottle_count(player))
@@ -674,7 +675,33 @@ class CollectionState(object):
                 or (self.has('Cane of Byrna', player) and (enemies < 6 or self.can_extend_magic(player)))
                 or self.can_shoot_arrows(player)
                 or self.has('Fire Rod', player)
-               )
+                )
+
+    # In the future, this can be used to check if the player starts without bombs
+    def can_use_bombs(self, player):
+        StartingBombs = True
+        return (StartingBombs or self.has('Bomb Upgrade (+10)', player))
+
+    def can_hit_crystal(self, player):
+        return (self.can_use_bombs(player)
+                or self.can_shoot_arrows(player)
+                or self.has_blunt_weapon(player)
+                or self.has('Blue Boomerang', player)
+                or self.has('Red Boomerang', player)
+                or self.has('Hookshot', player)
+                or self.has('Fire Rod', player)
+                or self.has('Ice Rod', player)
+                or self.has('Cane of Somaria', player)
+                or self.has('Cane of Byrna', player))
+    
+    def can_hit_crystal_through_barrier(self, player):
+        return (self.can_use_bombs(player)
+            or self.can_shoot_arrows(player)
+            or self.has('Blue Boomerang', player)
+            or self.has('Red Boomerang', player)
+            or self.has('Fire Rod', player)
+            or self.has('Ice Rod', player)
+            or self.has('Cane of Somaria', player))
 
     def can_shoot_arrows(self, player):
         if self.world.retro[player]:
@@ -1318,6 +1345,11 @@ class Door(object):
         self.quadrant = quadrant
         self.edge_width = width
         return self
+
+    def kind(self, world):
+        if self.roomIndex != -1 and self.doorListPos != -1:
+            return world.get_room(self.roomIndex, self.player).kind(self)
+        return None
 
     def small_key(self):
         self.smallKey = True
