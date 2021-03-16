@@ -729,6 +729,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         aga_portal = world.get_portal('Agahnims Tower', player)
         gt_portal = world.get_portal('Ganons Tower', player)
         aga_portal.exit_offset, gt_portal.exit_offset = gt_portal.exit_offset, aga_portal.exit_offset
+        aga_portal.default = False
+        gt_portal.default = False
 
     for portal in world.dungeon_portals[player]:
         if not portal.default:

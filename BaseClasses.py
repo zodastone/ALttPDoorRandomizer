@@ -586,7 +586,8 @@ class CollectionState(object):
         for event in reachable_events:
             if event.name in flooded_keys.keys():
                 flood_location = self.world.get_location(flooded_keys[event.name], event.player)
-                if flood_location.item and flood_location not in self.locations_checked:
+                if (flood_location.item and flood_location not in self.locations_checked
+                   and self.location_can_be_flooded(flood_location)):
                     adjusted_checks.remove(event)
         if len(adjusted_checks) < len(reachable_events):
             return adjusted_checks
@@ -597,8 +598,13 @@ class CollectionState(object):
             flood_location = world.get_location(flooded_keys[location.name], location.player)
             item = flood_location.item
             item_is_important = False if not item else item.advancement or item.bigkey or item.smallkey
-            return flood_location in self.locations_checked or not item_is_important
+            return (flood_location in self.locations_checked or not item_is_important
+                    or not self.location_can_be_flooded(flood_location))
         return True
+
+    @staticmethod
+    def location_can_be_flooded(location):
+        return location.parent_region.name in ['Swamp Trench 1 Alcove', 'Swamp Trench 2 Alcove']
 
     def has(self, item, player, count=1):
         if count == 1:

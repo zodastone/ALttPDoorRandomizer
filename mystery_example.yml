@@ -44,6 +44,10 @@
     mc: 3
     mcs: 2
     full: 5
+  dungeon_counters:
+    on: 5
+    off: 0
+    default: 5
   experimental:
     on: 1
     off: 0

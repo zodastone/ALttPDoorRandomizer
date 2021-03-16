@@ -128,6 +128,12 @@ New item counter modified to show total
 
 # Bug Fixes and Notes.
 
+* 0.3.1.6-u
+	* Fix for inverted. AT or GT vanilla lobby in intensity 3 should not softlock on exit in non-ER modes.
+	* Backward compatibility for "chaos" enemizer flags. (Thanks krebel)
+	* Fix for potshuffle and swamp trench generation errors (Thanks StructuralMike)
+	* Fix for TFH playthrough (Thanks StructuralMike)
+	* Fix for Standard+Retro (Thanks StructuralMike)
 * 0.3.1.5-u
 	* Ganon hints fixed for shops
 	* Added support for a settings file so SahasrahBot and the main website can use it easier. (Thanks Synack)
