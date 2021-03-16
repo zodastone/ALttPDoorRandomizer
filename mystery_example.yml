@@ -39,6 +39,11 @@
     dungeons: 1
     pedestal: 2
     triforce-hunt: 0
+  triforce_goal_min: 10
+  triforce_goal_max: 30
+  triforce_pool_min: 20
+  triforce_pool_max: 40
+  triforce_min_difference: 10
   dungeon_items:
     standard: 10
     mc: 3
