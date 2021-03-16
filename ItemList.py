@@ -198,7 +198,6 @@ def generate_itempool(world, player):
         region = world.get_region('Light World',player)
 
         loc = Location(player, "Murahdahla", parent=region)
-        loc.access_rule = lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) >= state.world.treasure_hunt_count[player]
         region.locations.append(loc)
         world.dynamic_locations.append(loc)
 
@@ -286,7 +285,7 @@ def generate_itempool(world, player):
                     if not found_sword and world.swords[player] != 'swordless':
                         found_sword = True
                         possible_weapons.append(item)
-                if item in ['Progressive Bow', 'Bow'] and not found_bow:
+                if item in ['Progressive Bow', 'Bow'] and not found_bow and not world.retro[player]:
                     found_bow = True
                     possible_weapons.append(item)
                 if item in ['Hammer', 'Fire Rod', 'Cane of Somaria', 'Cane of Byrna']:
