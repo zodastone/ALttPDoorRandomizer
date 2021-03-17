@@ -574,7 +574,6 @@ def customize_shops(world, player):
             loc.item = upgrade
             upgrade.location = loc
     change_shop_items_to_rupees(world, player, shops_to_customize)
-    todays_discounts(world, player)
 
 
 def randomize_price(price):
@@ -607,19 +606,6 @@ def change_shop_items_to_rupees(world, player, shops):
             shop.add_inventory(slot, new_item.name, randomize_price(new_item.price), 1, player=new_item.player)
 
 
-def todays_discounts(world, player):
-    locs = []
-    for shop, locations in shop_to_location_table.items():
-        for slot, loc in enumerate(locations):
-            locs.append((world.get_location(loc, player), shop, slot))
-    discount_number = random.randint(4, 7)
-    chosen_locations = random.choices(locs, k=discount_number)
-    for location, shop_name, slot in chosen_locations:
-        shop = world.get_region(shop_name, player).shop
-        orig = location.item.price
-        shop.inventory[slot]['price'] = randomize_price(orig // 5)
-
-
 repeatable_shop_items = ['Single Arrow', 'Arrows (10)', 'Bombs (3)', 'Bombs (10)', 'Red Potion', 'Small Heart',
                          'Blue Shield', 'Red Shield', 'Bee', 'Small Key (Universal)', 'Blue Potion', 'Green Potion']
 
@@ -629,7 +615,7 @@ cap_replacements = ['Single Arrow', 'Arrows (10)', 'Bombs (3)', 'Bombs (10)']
 
 cap_blacklist = ['Green Potion', 'Red Potion', 'Blue Potion']
 
-shop_transfer = {'Red Potion': 'Rupees (100)', 'Bee': 'Rupees (5)', 'Blue Potion': 'Rupees (100)',
+shop_transfer = {'Red Potion': 'Rupees (50)', 'Bee': 'Rupees (5)', 'Blue Potion': 'Rupees (50)',
                  'Green Potion': 'Rupees (50)',
                  # money seems a bit too generous with these on
                  # 'Blue Shield': 'Rupees (50)', 'Red Shield': 'Rupees (300)',

@@ -784,14 +784,17 @@ class CollectionState(object):
             elif 'Shield' in item.name:
                 if self.has('Mirror Shield', item.player):
                     pass
-                elif self.has('Red Shield', item.player) and self.world.difficulty_requirements[item.player].progressive_shield_limit >= 3:
+                elif self.has('Shield Level', item.player, 2) and self.world.difficulty_requirements[item.player].progressive_shield_limit >= 3:
                     self.prog_items['Mirror Shield', item.player] += 1
+                    self.prog_items['Shield Level', item.player] += 1
                     changed = True
-                elif self.has('Blue Shield', item.player)  and self.world.difficulty_requirements[item.player].progressive_shield_limit >= 2:
+                elif self.has('Shield Level', item.player, 1) and self.world.difficulty_requirements[item.player].progressive_shield_limit >= 2:
                     self.prog_items['Red Shield', item.player] += 1
+                    self.prog_items['Shield Level', item.player] += 1
                     changed = True
                 elif self.world.difficulty_requirements[item.player].progressive_shield_limit >= 1:
                     self.prog_items['Blue Shield', item.player] += 1
+                    self.prog_items['Shield Level', item.player] += 1
                     changed = True
             elif 'Bow' in item.name:
                 if self.has('Silver Arrows', item.player):
