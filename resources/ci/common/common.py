@@ -1,6 +1,7 @@
 import os   # for env vars
 import stat # file statistics
 import sys  # default system info
+from my_path import get_py_path
 
 global UBUNTU_VERSIONS
 global DEFAULT_EVENT
@@ -45,6 +46,8 @@ def prepare_env():
       APP_VERSION = f.readlines()[0].strip()
   # ci data
   env["CI_SYSTEM"] = os.getenv("CI_SYSTEM","")
+  # py data
+  (env["PYTHON_EXE_PATH"],env["PY_EXE_PATH"],env["PIP_EXE_PATH"]) = get_py_path()
   # git data
   env["BRANCH"] = os.getenv("TRAVIS_BRANCH","")
   env["GITHUB_ACTOR"] = os.getenv("GITHUB_ACTOR","MegaMan.EXE")
