@@ -144,6 +144,9 @@ New item counter modified to show total
 
 # Bug Fixes and Notes.
 
+* 0.3.1.7-u
+	* TFH counter fixed
+	* 
 * 0.3.1.6-u
 	* Fix for inverted. AT or GT vanilla lobby in intensity 3 should not softlock on exit in non-ER modes.
 	* Backward compatibility for "chaos" enemizer flags. (Thanks krebel)
