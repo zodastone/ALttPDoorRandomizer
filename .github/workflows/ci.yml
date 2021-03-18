@@ -287,7 +287,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ../deploy/linux/ALttPDoorRandomizer.tar.gz
-        asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-linux-bionic.tar.gz
+        asset_name: ALttPDoorRandomizer-${{ steps.debug_info.outputs.github_tag }}-linux-focal.tar.gz
         asset_content_type: application/gzip
       if: contains(github.ref, 'master') || contains(github.ref, 'stable') || contains(github.ref, 'dev') || contains(github.ref, 'DoorRelease')
     # upload macos archive asset
