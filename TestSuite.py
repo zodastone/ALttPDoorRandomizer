@@ -11,7 +11,7 @@ py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
 
 
 SETTINGS = {
-    'mode': ['open', 'standard', 'inverted'],
+    'mode': ['open'],
     'goal': ['ganon', 'pedestal', 'triforcehunt', 'crystals', 'dungeons'],
     'swords': ['random', 'swordless', 'assured'],
     'shuffle': ['vanilla','simple','restricted','full','dungeonssimple','dungeonsfull', 'crossed','insanity'],
@@ -25,15 +25,15 @@ SETTINGS = {
 }
 
 SETTINGS = {
-    'mode': ['open'],
+    'mode': ['open', 'inverted'],
     'goal': ['ganon'],
     'swords': ['random'],
     'shuffle': ['vanilla'],
     'accessibility': [True],
     'difficulty': [False],
     'shufflepots': [False],
-    'keydropshuffle': [False],
-    'keysanity': [False],
+    'keydropshuffle': [True, False],
+    'keysanity': [True, False],
     'retro': [False],
     'shopsanity': [False]
 }
@@ -223,7 +223,7 @@ if __name__ == "__main__":
 #    for dr in [['vanilla', args.count if args.count else 2, 1],
 #               ['basic', args.count if args.count else 5, 1],
 #               ['crossed', args.count if args.count else 10, 1]]:
-    for dr in [['basic', args.count if args.count else 2, 1]]:
+    for dr in [['crossed', args.count if args.count else 2, 1]]:
 
         for tense in range(1, dr[2] + 1):
             args = argparse.Namespace()

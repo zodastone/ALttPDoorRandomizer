@@ -29,6 +29,7 @@ from EntranceShuffle import door_addresses, exit_ids
 JAP10HASH = '03a63945398191337e896e5771f77173'
 RANDOMIZERBASEHASH = '2a9cd9b95c0ad118a3d58a77b7197eab'
 
+
 class JsonRom(object):
 
     def __init__(self, name=None, hash=None):
@@ -865,21 +866,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     rom.write_byte(0x18004F, 0x01)  # Byrna Invulnerability: on
 
-    # Default magic consumption costs
-    magic_cost = {
-        'Fire and Ice': [0x3B070, [0x10, 0x08, 0x04]],
-        'Medallions': [0x3B073, [0x20, 0x10, 0x08]],
-        'Magic Powder': [0x3B076, [0x08, 0x04, 0x02]],
-        'Unknown 1': [0x3B079, [0x08, 0x04, 0x02]],
-        'Cane of Somaria': [0x3B07C, [0x08, 0x04, 0x02]],
-        'Unknown 2': [0x3B07F, [0x10, 0x08, 0x04]],
-        'Lamp': [0x3B082, [0x04, 0x02, 0x02]],
-        'Unknown 3': [0x3B085, [0x08, 0x04, 0x02]],
-        'Cane of Byrna Activation': [0x3B088, [0x10, 0x08, 0x04]],
-        'Magic Cape Residual': [0x3ADA7, [0x04, 0x08, 0x10]],
-        'Cane of Byrna Residual': [0x45C42, [0x04, 0x02, 0x01]]
-    }
-
     # handle difficulty_adjustments
     if world.difficulty_adjustments[player] == 'hard':
         rom.write_byte(0x180181, 0x01) # Make silver arrows work only on ganon
@@ -891,7 +877,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         # potion magic restore amount
         rom.write_byte(0x180085, 0x40)  # Half Magic
         #Cape magic cost
-        magic_cost['Magic Cape Residual'][1] = [0x02, 0x04, 0x08]
+        rom.write_bytes(0x3ADA7, [0x02, 0x04, 0x08])
         # Byrna Invulnerability: off
         rom.write_byte(0x18004F, 0x00)
         #Disable catching fairies
@@ -911,7 +897,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         # potion magic restore amount
         rom.write_byte(0x180085, 0x20)  # Quarter Magic
         #Cape magic cost
-        magic_cost['Magic Cape Residual'][1] = [0x02, 0x04, 0x08]
+        rom.write_bytes(0x3ADA7, [0x02, 0x04, 0x08])
         # Byrna Invulnerability: off
         rom.write_byte(0x18004F, 0x00)
         #Disable catching fairies
@@ -931,7 +917,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         # potion magic restore amount
         rom.write_byte(0x180085, 0x80)  # full
         #Cape magic cost
-        magic_cost['Magic Cape Residual'][1] = [0x04, 0x08, 0x10]
+        rom.write_bytes(0x3ADA7, [0x04, 0x08, 0x10])
         # Byrna Invulnerability: on
         rom.write_byte(0x18004F, 0x01)
         #Enable catching fairies
@@ -948,9 +934,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     difficulty = world.difficulty_requirements[player]
 
-    #Write magic consumption rates to rom
-    for _,values in magic_cost.items():
-        rom.write_bytes(values[0], values[1])
+    #Byrna residual magic cost
+    rom.write_bytes(0x45C42, [0x04, 0x02, 0x01])
 
     #Set overflow items for progressive equipment
     rom.write_bytes(0x180090,
@@ -1039,7 +1024,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x184000, [
         # original_item, limit, replacement_item, filler
         0x12, 0x01, 0x35, 0xFF, # lamp -> 5 rupees
-        0x51, 0x06, 0x52, 0xFF, # 6 +5 bomb upgrades -> +10 bomb upgrade.
+        0x51, 0x06, 0x52, 0xFF, # 6 +5 bomb upgrades -> +10 bomb upgrade
         0x53, 0x06, 0x54, 0xFF, # 6 +5 arrow upgrades -> +10 arrow upgrade
         0x58, 0x01, 0x36 if world.retro[player] else 0x43, 0xFF, # silver arrows -> single arrow (red 20 in retro mode)
         0x3E, difficulty.boss_heart_container_limit, 0x47, 0xff, # boss heart -> green 20
@@ -1153,12 +1138,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x180171, 0x01 if world.ganon_at_pyramid[player] else 0x00)  # Enable respawning on pyramid after ganon death
     rom.write_byte(0x180173, 0x01) # Bob is enabled
     rom.write_byte(0x180168, 0x08)  # Spike Cave Damage
-    if not StartingMagic:
-        rom.write_bytes(0x18016B, [0x81, 0x04, 0x02])  # Set spike cave and MM spike room Byrna usage
-        rom.write_bytes(0x18016E, [0x01, 0x04, 0x08])  # Set spike cave and MM spike room Cape usage
-    else:
-        rom.write_bytes(0x18016B, [0x04, 0x02, 0x01])  # Set spike cave and MM spike room Byrna usage
-        rom.write_bytes(0x18016E, [0x04, 0x08, 0x10])  # Set spike cave and MM spike room Cape usage
+    rom.write_bytes(0x18016B, [0x04, 0x02, 0x01])  # Set spike cave and MM spike room Byrna usage
+    rom.write_bytes(0x18016E, [0x04, 0x08, 0x10])  # Set spike cave and MM spike room Cape usage
     rom.write_bytes(0x50563, [0x3F, 0x14]) # disable below ganon chest
     rom.write_byte(0x50599, 0x00) # disable below ganon chest
     rom.write_bytes(0xE9A5, [0x7E, 0x00, 0x24]) # disable below ganon chest

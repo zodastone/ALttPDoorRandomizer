@@ -661,12 +661,11 @@ class CollectionState(object):
         return self.has('Titans Mitts', player)
 
     def can_extend_magic(self, player, smallmagic=16, fullrefill=False): #This reflects the total magic Link has, not the total extra he has.
+        basemagic = 8
         if self.has('Magic Upgrade (1/4)', player):
             basemagic = 32
         elif self.has('Magic Upgrade (1/2)', player):
             basemagic = 16
-        else:
-            basemagic = 8
         if self.can_buy_unlimited('Green Potion', player) or self.can_buy_unlimited('Blue Potion', player):
             if self.world.difficulty_adjustments[player] == 'hard' and not fullrefill:
                 basemagic = basemagic + int(basemagic * 0.5 * self.bottle_count(player))
