@@ -687,7 +687,7 @@ class CollectionState(object):
     # In the future, this can be used to check if the player starts without bombs
     def can_use_bombs(self, player):
         StartingBombs = True
-        return (StartingBombs or self.has('Bomb Upgrade (+10)', player))
+        return StartingBombs or self.has('Bomb Upgrade (+10)', player)
 
     def can_hit_crystal(self, player):
         return (self.can_use_bombs(player)

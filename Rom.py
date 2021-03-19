@@ -948,16 +948,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     difficulty = world.difficulty_requirements[player]
 
-    #Shift magic consumption costs if not starting with magic
-    StartingMagic = True
-    if not StartingMagic:
-        for item in magic_cost:
-            magic_cost[item][1][2] = magic_cost[item][1][1]
-            magic_cost[item][1][1] = magic_cost[item][1][0]
-            magic_cost[item][1][0] = 0x81
-        # Cape consumpion is a cost/X tick thing
-        magic_cost['Magic Cape Residual'][1][0] = 0x01
-
     #Write magic consumption rates to rom
     for _,values in magic_cost.items():
         rom.write_bytes(values[0], values[1])
