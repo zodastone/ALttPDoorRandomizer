@@ -1571,8 +1571,9 @@ def write_custom_shops(rom, world, player):
                 break
             if world.shopsanity[player] or shop.type == ShopType.TakeAny:
                 rom.write_byte(0x186560 + shop.sram_address + index, 1)
-            loc_item = world.get_location(shop_to_location_table[shop.region.name][index], player).item
-            if not loc_item:
+            if world.shopsanity[player] and shop.region.name in shop_to_location_table:
+                loc_item = world.get_location(shop_to_location_table[shop.region.name][index], player).item
+            else:
                 loc_item = ItemFactory(item['item'], player)
             item_id = loc_item.code
             price = int16_as_bytes(item['price'])
