@@ -641,6 +641,12 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
     def want_progressives():
         return random.choice([True, False]) if progressive == 'random' else progressive == 'on'
 
+    # provide boots to boots glitch dependent modes
+    if logic in ['owglitches', 'nologic']:
+        precollected_items.append('Pegasus Boots')
+        pool.remove('Pegasus Boots')
+        pool.extend(['Rupees (20)'])
+
     if want_progressives():
         pool.extend(progressivegloves)
     else:

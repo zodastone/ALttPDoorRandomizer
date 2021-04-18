@@ -30,7 +30,8 @@ def create_inverted_regions(world, player):
                                                                         "Blind\'s Hideout - Right",
                                                                         "Blind\'s Hideout - Far Left",
                                                                         "Blind\'s Hideout - Far Right"]),
-        create_lw_region(player, 'Northeast Light World', None, ['Zoras River', 'Waterfall of Wishing', 'Potion Shop Outer Rock', 'Northeast Dark World Mirror Spot', 'Northeast Light World Warp']),
+        create_lw_region(player, 'Northeast Light World', None, ['Zoras River', 'Waterfall of Wishing Cave', 'Potion Shop Outer Rock', 'Catfish Mirror Spot', 'Northeast Light World Warp']),
+        create_lw_region(player, 'Waterfall of Wishing Cave', None, ['Waterfall of Wishing', 'Northeast Light World Return']),
         create_lw_region(player, 'Potion Shop Area', None, ['Potion Shop', 'Potion Shop Inner Bushes', 'Potion Shop Inner Rock', 'Potion Shop Mirror Spot', 'Potion Shop River Drop']),
         create_lw_region(player, 'Graveyard Cave Area', None, ['Graveyard Cave', 'Graveyard Cave Inner Bushes', 'Graveyard Cave Mirror Spot']),
         create_lw_region(player, 'River', None, ['Light World Pier', 'Potion Shop Pier']),
@@ -148,14 +149,16 @@ def create_inverted_regions(world, player):
 
         create_dw_region(player, 'East Dark World', ['Pyramid'], ['Pyramid Fairy', 'South Dark World Bridge', 'Palace of Darkness', 'Dark Lake Hylia Drop (East)', 
                                                           'Dark Lake Hylia Fairy', 'Palace of Darkness Hint', 'East Dark World Hint', 'Northeast Dark World Broken Bridge Pass', 'East Dark World Teleporter', 'EDW Flute']),
-        create_dw_region(player, 'Northeast Dark World', ['Catfish'], ['West Dark World Gap', 'Dark World Potion Shop', 'East Dark World Broken Bridge Pass', 'NEDW Flute', 'Dark Lake Hylia Teleporter']),
+        create_dw_region(player, 'Catfish', ['Catfish'], ['Catfish Exit Rock']),
+        create_dw_region(player, 'Northeast Dark World', None, ['West Dark World Gap', 'Dark World Potion Shop', 'East Dark World Broken Bridge Pass', 'NEDW Flute', 'Dark Lake Hylia Teleporter', 'Catfish Entrance Rock']),
         create_cave_region(player, 'Palace of Darkness Hint', 'a storyteller'),
         create_cave_region(player, 'East Dark World Hint', 'a storyteller'),
         create_dw_region(player, 'South Dark World', ['Stumpy', 'Digging Game'], ['Dark Lake Hylia Drop (South)', 'Hype Cave', 'Swamp Palace', 'Village of Outcasts Heavy Rock', 'East Dark World Bridge', 'Inverted Links House', 'Archery Game', 'Bonk Fairy (Dark)', 
                                               'Dark Lake Hylia Shop', 'South Dark World Teleporter', 'Post Aga Teleporter', 'SDW Flute']),
         create_cave_region(player, 'Inverted Big Bomb Shop', 'the bomb shop'),
         create_cave_region(player, 'Archery Game', 'a game of skill'),
-        create_dw_region(player, 'Dark Lake Hylia', None, ['East Dark World Pier', 'Dark Lake Hylia Ledge Pier', 'Ice Palace', 'Dark Lake Hylia Central Island Teleporter']),
+        create_dw_region(player, 'Dark Lake Hylia', None, ['East Dark World Pier', 'Dark Lake Hylia Ledge Pier', 'Ice Palace Missing Wall']),
+        create_dw_region(player, 'Dark Lake Hylia Central Island', None, ['Dark Lake Hylia Shallows', 'Ice Palace', 'Dark Lake Hylia Central Island Teleporter']),
         create_dw_region(player, 'Dark Lake Hylia Ledge', None, ['Dark Lake Hylia Ledge Drop', 'Dark Lake Hylia Ledge Fairy', 'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Ledge Spike Cave', 'DLHL Flute']),
         create_cave_region(player, 'Dark Lake Hylia Ledge Hint', 'a storyteller'),
         create_cave_region(player, 'Dark Lake Hylia Ledge Spike Cave', 'a spiky hint'),
@@ -193,8 +196,8 @@ def create_inverted_regions(world, player):
         create_dw_region(player, 'Turtle Rock (Top)', None, ['Dark Death Mountain Teleporter (East)', 'Turtle Rock Drop']),
         create_dw_region(player, 'Dark Death Mountain Isolated Ledge', None, ['Turtle Rock Isolated Ledge Entrance']),
         create_dw_region(player, 'Dark Death Mountain (East Bottom)', None, ['Superbunny Cave (Bottom)', 'Cave Shop (Dark Death Mountain)', 'Dark Death Mountain Teleporter (East Bottom)', 'EDDM Flute']),
-        create_cave_region(player, 'Superbunny Cave', 'a connector', ['Superbunny Cave - Top', 'Superbunny Cave - Bottom'],
-                           ['Superbunny Cave Exit (Top)', 'Superbunny Cave Exit (Bottom)']),
+        create_cave_region(player, 'Superbunny Cave (Top)', 'a connector', ['Superbunny Cave - Top', 'Superbunny Cave - Bottom'], ['Superbunny Cave Exit (Top)']),
+        create_cave_region(player, 'Superbunny Cave (Bottom)', 'a connector', None, ['Superbunny Cave Climb', 'Superbunny Cave Exit (Bottom)']),
         create_cave_region(player, 'Spike Cave', 'Spike Cave', ['Spike Cave']),
         create_cave_region(player, 'Hookshot Cave', 'a connector', ['Hookshot Cave - Top Right', 'Hookshot Cave - Top Left', 'Hookshot Cave - Bottom Right', 'Hookshot Cave - Bottom Left'],
                            ['Hookshot Cave Exit (South)', 'Hookshot Cave Exit (North)']),
@@ -203,10 +206,13 @@ def create_inverted_regions(world, player):
 
         create_cave_region(player, 'Pyramid', 'a drop\'s exit', ['Ganon'], ['Ganon Drop']),
         create_cave_region(player, 'Bottom of Pyramid', 'a drop\'s exit', None, ['Pyramid Exit']),
-        create_dw_region(player, 'Pyramid Ledge', None, ['Pyramid Drop']),  # houlihan room exits here in inverted 
+        create_dw_region(player, 'Pyramid Ledge', None, ['Pyramid Drop']),  # houlihan room exits here in inverted
         
         # to simplify flute connections
-        create_cave_region(player, 'The Sky', 'A Dark Sky', None, ['DDM Landing','NEDW Landing', 'WDW Landing', 'SDW Landing', 'EDW Landing', 'DD Landing', 'DLHL Landing']) 
+        create_cave_region(player, 'The Sky', 'A Dark Sky', None, ['DDM Landing','NEDW Landing', 'WDW Landing', 'SDW Landing', 'EDW Landing', 'DD Landing', 'DLHL Landing']),
+
+        create_lw_region(player, 'Desert Northern Cliffs'),
+        create_lw_region(player, 'Death Mountain Bunny Descent Area')
     ]
 
 

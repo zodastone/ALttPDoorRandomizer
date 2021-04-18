@@ -136,13 +136,16 @@ def create_regions(world, player):
         create_lw_region(player, 'Death Mountain (Top)', ['Ether Tablet'], ['East Death Mountain (Top)', 'Tower of Hera', 'Death Mountain Drop']),
         create_lw_region(player, 'Spectacle Rock', ['Spectacle Rock'], ['Spectacle Rock Drop']),
 
-        create_dw_region(player, 'East Dark World', ['Pyramid'], ['Pyramid Fairy', 'South Dark World Bridge', 'Palace of Darkness', 'Dark Lake Hylia Drop (East)', 'Dark Lake Hylia Teleporter',
-                                                           'Hyrule Castle Ledge Mirror Spot', 'Dark Lake Hylia Fairy', 'Palace of Darkness Hint', 'East Dark World Hint', 'Pyramid Hole', 'Northeast Dark World Broken Bridge Pass']),
-        create_dw_region(player, 'Northeast Dark World', ['Catfish'], ['West Dark World Gap', 'Dark World Potion Shop', 'East Dark World Broken Bridge Pass']),
+        create_dw_region(player, 'East Dark World', ['Pyramid'], ['Pyramid Fairy', 'South Dark World Bridge', 'Palace of Darkness', 'Dark Lake Hylia Drop (East)',
+                                                           'Hyrule Castle Ledge Mirror Spot', 'Dark Lake Hylia Fairy', 'Palace of Darkness Hint', 'East Dark World Hint', 'Pyramid Hole', 'Northeast Dark World Broken Bridge Pass',]),
+        create_dw_region(player, 'Catfish', ['Catfish'], ['Catfish Exit Rock']),
+        create_dw_region(player, 'Northeast Dark World', None, ['West Dark World Gap', 'Dark World Potion Shop', 'East Dark World Broken Bridge Pass', 'Catfish Entrance Rock', 'Dark Lake Hylia Teleporter']),
         create_cave_region(player, 'Palace of Darkness Hint', 'a storyteller'),
         create_cave_region(player, 'East Dark World Hint', 'a storyteller'),
-        create_dw_region(player, 'South Dark World', ['Stumpy', 'Digging Game', 'Bombos Tablet'], ['Dark Lake Hylia Drop (South)', 'Hype Cave', 'Swamp Palace', 'Village of Outcasts Heavy Rock', 'Maze Race Mirror Spot',
-                                                                                           'Cave 45 Mirror Spot', 'East Dark World Bridge', 'Big Bomb Shop', 'Archery Game', 'Bonk Fairy (Dark)', 'Dark Lake Hylia Shop']),
+        create_dw_region(player, 'South Dark World', ['Stumpy', 'Digging Game'], ['Dark Lake Hylia Drop (South)', 'Hype Cave', 'Swamp Palace', 'Village of Outcasts Heavy Rock', 'Maze Race Mirror Spot',
+                                                                                  'Cave 45 Mirror Spot', 'East Dark World Bridge', 'Big Bomb Shop', 'Archery Game', 'Bonk Fairy (Dark)', 'Dark Lake Hylia Shop',
+                                                                                  'Bombos Tablet Mirror Spot']),
+        create_lw_region(player, 'Bombos Tablet Ledge', ['Bombos Tablet']),
         create_cave_region(player, 'Big Bomb Shop', 'the bomb shop'),
         create_cave_region(player, 'Archery Game', 'a game of skill'),
         create_dw_region(player, 'Dark Lake Hylia', None, ['Lake Hylia Island Mirror Spot', 'East Dark World Pier', 'Dark Lake Hylia Ledge']),
@@ -184,8 +187,8 @@ def create_regions(world, player):
         create_dw_region(player, 'Dark Death Mountain Ledge', None, ['Dark Death Mountain Ledge (East)', 'Dark Death Mountain Ledge (West)', 'Mimic Cave Mirror Spot', 'Spiral Cave Mirror Spot']),
         create_dw_region(player, 'Dark Death Mountain Isolated Ledge', None, ['Isolated Ledge Mirror Spot', 'Turtle Rock Isolated Ledge Entrance']),
         create_dw_region(player, 'Dark Death Mountain (East Bottom)', None, ['Superbunny Cave (Bottom)', 'Cave Shop (Dark Death Mountain)', 'Fairy Ascension Mirror Spot']),
-        create_cave_region(player, 'Superbunny Cave', 'a connector', ['Superbunny Cave - Top', 'Superbunny Cave - Bottom'],
-                           ['Superbunny Cave Exit (Top)', 'Superbunny Cave Exit (Bottom)']),
+        create_cave_region(player, 'Superbunny Cave (Top)', 'a connector', ['Superbunny Cave - Top', 'Superbunny Cave - Bottom'], ['Superbunny Cave Exit (Top)']),
+        create_cave_region(player, 'Superbunny Cave (Bottom)', 'a connector', None, ['Superbunny Cave Climb', 'Superbunny Cave Exit (Bottom)']),
         create_cave_region(player, 'Spike Cave', 'Spike Cave', ['Spike Cave']),
         create_cave_region(player, 'Hookshot Cave', 'a connector', ['Hookshot Cave - Top Right', 'Hookshot Cave - Top Left', 'Hookshot Cave - Bottom Right', 'Hookshot Cave - Bottom Left'],
                            ['Hookshot Cave Exit (South)', 'Hookshot Cave Exit (North)']),
@@ -198,6 +201,8 @@ def create_regions(world, player):
         create_cave_region(player, 'Pyramid', 'a drop\'s exit', ['Ganon'], ['Ganon Drop']),
         create_cave_region(player, 'Bottom of Pyramid', 'a drop\'s exit', None, ['Pyramid Exit']),
         create_dw_region(player, 'Pyramid Ledge', None, ['Pyramid Entrance', 'Pyramid Drop']),
+        create_lw_region(player, 'Desert Northern Cliffs'),
+        create_dw_region(player, 'Dark Death Mountain Bunny Descent Area')
     ]
 
 

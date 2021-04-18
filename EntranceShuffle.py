@@ -59,7 +59,9 @@ def link_entrances(world, player):
 
         if world.mode[player] == 'standard':
             # rest of hyrule castle must be in light world, so it has to be the one connected to east exit of desert
-            connect_mandatory_exits(world, lw_entrances, [('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)')], list(LW_Dungeon_Entrances_Must_Exit), player)
+            hyrule_castle_exits = [('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)')]
+            connect_mandatory_exits(world, lw_entrances, hyrule_castle_exits, list(LW_Dungeon_Entrances_Must_Exit), player)
+            connect_caves(world, lw_entrances, [], hyrule_castle_exits, player)
         elif world.doorShuffle[player] != 'vanilla':
             #  sanc is in light world, so must all of HC if door shuffle is on
             connect_mandatory_exits(world, lw_entrances,
@@ -1933,15 +1935,25 @@ def connect_random(world, exitlist, targetlist, player, two_way=False):
 
 
 def connect_mandatory_exits(world, entrances, caves, must_be_exits, player):
-    """This works inplace"""
-    random.shuffle(entrances)
-    random.shuffle(caves)
+
     # Keeps track of entrances that cannot be used to access each exit / cave
     if world.mode == 'inverted':
         invalid_connections = Inverted_Must_Exit_Invalid_Connections.copy()
     else:
         invalid_connections = Must_Exit_Invalid_Connections.copy()
     invalid_cave_connections = defaultdict(set)
+
+    if world.logic in ['owglitches', 'nologic']:
+        import OverworldGlitchRules
+        for entrance in OverworldGlitchRules.get_non_mandatory_exits(world.mode == 'inverted'):
+            invalid_connections[entrance] = set()
+            if entrance in must_be_exits:
+                must_be_exits.remove(entrance)
+                entrances.append(entrance)
+
+    """This works inplace"""
+    random.shuffle(entrances)
+    random.shuffle(caves)
 
     # Handle inverted Aga Tower - if it depends on connections, then so does Hyrule Castle Ledge
     if world.mode == 'inverted':
@@ -2990,6 +3002,8 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('East Dark World River Pier', 'East Dark World'),
                          ('West Dark World Gap', 'West Dark World'),
                          ('East Dark World Broken Bridge Pass', 'East Dark World'),
+                         ('Catfish Exit Rock', 'Northeast Dark World'),
+                         ('Catfish Entrance Rock', 'Catfish'),
                          ('Northeast Dark World Broken Bridge Pass', 'Northeast Dark World'),
                          ('Bumper Cave Entrance Rock', 'Bumper Cave Entrance'),
                          ('Bumper Cave Entrance Drop', 'West Dark World'),
@@ -3032,6 +3046,7 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Spiral Cave Mirror Spot', 'Spiral Cave Ledge'),
                          ('Mimic Cave Mirror Spot', 'Mimic Cave Ledge'),
                          ('Cave 45 Mirror Spot', 'Cave 45 Ledge'),
+                         ('Bombos Tablet Mirror Spot', 'Bombos Tablet Ledge'),
                          ('Graveyard Ledge Mirror Spot', 'Graveyard Ledge'),
                          ('Ganon Drop', 'Bottom of Pyramid'),
                          ('Pyramid Drop', 'East Dark World')
@@ -3046,6 +3061,8 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('Lake Hylia Warp', 'Northeast Light World'),
                                   ('Northeast Light World Warp', 'Light World'),
                                   ('Zoras River', 'Zoras River'),
+                                  ('Waterfall of Wishing Cave', 'Waterfall of Wishing Cave'),
+                                  ('Northeast Light World Return', 'Northeast Light World'),
                                   ('Kings Grave Outer Rocks', 'Kings Grave Area'),
                                   ('Kings Grave Inner Rocks', 'Light World'),
                                   ('Kakariko Well (top to bottom)', 'Kakariko Well (bottom)'),
@@ -3082,6 +3099,8 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('Dark Lake Hylia Teleporter', 'Dark Lake Hylia'),
                                   ('Dark Lake Hylia Ledge Pier', 'Dark Lake Hylia Ledge'),
                                   ('Dark Lake Hylia Ledge Drop', 'Dark Lake Hylia'),
+                                  ('Ice Palace Missing Wall', 'Dark Lake Hylia Central Island'),
+                                  ('Dark Lake Hylia Shallows', 'Dark Lake Hylia'),
                                   ('East Dark World Pier', 'East Dark World'),
                                   ('South Dark World Bridge', 'South Dark World'),
                                   ('East Dark World Bridge', 'East Dark World'),
@@ -3095,6 +3114,8 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('West Dark World Gap', 'West Dark World'),
                                   ('East Dark World Broken Bridge Pass', 'East Dark World'),
                                   ('Northeast Dark World Broken Bridge Pass', 'Northeast Dark World'),
+                                  ('Catfish Exit Rock', 'Northeast Dark World'),
+                                  ('Catfish Entrance Rock', 'Catfish'),
                                   ('Bumper Cave Entrance Rock', 'Bumper Cave Entrance'),
                                   ('Bumper Cave Entrance Drop', 'West Dark World'),
                                   ('Bumper Cave Ledge Drop', 'West Dark World'),
@@ -3148,7 +3169,7 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('Desert Palace Stairs Mirror Spot', 'Dark Desert'),
                                   ('Desert Palace North Mirror Spot', 'Dark Desert'),
                                   ('Maze Race Mirror Spot', 'West Dark World'),
-                                  ('Lake Hylia Central Island Mirror Spot', 'Dark Lake Hylia'),
+                                  ('Lake Hylia Central Island Mirror Spot', 'Dark Lake Hylia Central Island'),
                                   ('Hammer Peg Area Mirror Spot', 'Hammer Peg Area'),
                                   ('Bumper Cave Ledge Mirror Spot', 'Bumper Cave Ledge'),
                                   ('Bumper Cave Entrance Mirror Spot', 'Bumper Cave Entrance'),
@@ -3164,7 +3185,7 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('West Dark World Mirror Spot', 'West Dark World'),
                                   ('South Dark World Mirror Spot', 'South Dark World'),
                                   ('Potion Shop Mirror Spot', 'Northeast Dark World'),
-                                  ('Northeast Dark World Mirror Spot', 'Northeast Dark World'),
+                                  ('Catfish Mirror Spot', 'Catfish'),
                                   ('Shopping Mall Mirror Spot', 'Dark Lake Hylia Ledge'),
                                   ('Skull Woods Mirror Spot', 'Skull Woods Forest (West)'),
                                   ('DDM Flute', 'The Sky'),
@@ -3327,10 +3348,10 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Dark Desert Fairy', 'Dark Desert Healer Fairy'),
                        ('Spike Cave', 'Spike Cave'),
                        ('Hookshot Cave', 'Hookshot Cave'),
-                       ('Superbunny Cave (Top)', 'Superbunny Cave'),
+                       ('Superbunny Cave (Top)', 'Superbunny Cave (Top)'),
                        ('Cave Shop (Dark Death Mountain)', 'Cave Shop (Dark Death Mountain)'),
                        ('Dark Death Mountain Fairy', 'Dark Death Mountain Healer Fairy'),
-                       ('Superbunny Cave (Bottom)', 'Superbunny Cave'),
+                       ('Superbunny Cave (Bottom)', 'Superbunny Cave (Bottom)'),
                        ('Superbunny Cave Exit (Top)', 'Dark Death Mountain (Top)'),
                        ('Superbunny Cave Exit (Bottom)', 'Dark Death Mountain (East Bottom)'),
                        ('Hookshot Cave Exit (South)', 'Dark Death Mountain (Top)'),
@@ -3461,9 +3482,9 @@ inverted_default_connections =  [('Waterfall of Wishing', 'Waterfall of Wishing'
                                  ('Dark Desert Fairy', 'Dark Desert Healer Fairy'),
                                  ('Spike Cave', 'Spike Cave'),
                                  ('Hookshot Cave', 'Hookshot Cave'),
-                                 ('Superbunny Cave (Top)', 'Superbunny Cave'),
+                                 ('Superbunny Cave (Top)', 'Superbunny Cave (Top)'),
                                  ('Cave Shop (Dark Death Mountain)', 'Cave Shop (Dark Death Mountain)'),
-                                 ('Superbunny Cave (Bottom)', 'Superbunny Cave'),
+                                 ('Superbunny Cave (Bottom)', 'Superbunny Cave (Bottom)'),
                                  ('Superbunny Cave Exit (Bottom)', 'Dark Death Mountain (East Bottom)'),
                                  ('Hookshot Cave Exit (North)', 'Death Mountain Floating Island (Dark World)'),
                                  ('Hookshot Cave Back Entrance', 'Hookshot Cave'),
