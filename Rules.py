@@ -1,3 +1,4 @@
+import collections
 import logging
 from collections import deque
 
@@ -35,7 +36,7 @@ def set_rules(world, player):
         no_glitches_rules(world, player)
     elif world.logic[player] == 'minorglitches':
         logging.getLogger('').info('Minor Glitches may be buggy still. No guarantee for proper logic checks.')
-    elif world.logic == 'owglitches':
+    elif world.logic[player] == 'owglitches':
         logging.getLogger('').info('There is a chance OWG has bugged edge case rulesets, especially in inverted. Definitely file a report on GitHub if you see anything strange.')
         # Initially setting no_glitches_rules to set the baseline rules for some
         # entrances. The overworld_glitches_rules set is primarily additive.
@@ -56,7 +57,7 @@ def set_rules(world, player):
 
     if world.mode[player] != 'inverted':
         set_big_bomb_rules(world, player)
-        if world.logic == 'owglitches' and world.shuffle not in ('insanity', 'insanity_legacy'):
+        if world.logic[player] == 'owglitches' and world.shuffle[player] not in ('insanity', 'insanity_legacy'):
             path_to_courtyard = mirrorless_path_to_castle_courtyard(world, player)
             add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.world.get_entrance('Dark Death Mountain Offset Mirror', player).can_reach(state) and all(rule(state) for rule in path_to_courtyard), 'or')
     else:
@@ -66,15 +67,9 @@ def set_rules(world, player):
     if not world.swamp_patch_required[player]:
         add_rule(world.get_entrance('Swamp Lobby Moat', player), lambda state: state.has_Mirror(player))
 
-    if world.mode[player] != 'inverted':
-        set_bunny_rules(world, player)
-    else:
-        set_inverted_bunny_rules(world, player)
+    set_bunny_rules(world, player, world.mode[player] == 'inverted')
 
-    set_trock_key_rules(world, player)
-
-    set_rule(ganons_tower, lambda state: state.has_crystals(world.crystals_needed_for_gt, player))
-    if world.mode != 'inverted' and world.logic == 'owglitches':
+    if world.mode[player] != 'inverted' and world.logic[player] == 'owglitches':
         add_rule(world.get_entrance('Ganons Tower', player), lambda state: state.world.get_entrance('Ganons Tower Ascent', player).can_reach(state), 'or')
 
     set_bunny_rules(world, player, world.mode == 'inverted')
@@ -1475,20 +1470,21 @@ def set_bunny_rules(world, player, inverted):
     def get_rule_to_add(region, location = None, connecting_entrance = None):
         # In OWG, a location can potentially be superbunny-mirror accessible or
         # bunny revival accessible.
-        if world.logic == 'owglitches':
+        if world.logic[player] == 'owglitches':
+            if region.type != RegionType.Dungeon \
+                and (((location is None or location.name not in OverworldGlitchRules.get_superbunny_accessible_locations())
+                     or (connecting_entrance is not None and connecting_entrance.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons()))
+                     and not is_link(region)):
+                return lambda state: state.has_Pearl(player)
             # TODO: Fix dungeon revive logic for door rando
-            if region.name == 'Swamp Palace (Entrance)':
-                return lambda state: state.has_Pearl(player)
-            if region.name == 'Tower of Hera (Bottom)':  # Need to hit the crystal switch
-                return lambda state: state.has_Mirror(player) and state.has_sword(player) or state.has_Pearl(player)
-            if region.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
-                return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
-            if region.type == RegionType.Dungeon:
-                return lambda state: True
-            if (((location is None or location.name not in OverworldGlitchRules.get_superbunny_accessible_locations())
-                    or (connecting_entrance is not None and connecting_entrance.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons()))
-                    and not is_link(region)):
-                return lambda state: state.has_Pearl(player)
+            # if region.name == 'Swamp Palace (Entrance)':
+            #     return lambda state: state.has_Pearl(player)
+            # if region.name == 'Tower of Hera (Bottom)':  # Need to hit the crystal switch
+            #     return lambda state: state.has_Mirror(player) and state.has_sword(player) or state.has_Pearl(player)
+            # if region.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
+            #     return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
+            # if region.type == RegionType.Dungeon:
+            #     return lambda state: True
         else:
             if not is_link(region):
                 return lambda state: state.has_Pearl(player)
@@ -1500,12 +1496,12 @@ def set_bunny_rules(world, player, inverted):
         possible_options = [lambda state: state.has_Pearl(player)]
 
         # We will search entrances recursively until we find
-        # one that leads to an exclusively dark world region
+        # one that leads to an exclusively light world region
         # for each such entrance a new option is added that consist of:
         #    a) being able to reach it, and
         #    b) being able to access all entrances from there to `region`
-        seen = {start_region}
-        queue = deque([(start_region, [])])
+        seen = {region}
+        queue = deque([(region, [])])
         while queue:
             (current, path) = queue.popleft()
             for entrance in current.entrances:
@@ -1516,7 +1512,7 @@ def set_bunny_rules(world, player, inverted):
                 seen.add(new_region)
                 if not is_link(new_region):
                     # For OWG, establish superbunny and revival rules.
-                    if world.logic == 'owglitches' and entrance.name not in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
+                    if world.logic[player] == 'owglitches' and entrance.name not in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
                         if region.name in OverworldGlitchRules.get_sword_required_superbunny_mirror_regions():
                             possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player) and state.has_sword(player))
                         elif (region.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_regions()
@@ -1534,7 +1530,7 @@ def set_bunny_rules(world, player, inverted):
                 if is_bunny(new_region):
                     queue.append((new_region, new_path))
                 else:
-                    # we have reached pure dark world, so we have a new possible option
+                    # we have reached pure light world, so we have a new possible option
                     possible_options.append(path_to_access_rule(new_path, entrance))
         return options_to_access_rule(possible_options)
 
@@ -1553,7 +1549,7 @@ def set_bunny_rules(world, player, inverted):
 
     for ent_name in bunny_impassible_doors:
         bunny_exit = world.get_entrance(ent_name, player)
-        if bunny_exit.parent_region.is_light_world:
+        if is_bunny(bunny_exit.parent_region):
             add_rule(bunny_exit, get_rule_to_add(bunny_exit.parent_region))
 
     doors_to_check = [x for x in world.doors if x.player == player and x not in bunny_impassible_doors]
@@ -1566,7 +1562,7 @@ def set_bunny_rules(world, player, inverted):
     # Add requirements for all locations that are actually in the dark world, except those available to the bunny, including dungeon revival
     for entrance in world.get_entrances():
         if entrance.player == player and is_bunny(entrance.connected_region):
-            if world.logic == 'owglitches':
+            if world.logic[player] == 'owglitches':
                 if entrance.connected_region.type == RegionType.Dungeon:
                     if entrance.parent_region.type != RegionType.Dungeon and entrance.connected_region.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
                         add_rule(entrance, get_rule_to_add(entrance.connected_region, None, entrance))
@@ -1574,11 +1570,49 @@ def set_bunny_rules(world, player, inverted):
                 if entrance.connected_region.name == 'Turtle Rock (Entrance)':
                     add_rule(world.get_entrance('Turtle Rock Entrance Gap', player), get_rule_to_add(entrance.connected_region, None, entrance))
             for location in entrance.connected_region.locations:
-                if world.logic == 'owglitches' and entrance.name in OverworldGlitchRules.get_invalid_mirror_bunny_entrances():
+                if world.logic[player] == 'owglitches' and entrance.name in OverworldGlitchRules.get_invalid_mirror_bunny_entrances():
                     continue
                 if location.name in bunny_accessible_locations:
                     continue
                 add_rule(location, get_rule_to_add(entrance.connected_region, location))
+
+bunny_revivable_entrances = {
+    "Sewers Pull Switch", "TR Dash Room", "Swamp Boss", "Hera Boss",
+    "Tower Agahnim 1", "Ice Lobby", "Sewers Rat Path", "PoD Falling Bridge",
+    "PoD Harmless Hellway", "PoD Mimics 2", "Ice Cross Bottom", "GT Agahnim 2",
+    "Sewers Water", "TR Lazy Eyes", "TR Big Chest", "Swamp Push Statue",
+    "PoD Arena Main", "PoD Arena Bridge", "PoD Map Balcony", "Sewers Dark Cross",
+    "Desert Boss", "Swamp Hub", "Skull Spike Corner", "PoD Pit Room",
+    "PoD Conveyor", "GT Crystal Circles", "Sewers Behind Tapestry",
+    "Desert Tiles 2", "Skull Star Pits", "Hyrule Castle West Hall",
+    "Hyrule Castle Throne Room", "Hyrule Castle East Hall", "Skull 2 West Lobby",
+    "Skull 2 East Lobby", "Skull Pot Prison", "Skull 1 Lobby", "Skull Map Room",
+    "Skull 3 Lobby", "PoD Boss", "GT Hidden Spikes", "GT Gauntlet 3",
+    "Ice Spike Cross", "Hyrule Castle West Lobby", "Hyrule Castle Lobby",
+    "Hyrule Castle East Lobby", "Desert Back Lobby", "Hyrule Dungeon Armory Main",
+    "Hyrule Dungeon North Abyss", "Desert Sandworm Corner", "Desert Dead End",
+    "Desert North Hall", "Desert Arrow Pot Corner", "GT DMs Room",
+    "GT Petting Zoo", "Ice Tall Hint", "Desert West Lobby", "Desert Main Lobby",
+    "Desert East Lobby", "GT Big Chest", "GT Bob\'s Room", "GT Speed Torch",
+    "Mire Boss", "GT Conveyor Bridge", "Mire Lobby", "Eastern Darkness",
+    "Ice Many Pots", "Mire South Fish", "Mire Right Bridge", "Mire Left Bridge",
+    "TR Boss", "Eastern Hint Tile Blocked Path", "Thieves Spike Switch",
+    "Thieves Boss", "Mire Spike Barrier", "Mire Cross", "Mire Hidden Shooters",
+    "Mire Spikes", "TR Final Abyss", "TR Dark Ride", "TR Pokey 1", "TR Tile Room",
+    "TR Roller Room", "Eastern Cannonball", "Thieves Hallway", "Ice Switch Room",
+    "Mire Tile Room", "Mire Conveyor Crystal", "Mire Hub", "TR Dash Bridge",
+    "TR Hub", "Eastern Boss", "Eastern Lobby", "Thieves Ambush",
+    "Thieves BK Corner", "TR Eye Bridge", "Thieves Lobby", "Tower Lobby",
+}
+
+# Revive as superbunny or use superbunny to get the item in a dead end
+superbunny_revivable_entrances = {
+    "TR Main Lobby", "Sanctuary", "Thieves Pot Alcove Bottom"
+}
+
+superbunny_sword_revivable_entrances = {
+    "Hera Lobby"
+}
 
 bunny_impassible_doors = {
     'Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory ES', 'Sewers Secret Room Push Block', 'Sewers Pull Switch S',

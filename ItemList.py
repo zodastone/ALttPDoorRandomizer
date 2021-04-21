@@ -254,7 +254,7 @@ def generate_itempool(world, player):
         (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = make_custom_item_pool(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.customitemarray)
         world.rupoor_cost = min(world.customitemarray[player]["rupoorcost"], 9999)
     else:
-        (pool, placed_items, precollected_items, clock_mode, lamps_needed_for_dark_rooms) = get_pool_core(world.progressive, world.shuffle[player], world.difficulty[player], world.treasure_hunt_total[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.doorShuffle[player])
+        (pool, placed_items, precollected_items, clock_mode, lamps_needed_for_dark_rooms) = get_pool_core(world.progressive, world.shuffle[player], world.difficulty[player], world.treasure_hunt_total[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.doorShuffle[player], world.logic[player])
 
     if player in world.pool_adjustment.keys():
         amt = world.pool_adjustment[player]
@@ -622,7 +622,7 @@ shop_transfer = {'Red Potion': 'Rupees (50)', 'Bee': 'Rupees (5)', 'Blue Potion'
                  }
 
 
-def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, goal, mode, swords, retro, door_shuffle):
+def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, goal, mode, swords, retro, door_shuffle, logic):
     pool = []
     placed_items = {}
     precollected_items = []
@@ -877,21 +877,22 @@ def test():
                     for swords in ['random', 'assured', 'swordless', 'vanilla']:
                         for progressive in ['on', 'off']:
                             for shuffle in ['full', 'insanity_legacy']:
-                                for retro in [True, False]:
-                                    for door_shuffle in ['basic', 'crossed', 'vanilla']:
-                                        out = get_pool_core(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, door_shuffle)
-                                        count = len(out[0]) + len(out[1])
+                                for logic in ['noglitches', 'minorglitches', 'owglitches', 'nologic']:
+                                    for retro in [True, False]:
+                                        for door_shuffle in ['basic', 'crossed', 'vanilla']:
+                                            out = get_pool_core(progressive, shuffle, difficulty, 30, timer, goal, mode, swords, retro, door_shuffle, logic)
+                                            count = len(out[0]) + len(out[1])
 
-                                        correct_count = total_items_to_place
-                                        if goal == 'pedestal' and swords != 'vanilla':
-                                            # pedestal goals generate one extra item
-                                            correct_count += 1
-                                        if retro:
-                                            correct_count += 28
-                                        try:
-                                            assert count == correct_count, "expected {0} items but found {1} items for {2}".format(correct_count, count, (progressive, shuffle, difficulty, timer, goal, mode, swords, retro))
-                                        except AssertionError as e:
-                                            print(e)
+                                            correct_count = total_items_to_place
+                                            if goal == 'pedestal' and swords != 'vanilla':
+                                                # pedestal goals generate one extra item
+                                                correct_count += 1
+                                            if retro:
+                                                correct_count += 28
+                                            try:
+                                                assert count == correct_count, "expected {0} items but found {1} items for {2}".format(correct_count, count, (progressive, shuffle, difficulty, timer, goal, mode, swords, retro))
+                                            except AssertionError as e:
+                                                print(e)
 
 if __name__ == '__main__':
     test()

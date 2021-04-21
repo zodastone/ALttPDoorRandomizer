@@ -18,7 +18,7 @@ invalid_key_rooms = {
 }
 
 vanilla_pots = {
-    2: [Pot(80, 6, PotItem.Nothing, 'Sewers Yet More Rats'), Pot(80, 8, PotItem.Nothing, 'Sewers Yet More Rats'), Pot(44, 8, PotItem.Nothing, 'Sewers Yet More Rats'), Pot(44, 10, PotItem.Nothing, 'Sewers Yet More Rats')],
+    2: [Pot(80, 6, PotItem.Nothing, '`Sewers Yet More Rats`'), Pot(80, 8, PotItem.Nothing, 'Sewers Yet More Rats'), Pot(44, 8, PotItem.Nothing, 'Sewers Yet More Rats'), Pot(44, 10, PotItem.Nothing, 'Sewers Yet More Rats')],
     4: [Pot(162, 25, PotItem.Nothing, 'TR Dash Room'), Pot(152, 25, PotItem.Nothing, 'TR Dash Room'), Pot(152, 22, PotItem.Nothing, 'TR Dash Room'), Pot(162, 22, PotItem.Nothing, 'TR Dash Room'), Pot(204, 19, PotItem.Bomb, 'TR Tongue Pull'),
         Pot(240, 19, PotItem.Bomb, 'TR Tongue Pull')],
     9: [Pot(12, 4, PotItem.OneRupee, 'PoD Shooter Room'), Pot(48, 4, PotItem.Heart, 'PoD Shooter Room'), Pot(12, 12, PotItem.Switch, 'PoD Shooter Room')],
