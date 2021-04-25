@@ -1445,9 +1445,25 @@ def set_bunny_rules(world, player, inverted):
                               'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)']
     bunny_accessible_locations = ['Link\'s House', 'Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree',
                                   'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid',
-                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins']
-
-    bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree', 'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid', 'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins', 'Spectacle Rock', 'Bombos Tablet', 'Ether Tablet', 'Purple Chest', 'Blacksmith', 'Missing Smith', 'Master Sword Pedestal', 'Bottle Merchant', 'Sunken Treasure', 'Desert Ledge']
+                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins',
+                                  'Spectacle Rock', 'Bombos Tablet', 'Ether Tablet', 'Purple Chest', 'Blacksmith',
+                                  'Missing Smith', 'Master Sword Pedestal', 'Bottle Merchant', 'Sunken Treasure', 'Desert Ledge',
+                                  'Kakariko Shop - Left', 'Kakariko Shop - Middle', 'Kakariko Shop - Right',
+                                  'Lake Hylia Shop - Left', 'Lake Hylia Shop - Middle', 'Lake Hylia Shop - Right',
+                                  'Potion Shop - Left', 'Potion Shop - Middle', 'Potion Shop - Right',
+                                  'Capacity Upgrade - Left', 'Capacity Upgrade - Right',
+                                  'Village of Outcasts Shop - Left', 'Village of Outcasts Shop - Middle', 'Village of Outcasts Shop - Right',
+                                  'Dark Lake Hylia Shop - Left', 'Dark Lake Hylia Shop - Middle', 'Dark Lake Hylia Shop - Right',
+                                  'Dark Death Mountain Shop - Left', 'Dark Death Mountain Shop - Middle', 'Dark Death Mountain Shop - Right',
+                                  'Dark Lumberjack Shop - Left', 'Dark Lumberjack Shop - Middle', 'Dark Lumberjack Shop - Right',
+                                  'Dark Potion Shop - Left', 'Dark Potion Shop - Middle', 'Dark Potion Shop - Right',
+                                  'Red Shield Shop - Left', 'Red Shield Shop - Middle', 'Red Shield Shop - Right',
+                                  'Old Man Sword Cave Item 1',
+                                  'Take - Any  # 1 Item 1', 'Take - Any  # 1 Item 2',
+                                  'Take - Any  # 2 Item 1', 'Take - Any  # 2 Item 2',
+                                  'Take - Any  # 3 Item 1', 'Take - Any  # 3 Item 2',
+                                  'Take - Any  # 4 Item 1', 'Take - Any  # 4 Item 2',
+                                  ]
 
     def path_to_access_rule(path, entrance):
         return lambda state: state.can_reach(entrance) and all(rule_func(state) for rule_func in path)
@@ -1472,19 +1488,9 @@ def set_bunny_rules(world, player, inverted):
         # bunny revival accessible.
         if world.logic[player] == 'owglitches':
             if region.type != RegionType.Dungeon \
-                and (((location is None or location.name not in OverworldGlitchRules.get_superbunny_accessible_locations())
-                     or (connecting_entrance is not None and connecting_entrance.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons()))
-                     and not is_link(region)):
+                    and (location is None or location.name not in OverworldGlitchRules.get_superbunny_accessible_locations()) \
+                    and not is_link(region):
                 return lambda state: state.has_Pearl(player)
-            # TODO: Fix dungeon revive logic for door rando
-            # if region.name == 'Swamp Palace (Entrance)':
-            #     return lambda state: state.has_Pearl(player)
-            # if region.name == 'Tower of Hera (Bottom)':  # Need to hit the crystal switch
-            #     return lambda state: state.has_Mirror(player) and state.has_sword(player) or state.has_Pearl(player)
-            # if region.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
-            #     return lambda state: state.has_Mirror(player) or state.has_Pearl(player)
-            # if region.type == RegionType.Dungeon:
-            #     return lambda state: True
         else:
             if not is_link(region):
                 return lambda state: state.has_Pearl(player)
@@ -1506,25 +1512,40 @@ def set_bunny_rules(world, player, inverted):
             (current, path) = queue.popleft()
             for entrance in current.entrances:
                 new_region = entrance.parent_region
-                if new_region in seen:
+                if new_region.type in (RegionType.Cave, RegionType.Dungeon) and new_region in seen:
                     continue
                 new_path = path + [entrance.access_rule]
                 seen.add(new_region)
                 if not is_link(new_region):
-                    # For OWG, establish superbunny and revival rules.
-                    if world.logic[player] == 'owglitches' and entrance.name not in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
-                        if region.name in OverworldGlitchRules.get_sword_required_superbunny_mirror_regions():
-                            possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player) and state.has_sword(player))
-                        elif (region.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_regions()
-                                or location is not None and location.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_locations()):
-                            possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player) and state.has_Boots(player))
-                        elif location is not None and location.name in OverworldGlitchRules.get_superbunny_accessible_locations():
-                            if new_region.name == 'Superbunny Cave (Bottom)' or region.name == 'Kakariko Well (top)':
-                                possible_options.append(lambda state: path_to_access_rule(new_path, entrance))
+                    if world.logic[player] == 'owglitches':
+                        if region.type == RegionType.Dungeon and new_region.type != RegionType.Dungeon:
+                            if entrance.name in OverworldGlitchRules.get_invalid_mirror_bunny_entrances():
+                                continue
+                            if entrance.name in drop_dungeon_entrances:
+                                lobby = entrance.connected_region
                             else:
-                                possible_options.append(lambda state: path_to_access_rule(new_path, entrance) and state.has_Mirror(player))
-                        if new_region.type != RegionType.Cave:
+                                lobby = next(exit.connected_region for exit in current.exits if exit.connected_region.type == RegionType.Dungeon)
+                            if lobby.name in bunny_revivable_entrances:
+                                possible_options.append(path_to_access_rule(new_path, entrance))
+                            elif lobby.name in superbunny_revivable_entrances:
+                                possible_options.append(lambda state: path_to_access_rule(new_path, entrance)(state) and state.has_Mirror(player))
+                            elif lobby.name in superbunny_sword_revivable_entrances:
+                                possible_options.append(lambda state: path_to_access_rule(new_path, entrance)(state) and state.has_Mirror(player) and state.has_sword(player))
                             continue
+                        elif region.type == RegionType.Cave and new_region.type != RegionType.Cave:
+                            if entrance.name in OverworldGlitchRules.get_invalid_mirror_bunny_entrances():
+                                continue
+                            if region.name in OverworldGlitchRules.get_sword_required_superbunny_mirror_regions():
+                                possible_options.append(lambda state: path_to_access_rule(new_path, entrance)(state) and state.has_Mirror(player) and state.has_sword(player))
+                            elif region.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_regions():
+                                possible_options.append(lambda state: path_to_access_rule(new_path, entrance)(state) and state.has_Mirror(player) and state.has_Boots(player))
+                            elif location.name in OverworldGlitchRules.get_superbunny_accessible_locations():
+                                if new_region.name == 'Superbunny Cave (Bottom)' or region.name == 'Kakariko Well (top)':
+                                    possible_options.append(path_to_access_rule(new_path, entrance))
+                                else:
+                                    possible_options.append(lambda state: path_to_access_rule(new_path, entrance)(state) and state.has_Mirror(player))
+                            continue
+
                     else:
                         continue
                 if is_bunny(new_region):
@@ -1556,31 +1577,31 @@ def set_bunny_rules(world, player, inverted):
     doors_to_check = [x for x in doors_to_check if x.type in [DoorType.Normal, DoorType.Interior] and not x.blocked]
     for door in doors_to_check:
         room = world.get_room(door.roomIndex, player)
-        if door.entrance.parent_region.is_light_world and room.kind(door) in [DoorKind.Dashable, DoorKind.Bombable, DoorKind.Hidden]:
+        if is_bunny(door.entrance.parent_region) and room.kind(door) in [DoorKind.Dashable, DoorKind.Bombable, DoorKind.Hidden]:
             add_rule(door.entrance, get_rule_to_add(door.entrance.parent_region))
 
-    # Add requirements for all locations that are actually in the dark world, except those available to the bunny, including dungeon revival
-    for entrance in world.get_entrances():
-        if entrance.player == player and is_bunny(entrance.connected_region):
-            if world.logic[player] == 'owglitches':
-                if entrance.connected_region.type == RegionType.Dungeon:
-                    if entrance.parent_region.type != RegionType.Dungeon and entrance.connected_region.name in OverworldGlitchRules.get_invalid_bunny_revival_dungeons():
-                        add_rule(entrance, get_rule_to_add(entrance.connected_region, None, entrance))
-                    continue
-                if entrance.connected_region.name == 'Turtle Rock (Entrance)':
-                    add_rule(world.get_entrance('Turtle Rock Entrance Gap', player), get_rule_to_add(entrance.connected_region, None, entrance))
-            for location in entrance.connected_region.locations:
-                if world.logic[player] == 'owglitches' and entrance.name in OverworldGlitchRules.get_invalid_mirror_bunny_entrances():
-                    continue
+    for region in world.get_regions():
+        if region.player == player and is_bunny(region):
+            for location in region.locations:
                 if location.name in bunny_accessible_locations:
                     continue
-                add_rule(location, get_rule_to_add(entrance.connected_region, location))
+                add_rule(location, get_rule_to_add(region, location))
+
+
+drop_dungeon_entrances = {
+    "Sewer Drop",
+    "Skull Left Drop",
+    "Skull Pinball",
+    "Skull Pot Circle",
+    "Skull Back Drop"
+}
+
 
 bunny_revivable_entrances = {
     "Sewers Pull Switch", "TR Dash Room", "Swamp Boss", "Hera Boss",
     "Tower Agahnim 1", "Ice Lobby", "Sewers Rat Path", "PoD Falling Bridge",
     "PoD Harmless Hellway", "PoD Mimics 2", "Ice Cross Bottom", "GT Agahnim 2",
-    "Sewers Water", "TR Lazy Eyes", "TR Big Chest", "Swamp Push Statue",
+    "Sewers Water", "TR Lazy Eyes", "TR Big Chest Entrance", "Swamp Push Statue",
     "PoD Arena Main", "PoD Arena Bridge", "PoD Map Balcony", "Sewers Dark Cross",
     "Desert Boss", "Swamp Hub", "Skull Spike Corner", "PoD Pit Room",
     "PoD Conveyor", "GT Crystal Circles", "Sewers Behind Tapestry",
@@ -1603,6 +1624,8 @@ bunny_revivable_entrances = {
     "Mire Tile Room", "Mire Conveyor Crystal", "Mire Hub", "TR Dash Bridge",
     "TR Hub", "Eastern Boss", "Eastern Lobby", "Thieves Ambush",
     "Thieves BK Corner", "TR Eye Bridge", "Thieves Lobby", "Tower Lobby",
+    "Sewer Drop", "Skull Left Drop", "Skull Pinball", "Skull Back Drop",
+    "Skull Pot Circle",  # You automatically get superbunny by dropping
 }
 
 # Revive as superbunny or use superbunny to get the item in a dead end

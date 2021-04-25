@@ -39,6 +39,9 @@ def get_invalid_mirror_bunny_entrances():
     yield 'Hookshot Cave'
     yield 'Dark Lake Hylia Ledge Fairy'
     yield 'Dark Lake Hylia Ledge Spike Cave'
+    yield 'Palace of Darkness'
+    yield 'Misery Mire'
+    yield 'Turtle Rock'
     yield 'Bonk Rock Cave'
     yield 'Bonk Fairy (Light)'
     yield '50 Rupee Cave'
@@ -51,6 +54,10 @@ def get_invalid_mirror_bunny_entrances():
     yield 'Ice Rod Cave'
     yield 'Sanctuary Grave'
     yield 'Kings Grave'
+    yield 'Sanctuary Grave'
+    yield 'Hyrule Castle Secret Entrance Drop'
+    yield 'Skull Woods Second Section Hole'
+    yield 'Skull Woods First Section Hole (North)'
 
 
 def get_superbunny_accessible_locations():
@@ -203,17 +210,6 @@ def get_mirror_offset_spots_lw(player):
     """
     yield ('Death Mountain Offset Mirror', 'Death Mountain', 'Light World')
     yield ('Death Mountain Offset Mirror (Houlihan Exit)', 'Death Mountain', 'Hyrule Castle Ledge', lambda state: state.has_Mirror(player) and state.can_boots_clip_dw(player) and state.has_Pearl(player))
-
-
-
-def get_invalid_bunny_revival_dungeons():
-    """
-    Dungeon regions that can't be bunny revived from without superbunny state.
-    """
-    yield 'Tower of Hera (Bottom)'
-    yield 'Swamp Palace (Entrance)'
-    yield 'Turtle Rock (Entrance)'
-    yield 'Sanctuary'
 
 
 def no_logic_rules(world, player):
