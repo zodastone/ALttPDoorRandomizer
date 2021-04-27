@@ -44,38 +44,44 @@ All items in the general item pool may appear in shops. This includes normal pro
 
 #### Pricing Guide
 
-All prices range approx. from half the base price to the base price in increments of 5, the exact price is chosen randomly within the range.
+#### Sphere effects
+
+Design goal: Shops in early spheres may be discounted below the base price while shops in later spheres will likely exceed the base price range. This is an attempt to balance out the rupees in the item pool vs. the prices the shops charges. Poorer item pools like Triforce Hunt may have early shop prices be adjusted downward while rupee rich item pools will have prices increased, but later in the game.
+
+Detailed explanation: It is calculated how much money is available in the item pool and various rupee sources. If this amount exceeds the total amount of money needed for shop prices for items, then shops that are not in sphere 1 will raise their prices by a calculated amount to help balance out the money. Conversely, if the amount is below the money needed, then shops in sphere 1 will be discounted by a calculated amount to help ensure everything is purchase-able with minimal grinding.
+
+#### Base prices
+
+All prices range approx. from half the base price to twice the base price (as a max) in increments of 5, the exact price is chosen randomly within the range subject to adjustments by the sphere effects above.
 
 | Category          | Items   | Base Price | Typical Range |
 | ----------------- | ------- |:----------:|:-------------:|
-| Major Progression | Hammer, Hookshot, Mirror, Ocarina, Boots, Somaria, Fire Rod, Ice Rod | 250 | 125-250
-|                   | Moon Pearl | 200 | 100-200
-|                   | Lamp, Progressive Bows, Gloves, & Swords | 150 | 75-150
-|                   | Triforce Piece | 100 | 50-100
-| Medallions        | Bombos, Ether, Quake | 100 | 50-100
-| Safety/Fetch      | Cape, Mushroom, Shovel, Powder, Bug Net, Byrna, Progressive Armor & Shields, Half Magic | 50 | 25-50
-| Bottles			| Empty Bottle or Bee Bottle | 50 | 25-50
-|       			| Green Goo or Good Bee | 60 | 30-60
-|       			| Red Goo or Fairy | 70 | 35-70
-|        			| Blue Goo | 80 | 40-80
-| Health            | Heart Container | 40 | 20-40
-|                   | Sanctuary Heart | 50 | 25-50 
-|                   | Piece of Heart | 10 | 5-10
-| Dungeon           | Big Keys | 60 | 30-60
-|                   | Small Keys | 40 | 20-40
-|                   | Info Maps | 20 | 10-20
-|                   | Other Maps & Compasses | 10 | 5-10
+| Major Progression | Hammer, Hookshot, Mirror, Ocarina, Boots, Somaria, Fire Rod, Ice Rod | 250 | 125-500
+|                   | Moon Pearl | 200 | 100-400
+|                   | Lamp, Progressive Bows, Gloves, & Swords | 150 | 75-300
+|                   | Triforce Piece | 100 | 50-200
+| Medallions        | Bombos, Ether, Quake | 100 | 50-200
+| Safety/Fetch      | Cape, Mushroom, Shovel, Powder, Bug Net, Byrna, Progressive Armor & Shields, Half Magic | 50 | 25-100
+| Bottles			| Empty Bottle or Bee Bottle | 50 | 25-100
+|       			| Green Goo or Good Bee | 60 | 30-120
+|       			| Red Goo or Fairy | 70 | 35-140
+|        			| Blue Goo | 80 | 40-160
+| Health            | Heart Container | 40 | 20-80
+|                   | Sanctuary Heart | 50 | 25-100 
+|                   | Piece of Heart | 10 | 5-20
+| Dungeon           | Big Keys | 60 | 30-120
+|                   | Small Keys | 40 | 20-80
+|                   | Info Maps | 20 | 10-40
+|                   | Other Maps & Compasses | 10 | 5-20
 | Rupees			| Green | Free | Free
-|       			| Blue  | 2 | 2
-|       			| Red  | 10 | 5-10
-|       			| Fifty  | 25 | 15-25
-|       			| One Hundred  | 50 | 25-50
-|       			| Three Hundred  | 150 | 75-150
-| Ammo	            | Three Bombs | 15 | 10-15
-|       			| Single Arrow | 3 | 3
-| Original Shop Items | Other Ammo, Refills, Non-Progressive Shields, Capacity Upgrades, Small Hearts, Retro Quiver, Universal Key | Original | Could be Discounted as Above  				
-
-~~In addition, 4-7 items are steeply discounted at random.~~ Sales are over.
+|       			| Blue  | 2 | 2-4
+|       			| Red  | 10 | 5-20
+|       			| Fifty  | 25 | 15-50
+|       			| One Hundred  | 50 | 25-100
+|       			| Three Hundred  | 150 | 75-300
+| Ammo	            | Three Bombs | 15 | 10-30
+|       			| Single Arrow | 3 | 3-6
+| Original Shop Items | Other Ammo, Refills, Non-Progressive Shields, Capacity Upgrades, Small Hearts, Retro Quiver, Universal Key | Original | .5 - 2 * Original
 
 #### Rupee Balancing Algorithm
 
@@ -144,6 +150,9 @@ New item counter modified to show total
 
 # Bug Fixes and Notes.
 
+* 0.3.1.8-u
+	* Fix for retro generation
+	* Shopsanity - rebalance pricing - later prices can be are higher
 * 0.3.1.7-u
 	* TFH counter off in modes where it should be off
 	* Fixed Big Bomb logic for inverted (bad merge)

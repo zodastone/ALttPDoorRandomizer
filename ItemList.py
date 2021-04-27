@@ -3,12 +3,12 @@ import logging
 import math
 import random
 
-from BaseClasses import Region, RegionType, Shop, ShopType, Location
+from BaseClasses import Region, RegionType, Shop, ShopType, Location, CollectionState
 from Bosses import place_bosses
 from Dungeons import get_dungeon_item_pool
 from EntranceShuffle import connect_entrance
 from Regions import shop_to_location_table, retro_shops, shop_table_by_location
-from Fill import FillError, fill_restrictive
+from Fill import FillError, fill_restrictive, fast_fill
 from Items import ItemFactory
 
 import source.classes.constants as CONST
@@ -574,6 +574,7 @@ def customize_shops(world, player):
             loc.item = upgrade
             upgrade.location = loc
     change_shop_items_to_rupees(world, player, shops_to_customize)
+    balance_prices(world, player)
 
 
 def randomize_price(price):
@@ -606,6 +607,77 @@ def change_shop_items_to_rupees(world, player, shops):
             shop.add_inventory(slot, new_item.name, randomize_price(new_item.price), 1, player=new_item.player)
 
 
+def balance_prices(world, player):
+    available_money = 765   # this base just counts the main rupee rooms. Could up it for houlihan by 225
+    needed_money = 830  # this base is the pay for
+    for loc in world.get_filled_locations(player):
+        if loc.item.name in rupee_chart:
+            available_money += rupee_chart[loc.item.name]  # rupee at locations
+    shop_locations = []
+    for shop, loc_list in shop_to_location_table.items():
+        for loc in loc_list:
+            loc = world.get_location(loc, player)
+            shop_locations.append(loc)
+            slot = shop_to_location_table[loc.parent_region.name].index(loc.name)
+            needed_money += loc.parent_region.shop.inventory[slot]['price']
+
+    target = available_money - needed_money
+    # remove the first set of shops from consideration (or used them for discounting)
+    state, done = CollectionState(world), False
+    unchecked_locations = world.get_locations().copy()
+    while not done:
+        state.sweep_for_events(key_only=True, locations=unchecked_locations)
+        sphere_loc = [l for l in unchecked_locations if state.can_reach(l) and state.not_flooding_a_key(state.world, l)]
+        if any(l in shop_locations for l in sphere_loc):
+            if target >= 0:
+                shop_locations = [l for l in shop_locations if l not in sphere_loc]
+            else:
+                shop_locations = [l for l in sphere_loc if l in shop_locations]
+            done = True
+        else:
+            for l in sphere_loc:
+                state.collect(l.item, True, l)
+                unchecked_locations.remove(l)
+
+    while len(shop_locations) > 0:
+        adjustment = target // len(shop_locations)
+        adjustment = 5 * (adjustment // 5)
+        more_adjustment = []
+        for loc in shop_locations:
+            slot = shop_to_location_table[loc.parent_region.name].index(loc.name)
+            price_max = loc.item.price * 2
+            inventory = loc.parent_region.shop.inventory[slot]
+            flex = price_max - inventory['price']
+            if flex <= adjustment:
+                inventory['price'] = price_max
+                target -= flex
+            elif adjustment <= 0:
+                old_price = inventory['price']
+                new_price = max(0, inventory['price'] + adjustment)
+                inventory['price'] = new_price
+                target += (old_price - new_price)
+            else:
+                more_adjustment.append(loc)
+        if len(shop_locations) == len(more_adjustment):
+            for loc in shop_locations:
+                slot = shop_to_location_table[loc.parent_region.name].index(loc.name)
+                inventory = loc.parent_region.shop.inventory[slot]
+                new_price = inventory['price'] + adjustment
+                new_price = min(500, max(0, new_price))  # cap prices between 0--twice base price
+                inventory['price'] = new_price
+                target -= adjustment
+            more_adjustment = []
+        shop_locations = more_adjustment
+    logging.getLogger('').debug(f'Price target is off by by {target} rupees')
+
+    # for loc in shop_locations:
+    #     slot = shop_to_location_table[loc.parent_region.name].index(loc.name)
+    #     new_price = loc.parent_region.shop.inventory[slot]['price'] + adjustment
+    #
+    #     new_price = min(500, max(0, new_price))  # cap prices between 0--twice base price
+    #     loc.parent_region.shop.inventory[slot]['price'] = new_price
+
+
 repeatable_shop_items = ['Single Arrow', 'Arrows (10)', 'Bombs (3)', 'Bombs (10)', 'Red Potion', 'Small Heart',
                          'Blue Shield', 'Red Shield', 'Bee', 'Small Key (Universal)', 'Blue Potion', 'Green Potion']
 
@@ -620,6 +692,9 @@ shop_transfer = {'Red Potion': 'Rupees (50)', 'Bee': 'Rupees (5)', 'Blue Potion'
                  # money seems a bit too generous with these on
                  # 'Blue Shield': 'Rupees (50)', 'Red Shield': 'Rupees (300)',
                  }
+
+rupee_chart = {'Rupee (1)': 1, 'Rupees (5)': 5, 'Rupees (20)': 20, 'Rupees (50)': 50,
+               'Rupees (100)': 100, 'Rupees (300)': 300}
 
 
 def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, goal, mode, swords, retro, door_shuffle):

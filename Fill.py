@@ -534,6 +534,30 @@ def balance_money_progression(world):
                    'TR Rupees': 270, 'PoD Dark Basement': 270}
     acceptable_balancers = ['Bombs (3)', 'Arrows (10)', 'Bombs (10)']
 
+    base_value = sum(rupee_rooms.values())
+    available_money = {player: base_value for player in range(1, world.players+1)}
+    for loc in world.get_locations():
+        if loc.item.name in rupee_chart:
+            available_money[loc.item.player] += rupee_chart[loc.item.name]
+
+    total_price = {player: 0 for player in range(1, world.players+1)}
+    for player in range(1, world.players+1):
+        for shop, loc_list in shop_to_location_table.items():
+            for loc in loc_list:
+                loc = world.get_location(loc, player)
+                slot = shop_to_location_table[loc.parent_region.name].index(loc.name)
+                shop = loc.parent_region.shop
+                shop_item = shop.inventory[slot]
+                if shop_item:
+                    total_price[player] += shop_item['price']
+        total_price[player] += 110 + sum(pay_for_locations.values())
+    # base needed: 830
+    # base available: 765
+
+    for player in range(1, world.players+1):
+        logger.debug(f'Money balance for P{player}: Needed: {total_price[player]} Available: {available_money[player]}')
+
+
     def get_sphere_locations(sphere_state, locations):
         sphere_state.sweep_for_events(key_only=True, locations=locations)
         return [loc for loc in locations if sphere_state.can_reach(loc) and sphere_state.not_flooding_a_key(sphere_state.world, loc)]
@@ -580,9 +604,15 @@ def balance_money_progression(world):
                 shop = location.parent_region.shop
                 shop_item = shop.inventory[slot]
                 if interesting_item(location, location.item, world, location.item.player):
-                    sphere_costs[loc_player] += shop_item['price']
-                    location_free = False
-                    locked_by_money[loc_player].add(location)
+                    if location.item.name.startswith('Rupee') and loc_player == location.item.player:
+                        if shop_item['price'] < rupee_chart[location.item.name]:
+                            wallet[loc_player] -= shop_item['price']  # will get picked up in the location_free block
+                        else:
+                            location_free = False
+                    else:
+                        location_free = False
+                        sphere_costs[loc_player] += shop_item['price']
+                        locked_by_money[loc_player].add(location)
             elif location.name in pay_for_locations:
                 sphere_costs[loc_player] += pay_for_locations[location.name]
                 location_free = False
