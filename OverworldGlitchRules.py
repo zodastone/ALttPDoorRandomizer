@@ -212,9 +212,9 @@ def get_mirror_offset_spots_lw(player):
     yield ('Death Mountain Offset Mirror (Houlihan Exit)', 'Death Mountain', 'Hyrule Castle Ledge', lambda state: state.has_Mirror(player) and state.can_boots_clip_dw(player) and state.has_Pearl(player))
 
 
-def no_logic_rules(world, player):
+def create_owg_connections(world, player):
     """
-    Add OWG transitions to no logic player's world
+    Add OWG transitions to player's world without logic
     """
     create_no_logic_connections(player, world, get_boots_clip_exits_lw(world.mode == 'inverted'))
     create_no_logic_connections(player, world, get_boots_clip_exits_dw(world.mode == 'inverted'))
@@ -231,23 +231,22 @@ def no_logic_rules(world, player):
 
 
 def overworld_glitches_rules(world, player):
-
     # Boots-accessible locations.
-    create_owg_connections(player, world, get_boots_clip_exits_lw(world.mode == 'inverted'), lambda state: state.can_boots_clip_lw(player))
-    create_owg_connections(player, world, get_boots_clip_exits_dw(world.mode == 'inverted'), lambda state: state.can_boots_clip_dw(player))
+    set_owg_rules(player, world, get_boots_clip_exits_lw(world.mode == 'inverted'), lambda state: state.can_boots_clip_lw(player))
+    set_owg_rules(player, world, get_boots_clip_exits_dw(world.mode == 'inverted'), lambda state: state.can_boots_clip_dw(player))
 
     # Glitched speed drops.
-    create_owg_connections(player, world, get_glitched_speed_drops_dw(world.mode == 'inverted'), lambda state: state.can_get_glitched_speed_dw(player))
+    set_owg_rules(player, world, get_glitched_speed_drops_dw(world.mode == 'inverted'), lambda state: state.can_get_glitched_speed_dw(player))
     # Dark Death Mountain Ledge Clip Spot also accessible with mirror.
     if world.mode != 'inverted':
         add_alternate_rule(world.get_entrance('Dark Death Mountain Ledge Clip Spot', player), lambda state: state.has_Mirror(player))
 
     # Mirror clip spots.
     if world.mode != 'inverted':
-        create_owg_connections(player, world, get_mirror_clip_spots_dw(), lambda state: state.has_Mirror(player))
-        create_owg_connections(player, world, get_mirror_offset_spots_dw(), lambda state: state.has_Mirror(player) and state.can_boots_clip_lw(player))
+        set_owg_rules(player, world, get_mirror_clip_spots_dw(), lambda state: state.has_Mirror(player))
+        set_owg_rules(player, world, get_mirror_offset_spots_dw(), lambda state: state.has_Mirror(player) and state.can_boots_clip_lw(player))
     else:
-        create_owg_connections(player, world, get_mirror_offset_spots_lw(player), lambda state: state.has_Mirror(player) and state.can_boots_clip_dw(player))
+        set_owg_rules(player, world, get_mirror_offset_spots_lw(player), lambda state: state.has_Mirror(player) and state.can_boots_clip_dw(player))
 
     # Regions that require the boots and some other stuff.
     if world.mode != 'inverted':
@@ -277,12 +276,9 @@ def create_no_logic_connections(player, world, connections):
         parent.exits.append(connection)
         connection.connect(target)
 
-def create_owg_connections(player, world, connections, default_rule):
+
+def set_owg_rules(player, world, connections, default_rule):
     for entrance, parent_region, target_region, *rule_override in connections:
-        parent = world.get_region(parent_region, player)
-        target = world.get_region(target_region, player)
-        connection = Entrance(player, entrance, parent)
-        parent.exits.append(connection)
-        connection.connect(target)
+        connection = world.get_entrance(entrance, player)
         rule = rule_override[0] if len(rule_override) > 0 else default_rule
         connection.access_rule = rule

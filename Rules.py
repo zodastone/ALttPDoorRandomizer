@@ -5,14 +5,13 @@ from collections import deque
 import OverworldGlitchRules
 from BaseClasses import CollectionState, RegionType, DoorType, Entrance, CrystalBarrier
 from RoomData import DoorKind
-from OverworldGlitchRules import overworld_glitches_rules, no_logic_rules
+from OverworldGlitchRules import overworld_glitches_rules
 
 
 def set_rules(world, player):
 
     if world.logic[player] == 'nologic':
         logging.getLogger('').info('WARNING! Seeds generated under this logic often require major glitches and may be impossible!')
-        no_logic_rules(world, player)
         world.get_region('Menu', player).can_reach_private = lambda state: True
         for exit in world.get_region('Menu', player).exits:
             exit.hide_path = True
@@ -36,6 +35,8 @@ def set_rules(world, player):
         no_glitches_rules(world, player)
     elif world.logic[player] == 'minorglitches':
         logging.getLogger('').info('Minor Glitches may be buggy still. No guarantee for proper logic checks.')
+        no_glitches_rules(world, player)
+        fake_flipper_rules(world, player)
     elif world.logic[player] == 'owglitches':
         logging.getLogger('').info('There is a chance OWG has bugged edge case rulesets, especially in inverted. Definitely file a report on GitHub if you see anything strange.')
         # Initially setting no_glitches_rules to set the baseline rules for some

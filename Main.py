@@ -11,6 +11,7 @@ import zlib
 from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance, Settings
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
+from OverworldGlitchRules import create_owg_connections
 from PotShuffle import shuffle_pots
 from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions, adjust_locations
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
@@ -123,6 +124,8 @@ def main(args, seed=None, fish=None):
             create_regions(world, player)
         else:
             create_inverted_regions(world, player)
+        if world.logic[player] in ('owglitches', 'nologic'):
+            create_owg_connections(world, player)
         create_dungeon_regions(world, player)
         create_shops(world, player)
         create_doors(world, player)
@@ -419,6 +422,8 @@ def copy_world(world):
         create_shops(ret, player)
         create_rooms(ret, player)
         create_dungeons(ret, player)
+        if world.logic[player] in ('owglitches', 'nologic'):
+            create_owg_connections(ret, player)
 
     copy_dynamic_regions_and_locations(world, ret)
     for player in range(1, world.players + 1):
