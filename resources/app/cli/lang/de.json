@@ -1,6 +1,6 @@
 {
   "cli": {
-    "app.title": "ALttP Tür Randomisier Version %s - Nummer: %d",
+    "app.title": "ALttP Tür Randomisier Version %s - Nummer: %d, Code: %s",
     "shuffling.world": "Welt wird durchmischt.",
     "generating.itempool": "Generier Gegenstandsbasis.",
     "calc.access.rules": "Berechne Zugriffsregeln.",

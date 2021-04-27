@@ -94,7 +94,8 @@ def main(args, seed=None, fish=None):
     logger.info(
       world.fish.translate("cli","cli","app.title") + "\n",
       __version__,
-      world.seed
+      world.seed,
+      Settings.make_code(world, 1) if world.players == 1 else ''
     )
 
     parsed_names = parse_player_names(args.names, world.players, args.teams)
@@ -419,6 +420,8 @@ def copy_world(world):
         copied_region.is_dark_world = region.is_dark_world
         copied_region.dungeon = region.dungeon
         copied_region.locations = [copied_locations[(location.name, location.player)] for location in region.locations]
+        for location in copied_region.locations:
+            location.parent_region = copied_region
         for entrance in region.entrances:
             ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
 
