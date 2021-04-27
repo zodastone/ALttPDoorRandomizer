@@ -128,5 +128,6 @@ class TestDungeons(TestVanillaOWG):
             ["Ganons Tower - Hope Room - Left", False, ['Moon Pearl', 'Crystal 1']],
             ["Ganons Tower - Hope Room - Left", False, ['Pegasus Boots', 'Crystal 1']],
             ["Ganons Tower - Hope Room - Left", True, ['Moon Pearl', 'Pegasus Boots']],
-            ["Ganons Tower - Hope Room - Left", True, ['Pegasus Boots', 'Hammer', 'Crystal 1', 'Crystal 2', 'Crystal 3', 'Crystal 4', 'Crystal 5', 'Crystal 6', 'Crystal 7']],
+            #todo: more advanced bunny revive logic
+            #["Ganons Tower - Hope Room - Left", True, ['Pegasus Boots', 'Hammer', 'Crystal 1', 'Crystal 2', 'Crystal 3', 'Crystal 4', 'Crystal 5', 'Crystal 6', 'Crystal 7']],
         ])

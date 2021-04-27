@@ -211,10 +211,10 @@ class TestInvertedDeathMountain(TestInverted):
             ["Spike Cave", False, [], ['Cape', 'Cane of Byrna']],
             ["Spike Cave", False, [], ['Cane of Byrna', 'AnyBottle', 'Magic Upgrade (1/2)']],
             ["Spike Cave", False, [], ['AnyBottle', 'Magic Upgrade (1/2)', 'Pegasus Boots', 'Boss Heart Container', 'Piece of Heart', 'Sanctuary Heart Container']],
-            ["Spike Cave", False, ['Bottle', 'Hammer', 'Progressive Glove', 'Lamp', 'Cape']],
+            ["Spike Cave", True, ['Bottle', 'Hammer', 'Progressive Glove', 'Lamp', 'Cape']],  # blue potion added to dark world
             ["Spike Cave", True, ['Bottle', 'Hammer', 'Progressive Glove', 'Lamp', 'Moon Pearl', 'Cape']],
             ["Spike Cave", True, ['Bottle', 'Hammer', 'Progressive Glove', 'Ocarina', 'Moon Pearl', 'Cape']],
-            ["Spike Cave", False, ['Bottle', 'Hammer', 'Progressive Glove', 'Lamp', 'Cane of Byrna']],
+            ["Spike Cave", True, ['Bottle', 'Hammer', 'Progressive Glove', 'Lamp', 'Cane of Byrna']],  # blue potion added to dark world
             ["Spike Cave", True, ['Bottle', 'Hammer', 'Progressive Glove', 'Lamp', 'Moon Pearl', 'Cane of Byrna']],
             ["Spike Cave", True, ['Bottle', 'Hammer', 'Progressive Glove', 'Ocarina', 'Moon Pearl', 'Cane of Byrna']],
             ["Spike Cave", True, ['Magic Upgrade (1/2)', 'Hammer', 'Progressive Glove', 'Lamp', 'Cape']],

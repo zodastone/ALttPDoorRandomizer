@@ -216,14 +216,14 @@ def create_owg_connections(world, player):
     """
     Add OWG transitions to player's world without logic
     """
-    create_no_logic_connections(player, world, get_boots_clip_exits_lw(world.mode == 'inverted'))
-    create_no_logic_connections(player, world, get_boots_clip_exits_dw(world.mode == 'inverted'))
+    create_no_logic_connections(player, world, get_boots_clip_exits_lw(world.mode[player] == 'inverted'))
+    create_no_logic_connections(player, world, get_boots_clip_exits_dw(world.mode[player] == 'inverted'))
 
     # Glitched speed drops.
-    create_no_logic_connections(player, world, get_glitched_speed_drops_dw(world.mode == 'inverted'))
+    create_no_logic_connections(player, world, get_glitched_speed_drops_dw(world.mode[player] == 'inverted'))
 
     # Mirror clip spots.
-    if world.mode != 'inverted':
+    if world.mode[player] != 'inverted':
         create_no_logic_connections(player, world, get_mirror_clip_spots_dw())
         create_no_logic_connections(player, world, get_mirror_offset_spots_dw())
     else:
@@ -232,24 +232,24 @@ def create_owg_connections(world, player):
 
 def overworld_glitches_rules(world, player):
     # Boots-accessible locations.
-    set_owg_rules(player, world, get_boots_clip_exits_lw(world.mode == 'inverted'), lambda state: state.can_boots_clip_lw(player))
-    set_owg_rules(player, world, get_boots_clip_exits_dw(world.mode == 'inverted'), lambda state: state.can_boots_clip_dw(player))
+    set_owg_rules(player, world, get_boots_clip_exits_lw(world.mode[player] == 'inverted'), lambda state: state.can_boots_clip_lw(player))
+    set_owg_rules(player, world, get_boots_clip_exits_dw(world.mode[player] == 'inverted'), lambda state: state.can_boots_clip_dw(player))
 
     # Glitched speed drops.
-    set_owg_rules(player, world, get_glitched_speed_drops_dw(world.mode == 'inverted'), lambda state: state.can_get_glitched_speed_dw(player))
+    set_owg_rules(player, world, get_glitched_speed_drops_dw(world.mode[player] == 'inverted'), lambda state: state.can_get_glitched_speed_dw(player))
     # Dark Death Mountain Ledge Clip Spot also accessible with mirror.
-    if world.mode != 'inverted':
+    if world.mode[player] != 'inverted':
         add_alternate_rule(world.get_entrance('Dark Death Mountain Ledge Clip Spot', player), lambda state: state.has_Mirror(player))
 
     # Mirror clip spots.
-    if world.mode != 'inverted':
+    if world.mode[player] != 'inverted':
         set_owg_rules(player, world, get_mirror_clip_spots_dw(), lambda state: state.has_Mirror(player))
         set_owg_rules(player, world, get_mirror_offset_spots_dw(), lambda state: state.has_Mirror(player) and state.can_boots_clip_lw(player))
     else:
         set_owg_rules(player, world, get_mirror_offset_spots_lw(player), lambda state: state.has_Mirror(player) and state.can_boots_clip_dw(player))
 
     # Regions that require the boots and some other stuff.
-    if world.mode != 'inverted':
+    if world.mode[player] != 'inverted':
         world.get_entrance('Turtle Rock Teleporter', player).access_rule = lambda state: (state.can_boots_clip_lw(player) or state.can_lift_heavy_rocks(player)) and state.has('Hammer', player)
         add_alternate_rule(world.get_entrance('Waterfall of Wishing', player), lambda state: state.has('Moon Pearl', player) or state.has_Boots(player))
     else:
