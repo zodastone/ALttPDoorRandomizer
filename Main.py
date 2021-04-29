@@ -338,32 +338,6 @@ def main(args, seed=None, fish=None):
     return world
 
 
-def copy_dynamic_regions_and_locations(world, ret):
-    for region in world.dynamic_regions:
-        new_reg = Region(region.name, region.type, region.hint_text, region.player)
-        new_reg.world = ret
-        ret.regions.append(new_reg)
-        ret.dynamic_regions.append(new_reg)
-
-        # Note: ideally exits should be copied here, but the current use case (Take anys) do not require this
-
-        if region.shop:
-            new_reg.shop = Shop(new_reg, region.shop.room_id, region.shop.type, region.shop.shopkeeper_config, region.shop.replaceable)
-            ret.shops.append(new_reg.shop)
-
-    for location in world.dynamic_locations:
-        new_reg = ret.get_region(location.parent_region.name, location.parent_region.player)
-        new_loc = Location(location.player, location.name, location.address, location.crystal, location.hint_text, new_reg)
-        # todo: this is potentially dangerous. later refactor so we
-        # can apply dynamic region rules on top of copied world like other rules
-        new_loc.access_rule = location.access_rule
-        new_loc.always_allow = location.always_allow
-        new_loc.item_rule = location.item_rule
-        new_reg.locations.append(new_loc)
-    
-        ret.clear_location_cache()
-
-
 def copy_world(world):
     # ToDo: Not good yet
     ret = World(world.players, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
@@ -411,7 +385,6 @@ def copy_world(world):
     ret.keydropshuffle = world.keydropshuffle.copy()
     ret.mixed_travel = world.mixed_travel.copy()
     ret.standardize_palettes = world.standardize_palettes.copy()
-    ret.boss_shuffle = world.boss_shuffle
 
     for player in range(1, world.players + 1):
         if world.mode[player] != 'inverted':
@@ -464,7 +437,6 @@ def copy_world(world):
             item = Item(location.item.name, location.item.advancement, location.item.priority, location.item.type, player=location.item.player)
             new_location.item = item
             item.location = new_location
-            item.world = ret
             item.world = ret
         if location.event:
             new_location.event = True

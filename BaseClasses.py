@@ -65,8 +65,6 @@ class World(object):
         self.custom = custom
         self.customitemarray = customitemarray
         self.can_take_damage = True
-        self.hints = hints
-
         self.hints = hints.copy()
         self.dynamic_regions = []
         self.dynamic_locations = []
