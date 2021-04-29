@@ -541,6 +541,7 @@ def create_playthrough(world):
 
     # get locations containing progress items
     prog_locations = [location for location in world.get_filled_locations() if location.item.advancement]
+    optional_locations = ['Trench 1 Switch', 'Trench 2 Switch', 'Ice Block Drop']
     state_cache = [None]
     collection_spheres = []
     state = CollectionState(world)
@@ -566,7 +567,7 @@ def create_playthrough(world):
         logging.getLogger('').debug(world.fish.translate("cli", "cli", "building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations))
         if not sphere:
             logging.getLogger('').error(world.fish.translate("cli", "cli", "cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
-            if any([world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
+            if any([location.name not in optional_locations and world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
                 raise RuntimeError(world.fish.translate("cli", "cli", "cannot.reach.progression"))
             else:
                 old_world.spoiler.unreachables = sphere_candidates.copy()
