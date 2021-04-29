@@ -1958,7 +1958,7 @@ def connect_mandatory_exits(world, entrances, caves, must_be_exits, player):
     # Handle inverted Aga Tower - if it depends on connections, then so does Hyrule Castle Ledge
     if world.mode[player] == 'inverted':
         for entrance in invalid_connections:
-            if world.get_entrance(entrance, player).connected_region == world.get_region('Inverted Agahnims Tower', player):
+            if world.get_entrance(entrance, player).connected_region == world.get_region('Agahnims Tower Portal', player):
                 for exit in invalid_connections[entrance]:
                     invalid_connections[exit] = invalid_connections[exit].union({'Inverted Ganons Tower', 'Hyrule Castle Entrance (West)', 'Hyrule Castle Entrance (East)'})
                 break
