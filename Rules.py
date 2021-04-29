@@ -78,6 +78,8 @@ def mirrorless_path_to_castle_courtyard(world, player):
     # If Agahnim is defeated then the courtyard needs to be accessible without using the mirror for the mirror offset glitch.
     # Only considering the secret passage for now (in non-insanity shuffle).  Basically, if it's Ganon you need the master sword.
     start = world.get_entrance('Hyrule Castle Secret Entrance Drop', player)
+    if start.connected_region == world.get_region('Sewer Drop', player):
+        return [lambda state: False]  # not handling dungeons for now
     target = world.get_region('Hyrule Castle Courtyard', player)
     seen = {start.parent_region, start.connected_region}
     queue = collections.deque([(start.connected_region, [])])
@@ -1538,7 +1540,7 @@ def set_bunny_rules(world, player, inverted):
                                 possible_options.append(path_to_access_rule(new_path + [lambda state: state.has_Mirror(player) and state.has_sword(player)], entrance))
                             elif region.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_regions():
                                 possible_options.append(path_to_access_rule(new_path + [lambda state: state.has_Mirror(player) and state.has_Boots(player)], entrance))
-                            elif location.name in OverworldGlitchRules.get_superbunny_accessible_locations():
+                            elif location and location.name in OverworldGlitchRules.get_superbunny_accessible_locations():
                                 if location.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_locations():
                                     possible_options.append(path_to_access_rule(new_path + [lambda state: state.has_Mirror(player) and state.has_Boots(player)], entrance))
                                 elif region.name == 'Kakariko Well (top)':
@@ -1546,7 +1548,7 @@ def set_bunny_rules(world, player, inverted):
                                 else:
                                     possible_options.append(path_to_access_rule(new_path + [lambda state: state.has_Mirror(player)], entrance))
                             continue
-                        elif region.name == 'Superbunny Cave (Top)' and new_region.name == 'Superbunny Cave (Bottom)' and location.name in OverworldGlitchRules.get_superbunny_accessible_locations():
+                        elif region.name == 'Superbunny Cave (Top)' and new_region.name == 'Superbunny Cave (Bottom)' and location and location.name in OverworldGlitchRules.get_superbunny_accessible_locations():
                             possible_options.append(path_to_access_rule(new_path, entrance))
                     else:
                         continue
