@@ -555,7 +555,7 @@ def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allo
     if not dead_end_allowed:
         ret = [x for x in ret if not x.deadEnd]
     if standard:
-        ret = [x for x in ret if not x.standard_restrict]
+        ret = [x for x in ret if not x.standard_restricted]
     return ret
 
 
