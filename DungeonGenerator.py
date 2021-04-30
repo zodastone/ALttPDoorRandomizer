@@ -1249,7 +1249,6 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player,
                 for r_name in ['Hyrule Dungeon Cellblock', 'Sanctuary']:  # need to deliver zelda
                     assign_sector(find_sector(r_name, candidate_sectors), current_dungeon,
                                   candidate_sectors, global_pole)
-                standard_stair_check(dungeon_map, current_dungeon, candidate_sectors, global_pole)
         entrances_map, potentials, connections = connections_tuple
         accessible_sectors, reverse_d_map = set(), {}
         for key in dungeon_entrances.keys():
@@ -1265,6 +1264,9 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player,
                     if not sector:
                         sector = find_sector(r_name, all_sectors)
                     reverse_d_map[sector] = key
+        if world.mode[player] == 'standard':
+            current_dungeon = dungeon_map['Hyrule Castle']
+            standard_stair_check(world, dungeon_map, current_dungeon, candidate_sectors, global_pole)
 
         complete_dungeons = {x: y for x, y in dungeon_map.items() if sum(len(sector.outstanding_doors) for sector in y.sectors) <= 0}
         [dungeon_map.pop(key) for key in complete_dungeons.keys()]
