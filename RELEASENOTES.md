@@ -152,6 +152,7 @@ New item counter modified to show total
 
 * 0.3.1.9-u
 	* Generation improvements for standard
+	* Removed link sprite from repo
 * 0.3.1.8-u
 	* Fix for retro generation
 	* Shopsanity - rebalance pricing - later prices can be are higher
