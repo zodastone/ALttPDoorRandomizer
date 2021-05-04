@@ -148,6 +148,13 @@ See the example yaml file for demonstrated usage.
 
 New item counter modified to show total
 
+## Volatile Notes
+
+* Mystery yaml parser updated to a package maintained version (Thanks StructuralMike)
+* Bomb-logic and extend crystal switch logic (Thanks StructuralMike)
+* Fixed logic for moved locations in playthrough (Thanks compiling)
+* OWG Glitch logic (Thanks qadan, cheuer, & compiling)
+
 # Bug Fixes and Notes.
 
 * 0.3.1.9-u

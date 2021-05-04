@@ -86,7 +86,7 @@ def get_weights(path):
         if urllib.parse.urlparse(path).scheme:
             return yaml.load(urllib.request.urlopen(path), Loader=yaml.FullLoader)
         with open(path, 'r', encoding='utf-8') as f:
-            return yaml.load(f, Loader=yaml.FullLoader)
+            return yaml.load(f, Loader=yaml.SafeLoader)
     except Exception as e:
         raise Exception(f'Failed to read weights file: {e}')
 
