@@ -19,6 +19,7 @@
       "options": [
         "noglitches",
         "minorglitches",
+        "owglitches",
         "nologic"
       ]
     },

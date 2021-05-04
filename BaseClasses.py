@@ -109,7 +109,7 @@ class World(object):
             set_player_attr('can_access_trock_front', None)
             set_player_attr('can_access_trock_big_chest', None)
             set_player_attr('can_access_trock_middle', None)
-            set_player_attr('fix_fake_world', True)
+            set_player_attr('fix_fake_world', logic[player] not in ['owglitches', 'nologic'] or shuffle[player] in ['crossed', 'insanity', 'madness_legacy'])
             set_player_attr('mapshuffle', False)
             set_player_attr('compassshuffle', False)
             set_player_attr('keyshuffle', False)
@@ -751,6 +751,31 @@ class CollectionState(object):
 
     def has_turtle_rock_medallion(self, player):
         return self.has(self.world.required_medallions[player][1], player)
+
+    def can_boots_clip_lw(self, player):
+        if self.world.mode[player] == 'inverted':
+            return self.has_Boots(player) and self.has_Pearl(player)
+        return self.has_Boots(player)
+
+    def can_boots_clip_dw(self, player):
+        if self.world.mode[player] != 'inverted':
+            return self.has_Boots(player) and self.has_Pearl(player)
+        return self.has_Boots(player)
+
+    def can_get_glitched_speed_lw(self, player):
+        rules = [self.has_Boots(player), any([self.has('Hookshot', player), self.has_sword(player)])]
+        if self.world.mode[player] == 'inverted':
+            rules.append(self.has_Pearl(player))
+        return all(rules)
+
+    def can_get_glitched_speed_dw(self, player):
+        rules = [self.has_Boots(player), any([self.has('Hookshot', player), self.has_sword(player)])]
+        if self.world.mode[player] != 'inverted':
+            rules.append(self.has_Pearl(player))
+        return all(rules)
+
+    def can_superbunny_mirror_with_sword(self, player):
+        return self.has_Mirror(player) and self.has_sword(player)
 
     def collect(self, item, event=False, location=None):
         if location:
@@ -2189,7 +2214,7 @@ er_mode = {"vanilla": 0, "simple": 1, "restricted": 2, "full": 3, "crossed": 4, 
            "full_legacy": 9, "madness_legacy": 10, "insanity_legacy": 11, "dungeonsfull": 7, "dungeonssimple": 6}
 
 # byte 1: LLLW WSSR (logic, mode, sword, retro)
-logic_mode = {"noglitches": 0, "minorglitches": 1, "nologic": 2, "owg": 3, "majorglitches": 4}
+logic_mode = {"noglitches": 0, "minorglitches": 1, "nologic": 2, "owglitches": 3, "majorglitches": 4}
 world_mode = {"open": 0, "standard": 1, "inverted": 2}
 sword_mode = {"random": 0,  "assured": 1, "swordless": 2, "vanilla": 3}
 

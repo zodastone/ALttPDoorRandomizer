@@ -1,8 +1,11 @@
+import collections
 import logging
 from collections import deque
 
+import OverworldGlitchRules
 from BaseClasses import CollectionState, RegionType, DoorType, Entrance, CrystalBarrier
 from RoomData import DoorKind
+from OverworldGlitchRules import overworld_glitches_rules
 
 
 def set_rules(world, player):
@@ -32,6 +35,15 @@ def set_rules(world, player):
         no_glitches_rules(world, player)
     elif world.logic[player] == 'minorglitches':
         logging.getLogger('').info('Minor Glitches may be buggy still. No guarantee for proper logic checks.')
+        no_glitches_rules(world, player)
+        fake_flipper_rules(world, player)
+    elif world.logic[player] == 'owglitches':
+        logging.getLogger('').info('There is a chance OWG has bugged edge case rulesets, especially in inverted. Definitely file a report on GitHub if you see anything strange.')
+        # Initially setting no_glitches_rules to set the baseline rules for some
+        # entrances. The overworld_glitches_rules set is primarily additive.
+        no_glitches_rules(world, player)
+        fake_flipper_rules(world, player)
+        overworld_glitches_rules(world, player)
     else:
         raise NotImplementedError('Not implemented yet')
 
@@ -46,6 +58,9 @@ def set_rules(world, player):
 
     if world.mode[player] != 'inverted':
         set_big_bomb_rules(world, player)
+        if world.logic[player] == 'owglitches' and world.shuffle[player] not in ('insanity', 'insanity_legacy'):
+            path_to_courtyard = mirrorless_path_to_castle_courtyard(world, player)
+            add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.world.get_entrance('Dark Death Mountain Offset Mirror', player).can_reach(state) and all(rule(state) for rule in path_to_courtyard), 'or')
     else:
         set_inverted_big_bomb_rules(world, player)
 
@@ -53,10 +68,30 @@ def set_rules(world, player):
     if not world.swamp_patch_required[player]:
         add_rule(world.get_entrance('Swamp Lobby Moat', player), lambda state: state.has_Mirror(player))
 
-    if world.mode[player] != 'inverted':
-        set_bunny_rules(world, player)
-    else:
-        set_inverted_bunny_rules(world, player)
+    set_bunny_rules(world, player, world.mode[player] == 'inverted')
+
+    if world.mode[player] != 'inverted' and world.logic[player] == 'owglitches':
+        add_rule(world.get_entrance('Ganons Tower', player), lambda state: state.world.get_entrance('Ganons Tower Ascent', player).can_reach(state), 'or')
+
+
+def mirrorless_path_to_castle_courtyard(world, player):
+    # If Agahnim is defeated then the courtyard needs to be accessible without using the mirror for the mirror offset glitch.
+    # Only considering the secret passage for now (in non-insanity shuffle).  Basically, if it's Ganon you need the master sword.
+    start = world.get_entrance('Hyrule Castle Secret Entrance Drop', player)
+    if start.connected_region == world.get_region('Sewer Drop', player):
+        return [lambda state: False]  # not handling dungeons for now
+    target = world.get_region('Hyrule Castle Courtyard', player)
+    seen = {start.parent_region, start.connected_region}
+    queue = collections.deque([(start.connected_region, [])])
+    while queue:
+        (current, path) = queue.popleft()
+        for entrance in current.exits:
+            if entrance.connected_region not in seen:
+                new_path = path + [entrance.access_rule]
+                if entrance.connected_region == target:
+                    return new_path
+                else:
+                    queue.append((entrance.connected_region, new_path))
 
 def set_rule(spot, rule):
     spot.access_rule = rule
@@ -448,7 +483,8 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Turtle Rock Teleporter', player), lambda state: state.can_lift_heavy_rocks(player) and state.has('Hammer', player))
     set_rule(world.get_entrance('East Death Mountain (Top)', player), lambda state: state.has('Hammer', player))
 
-    set_rule(world.get_location('Catfish', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Catfish Exit Rock', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Catfish Entrance Rock', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Northeast Dark World Broken Bridge Pass', player), lambda state: state.has_Pearl(player) and (state.can_lift_rocks(player) or state.has('Hammer', player) or state.has('Flippers', player)))
     set_rule(world.get_entrance('East Dark World Broken Bridge Pass', player), lambda state: state.has_Pearl(player) and (state.can_lift_rocks(player) or state.has('Hammer', player)))
     set_rule(world.get_entrance('South Dark World Bridge', player), lambda state: state.has('Hammer', player) and state.has_Pearl(player))
@@ -458,7 +494,7 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Hyrule Castle Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Hyrule Castle Main Gate', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: (state.has_Pearl(player) and state.has('Flippers', player) or state.has_Mirror(player)))  # Overworld Bunny Revival
-    set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player) and state.has_Mirror(player))
+    set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
     set_rule(world.get_entrance('Dark Lake Hylia Drop (South)', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # ToDo any fake flipper set up?
     set_rule(world.get_entrance('Dark Lake Hylia Ledge Fairy', player), lambda state: state.has_Pearl(player)) # bomb required
     set_rule(world.get_entrance('Dark Lake Hylia Ledge Spike Cave', player), lambda state: state.can_lift_rocks(player) and state.has_Pearl(player))
@@ -471,6 +507,7 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Skull Woods Second Section Hole', player), lambda state: state.has_Pearl(player)) # bunny cannot lift bush
     set_rule(world.get_entrance('Maze Race Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Cave 45 Mirror Spot', player), lambda state: state.has_Mirror(player))
+    set_rule(world.get_entrance('Bombos Tablet Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('East Dark World Bridge', player), lambda state: state.has_Pearl(player) and state.has('Hammer', player))
     set_rule(world.get_entrance('Lake Hylia Island Mirror Spot', player), lambda state: state.has_Pearl(player) and state.has_Mirror(player) and state.has('Flippers', player))
     set_rule(world.get_entrance('Lake Hylia Central Island Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -502,13 +539,10 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Spiral Cave Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Fairy Ascension Mirror Spot', player), lambda state: state.has_Mirror(player) and state.has_Pearl(player))  # need to lift flowers
     set_rule(world.get_entrance('Isolated Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-    set_rule(world.get_entrance('Superbunny Cave Exit (Bottom)', player), lambda state: False)  # Cannot get to bottom exit from top. Just exists for shuffling
     set_rule(world.get_entrance('Floating Island Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_Pearl(player) and state.has_sword(player) and state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock (Top)', 'Region', player))  # sword required to cast magic (!)
 
     set_rule(world.get_entrance('Pyramid Hole', player), lambda state: state.has('Beat Agahnim 2', player) or world.open_pyramid[player])
-    set_rule(world.get_entrance('Ganons Tower', player), lambda state: False) # This is a safety for the TR function below to not require GT entrance in its key logic.
-
     if world.swords[player] == 'swordless':
         swordless_rules(world, player)
 
@@ -523,10 +557,11 @@ def inverted_rules(world, player):
     set_rule(world.get_location('Ice Rod Cave', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_location('Maze Race', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Mini Moldorm Cave', player), lambda state: state.has_Pearl(player))
+    set_rule(world.get_entrance('Ice Rod Cave', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Light Hype Fairy', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Potion Shop Pier', player), lambda state: state.has('Flippers', player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Light World Pier', player), lambda state: state.has('Flippers', player) and state.has_Pearl(player))
-    set_rule(world.get_entrance('Kings Grave', player), lambda state: state.has_Boots(player) and state.can_lift_heavy_rocks(player) and state.has_Pearl(player))
+    set_rule(world.get_entrance('Kings Grave', player), lambda state: state.has_Boots(player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Kings Grave Outer Rocks', player), lambda state: state.can_lift_heavy_rocks(player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Kings Grave Inner Rocks', player), lambda state: state.can_lift_heavy_rocks(player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Potion Shop Inner Bushes', player), lambda state: state.has_Pearl(player))
@@ -537,7 +572,6 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Graveyard Cave Outer Bushes', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Secret Passage Inner Bushes', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Secret Passage Outer Bushes', player), lambda state: state.has_Pearl(player))
-    # Caution: If king's grave is releaxed at all to account for reaching it via a two way cave's exit in insanity mode, then the bomb shop logic will need to be updated (that would involve create a small ledge-like Region for it)
     set_rule(world.get_entrance('Bonk Fairy (Light)', player), lambda state: state.has_Boots(player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Bat Cave Drop Ledge', player), lambda state: state.has('Hammer', player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Lumberjack Tree Tree', player), lambda state: state.has_Boots(player) and state.has_Pearl(player) and state.has('Beat Agahnim 1', player))
@@ -557,7 +591,8 @@ def inverted_rules(world, player):
     set_rule(world.get_location('Flute Spot', player), lambda state: state.has('Shovel', player) and state.has_Pearl(player))
 
     set_rule(world.get_location('Zora\'s Ledge', player), lambda state: state.has('Flippers', player) and state.has_Pearl(player))
-    set_rule(world.get_entrance('Waterfall of Wishing', player), lambda state: state.has('Flippers', player) and state.has_Pearl(player))  # can be fake flippered into, but is in weird state inside that might prevent you from doing things. Can be improved in future Todo
+    set_rule(world.get_entrance('Waterfall of Wishing Cave', player), lambda state: state.has('Flippers', player) and state.has_Pearl(player))
+    set_rule(world.get_entrance('Northeast Light World Return', player), lambda state: state.has('Flippers', player) and state.has_Pearl(player))
     set_rule(world.get_location('Frog', player), lambda state: state.can_lift_heavy_rocks(player) and
                                                                (state.has_Pearl(player) or state.has('Beat Agahnim 1', player)) or (state.can_reach('Light World', 'Region', player)
                                                                                                                                     and state.has_Mirror(player)))  # Need LW access using Mirror or Portal
@@ -567,6 +602,7 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Bush Covered Lawn Outer Bushes', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Bomb Hut Inner Bushes', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Bomb Hut Outer Bushes', player), lambda state: state.has_Pearl(player))
+    set_rule(world.get_entrance('Light World Bomb Hut', player), lambda state: state.has_Pearl(player)) # need bomb
     set_rule(world.get_entrance('North Fairy Cave Drop', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Lost Woods Hideout Drop', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_location('Potion Shop', player), lambda state: state.has('Mushroom', player) and (state.can_reach('Potion Shop Area', 'Region', player)))  # new inverted region, need pearl for bushes or access to potion shop door/waterfall fairy
@@ -584,7 +620,7 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Dark Death Mountain Teleporter (East)', player), lambda state: state.can_lift_heavy_rocks(player) and state.has('Hammer', player) and state.has_Pearl(player))  # bunny cannot use hammer
     set_rule(world.get_entrance('East Death Mountain (Top)', player), lambda state: state.has('Hammer', player) and state.has_Pearl(player))  # bunny can not use hammer
 
-    set_rule(world.get_location('Catfish', player), lambda state: state.can_lift_rocks(player) or (state.has('Flippers', player) and state.has_Mirror(player) and state.has_Pearl(player) and state.can_reach('Light World', 'Region', player)))
+    set_rule(world.get_entrance('Catfish Entrance Rock', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Northeast Dark World Broken Bridge Pass', player), lambda state: ((state.can_lift_rocks(player) or state.has('Hammer', player)) or state.has('Flippers', player)))
     set_rule(world.get_entrance('East Dark World Broken Bridge Pass', player), lambda state: (state.can_lift_rocks(player) or state.has('Hammer', player)))
     set_rule(world.get_entrance('South Dark World Bridge', player), lambda state: state.has('Hammer', player))
@@ -595,7 +631,8 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Dark Lake Hylia Drop (South)', player), lambda state: state.has('Flippers', player))  # ToDo any fake flipper set up?
     set_rule(world.get_entrance('Dark Lake Hylia Ledge Pier', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Dark Lake Hylia Ledge Spike Cave', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has('Flippers', player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))  # Fake Flippers
+    set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has('Flippers', player))  # Fake Flippers
+    set_rule(world.get_entrance('Dark Lake Hylia Shallows', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Village of Outcasts Heavy Rock', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('East Dark World Bridge', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Lake Hylia Central Island Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -622,7 +659,6 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Dark Death Mountain Ledge Mirror Spot (East)', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Dark Death Mountain Ledge Mirror Spot (West)', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Laser Bridge Mirror Spot', player), lambda state: state.has_Mirror(player))
-    set_rule(world.get_entrance('Superbunny Cave Exit (Bottom)', player), lambda state: False)  # Cannot get to bottom exit from top. Just exists for shuffling
     set_rule(world.get_entrance('Floating Island Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_sword(player) and state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock (Top)', 'Region', player)) # sword required to cast magic (!)
 
@@ -634,7 +670,7 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('East Dark World Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('West Dark World Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('South Dark World Mirror Spot', player), lambda state: state.has_Mirror(player))
-    set_rule(world.get_entrance('Northeast Dark World Mirror Spot', player), lambda state: state.has_Mirror(player))
+    set_rule(world.get_entrance('Catfish Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Potion Shop Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Shopping Mall Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Maze Race Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -658,8 +694,6 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Hammer Peg Area Flute', player), lambda state: state.can_flute(player))
 
     set_rule(world.get_entrance('Inverted Pyramid Hole', player), lambda state: state.has('Beat Agahnim 2', player) or world.open_pyramid[player])
-    set_rule(world.get_entrance('Inverted Ganons Tower', player), lambda state: False) # This is a safety for the TR function below to not require GT entrance in its key logic.
-
     if world.swords[player] == 'swordless':
         swordless_rules(world, player)
 
@@ -694,19 +728,49 @@ def no_glitches_rules(world, player):
     # for location in DMs_room_chests:
     #     add_rule(world.get_location(location, player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: False)  # no glitches does not require block override
+    forbid_bomb_jump_requirements(world, player)
+    add_conditional_lamps(world, player)
+
+
+def fake_flipper_rules(world, player):
+    if world.mode[player] != 'inverted':
+        set_rule(world.get_entrance('Zoras River', player), lambda state: True)
+        set_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: True)
+        set_rule(world.get_entrance('Hobo Bridge', player), lambda state: True)
+        set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+        set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: state.has_Pearl(player))
+    else:
+        set_rule(world.get_entrance('Zoras River', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Lake Hylia Island Pier', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Lake Hylia Warp', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Northeast Light World Warp', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Hobo Bridge', player), lambda state: state.has_Pearl(player))
+        set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has('Flippers', player))
+        set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: True)
+        set_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: True)
+        set_rule(world.get_entrance('East Dark World Pier', player), lambda state: True)
+
+
+def forbid_bomb_jump_requirements(world, player):
+    DMs_room_chests = ['Ganons Tower - DMs Room - Top Left', 'Ganons Tower - DMs Room - Top Right', 'Ganons Tower - DMs Room - Bottom Left', 'Ganons Tower - DMs Room - Bottom Right']
+    for location in DMs_room_chests:
+        add_rule(world.get_location(location, player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Paradox Cave Bomb Jump', player), lambda state: False)
 
-    # Light cones in standard depend on which world we actually are in, not which one the location would normally be
-    # We add Lamp requirements only to those locations which lie in the dark world (or everything if open
-    DW_Entrances = ['Bumper Cave (Bottom)', 'Superbunny Cave (Top)', 'Superbunny Cave (Bottom)', 'Hookshot Cave', 'Bumper Cave (Top)', 'Hookshot Cave Back Entrance', 'Dark Death Mountain Ledge (East)',
-                    'Turtle Rock Isolated Ledge Entrance', 'Thieves Town', 'Skull Woods Final Section', 'Ice Palace', 'Misery Mire', 'Palace of Darkness', 'Swamp Palace', 'Turtle Rock', 'Dark Death Mountain Ledge (West)']
+# Light cones in standard depend on which world we actually are in, not which one the location would normally be
+# We add Lamp requirements only to those locations which lie in the dark world (or everything if open
+DW_Entrances = ['Bumper Cave (Bottom)', 'Superbunny Cave (Top)', 'Superbunny Cave (Bottom)', 'Hookshot Cave', 'Bumper Cave (Top)', 'Hookshot Cave Back Entrance', 'Dark Death Mountain Ledge (East)',
+                'Turtle Rock Isolated Ledge Entrance', 'Thieves Town', 'Skull Woods Final Section', 'Ice Palace', 'Misery Mire', 'Palace of Darkness', 'Swamp Palace', 'Turtle Rock', 'Dark Death Mountain Ledge (West)']
 
-    def check_is_dark_world(region):
-        for entrance in region.entrances:
-            if entrance.name in DW_Entrances:
-                return True
-        return False
+def check_is_dark_world(region):
+    for entrance in region.entrances:
+        if entrance.name in DW_Entrances:
+            return True
+    return False
 
+def add_conditional_lamps(world, player):
     def add_conditional_lamp(spot, region, spottype='Location'):
         if spottype == 'Location':
             spot = world.get_location(spot, player)
@@ -1361,6 +1425,9 @@ def set_inverted_big_bomb_rules(world, player):
     elif bombshop_entrance.name == 'Capacity Upgrade':
         # You must Mirror but then can use either Ice Palace return path.
         add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: (state.has('Flippers', player) or state.can_flute(player)) and state.has_Mirror(player))
+    elif bombshop_entrance.name == 'Two Brothers House (West)':
+        # First you must Mirror. Then you can either Flute, cross the peg bridge, or use the Agah 1 portal to Mirror again.
+        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: (state.can_flute(player) or state.has('Hammer', player) or state.has('Beat Agahnim 1', player)) and state.has_Mirror(player))
     elif bombshop_entrance.name in LW_inaccessible_entrances:
         # You can't get to the pyramid from these entrances without bomb duping.
         raise Exception('No valid path to open Pyramid Fairy. (Could not route from %s)' % bombshop_entrance.name)
@@ -1371,7 +1438,7 @@ def set_inverted_big_bomb_rules(world, player):
         raise Exception('No logic found for routing from %s to the pyramid.' % bombshop_entrance.name)
 
 
-def set_bunny_rules(world, player):
+def set_bunny_rules(world, player, inverted):
 
     # regions for the exits of multi-entrace caves/drops that bunny cannot pass
     # Note spiral cave may be technically passible, but it would be too absurd to require since OHKO mode is a thing.
@@ -1379,7 +1446,25 @@ def set_bunny_rules(world, player):
                               'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)']
     bunny_accessible_locations = ['Link\'s House', 'Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree',
                                   'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid',
-                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins']
+                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins',
+                                  'Spectacle Rock', 'Bombos Tablet', 'Ether Tablet', 'Purple Chest', 'Blacksmith',
+                                  'Missing Smith', 'Master Sword Pedestal', 'Bottle Merchant', 'Sunken Treasure', 'Desert Ledge',
+                                  'Kakariko Shop - Left', 'Kakariko Shop - Middle', 'Kakariko Shop - Right',
+                                  'Lake Hylia Shop - Left', 'Lake Hylia Shop - Middle', 'Lake Hylia Shop - Right',
+                                  'Potion Shop - Left', 'Potion Shop - Middle', 'Potion Shop - Right',
+                                  'Capacity Upgrade - Left', 'Capacity Upgrade - Right',
+                                  'Village of Outcasts Shop - Left', 'Village of Outcasts Shop - Middle', 'Village of Outcasts Shop - Right',
+                                  'Dark Lake Hylia Shop - Left', 'Dark Lake Hylia Shop - Middle', 'Dark Lake Hylia Shop - Right',
+                                  'Dark Death Mountain Shop - Left', 'Dark Death Mountain Shop - Middle', 'Dark Death Mountain Shop - Right',
+                                  'Dark Lumberjack Shop - Left', 'Dark Lumberjack Shop - Middle', 'Dark Lumberjack Shop - Right',
+                                  'Dark Potion Shop - Left', 'Dark Potion Shop - Middle', 'Dark Potion Shop - Right',
+                                  'Red Shield Shop - Left', 'Red Shield Shop - Middle', 'Red Shield Shop - Right',
+                                  'Old Man Sword Cave Item 1',
+                                  'Take - Any  # 1 Item 1', 'Take - Any  # 1 Item 2',
+                                  'Take - Any  # 2 Item 1', 'Take - Any  # 2 Item 2',
+                                  'Take - Any  # 3 Item 1', 'Take - Any  # 3 Item 2',
+                                  'Take - Any  # 4 Item 1', 'Take - Any  # 4 Item 2',
+                                  ]
 
     def path_to_access_rule(path, entrance):
         return lambda state: state.can_reach(entrance) and all(rule_func(state) for rule_func in path)
@@ -1387,9 +1472,30 @@ def set_bunny_rules(world, player):
     def options_to_access_rule(options):
         return lambda state: any(rule_func(state) for rule_func in options)
 
-    def get_rule_to_add(start_region):
-        if not start_region.is_light_world:
-            return lambda state: state.has_Pearl(player)
+    # Helper functions to determine if the moon pearl is required
+    def is_bunny(region):
+        if inverted:
+            return region.is_light_world
+        else:
+            return region.is_dark_world
+    def is_link(region):
+        if inverted:
+            return region.is_dark_world
+        else:
+            return region.is_light_world
+
+    def get_rule_to_add(region, location = None, connecting_entrance = None):
+        # In OWG, a location can potentially be superbunny-mirror accessible or
+        # bunny revival accessible.
+        if world.logic[player] == 'owglitches':
+            if region.type != RegionType.Dungeon \
+                    and (location is None or location.name not in OverworldGlitchRules.get_superbunny_accessible_locations()) \
+                    and not is_link(region):
+                return lambda state: state.has_Pearl(player)
+        else:
+            if not is_link(region):
+                return lambda state: state.has_Pearl(player)
+
         # in this case we are mixed region.
         # we collect possible options.
 
@@ -1401,144 +1507,139 @@ def set_bunny_rules(world, player):
         # for each such entrance a new option is added that consist of:
         #    a) being able to reach it, and
         #    b) being able to access all entrances from there to `region`
-        seen = {start_region}
-        queue = deque([(start_region, [])])
+        seen = {region}
+        queue = deque([(region, [])])
         while queue:
             (current, path) = queue.popleft()
             for entrance in current.entrances:
                 new_region = entrance.parent_region
-                if new_region in seen:
+                if new_region.type in (RegionType.Cave, RegionType.Dungeon) and new_region in seen:
                     continue
                 new_path = path + [entrance.access_rule]
                 seen.add(new_region)
-                if not new_region.is_light_world:
-                    continue  # we don't care about pure dark world entrances
-                if new_region.is_dark_world:
+                if not is_link(new_region):
+                    if world.logic[player] == 'owglitches':
+                        if region.type == RegionType.Dungeon and new_region.type != RegionType.Dungeon:
+                            if entrance.name in OverworldGlitchRules.get_invalid_mirror_bunny_entrances():
+                                continue
+                            if entrance.name in drop_dungeon_entrances:
+                                lobby = entrance.connected_region
+                            else:
+                                lobby = next(exit.connected_region for exit in current.exits if exit.connected_region.type == RegionType.Dungeon)
+                            if lobby.name in bunny_revivable_entrances:
+                                possible_options.append(path_to_access_rule(new_path, entrance))
+                            elif lobby.name in superbunny_revivable_entrances:
+                                possible_options.append(path_to_access_rule(new_path + [lambda state: state.has_Mirror(player)], entrance))
+                            elif lobby.name in superbunny_sword_revivable_entrances:
+                                possible_options.append(path_to_access_rule(new_path + [lambda state: state.has_Mirror(player) and state.has_sword(player)], entrance))
+                            continue
+                        elif region.type == RegionType.Cave and new_region.type != RegionType.Cave:
+                            if entrance.name in OverworldGlitchRules.get_invalid_mirror_bunny_entrances():
+                                continue
+                            if region.name in OverworldGlitchRules.get_sword_required_superbunny_mirror_regions():
+                                possible_options.append(path_to_access_rule(new_path + [lambda state: state.has_Mirror(player) and state.has_sword(player)], entrance))
+                            elif region.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_regions():
+                                possible_options.append(path_to_access_rule(new_path + [lambda state: state.has_Mirror(player) and state.has_Boots(player)], entrance))
+                            elif location and location.name in OverworldGlitchRules.get_superbunny_accessible_locations():
+                                if location.name in OverworldGlitchRules.get_boots_required_superbunny_mirror_locations():
+                                    possible_options.append(path_to_access_rule(new_path + [lambda state: state.has_Mirror(player) and state.has_Boots(player)], entrance))
+                                elif region.name == 'Kakariko Well (top)':
+                                    possible_options.append(path_to_access_rule(new_path, entrance))
+                                else:
+                                    possible_options.append(path_to_access_rule(new_path + [lambda state: state.has_Mirror(player)], entrance))
+                            continue
+                        elif region.name == 'Superbunny Cave (Top)' and new_region.name == 'Superbunny Cave (Bottom)' and location and location.name in OverworldGlitchRules.get_superbunny_accessible_locations():
+                            possible_options.append(path_to_access_rule(new_path, entrance))
+                    else:
+                        continue
+                if is_bunny(new_region):
                     queue.append((new_region, new_path))
                 else:
                     # we have reached pure light world, so we have a new possible option
                     possible_options.append(path_to_access_rule(new_path, entrance))
         return options_to_access_rule(possible_options)
 
-    # Add requirements for bunny-impassible caves if they occur in the dark world
-    for region in [world.get_region(name, player) for name in bunny_impassable_caves]:
-
-        if not region.is_dark_world:
-            continue
-        rule = get_rule_to_add(region)
-        for ext in region.exits:
-            add_rule(ext, rule)
-
-    paradox_shop = world.get_region('Light World Death Mountain Shop', player)
-    if paradox_shop.is_dark_world:
-        add_rule(paradox_shop.entrances[0], get_rule_to_add(paradox_shop))
-
-    for ent_name in bunny_impassible_doors:
-        bunny_exit = world.get_entrance(ent_name, player)
-        if bunny_exit.parent_region.is_dark_world:
-            add_rule(bunny_exit, get_rule_to_add(bunny_exit.parent_region))
-
-    doors_to_check = [x for x in world.doors if x.player == player and x not in bunny_impassible_doors]
-    doors_to_check = [x for x in doors_to_check if x.type in [DoorType.Normal, DoorType.Interior] and not x.blocked]
-    for door in doors_to_check:
-        room = world.get_room(door.roomIndex, player)
-        if door.entrance.parent_region.is_dark_world and room.kind(door) in [DoorKind.Dashable, DoorKind.Bombable, DoorKind.Hidden]:
-            add_rule(door.entrance, get_rule_to_add(door.entrance.parent_region))
-
-    # Add requirements for all locations that are actually in the dark world, except those available to the bunny
-    for location in world.get_locations():
-        if location.player == player and location.parent_region.is_dark_world:
-
-            if location.name in bunny_accessible_locations:
-                continue
-
-            add_rule(location, get_rule_to_add(location.parent_region))
-
-
-def set_inverted_bunny_rules(world, player):
-
-    # regions for the exits of multi-entrace caves/drops that bunny cannot pass
-    # Note spiral cave may be technically passible, but it would be too absurd to require since OHKO mode is a thing.
-    bunny_impassable_caves = ['Bumper Cave', 'Two Brothers House', 'Hookshot Cave',
-                              'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)', 'The Sky']
-    bunny_accessible_locations = ['Link\'s House', 'Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree',
-                                  'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid',
-                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins',
-                                  'Bombos Tablet', 'Ether Tablet', 'Purple Chest']
-
-    def path_to_access_rule(path, entrance):
-        return lambda state: state.can_reach(entrance) and all(rule_func(state) for rule_func in path)
-
-    def options_to_access_rule(options):
-        return lambda state: any(rule_func(state) for rule_func in options)
-
-    def get_rule_to_add(start_region):
-        if not start_region.is_dark_world:
-            return lambda state: state.has_Pearl(player)
-        # in this case we are mixed region.
-        # we collect possible options.
-
-        # The base option is having the moon pearl
-        possible_options = [lambda state: state.has_Pearl(player)]
-
-        # We will search entrances recursively until we find
-        # one that leads to an exclusively dark world region
-        # for each such entrance a new option is added that consist of:
-        #    a) being able to reach it, and
-        #    b) being able to access all entrances from there to `region`
-        seen = {start_region}
-        queue = deque([(start_region, [])])
-        while queue:
-            (current, path) = queue.popleft()
-            for entrance in current.entrances:
-                new_region = entrance.parent_region
-                if new_region in seen:
-                    continue
-                new_path = path + [entrance.access_rule]
-                seen.add(new_region)
-                if not new_region.is_dark_world:
-                    continue  # we don't care about pure light world entrances
-                if new_region.is_light_world:
-                    queue.append((new_region, new_path))
-                else:
-                    # we have reached pure dark world, so we have a new possible option
-                    possible_options.append(path_to_access_rule(new_path, entrance))
-        return options_to_access_rule(possible_options)
-
     # Add requirements for bunny-impassible caves if they occur in the light world
     for region in [world.get_region(name, player) for name in bunny_impassable_caves]:
 
-        if not region.is_light_world:
+        if not is_bunny(region):
             continue
         rule = get_rule_to_add(region)
         for ext in region.exits:
             add_rule(ext, rule)
 
     paradox_shop = world.get_region('Light World Death Mountain Shop', player)
-    if paradox_shop.is_light_world:
+    if is_bunny(paradox_shop):
         add_rule(paradox_shop.entrances[0], get_rule_to_add(paradox_shop))
 
     for ent_name in bunny_impassible_doors:
         bunny_exit = world.get_entrance(ent_name, player)
-        if bunny_exit.parent_region.is_light_world:
+        if is_bunny(bunny_exit.parent_region):
             add_rule(bunny_exit, get_rule_to_add(bunny_exit.parent_region))
 
     doors_to_check = [x for x in world.doors if x.player == player and x not in bunny_impassible_doors]
     doors_to_check = [x for x in doors_to_check if x.type in [DoorType.Normal, DoorType.Interior] and not x.blocked]
     for door in doors_to_check:
         room = world.get_room(door.roomIndex, player)
-        if door.entrance.parent_region.is_light_world and room.kind(door) in [DoorKind.Dashable, DoorKind.Bombable, DoorKind.Hidden]:
+        if is_bunny(door.entrance.parent_region) and room.kind(door) in [DoorKind.Dashable, DoorKind.Bombable, DoorKind.Hidden]:
             add_rule(door.entrance, get_rule_to_add(door.entrance.parent_region))
 
-    # Add requirements for all locations that are actually in the light world, except those available to the bunny
-    for location in world.get_locations():
-        if location.player == player and location.parent_region.is_light_world:
+    for region in world.get_regions():
+        if region.player == player and is_bunny(region):
+            for location in region.locations:
+                if location.name in bunny_accessible_locations:
+                    continue
+                add_rule(location, get_rule_to_add(region, location))
 
-            if location.name in bunny_accessible_locations:
-                continue
 
-            add_rule(location, get_rule_to_add(location.parent_region))
+drop_dungeon_entrances = {
+    "Sewer Drop",
+    "Skull Left Drop",
+    "Skull Pinball",
+    "Skull Pot Circle",
+    "Skull Back Drop"
+}
 
+
+bunny_revivable_entrances = {
+    "Sewers Pull Switch", "TR Dash Room", "Swamp Boss", "Hera Boss",
+    "Tower Agahnim 1", "Ice Lobby", "Sewers Rat Path", "PoD Falling Bridge",
+    "PoD Harmless Hellway", "PoD Mimics 2", "Ice Cross Bottom", "GT Agahnim 2",
+    "Sewers Water", "TR Lazy Eyes", "TR Big Chest Entrance", "Swamp Push Statue",
+    "PoD Arena Main", "PoD Arena Bridge", "PoD Map Balcony", "Sewers Dark Cross",
+    "Desert Boss", "Swamp Hub", "Skull Spike Corner", "PoD Pit Room",
+    "PoD Conveyor", "GT Crystal Circles", "Sewers Behind Tapestry",
+    "Desert Tiles 2", "Skull Star Pits", "Hyrule Castle West Hall",
+    "Hyrule Castle Throne Room", "Hyrule Castle East Hall", "Skull 2 West Lobby",
+    "Skull 2 East Lobby", "Skull Pot Prison", "Skull 1 Lobby", "Skull Map Room",
+    "Skull 3 Lobby", "PoD Boss", "GT Hidden Spikes", "GT Gauntlet 3",
+    "Ice Spike Cross", "Hyrule Castle West Lobby", "Hyrule Castle Lobby",
+    "Hyrule Castle East Lobby", "Desert Back Lobby", "Hyrule Dungeon Armory Main",
+    "Hyrule Dungeon North Abyss", "Desert Sandworm Corner", "Desert Dead End",
+    "Desert North Hall", "Desert Arrow Pot Corner", "GT DMs Room",
+    "GT Petting Zoo", "Ice Tall Hint", "Desert West Lobby", "Desert Main Lobby",
+    "Desert East Lobby", "GT Big Chest", "GT Bob\'s Room", "GT Speed Torch",
+    "Mire Boss", "GT Conveyor Bridge", "Mire Lobby", "Eastern Darkness",
+    "Ice Many Pots", "Mire South Fish", "Mire Right Bridge", "Mire Left Bridge",
+    "TR Boss", "Eastern Hint Tile Blocked Path", "Thieves Spike Switch",
+    "Thieves Boss", "Mire Spike Barrier", "Mire Cross", "Mire Hidden Shooters",
+    "Mire Spikes", "TR Final Abyss", "TR Dark Ride", "TR Pokey 1", "TR Tile Room",
+    "TR Roller Room", "Eastern Cannonball", "Thieves Hallway", "Ice Switch Room",
+    "Mire Tile Room", "Mire Conveyor Crystal", "Mire Hub", "TR Dash Bridge",
+    "TR Hub", "Eastern Boss", "Eastern Lobby", "Thieves Ambush",
+    "Thieves BK Corner", "TR Eye Bridge", "Thieves Lobby", "Tower Lobby",
+    "Sewer Drop", "Skull Left Drop", "Skull Pinball", "Skull Back Drop",
+    "Skull Pot Circle",  # You automatically get superbunny by dropping
+}
+
+# Revive as superbunny or use superbunny to get the item in a dead end
+superbunny_revivable_entrances = {
+    "TR Main Lobby", "Sanctuary", "Thieves Pot Alcove Bottom"
+}
+
+superbunny_sword_revivable_entrances = {
+    "Hera Lobby"
+}
 
 bunny_impassible_doors = {
     'Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory ES', 'Sewers Secret Room Push Block', 'Sewers Pull Switch S',

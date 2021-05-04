@@ -7,17 +7,10 @@ from EntranceShuffle import connect_entrance, Inverted_LW_Entrances, Inverted_LW
 from InvertedRegions import create_inverted_regions
 from ItemList import difficulties
 from Rules import set_inverted_big_bomb_rules
+from test.inverted.TestInverted import TestInverted
 
 
-class TestInvertedBombRules(unittest.TestCase):
-
-    def setUp(self):
-        self.world = World(1, 'vanilla', 'noglitches', 'inverted', 'random', 'normal', 'normal', 'none', 'on', 'ganon', 'balanced',
-                           True, False, False, False, False, False, False, False, False, None,
-                           'none', False)
-        self.world.difficulty_requirements = difficulties['normal']
-        create_inverted_regions(self.world, 1)
-        create_dungeons(self.world, 1)
+class TestInvertedBombRules(TestInverted):
 
     #TODO: Just making sure I haven't missed an entrance.  It would be good to test the rules make sense as well.
     def testInvertedBombRulesAreComplete(self):
@@ -26,6 +19,8 @@ class TestInvertedBombRules(unittest.TestCase):
         for entrance_name in (entrances + must_exits):
             if entrance_name not in ['Desert Palace Entrance (East)', 'Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']:
                 entrance = self.world.get_entrance(entrance_name, 1)
+                entrance.connected_region = None
+                self.world.get_region('Inverted Big Bomb Shop', 1).entrances = []
                 connect_entrance(self.world, entrance, 'Inverted Big Bomb Shop', 1)
                 set_inverted_big_bomb_rules(self.world, 1)
                 entrance.connected_region.entrances.remove(entrance)
@@ -40,6 +35,7 @@ class TestInvertedBombRules(unittest.TestCase):
     def testInvalidEntrances(self):
         for entrance_name in ['Desert Palace Entrance (East)', 'Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']:
             entrance = self.world.get_entrance(entrance_name, 1)
+            self.world.get_region('Inverted Big Bomb Shop', 1).entrances = []
             connect_entrance(self.world, entrance, 'Inverted Big Bomb Shop', 1)
             with self.assertRaises(Exception):
                 set_inverted_big_bomb_rules(self.world, 1)

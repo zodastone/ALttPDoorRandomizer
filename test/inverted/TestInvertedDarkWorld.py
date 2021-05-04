@@ -4,7 +4,7 @@ from test.inverted.TestInverted import TestInverted
 class TestInvertedDeathMountain(TestInverted):
 
     def testNorthWest(self):
-        self.run_tests([
+        self.run_location_tests([
             ["Brewery", True, []],
 
             ["C-Shaped House", True, []],
@@ -45,7 +45,7 @@ class TestInvertedDeathMountain(TestInverted):
         ])
 
     def testNorthEast(self):
-        self.run_tests([
+        self.run_location_tests([
             ["Catfish", False, []],
             ["Catfish", False, [], ['Progressive Glove', 'Flippers']],
             ["Catfish", False, [], ['Progressive Glove', 'Magic Mirror']],
@@ -80,7 +80,7 @@ class TestInvertedDeathMountain(TestInverted):
         ])
 
     def testSouth(self):
-        self.run_tests([
+        self.run_location_tests([
             ["Hype Cave - Top", True, []],
 
             ["Hype Cave - Middle Right", True, []],
@@ -99,7 +99,7 @@ class TestInvertedDeathMountain(TestInverted):
         ])
 
     def testMireArea(self):
-        self.run_tests([
+        self.run_location_tests([
             ["Mire Shed - Left", False, []],
             ["Mire Shed - Left", False, [], ['Ocarina', 'Magic Mirror']],
             ["Mire Shed - Left", True, ['Moon Pearl', 'Ocarina', 'Progressive Glove', 'Progressive Glove']],
