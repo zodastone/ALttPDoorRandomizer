@@ -150,6 +150,8 @@ New item counter modified to show total
 
 # Bug Fixes and Notes.
 
+* 0.3.1.10u
+	* Standard generation fixes
 * 0.3.1.9-u
 	* Generation improvements for standard
 	* Removed link sprite from repo
