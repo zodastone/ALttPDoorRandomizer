@@ -6,6 +6,8 @@ Thanks to qadan, cheuer, & compiling
 
 # Bug Fixes and Notes.
 
+* 0.4.0.1
+	* Moved stonewall pre-opening to not happen in experimental
 * 0.4.0.0
 	* Mystery yaml parser updated to a package maintained version (Thanks StructuralMike)
 	* Bomb-logic and extend crystal switch logic (Thanks StructuralMike)
