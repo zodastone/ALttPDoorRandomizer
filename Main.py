@@ -11,6 +11,7 @@ import zlib
 from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance, Settings
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
+from OverworldGlitchRules import create_owg_connections
 from PotShuffle import shuffle_pots
 from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions, adjust_locations
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
@@ -26,7 +27,7 @@ from Fill import sell_potions, sell_keys, balance_multiworld_progression, balanc
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.3.0-dev'
+__version__ = '0.4.0.0-u'
 
 
 class EnemizerError(RuntimeError):
@@ -94,7 +95,8 @@ def main(args, seed=None, fish=None):
     logger.info(
       world.fish.translate("cli","cli","app.title") + "\n",
       __version__,
-      world.seed
+      world.seed,
+      Settings.make_code(world, 1) if world.players == 1 else ''
     )
 
     parsed_names = parse_player_names(args.names, world.players, args.teams)
@@ -122,6 +124,8 @@ def main(args, seed=None, fish=None):
             create_regions(world, player)
         else:
             create_inverted_regions(world, player)
+        if world.logic[player] in ('owglitches', 'nologic'):
+            create_owg_connections(world, player)
         create_dungeon_regions(world, player)
         create_shops(world, player)
         create_doors(world, player)
@@ -391,6 +395,8 @@ def copy_world(world):
         create_shops(ret, player)
         create_rooms(ret, player)
         create_dungeons(ret, player)
+        if world.logic[player] in ('owglitches', 'nologic'):
+            create_owg_connections(ret, player)
 
     copy_dynamic_regions_and_locations(world, ret)
     for player in range(1, world.players + 1):
@@ -419,6 +425,8 @@ def copy_world(world):
         copied_region.is_dark_world = region.is_dark_world
         copied_region.dungeon = region.dungeon
         copied_region.locations = [copied_locations[(location.name, location.player)] for location in region.locations]
+        for location in copied_region.locations:
+            location.parent_region = copied_region
         for entrance in region.entrances:
             ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
 
@@ -426,7 +434,7 @@ def copy_world(world):
     for location in world.get_locations():
         new_location = ret.get_location(location.name, location.player)
         if location.item is not None:
-            item = Item(location.item.name, location.item.advancement, location.item.priority, location.item.type, player = location.item.player)
+            item = Item(location.item.name, location.item.advancement, location.item.priority, location.item.type, player=location.item.player)
             new_location.item = item
             item.location = new_location
             item.world = ret
@@ -505,6 +513,7 @@ def create_playthrough(world):
 
     # get locations containing progress items
     prog_locations = [location for location in world.get_filled_locations() if location.item.advancement]
+    optional_locations = ['Trench 1 Switch', 'Trench 2 Switch', 'Ice Block Drop']
     state_cache = [None]
     collection_spheres = []
     state = CollectionState(world)
@@ -530,7 +539,7 @@ def create_playthrough(world):
         logging.getLogger('').debug(world.fish.translate("cli", "cli", "building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations))
         if not sphere:
             logging.getLogger('').error(world.fish.translate("cli", "cli", "cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
-            if any([world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
+            if any([location.name not in optional_locations and world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
                 raise RuntimeError(world.fish.translate("cli", "cli", "cannot.reach.progression"))
             else:
                 old_world.spoiler.unreachables = sphere_candidates.copy()

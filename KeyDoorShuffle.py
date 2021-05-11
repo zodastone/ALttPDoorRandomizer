@@ -1671,7 +1671,7 @@ def val_mire(key_logic, world, player):
 
 def val_turtle(key_logic, world, player):
     # todo: check vanilla key logic when TR back doors are accessible
-    if world.shuffle[player] == 'vanilla' and world.mode[player] != 'inverted':
+    if world.shuffle[player] == 'vanilla' and world.mode[player] != 'inverted' and world.logic[player] in ('noglitches', 'minorglitches'):
         val_rule(key_logic.door_rules['TR Hub NW'], 1)
         val_rule(key_logic.door_rules['TR Pokey 1 NW'], 2)
         val_rule(key_logic.door_rules['TR Chain Chomps Down Stairs'], 3)

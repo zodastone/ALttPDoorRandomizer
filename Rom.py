@@ -1131,15 +1131,15 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x180211, gametype)  # Game type
 
     # assorted fixes
-    rom.write_byte(0x1800A2, 0x01)  # remain in real dark world when dying in dark world dungeon before killing aga1
+    rom.write_byte(0x1800A2, 0x01 if world.fix_fake_world else 0x00)  # remain in real dark world when dying in dark world dungeon before killing aga1
     rom.write_byte(0x180169, 0x01 if world.lock_aga_door_in_escape else 0x00)  # Lock or unlock aga tower door during escape sequence.
     if world.mode[player] == 'inverted':
         rom.write_byte(0x180169, 0x02)  # lock aga/ganon tower door with crystals in inverted
     rom.write_byte(0x180171, 0x01 if world.ganon_at_pyramid[player] else 0x00)  # Enable respawning on pyramid after ganon death
     rom.write_byte(0x180173, 0x01) # Bob is enabled
     rom.write_byte(0x180168, 0x08)  # Spike Cave Damage
-    rom.write_bytes(0x18016B, [0x04, 0x02, 0x01]) #Set spike cave and MM spike room Cape usage
-    rom.write_bytes(0x18016E, [0x04, 0x08, 0x10]) #Set spike cave and MM spike room Cape usage
+    rom.write_bytes(0x18016B, [0x04, 0x02, 0x01]) # Set spike cave and MM spike room Byrna usage
+    rom.write_bytes(0x18016E, [0x04, 0x08, 0x10]) # Set spike cave and MM spike room Cape usage
     rom.write_bytes(0x50563, [0x3F, 0x14]) # disable below ganon chest
     rom.write_byte(0x50599, 0x00) # disable below ganon chest
     rom.write_bytes(0xE9A5, [0x7E, 0x00, 0x24]) # disable below ganon chest
@@ -1291,6 +1291,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             if item.name != 'Piece of Heart' or equip[0x36B] == 0:
                 equip[0x36C] = min(equip[0x36C] + 0x08, 0xA0)
                 equip[0x36D] = min(equip[0x36D] + 0x08, 0xA0)
+        elif item.name == 'Pegasus Boots':
+            rom.write_byte(0x183015, 0x01)
+            ability_flags |= 0b00000100
         else:
             raise RuntimeError(f'Unsupported item in starting equipment: {item.name}')
 

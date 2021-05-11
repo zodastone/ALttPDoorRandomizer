@@ -3,33 +3,11 @@ import logging
 import random
 import urllib.request
 import urllib.parse
-import re
+import yaml
 
 from DungeonRandomizer import parse_cli
 from Main import main as DRMain
 from source.classes.BabelFish import BabelFish
-
-def parse_yaml(txt):
-    def strip(s):
-        s = s.strip()
-        return '' if not s else s.strip('"') if s[0] == '"' else s.strip("'") if s[0] == "'" else s
-    ret = {}
-    indents = {len(txt) - len(txt.lstrip(' ')): ret}
-    for line in txt.splitlines():
-        line = re.sub(r'#.*', '', line)
-        if not line:
-            continue
-        name, val = line.split(':', 1)
-        val = strip(val)
-        spaces = len(name) - len(name.lstrip(' '))
-        name = strip(name)
-        if val:
-            indents[spaces][name] = val
-        else:
-            newdict = {}
-            indents[spaces][name] = newdict
-            indents[spaces+2] = newdict
-    return ret
 
 def main():
     parser = argparse.ArgumentParser(add_help=False)
@@ -106,15 +84,11 @@ def main():
 def get_weights(path):
     try:
         if urllib.parse.urlparse(path).scheme:
-            yaml = str(urllib.request.urlopen(path).read(), "utf-8")
-        else:
-            with open(path, 'rb') as f:
-                yaml = str(f.read(), "utf-8")
+            return yaml.load(urllib.request.urlopen(path), Loader=yaml.FullLoader)
+        with open(path, 'r', encoding='utf-8') as f:
+            return yaml.load(f, Loader=yaml.SafeLoader)
     except Exception as e:
-        print('Failed to read weights (%s)' % e)
-        return
-
-    return parse_yaml(yaml)
+        raise Exception(f'Failed to read weights file: {e}')
 
 def roll_settings(weights):
     def get_choice(option, root=weights):
@@ -206,11 +180,13 @@ def roll_settings(weights):
 
     ret.item_functionality = get_choice('item_functionality')
 
-    ret.shufflebosses = {'none': 'none',
-                         'simple': 'basic',
-                         'full': 'normal',
-                         'random': 'chaos'
-                         }[get_choice('boss_shuffle')]
+    old_style_bosses = {'simple': 'basic',
+                        'full': 'normal',
+                        'random': 'chaos'}
+    boss_choice = get_choice('boss_shuffle')
+    if boss_choice in old_style_bosses.keys():
+        boss_choice = old_style_bosses[boss_choice]
+    ret.shufflebosses = boss_choice
 
     ret.shuffleenemies = {'none': 'none',
                           'shuffled': 'shuffled',

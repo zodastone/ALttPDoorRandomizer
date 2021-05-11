@@ -195,8 +195,11 @@ desert_regions = [
 ]
 
 hera_regions = [
-    'Hera Lobby', 'Hera Basement Cage', 'Hera Tile Room', 'Hera Tridorm', 'Hera Torches', 'Hera Beetles',
-    'Hera Startile Corner', 'Hera Startile Wide', 'Hera 4F', 'Hera Big Chest Landing', 'Hera 5F',
+    'Hera Lobby', 'Hera Lobby - Crystal', 'Hera Front', 'Hera Back', 'Hera Front - Crystal', 'Hera Down Stairs Landing',
+    'Hera Down Stairs Landing - Ranged Crystal', 'Hera Up Stairs Landing', 'Hera Up Stairs Landing - Ranged Crystal',
+    'Hera Back - Ranged Crystal', 'Hera Basement Cage', 'Hera Basement Cage - Crystal', 'Hera Tile Room',
+    'Hera Tridorm', 'Hera Tridorm - Crystal', 'Hera Torches', 'Hera Beetles', 'Hera Startile Corner',
+    'Hera Startile Wide', 'Hera Startile Wide - Crystal', 'Hera 4F', 'Hera Big Chest Landing', 'Hera 5F',
     'Hera Fairies', 'Hera Boss', 'Hera Portal'
 ]
 
@@ -209,19 +212,23 @@ tower_regions = [
 
 pod_regions = [
     'PoD Lobby', 'PoD Left Cage', 'PoD Middle Cage', 'PoD Shooter Room', 'PoD Pit Room', 'PoD Pit Room Blocked',
-    'PoD Arena Main', 'PoD Arena North', 'PoD Arena Crystal', 'PoD Arena Bridge', 'PoD Arena Ledge', 'PoD Sexy Statue',
-    'PoD Map Balcony', 'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room',
+    'PoD Arena Main', 'PoD Arena Main - Ranged Crystal', 'PoD Arena North', 'PoD Arena Bridge', 'PoD Arena Bridge - Ranged Crystal',
+    'PoD Arena Landing', 'PoD Arena Right', 'PoD Arena Right - Ranged Crystal', 'PoD Arena Ledge', 'PoD Arena Ledge - Ranged Crystal', 'PoD Sexy Statue',
+    'PoD Map Balcony', 'PoD Map Balcony - Ranged Crystal', 'PoD Conveyor', 'PoD Mimics 1', 'PoD Jelly Hall', 'PoD Warp Hint', 'PoD Warp Room',
     'PoD Stalfos Basement', 'PoD Basement Ledge', 'PoD Big Key Landing', 'PoD Falling Bridge',
     'PoD Falling Bridge Ledge', 'PoD Dark Maze', 'PoD Big Chest Balcony', 'PoD Compass Room', 'PoD Dark Basement',
-    'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue', 'PoD Bow Statue Moving Wall', 'PoD Dark Pegs', 'PoD Dark Pegs Ladder', 'PoD Dark Pegs Switch',
-    'PoD Lonely Turtle', 'PoD Turtle Party', 'PoD Dark Alley', 'PoD Callback', 'PoD Boss', 'Palace of Darkness Portal'
+    'PoD Harmless Hellway', 'PoD Mimics 2', 'PoD Bow Statue Left', 'PoD Bow Statue Left - Crystal', 'PoD Bow Statue Right', 'PoD Bow Statue Right - Ranged Crystal',
+    'PoD Dark Pegs Landing', 'PoD Dark Pegs Right', 'PoD Dark Pegs Middle', 'PoD Dark Pegs Left', 'PoD Dark Pegs Landing - Ranged Crystal',
+    'PoD Dark Pegs Middle - Ranged Crystal', 'PoD Dark Pegs Left - Ranged Crystal', 'PoD Lonely Turtle', 'PoD Turtle Party',
+    'PoD Dark Alley', 'PoD Callback', 'PoD Boss', 'Palace of Darkness Portal'
 ]
 
 swamp_regions = [
     'Swamp Lobby', 'Swamp Entrance', 'Swamp Pot Row', 'Swamp Map Ledge', 'Swamp Trench 1 Approach',
     'Swamp Trench 1 Nexus', 'Swamp Trench 1 Alcove', 'Swamp Trench 1 Key Ledge', 'Swamp Trench 1 Departure',
     'Swamp Hammer Switch', 'Swamp Hub', 'Swamp Hub Dead Ledge', 'Swamp Hub North Ledge', 'Swamp Donut Top',
-    'Swamp Donut Bottom', 'Swamp Compass Donut', 'Swamp Crystal Switch', 'Swamp Shortcut', 'Swamp Trench 2 Pots',
+    'Swamp Donut Bottom', 'Swamp Compass Donut', 'Swamp Crystal Switch Outer', 'Swamp Crystal Switch Outer - Ranged Crystal',
+    'Swamp Crystal Switch Inner', 'Swamp Crystal Switch Inner - Crystal', 'Swamp Shortcut', 'Swamp Trench 2 Pots',
     'Swamp Trench 2 Blocks', 'Swamp Trench 2 Alcove', 'Swamp Trench 2 Departure', 'Swamp Big Key Ledge',
     'Swamp West Shallows', 'Swamp West Block Path', 'Swamp West Ledge', 'Swamp Barrier Ledge', 'Swamp Barrier',
     'Swamp Attic', 'Swamp Push Statue', 'Swamp Shooters', 'Swamp Left Elbow', 'Swamp Right Elbow', 'Swamp Drain Left',
@@ -253,13 +260,13 @@ thieves_regions = [
 ice_regions = [
     'Ice Lobby', 'Ice Jelly Key', 'Ice Floor Switch', 'Ice Cross Left', 'Ice Cross Bottom', 'Ice Cross Right',
     'Ice Cross Top', 'Ice Compass Room', 'Ice Pengator Switch', 'Ice Dead End', 'Ice Big Key', 'Ice Bomb Drop',
-    'Ice Stalfos Hint', 'Ice Conveyor', 'Ice Bomb Jump Ledge', 'Ice Bomb Jump Catwalk', 'Ice Narrow Corridor',
+    'Ice Stalfos Hint', 'Ice Conveyor', 'Ice Conveyor - Crystal', 'Ice Bomb Jump Ledge', 'Ice Bomb Jump Catwalk', 'Ice Narrow Corridor',
     'Ice Pengator Trap', 'Ice Spike Cross', 'Ice Firebar', 'Ice Falling Square', 'Ice Spike Room', 'Ice Hammer Block',
     'Ice Tongue Pull', 'Ice Freezors', 'Ice Freezors Ledge', 'Ice Tall Hint', 'Ice Hookshot Ledge',
     'Ice Hookshot Balcony', 'Ice Spikeball', 'Ice Lonely Freezor', 'Iced T', 'Ice Catwalk', 'Ice Many Pots',
     'Ice Crystal Right', 'Ice Crystal Left', 'Ice Crystal Block', 'Ice Big Chest View', 'Ice Big Chest Landing',
-    'Ice Backwards Room', 'Ice Anti-Fairy', 'Ice Switch Room', 'Ice Refill', 'Ice Fairy', 'Ice Antechamber', 'Ice Boss',
-    'Ice Portal'
+    'Ice Backwards Room', 'Ice Anti-Fairy', 'Ice Switch Room', 'Ice Refill', 'Ice Refill - Crystal',
+    'Ice Fairy', 'Ice Antechamber', 'Ice Boss', 'Ice Portal'
 ]
 
 mire_regions = [
@@ -268,31 +275,38 @@ mire_regions = [
     'Mire Crystal Dead End', 'Mire Hidden Shooters', 'Mire Hidden Shooters Blocked', 'Mire Cross', 'Mire Minibridge',
     'Mire BK Door Room', 'Mire Spikes', 'Mire Ledgehop', 'Mire Bent Bridge', 'Mire Over Bridge', 'Mire Right Bridge',
     'Mire Left Bridge', 'Mire Fishbone', 'Mire South Fish', 'Mire Spike Barrier', 'Mire Square Rail', 'Mire Lone Warp',
-    'Mire Wizzrobe Bypass', 'Mire Conveyor Crystal', 'Mire Tile Room', 'Mire Compass Room', 'Mire Compass Chest',
+    'Mire Wizzrobe Bypass', 'Mire Conveyor Crystal', 'Mire Conveyor - Crystal', 'Mire Tile Room', 'Mire Compass Room', 'Mire Compass Chest',
     'Mire Neglected Room', 'Mire Chest View', 'Mire Conveyor Barrier', 'Mire BK Chest Ledge', 'Mire Warping Pool',
     'Mire Torches Top', 'Mire Torches Bottom', 'Mire Attic Hint', 'Mire Dark Shooters', 'Mire Key Rupees',
-    'Mire Block X', 'Mire Tall Dark and Roomy', 'Mire Crystal Right', 'Mire Crystal Mid', 'Mire Crystal Left',
+    'Mire Block X', 'Mire Tall Dark and Roomy', 'Mire Tall Dark and Roomy - Ranged Crystal', 'Mire Crystal Right', 'Mire Crystal Mid', 'Mire Crystal Left',
     'Mire Crystal Top', 'Mire Shooter Rupees', 'Mire Falling Foes', 'Mire Firesnake Skip', 'Mire Antechamber',
     'Mire Boss', 'Mire Portal'
 ]
 
 tr_regions = [
     'TR Main Lobby', 'TR Lobby Ledge', 'TR Compass Room', 'TR Hub', 'TR Torches Ledge', 'TR Torches', 'TR Roller Room',
-    'TR Tile Room', 'TR Refill', 'TR Pokey 1', 'TR Chain Chomps', 'TR Pipe Pit', 'TR Pipe Ledge', 'TR Lava Dual Pipes',
-    'TR Lava Island', 'TR Lava Escape', 'TR Pokey 2', 'TR Twin Pokeys', 'TR Hallway', 'TR Dodgers', 'TR Big View',
-    'TR Big Chest', 'TR Big Chest Entrance', 'TR Lazy Eyes', 'TR Dash Room', 'TR Tongue Pull', 'TR Rupees',
-    'TR Crystaroller', 'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge', 'TR Crystal Maze', 'TR Crystal Maze End',
-    'TR Final Abyss', 'TR Boss', 'Turtle Rock Main Portal', 'Turtle Rock Lazy Eyes Portal', 'Turtle Rock Chest Portal',
-    'Turtle Rock Eye Bridge Portal'
+    'TR Tile Room', 'TR Refill', 'TR Pokey 1', 'TR Chain Chomps Top', 'TR Chain Chomps Top - Crystal',
+    'TR Chain Chomps Bottom', 'TR Chain Chomps Bottom - Ranged Crystal', 'TR Pipe Pit', 'TR Pipe Ledge', 'TR Lava Dual Pipes',
+    'TR Lava Island', 'TR Lava Escape', 'TR Pokey 2 Top', 'TR Pokey 2 Top - Crystal', 'TR Pokey 2 Bottom', 'TR Pokey 2 Bottom - Ranged Crystal',
+    'TR Twin Pokeys', 'TR Hallway', 'TR Dodgers', 'TR Big View','TR Big Chest', 'TR Big Chest Entrance',
+    'TR Lazy Eyes', 'TR Dash Room', 'TR Tongue Pull', 'TR Rupees', 'TR Crystaroller Bottom',
+    'TR Crystaroller Middle', 'TR Crystaroller Top', 'TR Crystaroller Top - Crystal', 'TR Crystaroller Chest',
+    'TR Crystaroller Middle - Ranged Crystal', 'TR Crystaroller Bottom - Ranged Crystal', 'TR Dark Ride', 'TR Dash Bridge', 'TR Eye Bridge',
+    'TR Crystal Maze Start', 'TR Crystal Maze Start - Crystal', 'TR Crystal Maze Interior', 'TR Crystal Maze End',
+    'TR Crystal Maze End - Ranged Crystal', 'TR Final Abyss', 'TR Boss', 'Turtle Rock Main Portal',
+    'Turtle Rock Lazy Eyes Portal', 'Turtle Rock Chest Portal', 'Turtle Rock Eye Bridge Portal'
 ]
 
 gt_regions = [
     'GT Lobby', 'GT Bob\'s Torch', 'GT Hope Room', 'GT Big Chest', 'GT Blocked Stairs', 'GT Bob\'s Room',
     'GT Tile Room', 'GT Speed Torch', 'GT Speed Torch Upper', 'GT Pots n Blocks', 'GT Crystal Conveyor',
+    'GT Crystal Conveyor Corner', 'GT Crystal Conveyor Left', 'GT Crystal Conveyor - Ranged Crystal',
+    'GT Crystal Conveyor Corner - Ranged Crystal',
     'GT Compass Room', 'GT Invisible Bridges', 'GT Invisible Catwalk', 'GT Conveyor Cross', 'GT Hookshot East Platform',
-    'GT Hookshot North Platform', 'GT Hookshot South Platform', 'GT Hookshot South Entry', 'GT Map Room',
-    'GT Double Switch Entry', 'GT Double Switch Switches', 'GT Double Switch Transition', 'GT Double Switch Key Spot',
-    'GT Double Switch Exit', 'GT Spike Crystals', 'GT Warp Maze - Left Section', 'GT Warp Maze - Mid Section',
+    'GT Hookshot North Platform', 'GT Hookshot South Platform', 'GT Hookshot South Entry', 'GT Hookshot South Entry - Ranged Crystal', 'GT Map Room',
+    'GT Double Switch Entry', 'GT Double Switch Pot Corners - Ranged Switches', 'GT Double Switch Pot Corners', 'GT Double Switch Left',
+    'GT Double Switch Entry - Ranged Switches', 'GT Double Switch Exit', 'GT Spike Crystal Left',
+    'GT Spike Crystal Right', 'GT Warp Maze - Left Section', 'GT Warp Maze - Mid Section',
     'GT Warp Maze - Right Section', 'GT Warp Maze - Pit Section', 'GT Warp Maze - Pit Exit Warp Spot',
     'GT Warp Maze Exit Section', 'GT Firesnake Room', 'GT Firesnake Room Ledge', 'GT Warp Maze - Rail Choice',
     'GT Warp Maze - Rando Rail', 'GT Warp Maze - Main Rails', 'GT Warp Maze - Pot Rail', 'GT Petting Zoo',
@@ -301,9 +315,9 @@ gt_regions = [
     'GT Dash Hall', 'GT Hidden Spikes', 'GT Cannonball Bridge', 'GT Refill', 'GT Gauntlet 1', 'GT Gauntlet 2',
     'GT Gauntlet 3', 'GT Gauntlet 4', 'GT Gauntlet 5', 'GT Beam Dash', 'GT Lanmolas 2', 'GT Quad Pot', 'GT Wizzrobes 1',
     'GT Dashing Bridge', 'GT Wizzrobes 2', 'GT Conveyor Bridge', 'GT Torch Cross', 'GT Staredown', 'GT Falling Torches',
-    'GT Mini Helmasaur Room', 'GT Bomb Conveyor', 'GT Crystal Circles', 'GT Left Moldorm Ledge',
-    'GT Right Moldorm Ledge', 'GT Moldorm', 'GT Moldorm Pit', 'GT Validation', 'GT Validation Door', 'GT Frozen Over',
-    'GT Brightly Lit Hall', 'GT Agahnim 2', 'Ganons Tower Portal'
+    'GT Mini Helmasaur Room', 'GT Bomb Conveyor', 'GT Crystal Circles', 'GT Crystal Inner Circle', 'GT Crystal Circles - Ranged Crystal',
+    'GT Left Moldorm Ledge', 'GT Right Moldorm Ledge', 'GT Moldorm', 'GT Moldorm Pit', 'GT Validation', 'GT Validation Door',
+    'GT Frozen Over', 'GT Brightly Lit Hall', 'GT Agahnim 2', 'Ganons Tower Portal'
 ]
 
 

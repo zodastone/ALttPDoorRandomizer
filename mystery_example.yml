@@ -1,11 +1,11 @@
   description: Example door rando weights
   door_shuffle:
-    vanilla: 2
-    basic: 1
-    crossed: 1
+    vanilla: 0
+    basic: 2
+    crossed: 2
   intensity:
-    1: 1
-    2: 1
+    1: 2
+    2: 2
     3: 4
   keydropshuffle:
     on: 1
@@ -38,7 +38,7 @@
     fast_ganon: 2
     dungeons: 1
     pedestal: 2
-    triforce-hunt: 0
+    triforce-hunt: 2
   triforce_goal_min: 10
   triforce_goal_max: 30
   triforce_pool_min: 20
@@ -55,7 +55,7 @@
     default: 5
   experimental:
     on: 1
-    off: 0
+    off: 1
   glitches_required:
     none: 1
     no_logic: 0
@@ -90,23 +90,23 @@
     random: 1
   enemy_shuffle:
     none: 3
-    shuffled: 1
-    random: 0
+    shuffled: 2
+    random: 1
   hints:
     on: 1
-    off: 0
+    off: 1
   weapons:
-    randomized: 2
-    assured: 1
-    vanilla: 1
-    swordless: 0
+    randomized: 5
+    assured: 3
+    vanilla: 3
+    swordless: 1
   item_pool:
-    normal: 1
-    hard: 0
+    normal: 3
+    hard: 1
     expert: 0
   item_functionality:
-    normal: 1
-    hard: 0
+    normal: 3
+    hard: 1
     expert: 0
   enemy_damage:
     default: 3

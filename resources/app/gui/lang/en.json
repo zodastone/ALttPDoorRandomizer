@@ -195,6 +195,7 @@
     "randomizer.item.logiclevel": "Logic Level",
     "randomizer.item.logiclevel.noglitches": "No Glitches",
     "randomizer.item.logiclevel.minorglitches": "Minor Glitches",
+    "randomizer.item.logiclevel.owglitches": "Overworld Glitches",
     "randomizer.item.logiclevel.nologic": "No Logic",
 
     "randomizer.item.goal": "Goal",
