@@ -5,13 +5,13 @@
     "type": "bool"
   },
   "create_spoiler": {
-    "action": "store_true",
-    "type": "bool"
+    "action": "store_false",
+    "dest": "suppress_spoiler",
+    "type": "bool",
+    "help": "suppress"
   },
   "suppress_spoiler": {
-    "action": "store_false",
-    "dest": "create_spoiler",
-    "help": "suppress"
+    "action": "store_true"
   },
   "logic": {
     "choices": [
@@ -58,6 +58,10 @@
       "hard",
       "expert"
     ]
+  },
+  "shopsanity" : {
+    "action": "store_true",
+    "type": "bool"
   },
   "keydropshuffle" : {
     "action": "store_true",
@@ -214,6 +218,13 @@
   "usestartinventory": {
     "type": "bool"
   },
+  "triforce_pool": {},
+  "triforce_goal": {},
+  "triforce_pool_min": {},
+  "triforce_pool_max": {},
+  "triforce_goal_min": {},
+  "triforce_goal_max": {},
+  "triforce_min_difference": {},
   "custom": {
     "type": "bool",
     "help": "suppress"
@@ -355,5 +366,6 @@
       "never"
     ]
   },
-  "outputname": {}
+  "outputname": {},
+  "code": {}
 }

@@ -39,6 +39,7 @@ def MoldormDefeatRule(state, player):
     return state.has_blunt_weapon(player)
 
 def HelmasaurKingDefeatRule(state, player):
+    # TODO: technically possible with the hammer
     return state.has_sword(player) or state.can_shoot_arrows(player)
 
 def ArrghusDefeatRule(state, player):

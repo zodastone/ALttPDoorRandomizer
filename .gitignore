@@ -24,6 +24,9 @@ weights/
 /MultiMystery/
 /Players/
 /QUsb2Snes/
+/output/
+
+base2current.json
 
 resources/user/*
 !resources/user/.gitkeep
@@ -34,4 +37,5 @@ get-pip.py
 
 venv
 test
-data/base2current.json
+data/sprites/official/selan.1.zspr
+*.zspr

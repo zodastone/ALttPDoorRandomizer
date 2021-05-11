@@ -126,6 +126,12 @@ def roll_settings(weights):
             return None
         return random.choices(list(root[option].keys()), weights=list(map(int,root[option].values())))[0]
 
+    def get_choice_default(option, root=weights, default=None):
+        choice = get_choice(option, root)
+        if choice is None and default is not None:
+            return default
+        return choice
+
     ret = argparse.Namespace()
 
     glitches_required = get_choice('glitches_required')
@@ -156,6 +162,11 @@ def roll_settings(weights):
     if ret.dungeon_counters == 'default':
         ret.dungeon_counters = 'pickup' if ret.door_shuffle != 'vanilla' or ret.compassshuffle == 'on' else 'off'
 
+    ret.shopsanity = get_choice('shopsanity') == 'on'
+    ret.keydropshuffle = get_choice('keydropshuffle') == 'on'
+    ret.mixed_travel = get_choice('mixed_travel') if 'mixed_travel' in weights else 'prevent'
+    ret.standardize_palettes = get_choice('standardize_palettes') if 'standardize_palettes' in weights else 'standardize'
+
     goal = get_choice('goals')
     ret.goal = {'ganon': 'ganon',
                 'fast_ganon': 'crystals',
@@ -168,11 +179,20 @@ def roll_settings(weights):
     ret.crystals_gt = get_choice('tower_open')
 
     ret.crystals_ganon = get_choice('ganon_open')
-
+    
+    if ret.goal == 'triforcehunt':
+        goal_min = get_choice_default('triforce_goal_min', default=20)
+        goal_max = get_choice_default('triforce_goal_max', default=20)
+        pool_min = get_choice_default('triforce_pool_min', default=30)
+        pool_max = get_choice_default('triforce_pool_max', default=30)
+        ret.triforce_goal = random.randint(int(goal_min), int(goal_max))
+        min_diff = get_choice_default('triforce_min_difference', default=10)
+        ret.triforce_pool = random.randint(max(int(pool_min), ret.triforce_goal + int(min_diff)), int(pool_max))
     ret.mode = get_choice('world_state')
     if ret.mode == 'retro':
         ret.mode = 'open'
         ret.retro = True
+    ret.retro = get_choice('retro') == 'on'  # this overrides world_state if used
 
     ret.hints = get_choice('hints') == 'on'
 

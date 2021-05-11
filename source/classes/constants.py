@@ -34,7 +34,7 @@ CUSTOMITEMLABELS = [
   "Ether", "Quake", "Lamp", "Hammer", "Shovel",
 
   "Ocarina", "Bug Catching Net", "Book of Mudora", "Bottle", "Cane of Somaria",
-  "Cane of Byrna", "Magic Cape", "Magic Mirror", "Pegasus Boots", "Power Glove",
+  "Cane of Byrna", "Cape", "Magic Mirror", "Pegasus Boots", "Power Glove",
   "Titans Mitts", "Progressive Glove", "Flippers", "Moon Pearl", "Piece of Heart",
 
   "Boss Heart Container", "Sanctuary Heart Container", "Fighter Sword", "Master Sword", "Tempered Sword",
@@ -56,6 +56,7 @@ SETTINGSTOPROCESS = {
   "randomizer": {
     "item": {
       "retro": "retro",
+      "shopsanity": "shopsanity",
       "worldstate": "mode",
       "logiclevel": "logic",
       "goal": "goal",
