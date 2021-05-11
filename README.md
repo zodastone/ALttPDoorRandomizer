@@ -14,13 +14,63 @@ Please just DM me on discord for now. I (Aerinon) can be found at the [ALTTP Ran
 
 # Installation
 
-Install Python 3
+Click on 
 
-Run ```pip install python-bps-continued```.  On Linux, you should use pip3.  On Windows, you may need to run ```python -m pip install python-bps-continued``` or ```py -m pip install python-bps-continued```.
+https://github.com/aerinon/ALttPDoorRandomizer/releases
 
-Clone this repository then run ```DungeonRandomizer.py```.
+Go down to Assets and find a build for your system (Windows, Mac, or Linux)
 
-Alternatively, run ```Gui.py``` for a simple graphical user interface. (WIP)
+Download and unzip. Find the DungeonRandomizer.exe or equivalent
+
+# Installation from source
+
+See these instructions.
+
+https://github.com/aerinon/ALttPDoorRandomizer/blob/DoorDev/docs/BUILDING.md
+
+When installing platform specific dependencies, don't forget to run the appropriate command from the bottom of the page! Those will install missing pip dependencies.
+
+Running the MultiServer and MultiClient for multiworld should run resources/ci/common/local_install.py for those dependencies as well.
+
+To use the CLI, run ```DungeonRandomizer.py```.
+
+Alternatively, run ```Gui.py``` for a simple graphical user interface.
+
+# Commonly Missed Things and Differences from other Randomizers
+
+### Starting Item
+
+You start with a “Mirror Scroll”, a dumbed-down mirror that only works in dungeons, not the overworld and can’t erase blocks like the Mirror
+
+### Navigation
+
+* The Pinball Room’s trap door can be removed in the case where it is required to go through to get to the back of Skull Woods.
+* Holes in Mire Torches Top and Mire Torches Bottom fall through to rooms below (you only need fire to get the chest)
+* You can Hookshot from the left Mire wooden Bridge to the right one.
+* In the PoD Arena, you can bonk with Boots between the two blue crystal barriers against the ladder to reach the Arena Bridge chest and door. (Bomb Jump also possible but not in logic - Boots are required)
+* Flooded Rooms in Swamp can be traversed backward and may be required.
+
+### Other Logic
+
+* The chest in southeast Skull Woods that is traditionally a guaranteed Small Key in ER is not guaranteed here.
+* Fire Rod is not in logic for dark rooms. (Hard enough to figure out which dark room you are in.) This is different from Advanced mode on the VT randomizer. Otherwise Advanced logic is always used. (There is no basic logic.)
+* The hammerjump (and some other skips) are not in logic by default (see the mixed_travel setting for details). Doing so in a crossed dungeon seed can put you into another dungeon with the wrong dungeon id. (Much like EG)
+
+### Boss Differences
+
+* You have to find the attic floor and bomb it open and bring the maiden to the light to fight Blind. In cross dungeon door shuffle, the attic can be in any dungeon. If hints are on, there is a special one about a cracked floor.
+* GT Bosses do not respawn after killing them in this mode.
+* Enemizer change: The attic/maiden sequence is now active and required when Blind is the boss of Theives' Town even when bosses are shuffled.
+
+### Crystal Switches
+
+* You can hit the PoD crystal switch in the Sexy Statue room with a bomb from the balcony above without jumping down.
+* GT Crystal Conveyor room (it has gibdos) - You can hit the crystal switch with a bomb when the blue barrier is up from the far side so you can leave the room to the left with blue barriers down.
+* PoD Arena Bridge. If entering from the bridge, you can circle round and hit the switch, then fall into the hole to respawn at the bridge again with the crystal barriers different (if you don’t have a proper ranged weapon that can hit it)
+
+### Misc
+
+* Compass counts no longer function after you get the Triforce
 
 # Settings
 
@@ -86,24 +136,109 @@ Rooms adjacent to sanctuary get their coloring to match the Sanctuary's original
 #### Original
 Rooms/supertiles keep their original palettes.
 
+## Shopsanity
 
-## Map/Compass/Small Key/Big Key shuffle (aka Keysanity)
+This adds 32 shop locations (9 more in retro) to the general location pool.
 
-These settings allow dungeon specific items to be distributed anywhere in the world and not just in their native dungeon.
-Small Keys dropped by enemies or found in pots are not affected. The chest in southeast Skull Woods that is traditionally
-a guaranteed Small Key still is. These items will be distributed according to the v26/balanced algorithm, but the rest
-of the itempool will respect the algorithm setting. Music for dungeons is randomized so it cannot be used as a tell
-for which dungeons contain pendants and crystals; finding a Map for a dungeon will allow the overworld map to display its prize.
+Multi-world supported. Thanks go to Pepper and CaitSith2 for figuring out several items related to this major feature.
 
-## Retro
+Shop locations:
+* Lake Hylia Cave Shop (3 items)
+* Kakariko Village Shop (3 items)
+* Potion Shop (3 new items)
+* Paradox Cave Shop (3 items)
+* Capacity Upgrade Fairy (2 items)
+* Dark Lake Hylia Shop (3 items)
+* Curiosity/Red Shield Shop (3 items)
+* Dark Lumberjack Shop (3 items)
+* Dark Potion Shop (3 items)
+* Village of Outcast Hammer Peg Shop (3 items)
+* Dark Death Mountain Shop (3 items)
 
-This setting turns all Small Keys into universal Small Keys that can be used in any dungeon and are distributed across the world.
-The Bow now consumed rupees to shoot; the cost is 10 rupees per Wood Arrow and 50 per Silver Arrow. Shooting Wood Arrows requires
-the purchase of an arrow item from shops, and to account for this and the dynamic use of keys, both Wood Arrows and Small Keys will
-be added to several shops around the world. Four "take any" caves are added that allow the player to choose between an extra Heart
-Container and a Bottle being filled with Blue Potion, and one of the four swords from the item pool is placed into a special cave as
-well. The five caves that are removed for these will be randomly selected single entrance caves that did not contain any items or any shops.
-In further concert with the Bow changes, all arrows under pots, in chests, and elsewhere in the seed will be replaced with rupees.
+Item Pool changes: To accommodate the new locations, new items are added to the pool, as follows:
+
+* 10 - Red Potion Refills
+* 9 - Ten Bombs
+* 4 - Small Hearts
+* 4 - Blue Shields
+* 1 - Red Shield
+* 1 - Bee
+* 1 - Ten Arrows
+* 1 - Green Potion Refill
+* 1 - Blue Potion Refill
+* 1 - +5 Bomb Capacity
+* 1 - +5 Arrow Capacity
+
+1. Initially, 1 of each type of potion refill is shuffled to the shops. (the Capacity Fairy is excluded from this, see step 4). This ensures that potions can be bought somewhere.
+2. The rest of the shop pool is shuffled with the rest of the item pool. 
+3. At this time, only Ten Bombs, Ten Arrows, Capacity upgrades, Small Hearts, and the non-progressive shields can appear outside of shops. Any other shop items are replaced with rupees of various amounts. This is because of one reason: potion refills and the Bee are indistinguishable from Bottles with that item in them. Receiving those items without a bottle or empty bottle is essentially a nothing item but looks like a bottle. Note, the non-progressive Shields interact fine with Progressive Shields (you never get downgraded) but are usually also a nothing item most of the time.
+4. The Capacity Fairy cannot sell Potion Refills because the graphics are incompatible. 300 Rupees will replace any potion refill that ends up there.
+5. For capacity upgrades, if any shop sells capacity upgrades, then it will sell all seven of that type. Otherwise, if plain bombs or arrows are sold somewhere, then the other six capacity upgrades will be purchasable first at those locations and then replaced by the underlying ammo. If no suitable spot is found, then no more capacity upgrades will be available for that seed. (There is always one somewhere in the pool.)
+6. Any shop item that is originally sold by shops can be bought indefinitely, but only the first purchase counts toward total checks on the credits screen & item counter. All other items can be bought only once.
+
+All items in the general item pool may appear in shops. This includes normal progression items and dungeon items in the appropriate keysanity settings.
+
+#### Pricing Guide
+
+#### Sphere effects
+
+Design goal: Shops in early spheres may be discounted below the base price while shops in later spheres will likely exceed the base price range. This is an attempt to balance out the rupees in the item pool vs. the prices the shops charges. Poorer item pools like Triforce Hunt may have early shop prices be adjusted downward while rupee rich item pools will have prices increased, but later in the game.
+
+Detailed explanation: It is calculated how much money is available in the item pool and various rupee sources. If this amount exceeds the total amount of money needed for shop prices for items, then shops that are not in sphere 1 will raise their prices by a calculated amount to help balance out the money. Conversely, if the amount is below the money needed, then shops in sphere 1 will be discounted by a calculated amount to help ensure everything is purchase-able with minimal grinding.
+
+#### Base prices
+
+All prices range approx. from half the base price to twice the base price (as a max) in increments of 5, the exact price is chosen randomly within the range subject to adjustments by the sphere effects above.
+
+| Category          | Items   | Base Price | Typical Range |
+| ----------------- | ------- |:----------:|:-------------:|
+| Major Progression | Hammer, Hookshot, Mirror, Ocarina, Boots, Somaria, Fire Rod, Ice Rod | 250 | 125-500
+|                   | Moon Pearl | 200 | 100-400
+|                   | Lamp, Progressive Bows, Gloves, & Swords | 150 | 75-300
+|                   | Triforce Piece | 100 | 50-200
+| Medallions        | Bombos, Ether, Quake | 100 | 50-200
+| Safety/Fetch      | Cape, Mushroom, Shovel, Powder, Bug Net, Byrna, Progressive Armor & Shields, Half Magic | 50 | 25-100
+| Bottles			| Empty Bottle or Bee Bottle | 50 | 25-100
+|       			| Green Goo or Good Bee | 60 | 30-120
+|       			| Red Goo or Fairy | 70 | 35-140
+|        			| Blue Goo | 80 | 40-160
+| Health            | Heart Container | 40 | 20-80
+|                   | Sanctuary Heart | 50 | 25-100 
+|                   | Piece of Heart | 10 | 5-20
+| Dungeon           | Big Keys | 60 | 30-120
+|                   | Small Keys | 40 | 20-80
+|                   | Info Maps | 20 | 10-40
+|                   | Other Maps & Compasses | 10 | 5-20
+| Rupees			| Green | Free | Free
+|       			| Blue  | 2 | 2-4
+|       			| Red  | 10 | 5-20
+|       			| Fifty  | 25 | 15-50
+|       			| One Hundred  | 50 | 25-100
+|       			| Three Hundred  | 150 | 75-300
+| Ammo	            | Three Bombs | 15 | 10-30
+|       			| Single Arrow | 3 | 3-6
+| Original Shop Items | Other Ammo, Refills, Non-Progressive Shields, Capacity Upgrades, Small Hearts, Retro Quiver, Universal Key | Original | .5 - 2 * Original
+
+#### Rupee Balancing Algorithm
+
+To prevent needed to grind for rupees to buy things in Sphere 1 and later, a money balancing algorithm has been developed to counteract the need for rupees. Basic logic: it assumes you buy nothing until you are blocked by a shop, a check that requires money, or blocked by Kiki. Then you must have enough to make all purchases. If not, any free rupees encountered may be swapped with higher denominations that have not been encountered. Ammo may also be swapped, if necessary.
+
+(Checks that require money: Bottle Merchant, King Zora, Digging Game, Chest Game, Blacksmith, anything blocked by Kiki e.g. all of Palace of Darkness when ER is vanilla)
+
+The Houlihan room is not in logic but the five dungeon rooms that provide rupees are. Pots with rupees, the arrow game, and all other gambling games are not counted for determining income.
+
+Currently this is applied to seeds without shopsanity on so early money is slightly more likely if progression is on a check that requires money even if Shopsanity is not turned on. 
+
+#### Retro and Shopsanity
+
+9 new locations are added.
+
+The four "Take Any" caves are converted into "Take Both" caves. Those and the old man cave are included in the shuffle. The sword is returned to the pool, and the 4 heart containers and 4 blue potion refills are also added to the general item pool. All items found in the retro caves are free to take once. Potion refills will disappear after use.
+
+Arrow Capacity upgrades are now replaced by Rupees wherever it might end up.
+ 
+The Ten Arrows and 5 randomly selected Small Hearts or Blue Shields are replaced by the quiver item (represented by the Single Arrow in game.) 5 Red Potion refills are replaced by the Universal small key. It is assured that at least one shop sells Universal Small Keys. The quiver may thus not be found in shops. The quiver and small keys retain their original base price, but may be discounted.
+
 
 ## Seed
 
@@ -138,6 +273,12 @@ For specifying the door shuffle intensity level you want as above. (default: 2)
 ```
 
 Include mobs and pots drop in the item pool. (default: not enabled)
+
+```
+--shopsanity      
+```
+
+Includes shop locations in the item pool.
 
 ```
 --mixed_travel <mode>      
