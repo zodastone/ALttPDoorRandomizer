@@ -209,12 +209,10 @@ QuadrantLoadOrderBeforeScroll:
     lda $045f : beq .end
     lda #$08 : sta $045c ; start with opposite quadrant row
     .end
-    jsl $0091c4 ; what we overwrote
-    rtl
+    JML $0091c4 ; what we overwrote
 
 QuadrantLoadOrderAfterScroll:
     lda $045f : beq .end
     stz $045c : stz $045f ; draw other row and clear flag
     .end
-    jsl $0091c4 ; what we overwrote
-    rtl
+    JML $0091c4 ; what we overwrote

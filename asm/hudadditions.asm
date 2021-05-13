@@ -82,8 +82,8 @@ DrHudDungeonItemsAdditions:
     - sta $1704, x : sta $170e, x : sta $1718, x
     inx #2 : cpx #$0008 : !blt -
 
-    lda !HUD_FLAG : and.w #$0020 : beq + : brl ++ : +
-    lda HUDDungeonItems : and.w #$0007 : bne + : brl ++ : +
+    lda !HUD_FLAG : and.w #$0020 : beq + : JMP ++ : +
+    lda HUDDungeonItems : and.w #$0007 : bne + : JMP ++ : +
     	; bk symbols
 		lda.w #$2811 : sta $1606 : sta $1610 : sta $161a : sta $1624
 		; sm symbols
@@ -125,10 +125,10 @@ DrHudDungeonItemsAdditions:
         			lda.w #$24f5 : sta $1644, y
         		+
         	ldx $00
-            + inx #2 : cpx #$001b : bcs ++ : brl -
+            + inx #2 : cpx #$001b : bcs ++ : JMP -
     ++
-    lda !HUD_FLAG : and.w #$0020 : bne + : brl ++ : +
-    lda HUDDungeonItems : and.w #$000c : bne + : brl ++ : +
+    lda !HUD_FLAG : and.w #$0020 : bne + : JMP ++ : +
+    lda HUDDungeonItems : and.w #$000c : bne + : JMP ++ : +
         ; map symbols (do I want these) ; note compass symbol is 2c20
         lda.w #$2821 : sta $1606 : sta $1610 : sta $161a : sta $1624
         ; blank out a couple thing from old hud
@@ -159,7 +159,7 @@ DrHudDungeonItemsAdditions:
             .skipBlanks iny #2
             cpx #$001a : beq +
 				lda.w #$24f5 : sta $1644, y ; blank out spot
-            + inx #2 : cpx #$001b : !bge ++ : brl -
+            + inx #2 : cpx #$001b : !bge ++ : JMP -
     ++
     plp : ply : plx : rtl
 }

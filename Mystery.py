@@ -8,6 +8,12 @@ import yaml
 from DungeonRandomizer import parse_cli
 from Main import main as DRMain
 from source.classes.BabelFish import BabelFish
+from yaml.constructor import SafeConstructor
+
+def add_bool(self, node):
+    return self.construct_scalar(node)
+
+SafeConstructor.add_constructor(u'tag:yaml.org,2002:bool', add_bool)
 
 def main():
     parser = argparse.ArgumentParser(add_help=False)

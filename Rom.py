@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '2a9cd9b95c0ad118a3d58a77b7197eab'
+RANDOMIZERBASEHASH = '0c27ed494039b6da016678b8741939ed'
 
 
 class JsonRom(object):
@@ -782,17 +782,19 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                         | (0x4 if world.retro[player] else 0))
     rom.write_byte(0x140001, multiClientFlags)
 
-    write_int16(rom, 0x187010, credits_total)  # dynamic credits
+    #write_int16(rom, 0x187010, credits_total)  # dynamic credits
     if credits_total != 216:
-        # collection rate address: 238C37
+        # collection rate address:
+        cr_address = 0x2391BE
+        cr_pc = cr_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
         last_top, last_bot = credits_digit(credits_total % 10)
         # top half
-        rom.write_byte(0x118C53, mid_top)
-        rom.write_byte(0x118C54, last_top)
+        rom.write_byte(cr_pc+0x1c, mid_top)
+        rom.write_byte(cr_pc+0x1d, last_top)
         # bottom half
-        rom.write_byte(0x118C71, mid_bot)
-        rom.write_byte(0x118C72, last_bot)
+        rom.write_byte(cr_pc+0x3a, mid_bot)
+        rom.write_byte(cr_pc+0x3b, last_bot)
 
     if world.keydropshuffle[player] or world.doorShuffle[player] != 'vanilla':
         gt = world.dungeon_layouts[player]['Ganons Tower']
@@ -800,16 +802,18 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         total = 0
         for region in gt.master_sector.regions:
             total += count_locations_exclude_logic(region.locations, gt_logic)
-        rom.write_byte(0x187012, total)  # dynamic credits
-        # gt big key address: 238B59
+        # rom.write_byte(0x187012, total)  # dynamic credits
+        # gt big key address:
+        gtbk_address = 0x2390E0
+        gtbk_pc = gtbk_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit(total // 10)
         last_top, last_bot = credits_digit(total % 10)
         # top half
-        rom.write_byte(0x118B75, mid_top)
-        rom.write_byte(0x118B76, last_top)
+        rom.write_byte(gtbk_pc+0x1c, mid_top)
+        rom.write_byte(gtbk_pc+0x1d, last_top)
         # bottom half
-        rom.write_byte(0x118B93, mid_bot)
-        rom.write_byte(0x118B94, last_bot)
+        rom.write_byte(gtbk_pc+0x3a, mid_bot)
+        rom.write_byte(gtbk_pc+0x3b, last_bot)
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':

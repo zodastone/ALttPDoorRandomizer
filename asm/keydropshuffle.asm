@@ -173,7 +173,7 @@ KeyGetPlayer:
 LoadProperties_PreserveItemMaybe:
 {
     lda.l ShuffleKeyDrops : bne +
-        jsl Sprite_LoadProperties : rtl
+        JML Sprite_LoadProperties
     + lda $0e80, x : pha
     jsl Sprite_LoadProperties
     pla : sta $0e80, x

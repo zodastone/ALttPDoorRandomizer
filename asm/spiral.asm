@@ -182,7 +182,7 @@ InroomStairsWarp: {
         sta $02
         stz $07
         lda $01 : and #$10 : lsr #4
-        brl .layer
+        JMP .layer
     .notEdge
     lda $01 : and #$03 : cmp #$03 : bne .normal
         txa : and #$06 : sta $07

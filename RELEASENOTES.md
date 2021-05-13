@@ -8,6 +8,20 @@ Thanks to qadan, cheuer, & compiling
 
 * 0.4.0.1
 	* Moved stonewall pre-opening to not happen in experimental
+	* Updated baserom
+		* Boss RNG perseved between files
+		* Vanilla prize pack fix
+		* Starting equipment fix
+		* Post-Aga world state option
+		* Code optimzation
+		* Bottle quickswap via double shoulder
+		* Credits update
+		* Accessibility option
+		* Sewer map/compass fix
+	* Fixed a standard bug where the exits to the ledge would be unavailable if the pyramid was pre-opened
+	* DR ASM optimization
+	* Removed Archery Game from Take-Any caves in inverted
+	* Fixed a problem with new YAML parser
 * 0.4.0.0
 	* Mystery yaml parser updated to a package maintained version (Thanks StructuralMike)
 	* Bomb-logic and extend crystal switch logic (Thanks StructuralMike)
