@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '0c27ed494039b6da016678b8741939ed'
+RANDOMIZERBASEHASH = '5c5111bcb73b033ddf72be5b8ea08a8e'
 
 
 class JsonRom(object):
@@ -782,7 +782,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                         | (0x4 if world.retro[player] else 0))
     rom.write_byte(0x140001, multiClientFlags)
 
-    #write_int16(rom, 0x187010, credits_total)  # dynamic credits
+    write_int16(rom, 0x187010, credits_total)  # dynamic credits
     if credits_total != 216:
         # collection rate address:
         cr_address = 0x2391BE

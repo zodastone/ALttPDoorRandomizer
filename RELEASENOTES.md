@@ -6,6 +6,10 @@ Thanks to qadan, cheuer, & compiling
 
 # Bug Fixes and Notes.
 
+* 0.4.0.2
+	* Fixed a bug where Defeat Ganon is not possible
+	* Fixed the item counter total
+	* Fixed the bunny state when starting out in Sanc in a dark world dungeon
 * 0.4.0.1
 	* Moved stonewall pre-opening to not happen in experimental
 	* Updated baserom
