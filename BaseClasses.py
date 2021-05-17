@@ -1280,6 +1280,7 @@ class Door(object):
         self.dungeonLink = None
         self.bk_shuffle_req = False
         self.standard_restricted = False  # flag if portal is not allowed in HC in standard
+        self.lw_restricted = False  # flag if portal is not allowed in DW
         # self.incognitoPos = -1
         # self.sectorLink = False
 

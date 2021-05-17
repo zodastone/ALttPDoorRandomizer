@@ -563,6 +563,9 @@ def assign_portal(candidates, possible_portals, world, player):
     candidate = random.choice(candidates)
     portal_choice = random.choice(possible_portals)
     portal = world.get_portal(portal_choice, player)
+    while candidate.lw_restricted and not portal.light_world:
+        candidates.remove(candidate)
+        candidate = random.choice(candidates)
     if candidate != portal.door:
         if candidate.entranceFlag:
             for other_portal in world.dungeon_portals[player]:

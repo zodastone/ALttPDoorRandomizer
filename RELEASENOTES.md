@@ -6,6 +6,8 @@ Thanks to qadan, cheuer, & compiling
 
 # Bug Fixes and Notes.
 
+* 0.4.0.3
+	* Fixed a bug where Sanctuary could be chosen as a lobby for a DW dungeon in non-crossed ER modes
 * 0.4.0.2
 	* Fixed a bug where Defeat Ganon is not possible
 	* Fixed the item counter total
