@@ -2021,6 +2021,7 @@ class DROptions(Flag):
     Open_PoD_Wall = 0x40  # If on, pre opens the PoD wall, no bow required
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
     Hide_Total = 0x100
+    DarkWorld_Spawns = 0x200
 
 
 # DATA GOES DOWN HERE

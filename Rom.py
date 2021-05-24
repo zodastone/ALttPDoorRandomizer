@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '5c5111bcb73b033ddf72be5b8ea08a8e'
+RANDOMIZERBASEHASH = '32b289d8294deba1603c75bb1321d3da'
 
 
 class JsonRom(object):
@@ -655,6 +655,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         dr_flags |= DROptions.Rails
     if world.standardize_palettes[player] == 'original':
         dr_flags |= DROptions.OriginalPalettes
+    if world.experimental[player]:
+        dr_flags |= DROptions.DarkWorld_Spawns
 
 
     # fix hc big key problems (map and compass too)
@@ -664,6 +666,23 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         sanctuary = world.get_region('Sanctuary', player)
         rom.write_byte(0x1597b, sanctuary.dungeon.dungeon_id*2)
         update_compasses(rom, world, player)
+
+    def should_be_bunny(region, mode):
+        if mode != 'inverted':
+            return region.is_dark_world and not region.is_light_world
+        else:
+            return region.is_light_world and not region.is_dark_world
+
+    # dark world spawns
+    sanc_region = world.get_region('Sanctuary', player)
+    if should_be_bunny(sanc_region, world.mode[player]):
+        rom.write_bytes(0x13fff2, [0x12, 0x00])
+
+    lh_name = 'Links House' if world.mode[player] != 'inverted' else 'Inverted Links House'
+    links_house = world.get_region(lh_name, player)
+    if should_be_bunny(links_house, world.mode[player]):
+        rom.write_bytes(0x13fff0, [0x04, 0x01])
+
 
     # patch doors
     if world.doorShuffle[player] == 'crossed':

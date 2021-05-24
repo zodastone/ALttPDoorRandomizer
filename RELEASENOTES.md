@@ -1,11 +1,19 @@
 # New Features
 
+## Shuffle Links House
+
+Links house can now be shuffled in different ER settings. It will be limited to the Light World (or Dark World in inverted) if Crossed or Insanity shuffle is not one. It it also limited if door shuffle settings allow the Sanctuary to be in the dark world. (This is prevent having no Light World spawn points in Open modes) This setting is ignored by standard mode. THe CLI parameter is --shufflelinks
+
 ## OWG Glitch Logic
 
 Thanks to qadan, cheuer, & compiling
 
 # Bug Fixes and Notes.
 
+* 0.4.0.4
+	* Added --shufflelinks option
+	* Moved spawning as a bunny indoors to experimental
+	* Baserom bug fixes	
 * 0.4.0.3
 	* Fixed a bug where Sanctuary could be chosen as a lobby for a DW dungeon in non-crossed ER modes
 * 0.4.0.2

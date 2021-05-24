@@ -73,6 +73,7 @@ SETTINGSTOPROCESS = {
     "entrance": {
       "openpyramid": "openpyramid",
       "shuffleganon": "shuffleganon",
+      "shufflelinks": "shufflelinks",
       "entranceshuffle": "shuffle"
     },
     "enemizer": {

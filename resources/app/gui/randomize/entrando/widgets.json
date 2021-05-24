@@ -18,6 +18,7 @@
         "dungeonsfull",
         "dungeonssimple"
       ]
-    }
+    },
+    "shufflelinks":     { "type": "checkbox" }
   }
 }

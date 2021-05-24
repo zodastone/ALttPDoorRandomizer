@@ -98,7 +98,7 @@ def parse_cli(argv, no_defaults=False):
                          'shuffle', 'door_shuffle', 'intensity', 'crystals_ganon', 'crystals_gt', 'openpyramid',
                          'mapshuffle', 'compassshuffle', 'keyshuffle', 'bigkeyshuffle', 'startinventory',
                          'triforce_pool_min', 'triforce_pool_max', 'triforce_goal_min', 'triforce_goal_max',
-                         'triforce_min_difference', 'triforce_goal', 'triforce_pool',
+                         'triforce_min_difference', 'triforce_goal', 'triforce_pool', 'shufflelinks',
                          'retro', 'accessibility', 'hints', 'beemizer', 'experimental', 'dungeon_counters',
                          'shufflebosses', 'shuffleenemies', 'enemy_health', 'enemy_damage', 'shufflepots',
                          'ow_palettes', 'uw_palettes', 'sprite', 'disablemusic', 'quickswap', 'fastmenu', 'heartcolor', 'heartbeep',
@@ -143,6 +143,7 @@ def parse_settings():
         "openpyramid": False,
         "shuffleganon": True,
         "shuffle": "vanilla",
+        "shufflelinks": False,
 
         "shufflepots": False,
         "shuffleenemies": "none",

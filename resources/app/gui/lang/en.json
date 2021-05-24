@@ -111,6 +111,7 @@
 
     "randomizer.entrance.openpyramid": "Pre-open Pyramid Hole",
     "randomizer.entrance.shuffleganon": "Include Ganon's Tower and Pyramid Hole in shuffle pool",
+    "randomizer.entrance.shufflelinks": "Include Link's House in the shuffle pool",
 
     "randomizer.entrance.entranceshuffle": "Entrance Shuffle",
     "randomizer.entrance.entranceshuffle.vanilla": "Vanilla",

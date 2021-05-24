@@ -278,6 +278,9 @@
       "Include the Ganon's Tower and Pyramid Hole in the",
       "entrance shuffle pool. (default: %(default)s)"
     ],
+    "shufflelink": [
+      "Include Link's House in the entrance shuffle pool. (default: %(default)s)"
+    ],
     "heartbeep": [
       "Select the rate at which the heart beep sound is played at",
       "low health. (default: %(default)s)"

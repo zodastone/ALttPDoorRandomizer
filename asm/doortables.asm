@@ -669,6 +669,10 @@ db $07,$07,$02,$02,$02,$02,$07,$07,$07,$20,$20,$07,$20,$20,$20,$07
 ;27f300
 
 ;
-org $27ff00
-SancDarkWorldFlag:
-db 0
+;org $27ff00
+
+org $27fff0
+LinksHouseDarkWorld:
+dw $ffff
+SanctuaryDarkWorld:
+dw $ffff
