@@ -902,7 +902,7 @@ def link_entrances(world, player):
 
         # place links house
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
-            links_house = 'Links house'
+            links_house = 'Links House'
         else:
             links_house_doors = [i for i in entrances + entrances_must_exits if i not in Isolated_LH_Doors_Open]
             if world.doorShuffle[player] == 'crossed' and world.intensity[player] >= 3:
