@@ -1314,9 +1314,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             if item.name != 'Piece of Heart' or equip[0x36B] == 0:
                 equip[0x36C] = min(equip[0x36C] + 0x08, 0xA0)
                 equip[0x36D] = min(equip[0x36D] + 0x08, 0xA0)
-        elif item.name == 'Pegasus Boots':
-            rom.write_byte(0x183015, 0x01)
-            ability_flags |= 0b00000100
         else:
             raise RuntimeError(f'Unsupported item in starting equipment: {item.name}')
 
