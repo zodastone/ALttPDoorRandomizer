@@ -970,7 +970,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     #Work around for json patch ordering issues - write bow limit separately so that it is replaced in the patch
     rom.write_bytes(0x180098, [difficulty.progressive_bow_limit, overflow_replacement])
 
-    if difficulty.progressive_bow_limit < 2 and world.swords == 'swordless':
+    if difficulty.progressive_bow_limit < 2 and world.swords[player] == 'swordless':
         rom.write_bytes(0x180098, [2, overflow_replacement])
 
     # set up game internal RNG seed
@@ -1314,9 +1314,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             if item.name != 'Piece of Heart' or equip[0x36B] == 0:
                 equip[0x36C] = min(equip[0x36C] + 0x08, 0xA0)
                 equip[0x36D] = min(equip[0x36D] + 0x08, 0xA0)
-        elif item.name == 'Pegasus Boots':
-            rom.write_byte(0x183015, 0x01)
-            ability_flags |= 0b00000100
         else:
             raise RuntimeError(f'Unsupported item in starting equipment: {item.name}')
 
