@@ -187,9 +187,9 @@ def roll_settings(weights):
 
     ret.item_functionality = get_choice('item_functionality')
 
-    old_style_bosses = {'simple': 'basic',
-                        'full': 'normal',
-                        'random': 'chaos'}
+    old_style_bosses = {'basic': 'simple',
+                        'normal': 'full',
+                        'chaos': 'random'}
     boss_choice = get_choice('boss_shuffle')
     if boss_choice in old_style_bosses.keys():
         boss_choice = old_style_bosses[boss_choice]

@@ -174,7 +174,7 @@ def place_bosses(world, player):
             boss_locations.remove(['Ice Palace', None])
             placeable_bosses.remove('Kholdstare')
 
-        if world.boss_shuffle[player] == "basic": # vanilla bosses shuffled
+        if world.boss_shuffle[player] == "simple":  # vanilla bosses shuffled
             bosses = placeable_bosses + ['Armos Knights', 'Lanmolas', 'Moldorm']
         else: # all bosses present, the three duplicates chosen at random
             bosses = all_bosses + [random.choice(placeable_bosses) for _ in range(3)]

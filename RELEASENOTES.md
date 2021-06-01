@@ -10,6 +10,12 @@ Thanks to qadan, cheuer, & compiling
 
 # Bug Fixes and Notes.
 
+* 0.4.0.5
+	* Insanity - less restrictions on exiting (all modes)
+	* Fix for simple bosses shuffle
+	* Fix for boss shuffle from Mystery.py
+	* Minor msu fade out bug (thanks codemann8)
+	* Other bug fixes (thanks Catobat)
 * 0.4.0.4
 	* Added --shufflelinks option
 	* Moved spawning as a bunny indoors to experimental
