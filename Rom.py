@@ -1600,6 +1600,9 @@ def write_custom_shops(rom, world, player):
                 loc_item = world.get_location(retro_shops[shop.region.name][index], player).item
             else:
                 loc_item = ItemFactory(item['item'], player)
+            if (not world.shopsanity[player] and shop.region.name == 'Capacity Upgrade'
+               and world.difficulty[player] != 'normal'):
+                continue  # skip cap upgrades except in normal/shopsanity
             item_id = loc_item.code
             price = int16_as_bytes(item['price'])
             replace = ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF
