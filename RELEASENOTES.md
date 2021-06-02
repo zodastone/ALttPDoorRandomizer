@@ -1,5 +1,9 @@
 # New Features
 
+## Maiden Hint for Theives Town Attic
+
+In crossed dungeon mode, if you bring the maiden to the boss room when the attic is not bombed (and thus no light in the room), she mentions the dungeon where you can find the cracked floor.
+
 ## Shuffle Links House
 
 Links house can now be shuffled in different ER settings. It will be limited to the Light World (or Dark World in inverted) if Crossed or Insanity shuffle is not one. It it also limited if door shuffle settings allow the Sanctuary to be in the dark world. (This is prevent having no Light World spawn points in Open modes) This setting is ignored by standard mode. THe CLI parameter is --shufflelinks
@@ -10,6 +14,10 @@ Thanks to qadan, cheuer, & compiling
 
 # Bug Fixes and Notes.
 
+* 0.4.0.6
+	* Hints now default to off
+	* The maiden gives you a hint to the attic if you bring her to the unlit boss room
+	* Beemizer support and fix for shopsanity	
 * 0.4.0.5
 	* Insanity - less restrictions on exiting (all modes)
 	* Fix for simple bosses shuffle

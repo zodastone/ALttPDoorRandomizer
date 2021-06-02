@@ -209,7 +209,7 @@ def roll_settings(weights):
 
     ret.shufflepots = get_choice('pot_shuffle') == 'on'
 
-    ret.beemizer = int(get_choice('beemizer')) if 'beemizer' in weights else 0
+    ret.beemizer = get_choice('beemizer') if 'beemizer' in weights else '0'
 
     inventoryweights = weights.get('startinventory', {})
     startitems = []

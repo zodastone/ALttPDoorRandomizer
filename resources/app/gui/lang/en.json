@@ -234,6 +234,13 @@
     "randomizer.item.weapons.swordless": "Swordless",
     "randomizer.item.weapons.vanilla": "Vanilla",
 
+    "randomizer.item.beemizer": "Beemizer",
+    "randomizer.item.beemizer.0": "No Bee Traps",
+    "randomizer.item.beemizer.1": "25% Bee Traps",
+    "randomizer.item.beemizer.2": "40% Traps, 20% Refills",
+    "randomizer.item.beemizer.3": "50% Traps, 50% Refills",
+    "randomizer.item.beemizer.4": "100% Bee Traps",
+
     "randomizer.item.itempool": "Item Pool",
     "randomizer.item.itempool.normal": "Normal",
     "randomizer.item.itempool.hard": "Hard",

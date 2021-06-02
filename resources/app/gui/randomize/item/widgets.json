@@ -58,6 +58,12 @@
         "swordless",
         "vanilla"
       ]
+    },
+    "beemizer": {
+      "type": "selectbox",
+      "options": [
+        "0", "1", "2", "3", "4"
+      ]
     }
   },
   "rightItemFrame": {

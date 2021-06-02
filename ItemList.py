@@ -306,6 +306,10 @@ def generate_itempool(world, player):
                         pool.append(slot['item'])
 
     items = ItemFactory(pool, player)
+    if world.shopsanity[player]:
+        for potion in ['Green Potion', 'Blue Potion', 'Red Potion']:
+            p_item = next(item for item in items if item.name == potion and item.player == player)
+            p_item.priority = True  # don't beemize one of each potion
 
     world.lamps_needed_for_dark_rooms = lamps_needed_for_dark_rooms
 
@@ -337,11 +341,11 @@ def generate_itempool(world, player):
         for hp in adv_heart_pieces:
             hp.advancement = True
 
-    beeweights = {0: {None: 100},
-                  1: {None: 75, 'trap': 25},
-                  2: {None: 40, 'trap': 40, 'bee': 20},
-                  3: {'trap': 50, 'bee': 50},
-                  4: {'trap': 100}}
+    beeweights = {'0': {None: 100},
+                  '1': {None: 75, 'trap': 25},
+                  '2': {None: 40, 'trap': 40, 'bee': 20},
+                  '3': {'trap': 50, 'bee': 50},
+                  '4': {'trap': 100}}
     def beemizer(item):
         if world.beemizer[item.player] and not item.advancement and not item.priority and not item.type:
             choice = random.choices(list(beeweights[world.beemizer[item.player]].keys()), weights=list(beeweights[world.beemizer[item.player]].values()))[0]

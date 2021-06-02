@@ -159,6 +159,11 @@
       "7", "6", "5", "4", "3", "2", "1", "0", "random"
     ]
   },
+  "beemizer": {
+    "choices": [
+      "4", "3", "2", "1", "0"
+    ]
+  },
   "openpyramid": {
     "action": "store_true",
     "type": "bool"

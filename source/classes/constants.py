@@ -69,7 +69,8 @@ SETTINGSTOPROCESS = {
       "timer": "timer",
       "progressives": "progressive",
       "accessibility": "accessibility",
-      "sortingalgo": "algorithm"
+      "sortingalgo": "algorithm",
+      "beemizer": "beemizer"
     },
     "entrance": {
       "openpyramid": "openpyramid",

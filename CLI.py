@@ -74,7 +74,6 @@ def parse_cli(argv, no_defaults=False):
     parser.add_argument('--customitemarray', default={}, help=argparse.SUPPRESS)
 
     # included for backwards compatibility
-    parser.add_argument('--beemizer', default=defval(settings["beemizer"]), type=lambda value: min(max(int(value), 0), 4))
     parser.add_argument('--multi', default=defval(settings["multi"]), type=lambda value: min(max(int(value), 1), 255))
     parser.add_argument('--securerandom', default=defval(settings["securerandom"]), action='store_true')
     parser.add_argument('--teams', default=defval(1), type=lambda value: max(int(value), 1))
