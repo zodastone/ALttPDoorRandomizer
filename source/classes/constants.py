@@ -55,6 +55,7 @@ CUSTOMITEMLABELS = [
 SETTINGSTOPROCESS = {
   "randomizer": {
     "item": {
+      "hints": "hints",
       "retro": "retro",
       "shopsanity": "shopsanity",
       "worldstate": "mode",
@@ -97,7 +98,6 @@ SETTINGSTOPROCESS = {
       "standardize_palettes": "standardize_palettes",
     },
     "gameoptions": {
-      "hints": "hints",
       "nobgm": "disablemusic",
       "quickswap": "quickswap",
       "heartcolor": "heartcolor",

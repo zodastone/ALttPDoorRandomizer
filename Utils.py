@@ -294,29 +294,18 @@ def update_deprecated_args(args):
     if args:
         argVars = vars(args)
         truthy = [1, True, "True", "true"]
-        # Hints default to TRUE
+        # Hints default to FALSE
         # Don't do: Yes
         # Do:       No
         if "no_hints" in argVars:
-            src = "no_hints"
-            if isinstance(argVars["hints"], dict):
-                tmp = {}
-                for idx in range(1, len(argVars["hints"]) + 1):
-                    tmp[idx] = argVars[src] not in truthy  # tmp = !src
-                args.hints = tmp  # dest = tmp
-            else:
-                args.hints = args.no_hints not in truthy  # dest = !src
-        # Don't do: No
-        # Do:       Yes
-        if "hints" in argVars:
-            src = "hints"
-            if isinstance(argVars["hints"], dict):
-                tmp = {}
-                for idx in range(1, len(argVars["hints"]) + 1):
-                    tmp[idx] = argVars[src] not in truthy  # tmp = !src
-                args.no_hints = tmp  # dest = tmp
-            else:
-                args.no_hints = args.hints not in truthy  # dest = !src
+            if args.no_hints in truthy:
+                if isinstance(argVars["hints"], dict):
+                    tmp = {}
+                    for idx in range(1, len(argVars["hints"]) + 1):
+                        tmp[idx] = False
+                    args.hints = tmp
+                else:
+                    args.hints = False
 
         # Spoiler defaults to TRUE
         # Don't do: Yes

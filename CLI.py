@@ -179,9 +179,7 @@ def parse_settings():
         "names": "",
         "securerandom": False,
 
-        # Hints default to TRUE
-        "hints": True,
-        "no_hints": False,
+        "hints": False,
         "disablemusic": False,
         "quickswap": False,
         "heartcolor": "red",

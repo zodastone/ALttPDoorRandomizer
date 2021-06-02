@@ -128,7 +128,7 @@
     "randomizer.entrance.entranceshuffle.dungeonssimple": "Dungeons + Simple",
 
 
-    "randomizer.gameoptions.hints": "Include Helpful Hints",
+
     "randomizer.gameoptions.nobgm": "Disable Music & MSU-1",
     "randomizer.gameoptions.quickswap": "L/R Quickswapping",
 
@@ -184,7 +184,7 @@
     "randomizer.generation.rom.dialog.romfiles": "Rom Files",
     "randomizer.generation.rom.dialog.allfiles": "All Files",
 
-
+    "randomizer.item.hints": "Include Helpful Hints",
     "randomizer.item.retro": "Retro mode (universal keys)",
 
     "randomizer.item.worldstate": "World State",

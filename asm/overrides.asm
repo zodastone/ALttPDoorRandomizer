@@ -148,3 +148,10 @@ StandardAgaDmg:
 		LDA.b #$10 ; hurt him!
 	+ RTL ; A is zero if the AND results in zero and then Agahnim's invincible!
 
+; note: this skips both maiden dialog triggers if the hole is open
+BlindsAtticHint:
+	CMP.w #$0122 : BNE +
+	LDA $7EF0CA : AND.w #$0100 : BEQ +
+		SEP #$20 : RTL ; skip the dialog box if the hole is already open
+	+ SEP #$20 : JML Main_ShowTextMessage
+

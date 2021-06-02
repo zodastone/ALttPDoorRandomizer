@@ -1,7 +1,10 @@
 {
   "checkboxes": {
     "retro": { "type": "checkbox" },
-    "shopsanity": { "type": "checkbox" }
+    "shopsanity": { "type": "checkbox" },
+    "hints": {
+      "type": "checkbox"
+    }
   },
   "leftItemFrame": {
     "worldstate": {

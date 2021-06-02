@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'f8f1b851b091d50af2b87283ea79ed90'
+RANDOMIZERBASEHASH = '56cf37536facb8e6b19d2ce516436f66'
 
 
 class JsonRom(object):
@@ -2026,7 +2026,7 @@ def write_strings(rom, world, player, team):
         if world.doorShuffle[player] in ['crossed']:
             attic_hint = world.get_location("Thieves' Town - Attic", player).parent_region.dungeon.name
             this_hint = 'A cracked floor can be found in ' + attic_hint + '.'
-            if hint_locations[0] == 'telepathic_tile_thieves_town_upstairs':
+            if world.intensity[player] < 2 and hint_locations[0] == 'telepathic_tile_thieves_town_upstairs':
                 tt[hint_locations.pop(1)] = this_hint
             else:
                 tt[hint_locations.pop(0)] = this_hint
@@ -2114,6 +2114,17 @@ def write_strings(rom, world, player, team):
     bombositem = world.get_location('Bombos Tablet', player).item
     bombos_text = 'Some Hot Air' if bombositem is None else hint_text(bombositem, True) if bombositem.pedestal_hint_text is not None else 'Unknown Item'
     tt['tablet_bombos_book'] = bombos_text
+
+    # attic hint
+    if world.doorShuffle[player] in ['crossed']:
+        attic_hint = world.get_location("Thieves' Town - Attic", player).parent_region.dungeon.name
+        tt['blind_not_that_way'] = f'{attic_hint} is too bright for my eyes'
+        # see tagalog.asm tables at 957,967 or Follower_HandleTrigger in JPDASM
+        # also the baserom table at org $09A4C2 in hooks.asm (Escort text)
+        rom.write_byte(0x04a4be, 0xac)  # change the room to blind's room
+        rom.write_byte(0x04a526, 0xb8)  # y coordinate, shifted down
+        rom.write_byte(0x04a529, 0x19)  # x tile shifted right a few tiles
+        rom.write_byte(0x04a52e, 0x06)  # follower set to blind maiden
 
     # inverted spawn menu changes
     if world.mode[player] == 'inverted':

@@ -1,9 +1,5 @@
 {
   "checkboxes":   {
-    "hints": {
-      "type": "checkbox",
-      "default": "true"
-    },
     "nobgm":      { "type": "checkbox" },
     "quickswap":  { "type": "checkbox" }
   },
