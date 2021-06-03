@@ -17,7 +17,11 @@ Thanks to qadan, cheuer, & compiling
 * 0.4.0.6
 	* Hints now default to off
 	* The maiden gives you a hint to the attic if you bring her to the unlit boss room
-	* Beemizer support and fix for shopsanity	
+	* Beemizer support and fix for shopsanity
+	* Capacity upgrades removed in hard/expert item difficulties
+	* Swamp Hub added to lobby shuffle with ugly cave entrance.
+	* TR Lava Escape added to lobby shuffle.
+	* Hyrule Main Lobby and Sanctuary can now have a more visible outside exit, and rugs modified to be fully clipped. 
 * 0.4.0.5
 	* Insanity - less restrictions on exiting (all modes)
 	* Fix for simple bosses shuffle
@@ -59,8 +63,7 @@ Thanks to qadan, cheuer, & compiling
 # Known Issues
 
 * Shopsanity Issues
-	* Hints for items in shops can be misleading
-	* Capacity upgrades present in hard/expert item pools
+	* Hints for items in shops can be misleading (ER)
 	* Forfeit in Multiworld not granting all shop items
 * Potential keylocks in multi-entrance dungeons
 * Incorrect vanilla key logic for Mire

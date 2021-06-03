@@ -84,32 +84,24 @@ SuctionOverworldFix:
         stz $49
     + rtl
 
-; TT Alcove, Mire bridges, pod falling, SW torch room, TR Pipe room, Bob's Room, Ice Many Pots, Mire Hub
-; swamp waterfall, Gauntlet 3, Eastern Push block
-CutoffRooms:
-db $bc, $a2, $1a, $49, $14, $8c, $9f, $c2
-db $66, $5d, $a8
-; Don't forget CutoffRoomCount!!!
+!CutoffTable = "$27E000"
 
 CutoffEntranceRug:
-    pha : phx
-    lda.l DRMode : beq .norm
-        lda $04 : cmp #$000A : beq +
-        cmp #$000C : bne .norm
-          + lda $a0 : sep #$20 : ldx #$0000
-          	- cmp.l CutoffRooms, x : beq .check
-          	inx : cpx #$000B : !blt - ; CutoffRoomCount is here!
-        rep #$20
-    .norm plx : pla : lda $9B52, y : sta $7E2000, x ; what we wrote over
-rtl
+    PHA : PHX
+    LDA.l DRMode : BEQ .norm
+        LDA $04 : cmp #$000A : BEQ + ; only affect A & C objects
+        cmp #$000C : BNE .norm
+          + LDX #$0000 : LDA !CutoffTable, x
+          	- CMP.W $A0 : BEQ .check
+           	TXA : !ADD #$0008 : TAX : LDA !CutoffTable, x : CMP.w #$FFFF : BNE -
+    .norm PLX : PLA : LDA $9B52, y : STA $7E2000, x ; what we wrote over
+RTL
      .check
-		  rep #$20
-		  lda $0c : cmp #$0006 : !bge .skip
-		  lda $0e : cmp #$0008 : !bge .skip
-		  cmp #$0004 : !blt .skip
-      bra  .norm
-.skip plx : pla : rtl
-
+		  LDA $0c : CMP.l !CutoffTable+2, x : !BGE .skip
+		  LDA $0e : CMP.l !CutoffTable+4, x : !BGE .skip
+		  CMP.l !CutoffTable+6, x : !BLT .skip
+      BRA .norm
+.skip PLX : PLA : RTL
 
 StoreTempBunnyState:
 	LDA $5D : CMP #$1C : BNE +
@@ -131,7 +123,7 @@ RainPrevention:
 			LDA.l BlockSanctuaryDoorInRain : BEQ .done ;flagged
 			LDA $A0 : CMP #$0012 : BNE + ;we're in the sanctuary
 				LDA.l $7EF3CC : AND #$00FF : CMP #$0001 : BEQ .done ; zelda is following
-					LDA $00 : CMP #$02A1 : BNE .done
+					LDA $00 : AND #$00FF : CMP #$00A1 : BNE .done ; position is a1
 						PLA : LDA #$0008 : RTL
 			+ LDA.l BlockCastleDoorsInRain : AND #$00FF : BEQ .done ;flagged
 			LDX #$FFFE
@@ -150,6 +142,7 @@ StandardAgaDmg:
 
 ; note: this skips both maiden dialog triggers if the hole is open
 BlindsAtticHint:
+	REP #$20
 	CMP.w #$0122 : BNE +
 	LDA $7EF0CA : AND.w #$0100 : BEQ +
 		SEP #$20 : RTL ; skip the dialog box if the hole is already open

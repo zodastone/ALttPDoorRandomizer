@@ -572,6 +572,33 @@ InroomStairsY:
 dw $0058, $0148, $0198, $0190
 
 
+org $27E000
+CutoffRooms:
+; Room, quad, y max, x max, x min
+dw $00bc, $0007, $0009, $0003  ; TT Alcove
+dw $00a2, $0007, $000b, $0000  ; Mire Bridge Left & Right
+dw $00a3, $0009, $0008, $0004  ; Mire Bent Bridge
+dw $00c2, $0007, $0008, $0000  ; Mire Hub
+;dw $00c2, $0004, $0008, $0004  ; Mire Hub
+dw $001a, $0007, $0008, $0004  ; Pod Falling & Harmless
+dw $0049, $0004, $0008, $0004  ; SW Star Pits
+dw $0014, $0009, $0008, $0004  ; TR Lava Escape & TR Dual Pipes
+dw $008c, $0009, $0008, $0004  ; Bob's Room & GT Big Chest
+
+dw $009f, $0009, $000a, $0002  ; Ice Many Pots
+dw $0066, $0009, $0008, $0000  ; Swamp Waterfall
+dw $005d, $0007, $000b, $0000  ; GT Gauntlet 3
+dw $00a8, $0007, $0008, $0004  ; Eastern Push Block
+dw $00a9, $0009, $0009, $0003  ; Eastern Courtyard
+dw $00aa, $0009, $0009, $0003  ; Eastern Map Valley
+dw $00b9, $0008, $000b, $0000  ; Eastern Cannonball
+dw $0052, $0008, $000a, $0003  ; HC East Hall - affects both doors
+
+dw $0050, $0009, $000a, $0002  ; HC West Hall
+dw $00c5, $0008, $0008, $0000  ; TR Dash Bridge
+dw $00c6, $0007, $0008, $0004  ; TR Hub
+dw $ffff
+
 ; dungeon tables
 ;   HC   HC   EP   DP   AT   SP   PD   MM   SW   IP   TH   TT   TR   GT
 org $27f000
@@ -675,4 +702,6 @@ org $27fff0
 LinksHouseDarkWorld:
 dw $ffff
 SanctuaryDarkWorld:
+dw $ffff
+OldManDarkWorld:
 dw $ffff

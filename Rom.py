@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '56cf37536facb8e6b19d2ce516436f66'
+RANDOMIZERBASEHASH = 'fef56e6629ee9fe1de52b7842beb333d'
 
 
 class JsonRom(object):
@@ -683,6 +683,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     if should_be_bunny(links_house, world.mode[player]):
         rom.write_bytes(0x13fff0, [0x04, 0x01])
 
+    old_man_house = world.get_region('Old Man House', player)
+    if should_be_bunny(old_man_house, world.mode[player]):
+        rom.write_bytes(0x13fff4, [0xe4, 0x00])
 
     # patch doors
     if world.doorShuffle[player] == 'crossed':

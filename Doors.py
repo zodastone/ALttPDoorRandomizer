@@ -496,7 +496,7 @@ def create_doors(world, player):
         create_door(player, 'Swamp Hammer Switch SW', Intr).dir(So, 0x37, Left, High).small_key().pos(2),
         create_door(player, 'Swamp Hammer Switch WN', Nrml).dir(We, 0x37, Top, High).pos(0),
         create_door(player, 'Swamp Hub ES', Nrml).dir(Ea, 0x36, Bot, High).pos(4),
-        create_door(player, 'Swamp Hub S', Nrml).dir(So, 0x36, Mid, High).pos(5),  # .portal(Z, 0x22, 1), couldn't figure this out
+        create_door(player, 'Swamp Hub S', Nrml).dir(So, 0x36, Mid, High).pos(5).portal(Z, 0x22, 1),
         create_door(player, 'Swamp Hub WS', Nrml).dir(We, 0x36, Bot, High).pos(3),
         create_door(player, 'Swamp Hub WN', Nrml).dir(We, 0x36, Top, High).small_key().pos(2),
         create_door(player, 'Swamp Hub Hook Path', Lgcl),
@@ -981,7 +981,7 @@ def create_doors(world, player):
         create_door(player, 'TR Lava Dual Pipes SW', Nrml).dir(So, 0x14, Left, High).pos(4).portal(Z, 0x22),
         create_door(player, 'TR Lava Island WS', Nrml).dir(We, 0x14, Bot, High).small_key().pos(1),
         create_door(player, 'TR Lava Island ES', Nrml).dir(Ea, 0x14, Bot, High).pos(6),
-        create_door(player, 'TR Lava Escape SE', Nrml).dir(So, 0x14, Right, High).small_key().pos(0),
+        create_door(player, 'TR Lava Escape SE', Nrml).dir(So, 0x14, Right, High).small_key().pos(0).portal(X, 0x22),
         create_door(player, 'TR Lava Escape NW', Nrml).dir(No, 0x14, Left, High).pos(2),
         create_door(player, 'TR Pokey 2 EN', Nrml).dir(Ea, 0x13, Top, High).pos(1),
         create_door(player, 'TR Pokey 2 Top to Bottom Barrier - Blue', Lgcl),
