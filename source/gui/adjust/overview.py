@@ -101,7 +101,8 @@ def adjust_page(top, parent, settings):
           "owpalettes": "ow_palettes",
           "uwpalettes": "uw_palettes",
           "quickswap": "quickswap",
-          "nobgm": "disablemusic"
+          "nobgm": "disablemusic",
+          "reduce_flashing": "reduce_flashing",
         }
         guiargs = Namespace()
         for option in options:

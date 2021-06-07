@@ -35,6 +35,7 @@ def main():
                         help='Select the color of Link\'s heart meter. (default: %(default)s)')
     parser.add_argument('--ow_palettes', default='default', choices=['default', 'random', 'blackout'])
     parser.add_argument('--uw_palettes', default='default', choices=['default', 'random', 'blackout'])
+    parser.add_argument('--reduce_flashing', help='Reduce some in-game flashing.', action='store_true')
     parser.add_argument('--sprite', help='''\
                              Path to a sprite sheet to use for Link. Needs to be in
                              binary format and have a length of 0x7000 (28672) bytes,

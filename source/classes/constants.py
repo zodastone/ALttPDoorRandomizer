@@ -105,7 +105,8 @@ SETTINGSTOPROCESS = {
       "heartbeep": "heartbeep",
       "menuspeed": "fastmenu",
       "owpalettes": "ow_palettes",
-      "uwpalettes": "uw_palettes"
+      "uwpalettes": "uw_palettes",
+      "reduce_flashing": "reduce_flashing"
     },
     "generation": {
       "createspoiler": "create_spoiler",

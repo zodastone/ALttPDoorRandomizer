@@ -278,7 +278,7 @@
       "Include the Ganon's Tower and Pyramid Hole in the",
       "entrance shuffle pool. (default: %(default)s)"
     ],
-    "shufflelink": [
+    "shufflelinks": [
       "Include Link's House in the entrance shuffle pool. (default: %(default)s)"
     ],
     "heartbeep": [
@@ -293,6 +293,7 @@
       "Alternatively, can be a ALttP Rom patched with a Link",
       "sprite that will be extracted."
     ],
+    "reduce_flashing": [ "Reduce some in-game flashing (default: %(default)s)" ],
     "create_rom": [ "Create an output rom file. (default: %(default)s)" ],
     "gui": [ "Launch the GUI. (default: %(default)s)" ],
     "jsonout": [

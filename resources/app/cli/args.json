@@ -195,6 +195,10 @@
     "action": "store_true",
     "type": "bool"
   },
+  "reduce_flashing": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "mapshuffle": {
     "action": "store_true",
     "type": "bool"

@@ -495,8 +495,6 @@ class Sprite(object):
         sprite_name = read_utf16le(stream)
         author_name = read_utf16le(stream)
 
-        # Ignoring the Author Rom name for the time being.
-
         real_csum = sum(filedata) % 0x10000
         if real_csum != csum or real_csum ^ 0xFFFF != icsum:
             logger.warning('ZSPR file has incorrect checksum. It may be corrupted.')
@@ -1638,7 +1636,8 @@ def hud_format_text(text):
     return output[:32]
 
 
-def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite, ow_palettes, uw_palettes):
+def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite,
+                       ow_palettes, uw_palettes, reduce_flashing):
     if sprite and not isinstance(sprite, Sprite):
         sprite = Sprite(sprite) if os.path.isfile(sprite) else get_sprite_from_name(sprite)
 
@@ -1694,6 +1693,32 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
     # write link sprite if required
     if sprite is not None:
         write_sprite(rom, sprite)
+
+    # sprite author credits
+    padded_author = sprite.author_name if sprite is not None else "Nintendo"
+    padded_author = padded_author[:28] if len(padded_author) > 28 else padded_author
+    padded_author = padded_author.center(28).upper()
+
+    def convert_char_to_credits(char):
+        char_map = {
+            " ": (0x9F, 0x9F), "0": (0x53, 0x79), "1": (0x54, 0x7A), "2": (0x55, 0x7B), "3": (0x56, 0x7C),
+            "4": (0x57, 0x7D), "5": (0x58, 0x7E), "6": (0x59, 0x7F), "7": (0x5A, 0x80), "8": (0x5B, 0x81),
+            "9": (0x5C, 0x82), "A": (0x5D, 0x83), "B": (0x5E, 0x84), "C": (0x5F, 0x85), "D": (0x60, 0x86),
+            "E": (0x61, 0x87), "F": (0x62, 0x88), "G": (0x63, 0x89), "H": (0x64, 0x8A), "I": (0x65, 0x8B),
+            "J": (0x66, 0x8C), "K": (0x67, 0x8D), "L": (0x68, 0x8E), "M": (0x69, 0x8F), "N": (0x6A, 0x90),
+            "O": (0x6B, 0x91), "P": (0x6C, 0x92), "Q": (0x6D, 0x93), "R": (0x6E, 0x94), "S": (0x6F, 0x95),
+            "T": (0x70, 0x96), "U": (0x71, 0x97), "V": (0x72, 0x98), "W": (0x73, 0x99), "X": (0x74, 0x9A),
+            "Y": (0x75, 0x9B), "Z": (0x76, 0x9C), "'": (0x77, 0x9d), ".": (0xA0, 0xC0), "/": (0xA2, 0xC2),
+            ":": (0xA3, 0xC3), "_": (0xA6, 0xC6)}
+        return char_map[char] if char in char_map else (0x9F, 0x9F)
+
+    character_bytes = map(convert_char_to_credits, padded_author)
+    for i, pair in enumerate(character_bytes):
+        rom.write_byte(0x118002 + i, pair[0])
+        rom.write_byte(0x118020 + i, pair[1])
+
+    if reduce_flashing:
+        rom.write_byte(0x18017f, 1)
 
     default_ow_palettes(rom)
     if ow_palettes == 'random':

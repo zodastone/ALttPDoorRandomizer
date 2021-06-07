@@ -14,6 +14,9 @@ Thanks to qadan, cheuer, & compiling
 
 # Bug Fixes and Notes.
 
+* 0.4.0.7
+	* Reduce flashing option added
+	* Sprite author credit added
 * 0.4.0.6
 	* Hints now default to off
 	* The maiden gives you a hint to the attic if you bring her to the unlit boss room
