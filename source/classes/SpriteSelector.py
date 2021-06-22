@@ -110,7 +110,7 @@ class SpriteSelector(object):
 
         sprites = []
 
-        for file in glob(output_path(path)):
+        for file in glob(path):
             sprites.append(Sprite(file))
 
         sprites.sort(key=lambda s: str.lower(s.name or "").strip())
@@ -161,7 +161,8 @@ class SpriteSelector(object):
                 task.update_status("Determining needed sprites")
                 current_sprites = [os.path.basename(file) for file in glob(os.path.join(self.official_sprite_dir,"*"))]
                 official_sprites = [(sprite['file'], os.path.basename(urlparse(sprite['file']).path)) for sprite in sprites_arr]
-                needed_sprites = [(sprite_url, filename) for (sprite_url, filename) in official_sprites if filename not in current_sprites]
+                needed_sprites = [(sprite_url, filename) for (sprite_url, filename) in official_sprites
+                                  if filename not in current_sprites and filename != "001.link.1.zspr"]
                 bundled_sprites = [os.path.basename(file) for file in glob(os.path.join(self.unofficial_sprite_dir,"*"))]
                 # todo: eventually use the above list to avoid downloading any sprites that we already have cached in the bundle.
 

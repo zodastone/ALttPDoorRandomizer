@@ -1638,6 +1638,14 @@ def hud_format_text(text):
 
 def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite,
                        ow_palettes, uw_palettes, reduce_flashing):
+
+    if not os.path.exists("data/sprites/official/001.link.1.zspr"):
+        dump_zspr(rom.orig_buffer[0x80000:0x87000], rom.orig_buffer[0xdd308:0xdd380],
+                  rom.orig_buffer[0xdedf5:0xdedf9], "data/sprites/official/001.link.1.zspr", "Nintendo", "Link")
+
+    # todo: implement a flag for msu resume delay
+    rom.write_bytes(0x18021D, [0, 0])  # default to off for now
+
     if sprite and not isinstance(sprite, Sprite):
         sprite = Sprite(sprite) if os.path.isfile(sprite) else get_sprite_from_name(sprite)
 
@@ -1735,6 +1743,61 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
     if isinstance(rom, LocalRom):
         rom.write_crc()
 
+
+# .zspr file dumping logic copied with permission from SpriteSomething:
+# https://github.com/Artheau/SpriteSomething/blob/master/source/meta/classes/spritelib.py#L443 (thanks miketrethewey!)
+def dump_zspr(basesprite, basepalette, baseglove, outfilename, author_name, sprite_name):
+    palettes = basepalette
+    # Add glove data
+    palettes.extend(baseglove)
+    HEADER_STRING = b"ZSPR"
+    VERSION = 0x01
+    SPRITE_TYPE = 0x01  # this format has "1" for the player sprite
+    RESERVED_BYTES = b'\x00\x00\x00\x00\x00\x00'
+    QUAD_BYTE_NULL_CHAR = b'\x00\x00\x00\x00'
+    DOUBLE_BYTE_NULL_CHAR = b'\x00\x00'
+    SINGLE_BYTE_NULL_CHAR = b'\x00'
+
+    write_buffer = bytearray()
+
+    write_buffer.extend(HEADER_STRING)
+    write_buffer.extend(struct.pack('B', VERSION)) # as_u8
+    checksum_start = len(write_buffer)
+    write_buffer.extend(QUAD_BYTE_NULL_CHAR)  # checksum
+    sprite_sheet_pointer = len(write_buffer)
+    write_buffer.extend(QUAD_BYTE_NULL_CHAR)
+    write_buffer.extend(struct.pack('<H', len(basesprite)))  # as_u16
+    palettes_pointer = len(write_buffer)
+    write_buffer.extend(QUAD_BYTE_NULL_CHAR)
+    write_buffer.extend(struct.pack('<H', len(palettes)))  # as_u16
+    write_buffer.extend(struct.pack('<H', SPRITE_TYPE))  # as_u16
+    write_buffer.extend(RESERVED_BYTES)
+    # sprite.name
+    write_buffer.extend(sprite_name.encode('utf-16-le'))
+    write_buffer.extend(DOUBLE_BYTE_NULL_CHAR)
+    # author.name
+    write_buffer.extend(author_name.encode('utf-16-le'))
+    write_buffer.extend(DOUBLE_BYTE_NULL_CHAR)
+    # author.name-short
+    write_buffer.extend(author_name.encode('ascii'))
+    write_buffer.extend(SINGLE_BYTE_NULL_CHAR)
+    write_buffer[sprite_sheet_pointer:sprite_sheet_pointer +
+                                      4] = struct.pack('<L', len(write_buffer)) # as_u32
+    write_buffer.extend(basesprite)
+    write_buffer[palettes_pointer:palettes_pointer +
+                                  4] = struct.pack('<L', len(write_buffer)) # as_u32
+    write_buffer.extend(palettes)
+
+    checksum = (sum(write_buffer) + 0xFF + 0xFF) % 0x10000
+    checksum_complement = 0xFFFF - checksum
+
+    write_buffer[checksum_start:checksum_start +
+                                2] = struct.pack('<H', checksum) # as_u16
+    write_buffer[checksum_start + 2:checksum_start +
+                                    4] = struct.pack('<H', checksum_complement) # as_u16
+
+    with open('%s' % outfilename, "wb") as zspr_file:
+        zspr_file.write(write_buffer)
 
 def write_sprite(rom, sprite):
     if not sprite.valid:

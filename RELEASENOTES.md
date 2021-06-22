@@ -18,6 +18,9 @@ Thanks to qadan, cheuer, & compiling
 	* Reduce flashing option added
 	* Sprite author credit added
 	* Ranged Crystal switch rules tweaked
+	* Baserom update: includes Credits Speedup, reduced flashing option, msu resume (but turned off by default)
+	* Create link sprite's zspr from local ROM and no longer attempts to download it from website
+	* Some minor bug fixes
 * 0.4.0.6
 	* Hints now default to off
 	* The maiden gives you a hint to the attic if you bring her to the unlit boss room
