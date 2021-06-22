@@ -397,10 +397,10 @@ def create_doors(world, player):
         create_door(player, 'PoD Arena Landing to Right Barrier - Blue', Lgcl),
         create_door(player, 'PoD Arena Landing to North Barrier - Orange', Lgcl),
         create_door(player, 'PoD Arena Right to Landing Barrier - Blue', Lgcl),
-        create_door(player, 'PoD Arena Right to Ranged Crystal', Lgcl),
-        create_door(player, 'PoD Arena Right Ranged Crystal Exit', Lgcl),
-        create_door(player, 'PoD Arena Ledge to Ranged Crystal', Lgcl),
-        create_door(player, 'PoD Arena Ledge Ranged Crystal Exit', Lgcl),
+        create_door(player, 'PoD Arena Right to Ranged Crystal', Lgcl),  # considered out of logic
+        create_door(player, 'PoD Arena Right Ranged Crystal Exit', Lgcl).no_exit(),  # blocked here for pre-validate
+        create_door(player, 'PoD Arena Ledge to Ranged Crystal', Lgcl),  # considered out of logic
+        create_door(player, 'PoD Arena Ledge Ranged Crystal Exit', Lgcl).no_exit(),   # blocked here for pre-validate
         create_door(player, 'PoD Arena Ledge ES', Nrml).dir(Ea, 0x2a, Bot, High).pos(2),
         create_door(player, 'PoD Sexy Statue W', Nrml).dir(We, 0x2b, Mid, High).pos(3),
         create_door(player, 'PoD Sexy Statue NW', Nrml).dir(No, 0x2b, Left, High).trap(0x1).pos(2),
@@ -875,7 +875,7 @@ def create_doors(world, player):
         create_door(player, 'Mire Left Bridge Down Stairs', Sprl).dir(Dn, 0xa2, 0, HTL).ss(A, 0x12, 0x00),
         create_door(player, 'Mire Fishbone E', Nrml).dir(Ea, 0xa1, Mid, High).pos(1),
         create_door(player, 'Mire Fishbone Blue Barrier', Lgcl),
-        create_door(player, 'Mire Fishbone Blue Barrier Bypass', Lgcl),
+        create_door(player, 'Mire Fishbone Blue Barrier Bypass', Lgcl).no_exit(),  # considered out of logic
         create_door(player, 'Mire South Fish Blue Barrier', Lgcl),
         create_door(player, 'Mire Fishbone SE', Nrml).dir(So, 0xa1, Right, High).small_key().pos(0),
         create_door(player, 'Mire Spike Barrier NE', Nrml).dir(No, 0xb1, Right, High).small_key().pos(1),
@@ -1116,16 +1116,18 @@ def create_doors(world, player):
         create_door(player, 'GT Double Switch NW', Nrml).dir(No, 0x9b, Left, High).pos(1).kill(),
         create_door(player, 'GT Double Switch Entry to Pot Corners Barrier - Orange', Lgcl),
         create_door(player, 'GT Double Switch Entry to Left Barrier - Orange', Lgcl),
-        create_door(player, 'GT Double Switch Entry to Ranged Switches', Lgcl),
-        create_door(player, 'GT Double Switch Entry Ranged Switches Exit', Lgcl),
+        create_door(player, 'GT Double Switch Entry to Ranged Switches', Lgcl),  # considered out of logic
+        create_door(player, 'GT Double Switch Entry Ranged Switches Exit', Lgcl).no_exit(),  # blocked here for reasons
+        create_door(player, 'GT Double Switch Left to Crystal', Lgcl),
+        create_door(player, 'GT Double Switch Left Crystal Exit', Lgcl),
         create_door(player, 'GT Double Switch Left to Entry Barrier - Orange', Lgcl),
         create_door(player, 'GT Double Switch Left to Pot Corners Bypass', Lgcl),
         create_door(player, 'GT Double Switch Left to Entry Bypass', Lgcl),
-        create_door(player, 'GT Double Switch Left to Exit Bypass', Lgcl),
+        create_door(player, 'GT Double Switch Left to Exit Bypass', Lgcl).no_exit(),  # considered out of logic
         create_door(player, 'GT Double Switch Pot Corners to Entry Barrier - Orange', Lgcl),
         create_door(player, 'GT Double Switch Pot Corners to Exit Barrier - Blue', Lgcl),
-        create_door(player, 'GT Double Switch Pot Corners to Ranged Switches', Lgcl),
-        create_door(player, 'GT Double Switch Pot Corners Ranged Switches Exit', Lgcl),
+        create_door(player, 'GT Double Switch Pot Corners to Ranged Switches', Lgcl),  # considered out of logic
+        create_door(player, 'GT Double Switch Pot Corners Ranged Switches Exit', Lgcl).no_exit(),  # blocked here
         create_door(player, 'GT Double Switch Exit to Blue Barrier', Lgcl),
         create_door(player, 'GT Double Switch EN', Intr).dir(Ea, 0x9b, Top, High).small_key().pos(0),
         create_door(player, 'GT Spike Crystals WN', Intr).dir(We, 0x9b, Top, High).small_key().pos(0),
@@ -1438,6 +1440,7 @@ def create_doors(world, player):
     world.get_door('GT Double Switch Entry to Pot Corners Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Entry to Left Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Entry Ranged Switches Exit', player).c_switch()
+    world.get_door('GT Double Switch Left Crystal Exit', player).c_switch()
     world.get_door('GT Double Switch Left to Entry Barrier - Orange', player).barrier(CrystalBarrier.Orange)
     world.get_door('GT Double Switch Left to Entry Bypass', player).barrier(CrystalBarrier.Blue)
     world.get_door('GT Double Switch Left to Pot Corners Bypass', player).barrier(CrystalBarrier.Blue)

@@ -99,6 +99,7 @@ def link_doors_main(world, player):
         for portal in world.dungeon_portals[player]:
             connect_portal(portal, world, player)
 
+    fix_big_key_doors_with_ugly_smalls(world, player)
     if world.doorShuffle[player] == 'vanilla':
         for entrance, ext in open_edges:
             connect_two_way(world, entrance, ext, player)
@@ -676,7 +677,6 @@ def find_entrance_region(portal):
 #         paired_door.pair = False
 
 def within_dungeon(world, player):
-    fix_big_key_doors_with_ugly_smalls(world, player)
     add_inaccessible_doors(world, player)
     entrances_map, potentials, connections = determine_entrance_list(world, player)
     connections_tuple = (entrances_map, potentials, connections)
@@ -930,7 +930,6 @@ def treat_split_as_whole_dungeon(split_dungeon, name, origin_list, world, player
 
 
 def cross_dungeon(world, player):
-    fix_big_key_doors_with_ugly_smalls(world, player)
     add_inaccessible_doors(world, player)
     entrances_map, potentials, connections = determine_entrance_list(world, player)
     connections_tuple = (entrances_map, potentials, connections)
@@ -1617,13 +1616,15 @@ def reassign_key_doors(builder, world, player):
                 else:
                     room.delete(d.doorListPos)
             d.smallKey = False
-        elif d.type is DoorType.Interior and d not in flat_proposal and d.dest not in flat_proposal and not d.entranceFlag:
-            world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)
+        elif d.type is DoorType.Interior and d not in flat_proposal and d.dest not in flat_proposal:
+            if not d.entranceFlag:
+                world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)
             d.smallKey = False
             d.dest.smallKey = False
             queue.remove(d.dest)
-        elif d.type is DoorType.Normal and d not in flat_proposal and not d.entranceFlag:
-            world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)
+        elif d.type is DoorType.Normal and d not in flat_proposal:
+            if not d.entranceFlag:
+                world.get_room(d.roomIndex, player).change(d.doorListPos, DoorKind.Normal)
             d.smallKey = False
             for dp in world.paired_doors[player]:
                 if dp.door_a == d.name or dp.door_b == d.name:
@@ -2294,6 +2295,8 @@ logical_connections = [
     ('GT Double Switch Entry to Left Barrier - Orange', 'GT Double Switch Left'),
     ('GT Double Switch Entry to Ranged Switches', 'GT Double Switch Entry - Ranged Switches'),
     ('GT Double Switch Entry Ranged Switches Exit', 'GT Double Switch Entry'),
+    ('GT Double Switch Left to Crystal', 'GT Double Switch Left - Crystal'),
+    ('GT Double Switch Left Crystal Exit', 'GT Double Switch Left'),
     ('GT Double Switch Left to Entry Barrier - Orange', 'GT Double Switch Entry'),
     ('GT Double Switch Left to Entry Bypass', 'GT Double Switch Entry'),
     ('GT Double Switch Left to Pot Corners Bypass', 'GT Double Switch Pot Corners'),
