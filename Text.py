@@ -21,13 +21,14 @@ text_addresses = {'Pedestal': (0x180300, 256),
 
 
 Uncle_texts = [
+    # these ones are er specific
     'Good Luck!\nYou will need it.',
     'Forward this message to 10 other people or this seed will be awful.',
     'I hope you like your seeds bootless and fluteless.',
     '10\n9\n8\n7\n6\n5\n4\n3\n2\n1\nGo!',
     'I\'m off to visit cousin Fritzl.',
     'Don\'t forget to check Antlion Cave.'
-] * 2 + [
+    # these ones are from web randomizer
     "We're out of\nWeetabix. To\nthe store!",
     "This seed is\nbootless\nuntil boots.",
     "Why do we only\nhave one bed?",
@@ -66,15 +67,32 @@ Uncle_texts = [
     "Get to the\nchop...\ncastle!",
     "Come with me\nif you want\nto live",
     "I must go\nmy planet\nneeds me",
+    "Are we in\ngo mode yet?",
+    "Darn, I\nthought this\nwas combo.",
+    "Don't check\nanything I\nwouldn't!",
+    "I know where\nthe bow is!\n",
+    "This message\nwill self\ndestruct.",
+    "Time to cast\nMeteo on\nGanon!",
+    "I have a\nlong, full\nlife ahead!",
+    "Why did that\nsoda have a\nskull on it?",
+    "Something\nrandom just\ncame up.",
+    "I'm bad at\nthis. Can you\ndo it for me?",
+    "Link!\n   Wake up!\n      ... Bye!",
+    "Text me when\nyou hit\ngo mode.",
+    "Turn off the\nstove before\nyou leave.",
+    "It's raining.\nI'm taking\nthe umbrella.",
+    "Count to 30.\nThen come\nfind me.",
+    "Gonna shuffle\nall the items\nreal quick."
 ]
 Triforce_texts = [
+    # these ones are er specific
     'Product has Hole in center. Bad seller, 0 out of 5.',
     'Who stole the fourth triangle?',
     'Trifource?\nMore Like Tritrice, am I right?'
     '\n  Well Done!',
     'You just wasted 2 hours of your life.',
-    'This was meant to be a trapezoid'
-] * 2 + [
+    'This was meant to be a trapezoid',
+    # these ones are from web randomizer
     "\n     G G",
     "All your base\nare belong\nto us.",
     "You have ended\nthe domination\nof Dr. Wily",
@@ -107,6 +125,13 @@ Triforce_texts = [
     "You get one\nwish.  Choose\nwisely, hero!",
     "Can you please\nbreak us three\nup?  Thanks.",
     "  Pick us up\n  before we\n  get dizzy!",
+    "Thank you,\nMikey. You’re\n2 minutes late",
+    "This was a\n7000 series\ntrain.",
+    "   I'd buy\n   that for\n   a rupee!",
+    " Did you like\n   that bow\n  placement?",
+    "I promise the\nnext seed will\nbe better.",
+    "\n   Honk.",
+    "Breakfast\nis served!",
 ]
 BombShop2_texts = ['Bombs!\nBombs!\nBiggest!\nBestest!\nGreatest!\nBoomest!']
 Sahasrahla2_texts = ['You already got my item, idiot.', 'Why are you still talking to me?', 'This text won\'t change.', 'Have you met my brother, Hasarahshla?']
@@ -145,6 +170,34 @@ Blind_texts = [
     "I tried to\ncatch fog,\nbut I mist.",
     "Winter is a\ngreat time\nto chill.",
     "Do you think\nthe Ice Rod\nis cool?",
+    "Pyramids?\nI never saw\nthe point.",
+    "Stone golems\nare created as\nblank slates.",
+    "Desert humor\nis often dry.\n",
+    "Ganon is a\nbacon of\ndespair!",
+    "Butchering\ncows means\nhigh steaks.",
+    "I can't search\nthe web...\nToo many links",
+    "I can whistle\nMost pitches\nbut I can't C",
+    "The Blinds\nStore is\ncurtain death",
+    "Dark Aga Rooms\nare not a\nbright idea.",
+    "Best advice\nfor a Goron?\nBe Boulder.",
+    "Equestrian\nservices are\na stable job.",
+    "Do I like\ndrills? Just\na bit.",
+    "I'd shell out\ngood rupees\nfor a conch.",
+    "Current\naffairs are\nshocking!",
+    "A lying Goron\ndeals in\nboulderdash.",
+    "A bread joke?\nEh, it'd be\nhalf baked.",
+    "I could take\na stab at a\nsword pun.",
+    "Gloves open\na handful\nof checks",
+    "Red mail?\nReturn to\nsender.",
+    "For sale:\nBaby boots,\nNever found",
+    "SRL or rtGG?\nI prefer the\nLadder",
+    "Ladders are\nalways up\nto something",
+    "Zelda's\nfashion is\nvery chic",
+    "Zombie geese\nare waterfoul.\n",
+    "I bought some\ncuccos for a\npoultry sum.",
+    "The stratus of\nclouds is up\nin the air.",
+    "Tie two ropes\ntogether?!\nI think knot!",
+    "Time for you\nto go on a\nBlind date!"
 ]
 Ganon1_texts = [
     "Start your day\nsmiling with a\ndelicious\nwhole grain\nbreakfast\ncreated for\nyour\nincredible\ninsides.",
@@ -171,6 +224,40 @@ Ganon1_texts = [
     "Life, dreams,\nhope...\nWhere'd they\ncome from? And\nwhere are they\nheaded?  These\nthings... I am\ngoing to\ndestroy!",
     "My minions all\nfailed to\nguard those\nitems?!\n\nWhy am I\nsurrounded by\nincompetent\nfools?!",
 ]
+
+Ganon_Phase_3_No_Silvers_texts = [
+    "Did you find\nthe arrows on\nPlanet Zebes?",
+    "Did you find\nthe arrows?\nI think not.",
+    "Silver arrows?\nI have never\nheard of them",
+    "Did you find\nthe arrows on\nThe Moon?",
+    "Did you find\nthe arrows\nIn dev null?",
+    "I have sold\nthe arrows for\na green big 20",
+    "Did you find\nThe arrows in\nCount Dracula?",
+    "Error 404\nSilver arrows\nnot found.",
+    "No arrows for\nYou today,\nSorry",
+    "No arrows?\nCheck your\njunk mail."
+    "Careful, all\nthat spinning\nmakes me dizzy",
+    "Did you find\nthe arrows in\nJabu's belly?",
+    "Silver is not\nan appropriate\narrow material",
+    "Did you find\nthe arrows in\nNarnia?",
+    "Are you ready\nTo spin\nTo win?",
+    "DID YOU FIND\nTHE ARROWS IN\nKEFKA'S TOWER",
+    "Did you find\nthe arrows in\nRecycle Bin?",
+    "Silver Arrows?\n\nLUL",
+    "Imagine\nfinding the\narrows",
+    "Did you find\nsilvers in\nscenic Ohio?",
+    "Did you find\nThe arrows in\n*mumblemumble*",
+    "\nSpin To Win!\n",
+    "did you find\nthe arrows in\nthe hourglass?",
+    "Silver Arrows\nare so v30",
+    "OH, NO, THEY\nACTUALLY SAID\nSILVER MARROW",
+    "SURELY THE\nLEFTMOST TILES\nWILL STAY UP",
+    "Did you find\nthe arrows in\nWorld 4-2?",
+    "You Spin Me\nRight Round\nLike A Record",
+    "SILLY HERO,\nSILVER IS FOR\nWEREWOLVES!",
+    "Did you find\nthe silvers in\nganti's ears",
+]
+
 TavernMan_texts = [
     "What do you\ncall a blind\ndinosaur?\na doyouthink-\nhesaurus.",
     "A blind man\nwalks into\na bar.\nAnd a table.\nAnd a chair.",

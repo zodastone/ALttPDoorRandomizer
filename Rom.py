@@ -19,7 +19,8 @@ from KeyDoorShuffle import count_locations_exclude_logic
 from Regions import location_table, shop_to_location_table, retro_shops
 from RoomData import DoorKind
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
-from Text import Uncle_texts, Ganon1_texts, TavernMan_texts, Sahasrahla2_texts, Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
+from Text import Uncle_texts, Ganon1_texts, Ganon_Phase_3_No_Silvers_texts, TavernMan_texts, Sahasrahla2_texts
+from Text import Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
 from Text import KingsReturn_texts, Sanctuary_texts, Kakariko_texts, Blacksmiths_texts, DeathMountain_texts, LostWoods_texts, WishingWell_texts, DesertPalace_texts, MountainTower_texts, LinksHouse_texts, Lumberjacks_texts, SickKid_texts, FluteBoy_texts, Zora_texts, MagicShop_texts, Sahasrahla_names
 from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_to_pc
 from Items import ItemFactory
@@ -2133,24 +2134,30 @@ def write_strings(rom, world, player, team):
 
     # We still need the older hints of course. Those are done here.
 
+    no_silver_text = Ganon_Phase_3_No_Silvers_texts[random.randint(0, len(Ganon_Phase_3_No_Silvers_texts) - 1)]
 
     silverarrows = world.find_items('Silver Arrows', player)
     random.shuffle(silverarrows)
-    silverarrow_hint = (' %s?' % hint_text(silverarrows[0]).replace('Ganon\'s', 'my')) if silverarrows else '?\nI think not!'
-    tt['ganon_phase_3_no_silvers'] = 'Did you find the silver arrows%s' % silverarrow_hint
-    tt['ganon_phase_3_no_silvers_alt'] = 'Did you find the silver arrows%s' % silverarrow_hint
+    if silverarrows:
+        hint_phrase = hint_text(silverarrows[0]).replace("Ganon's", "my")
+        silverarrow_hint = f'Did you find the silver arrows {hint_phrase}?'
+    else:
+        silverarrow_hint = no_silver_text
+    tt['ganon_phase_3_no_silvers'] = silverarrow_hint
+    tt['ganon_phase_3_no_silvers_alt'] = silverarrow_hint
 
     prog_bow_locs = world.find_items('Progressive Bow', player)
     distinguished_prog_bow_loc = next((location for location in prog_bow_locs if location.item.code == 0x65), None)
     progressive_silvers = world.difficulty_requirements[player].progressive_bow_limit >= 2 or world.swords[player] == 'swordless'
     if distinguished_prog_bow_loc:
         prog_bow_locs.remove(distinguished_prog_bow_loc)
-        silverarrow_hint = (' %s?' % hint_text(distinguished_prog_bow_loc).replace('Ganon\'s', 'my')) if progressive_silvers else '?\nI think not!'
-        tt['ganon_phase_3_no_silvers'] = 'Did you find the silver arrows%s' % silverarrow_hint
-
+        hint_phrase = hint_text(distinguished_prog_bow_loc).replace("Ganon's", "my")
+        silverarrow_hint = f'Did you find the silver arrows {hint_phrase}?' if progressive_silvers else no_silver_text
+        tt['ganon_phase_3_no_silvers'] = silverarrow_hint
     if any(prog_bow_locs):
-        silverarrow_hint = (' %s?' % hint_text(random.choice(prog_bow_locs)).replace('Ganon\'s', 'my')) if progressive_silvers else '?\nI think not!'
-        tt['ganon_phase_3_no_silvers_alt'] = 'Did you find the silver arrows%s' % silverarrow_hint
+        hint_phrase = hint_text(random.choice(prog_bow_locs)).replace("Ganon's", "my")
+        silverarrow_hint = f'Did you find the silver arrows {hint_phrase}?' if progressive_silvers else no_silver_text
+        tt['ganon_phase_3_no_silvers_alt'] = silverarrow_hint
 
     crystal5 = world.find_items('Crystal 5', player)[0]
     crystal6 = world.find_items('Crystal 6', player)[0]
