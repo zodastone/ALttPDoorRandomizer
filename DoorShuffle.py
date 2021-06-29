@@ -1,22 +1,21 @@
 import random
 from collections import defaultdict, deque
 import logging
-import operator as op
 import time
 from enum import unique, Flag
 from typing import DefaultDict, Dict, List
 
-from functools import reduce
-from BaseClasses import RegionType, Region, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo
+from BaseClasses import RegionType, Region, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo, dungeon_keys
 from Doors import reset_portals
 from Dungeons import dungeon_regions, region_starts, standard_starts, split_region_starts
-from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
+from Dungeons import dungeon_bigs, dungeon_hints
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor, reset_rooms
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths, drop_entrances
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from DungeonGenerator import dungeon_portals, dungeon_drops, GenerationException
-from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout
+from KeyDoorShuffle import analyze_dungeon, build_key_layout, validate_key_layout
+from Utils import ncr, kth_combination
 
 
 def link_doors(world, player):
@@ -212,8 +211,8 @@ def vanilla_key_logic(world, player):
         analyze_dungeon(key_layout, world, player)
         world.key_logic[player][builder.name] = key_layout.key_logic
         log_key_logic(builder.name, key_layout.key_logic)
-    if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player] and not world.keydropshuffle[player]:
-        validate_vanilla_key_logic(world, player)
+    # if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player] and not world.keydropshuffle[player]:
+    #     validate_vanilla_key_logic(world, player)
 
 
 # some useful functions
@@ -1574,28 +1573,6 @@ def find_key_door_candidates(region, checked, world, player):
                 if d is not None:
                     checked_doors.append(d)
     return candidates, checked_doors
-
-
-def kth_combination(k, l, r):
-    if r == 0:
-        return []
-    elif len(l) == r:
-        return l
-    else:
-        i = ncr(len(l)-1, r-1)
-        if k < i:
-            return l[0:1] + kth_combination(k, l[1:], r-1)
-        else:
-            return kth_combination(k-i, l[1:], r)
-
-
-def ncr(n, r):
-    if r == 0:
-        return 1
-    r = min(r, n-r)
-    numerator = reduce(op.mul, range(n, n-r, -1), 1)
-    denominator = reduce(op.mul, range(1, r+1), 1)
-    return numerator / denominator
 
 
 def reassign_key_doors(builder, world, player):

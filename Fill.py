@@ -199,6 +199,7 @@ def fill_restrictive(world, base_state, locations, itempool, keys_in_itempool = 
 
                 spot_to_fill = None
 
+                valid_locations = []
                 for location in locations:
                     if item_to_place.smallkey or item_to_place.bigkey:  # a better test to see if a key can go there
                         location.item = item_to_place
@@ -209,10 +210,15 @@ def fill_restrictive(world, base_state, locations, itempool, keys_in_itempool = 
                     if (not single_player_placement or location.player == item_to_place.player)\
                             and location.can_fill(test_state, item_to_place, perform_access_check)\
                             and valid_key_placement(item_to_place, location, itempool if (keys_in_itempool and keys_in_itempool[item_to_place.player]) else world.itempool, world):
-                        spot_to_fill = location
-                        break
-                    elif item_to_place.smallkey or item_to_place.bigkey:
+                        # todo: optimization: break instead of cataloging all valid locations
+                        if not spot_to_fill:
+                            spot_to_fill = location
+                        valid_locations.append(location)
+
+                    if item_to_place.smallkey or item_to_place.bigkey:
                         location.item = None
+
+                logging.getLogger('').debug(f'{item_to_place} valid placement at {len(valid_locations)} locations')
 
                 if spot_to_fill is None:
                     # we filled all reachable spots. Maybe the game can be beaten anyway?
@@ -250,9 +256,7 @@ def valid_key_placement(item, location, itempool, world):
 def track_outside_keys(item, location, world):
     if not item.smallkey:
         return
-    item_dungeon = item.name.split('(')[1][:-1]
-    if item_dungeon == 'Escape':
-        item_dungeon = 'Hyrule Castle'
+    item_dungeon = item.dungeon
     if location.player == item.player:
         loc_dungeon = location.parent_region.dungeon
         if loc_dungeon and loc_dungeon.name == item_dungeon:

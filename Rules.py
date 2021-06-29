@@ -3,7 +3,7 @@ import logging
 from collections import deque
 
 import OverworldGlitchRules
-from BaseClasses import CollectionState, RegionType, DoorType, Entrance, CrystalBarrier
+from BaseClasses import CollectionState, RegionType, DoorType, Entrance, CrystalBarrier, KeyRuleType
 from RoomData import DoorKind
 from OverworldGlitchRules import overworld_glitches_rules
 
@@ -1939,14 +1939,10 @@ bunny_impassible_doors = {
 def add_key_logic_rules(world, player):
     key_logic = world.key_logic[player]
     for d_name, d_logic in key_logic.items():
-        for door_name, keys in d_logic.door_rules.items():
-            spot = world.get_entrance(door_name, player)
-            if not world.retro[player] or world.mode[player] != 'standard' or not retro_in_hc(spot):
-                rule = create_advanced_key_rule(d_logic, player, keys)
-                if keys.opposite:
-                    rule = or_rule(rule, create_advanced_key_rule(d_logic, player, keys.opposite))
-                add_rule(spot, rule)
-
+        for door_name, rule in d_logic.door_rules.items():
+            add_rule(world.get_entrance(door_name, player), eval_small_key_door(door_name, d_name, player))
+            if rule.allow_small:
+                set_always_allow(rule.small_location, allow_self_locking_small(d_logic, player))
         for location in d_logic.bk_restricted:
             if not location.forced_item:
                 forbid_item(location, d_logic.bk_name, player)
@@ -1954,13 +1950,47 @@ def add_key_logic_rules(world, player):
             forbid_item(location, d_logic.small_key_name, player)
         for door in d_logic.bk_doors:
             add_rule(world.get_entrance(door.name, player), create_rule(d_logic.bk_name, player))
-        for chest in d_logic.bk_chests:
-            add_rule(world.get_location(chest.name, player), create_rule(d_logic.bk_name, player))
+        if len(d_logic.bk_doors) > 0 or len(d_logic.bk_chests) > 1:
+            for chest in d_logic.bk_chests:
+                add_rule(world.get_location(chest.name, player), create_rule(d_logic.bk_name, player))
     if world.retro[player]:
         for d_name, layout in world.key_layout[player].items():
             for door in layout.flat_prop:
                 if world.mode[player] != 'standard' or not retro_in_hc(door.entrance):
                     add_rule(door.entrance, create_key_rule('Small Key (Universal)', player, 1))
+
+
+def allow_self_locking_small(logic, player):
+    return lambda state, item: item.player == player and logic.small_key_name == item.name
+
+
+def eval_small_key_door_main(state, door_name, dungeon, player):
+    if state.is_door_open(door_name, player):
+        return True
+    key_logic = state.world.key_logic[player][dungeon]
+    door_rule = key_logic.door_rules[door_name]
+    door_openable = False
+    for ruleType, number in door_rule.new_rules.items():
+        if door_openable:
+            return True
+        if ruleType == KeyRuleType.WorstCase:
+            door_openable |= state.has_sm_key(key_logic.small_key_name, player, number)
+        elif ruleType == KeyRuleType.AllowSmall:
+            if door_rule.small_location.item and door_rule.small_location.item.name == key_logic.small_key_name:
+                return True  # always okay if allow small is on
+        elif isinstance(ruleType, tuple):
+            lock, lock_item = ruleType
+            # this doesn't track logical locks yet, i.e. hammer locks the item and hammer is there, but the item isn't
+            for loc in door_rule.alternate_big_key_loc:
+                spot = state.world.get_location(loc, player)
+                if spot.item and spot.item.name == lock_item:
+                    door_openable |= state.has_sm_key(key_logic.small_key_name, player, number)
+                    break
+    return door_openable
+
+
+def eval_small_key_door(door_name, dungeon, player):
+    return lambda state: eval_small_key_door_main(state, door_name, dungeon, player)
 
 
 def retro_in_hc(spot):

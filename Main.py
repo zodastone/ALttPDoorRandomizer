@@ -448,6 +448,7 @@ def copy_world(world):
         # these need to be modified properly by set_rules
         new_location.access_rule = lambda state: True
         new_location.item_rule = lambda state: True
+        new_location.forced_item = location.forced_item
 
     # copy remaining itempool. No item in itempool should have an assigned location
     for item in world.itempool:
