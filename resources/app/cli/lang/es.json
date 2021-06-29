@@ -1,6 +1,6 @@
 {
   "cli": {
-    "app.title": "ALttP Puerta Aleatorizador Versión %s - Número: %d, Código: %s",
+    "app.title": "ALttP Puerta Aleatorizador Versión %s - Número: %s, Código: %s",
     "player": "Jugador",
     "shuffling.world": "Barajando el Mundo",
     "shuffling.dungeons": "Barajando Mazmorras",

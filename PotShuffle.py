@@ -275,7 +275,7 @@ vanilla_pots = {
 
 
 def shuffle_pots(world, player):
-    import random
+    import RaceRandom as random
 
     new_pot_contents = {}
 
