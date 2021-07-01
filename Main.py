@@ -389,6 +389,8 @@ def copy_world(world):
     ret.mixed_travel = world.mixed_travel.copy()
     ret.standardize_palettes = world.standardize_palettes.copy()
 
+    ret.exp_cache = world.exp_cache.copy()
+
     for player in range(1, world.players + 1):
         if world.mode[player] != 'inverted':
             create_regions(ret, player)
@@ -557,10 +559,14 @@ def create_playthrough(world):
             logging.getLogger('').debug('Checking if %s (Player %d) is required to beat the game.', location.item.name, location.item.player)
             old_item = location.item
             location.item = None
+            # todo: this is not very efficient, but I'm not sure how else to do it for this backwards logic
+            world.clear_exp_cache()
             if world.can_beat_game(state_cache[num]):
+                # logging.getLogger('').debug(f'{old_item.name} (Player {old_item.player}) is not required')
                 to_delete.append(location)
             else:
                 # still required, got to keep it around
+                # logging.getLogger('').debug(f'{old_item.name} (Player {old_item.player}) is required')
                 location.item = old_item
 
         # cull entries in spheres for spoiler walkthrough at end

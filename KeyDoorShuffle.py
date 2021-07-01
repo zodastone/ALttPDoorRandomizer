@@ -795,6 +795,7 @@ def check_for_self_lock_key(rule, door, parent_counter, key_layout, world, playe
         if len(counter.free_locations) == 1 and len(counter.key_only_locations) == 0 and not counter.important_location:
             rule.allow_small = True
             rule.small_location = next(iter(counter.free_locations))
+            rule.new_rules[KeyRuleType.AllowSmall] = rule.new_rules[KeyRuleType.WorstCase] - 1
 
 
 def find_inverted_counter(door, parent_counter, key_layout, world, player):

@@ -1976,7 +1976,8 @@ def eval_small_key_door_main(state, door_name, dungeon, player):
         if ruleType == KeyRuleType.WorstCase:
             door_openable |= state.has_sm_key(key_logic.small_key_name, player, number)
         elif ruleType == KeyRuleType.AllowSmall:
-            if door_rule.small_location.item and door_rule.small_location.item.name == key_logic.small_key_name:
+            if (door_rule.small_location.item and door_rule.small_location.item.name == key_logic.small_key_name
+               and door_rule.small_location.item.player == player):
                 return True  # always okay if allow small is on
         elif isinstance(ruleType, tuple):
             lock, lock_item = ruleType

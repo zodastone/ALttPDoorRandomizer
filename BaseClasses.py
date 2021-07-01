@@ -138,6 +138,8 @@ class World(object):
             set_player_attr('standardize_palettes', 'standardize')
             set_player_attr('force_fix', {'gt': False, 'sw': False, 'pod': False, 'tr': False})
 
+            set_player_attr('exp_cache', defaultdict(dict))
+
     def get_name_string_for_object(self, obj):
         return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_names(obj.player)})'
 
@@ -392,6 +394,10 @@ class World(object):
     def clear_location_cache(self):
         self._cached_locations = None
 
+    def clear_exp_cache(self):
+        for p in range(1, self.players + 1):
+            self.exp_cache[p].clear()
+
     def get_unfilled_locations(self, player=None):
         return [location for location in self.get_locations() if (player is None or location.player == player) and location.item is None]
 
@@ -478,6 +484,7 @@ class CollectionState(object):
 
             self.ghost_keys = Counter()
         self.dungeon_limits = None
+        # self.trace = None
 
     def update_reachable_regions(self, player):
         self.stale[player] = False
@@ -588,6 +595,8 @@ class CollectionState(object):
 
     def check_key_doors_in_dungeons(self, rrp, player):
         for dungeon_name, checklist in self.dungeons_to_check[player].items():
+            if self.apply_dungeon_exploration(rrp, player, dungeon_name, checklist):
+                continue
             init_door_candidates = self.should_explore_child_state(self, dungeon_name, player)
             key_total = self.prog_items[(dungeon_keys[dungeon_name], player)]  # todo: universal
             remaining_keys = key_total - self.door_counter[player][1][dungeon_name]
@@ -602,61 +611,64 @@ class CollectionState(object):
             child_states.append(self)
             visited_opened_doors = set()
             visited_opened_doors.add(frozenset(self.opened_doors[player]))
-            terminal_states, done, common_regions, common_bc, common_doors = [], False, {}, {}, set()
-            while not done:
-                terminal_states.clear()
-                while len(child_states) > 0:
-                    next_child = child_states.popleft()
-                    door_candidates = CollectionState.should_explore_child_state(next_child, dungeon_name, player)
-                    if door_candidates:
-                        for chosen_door in door_candidates:
-                            child_state = next_child.copy()
-                            child_queue = deque()
-                            child_state.door_counter[player][1][dungeon_name] += 1
-                            if isinstance(chosen_door, tuple):
-                                child_state.opened_doors[player].add(chosen_door[0])
-                                child_state.opened_doors[player].add(chosen_door[1])
-                                if chosen_door[0] in checklist:
-                                    child_queue.append(checklist[chosen_door[0]])
-                                if chosen_door[1] in checklist:
-                                    child_queue.append(checklist[chosen_door[1]])
-                            else:
-                                child_state.opened_doors[player].add(chosen_door)
-                                if chosen_door in checklist:
-                                    child_queue.append(checklist[chosen_door])
+            terminal_states, common_regions, common_bc, common_doors = [], {}, {}, set()
+            while len(child_states) > 0:
+                next_child = child_states.popleft()
+                door_candidates = CollectionState.should_explore_child_state(next_child, dungeon_name, player)
+                child_checklist = next_child.dungeons_to_check[player][dungeon_name]
+                if door_candidates:
+                    for chosen_door in door_candidates:
+                        child_state = next_child.copy()
+                        child_queue = deque()
+                        child_state.door_counter[player][1][dungeon_name] += 1
+                        if isinstance(chosen_door, tuple):
+                            child_state.opened_doors[player].add(chosen_door[0])
+                            child_state.opened_doors[player].add(chosen_door[1])
+                            if chosen_door[0] in child_checklist:
+                                child_queue.append(child_checklist[chosen_door[0]])
+                            if chosen_door[1] in child_checklist:
+                                child_queue.append(child_checklist[chosen_door[1]])
+                        else:
+                            child_state.opened_doors[player].add(chosen_door)
+                            if chosen_door in child_checklist:
+                                child_queue.append(child_checklist[chosen_door])
+                        if child_state.opened_doors[player] not in visited_opened_doors:
+                            done = False
+                            while not done:
+                                rrp_ = child_state.reachable_regions[player]
+                                bc_ = child_state.blocked_connections[player]
+                                self.dungeon_limits = [dungeon_name]
+                                child_state.traverse_world(child_queue, rrp_, bc_, player)
+                                new_events = child_state.sweep_for_events_once()
+                                child_state.stale[player] = False
+                                if new_events:
+                                    for conn in bc_:
+                                        if conn.parent_region.dungeon and conn.parent_region.dungeon.name == dungeon_name:
+                                            child_queue.append((conn, bc_[conn]))
+                                done = not new_events
                             if child_state.opened_doors[player] not in visited_opened_doors:
-                                done = False
-                                while not done:
-                                    rrp_ = child_state.reachable_regions[player]
-                                    bc_ = child_state.blocked_connections[player]
-                                    self.dungeon_limits = [dungeon_name]
-                                    child_state.traverse_world(child_queue, rrp_, bc_, player)
-                                    new_events = child_state.sweep_for_events_once()
-                                    child_state.stale[player] = False
-                                    if new_events:
-                                        for conn in bc_:
-                                            if conn.parent_region.dungeon and conn.parent_region.dungeon.name == dungeon_name:
-                                                child_queue.append((conn, bc_[conn]))
-                                    done = not new_events
                                 visited_opened_doors.add(frozenset(child_state.opened_doors[player]))
                                 child_states.append(child_state)
-                    else:
-                        terminal_states.append(next_child)
-                common_regions, common_doors, first = {}, set(), True
-                for term_state in terminal_states:
-                    t_rrp = term_state.reachable_regions[player]
-                    if first:
-                        first = False
-                        common_regions = {x: y for x, y in t_rrp.items() if x not in rrp or y != rrp[x]}
-                        common_doors = {x for x in term_state.opened_doors[player] - self.opened_doors[player]
-                                        if valid_d_door(x)}
-                    else:
-                        cm_rrp = {x: y for x, y in t_rrp.items() if x not in rrp or y != rrp[x]}
-                        common_regions = {k: self.comb_crys(v, cm_rrp[k]) for k, v in common_regions.items()
-                                          if k in cm_rrp and self.crys_agree(v, cm_rrp[k])}
-                        common_doors &= {x for x in term_state.opened_doors[player] - self.opened_doors[player]
-                                         if valid_d_door(x)}
-                done = len(child_states) == 0
+                else:
+                    terminal_states.append(next_child)
+            common_regions, common_bc, common_doors, first = {}, {}, set(), True
+            bc = self.blocked_connections[player]
+            for term_state in terminal_states:
+                t_rrp = term_state.reachable_regions[player]
+                t_bc = term_state.blocked_connections[player]
+                if first:
+                    first = False
+                    common_regions = {x: y for x, y in t_rrp.items() if x not in rrp or y != rrp[x]}
+                    common_bc = {x: y for x, y in t_bc.items() if x not in bc}
+                    common_doors = {x for x in term_state.opened_doors[player] - self.opened_doors[player]
+                                    if valid_d_door(x)}
+                else:
+                    cm_rrp = {x: y for x, y in t_rrp.items() if x not in rrp or y != rrp[x]}
+                    common_regions = {k: self.comb_crys(v, cm_rrp[k]) for k, v in common_regions.items()
+                                      if k in cm_rrp and self.crys_agree(v, cm_rrp[k])}
+                    common_bc.update({x: y for x, y in t_bc.items() if x not in bc and x not in common_bc})
+                    common_doors &= {x for x in term_state.opened_doors[player] - self.opened_doors[player]
+                                     if valid_d_door(x)}
 
             terminal_queue = deque()
             for door in common_doors:
@@ -669,6 +681,9 @@ class CollectionState(object):
             self.dungeon_limits = [dungeon_name]
             rrp_ = self.reachable_regions[player]
             bc_ = self.blocked_connections[player]
+            for block, crystal in bc_.items():
+                if (block, crystal) not in terminal_queue and self.possibly_connected_to_dungeon(block.connected_region, player):
+                        terminal_queue.append((block, crystal))
             self.traverse_world(terminal_queue, rrp_, bc_, player)
             self.dungeon_limits = None
 
@@ -676,6 +691,13 @@ class CollectionState(object):
             missing_regions = {x: y for x, y in common_regions.items() if x not in rrp}
             for k in missing_regions:
                 rrp[k] = missing_regions[k]
+            missing_bc = {}
+            for blocked, crystal in common_bc.items():
+                if blocked not in bc and self.should_visit(blocked.connected_region, rrp, crystal, player):
+                    missing_bc[blocked] = crystal
+            for k in missing_bc:
+                bc[k] = missing_bc[k]
+            self.record_dungeon_exploration(player, dungeon_name, checklist, common_doors, missing_regions, missing_bc)
             checklist.clear()
 
     @staticmethod
@@ -737,13 +759,103 @@ class CollectionState(object):
                             for player in range(1, self.world.players + 1)}
         ret.reached_doors = {player: copy.copy(self.reached_doors[player]) for player in range(1, self.world.players + 1)}
         ret.opened_doors = {player: copy.copy(self.opened_doors[player]) for player in range(1, self.world.players + 1)}
-        # todo: verify if this isn't copied deep enough
         ret.dungeons_to_check = {
             player: defaultdict(dict, {name: copy.copy(checklist)
                                        for name, checklist in self.dungeons_to_check[player].items()})
             for player in range(1, self.world.players + 1)}
         ret.ghost_keys = self.ghost_keys.copy()
         return ret
+
+    def apply_dungeon_exploration(self, rrp, player, dungeon_name, checklist):
+        bc = self.blocked_connections[player]
+        ec = self.world.exp_cache[player]
+        prog_set = self.reduce_prog_items(player, dungeon_name)
+        exp_key = (prog_set, frozenset(checklist))
+        if dungeon_name in ec and exp_key in ec[dungeon_name]:
+            # apply
+            cnt, miss, common_doors, missing_regions, missing_bc = ec[dungeon_name][exp_key]
+            terminal_queue = deque()
+            for door in common_doors:
+                self.opened_doors[player].add(door)
+                if door in checklist:
+                    terminal_queue.append(checklist[door])
+                if self.find_door_pair(player, dungeon_name, door) not in self.opened_doors[player]:
+                    self.door_counter[player][1][dungeon_name] += 1
+
+            self.dungeon_limits = [dungeon_name]
+            rrp_ = self.reachable_regions[player]
+            bc_ = self.blocked_connections[player]
+            for block, crystal in bc_.items():
+                if (block, crystal) not in terminal_queue and self.possibly_connected_to_dungeon(block.connected_region, player):
+                    terminal_queue.append((block, crystal))
+            self.traverse_world(terminal_queue, rrp_, bc_, player)
+            self.dungeon_limits = None
+
+            for k in missing_regions:
+                rrp[k] = missing_regions[k]
+            for k in missing_bc:
+                bc[k] = missing_bc[k]
+
+            return True
+        return False
+
+    def record_dungeon_exploration(self, player, dungeon_name, checklist, common_doors, missing_regions, missing_bc):
+        ec = self.world.exp_cache[player]
+        prog_set = self.reduce_prog_items(player, dungeon_name)
+        exp_key = (prog_set, frozenset(checklist))
+        count = 1
+        misses = 0
+        # if exp_key in ec:
+        #     if dungeon_name in ec[exp_key]:
+        #         cnt, miss, old_common, old_missing, old_bc, trace = ec[exp_key][dungeon_name]
+        #         if old_common == common_doors and old_missing == missing_regions and old_bc == missing_bc:
+        #             count = cnt + 1
+        #         else:
+        #             misses = miss + 1
+        ec[dungeon_name][exp_key] = (count, misses, common_doors, missing_regions, missing_bc)
+
+    def reduce_prog_items(self, player, dungeon_name):
+        # todo: possibly could include an analysis of dungeon items req. like Hammer, Hookshot, etc
+        # static logic rules needed most likely
+        # todo: universal smalls where needed
+        life_count, bottle_count = 0, 0
+        reduced = Counter()
+        for item, cnt in self.prog_items.items():
+            item_name, item_player = item
+            if item_player == player and self.check_if_progressive(item_name):
+                if item_name.startswith('Bottle'):
+                    bottle_count += cnt
+                elif item_name.startswith(('Small Key', 'Big Key')):
+                    d_name = 'Escape' if dungeon_name == 'Hyrule Castle' else dungeon_name
+                    if d_name in item_name:
+                        reduced[item] = cnt
+                elif item_name in ['Boss Heart Container', 'Sanctuary Heart Container', 'Piece of Heart']:
+                    if 'Container' in item_name:
+                        life_count += 1
+                    elif 'Piece of Heart' == item_name:
+                        life_count += .25
+                else:
+                    reduced[item] = cnt
+        if bottle_count > 0:
+            reduced[('Bottle', player)] = 1
+        if life_count >= 1:
+            reduced[('Heart Container', player)] = 1
+        return frozenset(reduced.items())
+
+    @staticmethod
+    def check_if_progressive(item_name):
+        return (item_name in
+                ['Bow', 'Progressive Bow', 'Progressive Bow (Alt)', 'Book of Mudora', 'Hammer', 'Hookshot',
+                 'Magic Mirror', 'Ocarina', 'Pegasus Boots', 'Power Glove', 'Cape', 'Mushroom', 'Shovel',
+                 'Lamp', 'Magic Powder', 'Moon Pearl', 'Cane of Somaria', 'Fire Rod', 'Flippers', 'Ice Rod',
+                 'Titans Mitts', 'Bombos', 'Ether', 'Quake', 'Master Sword', 'Tempered Sword', 'Fighter Sword',
+                 'Golden Sword', 'Progressive Sword', 'Progressive Glove', 'Silver Arrows', 'Green Pendant',
+                 'Blue Pendant', 'Red Pendant', 'Crystal 1', 'Crystal 2', 'Crystal 3', 'Crystal 4', 'Crystal 5',
+                 'Crystal 6', 'Crystal 7', 'Blue Boomerang', 'Red Boomerang', 'Blue Shield', 'Red Shield',
+                 'Mirror Shield', 'Progressive Shield', 'Bug Catching Net', 'Cane of Byrna',
+                 'Boss Heart Container', 'Sanctuary Heart Container', 'Piece of Heart', 'Magic Upgrade (1/2)',
+                 'Magic Upgrade (1/4)']
+            or item_name.startswith(('Bottle', 'Small Key', 'Big Key')))
 
     def can_reach(self, spot, resolution_hint=None, player=None):
         try:
@@ -760,13 +872,10 @@ class CollectionState(object):
 
         return spot.can_reach(self)
 
-    def sweep_for_events_once(self, key_only=False, locations=None):
-        if locations is None:
-            locations = self.world.get_filled_locations()
+    def sweep_for_events_once(self):
+        locations = self.world.get_filled_locations()
         checked_locations = set([l for l in locations if l in self.locations_checked])
-        reachable_events = [location for location in locations if location.event and
-                            (not key_only or (not self.world.keyshuffle[location.item.player] and location.item.smallkey) or (not self.world.bigkeyshuffle[location.item.player] and location.item.bigkey))
-                            and location.can_reach(self)]
+        reachable_events = [location for location in locations if location.event and location.can_reach(self)]
         reachable_events = self._do_not_flood_the_keys(reachable_events)
         for event in reachable_events:
             if event not in checked_locations:
@@ -1958,9 +2067,7 @@ class Location(object):
         return self.always_allow(state, item) or (self.parent_region.can_fill(item) and self.item_rule(item) and (not check_access or self.can_reach(state)))
 
     def can_reach(self, state):
-        if self.parent_region.can_reach(state) and self.access_rule(state):
-            return True
-        return False
+        return self.parent_region.can_reach(state) and self.access_rule(state)
 
     def forced_big_key(self):
         if self.forced_item and self.forced_item.bigkey and self.player == self.forced_item.player:
@@ -1986,6 +2093,12 @@ class Location(object):
     def __unicode__(self):
         world = self.parent_region.world if self.parent_region and self.parent_region.world else None
         return world.get_name_string_for_object(self) if world else f'{self.name} (Player {self.player})'
+
+    def __eq__(self, other):
+        return self.name == other.name and self.player == other.player
+
+    def __hash__(self):
+        return hash((self.name, self.player))
 
 
 class Item(object):
@@ -2597,7 +2710,7 @@ class Settings(object):
 
 
 @unique
-class KeyRuleType(Enum):
+class KeyRuleType(FastEnum):
     WorstCase = 0
     AllowSmall = 1
     Lock = 2
