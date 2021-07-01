@@ -5,7 +5,8 @@
       "options": [
         "none",
         "shuffled",
-        "random"
+        "random",
+        "legacy"
       ]
     },
     "bossshuffle": {

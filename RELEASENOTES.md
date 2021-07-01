@@ -17,6 +17,8 @@ Thanks to qadan, cheuer, & compiling
 * 0.4.0.8
 	* Ganon jokes added for when silvers aren't available
 	* Some text updated (Blind jokes, uncle text)
+	* Fixed some enemizer Mystery settings
+	* Added a setting that's random enemy shuffle without Unkillable Thieves possible
 * 0.4.0.7
 	* Reduce flashing option added
 	* Sprite author credit added
