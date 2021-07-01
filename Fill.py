@@ -496,6 +496,10 @@ def balance_multiworld_progression(world):
                         new_location = replacement_locations.pop()
 
                     new_location.item, old_location.item = old_location.item, new_location.item
+                    if world.shopsanity[new_location.player]:
+                        check_shop_swap(new_location)
+                    if world.shopsanity[old_location.player]:
+                        check_shop_swap(old_location)
                     new_location.event, old_location.event = True, False
                     state.collect(new_location.item, True, new_location)
                     replaced_items = True
@@ -514,6 +518,18 @@ def balance_multiworld_progression(world):
             break
         elif not sphere_locations:
             raise RuntimeError('Not all required items reachable. Something went terribly wrong here.')
+
+
+def check_shop_swap(l):
+    if l.parent_region.name in shop_to_location_table:
+        if l.name in shop_to_location_table[l.parent_region.name]:
+            idx = shop_to_location_table[l.parent_region.name].index(l.name)
+            inv_slot = l.parent_region.shop.inventory[idx]
+            inv_slot['item'] = l.item.name
+    elif l.parent_region in retro_shops:
+        idx = retro_shops[l.parent_region.name].index(l.name)
+        inv_slot = l.parent_region.shop.inventory[idx]
+        inv_slot['item'] = l.item.name
 
 
 def balance_money_progression(world):
@@ -582,17 +598,6 @@ def balance_money_progression(world):
                     return True
                 path = path[1]
         return False
-
-    def check_shop_swap(l):
-        if l.parent_region.name in shop_to_location_table:
-            if l.name in shop_to_location_table[l.parent_region.name]:
-                idx = shop_to_location_table[l.parent_region.name].index(l.name)
-                inv_slot = l.parent_region.shop.inventory[idx]
-                inv_slot['item'] = l.item.name
-        elif location.parent_region in retro_shops:
-            idx = retro_shops[l.parent_region.name].index(l.name)
-            inv_slot = l.parent_region.shop.inventory[idx]
-            inv_slot['item'] = l.item.name
 
     done = False
     while not done:
