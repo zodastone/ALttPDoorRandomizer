@@ -19,6 +19,7 @@ Thanks to qadan, cheuer, & compiling
 	* Some text updated (Blind jokes, uncle text)
 	* Fixed some enemizer Mystery settings
 	* Added a setting that's random enemy shuffle without Unkillable Thieves possible
+	* Fixed shop spoiler when money balancing
 * 0.4.0.7
 	* Reduce flashing option added
 	* Sprite author credit added

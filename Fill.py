@@ -3,7 +3,7 @@ import logging
 
 from BaseClasses import CollectionState
 from Items import ItemFactory
-from Regions import shop_to_location_table
+from Regions import shop_to_location_table, retro_shops
 
 
 class FillError(RuntimeError):
@@ -557,7 +557,6 @@ def balance_money_progression(world):
     for player in range(1, world.players+1):
         logger.debug(f'Money balance for P{player}: Needed: {total_price[player]} Available: {available_money[player]}')
 
-
     def get_sphere_locations(sphere_state, locations):
         sphere_state.sweep_for_events(key_only=True, locations=locations)
         return [loc for loc in locations if sphere_state.can_reach(loc) and sphere_state.not_flooding_a_key(sphere_state.world, loc)]
@@ -583,6 +582,17 @@ def balance_money_progression(world):
                     return True
                 path = path[1]
         return False
+
+    def check_shop_swap(l):
+        if l.parent_region.name in shop_to_location_table:
+            if l.name in shop_to_location_table[l.parent_region.name]:
+                idx = shop_to_location_table[l.parent_region.name].index(l.name)
+                inv_slot = l.parent_region.shop.inventory[idx]
+                inv_slot['item'] = l.item.name
+        elif location.parent_region in retro_shops:
+            idx = retro_shops[l.parent_region.name].index(l.name)
+            inv_slot = l.parent_region.shop.inventory[idx]
+            inv_slot['item'] = l.item.name
 
     done = False
     while not done:
@@ -672,6 +682,7 @@ def balance_money_progression(world):
                         logger.debug(f'Upgrading {best_target.item.name} @ {best_target.name} for 300 Rupees')
                         best_target.item = ItemFactory('Rupees (300)', best_target.item.player)
                         best_target.item.location = best_target
+                        check_shop_swap(best_target.item.location)
                     else:
                         old_item = best_target.item
                         logger.debug(f'Swapping {best_target.item.name} @ {best_target.name} for {best_swap.item.name} @ {best_swap.name}')
@@ -679,6 +690,8 @@ def balance_money_progression(world):
                         best_target.item.location = best_target
                         best_swap.item = old_item
                         best_swap.item.location = best_swap
+                        check_shop_swap(best_target.item.location)
+                        check_shop_swap(best_swap.item.location)
                     increase = best_value - old_value
                     difference -= increase
                     wallet[target_player] += increase
