@@ -209,8 +209,8 @@ def fill_restrictive(world, base_state, locations, itempool, keys_in_itempool = 
                     if (not single_player_placement or location.player == item_to_place.player)\
                             and location.can_fill(test_state, item_to_place, perform_access_check)\
                             and valid_key_placement(item_to_place, location, itempool if (keys_in_itempool and keys_in_itempool[item_to_place.player]) else world.itempool, world):
-                            spot_to_fill = location
-                            break
+                        spot_to_fill = location
+                        break
                     if item_to_place.smallkey or item_to_place.bigkey:
                         location.item = None
 

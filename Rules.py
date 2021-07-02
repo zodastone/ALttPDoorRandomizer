@@ -1941,8 +1941,6 @@ def add_key_logic_rules(world, player):
     for d_name, d_logic in key_logic.items():
         for door_name, rule in d_logic.door_rules.items():
             add_rule(world.get_entrance(door_name, player), eval_small_key_door(door_name, d_name, player))
-            if rule.allow_small:
-                set_always_allow(rule.small_location, allow_self_locking_small(d_logic, player))
         for location in d_logic.bk_restricted:
             if not location.forced_item:
                 forbid_item(location, d_logic.bk_name, player)
@@ -1958,10 +1956,6 @@ def add_key_logic_rules(world, player):
             for door in layout.flat_prop:
                 if world.mode[player] != 'standard' or not retro_in_hc(door.entrance):
                     add_rule(door.entrance, create_key_rule('Small Key (Universal)', player, 1))
-
-
-def allow_self_locking_small(logic, player):
-    return lambda state, item: item.player == player and logic.small_key_name == item.name
 
 
 def eval_small_key_door_main(state, door_name, dungeon, player):

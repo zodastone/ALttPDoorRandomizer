@@ -689,15 +689,20 @@ class CollectionState(object):
 
             rrp = self.reachable_regions[player]
             missing_regions = {x: y for x, y in common_regions.items() if x not in rrp}
+            paths = {}
             for k in missing_regions:
                 rrp[k] = missing_regions[k]
+                possible_path = terminal_states[0].path[k]
+                self.path[k] = paths[k] = possible_path
             missing_bc = {}
             for blocked, crystal in common_bc.items():
-                if blocked not in bc and self.should_visit(blocked.connected_region, rrp, crystal, player):
+                if (blocked not in bc and blocked.parent_region in rrp
+                   and self.should_visit(blocked.connected_region, rrp, crystal, player)):
                     missing_bc[blocked] = crystal
             for k in missing_bc:
                 bc[k] = missing_bc[k]
-            self.record_dungeon_exploration(player, dungeon_name, checklist, common_doors, missing_regions, missing_bc)
+            self.record_dungeon_exploration(player, dungeon_name, checklist,
+                                            common_doors, missing_regions, missing_bc, paths)
             checklist.clear()
 
     @staticmethod
@@ -773,7 +778,7 @@ class CollectionState(object):
         exp_key = (prog_set, frozenset(checklist))
         if dungeon_name in ec and exp_key in ec[dungeon_name]:
             # apply
-            cnt, miss, common_doors, missing_regions, missing_bc = ec[dungeon_name][exp_key]
+            common_doors, missing_regions, missing_bc, paths = ec[dungeon_name][exp_key]
             terminal_queue = deque()
             for door in common_doors:
                 self.opened_doors[player].add(door)
@@ -793,42 +798,32 @@ class CollectionState(object):
 
             for k in missing_regions:
                 rrp[k] = missing_regions[k]
+            for r, path in paths.items():
+                self.path[r] = path
             for k in missing_bc:
                 bc[k] = missing_bc[k]
 
             return True
         return False
 
-    def record_dungeon_exploration(self, player, dungeon_name, checklist, common_doors, missing_regions, missing_bc):
+    def record_dungeon_exploration(self, player, dungeon_name, checklist,
+                                   common_doors, missing_regions, missing_bc, paths):
         ec = self.world.exp_cache[player]
         prog_set = self.reduce_prog_items(player, dungeon_name)
         exp_key = (prog_set, frozenset(checklist))
-        count = 1
-        misses = 0
-        # if exp_key in ec:
-        #     if dungeon_name in ec[exp_key]:
-        #         cnt, miss, old_common, old_missing, old_bc, trace = ec[exp_key][dungeon_name]
-        #         if old_common == common_doors and old_missing == missing_regions and old_bc == missing_bc:
-        #             count = cnt + 1
-        #         else:
-        #             misses = miss + 1
-        ec[dungeon_name][exp_key] = (count, misses, common_doors, missing_regions, missing_bc)
+        ec[dungeon_name][exp_key] = (common_doors, missing_regions, missing_bc, paths)
 
     def reduce_prog_items(self, player, dungeon_name):
         # todo: possibly could include an analysis of dungeon items req. like Hammer, Hookshot, etc
-        # static logic rules needed most likely
+        # cross dungeon requirements may be necessary for keysanity - which invalidates the above
         # todo: universal smalls where needed
         life_count, bottle_count = 0, 0
         reduced = Counter()
         for item, cnt in self.prog_items.items():
             item_name, item_player = item
             if item_player == player and self.check_if_progressive(item_name):
-                if item_name.startswith('Bottle'):
+                if item_name.startswith('Bottle'):  # I think magic requirements can require multiple bottles
                     bottle_count += cnt
-                elif item_name.startswith(('Small Key', 'Big Key')):
-                    d_name = 'Escape' if dungeon_name == 'Hyrule Castle' else dungeon_name
-                    if d_name in item_name:
-                        reduced[item] = cnt
                 elif item_name in ['Boss Heart Container', 'Sanctuary Heart Container', 'Piece of Heart']:
                     if 'Container' in item_name:
                         life_count += 1
