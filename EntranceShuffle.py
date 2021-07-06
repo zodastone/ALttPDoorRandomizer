@@ -963,7 +963,6 @@ def link_entrances(world, player):
         blacksmith_hut = blacksmith_doors.pop()
         connect_entrance(world, blacksmith_hut, 'Blacksmiths Hut', player)
         doors.remove(blacksmith_hut)
-        exit_pool.remove(blacksmith_hut)
 
         # place dam and pyramid fairy, have limited options
         bomb_shop_doors = [door for door in bomb_shop_doors if door in doors]
@@ -971,7 +970,6 @@ def link_entrances(world, player):
         bomb_shop = bomb_shop_doors.pop()
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         doors.remove(bomb_shop)
-        exit_pool.remove(bomb_shop)
 
         # handle remaining caves
         for cave in caves:
@@ -1804,7 +1802,6 @@ def link_inverted_entrances(world, player):
         blacksmith_hut = blacksmith_doors.pop()
         connect_entrance(world, blacksmith_hut, 'Blacksmiths Hut', player)
         doors.remove(blacksmith_hut)
-        exit_pool.remove(blacksmith_hut)
 
         # place dam and pyramid fairy, have limited options
         bomb_shop_doors = [door for door in bomb_shop_doors if door in doors]
@@ -1812,7 +1809,6 @@ def link_inverted_entrances(world, player):
         bomb_shop = bomb_shop_doors.pop()
         connect_entrance(world, bomb_shop, 'Inverted Big Bomb Shop', player)
         doors.remove(bomb_shop)
-        exit_pool.remove(bomb_shop)
 
         # handle remaining caves
         for cave in caves:
