@@ -9,8 +9,11 @@ import random
 import struct
 import sys
 import subprocess
-import bps.apply
-import bps.io
+try:
+    import bps.apply
+    import bps.io
+except ImportError:
+    raise Exception('Could not load BPS module')
 
 from BaseClasses import CollectionState, ShopType, Region, Location, Door, DoorType, RegionType, PotItem
 from DoorShuffle import compass_data, DROptions, boss_indicator
