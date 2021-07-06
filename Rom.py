@@ -9,8 +9,11 @@ import random
 import struct
 import sys
 import subprocess
-import bps.apply
-import bps.io
+try:
+    import bps.apply
+    import bps.io
+except ImportError:
+    raise Exception('Could not load BPS module')
 
 from BaseClasses import CollectionState, ShopType, Region, Location, Door, DoorType, RegionType, PotItem
 from DoorShuffle import compass_data, DROptions, boss_indicator
@@ -201,7 +204,7 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
     options = {
         'RandomizeEnemies': world.enemy_shuffle[player] != 'none',
         'RandomizeEnemiesType': 3,
-        'RandomizeBushEnemyChance': world.enemy_shuffle[player] == 'random',
+        'RandomizeBushEnemyChance': world.enemy_shuffle[player] in ['random', 'legacy'],
         'RandomizeEnemyHealthRange': world.enemy_health[player] != 'default',
         'RandomizeEnemyHealthType': {'default': 0, 'easy': 0, 'normal': 1, 'hard': 2, 'expert': 3}[world.enemy_health[player]],
         'OHKO': False,
@@ -247,9 +250,9 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
         'SwordGraphics': "sword_gfx/normal.gfx",
         'BeeMizer': False,
         'BeesLevel': 0,
-        'RandomizeTileTrapPattern': world.enemy_shuffle[player] == 'random',
+        'RandomizeTileTrapPattern': world.enemy_shuffle[player] in ['random', 'legacy'],
         'RandomizeTileTrapFloorTile': False,
-        'AllowKillableThief': bool(random.randint(0, 1)) if world.enemy_shuffle[player] == 'random' else world.enemy_shuffle[player] != 'none',
+        'AllowKillableThief': bool(random.randint(0, 1)) if world.enemy_shuffle[player] == 'legacy' else world.enemy_shuffle[player] != 'none',
         'RandomizeSpriteOnHit': random_sprite_on_hit,
         'DebugMode': False,
         'DebugForceEnemy': False,
@@ -806,7 +809,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     write_int16(rom, 0x187010, credits_total)  # dynamic credits
     if credits_total != 216:
         # collection rate address:
-        cr_address = 0x2391BE
+        cr_address = 0x2391FA
         cr_pc = cr_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
         last_top, last_bot = credits_digit(credits_total % 10)
@@ -825,7 +828,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             total += count_locations_exclude_logic(region.locations, gt_logic)
         # rom.write_byte(0x187012, total)  # dynamic credits
         # gt big key address:
-        gtbk_address = 0x2390E0
+        gtbk_address = 0x23911C
         gtbk_pc = gtbk_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit(total // 10)
         last_top, last_bot = credits_digit(total % 10)
@@ -1640,7 +1643,7 @@ def hud_format_text(text):
 def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite,
                        ow_palettes, uw_palettes, reduce_flashing):
 
-    if not os.path.exists("data/sprites/official/001.link.1.zspr"):
+    if not os.path.exists("data/sprites/official/001.link.1.zspr") and rom.orig_buffer:
         dump_zspr(rom.orig_buffer[0x80000:0x87000], rom.orig_buffer[0xdd308:0xdd380],
                   rom.orig_buffer[0xdedf5:0xdedf9], "data/sprites/official/001.link.1.zspr", "Nintendo", "Link")
 

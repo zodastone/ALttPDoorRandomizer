@@ -340,7 +340,8 @@
     "choices": [
       "none",
       "shuffled",
-      "random"
+      "random",
+      "legacy"
     ]
   },
   "enemy_health": {

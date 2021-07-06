@@ -3,7 +3,7 @@ import logging
 
 from BaseClasses import CollectionState
 from Items import ItemFactory
-from Regions import shop_to_location_table
+from Regions import shop_to_location_table, retro_shops
 
 
 class FillError(RuntimeError):
@@ -494,6 +494,10 @@ def balance_multiworld_progression(world):
                         new_location = replacement_locations.pop()
 
                     new_location.item, old_location.item = old_location.item, new_location.item
+                    if world.shopsanity[new_location.player]:
+                        check_shop_swap(new_location)
+                    if world.shopsanity[old_location.player]:
+                        check_shop_swap(old_location)
                     new_location.event, old_location.event = True, False
                     state.collect(new_location.item, True, new_location)
                     replaced_items = True
@@ -512,6 +516,18 @@ def balance_multiworld_progression(world):
             break
         elif not sphere_locations:
             raise RuntimeError('Not all required items reachable. Something went terribly wrong here.')
+
+
+def check_shop_swap(l):
+    if l.parent_region.name in shop_to_location_table:
+        if l.name in shop_to_location_table[l.parent_region.name]:
+            idx = shop_to_location_table[l.parent_region.name].index(l.name)
+            inv_slot = l.parent_region.shop.inventory[idx]
+            inv_slot['item'] = l.item.name
+    elif l.parent_region in retro_shops:
+        idx = retro_shops[l.parent_region.name].index(l.name)
+        inv_slot = l.parent_region.shop.inventory[idx]
+        inv_slot['item'] = l.item.name
 
 
 def balance_money_progression(world):
@@ -554,7 +570,6 @@ def balance_money_progression(world):
 
     for player in range(1, world.players+1):
         logger.debug(f'Money balance for P{player}: Needed: {total_price[player]} Available: {available_money[player]}')
-
 
     def get_sphere_locations(sphere_state, locations):
         sphere_state.sweep_for_events(key_only=True, locations=locations)
@@ -670,6 +685,7 @@ def balance_money_progression(world):
                         logger.debug(f'Upgrading {best_target.item.name} @ {best_target.name} for 300 Rupees')
                         best_target.item = ItemFactory('Rupees (300)', best_target.item.player)
                         best_target.item.location = best_target
+                        check_shop_swap(best_target.item.location)
                     else:
                         old_item = best_target.item
                         logger.debug(f'Swapping {best_target.item.name} @ {best_target.name} for {best_swap.item.name} @ {best_swap.name}')
@@ -677,6 +693,8 @@ def balance_money_progression(world):
                         best_target.item.location = best_target
                         best_swap.item = old_item
                         best_swap.item.location = best_swap
+                        check_shop_swap(best_target.item.location)
+                        check_shop_swap(best_swap.item.location)
                     increase = best_value - old_value
                     difference -= increase
                     wallet[target_player] += increase

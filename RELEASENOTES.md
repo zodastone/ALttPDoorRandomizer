@@ -17,6 +17,13 @@ Thanks to qadan, cheuer, & compiling
 * 0.4.0.8
 	* Ganon jokes added for when silvers aren't available
 	* Some text updated (Blind jokes, uncle text)
+	* Fixed some enemizer Mystery settings
+	* Added a setting that's random enemy shuffle without Unkillable Thieves possible
+	* Fixed shop spoiler when money balancing/multiworld balancing
+	* Fixed a problem with insanity
+	* Fixed an issue with the credit stats specific to DR (e.g. collection rate total)
+	* More helpful error message when bps is missing?
+	* Minor generation issues involving enemizer and the link sprite
 * 0.4.0.7
 	* Reduce flashing option added
 	* Sprite author credit added

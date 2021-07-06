@@ -195,15 +195,17 @@ def roll_settings(weights):
         boss_choice = old_style_bosses[boss_choice]
     ret.shufflebosses = boss_choice
 
-    ret.shuffleenemies = {'none': 'none',
-                          'shuffled': 'shuffled',
-                          'random': 'chaos'
-                          }[get_choice('enemy_shuffle')]
+    enemy_choice = get_choice('enemy_shuffle')
+    if enemy_choice == 'chaos':
+        enemy_choice = 'random'
+    ret.shuffleenemies = enemy_choice
 
-    ret.enemy_damage = {'default': 'default',
-                        'shuffled': 'shuffled',
-                        'random': 'chaos'
-                        }[get_choice('enemy_damage')]
+    old_style_damage = {'none': 'default',
+                        'chaos': 'random'}
+    damage_choice = get_choice('enemy_damage')
+    if damage_choice in old_style_damage:
+        damage_choice = old_style_damage[damage_choice]
+    ret.enemy_damage = damage_choice
 
     ret.enemy_health = get_choice('enemy_health')
 
