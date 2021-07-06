@@ -809,7 +809,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     write_int16(rom, 0x187010, credits_total)  # dynamic credits
     if credits_total != 216:
         # collection rate address:
-        cr_address = 0x2391BE
+        cr_address = 0x2391FA
         cr_pc = cr_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
         last_top, last_bot = credits_digit(credits_total % 10)
@@ -828,7 +828,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             total += count_locations_exclude_logic(region.locations, gt_logic)
         # rom.write_byte(0x187012, total)  # dynamic credits
         # gt big key address:
-        gtbk_address = 0x2390E0
+        gtbk_address = 0x23911C
         gtbk_pc = gtbk_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit(total // 10)
         last_top, last_bot = credits_digit(total % 10)
