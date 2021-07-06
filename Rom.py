@@ -1643,7 +1643,7 @@ def hud_format_text(text):
 def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite,
                        ow_palettes, uw_palettes, reduce_flashing):
 
-    if not os.path.exists("data/sprites/official/001.link.1.zspr"):
+    if not os.path.exists("data/sprites/official/001.link.1.zspr") and rom.orig_buffer:
         dump_zspr(rom.orig_buffer[0x80000:0x87000], rom.orig_buffer[0xdd308:0xdd380],
                   rom.orig_buffer[0xdedf5:0xdedf9], "data/sprites/official/001.link.1.zspr", "Nintendo", "Link")
 
