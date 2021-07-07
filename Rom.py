@@ -18,7 +18,6 @@ except ImportError:
 from BaseClasses import CollectionState, ShopType, Region, Location, Door, DoorType, RegionType, PotItem
 from DoorShuffle import compass_data, DROptions, boss_indicator
 from Dungeons import dungeon_music_addresses
-from KeyDoorShuffle import count_locations_exclude_logic
 from Regions import location_table, shop_to_location_table, retro_shops
 from RoomData import DoorKind
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
@@ -1163,6 +1162,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x18017E, 0x01) # Fairy fountains only trade in bottles
 
     # Starting equipment
+    if world.fakeboots[player]:
+        rom.write_byte(0x18008E, 0x01)
+
     equip = [0] * (0x340 + 0x4F)
     equip[0x36C] = 0x18
     equip[0x36D] = 0x18

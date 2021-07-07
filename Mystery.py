@@ -143,6 +143,7 @@ def roll_settings(weights):
         ret.dungeon_counters = 'pickup' if ret.door_shuffle != 'vanilla' or ret.compassshuffle == 'on' else 'off'
 
     ret.shufflelinks = get_choice('shufflelinks') == 'on'
+    ret.fakeboots = get_choice('fakeboots') == 'on'
     ret.shopsanity = get_choice('shopsanity') == 'on'
     ret.keydropshuffle = get_choice('keydropshuffle') == 'on'
     ret.mixed_travel = get_choice('mixed_travel') if 'mixed_travel' in weights else 'prevent'
