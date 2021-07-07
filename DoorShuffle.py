@@ -20,6 +20,7 @@ from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_ke
 
 
 def link_doors(world, player):
+    orig_swamp_patch = world.swamp_patch_required[player]
     attempt, valid = 1, False
     while not valid:
         try:
@@ -43,6 +44,7 @@ def link_doors(world, player):
             reset_portals(world, player)
             reset_rooms(world, player)
             world.get_door("Skull Pinball WS", player).no_exit()
+            world.swamp_patch_required[player] = orig_swamp_patch
 
 
 def link_doors_main(world, player):
