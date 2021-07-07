@@ -189,6 +189,7 @@
 
     "randomizer.item.hints": "Include Helpful Hints",
     "randomizer.item.retro": "Retro mode (universal keys)",
+    "randomizer.item.fakeboots": "Start with Fake Boots",
 
     "randomizer.item.worldstate": "World State",
     "randomizer.item.worldstate.standard": "Standard",

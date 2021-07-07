@@ -1,4 +1,4 @@
-from tkinter import ttk, Frame, E, W, LEFT, RIGHT
+from tkinter import ttk, Frame, E, W, LEFT, RIGHT, Label
 import source.gui.widgets as widgets
 import json
 import os
@@ -17,6 +17,9 @@ def item_page(parent):
     self.frames["checkboxes"] = Frame(self)
     self.frames["checkboxes"].pack(anchor=W)
 
+    various_options = Label(self.frames["checkboxes"], text="")
+    various_options.pack(side=LEFT)
+
     self.frames["leftItemFrame"] = Frame(self)
     self.frames["rightItemFrame"] = Frame(self)
     self.frames["leftItemFrame"].pack(side=LEFT)
@@ -34,7 +37,7 @@ def item_page(parent):
                 self.widgets[key] = dictWidgets[key]
                 packAttrs = {"anchor":E}
                 if self.widgets[key].type == "checkbox":
-                    packAttrs["anchor"] = W
+                    packAttrs["side"] = LEFT
                 self.widgets[key].pack(packAttrs)
 
     return self

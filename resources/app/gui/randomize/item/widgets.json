@@ -4,7 +4,8 @@
     "shopsanity": { "type": "checkbox" },
     "hints": {
       "type": "checkbox"
-    }
+    },
+    "fakeboots": { "type": "checkbox" }
   },
   "leftItemFrame": {
     "worldstate": {

@@ -18,7 +18,6 @@ except ImportError:
 from BaseClasses import CollectionState, ShopType, Region, Location, Door, DoorType, RegionType, PotItem
 from DoorShuffle import compass_data, DROptions, boss_indicator
 from Dungeons import dungeon_music_addresses
-from KeyDoorShuffle import count_locations_exclude_logic
 from Regions import location_table, shop_to_location_table, retro_shops
 from RoomData import DoorKind
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
@@ -31,7 +30,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '712324ad3ca7bff751d9f62812a2c3b6'
+RANDOMIZERBASEHASH = '736978dd2b3a2bb109ac80ed7c048e67'
 
 
 class JsonRom(object):
@@ -809,7 +808,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     write_int16(rom, 0x187010, credits_total)  # dynamic credits
     if credits_total != 216:
         # collection rate address:
-        cr_address = 0x2391FA
+        cr_address = 0x2391F2
         cr_pc = cr_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
         last_top, last_bot = credits_digit(credits_total % 10)
@@ -819,25 +818,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         # bottom half
         rom.write_byte(cr_pc+0x3a, mid_bot)
         rom.write_byte(cr_pc+0x3b, last_bot)
-
-    if world.keydropshuffle[player] or world.doorShuffle[player] != 'vanilla':
-        gt = world.dungeon_layouts[player]['Ganons Tower']
-        gt_logic = world.key_logic[player]['Ganons Tower']
-        total = 0
-        for region in gt.master_sector.regions:
-            total += count_locations_exclude_logic(region.locations, gt_logic)
-        # rom.write_byte(0x187012, total)  # dynamic credits
-        # gt big key address:
-        gtbk_address = 0x23911C
-        gtbk_pc = gtbk_address - 0x120000  # convert to pc
-        mid_top, mid_bot = credits_digit(total // 10)
-        last_top, last_bot = credits_digit(total % 10)
-        # top half
-        rom.write_byte(gtbk_pc+0x1c, mid_top)
-        rom.write_byte(gtbk_pc+0x1d, last_top)
-        # bottom half
-        rom.write_byte(gtbk_pc+0x3a, mid_bot)
-        rom.write_byte(gtbk_pc+0x3b, last_bot)
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':
@@ -1182,6 +1162,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x18017E, 0x01) # Fairy fountains only trade in bottles
 
     # Starting equipment
+    if world.fakeboots[player]:
+        rom.write_byte(0x18008E, 0x01)
+
     equip = [0] * (0x340 + 0x4F)
     equip[0x36C] = 0x18
     equip[0x36D] = 0x18
