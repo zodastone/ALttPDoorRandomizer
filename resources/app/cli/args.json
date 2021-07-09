@@ -247,7 +247,7 @@
     ]
   },
   "hints": {
-    "action": "store_false",
+    "action": "store_true",
     "type": "bool"
   },
   "no_hints": {
@@ -310,7 +310,7 @@
     "action": "store_true",
     "type": "bool"
   },
-  "fakeboots": {
+  "pseudoboots": {
     "action": "store_true",
     "type": "bool"
   },

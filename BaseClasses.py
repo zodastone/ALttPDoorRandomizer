@@ -131,7 +131,7 @@ class World(object):
             set_player_attr('treasure_hunt_total', 0)
             set_player_attr('potshuffle', False)
             set_player_attr('pot_contents', None)
-            set_player_attr('fakeboots', False)
+            set_player_attr('pseudoboots', False)
 
             set_player_attr('shopsanity', False)
             set_player_attr('keydropshuffle', False)
