@@ -58,7 +58,7 @@ SETTINGSTOPROCESS = {
       "hints": "hints",
       "retro": "retro",
       "shopsanity": "shopsanity",
-      "fakeboots": "fakeboots",
+      "pseudoboots": "pseudoboots",
       "worldstate": "mode",
       "logiclevel": "logic",
       "goal": "goal",

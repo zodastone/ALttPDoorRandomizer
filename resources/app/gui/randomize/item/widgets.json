@@ -5,7 +5,7 @@
     "hints": {
       "type": "checkbox"
     },
-    "fakeboots": { "type": "checkbox" }
+    "pseudoboots": { "type": "checkbox" }
   },
   "leftItemFrame": {
     "worldstate": {

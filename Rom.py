@@ -1162,7 +1162,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x18017E, 0x01) # Fairy fountains only trade in bottles
 
     # Starting equipment
-    if world.fakeboots[player]:
+    if world.pseudoboots[player]:
         rom.write_byte(0x18008E, 0x01)
 
     equip = [0] * (0x340 + 0x4F)

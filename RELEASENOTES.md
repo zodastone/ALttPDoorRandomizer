@@ -12,8 +12,19 @@ Links house can now be shuffled in different ER settings. It will be limited to 
 
 Thanks to qadan, cheuer, & compiling
 
+## Pseudo Boots
+
+Thanks to Bonta. You can now start with pseudo boots that let you move fast, but have no other logical uses (bonking open things, hovering, etc)
+
+## Pendant/Crystal Indicator
+
+For accessibility, you now get a C or P indicator to the left of the magic bar on the HUD when instead a Crystal or Pendant. Requires ownership of the map of that dungeon for display. Thanks to kan. 
+
 # Bug Fixes and Notes.
 
+* 0.4.0.10
+	* Renamed to pseudoboots
+	* Some release note updates
 * 0.4.0.9
 	* Fixes for stats and P/C indicator (thanks Kara)
 	* Swamp lobby fixes (thanks Catobat)
@@ -38,7 +49,7 @@ Thanks to qadan, cheuer, & compiling
 		* Chest turn tracking (not yet in credits)
 		* Damaged and magic stats in credits (gt bk removed)
 		* Fix for infinite bombs
-		* Fake boots option
+		* Pseudo boots option
 		* Always allowed medallions for swordless (no option yet)
 * 0.4.0.7
 	* Reduce flashing option added
