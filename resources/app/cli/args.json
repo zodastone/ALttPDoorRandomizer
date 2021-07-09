@@ -247,7 +247,7 @@
     ]
   },
   "hints": {
-    "action": "store_false",
+    "action": "store_true",
     "type": "bool"
   },
   "no_hints": {
