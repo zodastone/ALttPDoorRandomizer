@@ -30,7 +30,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '736978dd2b3a2bb109ac80ed7c048e67'
+RANDOMIZERBASEHASH = 'df3386b7a48d79950a1432b8bbaafde1'
 
 
 class JsonRom(object):

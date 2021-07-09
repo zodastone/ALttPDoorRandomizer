@@ -19,6 +19,7 @@ from Utils import ncr, kth_combination
 
 
 def link_doors(world, player):
+    orig_swamp_patch = world.swamp_patch_required[player]
     attempt, valid = 1, False
     while not valid:
         try:
@@ -42,6 +43,7 @@ def link_doors(world, player):
             reset_portals(world, player)
             reset_rooms(world, player)
             world.get_door("Skull Pinball WS", player).no_exit()
+            world.swamp_patch_required[player] = orig_swamp_patch
 
 
 def link_doors_main(world, player):
@@ -466,8 +468,8 @@ def choose_portals(world, player):
                 world.get_room(0xd5, player).change(0, DoorKind.DungeonEntrance)
 
     if not world.swamp_patch_required[player]:
-        swamp_region = world.get_entrance('Swamp Palace', player).connected_region
-        if swamp_region.name != 'Swamp Lobby':
+        swamp_portal = world.get_portal('Swamp', player)
+        if swamp_portal.door.name != 'Swamp Lobby S':
             world.swamp_patch_required[player] = True
 
 
