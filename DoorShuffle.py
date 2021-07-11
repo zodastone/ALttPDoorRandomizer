@@ -1704,25 +1704,14 @@ def smooth_door_pairs(world, player):
                             remove_pair(door, world, player)
                         if type_b == DoorKind.SmallKey:
                             remove_pair(door, world, player)
-                elif type_a in [DoorKind.Bombable, DoorKind.Dashable] or type_b in [DoorKind.Bombable, DoorKind.Dashable]:
+                else:
                     if valid_pair:
-                        new_type = type_a
-                        if type_a != type_b:
-                            new_type = DoorKind.Dashable if type_a == DoorKind.Dashable or type_b == DoorKind.Dashable else DoorKind.Bombable
-                            if type_a != new_type:
-                                room_a.change(door.doorListPos, new_type)
-                            if type_b != new_type:
-                                room_b.change(partner.doorListPos, new_type)
-                        add_pair(door, partner, world, player)
-                        spoiler_type = 'Bomb Door' if new_type == DoorKind.Bombable else 'Dash Door'
-                        world.spoiler.set_door_type(door.name + ' <-> ' + partner.name, spoiler_type, player)
-                        counter = bombable_counts if new_type == DoorKind.Bombable else dashable_counts
-                        counter[door.entrance.parent_region.dungeon] += 1
-                    else:
+                        bd_candidates[door.entrance.parent_region.dungeon].append(door)
+                    elif type_a in [DoorKind.Bombable, DoorKind.Dashable] or type_b in [DoorKind.Bombable, DoorKind.Dashable]:
                         if type_a in [DoorKind.Bombable, DoorKind.Dashable]:
                             room_a.change(door.doorListPos, DoorKind.Normal)
                             remove_pair(door, world, player)
-                        elif type_b in [DoorKind.Bombable, DoorKind.Dashable]:
+                        else:
                             room_b.change(partner.doorListPos, DoorKind.Normal)
                             remove_pair(partner, world, player)
             elif valid_pair and type_a != DoorKind.SmallKey and type_b != DoorKind.SmallKey:
