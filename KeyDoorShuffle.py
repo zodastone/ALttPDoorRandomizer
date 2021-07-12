@@ -1035,14 +1035,6 @@ def filter_big_chest(locations):
     return [x for x in locations if '- Big Chest' not in x.name]
 
 
-def count_locations_exclude_logic(locations, key_logic):
-    cnt = 0
-    for loc in locations:
-        if not location_is_bk_locked(loc, key_logic) and not loc.forced_item and not prize_or_event(loc):
-            cnt += 1
-    return cnt
-
-
 def location_is_bk_locked(loc, key_logic):
     return loc in key_logic.bk_chests or loc in key_logic.bk_locked
 
@@ -1051,18 +1043,36 @@ def prize_or_event(loc):
     return loc.name in dungeon_events or '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2']
 
 
-def count_free_locations(state):
+def boss_unavail(loc, world, player):
+    # todo: ambrosia
+    # return world.bossdrops[player] == 'ambrosia' and "- Boss" in loc.name
+    return False
+
+
+def blind_boss_unavail(loc, state, world, player):
+    if loc.name == "Thieves' Town - Boss":
+        # todo: check attic
+        return (loc.parent_region.dungeon.boss.name == 'Blind' and
+                (not any(x for x in state.found_locations if x.name == 'Suspicious Maiden') or
+                 (world.get_region('Thieves Attic Window', player).dungeon.name == 'Thieves Town' and
+                  not any(x for x in state.found_locations if x.name == 'Attic Cracked Floor'))))
+    return False
+
+
+def count_free_locations(state, world, player):
     cnt = 0
     for loc in state.found_locations:
-        if not prize_or_event(loc) and not loc.forced_item:
+        if (not prize_or_event(loc) and not loc.forced_item and not boss_unavail(loc, world, player)
+           and not blind_boss_unavail(loc, state, world, player)):
             cnt += 1
     return cnt
 
 
-def count_locations_exclude_big_chest(state):
+def count_locations_exclude_big_chest(state, world, player):
     cnt = 0
     for loc in state.found_locations:
-        if '- Big Chest' not in loc.name and not loc.forced_item and not prize_or_event(loc):
+        if ('- Big Chest' not in loc.name and not loc.forced_item and not boss_unavail(loc, world, player)
+           and not prize_or_event(loc) and not blind_boss_unavail(loc, state, world, player)):
             cnt += 1
     return cnt
 
@@ -1340,7 +1350,10 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     if not smalls_avail and num_bigs == 0:
         return True   # I think that's the end
     # todo: fix state to separate out these types
-    ttl_locations = count_free_locations(state) if state.big_key_opened else count_locations_exclude_big_chest(state)
+    if state.big_key_opened:
+        ttl_locations = count_free_locations(state, world, player)
+    else:
+        ttl_locations = count_locations_exclude_big_chest(state, world, player)
     ttl_small_key_only = count_small_key_only_locations(state)
     available_small_locations = cnt_avail_small_locations(ttl_locations, ttl_small_key_only, state, world, player)
     available_big_locations = cnt_avail_big_locations(ttl_locations, state, world, player)
