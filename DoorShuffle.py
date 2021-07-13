@@ -1678,7 +1678,7 @@ def change_door_to_small_key(d, world, player):
 def smooth_door_pairs(world, player):
     all_doors = [x for x in world.doors if x.player == player]
     skip = set()
-    bd_candidates, dashable_counts, bombable_counts = defaultdict(list), defaultdict(int), defaultdict(int)
+    bd_candidates = defaultdict(list)
     for door in all_doors:
         if door.type in [DoorType.Normal, DoorType.Interior] and door not in skip and not door.entranceFlag:
             partner = door.dest
@@ -1704,30 +1704,19 @@ def smooth_door_pairs(world, player):
                             remove_pair(door, world, player)
                         if type_b == DoorKind.SmallKey:
                             remove_pair(door, world, player)
-                elif type_a in [DoorKind.Bombable, DoorKind.Dashable] or type_b in [DoorKind.Bombable, DoorKind.Dashable]:
+                else:
                     if valid_pair:
-                        new_type = type_a
-                        if type_a != type_b:
-                            new_type = DoorKind.Dashable if type_a == DoorKind.Dashable or type_b == DoorKind.Dashable else DoorKind.Bombable
-                            if type_a != new_type:
-                                room_a.change(door.doorListPos, new_type)
-                            if type_b != new_type:
-                                room_b.change(partner.doorListPos, new_type)
-                        add_pair(door, partner, world, player)
-                        spoiler_type = 'Bomb Door' if new_type == DoorKind.Bombable else 'Dash Door'
-                        world.spoiler.set_door_type(door.name + ' <-> ' + partner.name, spoiler_type, player)
-                        counter = bombable_counts if new_type == DoorKind.Bombable else dashable_counts
-                        counter[door.entrance.parent_region.dungeon] += 1
-                    else:
+                        bd_candidates[door.entrance.parent_region.dungeon].append(door)
+                    elif type_a in [DoorKind.Bombable, DoorKind.Dashable] or type_b in [DoorKind.Bombable, DoorKind.Dashable]:
                         if type_a in [DoorKind.Bombable, DoorKind.Dashable]:
                             room_a.change(door.doorListPos, DoorKind.Normal)
                             remove_pair(door, world, player)
-                        elif type_b in [DoorKind.Bombable, DoorKind.Dashable]:
+                        else:
                             room_b.change(partner.doorListPos, DoorKind.Normal)
                             remove_pair(partner, world, player)
             elif valid_pair and type_a != DoorKind.SmallKey and type_b != DoorKind.SmallKey:
                 bd_candidates[door.entrance.parent_region.dungeon].append(door)
-    shuffle_bombable_dashable(bd_candidates, bombable_counts, dashable_counts, world, player)
+    shuffle_bombable_dashable(bd_candidates, world, player)
     world.paired_doors[player] = [x for x in world.paired_doors[player] if x.pair or x.original]
 
 
@@ -1764,15 +1753,15 @@ def stateful_door(door, kind):
     return False
 
 
-def shuffle_bombable_dashable(bd_candidates, bombable_counts, dashable_counts, world, player):
+def shuffle_bombable_dashable(bd_candidates, world, player):
     if world.doorShuffle[player] == 'basic':
         for dungeon, candidates in bd_candidates.items():
-            diff = bomb_dash_counts[dungeon.name][1] - dashable_counts[dungeon]
+            diff = bomb_dash_counts[dungeon.name][1]
             if diff > 0:
                 for chosen in random.sample(candidates, min(diff, len(candidates))):
                     change_pair_type(chosen, DoorKind.Dashable, world, player)
                     candidates.remove(chosen)
-            diff = bomb_dash_counts[dungeon.name][0] - bombable_counts[dungeon]
+            diff = bomb_dash_counts[dungeon.name][0]
             if diff > 0:
                 for chosen in random.sample(candidates, min(diff, len(candidates))):
                     change_pair_type(chosen, DoorKind.Bombable, world, player)
@@ -1781,16 +1770,12 @@ def shuffle_bombable_dashable(bd_candidates, bombable_counts, dashable_counts, w
                 remove_pair_type_if_present(excluded, world, player)
     elif world.doorShuffle[player] == 'crossed':
         all_candidates = sum(bd_candidates.values(), [])
-        all_bomb_counts = sum(bombable_counts.values())
-        all_dash_counts = sum(dashable_counts.values())
-        if all_dash_counts < 8:
-            for chosen in random.sample(all_candidates, min(8 - all_dash_counts, len(all_candidates))):
-                change_pair_type(chosen, DoorKind.Dashable, world, player)
-                all_candidates.remove(chosen)
-        if all_bomb_counts < 12:
-            for chosen in random.sample(all_candidates, min(12 - all_bomb_counts, len(all_candidates))):
-                change_pair_type(chosen, DoorKind.Bombable, world, player)
-                all_candidates.remove(chosen)
+        for chosen in random.sample(all_candidates, min(8, len(all_candidates))):
+            change_pair_type(chosen, DoorKind.Dashable, world, player)
+            all_candidates.remove(chosen)
+        for chosen in random.sample(all_candidates, min(12, len(all_candidates))):
+            change_pair_type(chosen, DoorKind.Bombable, world, player)
+            all_candidates.remove(chosen)
         for excluded in all_candidates:
             remove_pair_type_if_present(excluded, world, player)
 
