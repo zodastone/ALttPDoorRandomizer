@@ -221,7 +221,10 @@ def fill_restrictive(world, base_state, locations, itempool, keys_in_itempool = 
                         if world.accessibility[item_to_place.player] != 'none':
                             logging.getLogger('').warning('Not all items placed. Game beatable anyway. (Could not place %s)' % item_to_place)
                         continue
-                    raise FillError('No more spots to place %s' % item_to_place)
+                    spot_to_fill = last_ditch_placement(item_to_place, locations, world, maximum_exploration_state,
+                                                        base_state, itempool, keys_in_itempool, single_player_placement)
+                    if spot_to_fill is None:
+                        raise FillError('No more spots to place %s' % item_to_place)
 
                 world.push_item(spot_to_fill, item_to_place, False)
                 track_outside_keys(item_to_place, spot_to_fill, world)
@@ -256,6 +259,69 @@ def track_outside_keys(item, location, world):
         if loc_dungeon and loc_dungeon.name == item_dungeon:
             return  # this is an inside key
     world.key_logic[item.player][item_dungeon].outside_keys += 1
+
+
+def last_ditch_placement(item_to_place, locations, world, state, base_state, itempool,
+                         keys_in_itempool=None, single_player_placement=False):
+    def location_preference(loc):
+        if not loc.item.advancement:
+            return 1
+        if loc.item.type and loc.item.type != 'Sword':
+            if loc.item.type in ['Map', 'Compass']:
+                return 2
+            else:
+                return 3
+        return 4
+
+    possible_swaps = [x for x in state.locations_checked
+                      if x.item.type not in ['Event', 'Crystal']]
+    swap_locations = sorted(possible_swaps, key=location_preference)
+
+    for location in swap_locations:
+        old_item = location.item
+        new_pool = list(itempool) + [old_item]
+        new_spot = find_spot_for_item(item_to_place, [location], world, base_state, new_pool,
+                                      keys_in_itempool, single_player_placement)
+        if new_spot:
+            new_spot.item = item_to_place
+            swap_spot = find_spot_for_item(old_item, locations, world, base_state, itempool,
+                                           keys_in_itempool, single_player_placement)
+            if swap_spot:
+                logging.getLogger('').debug(f'Swapping {old_item} for {item_to_place}')
+                world.push_item(swap_spot, old_item, False)
+                locations.remove(swap_spot)
+                locations.append(new_spot)
+                return new_spot
+    return None
+
+
+def find_spot_for_item(item_to_place, locations, world, base_state, pool,
+                       keys_in_itempool=None, single_player_placement=False):
+    def sweep_from_pool():
+        new_state = base_state.copy()
+        for item in pool:
+            new_state.collect(item, True)
+        new_state.sweep_for_events()
+        return new_state
+    for location in locations:
+        maximum_exploration_state = sweep_from_pool()
+        perform_access_check = True
+        if world.accessibility[item_to_place.player] == 'none':
+            perform_access_check = not world.has_beaten_game(maximum_exploration_state, item_to_place.player) if single_player_placement else not world.has_beaten_game(maximum_exploration_state)
+
+        if item_to_place.smallkey or item_to_place.bigkey:  # a better test to see if a key can go there
+            location.item = item_to_place
+            test_state = maximum_exploration_state.copy()
+            test_state.stale[item_to_place.player] = True
+        else:
+            test_state = maximum_exploration_state
+        if (not single_player_placement or location.player == item_to_place.player) \
+             and location.can_fill(test_state, item_to_place, perform_access_check) \
+             and valid_key_placement(item_to_place, location, pool if (keys_in_itempool and keys_in_itempool[item_to_place.player]) else world.itempool, world):
+            return location
+        if item_to_place.smallkey or item_to_place.bigkey:
+            location.item = None
+    return None
 
 
 def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None):

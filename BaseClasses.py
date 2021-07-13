@@ -505,6 +505,7 @@ class CollectionState(object):
         unresolved_events = [x for y in self.reachable_regions[player] for x in y.locations
                              if x.event and x.item and (x.item.smallkey or x.item.bigkey or x.item.advancement)
                              and x not in self.locations_checked and x.can_reach(self)]
+        unresolved_events = self._do_not_flood_the_keys(unresolved_events)
         if len(unresolved_events) == 0:
             self.check_key_doors_in_dungeons(rrp, player)
 
