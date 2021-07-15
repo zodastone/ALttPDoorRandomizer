@@ -100,8 +100,8 @@ def link_doors_main(world, player):
             analyze_portals(world, player)
         for portal in world.dungeon_portals[player]:
             connect_portal(portal, world, player)
-
-    fix_big_key_doors_with_ugly_smalls(world, player)
+    if not world.doorShuffle[player] == 'vanilla':
+        fix_big_key_doors_with_ugly_smalls(world, player)
     if world.doorShuffle[player] == 'vanilla':
         for entrance, ext in open_edges:
             connect_two_way(world, entrance, ext, player)
