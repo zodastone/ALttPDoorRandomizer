@@ -482,8 +482,6 @@ class CollectionState(object):
             self.reached_doors = {player: set() for player in range(1, parent.players + 1)}
             self.opened_doors = {player: set() for player in range(1, parent.players + 1)}
             self.dungeons_to_check = {player: defaultdict(dict) for player in range(1, parent.players + 1)}
-
-            self.ghost_keys = Counter()
         self.dungeon_limits = None
         # self.trace = None
 
@@ -551,9 +549,9 @@ class CollectionState(object):
                         if (new_entrance, new_crystal_state) not in queue:
                             queue.append((new_entrance, new_crystal_state))
             # else those connections that are not accessible yet
-            if self.is_small_door(connection) and not self.world.retro[player]:  # todo: retro
+            if self.is_small_door(connection):
                 door = connection.door
-                dungeon_name = connection.parent_region.dungeon.name  # todo: universal
+                dungeon_name = connection.parent_region.dungeon.name
                 key_logic = self.world.key_logic[player][dungeon_name]
                 if door.name not in self.reached_doors[player]:
                     self.door_counter[player][0][dungeon_name] += 1
@@ -561,7 +559,8 @@ class CollectionState(object):
                     if key_logic.sm_doors[door]:
                         self.reached_doors[player].add(key_logic.sm_doors[door].name)
                 if not connection.can_reach(self):
-                    checklist = self.dungeons_to_check[player][dungeon_name]
+                    checklist_key = 'Universal' if self.world.retro[player] else dungeon_name
+                    checklist = self.dungeons_to_check[player][checklist_key]
                     checklist[connection.name] = (connection, crystal_state)
                 elif door.name not in self.opened_doors[player]:
                     opened_doors = self.opened_doors[player]
@@ -639,7 +638,7 @@ class CollectionState(object):
                             while not done:
                                 rrp_ = child_state.reachable_regions[player]
                                 bc_ = child_state.blocked_connections[player]
-                                self.dungeon_limits = [dungeon_name]
+                                self.set_dungeon_limits(player, dungeon_name)
                                 child_state.traverse_world(child_queue, rrp_, bc_, player)
                                 new_events = child_state.sweep_for_events_once()
                                 child_state.stale[player] = False
@@ -674,13 +673,19 @@ class CollectionState(object):
 
             terminal_queue = deque()
             for door in common_doors:
+                pair = self.find_door_pair(player, dungeon_name, door)
+                if door not in self.reached_doors[player]:
+                    self.door_counter[player][0][dungeon_name] += 1
+                    self.reached_doors[player].add(door)
+                    if pair not in self.reached_doors[player]:
+                        self.reached_doors[player].add(pair)
                 self.opened_doors[player].add(door)
                 if door in checklist:
                     terminal_queue.append(checklist[door])
-                if self.find_door_pair(player, dungeon_name, door) not in self.opened_doors[player]:
+                if pair not in self.opened_doors[player]:
                     self.door_counter[player][1][dungeon_name] += 1
 
-            self.dungeon_limits = [dungeon_name]
+            self.set_dungeon_limits(player, dungeon_name)
             rrp_ = self.reachable_regions[player]
             bc_ = self.blocked_connections[player]
             for block, crystal in bc_.items():
@@ -722,14 +727,20 @@ class CollectionState(object):
                 return paired_door.name if paired_door else None
         return None
 
+    def set_dungeon_limits(self, player, dungeon_name):
+        if self.world.retro[player] and self.world.mode[player] == 'standard':
+            self.dungeon_limits = ['Hyrule Castle', 'Agahnims Tower']
+        else:
+            self.dungeon_limits = [dungeon_name]
+
     @staticmethod
     def should_explore_child_state(state, dungeon_name, player):
-        small_key_name = dungeon_keys[dungeon_name]  # todo: universal
-        key_total = state.prog_items[(small_key_name, player)] + state.ghost_keys[(small_key_name, player)]
+        small_key_name = dungeon_keys[dungeon_name]
+        key_total = state.prog_items[(small_key_name, player)]
         remaining_keys = key_total - state.door_counter[player][1][dungeon_name]
         unopened_doors = state.door_counter[player][0][dungeon_name] - state.door_counter[player][1][dungeon_name]
         if remaining_keys > 0 and unopened_doors > 0:
-            key_logic = state.world.key_logic[player][dungeon_name]   # todo: universal
+            key_logic = state.world.key_logic[player][dungeon_name]
             door_candidates, skip = [], set()
             for door, paired in key_logic.sm_doors.items():
                 if door.name in state.reached_doors[player] and door.name not in state.opened_doors[player]:
@@ -770,7 +781,6 @@ class CollectionState(object):
             player: defaultdict(dict, {name: copy.copy(checklist)
                                        for name, checklist in self.dungeons_to_check[player].items()})
             for player in range(1, self.world.players + 1)}
-        ret.ghost_keys = self.ghost_keys.copy()
         return ret
 
     def apply_dungeon_exploration(self, rrp, player, dungeon_name, checklist):
@@ -783,13 +793,19 @@ class CollectionState(object):
             common_doors, missing_regions, missing_bc, paths = ec[dungeon_name][exp_key]
             terminal_queue = deque()
             for door in common_doors:
+                pair = self.find_door_pair(player, dungeon_name, door)
+                if door not in self.reached_doors[player]:
+                    self.door_counter[player][0][dungeon_name] += 1
+                    self.reached_doors[player].add(door)
+                    if pair not in self.reached_doors[player]:
+                        self.reached_doors[player].add(pair)
                 self.opened_doors[player].add(door)
                 if door in checklist:
                     terminal_queue.append(checklist[door])
-                if self.find_door_pair(player, dungeon_name, door) not in self.opened_doors[player]:
+                if pair not in self.opened_doors[player]:
                     self.door_counter[player][1][dungeon_name] += 1
 
-            self.dungeon_limits = [dungeon_name]
+            self.set_dungeon_limits(player, dungeon_name)
             rrp_ = self.reachable_regions[player]
             bc_ = self.blocked_connections[player]
             for block, crystal in bc_.items():
@@ -1812,6 +1828,7 @@ class Sector(object):
         self.entrance_sector = None
         self.destination_entrance = False
         self.equations = None
+        self.item_logic = set()
 
     def region_set(self):
         if self.r_name_set is None:
@@ -2552,7 +2569,8 @@ dungeon_keys = {
     'Ice Palace': 'Small Key (Ice Palace)',
     'Misery Mire': 'Small Key (Misery Mire)',
     'Turtle Rock': 'Small Key (Turtle Rock)',
-    'Ganons Tower': 'Small Key (Ganons Tower)'
+    'Ganons Tower': 'Small Key (Ganons Tower)',
+    'Universal': 'Small Key (Universal)'
 }
 
 class PotItem(FastEnum):

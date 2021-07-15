@@ -1101,9 +1101,9 @@ def assign_cross_keys(dungeon_builders, world, player):
     logger.debug('Cross Dungeon: Keys unable to assign in pool %s', remaining)
 
     # Last Step: Adjust Small Key Dungeon Pool
-    if not world.retro[player]:
-        for name, builder in dungeon_builders.items():
-            reassign_key_doors(builder, world, player)
+    for name, builder in dungeon_builders.items():
+        reassign_key_doors(builder, world, player)
+        if not world.retro[player]:
             log_key_logic(builder.name, world.key_logic[player][builder.name])
             actual_chest_keys = max(builder.key_doors_num - builder.key_drop_cnt, 0)
             dungeon = world.get_dungeon(name, player)

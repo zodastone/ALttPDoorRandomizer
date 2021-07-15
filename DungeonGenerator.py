@@ -1290,13 +1290,16 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player,
                 sanc_builder = random.choice(lw_builders)
                 assign_sector(sanc, sanc_builder, candidate_sectors, global_pole)
 
+        bow_sectors, retro_std_flag = {}, world.retro[player] and world.mode[player] == 'standard'
         free_location_sectors = {}
         crystal_switches = {}
         crystal_barriers = {}
         polarized_sectors = {}
         neutral_sectors = {}
         for sector in candidate_sectors:
-            if sector.chest_locations > 0:
+            if retro_std_flag and 'Bow' in sector.item_logic:  # these need to be distributed outside of HC
+                bow_sectors[sector] = None
+            elif sector.chest_locations > 0:
                 free_location_sectors[sector] = None
             elif sector.c_switch:
                 crystal_switches[sector] = None
@@ -1306,6 +1309,8 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player,
                 neutral_sectors[sector] = None
             else:
                 polarized_sectors[sector] = None
+        if bow_sectors:
+            assign_bow_sectors(dungeon_map, bow_sectors, global_pole)
         assign_location_sectors(dungeon_map, free_location_sectors, global_pole)
         leftover = assign_crystal_switch_sectors(dungeon_map, crystal_switches, crystal_barriers, global_pole)
         ensure_crystal_switches_reachable(dungeon_map, leftover, polarized_sectors, crystal_barriers, global_pole)
@@ -1471,6 +1476,9 @@ def define_sector_features(sectors):
                         sector.blue_barrier = True
                     if door.bigKey:
                         sector.bk_required = True
+            if region.name in ['PoD Mimics 2', 'PoD Bow Statue Right', 'PoD Mimics 1', 'GT Mimics 1', 'GT Mimics 2',
+                               'Eastern Single Eyegore', 'Eastern Duo Eyegores']:
+                sector.item_logic.add('Bow')
 
 
 def assign_sector(sector, dungeon, candidate_sectors, global_pole):
@@ -1519,6 +1527,19 @@ def find_sector(r_name, sectors):
         if r_name in s.region_set():
             return s
     return None
+
+
+def assign_bow_sectors(dungeon_map, bow_sectors, global_pole):
+    sector_list = list(bow_sectors)
+    random.shuffle(sector_list)
+    population = []
+    for name in dungeon_map:
+        if name != 'Hyrule Castle':
+            population.append(name)
+    choices = random.choices(population, k=len(sector_list))
+    for i, choice in enumerate(choices):
+        builder = dungeon_map[choice]
+        assign_sector(sector_list[i], builder, bow_sectors, global_pole)
 
 
 def assign_location_sectors(dungeon_map, free_location_sectors, global_pole):
