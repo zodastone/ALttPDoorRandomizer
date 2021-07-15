@@ -107,7 +107,8 @@ SETTINGSTOPROCESS = {
       "menuspeed": "fastmenu",
       "owpalettes": "ow_palettes",
       "uwpalettes": "uw_palettes",
-      "reduce_flashing": "reduce_flashing"
+      "reduce_flashing": "reduce_flashing",
+      "shuffle_sfx": "shuffle_sfx",
     },
     "generation": {
       "createspoiler": "create_spoiler",
