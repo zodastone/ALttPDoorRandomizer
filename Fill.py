@@ -273,8 +273,11 @@ def last_ditch_placement(item_to_place, locations, world, state, base_state, ite
                 return 3
         return 4
 
-    possible_swaps = [x for x in state.locations_checked
-                      if x.item.type not in ['Event', 'Crystal']]
+    if item_to_place.type == 'Crystal':
+        possible_swaps = [x for x in state.locations_checked if x.item.type == 'Crystal']
+    else:
+        possible_swaps = [x for x in state.locations_checked
+                          if x.item.type not in ['Event', 'Crystal'] and not x.forced_item]
     swap_locations = sorted(possible_swaps, key=location_preference)
 
     for location in swap_locations:
@@ -283,6 +286,7 @@ def last_ditch_placement(item_to_place, locations, world, state, base_state, ite
         new_spot = find_spot_for_item(item_to_place, [location], world, base_state, new_pool,
                                       keys_in_itempool, single_player_placement)
         if new_spot:
+            restore_item = new_spot.item
             new_spot.item = item_to_place
             swap_spot = find_spot_for_item(old_item, locations, world, base_state, itempool,
                                            keys_in_itempool, single_player_placement)
@@ -292,6 +296,9 @@ def last_ditch_placement(item_to_place, locations, world, state, base_state, ite
                 locations.remove(swap_spot)
                 locations.append(new_spot)
                 return new_spot
+            else:
+                new_spot.item = restore_item
+
     return None
 
 
