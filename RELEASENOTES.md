@@ -22,6 +22,9 @@ For accessibility, you now get a C or P indicator to the left of the magic bar o
 
 # Bug Fixes and Notes.
 
+* 0.4.0.12
+	* ER Inverted fix for HC Ledge
+	* Credits again
 * 0.4.0.11
 	* Some minor base rom fixes
 	* Improved distribution of bombable/dashable doors
