@@ -1835,7 +1835,7 @@ def find_accessible_entrances(world, player, builder):
     elif world.mode[player] != 'inverted':
         start_regions = ['Links House', 'Sanctuary']
     else:
-        start_regions = ['Inverted Links House', 'Inverted Dark Sanctuary']
+        start_regions = ['Inverted Links House', 'Inverted Dark Sanctuary', 'Hyrule Castle Ledge']
     regs = convert_regions(start_regions, world, player)
     visited_regions = set()
     visited_entrances = []
