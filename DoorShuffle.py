@@ -1,4 +1,4 @@
-import random
+import RaceRandom as random
 from collections import defaultdict, deque
 import logging
 import operator as op

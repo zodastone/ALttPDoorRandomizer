@@ -3,7 +3,7 @@ import argparse
 import copy
 import os
 import logging
-import random
+import RaceRandom as random
 import textwrap
 import shlex
 import sys

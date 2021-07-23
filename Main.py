@@ -4,7 +4,8 @@ from itertools import zip_longest
 import json
 import logging
 import os
-import random
+import RaceRandom as random
+import string
 import time
 import zlib
 
@@ -41,8 +42,8 @@ def main(args, seed=None, fish=None):
 
     start = time.perf_counter()
 
-    # if args.securerandom:
-    #     random.use_secure()
+    if args.securerandom:
+        random.use_secure()
 
     # initialize the world
     if args.code:
@@ -61,7 +62,7 @@ def main(args, seed=None, fish=None):
     random.seed(world.seed)
 
     if args.securerandom:
-        world.seed = None
+        world.seed = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(9))
 
     world.remote_items = args.remote_items.copy()
     world.mapshuffle = args.mapshuffle.copy()
@@ -331,7 +332,7 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli","cli","made.playthrough") % (YES if (args.calc_playthrough) else NO))
     logger.info(world.fish.translate("cli","cli","made.spoiler") % (YES if (not args.jsonout and args.create_spoiler) else NO))
     logger.info(world.fish.translate("cli","cli","used.enemizer") % (YES if enemized else NO))
-    logger.info(world.fish.translate("cli","cli","seed") + ": %d", world.seed)
+    logger.info(world.fish.translate("cli","cli","seed") + ": %s", world.seed)
     logger.info(world.fish.translate("cli","cli","total.time"), time.perf_counter() - start)
 
 #    print_wiki_doors_by_room(dungeon_regions,world,1)
