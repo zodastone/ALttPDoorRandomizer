@@ -30,7 +30,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '25dd18672e1234c85900f5b2155e7e4f'
+RANDOMIZERBASEHASH = '9c2878d1035bb3889784906a55a92a26'
 
 
 class JsonRom(object):
@@ -807,17 +807,17 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     write_int16(rom, 0x187010, credits_total)  # dynamic credits
     if credits_total != 216:
-        # collection rate address:
-        cr_address = 0x2391F0
+        # collection rate address (hi):
+        cr_address = 0x238057
         cr_pc = cr_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
         last_top, last_bot = credits_digit(credits_total % 10)
         # top half
-        rom.write_byte(cr_pc+0x1c, mid_top)
-        rom.write_byte(cr_pc+0x1d, last_top)
+        rom.write_byte(cr_pc+0x1, mid_top)
+        rom.write_byte(cr_pc+0x2, last_top)
         # bottom half
-        rom.write_byte(cr_pc+0x3a, mid_bot)
-        rom.write_byte(cr_pc+0x3b, last_bot)
+        rom.write_byte(cr_pc+0x1f, mid_bot)
+        rom.write_byte(cr_pc+0x20, last_bot)
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':
