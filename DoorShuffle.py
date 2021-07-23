@@ -502,6 +502,9 @@ def analyze_portals(world, player):
                 raise Exception('please inspect this case')
         if len(reachable_portals) == 1:
             info.sole_entrance = reachable_portals[0]
+        if world.intensity[player] < 2 and world.doorShuffle[player] == 'basic' and dungeon == 'Desert Palace':
+            if len(inaccessible_portals) == 1 and inaccessible_portals[0] == 'Desert Back':
+                info.required_passage.clear()  # can't make a passage at this intensity level, something else must exit
         info_map[dungeon] = info
 
     for dungeon, info in info_map.items():
