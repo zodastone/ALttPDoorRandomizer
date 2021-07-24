@@ -719,6 +719,7 @@ class CollectionState(object):
     def can_get_good_bee(self, player):
         cave = self.world.get_region('Good Bee Cave', player)
         return (
+            self.can_use_bombs(player) and
             self.has_bottle(player) and
             self.has('Bug Catching Net', player) and
             (self.has_Boots(player) or (self.has_sword(player) and self.has('Quake', player))) and

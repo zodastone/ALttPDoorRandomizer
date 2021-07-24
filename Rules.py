@@ -576,9 +576,10 @@ def bomb_rules(world, player):
     for location in bombable_items:
         add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player)) 
 
-    cave_kill_locations = ['Mini Moldorm Cave - Far Left', 'Mini Moldorm Cave - Far Right', 'Mini Moldorm Cave - Left', 'Mini Moldorm Cave - Right', 'Mini Moldorm Cave - Generous Guy']
+    cave_kill_locations = ['Mini Moldorm Cave - Far Left', 'Mini Moldorm Cave - Far Right', 'Mini Moldorm Cave - Left', 'Mini Moldorm Cave - Right', 'Mini Moldorm Cave - Generous Guy', 'Spiral Cave']
     for location in cave_kill_locations:
         add_rule(world.get_location(location, player), lambda state: state.can_kill_most_things(player) or state.can_use_bombs(player))
+    add_rule(world.get_entrance('Spiral Cave (top to bottom)', player), lambda state: state.can_kill_most_things(player) or state.can_use_bombs(player))
 
     paradox_switch_chests = ['Paradox Cave Lower - Far Left', 'Paradox Cave Lower - Left', 'Paradox Cave Lower - Right', 'Paradox Cave Lower - Far Right', 'Paradox Cave Lower - Middle']
     for location in paradox_switch_chests:
