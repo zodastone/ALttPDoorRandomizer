@@ -52,7 +52,8 @@
     "enemizer.nothing.applied": "No Enemizer options will be applied until this is resolved.",
     "building.collection.spheres": "Building up collection spheres",
     "building.calculating.spheres": "Calculated sphere %i, containing %i of %i progress items.",
-    "building.final.spheres": "Calculated final sphere %i, containing %i of %i progress items."
+    "building.final.spheres": "Calculated final sphere %i, containing %i of %i progress items.",
+    "old.python.version": "Door Rando may have issues with python versions earlier than 3.7.  Detected version: %s"
   },
   "help": {
     "lang": [ "App Language, if available, defaults to English" ],

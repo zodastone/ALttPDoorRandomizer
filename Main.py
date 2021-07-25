@@ -29,6 +29,8 @@ from Utils import output_path, parse_player_names
 
 __version__ = '0.4.0.11u'
 
+from source.classes.BabelFish import BabelFish
+
 
 class EnemizerError(RuntimeError):
     pass
@@ -38,7 +40,7 @@ def check_python_version():
     import sys
     version = sys.version_info
     if version.major < 3 or version.minor < 7:
-        logging.warning('Door Rando may have issues with python versions earlier than 3.7.  Detected version: %s', sys.version)
+        logging.warning(BabelFish().translate("cli","cli","old.python.version"), sys.version)
 
 
 def main(args, seed=None, fish=None):
