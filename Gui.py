@@ -24,6 +24,13 @@ from source.classes.BabelFish import BabelFish
 from source.classes.Empty import Empty
 
 
+def check_python_version():
+    import sys
+    version = sys.version_info
+    if version.major < 3 or version.minor < 7:
+        messagebox.showinfo("Door Shuffle " + ESVersion, 'Door Rando may have issues with python versions earlier than 3.7.  Detected version: %s' % sys.version)
+
+
 def guiMain(args=None):
     # Save settings to file
     def save_settings(args):
@@ -187,6 +194,8 @@ def guiMain(args=None):
 
     # load adjust settings into options
     loadadjustargs(self, self.settings)
+
+    check_python_version()
 
     # run main window
     mainWindow.mainloop()
