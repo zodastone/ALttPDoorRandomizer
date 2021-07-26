@@ -86,10 +86,12 @@ class LocalRom(object):
         self.name = name
         self.hash = hash
         self.orig_buffer = None
+        self.file = file
+        self.has_smc_header = False
         if not os.path.isfile(file):
             raise RuntimeError("Could not find valid local base rom for patching at expected path %s." % file)
         with open(file, 'rb') as stream:
-            self.buffer = read_rom(stream)
+            self.buffer, self.has_smc_header = read_rom(stream)
         if patch:
             self.patch_base_rom()
             self.orig_buffer = self.buffer.copy()
@@ -187,12 +189,21 @@ def write_int32s(rom, startaddress, values):
 def read_rom(stream):
     "Reads rom into bytearray and strips off any smc header"
     buffer = bytearray(stream.read())
+    has_smc_header = False
     if len(buffer)%0x400 == 0x200:
         buffer = buffer[0x200:]
-    return buffer
+        has_smc_header = True
+    return buffer, has_smc_header
 
-def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_on_hit):
-    baserom_path = os.path.abspath(baserom_path)
+def patch_enemizer(world, player, rom, local_rom, enemizercli, random_sprite_on_hit):
+    baserom_path = os.path.abspath(local_rom.file)
+    unheadered_path = None
+    if local_rom.has_smc_header:
+        headered_path = baserom_path
+        unheadered_path = baserom_path = os.path.abspath(output_path('unheadered_rom.sfc'))
+        with open(headered_path, 'rb') as headered:
+            with open(baserom_path, 'wb') as unheadered:
+                unheadered.write(headered.read()[0x200:])
     basepatch_path = os.path.abspath(local_path(os.path.join("data","base2current.json")))
     enemizer_basepatch_path = os.path.join(os.path.dirname(enemizercli), "enemizerBasePatch.json")
     randopatch_path = os.path.abspath(output_path('enemizer_randopatch.json'))
@@ -335,6 +346,12 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
                 rom.write_bytes(0x300000 + (i * 0x8000), sprite.sprite)
                 rom.write_bytes(0x307000 + (i * 0x8000), sprite.palette)
                 rom.write_bytes(0x307078 + (i * 0x8000), sprite.glove_palette)
+
+    if local_rom.has_smc_header:
+        try:
+            os.remove(unheadered_path)
+        except OSError:
+            pass
 
     try:
         os.remove(randopatch_path)

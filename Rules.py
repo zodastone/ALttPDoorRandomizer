@@ -1149,7 +1149,7 @@ def standard_rules(world, player):
             set_rule(entrance, lambda state: state.has('Zelda Delivered', player))
     set_rule(world.get_entrance('Sanctuary Exit', player), lambda state: state.has('Zelda Delivered', player))
     # zelda should be saved before agahnim is in play
-    set_rule(world.get_location('Agahnim 1', player), lambda state: state.has('Zelda Delivered', player))
+    add_rule(world.get_location('Agahnim 1', player), lambda state: state.has('Zelda Delivered', player))
 
     # too restrictive for crossed?
     def uncle_item_rule(item):
