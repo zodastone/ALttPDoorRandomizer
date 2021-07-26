@@ -526,8 +526,6 @@ def set_up_shops(world, player):
     if world.bomblogic[player]:
         if world.shopsanity[player]:
             removals = [item for item in world.itempool if item.name == 'Bomb Upgrade (+5)' and item.player == player]
-            for i in removals:
-                print(i)
             for remove in removals:
                 world.itempool.remove(remove)
             world.itempool.append(ItemFactory('Rupees (50)', player)) # replace the bomb upgrade
