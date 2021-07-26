@@ -38,9 +38,11 @@ Alternatively, run ```Gui.py``` for a simple graphical user interface.
 
 # Commonly Missed Things and Differences from other Randomizers
 
+Most of these apply only when the door shuffle is not vanilla.
+
 ### Starting Item
 
-You start with a “Mirror Scroll”, a dumbed-down mirror that only works in dungeons, not the overworld and can’t erase blocks like the Mirror
+You start with a “Mirror Scroll”, a dumbed-down mirror that only works in dungeons, not the overworld and can’t erase blocks like the Mirror.
 
 ### Navigation
 
@@ -58,7 +60,7 @@ You start with a “Mirror Scroll”, a dumbed-down mirror that only works in du
 
 ### Boss Differences
 
-* You have to find the attic floor and bomb it open and bring the maiden to the light to fight Blind. In cross dungeon door shuffle, the attic can be in any dungeon. If hints are on, there is a special one about a cracked floor.
+* You have to find the attic floor and bomb it open and bring the maiden to the light to fight Blind. In cross dungeon door shuffle, the attic can be in any dungeon. If you bring the maiden to the boss arena, she will hint were the cracked floor can be found. If hints are on, there is a special one about the cracked floor.
 * GT Bosses do not respawn after killing them in this mode.
 * Enemizer change: The attic/maiden sequence is now active and required when Blind is the boss of Theives' Town even when bosses are shuffled.
 
@@ -70,7 +72,7 @@ You start with a “Mirror Scroll”, a dumbed-down mirror that only works in du
 
 ### Misc
 
-* Compass counts no longer function after you get the Triforce
+* Compass counts no longer function after you get the Triforce (this is actually true in all randomizers)
 
 # Settings
 
@@ -124,7 +126,7 @@ The rooms are left alone and it is up to the discretion of the player whether to
 
 #### Force
 
-The two disjointed sections are forced to be in the same dungeon but the glitches are never logically required to complete that game.
+The two disjointed sections are forced to be in the same dungeon but the glitches are never logically required to complete that game.cause then you would need time to check the map in a d
 
 ### Standardize Palettes (--standardize_palettes)
 No effect if door shuffle is not on crossed
@@ -239,6 +241,37 @@ Arrow Capacity upgrades are now replaced by Rupees wherever it might end up.
  
 The Ten Arrows and 5 randomly selected Small Hearts or Blue Shields are replaced by the quiver item (represented by the Single Arrow in game.) 5 Red Potion refills are replaced by the Universal small key. It is assured that at least one shop sells Universal Small Keys. The quiver may thus not be found in shops. The quiver and small keys retain their original base price, but may be discounted.
 
+## Logic Level
+
+### Overworld Glitches
+
+Set `--logic` to `owglitches` to make overworld glitches required in the logic.
+
+## Shuffle Links House
+
+In certain ER shuffles, (not dungeonssimple or dungeonsfulls), you can now control whether Links House is shuffled or remains vanilla. Previously, inverted seeds had this behavior and would shuffle links house, but now if will only do so if this is specified. Now, also works for open modes, but links house is never shuffled in standard mode.
+
+## Reduce Flashing
+
+Accessibility option to reducing some flashing animations in the game.
+
+## Pseudo-boots
+
+Option to start with ability to dash, but not able to make any boots required logical checks or traversal.
+
+## Experimental Features
+
+The treasure check counter is turned on. Also, you will start as a bunny if your spawn point is in the dark world.
+
+## Triforce Hunt Settings
+
+A collection of settings to control the triforce piece pool.
+
+* --triforce_goal_min: Minimum number of pieces to collect to win
+* --triforce_goal_max: Maximum number of pieces to collect to win
+* --triforce_pool_min: Minimum number of pieces in item pool
+* --triforce_pool_max: Maximum number of pieces in item pool
+* --triforce_min_difference: Minimum difference between pool and goal to win
 
 ## Seed
 
@@ -281,6 +314,24 @@ Include mobs and pots drop in the item pool. (default: not enabled)
 Includes shop locations in the item pool.
 
 ```
+--pseudoboots
+```
+
+Start with dash ability, but no way to use boots to accomplish checks 
+
+```
+--shufflelinks
+```
+
+Whether to shuffle links house in most ER modes.
+
+```
+--experimental
+```
+
+Enables experimental features
+
+```
 --mixed_travel <mode>      
 ```
 
@@ -291,3 +342,9 @@ How to handle certain glitches in crossed dungeon mode. (default: prevent)
 ```
 
 Whether to standardize dungeon palettes in crossed dungeon mode. (default: standardize)
+
+```
+--reduce_flashing
+```
+
+Reduces amount of flashing in some animations
