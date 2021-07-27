@@ -6,7 +6,7 @@ None yet
 
 * 0.5.0.0
 	* Handles headered roms for enemizer (Thanks compiling)
-	* Warning added for earlier version of pythong (Thanks compiling)
+	* Warning added for earlier version of python (Thanks compiling)
 	* Minor logic issue for defeating Aga in standard (Thanks compiling)
 	* Fix for boss music in non-DR modes (Thanks codemann8)
 
