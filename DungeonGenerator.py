@@ -807,6 +807,10 @@ class ExplorationState(object):
         self.dungeon = dungeon
         self.pinball_used = False
 
+        self.prize_door_set = {}
+        self.prize_doors = []
+        self.prize_doors_opened = False
+
     def copy(self):
         ret = ExplorationState(dungeon=self.dungeon)
         ret.unattached_doors = list(self.unattached_doors)
@@ -833,6 +837,10 @@ class ExplorationState(object):
         ret.non_door_entrances = list(self.non_door_entrances)
         ret.dungeon = self.dungeon
         ret.pinball_used = self.pinball_used
+
+        ret.prize_door_set = dict(self.prize_door_set)
+        ret.prize_doors = list(self.prize_doors)
+        ret.prize_doors_opened = self.prize_doors_opened
         return ret
 
     def next_avail_door(self):
@@ -868,6 +876,8 @@ class ExplorationState(object):
                 if location.name in flooded_keys_reverse.keys() and self.location_found(
                      flooded_keys_reverse[location.name]):
                     self.perform_event(flooded_keys_reverse[location.name], key_region)
+                if '- Prize' in location.name:
+                    self.prize_received = True
 
     def flooded_key_check(self, location):
         if location.name not in flooded_keys.keys():
