@@ -5,7 +5,10 @@ None yet
 # Bug Fixes and Notes.
 
 * 0.5.0.0
-	* None yet
+	* Handles headered roms for enemizer (Thanks compiling)
+	* Warning added for earlier version of pythong (Thanks compiling)
+	* Minor logic issue for defeating Aga in standard (Thanks compiling)
+	* Fix for boss music in non-DR modes (Thanks codemann8)
 
 # Known Issues
 
