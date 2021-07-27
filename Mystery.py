@@ -226,6 +226,7 @@ def roll_settings(weights):
         ret.sprite = get_choice('sprite', romweights)
         ret.disablemusic = get_choice('disablemusic', romweights) == 'on'
         ret.quickswap = get_choice('quickswap', romweights) == 'on'
+        ret.reduce_flashing = get_choice('reduce_flashing', romweights) == 'on'
         ret.fastmenu = get_choice('menuspeed', romweights)
         ret.heartcolor = get_choice('heartcolor', romweights)
         ret.heartbeep = get_choice('heartbeep', romweights)
