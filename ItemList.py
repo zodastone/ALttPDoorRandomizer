@@ -524,6 +524,9 @@ def set_up_shops(world, player):
             cap_shop = world.get_region('Capacity Upgrade', player).shop
             cap_shop.inventory[1] = None  # remove arrow capacity upgrades in retro
     if world.bomblogic[player]:
+        for item in world.itempool:
+            if item.name == 'Bomb Upgrade (+10)' and item.player == player:
+                item.advancement = True
         if world.shopsanity[player]:
             removals = [item for item in world.itempool if item.name == 'Bomb Upgrade (+5)' and item.player == player]
             for remove in removals:
@@ -573,10 +576,10 @@ def customize_shops(world, player):
             shop.shopkeeper_config = shopkeeper
     # handle capacity upgrades - randomly choose a bomb bunch or arrow bunch to become capacity upgrades
     if world.difficulty[player] == 'normal':
-        if not found_bomb_upgrade and len(possible_replacements) > 0:
+        if not found_bomb_upgrade and len(possible_replacements) > 0 and not world.bomblogic[player]:
             choices = []
             for shop, idx, loc, item in possible_replacements:
-                if item.name in ['Bombs (3)', 'Bombs (10)'] and not world.bomblogic[player]:
+                if item.name in ['Bombs (3)', 'Bombs (10)']:
                     choices.append((shop, idx, loc, item))
             if len(choices) > 0:
                 shop, idx, loc, item = random.choice(choices)
