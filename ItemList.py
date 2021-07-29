@@ -301,6 +301,11 @@ def generate_itempool(world, player):
         world.get_location(location, player).event = True
         world.get_location(location, player).locked = True
 
+    if world.bomblogic[player]:
+        for item in world.itempool:
+            if item.name == 'Bomb Upgrade (+10)' and item.player == player:
+                item.advancement = True
+
     if world.shopsanity[player]:
         for shop in world.shops[player]:
             if shop.region.name in shop_to_location_table:
@@ -524,9 +529,6 @@ def set_up_shops(world, player):
             cap_shop = world.get_region('Capacity Upgrade', player).shop
             cap_shop.inventory[1] = None  # remove arrow capacity upgrades in retro
     if world.bomblogic[player]:
-        for item in world.itempool:
-            if item.name == 'Bomb Upgrade (+10)' and item.player == player:
-                item.advancement = True
         if world.shopsanity[player]:
             removals = [item for item in world.itempool if item.name == 'Bomb Upgrade (+5)' and item.player == player]
             for remove in removals:
