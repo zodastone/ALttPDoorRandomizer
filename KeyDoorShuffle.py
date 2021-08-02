@@ -61,7 +61,7 @@ class KeyLogic(object):
 
     def check_placement(self, unplaced_keys, big_key_loc=None):
         for rule in self.placement_rules:
-            if not rule.is_satisfiable(self.outside_keys, unplaced_keys):
+            if not rule.is_satisfiable(self.outside_keys, unplaced_keys, big_key_loc):
                 return False
             if big_key_loc:
                 for rule_a, rule_b in itertools.combinations(self.placement_rules, 2):
@@ -149,13 +149,20 @@ class PlacementRule(object):
                 left -= rule_needed
         return False
 
-    def is_satisfiable(self, outside_keys, unplaced_keys):
+    def is_satisfiable(self, outside_keys, unplaced_keys, big_key_loc):
         bk_blocked = False
         if self.bk_conditional_set:
             for loc in self.bk_conditional_set:
                 if loc.item and loc.item.bigkey:
                     bk_blocked = True
                     break
+        else:
+            def loc_has_bk(l):
+                return (big_key_loc is not None and big_key_loc == l) or (l.item and l.item.bigkey)
+
+            bk_found = any(loc for loc in self.check_locations_w_bk if loc_has_bk(loc))
+            if not bk_found:
+                return True
         check_locations = self.check_locations_wo_bk if bk_blocked else self.check_locations_w_bk
         if not bk_blocked and check_locations is None:
             return True
