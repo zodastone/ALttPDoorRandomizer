@@ -1,4 +1,4 @@
-import random
+import RaceRandom as random
 import collections
 import itertools
 from collections import defaultdict, deque

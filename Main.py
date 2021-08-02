@@ -4,7 +4,8 @@ from itertools import zip_longest
 import json
 import logging
 import os
-import random
+import RaceRandom as random
+import string
 import time
 import zlib
 
@@ -27,22 +28,32 @@ from Fill import sell_potions, sell_keys, balance_multiworld_progression, balanc
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.4.1.0-u'
+__version__ = '0.5.1.0-u'
+
+from source.classes.BabelFish import BabelFish
 
 
 class EnemizerError(RuntimeError):
     pass
 
 
+def check_python_version():
+    import sys
+    version = sys.version_info
+    if version.major < 3 or version.minor < 7:
+        logging.warning(BabelFish().translate("cli","cli","old.python.version"), sys.version)
+
+
 def main(args, seed=None, fish=None):
+    check_python_version()
     if args.outputpath:
         os.makedirs(args.outputpath, exist_ok=True)
         output_path.cached_path = args.outputpath
 
     start = time.perf_counter()
 
-    # if args.securerandom:
-    #     random.use_secure()
+    if args.securerandom:
+        random.use_secure()
 
     # initialize the world
     if args.code:
@@ -61,13 +72,14 @@ def main(args, seed=None, fish=None):
     random.seed(world.seed)
 
     if args.securerandom:
-        world.seed = None
+        world.seed = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(9))
 
     world.remote_items = args.remote_items.copy()
     world.mapshuffle = args.mapshuffle.copy()
     world.compassshuffle = args.compassshuffle.copy()
     world.keyshuffle = args.keyshuffle.copy()
     world.bigkeyshuffle = args.bigkeyshuffle.copy()
+    world.bomblogic = args.bomblogic.copy()
     world.crystals_needed_for_ganon = {player: random.randint(0, 7) if args.crystals_ganon[player] == 'random' else int(args.crystals_ganon[player]) for player in range(1, world.players + 1)}
     world.crystals_needed_for_gt = {player: random.randint(0, 7) if args.crystals_gt[player] == 'random' else int(args.crystals_gt[player]) for player in range(1, world.players + 1)}
     world.crystals_ganon_orig = args.crystals_ganon.copy()
@@ -257,11 +269,11 @@ def main(args, seed=None, fish=None):
                 rom = JsonRom() if args.jsonout or use_enemizer else LocalRom(args.rom)
 
                 if use_enemizer and (args.enemizercli or not args.jsonout):
-                    base_patch = LocalRom(args.rom)  # update base2current.json (side effect)
+                    local_rom = LocalRom(args.rom)  # update base2current.json (side effect)
                     if args.rom and not(os.path.isfile(args.rom)):
                         raise RuntimeError("Could not find valid base rom for enemizing at expected path %s." % args.rom)
                     if os.path.exists(args.enemizercli):
-                        patch_enemizer(world, player, rom, args.rom, args.enemizercli, sprite_random_on_hit)
+                        patch_enemizer(world, player, rom, local_rom, args.enemizercli, sprite_random_on_hit)
                         enemized = True
                         if not args.jsonout:
                             rom = LocalRom.fromJsonRom(rom, args.rom, 0x400000)
@@ -281,7 +293,8 @@ def main(args, seed=None, fish=None):
 
                 apply_rom_settings(rom, args.heartbeep[player], args.heartcolor[player], args.quickswap[player],
                                    args.fastmenu[player], args.disablemusic[player], args.sprite[player],
-                                   args.ow_palettes[player], args.uw_palettes[player], args.reduce_flashing[player])
+                                   args.ow_palettes[player], args.uw_palettes[player], args.reduce_flashing[player],
+                                   args.shuffle_sfx[player])
 
                 if args.jsonout:
                     jsonout[f'patch_t{team}_p{player}'] = rom.patches
@@ -331,7 +344,7 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli","cli","made.playthrough") % (YES if (args.calc_playthrough) else NO))
     logger.info(world.fish.translate("cli","cli","made.spoiler") % (YES if (not args.jsonout and args.create_spoiler) else NO))
     logger.info(world.fish.translate("cli","cli","used.enemizer") % (YES if enemized else NO))
-    logger.info(world.fish.translate("cli","cli","seed") + ": %d", world.seed)
+    logger.info(world.fish.translate("cli","cli","seed") + ": %s", world.seed)
     logger.info(world.fish.translate("cli","cli","total.time"), time.perf_counter() - start)
 
 #    print_wiki_doors_by_room(dungeon_regions,world,1)
@@ -371,6 +384,7 @@ def copy_world(world):
     ret.compassshuffle = world.compassshuffle.copy()
     ret.keyshuffle = world.keyshuffle.copy()
     ret.bigkeyshuffle = world.bigkeyshuffle.copy()
+    ret.bomblogic = world.bomblogic.copy()
     ret.crystals_needed_for_ganon = world.crystals_needed_for_ganon.copy()
     ret.crystals_needed_for_gt = world.crystals_needed_for_gt.copy()
     ret.crystals_ganon_orig = world.crystals_ganon_orig.copy()

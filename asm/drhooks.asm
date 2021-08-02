@@ -179,6 +179,17 @@ JSL BlindsAtticHint : NOP #2
 org $1cfd69
 Main_ShowTextMessage:
 
+; Conditionally disable UW music changes in Door Rando
+org $028ADB ; <- Bank02.asm:2088-2095 (LDX.b #$14 : LDA $A0 ...)
+JSL.l Underworld_DoorDown_Entry : CPX #$10
+db $B0, $21 ; BCS $028B04
+BRA + : NOP #6 : +
+
+org $02C3F2 ; <- Bank02.asm:10521 Unused call
+Underworld_DoorDown_Call:
+org $02C3F3
+dw $8AD9 ; address of Bank02.asm:2085
+
 ; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
 ; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes
 ; Hera BK door back can be seen with Pot clipping - likely useful for no logic seeds

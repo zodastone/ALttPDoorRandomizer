@@ -5,7 +5,7 @@ import json
 import hashlib
 import logging
 import os
-import random
+import RaceRandom as random
 import struct
 import sys
 import subprocess
@@ -28,9 +28,11 @@ from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_
 from Items import ItemFactory
 from EntranceShuffle import door_addresses, exit_ids
 
+from source.classes.SFX import randomize_sfx
+
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'df3386b7a48d79950a1432b8bbaafde1'
+RANDOMIZERBASEHASH = '988f1546b14d8f2e6ee30b9de44882da'
 
 
 class JsonRom(object):
@@ -86,10 +88,12 @@ class LocalRom(object):
         self.name = name
         self.hash = hash
         self.orig_buffer = None
+        self.file = file
+        self.has_smc_header = False
         if not os.path.isfile(file):
             raise RuntimeError("Could not find valid local base rom for patching at expected path %s." % file)
         with open(file, 'rb') as stream:
-            self.buffer = read_rom(stream)
+            self.buffer, self.has_smc_header = read_rom(stream)
         if patch:
             self.patch_base_rom()
             self.orig_buffer = self.buffer.copy()
@@ -187,12 +191,21 @@ def write_int32s(rom, startaddress, values):
 def read_rom(stream):
     "Reads rom into bytearray and strips off any smc header"
     buffer = bytearray(stream.read())
+    has_smc_header = False
     if len(buffer)%0x400 == 0x200:
         buffer = buffer[0x200:]
-    return buffer
+        has_smc_header = True
+    return buffer, has_smc_header
 
-def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_on_hit):
-    baserom_path = os.path.abspath(baserom_path)
+def patch_enemizer(world, player, rom, local_rom, enemizercli, random_sprite_on_hit):
+    baserom_path = os.path.abspath(local_rom.file)
+    unheadered_path = None
+    if local_rom.has_smc_header:
+        headered_path = baserom_path
+        unheadered_path = baserom_path = os.path.abspath(output_path('unheadered_rom.sfc'))
+        with open(headered_path, 'rb') as headered:
+            with open(baserom_path, 'wb') as unheadered:
+                unheadered.write(headered.read()[0x200:])
     basepatch_path = os.path.abspath(local_path(os.path.join("data","base2current.json")))
     enemizer_basepatch_path = os.path.join(os.path.dirname(enemizercli), "enemizerBasePatch.json")
     randopatch_path = os.path.abspath(output_path('enemizer_randopatch.json'))
@@ -335,6 +348,12 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
                 rom.write_bytes(0x300000 + (i * 0x8000), sprite.sprite)
                 rom.write_bytes(0x307000 + (i * 0x8000), sprite.palette)
                 rom.write_bytes(0x307078 + (i * 0x8000), sprite.glove_palette)
+
+    if local_rom.has_smc_header:
+        try:
+            os.remove(unheadered_path)
+        except OSError:
+            pass
 
     try:
         os.remove(randopatch_path)
@@ -807,17 +826,17 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     write_int16(rom, 0x187010, credits_total)  # dynamic credits
     if credits_total != 216:
-        # collection rate address:
-        cr_address = 0x2391F2
+        # collection rate address (hi):
+        cr_address = 0x238057
         cr_pc = cr_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
         last_top, last_bot = credits_digit(credits_total % 10)
         # top half
-        rom.write_byte(cr_pc+0x1c, mid_top)
-        rom.write_byte(cr_pc+0x1d, last_top)
+        rom.write_byte(cr_pc+0x1, mid_top)
+        rom.write_byte(cr_pc+0x2, last_top)
         # bottom half
-        rom.write_byte(cr_pc+0x3a, mid_bot)
-        rom.write_byte(cr_pc+0x3b, last_bot)
+        rom.write_byte(cr_pc+0x1f, mid_bot)
+        rom.write_byte(cr_pc+0x20, last_bot)
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':
@@ -1032,7 +1051,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x184000, [
         # original_item, limit, replacement_item, filler
         0x12, 0x01, 0x35, 0xFF, # lamp -> 5 rupees
-        0x51, 0x06, 0x52, 0xFF, # 6 +5 bomb upgrades -> +10 bomb upgrade
+        0x51, 0x00 if world.bomblogic[player] else 0x06, 0x31 if world.bomblogic[player] else 0x52, 0xFF, # 6 +5 bomb upgrades -> +10 bomb upgrade. If bomblogic -> turns into Bombs (10)
         0x53, 0x06, 0x54, 0xFF, # 6 +5 arrow upgrades -> +10 arrow upgrade
         0x58, 0x01, 0x36 if world.retro[player] else 0x43, 0xFF, # silver arrows -> single arrow (red 20 in retro mode)
         0x3E, difficulty.boss_heart_container_limit, 0x47, 0xff, # boss heart -> green 20
@@ -1169,7 +1188,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     equip[0x36C] = 0x18
     equip[0x36D] = 0x18
     equip[0x379] = 0x68
-    starting_max_bombs = 10
+    if world.bomblogic[player]:
+        starting_max_bombs = 0
+    else:
+        starting_max_bombs = 10
     starting_max_arrows = 30
 
     startingstate = CollectionState(world)
@@ -1461,7 +1483,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             rom.write_bytes(0x180188, [0, 0, 10])  # Zelda respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x18018B, [0, 0, 10])  # Mantle respawn refills (magic, bombs, arrows)
             bow_max, bow_small = 70, 10
-        elif uncle_location.item is not None and uncle_location.item.name in ['Bombs (10)']:
+        elif uncle_location.item is not None and uncle_location.item.name in ['Bomb Upgrade (+10)' if world.bomblogic[player] else 'Bombs (10)']:
             rom.write_byte(0x18004E, 2)  # Escape Fill (bombs)
             rom.write_bytes(0x180185, [0, 50, 0])  # Uncle respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x180188, [0, 3, 0])  # Zelda respawn refills (magic, bombs, arrows)
@@ -1529,8 +1551,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # set rom name
     # 21 bytes
     from Main import __version__
+    seedstring = f'{world.seed:09}' if isinstance(world.seed, int) else world.seed
     # todo: change to DR when Enemizer is okay with DR
-    rom.name = bytearray(f'ER{__version__.split("-")[0].replace(".","")[0:3]}_{team+1}_{player}_{world.seed:09}\0', 'utf8')[:21]
+    rom.name = bytearray(f'ER{__version__.split("-")[0].replace(".","")[0:3]}_{team+1}_{player}_{seedstring}\0', 'utf8')[:21]
     rom.name.extend([0] * (21 - len(rom.name)))
     rom.write_bytes(0x7FC0, rom.name)
 
@@ -1624,7 +1647,7 @@ def hud_format_text(text):
 
 
 def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite,
-                       ow_palettes, uw_palettes, reduce_flashing):
+                       ow_palettes, uw_palettes, reduce_flashing, shuffle_sfx):
 
     if not os.path.exists("data/sprites/official/001.link.1.zspr") and rom.orig_buffer:
         dump_zspr(rom.orig_buffer[0x80000:0x87000], rom.orig_buffer[0xdd308:0xdd380],
@@ -1726,6 +1749,9 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
         randomize_uw_palettes(rom)
     elif uw_palettes == 'blackout':
         blackout_uw_palettes(rom)
+
+    if shuffle_sfx:
+        randomize_sfx(rom)
 
     if isinstance(rom, LocalRom):
         rom.write_crc()

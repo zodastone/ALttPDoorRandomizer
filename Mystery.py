@@ -1,6 +1,6 @@
 import argparse
 import logging
-import random
+import RaceRandom as random
 import urllib.request
 import urllib.parse
 import yaml
@@ -176,6 +176,8 @@ def roll_settings(weights):
         ret.retro = True
     ret.retro = get_choice('retro') == 'on'  # this overrides world_state if used
 
+    ret.bomblogic = get_choice('bomblogic') == 'on'
+
     ret.hints = get_choice('hints') == 'on'
 
     ret.swords = {'randomized': 'random',
@@ -226,11 +228,13 @@ def roll_settings(weights):
         ret.sprite = get_choice('sprite', romweights)
         ret.disablemusic = get_choice('disablemusic', romweights) == 'on'
         ret.quickswap = get_choice('quickswap', romweights) == 'on'
+        ret.reduce_flashing = get_choice('reduce_flashing', romweights) == 'on'
         ret.fastmenu = get_choice('menuspeed', romweights)
         ret.heartcolor = get_choice('heartcolor', romweights)
         ret.heartbeep = get_choice('heartbeep', romweights)
         ret.ow_palettes = get_choice('ow_palettes', romweights)
         ret.uw_palettes = get_choice('uw_palettes', romweights)
+        ret.uw_palettes = get_choice('shuffle_sfx', romweights) == 'on'
 
     return ret
 
