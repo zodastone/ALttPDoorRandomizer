@@ -318,6 +318,11 @@ def generate_itempool(world, player):
             p_item = next(item for item in items if item.name == potion and item.player == player)
             p_item.priority = True  # don't beemize one of each potion
 
+    if world.bomblogic[player]:
+        for item in items:
+            if item.name == 'Bomb Upgrade (+10)' and item.player == player:
+                item.advancement = True
+
     world.lamps_needed_for_dark_rooms = lamps_needed_for_dark_rooms
 
     if clock_mode is not None:
@@ -524,9 +529,6 @@ def set_up_shops(world, player):
             cap_shop = world.get_region('Capacity Upgrade', player).shop
             cap_shop.inventory[1] = None  # remove arrow capacity upgrades in retro
     if world.bomblogic[player]:
-        for item in world.itempool:
-            if item.name == 'Bomb Upgrade (+10)' and item.player == player:
-                item.advancement = True
         if world.shopsanity[player]:
             removals = [item for item in world.itempool if item.name == 'Bomb Upgrade (+5)' and item.player == player]
             for remove in removals:
