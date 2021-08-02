@@ -1113,9 +1113,9 @@ def valid_region_to_explore_in_regions(region, all_regions, world, player):
 def valid_region_to_explore(region, name, world, player):
     if region is None:
         return False
-    return (region.type == RegionType.Dungeon and region.dungeon.name in name)\
-        or region.name in world.inaccessible_regions[player]\
-        or (region.name == 'Hyrule Castle Ledge' and world.mode[player] == 'standard')
+    return ((region.type == RegionType.Dungeon and region.dungeon and region.dungeon.name in name)
+        or region.name in world.inaccessible_regions[player]
+        or (region.name == 'Hyrule Castle Ledge' and world.mode[player] == 'standard'))
 
 
 def get_doors(world, region, player):

@@ -393,11 +393,9 @@ dungeon_bigs = {
 }
 
 dungeon_prize = {
-    'Hyrule Castle': None,
     'Eastern Palace': 'Eastern Palace - Prize',
     'Desert Palace': 'Desert Palace - Prize',
     'Tower of Hera': 'Tower of Hera - Prize',
-    'Agahnims Tower': None,
     'Palace of Darkness': 'Palace of Darkness - Prize',
     'Swamp Palace': 'Swamp Palace - Prize',
     'Skull Woods': 'Skull Woods - Prize',
@@ -405,7 +403,6 @@ dungeon_prize = {
     'Ice Palace': 'Ice Palace - Prize',
     'Misery Mire': 'Misery Mire - Prize',
     'Turtle Rock': 'Turtle Rock - Prize',
-    'Ganons Tower': None
 }
 
 dungeon_hints = {

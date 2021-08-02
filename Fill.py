@@ -722,7 +722,7 @@ def balance_money_progression(world):
                 if room not in rooms_visited[player] and world.get_region(room, player) in state.reachable_regions[player]:
                     wallet[player] += income
                     rooms_visited[player].add(room)
-        if checked_locations:
+        if checked_locations or len(unchecked_locations) == 0:
             if world.has_beaten_game(state):
                 done = True
                 continue
@@ -732,7 +732,7 @@ def balance_money_progression(world):
             solvent = set()
             insolvent = set()
             for player in range(1, world.players+1):
-                if wallet[player] >= sphere_costs[player] > 0:
+                if wallet[player] >= sphere_costs[player] >= 0:
                     solvent.add(player)
                 if sphere_costs[player] > 0 and sphere_costs[player] > wallet[player]:
                     insolvent.add(player)

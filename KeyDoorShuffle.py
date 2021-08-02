@@ -307,7 +307,7 @@ def create_exhaustive_placement_rules(key_layout, world, player):
     key_logic = key_layout.key_logic
     max_ctr = find_max_counter(key_layout)
     for code, key_counter in key_layout.key_counters.items():
-        if key_counter.prize_received and not key_counter.prize_doors_opened:
+        if skip_key_counter_due_to_prize(key_layout, key_counter):
             continue  # we have the prize, we are not concerned about this case
         accessible_loc = set()
         accessible_loc.update(key_counter.free_locations)
@@ -341,6 +341,10 @@ def create_exhaustive_placement_rules(key_layout, world, player):
                 adjust_locations_rules(key_logic, rule, accessible_loc, key_layout, key_counter, max_ctr)
     refine_placement_rules(key_layout, max_ctr)
     refine_location_rules(key_layout)
+
+
+def skip_key_counter_due_to_prize(key_layout, key_counter):
+    return key_layout.prize_relevant and key_counter.prize_received and not key_counter.prize_doors_opened
 
 
 def placement_self_lock_adjustment(rule, max_ctr, blocked_loc, ctr, world, player):
@@ -1356,7 +1360,8 @@ def validate_key_layout(key_layout, world, player):
     state.big_key_special = check_bk_special(key_layout.sector.regions, world, player)
     for region in key_layout.start_regions:
         dungeon_entrance, portal_door = find_outside_connection(region)
-        if dungeon_entrance and dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower', 'Pyramid Fairy']:
+        if (key_layout.prize_relevant and dungeon_entrance and
+           dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower', 'Pyramid Fairy']):
             state.append_door_to_list(portal_door, state.prize_doors)
             state.prize_door_set[portal_door] = dungeon_entrance
         else:
@@ -1396,7 +1401,7 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
                 state_copy.used_smalls += 1
                 if state_copy.used_smalls > ttl_small_key_only:
                     state_copy.used_locations += 1
-                code = state_id(state_copy, flat_proposal)
+                code = validate_id(state_copy, flat_proposal)
                 if code not in checked_states.keys():
                     valid = validate_key_layout_sub_loop(key_layout, state_copy, checked_states, flat_proposal,
                                                          state, available_small_locations, world, player)
@@ -1410,7 +1415,7 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
             open_a_door(state.big_doors[0].door, state_copy, flat_proposal, world, player)
             if not found_forced_bk:
                 state_copy.used_locations += 1
-            code = state_id(state_copy, flat_proposal)
+            code = validate_id(state_copy, flat_proposal)
             if code not in checked_states.keys():
                 valid = validate_key_layout_sub_loop(key_layout, state_copy, checked_states, flat_proposal,
                                                      state, available_small_locations, world, player)
@@ -1422,7 +1427,7 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
         if not state.prize_doors_opened and key_layout.prize_relevant:
             state_copy = state.copy()
             open_a_door(next(iter(state_copy.prize_door_set)), state_copy, flat_proposal, world, player)
-            code = state_id(state_copy, flat_proposal)
+            code = validate_id(state_copy, flat_proposal)
             if code not in checked_states.keys():
                 valid = validate_key_layout_sub_loop(key_layout, state_copy, checked_states, flat_proposal,
                                                      state, available_small_locations, world, player)
@@ -1496,7 +1501,9 @@ def create_key_counters(key_layout, world, player):
                 special_region = region
     for region in key_layout.start_regions:
         dungeon_entrance, portal_door = find_outside_connection(region)
-        if dungeon_entrance and dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower', 'Pyramid Fairy']:
+        if (len(key_layout.start_regions) > 1 and dungeon_entrance and
+           dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower', 'Pyramid Fairy']
+           and key_layout.key_logic.dungeon in dungeon_prize):
             state.append_door_to_list(portal_door, state.prize_doors)
             state.prize_door_set[portal_door] = dungeon_entrance
             key_layout.prize_relevant = True
@@ -1613,6 +1620,16 @@ def state_id(state, flat_proposal):
         s_id += '1' if d in state.opened_doors else '0'
     if len(state.prize_door_set) > 0:
         s_id += '1' if state.prize_doors_opened else '0'
+    return s_id
+
+
+def validate_id(state, flat_proposal):
+    s_id = '1' if state.big_key_opened else '0'
+    for d in flat_proposal:
+        s_id += '1' if d in state.opened_doors else '0'
+    if len(state.prize_door_set) > 0:
+        s_id += '1' if state.prize_doors_opened else '0'
+    s_id += str(state.used_locations)
     return s_id
 
 
@@ -1878,7 +1895,7 @@ def validate_key_placement(key_layout, world, player):
                      len(counter.key_only_locations) + keys_outside
         if key_layout.prize_relevant:
             found_prize = any(x for x in counter.important_locations if '- Prize' in x.name)
-            if not found_prize:
+            if not found_prize and key_layout.sector.name in dungeon_prize:
                 prize_loc = world.get_location(dungeon_prize[key_layout.sector.name], player)
                 # todo: pyramid fairy only care about crystals 5 & 6
                 found_prize = 'Crystal' not in prize_loc.item.name
