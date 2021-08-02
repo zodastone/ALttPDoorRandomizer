@@ -28,6 +28,8 @@ from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_
 from Items import ItemFactory
 from EntranceShuffle import door_addresses, exit_ids
 
+from source.classes.SFX import randomize_sfx
+
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
 RANDOMIZERBASEHASH = '988f1546b14d8f2e6ee30b9de44882da'
@@ -1645,7 +1647,7 @@ def hud_format_text(text):
 
 
 def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite,
-                       ow_palettes, uw_palettes, reduce_flashing):
+                       ow_palettes, uw_palettes, reduce_flashing, shuffle_sfx):
 
     if not os.path.exists("data/sprites/official/001.link.1.zspr") and rom.orig_buffer:
         dump_zspr(rom.orig_buffer[0x80000:0x87000], rom.orig_buffer[0xdd308:0xdd380],
@@ -1747,6 +1749,9 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
         randomize_uw_palettes(rom)
     elif uw_palettes == 'blackout':
         blackout_uw_palettes(rom)
+
+    if shuffle_sfx:
+        randomize_sfx(rom)
 
     if isinstance(rom, LocalRom):
         rom.write_crc()

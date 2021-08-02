@@ -297,6 +297,7 @@
       "sprite that will be extracted."
     ],
     "reduce_flashing": [ "Reduce some in-game flashing (default: %(default)s)" ],
+    "shuffle_sfx": [ "Shuffle sounds effects (default: %(default)s)" ],
     "create_rom": [ "Create an output rom file. (default: %(default)s)" ],
     "gui": [ "Launch the GUI. (default: %(default)s)" ],
     "jsonout": [
