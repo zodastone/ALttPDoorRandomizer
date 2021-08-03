@@ -736,7 +736,7 @@ def balance_money_progression(world):
                     solvent.add(player)
                 if sphere_costs[player] > 0 and sphere_costs[player] > wallet[player]:
                     insolvent.add(player)
-            if len(solvent) == 0:
+            if len([p for p in solvent if len(locked_by_money[p]) > 0]) == 0:
                 target_player = min(insolvent, key=lambda p: sphere_costs[p]-wallet[p])
                 difference = sphere_costs[target_player]-wallet[target_player]
                 logger.debug(f'Money balancing needed: Player {target_player} short {difference}')

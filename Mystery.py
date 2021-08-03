@@ -31,6 +31,7 @@ def main():
     parser.add_argument('--rom')
     parser.add_argument('--enemizercli')
     parser.add_argument('--outputpath')
+    parser.add_argument('--loglevel', default='info', choices=['debug', 'info', 'warning', 'error', 'critical'])
     for player in range(1, multiargs.multi + 1):
         parser.add_argument(f'--p{player}', help=argparse.SUPPRESS)
     args = parser.parse_args()
@@ -63,6 +64,7 @@ def main():
     erargs.race = True
     erargs.outputname = seedname
     erargs.outputpath = args.outputpath
+    erargs.loglevel = args.loglevel
 
     if args.rom:
         erargs.rom = args.rom

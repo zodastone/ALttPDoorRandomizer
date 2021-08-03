@@ -101,6 +101,8 @@ def link_doors_main(world, player):
             connect_portal(portal, world, player)
     if not world.doorShuffle[player] == 'vanilla':
         fix_big_key_doors_with_ugly_smalls(world, player)
+    else:
+        unmark_ugly_smalls(world, player)
     if world.doorShuffle[player] == 'vanilla':
         for entrance, ext in open_edges:
             connect_two_way(world, entrance, ext, player)
@@ -314,6 +316,13 @@ def connect_one_way(world, entrancename, exitname, player):
         x.dest = y
     if y is not None:
         y.dest = x
+
+
+def unmark_ugly_smalls(world, player):
+    for d in ['Eastern Hint Tile Blocked Path SE', 'Eastern Darkness S', 'Thieves Hallway SE', 'Mire Left Bridge S',
+              'TR Lava Escape SE', 'GT Hidden Spikes SE']:
+        door = world.get_door(d, player)
+        door.smallKey = False
 
 
 def fix_big_key_doors_with_ugly_smalls(world, player):
