@@ -434,8 +434,12 @@ class World(object):
 
     def can_beat_game(self, starting_state=None):
         if starting_state:
+            if self.has_beaten_game(starting_state):
+                return True
             state = starting_state.copy()
         else:
+            if self.has_beaten_game(self.state):
+                return True
             state = CollectionState(self)
 
         if self.has_beaten_game(state):

@@ -2120,10 +2120,11 @@ def connect_doors(world, doors, targets, player):
     """This works inplace"""
     random.shuffle(doors)
     random.shuffle(targets)
-    while doors:
-        door = doors.pop()
-        target = targets.pop()
+    placing = min(len(doors), len(targets))
+    for door, target in zip(doors, targets):
         connect_entrance(world, door, target, player)
+    doors[:] = doors[placing:]
+    targets[:] = targets[placing:]
 
 
 def skull_woods_shuffle(world, player):

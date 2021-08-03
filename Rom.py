@@ -102,8 +102,7 @@ class LocalRom(object):
         self.buffer[address] = value
 
     def write_bytes(self, startaddress, values):
-        for i, value in enumerate(values):
-            self.write_byte(startaddress + i, value)
+        self.buffer[startaddress:startaddress + len(values)] = values
 
     def write_to_file(self, file):
         with open(file, 'wb') as outfile:

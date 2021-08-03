@@ -541,11 +541,11 @@ def create_playthrough(world):
     while sphere_candidates:
         state.sweep_for_events(key_only=True)
 
-        sphere = []
+        sphere = set()
         # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
         for location in sphere_candidates:
             if state.can_reach(location) and state.not_flooding_a_key(world, location):
-                sphere.append(location)
+                sphere.add(location)
 
         for location in sphere:
             sphere_candidates.remove(location)
@@ -566,7 +566,7 @@ def create_playthrough(world):
 
     # in the second phase, we cull each sphere such that the game is still beatable, reducing each range of influence to the bare minimum required inside it
     for num, sphere in reversed(list(enumerate(collection_spheres))):
-        to_delete = []
+        to_delete = set()
         for location in sphere:
             # we remove the item at location and check if game is still beatable
             logging.getLogger('').debug('Checking if %s (Player %d) is required to beat the game.', location.item.name, location.item.player)
@@ -576,15 +576,14 @@ def create_playthrough(world):
             world.clear_exp_cache()
             if world.can_beat_game(state_cache[num]):
                 # logging.getLogger('').debug(f'{old_item.name} (Player {old_item.player}) is not required')
-                to_delete.append(location)
+                to_delete.add(location)
             else:
                 # still required, got to keep it around
                 # logging.getLogger('').debug(f'{old_item.name} (Player {old_item.player}) is required')
                 location.item = old_item
 
         # cull entries in spheres for spoiler walkthrough at end
-        for location in to_delete:
-            sphere.remove(location)
+        sphere -= to_delete
 
     # second phase, sphere 0
     for item in [i for i in world.precollected_items if i.advancement]:
@@ -600,7 +599,7 @@ def create_playthrough(world):
     # used to access it was deemed not required.) So we need to do one final sphere collection pass
     # to build up the correct spheres
 
-    required_locations = [item for sphere in collection_spheres for item in sphere]
+    required_locations = {item for sphere in collection_spheres for item in sphere}
     state = CollectionState(world)
     collection_spheres = []
     while required_locations:
@@ -637,7 +636,7 @@ def create_playthrough(world):
     old_world.spoiler.paths = dict()
     for player in range(1, world.players + 1):
         old_world.spoiler.paths.update({location.gen_name(): get_path(state, location.parent_region) for sphere in collection_spheres for location in sphere if location.player == player})
-        for _, path in dict(old_world.spoiler.paths).items():
+        for path in dict(old_world.spoiler.paths).values():
             if any(exit == 'Pyramid Fairy' for (_, exit) in path):
                 if world.mode[player] != 'inverted':
                     old_world.spoiler.paths[str(world.get_region('Big Bomb Shop', player))] = get_path(state, world.get_region('Big Bomb Shop', player))
@@ -645,6 +644,6 @@ def create_playthrough(world):
                     old_world.spoiler.paths[str(world.get_region('Inverted Big Bomb Shop', player))] = get_path(state, world.get_region('Inverted Big Bomb Shop', player))
 
     # we can finally output our playthrough
-    old_world.spoiler.playthrough = OrderedDict([("0", [str(item) for item in world.precollected_items if item.advancement])])
+    old_world.spoiler.playthrough = {"0": [str(item) for item in world.precollected_items if item.advancement]}
     for i, sphere in enumerate(collection_spheres):
         old_world.spoiler.playthrough[str(i + 1)] = {location.gen_name(): str(location.item) for location in sphere}
