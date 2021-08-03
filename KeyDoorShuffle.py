@@ -275,7 +275,7 @@ def analyze_dungeon(key_layout, world, player):
         # try to relax the rules here? - smallest requirement that doesn't force a softlock
         child_queue = deque()
         for child in key_counter.child_doors.keys():
-            if not child.bigKey or not key_layout.big_key_special or big_avail:
+            if can_open_door_by_counter(child, key_counter, key_layout, world, player):
                 odd_counter = create_odd_key_counter(child, key_counter, key_layout, world, player)
                 empty_flag = empty_counter(odd_counter)
                 child_queue.append((child, odd_counter, empty_flag))
@@ -460,7 +460,8 @@ def refine_placement_rules(key_layout, max_ctr):
                 rule_b = temp
             if rule_a.bk_conditional_set and rule_b.check_locations_w_bk:
                 common_needed = min(rule_a.needed_keys_wo_bk, rule_b.needed_keys_w_bk)
-                if len(rule_b.check_locations_w_bk & rule_a.check_locations_wo_bk) < common_needed:
+                common_locs = len(rule_b.check_locations_w_bk & rule_a.check_locations_wo_bk)
+                if (common_needed - common_locs) * 2 > key_layout.max_chests:
                     key_logic.bk_restricted.update(rule_a.bk_conditional_set)
                     rules_to_remove.append(rule_a)
                     changed = True
@@ -821,7 +822,7 @@ def check_for_self_lock_key(rule, door, parent_counter, key_layout, world, playe
 
 def find_inverted_counter(door, parent_counter, key_layout, world, player):
     # open all doors in counter
-    counter = open_all_counter(parent_counter, key_layout, door=door)
+    counter = open_all_counter(parent_counter, key_layout, world, player, door=door)
     max_counter = find_max_counter(key_layout)
     # find the difference
     inverted_counter = KeyCounter(key_layout.max_chests)
@@ -837,7 +838,7 @@ def find_inverted_counter(door, parent_counter, key_layout, world, player):
     return inverted_counter
 
 
-def open_all_counter(parent_counter, key_layout, door=None, skipBk=False):
+def open_all_counter(parent_counter, key_layout, world, player, door=None, skipBk=False):
     changed = True
     counter = parent_counter
     proposed_doors = dict.fromkeys(parent_counter.open_doors.keys())
@@ -849,13 +850,11 @@ def open_all_counter(parent_counter, key_layout, door=None, skipBk=False):
                 if skipBk:
                     if not child.bigKey:
                         doors_to_open[child] = None
-                elif not child.bigKey or not key_layout.big_key_special or counter.big_key_opened:
+                elif can_open_door_by_counter(child, counter, key_layout, world, player):
                     doors_to_open[child] = None
         if len(doors_to_open.keys()) > 0:
             proposed_doors = {**proposed_doors, **doors_to_open}
-            bk_hint = counter.big_key_opened
-            for d in doors_to_open.keys():
-                bk_hint = bk_hint or d.bigKey
+            bk_hint = counter.big_key_opened or any(d.bigKey for d in doors_to_open.keys())
             counter = find_counter(proposed_doors, bk_hint, key_layout, True)
             changed = True
     return counter
@@ -1485,10 +1484,26 @@ def cnt_avail_small_locations(free_locations, key_only, state, world, player):
     return state.key_locations - state.used_smalls
 
 
+def cnt_avail_small_locations_by_ctr(free_locations, counter, layout, world, player):
+    if not world.keyshuffle[player] and not world.retro[player]:
+        bk_adj = 1 if counter.big_key_opened and not layout.big_key_special else 0
+        avail_chest_keys = min(free_locations - bk_adj, layout.max_chests)
+        return max(0, avail_chest_keys + len(counter.key_only_locations) - counter.used_keys)
+    return layout.max_chests + len(counter.key_only_locations) - counter.used_keys
+
+
 def cnt_avail_big_locations(ttl_locations, state, world, player):
     if not world.bigkeyshuffle[player]:
         return max(0, ttl_locations - state.used_locations) if not state.big_key_special else 0
     return 1 if not state.big_key_special else 0
+
+
+def cnt_avail_big_locations_by_ctr(ttl_locations, counter, layout, world, player):
+    if not world.bigkeyshuffle[player]:
+        bk_adj = 1 if counter.big_key_opened and not layout.big_key_special else 0
+        used_locations = max(0, counter.used_keys - len(counter.key_only_locations)) + bk_adj
+        return max(0, ttl_locations - used_locations) if not layout.big_key_special else 0
+    return 1 if not layout.big_key_special else 0
 
 
 def create_key_counters(key_layout, world, player):
@@ -1500,12 +1515,11 @@ def create_key_counters(key_layout, world, player):
         state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
     else:
         state.key_locations = world.dungeon_layouts[player][key_layout.sector.name].key_doors_num
-    state.big_key_special, special_region = False, None
+    state.big_key_special = False
     for region in key_layout.sector.regions:
         for location in region.locations:
             if location.forced_big_key():
                 state.big_key_special = True
-                special_region = region
     for region in key_layout.start_regions:
         dungeon_entrance, portal_door = find_outside_connection(region)
         if (len(key_layout.start_regions) > 1 and dungeon_entrance and
@@ -1531,7 +1545,7 @@ def create_key_counters(key_layout, world, player):
             if door.bigKey or door.name in special_big_key_doors:
                 key_layout.key_logic.bk_doors.add(door)
             # open the door, if possible
-            if not door.bigKey or not child_state.big_key_special or child_state.visited_at_all(special_region):
+            if can_open_door(door, child_state, world, player):
                 open_a_door(door, child_state, flat_proposal, world, player)
                 expand_key_state(child_state, flat_proposal, world, player)
                 code = state_id(child_state, key_layout.flat_prop)
@@ -1550,6 +1564,39 @@ def find_outside_connection(region):
         portal_entrance = next(x for x in portal.parent_region.entrances if x.parent_region == region)
         return dungeon_entrance, portal_entrance.door
     return None, None
+
+
+def can_open_door(door, state, world, player):
+    if state.big_key_opened:
+        ttl_locations = count_free_locations(state, world, player)
+    else:
+        ttl_locations = count_locations_exclude_big_chest(state, world, player)
+    if door.smallKey:
+        ttl_small_key_only = count_small_key_only_locations(state)
+        available_small_locations = cnt_avail_small_locations(ttl_locations, ttl_small_key_only, state, world, player)
+        return available_small_locations > 0
+    elif door.bigKey:
+        available_big_locations = cnt_avail_big_locations(ttl_locations, state, world, player)
+        found_forced_bk = state.found_forced_bk()
+        return not state.big_key_opened and (available_big_locations > 0 or found_forced_bk)
+    else:
+        return True
+
+
+def can_open_door_by_counter(door, counter: KeyCounter, layout, world, player):
+    if counter.big_key_opened:
+        ttl_locations = len(counter.free_locations)
+    else:
+        ttl_locations = len([x for x in counter.free_locations if '- Big Chest' not in x.name])
+
+    if door.smallKey:
+        # ttl_small_key_only = len(counter.key_only_locations)
+        return cnt_avail_small_locations_by_ctr(ttl_locations, counter, layout, world, player) > 0
+    elif door.bigKey:
+        available_big_locations = cnt_avail_big_locations_by_ctr(ttl_locations, counter, layout, world, player)
+        return not counter.big_key_opened and available_big_locations > 0 and not layout.big_key_special
+    else:
+        return True
 
 
 def create_key_counter(state, key_layout, world, player):
