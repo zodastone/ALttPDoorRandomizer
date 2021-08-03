@@ -564,10 +564,11 @@ def balance_multiworld_progression(world):
                 replaced_items = False
                 # sort then shuffle to maintain deterministic behaviour,
                 # while allowing use of set for better algorithm growth behaviour elsewhere
-                replacement_locations = sorted(l for l in checked_locations if not l.event and not l.locked)
-                world.random.shuffle(replacement_locations)
-                items_to_replace.sort()
-                world.random.shuffle(items_to_replace)
+                replacement_locations = sorted((l for l in checked_locations if not l.event and not l.locked),
+                                               key=lambda loc: (loc.name, loc.player))
+                random.shuffle(replacement_locations)
+                items_to_replace.sort(key=lambda item: (item.name, item.player))
+                random.shuffle(items_to_replace)
                 while replacement_locations and items_to_replace:
                     old_location = items_to_replace.pop()
                     for new_location in replacement_locations:
