@@ -518,7 +518,8 @@ class CollectionState(object):
             connection, crystal_state = queue.popleft()
             new_region = connection.connected_region
             if not self.should_visit(new_region, rrp, crystal_state, player):
-                bc.pop(connection, None)
+                if not self.dungeon_limits or self.possibly_connected_to_dungeon(new_region, player):
+                    bc.pop(connection, None)
             elif connection.can_reach(self):
                 bc.pop(connection, None)
                 if new_region.type == RegionType.Dungeon:
@@ -643,9 +644,12 @@ class CollectionState(object):
                             while not done:
                                 rrp_ = child_state.reachable_regions[player]
                                 bc_ = child_state.blocked_connections[player]
-                                self.set_dungeon_limits(player, dungeon_name)
+                                child_state.set_dungeon_limits(player, dungeon_name)
+                                child_queue.extend([(x, y) for x, y in bc_.items()
+                                                    if child_state.possibly_connected_to_dungeon(x.parent_region,
+                                                                                                 player)])
                                 child_state.traverse_world(child_queue, rrp_, bc_, player)
-                                new_events = child_state.sweep_for_events_once()
+                                new_events = child_state.sweep_for_events_once(player)
                                 child_state.stale[player] = False
                                 if new_events:
                                     for conn in bc_:
@@ -890,8 +894,8 @@ class CollectionState(object):
 
         return spot.can_reach(self)
 
-    def sweep_for_events_once(self):
-        locations = self.world.get_filled_locations()
+    def sweep_for_events_once(self, player):
+        locations = self.world.get_filled_locations(player)
         checked_locations = set([l for l in locations if l in self.locations_checked])
         reachable_events = [location for location in locations if location.event and location.can_reach(self)]
         reachable_events = self._do_not_flood_the_keys(reachable_events)
@@ -2520,7 +2524,7 @@ class Spoiler(object):
 
             for player in range(1, self.world.players + 1):
                 if self.world.boss_shuffle[player] != 'none':
-                    bossmap = self.bosses[player] if self.world.players > 1 else self.bosses
+                    bossmap = self.bosses[str(player)] if self.world.players > 1 else self.bosses
                     outfile.write(f'\n\nBosses ({self.world.get_player_names(player)}):\n\n')
                     outfile.write('\n'.join([f'{x}: {y}' for x, y in bossmap.items() if y not in ['Agahnim', 'Agahnim 2', 'Ganon']]))
 

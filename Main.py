@@ -573,7 +573,7 @@ def create_playthrough(world):
             old_item = location.item
             location.item = None
             # todo: this is not very efficient, but I'm not sure how else to do it for this backwards logic
-            world.clear_exp_cache()
+            # world.clear_exp_cache()
             if world.can_beat_game(state_cache[num]):
                 # logging.getLogger('').debug(f'{old_item.name} (Player {old_item.player}) is not required')
                 to_delete.add(location)
@@ -615,7 +615,10 @@ def create_playthrough(world):
 
         logging.getLogger('').debug(world.fish.translate("cli","cli","building.final.spheres"), len(collection_spheres), len(sphere), len(required_locations))
         if not sphere:
-            raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.required"))
+            if world.has_beaten_game(state):
+                required_locations.clear()
+            else:
+                raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.required"))
 
     # store the required locations for statistical analysis
     old_world.required_locations = [(location.name, location.player) for sphere in collection_spheres for location in sphere]
