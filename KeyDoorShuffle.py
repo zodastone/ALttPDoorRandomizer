@@ -127,6 +127,10 @@ class PlacementRule(object):
         rule_locations = rule.check_locations_wo_bk if rule_blocked else rule.check_locations_w_bk
         if check_locations is None or rule_locations is None:
             return False
+        if not bk_blocked and big_key_loc not in check_locations:  # bk is not available, so rule doesn't apply
+            return False
+        if not rule_blocked and big_key_loc not in rule_locations:  # bk is not available, so rule doesn't apply
+            return False
         check_locations = check_locations - {big_key_loc}
         rule_locations = rule_locations - {big_key_loc}
         threshold = self.needed_keys_wo_bk if bk_blocked else self.needed_keys_w_bk
