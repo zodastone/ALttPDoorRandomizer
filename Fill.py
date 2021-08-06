@@ -553,7 +553,7 @@ def balance_money_progression(world):
     base_value = sum(rupee_rooms.values())
     available_money = {player: base_value for player in range(1, world.players+1)}
     for loc in world.get_locations():
-        if loc.item.name in rupee_chart:
+        if loc.item and loc.item.name in rupee_chart:
             available_money[loc.item.player] += rupee_chart[loc.item.name]
 
     total_price = {player: 0 for player in range(1, world.players+1)}
@@ -618,7 +618,7 @@ def balance_money_progression(world):
                 slot = shop_to_location_table[location.parent_region.name].index(location.name)
                 shop = location.parent_region.shop
                 shop_item = shop.inventory[slot]
-                if interesting_item(location, location.item, world, location.item.player):
+                if location.item and interesting_item(location, location.item, world, location.item.player):
                     if location.item.name.startswith('Rupee') and loc_player == location.item.player:
                         if shop_item['price'] < rupee_chart[location.item.name]:
                             wallet[loc_player] -= shop_item['price']  # will get picked up in the location_free block
@@ -638,14 +638,15 @@ def balance_money_progression(world):
             if location_free:
                 state.collect(location.item, True, location)
                 unchecked_locations.remove(location)
-                if location.item.name.startswith('Rupee'):
-                    wallet[location.item.player] += rupee_chart[location.item.name]
-                    if location.item.name != 'Rupees (300)':
+                if location.item:
+                    if location.item.name.startswith('Rupee'):
+                        wallet[location.item.player] += rupee_chart[location.item.name]
+                        if location.item.name != 'Rupees (300)':
+                            balance_locations[location.item.player].add(location)
+                    if interesting_item(location, location.item, world, location.item.player):
+                        checked_locations.append(location)
+                    elif location.item.name in acceptable_balancers:
                         balance_locations[location.item.player].add(location)
-                if interesting_item(location, location.item, world, location.item.player):
-                    checked_locations.append(location)
-                elif location.item.name in acceptable_balancers:
-                    balance_locations[location.item.player].add(location)
         for room, income in rupee_rooms.items():
             for player in range(1, world.players+1):
                 if room not in rooms_visited[player] and world.get_region(room, player) in state.reachable_regions[player]:
@@ -710,5 +711,5 @@ def balance_money_progression(world):
                     else:
                         state.collect(location.item, True, location)
                         unchecked_locations.remove(location)
-                        if location.item.name.startswith('Rupee'):
+                        if location.item and location.item.name.startswith('Rupee'):
                             wallet[location.item.player] += rupee_chart[location.item.name]

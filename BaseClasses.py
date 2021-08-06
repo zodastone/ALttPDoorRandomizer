@@ -808,6 +808,8 @@ class CollectionState(object):
     def collect(self, item, event=False, location=None):
         if location:
             self.locations_checked.add(location)
+        if not item:
+            return
         changed = False
         if item.name.startswith('Progressive '):
             if 'Sword' in item.name:
