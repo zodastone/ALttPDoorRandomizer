@@ -1162,7 +1162,7 @@ def standard_rules(world, player):
 
     def bomb_escape_rule():
         loc = world.get_location("Link's Uncle", player)
-        return loc.item and loc.item.name in ['Bomb Upgrade (+10)' if world.bomblogic[player] else 'Bombs (10)']
+        return loc.item and loc.item.name in ['Bomb Upgrade (+10)' if world.bombbags[player] else 'Bombs (10)']
 
     def standard_escape_rule(state):
         return state.can_kill_most_things(player) or bomb_escape_rule() 

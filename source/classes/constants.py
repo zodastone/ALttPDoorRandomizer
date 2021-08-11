@@ -57,7 +57,7 @@ SETTINGSTOPROCESS = {
     "item": {
       "hints": "hints",
       "retro": "retro",
-      "bomblogic": "bomblogic",
+      "bombbags": "bombbags",
       "shopsanity": "shopsanity",
       "pseudoboots": "pseudoboots",
       "worldstate": "mode",

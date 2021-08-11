@@ -224,7 +224,7 @@
     "type": "bool",
     "help": "suppress"
   },
-  "bomblogic": {
+  "bombbags": {
     "action": "store_true",
     "type": "bool"
   },

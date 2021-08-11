@@ -16,6 +16,9 @@
   pot_shuffle:
     on: 1
     off: 3
+  bombbags:
+    on: 1
+    off: 4
   entrance_shuffle:
     none: 15
     dungeonssimple: 3
