@@ -1,12 +1,22 @@
 # New Features
 
-Bomb Logic added as an option. This removes your ability to use bombs until you find a "bomb bag", a +10 Bomb Capacity item. It is accounted for in the logic, so you aren't expected to get items behind bomb walls until you have found the bomb capacity item. The upgrades are removed from the upgrade fairy as well.
+## Shuffle SFX
+
+Shuffles a large portion of the sounds effects. Can be used with the adjuster.
+
+CLI: ```--shuffle_sfx```
  
-```
---bomblogic
-```
+## Bomb Logic 
+
+When enabling this option, you do not start with bomb capacity but rather you must find 1 of 2 bomb bags. (They are represented by the +10 capacity item.) Bomb capacity upgrades are otherwise unavailable.
+ 
+CLI: ```--bomblogic```
+
 
 # Bug Fixes and Notes.
+
+* 0.5.0.2
+	* --shuffle_sfx option added 
 * 0.5.0.1
 	* --bomblogic option added 
 * 0.5.0.0
