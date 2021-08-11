@@ -16,7 +16,7 @@
   pot_shuffle:
     on: 1
     off: 3
-  bombbags:
+  bombbag:
     on: 1
     off: 4
   entrance_shuffle:

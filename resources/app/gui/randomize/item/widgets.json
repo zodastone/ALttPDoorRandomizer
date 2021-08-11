@@ -1,7 +1,7 @@
 {
   "checkboxes": {
     "retro": { "type": "checkbox" },
-    "bombbags": { "type": "checkbox" },    
+    "bombbag": { "type": "checkbox" },    
     "shopsanity": { "type": "checkbox" },
     "hints": {
       "type": "checkbox"

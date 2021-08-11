@@ -176,7 +176,7 @@ def roll_settings(weights):
         ret.retro = True
     ret.retro = get_choice('retro') == 'on'  # this overrides world_state if used
 
-    ret.bombbags = get_choice('bombbags') == 'on'
+    ret.bombbag = get_choice('bombbag') == 'on'
 
     ret.hints = get_choice('hints') == 'on'
 
