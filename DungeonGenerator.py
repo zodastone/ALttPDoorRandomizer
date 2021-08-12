@@ -1175,6 +1175,7 @@ class DungeonBuilder(object):
         self.pre_open_stonewalls = set()  # used by stonewall system
 
         self.candidates = None
+        self.total_keys = None
         self.key_doors_num = None
         self.combo_size = None
         self.flex = 0

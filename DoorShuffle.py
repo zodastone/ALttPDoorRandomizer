@@ -1071,6 +1071,7 @@ def assign_cross_keys(dungeon_builders, world, player):
     # Step 3: Initial valid combination find - reduce flex if needed
     for name, builder in dungeon_builders.items():
         suggested = builder.key_doors_num - builder.key_drop_cnt
+        builder.total_keys = builder.key_doors_num
         find_valid_combination(builder, start_regions_map[name], world, player)
         actual_chest_keys = builder.key_doors_num - builder.key_drop_cnt
         if actual_chest_keys < suggested:
@@ -1087,6 +1088,7 @@ def assign_cross_keys(dungeon_builders, world, player):
         name = builder.name
         logger.debug('Cross Dungeon: Increasing key count by 1 for %s', name)
         builder.key_doors_num += 1
+        builder.total_keys = builder.key_doors_num
         result = find_valid_combination(builder, start_regions_map[name], world, player, drop_keys=False)
         if result:
             remaining -= 1
@@ -1380,7 +1382,7 @@ def shuffle_key_doors(builder, world, player):
                                 skips.append(world.get_door(dp.door_a, player))
                                 break
                     num_key_doors += 1
-    builder.key_doors_num = num_key_doors
+    builder.key_doors_num = builder.total_keys = num_key_doors
     find_small_key_door_candidates(builder, start_regions, world, player)
     find_valid_combination(builder, start_regions, world, player)
     reassign_key_doors(builder, world, player)
