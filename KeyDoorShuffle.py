@@ -4,7 +4,7 @@ from collections import defaultdict, deque
 
 from BaseClasses import DoorType
 from Regions import dungeon_events
-from Dungeons import dungeon_keys, dungeon_bigs
+from Dungeons import dungeon_keys, dungeon_bigs, default_key_counts
 from DungeonGenerator import ExplorationState, special_big_key_doors
 
 
@@ -1384,9 +1384,10 @@ def create_key_counters(key_layout, world, player):
     flat_proposal = key_layout.flat_prop
     state = ExplorationState(dungeon=key_layout.sector.name)
     if world.doorShuffle[player] == 'vanilla':
-        state.key_locations = len(world.get_dungeon(key_layout.sector.name, player).small_keys)
+        state.key_locations = default_key_counts[key_layout.sector.name]
     else:
-        state.key_locations = world.dungeon_layouts[player][key_layout.sector.name].key_doors_num
+        builder = world.dungeon_layouts[player][key_layout.sector.name]
+        state.key_locations = builder.key_doors_num - builder.key_drop_cnt
     state.big_key_special, special_region = False, None
     for region in key_layout.sector.regions:
         for location in region.locations:

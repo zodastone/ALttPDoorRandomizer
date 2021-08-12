@@ -375,6 +375,13 @@ flexible_starts = {
     'Skull Woods': ['Skull Left Drop', 'Skull Pinball']
 }
 
+default_key_counts = {
+    'Hyrule Castle': 1, 'Eastern Palace': 0, 'Desert Palace': 1,
+    'Tower of Hera': 1, 'Agahnims Tower': 2, 'Palace of Darkness': 6,
+    'Swamp Palace': 1, 'Skull Woods': 3, 'Thieves Town': 1,
+    'Ice Palace': 2, 'Misery Mire': 3, 'Turtle Rock': 4, 'Ganons Tower': 4
+}
+
 dungeon_keys = {
     'Hyrule Castle': 'Small Key (Escape)',
     'Eastern Palace': 'Small Key (Eastern Palace)',

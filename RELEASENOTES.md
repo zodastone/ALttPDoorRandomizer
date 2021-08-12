@@ -15,6 +15,10 @@ CLI: ```--bomblogic```
 
 # Bug Fixes and Notes.
 
+* 0.5.0.3
+	* Fixed a bug in retro+vanilla and big key placement
+	* Fixed a problem with shops not registering in the Multiclient until you visit one
+	* Fixed a bug in the Mystery code with sfx
 * 0.5.0.2
 	* --shuffle_sfx option added 
 * 0.5.0.1
