@@ -234,7 +234,7 @@ def roll_settings(weights):
         ret.heartbeep = get_choice('heartbeep', romweights)
         ret.ow_palettes = get_choice('ow_palettes', romweights)
         ret.uw_palettes = get_choice('uw_palettes', romweights)
-        ret.uw_palettes = get_choice('shuffle_sfx', romweights) == 'on'
+        ret.shuffle_sfx = get_choice('shuffle_sfx', romweights) == 'on'
 
     return ret
 
