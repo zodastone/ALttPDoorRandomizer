@@ -39,14 +39,15 @@ def pre_validate(builder, entrance_region_names, split_dungeon, world, player):
     proposed_map = {}
     doors_to_connect = {}
     all_regions = set()
-    bk_needed = False
     bk_special = False
     for sector in builder.sectors:
         for door in sector.outstanding_doors:
             doors_to_connect[door.name] = door
         all_regions.update(sector.regions)
-        bk_needed = bk_needed or determine_if_bk_needed(sector, split_dungeon, world, player)
-        bk_special = bk_special or check_for_special(sector)
+        bk_special |= check_for_special(sector.regions)
+    bk_needed = False
+    for sector in builder.sectors:
+        bk_needed |= determine_if_bk_needed(sector, split_dungeon, bk_special, world, player)
     paths = determine_paths_for_dungeon(world, player, all_regions, builder.name)
     dungeon, hangers, hooks = gen_dungeon_info(builder.name, builder.sectors, entrance_regions, all_regions,
                                                proposed_map, doors_to_connect, bk_needed, bk_special, world, player)
@@ -106,14 +107,15 @@ def generate_dungeon_find_proposal(builder, entrance_region_names, split_dungeon
     entrance_regions = [x for x in entrance_regions if x not in excluded.keys()]
     doors_to_connect = {}
     all_regions = set()
-    bk_needed = False
     bk_special = False
     for sector in builder.sectors:
         for door in sector.outstanding_doors:
             doors_to_connect[door.name] = door
         all_regions.update(sector.regions)
-        bk_needed = bk_needed or determine_if_bk_needed(sector, split_dungeon, world, player)
-        bk_special = bk_special or check_for_special(sector)
+        bk_special |= check_for_special(sector.regions)
+    bk_needed = False
+    for sector in builder.sectors:
+        bk_needed |= determine_if_bk_needed(sector, split_dungeon, bk_special, world, player)
     proposed_map = {}
     choices_master = [[]]
     depth = 0
@@ -187,8 +189,8 @@ def generate_dungeon_find_proposal(builder, entrance_region_names, split_dungeon
     return proposed_map
 
 
-def determine_if_bk_needed(sector, split_dungeon, world, player):
-    if not split_dungeon:
+def determine_if_bk_needed(sector, split_dungeon, bk_special, world, player):
+    if not split_dungeon or bk_special:
         for region in sector.regions:
             for ext in region.exits:
                 door = world.check_for_door(ext.name, player)
@@ -197,8 +199,8 @@ def determine_if_bk_needed(sector, split_dungeon, world, player):
     return False
 
 
-def check_for_special(sector):
-    for region in sector.regions:
+def check_for_special(regions):
+    for region in regions:
         for loc in region.locations:
             if loc.forced_big_key():
                 return True
@@ -417,6 +419,8 @@ def check_valid(name, dungeon, hangers, hooks, proposed_map, doors_to_connect, a
     # origin has no more hooks, but not all doors have been proposed
     if not world.bigkeyshuffle[player]:
         possible_bks = len(dungeon['Origin'].possible_bk_locations)
+        if bk_special and check_for_special(dungeon['Origin'].visited_regions):
+            possible_bks = 1
         true_origin_hooks = [x for x in dungeon['Origin'].hooks.keys() if not x.bigKey or possible_bks > 0 or not bk_needed]
         if len(true_origin_hooks) == 0 and len(proposed_map.keys()) < len(doors_to_connect):
             return False
@@ -450,7 +454,8 @@ def check_valid(name, dungeon, hangers, hooks, proposed_map, doors_to_connect, a
     bk_possible = not bk_needed or (world.bigkeyshuffle[player] and not bk_special)
     for piece in dungeon.values():
         all_visited.update(piece.visited_regions)
-        if not bk_possible and len(piece.possible_bk_locations) > 0:
+        if ((not bk_possible and len(piece.possible_bk_locations) > 0) or
+           (bk_special and check_for_special(piece.visited_regions))):
             bk_possible = True
     if len(all_regions.difference(all_visited)) > 0:
         return False
