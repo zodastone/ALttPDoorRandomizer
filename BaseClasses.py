@@ -518,7 +518,7 @@ class CollectionState(object):
             connection, crystal_state = queue.popleft()
             new_region = connection.connected_region
             if not self.should_visit(new_region, rrp, crystal_state, player):
-                if not self.dungeon_limits or self.possibly_connected_to_dungeon(new_region, player):
+                if not new_region or not self.dungeon_limits or self.possibly_connected_to_dungeon(new_region, player):
                     bc.pop(connection, None)
             elif connection.can_reach(self):
                 bc.pop(connection, None)
