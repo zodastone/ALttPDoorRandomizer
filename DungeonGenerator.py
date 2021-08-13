@@ -102,8 +102,15 @@ def generate_dungeon_find_proposal(builder, entrance_region_names, split_dungeon
     excluded = {}
     for region in entrance_regions:
         portal = next((x for x in world.dungeon_portals[player] if x.door.entrance.parent_region == region), None)
-        if portal and portal.destination:
-            excluded[region] = None
+        if portal:
+            if portal.destination:
+                excluded[region] = None
+            elif len(entrance_regions) > 1:
+                p_region = portal.door.entrance.connected_region
+                access_region = next(x.parent_region for x in p_region.entrances
+                                     if x.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld])
+                if access_region.name in world.inaccessible_regions[player]:
+                    excluded[region] = None
     entrance_regions = [x for x in entrance_regions if x not in excluded.keys()]
     doors_to_connect = {}
     all_regions = set()
@@ -855,6 +862,8 @@ class ExplorationState(object):
         return exp_door
 
     def visit_region(self, region, key_region=None, key_checks=False, bk_Flag=False):
+        if region.type != RegionType.Dungeon:
+            self.crystal = CrystalBarrier.Orange
         if self.crystal == CrystalBarrier.Either:
             if region not in self.visited_blue:
                 self.visited_blue.append(region)
