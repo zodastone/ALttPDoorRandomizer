@@ -10,7 +10,7 @@ CLI: ```--shuffle_sfx```
 
 When enabling this option, you do not start with bomb capacity but rather you must find 1 of 2 bomb bags. (They are represented by the +10 capacity item.) Bomb capacity upgrades are otherwise unavailable.
  
-CLI: ```--bomblogic```
+CLI: ```--bombbag```
 
 
 # Bug Fixes and Notes.
@@ -22,7 +22,7 @@ CLI: ```--bomblogic```
 * 0.5.0.2
 	* --shuffle_sfx option added 
 * 0.5.0.1
-	* --bomblogic option added 
+	* --bombbag option added 
 * 0.5.0.0
 	* Handles headered roms for enemizer (Thanks compiling)
 	* Warning added for earlier version of python (Thanks compiling)
