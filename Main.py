@@ -244,7 +244,7 @@ def main(args, seed=None, fish=None):
         balance_multiworld_progression(world)
 
     # if we only check for beatable, we can do this sanity check first before creating the rom
-    if not world.can_beat_game():
+    if not world.can_beat_game(log_error=True):
         raise RuntimeError(world.fish.translate("cli","cli","cannot.beat.game"))
 
     for player in range(1, world.players+1):

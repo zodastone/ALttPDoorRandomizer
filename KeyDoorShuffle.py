@@ -116,6 +116,7 @@ class PlacementRule(object):
         self.needed_keys_w_bk = None
         self.needed_keys_wo_bk = None
         self.check_locations_w_bk = None
+        self.special_bk_avail = False
         self.check_locations_wo_bk = None
         self.bk_relevant = True
         self.key_reduced = False
@@ -164,7 +165,10 @@ class PlacementRule(object):
             def loc_has_bk(l):
                 return (big_key_loc is not None and big_key_loc == l) or (l.item and l.item.bigkey)
 
-            bk_found = any(loc for loc in self.check_locations_w_bk if loc_has_bk(loc))
+            # todo: sometimes the bk avail rule doesn't mean the bk must be avail or this rule is invalid
+            # but sometimes it certainly does
+            # check threshold vs len(check_loc) maybe to determine bk isn't relevant?
+            bk_found = self.special_bk_avail or any(loc for loc in self.check_locations_w_bk if loc_has_bk(loc))
             if not bk_found:
                 return True
         check_locations = self.check_locations_wo_bk if bk_blocked else self.check_locations_w_bk
@@ -258,6 +262,8 @@ def analyze_dungeon(key_layout, world, player):
         return
 
     original_key_counter = find_counter({}, False, key_layout, False)
+    if key_layout.big_key_special and forced_big_key_avail(original_key_counter.other_locations) is not None:
+        original_key_counter = find_counter({}, True, key_layout, False)
     queue = deque([(None, original_key_counter)])
     doors_completed = set()
     visited_cid = set()
@@ -340,6 +346,8 @@ def create_exhaustive_placement_rules(key_layout, world, player):
                 else:
                     placement_self_lock_adjustment(rule, max_ctr, blocked_loc, key_counter, world, player)
                     rule.check_locations_w_bk = accessible_loc
+                    if key_layout.big_key_special:
+                        rule.special_bk_avail = forced_big_key_avail(key_counter.important_locations) is not None
                     # check_sm_restriction_needed(key_layout, max_ctr, rule, blocked_loc)
             else:
                 if big_key_progress(key_counter) and only_sm_doors(key_counter):
@@ -1359,6 +1367,13 @@ def check_bk_special(regions, world, player):
     return False
 
 
+def forced_big_key_avail(locations):
+    for loc in locations:
+        if loc.forced_big_key():
+            return loc
+    return None
+
+
 # Soft lock stuff
 def validate_key_layout(key_layout, world, player):
     # retro is all good - except for hyrule castle in standard mode
@@ -1962,6 +1977,7 @@ def validate_key_placement(key_layout, world, player):
             found_prize = False
         can_progress = (not counter.big_key_opened and big_found and any(d.bigKey for d in counter.child_doors)) or \
             found_keys > counter.used_keys and any(not d.bigKey for d in counter.child_doors) or \
+            self_locked_child_door(key_layout, counter) or \
             (key_layout.prize_relevant and not counter.prize_doors_opened and found_prize)
         if not can_progress:
             missing_locations = set(max_counter.free_locations.keys()).difference(found_locations)
@@ -1975,4 +1991,12 @@ def validate_key_placement(key_layout, world, player):
                 return False
 
     return True
+
+
+def self_locked_child_door(key_layout, counter):
+    if len(counter.child_doors) == 1:
+        door = next(iter(counter.child_doors.keys()))
+        return door.smallKey and key_layout.key_logic.door_rules[door.name].allow_small
+    return False
+
 

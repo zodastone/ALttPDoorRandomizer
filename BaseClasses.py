@@ -432,7 +432,7 @@ class World(object):
         else:
             return all((self.has_beaten_game(state, p) for p in range(1, self.players + 1)))
 
-    def can_beat_game(self, starting_state=None):
+    def can_beat_game(self, starting_state=None, log_error=False):
         if starting_state:
             if self.has_beaten_game(starting_state):
                 return True
@@ -456,6 +456,9 @@ class World(object):
 
             if not sphere:
                 # ran out of places and did not finish yet, quit
+                if log_error:
+                    missing_locations = ", ".join([x.name for x in prog_locations])
+                    logging.getLogger('').error(f'Cannot reach the following locations: {missing_locations}')
                 return False
 
             for location in sphere:

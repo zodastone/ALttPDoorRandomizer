@@ -295,12 +295,14 @@ def last_ditch_placement(item_to_place, locations, world, state, base_state, ite
             if swap_spot:
                 logging.getLogger('').debug(f'Swapping {old_item} for {item_to_place}')
                 world.push_item(swap_spot, old_item, False)
+                swap_spot.event = True
                 locations.remove(swap_spot)
                 locations.append(new_spot)
                 return new_spot
             else:
                 new_spot.item = restore_item
-
+        else:
+            location.item = old_item
     return None
 
 
@@ -315,10 +317,12 @@ def find_spot_for_item(item_to_place, locations, world, base_state, pool,
     for location in locations:
         maximum_exploration_state = sweep_from_pool()
         perform_access_check = True
+        old_item = None
         if world.accessibility[item_to_place.player] == 'none':
             perform_access_check = not world.has_beaten_game(maximum_exploration_state, item_to_place.player) if single_player_placement else not world.has_beaten_game(maximum_exploration_state)
 
         if item_to_place.smallkey or item_to_place.bigkey:  # a better test to see if a key can go there
+            old_item = location.item
             location.item = item_to_place
             test_state = maximum_exploration_state.copy()
             test_state.stale[item_to_place.player] = True
@@ -329,7 +333,7 @@ def find_spot_for_item(item_to_place, locations, world, base_state, pool,
              and valid_key_placement(item_to_place, location, pool if (keys_in_itempool and keys_in_itempool[item_to_place.player]) else world.itempool, world):
             return location
         if item_to_place.smallkey or item_to_place.bigkey:
-            location.item = None
+            location.item = old_item
     return None
 
 
