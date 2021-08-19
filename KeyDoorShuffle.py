@@ -1385,10 +1385,12 @@ def validate_key_layout(key_layout, world, player):
     state.big_key_special = check_bk_special(key_layout.sector.regions, world, player)
     for region in key_layout.start_regions:
         dungeon_entrance, portal_door = find_outside_connection(region)
-        if (key_layout.prize_relevant and dungeon_entrance and
-           dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower', 'Pyramid Fairy']):
+        if (len(key_layout.start_regions) > 1 and dungeon_entrance and
+           dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower', 'Pyramid Fairy']
+           and key_layout.key_logic.dungeon in dungeon_prize):
             state.append_door_to_list(portal_door, state.prize_doors)
             state.prize_door_set[portal_door] = dungeon_entrance
+            key_layout.prize_relevant = True
         else:
             state.visit_region(region, key_checks=True)
             state.add_all_doors_check_keys(region, flat_proposal, world, player)
@@ -1419,6 +1421,8 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     if smalls_done and bk_done:
         return False
     else:
+        # todo: pretty sure you should OR these paths together, maybe when there's one location and it can
+        # either be small or big key
         if smalls_avail and available_small_locations > 0:
             for exp_door in state.small_doors:
                 state_copy = state.copy()
@@ -1449,6 +1453,7 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
                 valid = checked_states[code]
             if not valid:
                 return False
+        # todo: feel like you only open these if the boss is available???
         if not state.prize_doors_opened and key_layout.prize_relevant:
             state_copy = state.copy()
             open_a_door(next(iter(state_copy.prize_door_set)), state_copy, flat_proposal, world, player)

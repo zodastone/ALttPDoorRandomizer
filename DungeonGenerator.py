@@ -3320,6 +3320,7 @@ def check_for_valid_layout(builder, sector_list, builder_info):
                     possible_regions.add(portal.door.entrance.parent_region.name)
             if builder.name in dungeon_drops.keys():
                 possible_regions.update(dungeon_drops[builder.name])
+            independents = find_independent_entrances(possible_regions, world, player)
             for name, split_build in builder.split_dungeon_map.items():
                 name_bits = name.split(" ")
                 orig_name = " ".join(name_bits[:-1])
@@ -3332,7 +3333,8 @@ def check_for_valid_layout(builder, sector_list, builder_info):
                             if r_name not in entrance_regions:
                                 entrance_regions.append(r_name)
                 # entrance_regions = [x for x in entrance_regions if x not in split_check_entrance_invalid]
-                proposal = generate_dungeon_find_proposal(split_build, entrance_regions, True, world, player)
+                split = any(x for x in independents if x not in entrance_regions)
+                proposal = generate_dungeon_find_proposal(split_build, entrance_regions, split, world, player)
                 # record split proposals
                 builder.valid_proposal[name] = proposal
             builder.exception_list = list(sector_list)
@@ -3345,6 +3347,32 @@ def check_for_valid_layout(builder, sector_list, builder_info):
     else:
         unreached_doors = resolve_equations(builder, sector_list)
         return len(unreached_doors) == 0, unreached_doors
+
+
+def find_independent_entrances(entrance_regions, world, player):
+    independents = set()
+    for region in entrance_regions:
+        portal = next((x for x in world.dungeon_portals[player] if x.door.entrance.parent_region.name == region), None)
+        if portal:
+            if portal.destination:
+                continue
+            elif len(entrance_regions) > 1:
+                p_region = portal.door.entrance.connected_region
+                access_region = next(x.parent_region for x in p_region.entrances
+                                     if x.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld])
+                if access_region.name in world.inaccessible_regions[player]:
+                    continue
+        else:
+            r = world.get_region(region, player)
+            access_region = next(x.parent_region for x in r.entrances
+                                 if x.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld]
+                                 or x.parent_region.name == 'Sewer Drop')
+            if access_region.name == 'Sewer Drop':
+                access_region = next(x.parent_region for x in access_region.entrances)
+            if access_region.name in world.inaccessible_regions[player]:
+                continue
+        independents.add(region)
+    return independents
 
 
 def resolve_equations(builder, sector_list):
