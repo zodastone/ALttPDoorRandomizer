@@ -1,22 +1,21 @@
 import RaceRandom as random
 from collections import defaultdict, deque
 import logging
-import operator as op
 import time
 from enum import unique, Flag
 from typing import DefaultDict, Dict, List
 
-from functools import reduce
-from BaseClasses import RegionType, Region, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo
+from BaseClasses import RegionType, Region, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo, dungeon_keys
 from Doors import reset_portals
 from Dungeons import dungeon_regions, region_starts, standard_starts, split_region_starts
-from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
+from Dungeons import dungeon_bigs, dungeon_hints
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor, reset_rooms
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths, drop_entrances
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from DungeonGenerator import dungeon_portals, dungeon_drops, GenerationException
-from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout
+from KeyDoorShuffle import analyze_dungeon, build_key_layout, validate_key_layout
+from Utils import ncr, kth_combination
 
 
 def link_doors(world, player):
@@ -102,6 +101,8 @@ def link_doors_main(world, player):
             connect_portal(portal, world, player)
     if not world.doorShuffle[player] == 'vanilla':
         fix_big_key_doors_with_ugly_smalls(world, player)
+    else:
+        unmark_ugly_smalls(world, player)
     if world.doorShuffle[player] == 'vanilla':
         for entrance, ext in open_edges:
             connect_two_way(world, entrance, ext, player)
@@ -214,8 +215,8 @@ def vanilla_key_logic(world, player):
         analyze_dungeon(key_layout, world, player)
         world.key_logic[player][builder.name] = key_layout.key_logic
         log_key_logic(builder.name, key_layout.key_logic)
-    if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player] and not world.keydropshuffle[player]:
-        validate_vanilla_key_logic(world, player)
+    # if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player] and not world.keydropshuffle[player]:
+    #     validate_vanilla_key_logic(world, player)
 
 
 # some useful functions
@@ -315,6 +316,13 @@ def connect_one_way(world, entrancename, exitname, player):
         x.dest = y
     if y is not None:
         y.dest = x
+
+
+def unmark_ugly_smalls(world, player):
+    for d in ['Eastern Hint Tile Blocked Path SE', 'Eastern Darkness S', 'Thieves Hallway SE', 'Mire Left Bridge S',
+              'TR Lava Escape SE', 'GT Hidden Spikes SE']:
+        door = world.get_door(d, player)
+        door.smallKey = False
 
 
 def fix_big_key_doors_with_ugly_smalls(world, player):
@@ -503,6 +511,9 @@ def analyze_portals(world, player):
                 raise Exception('please inspect this case')
         if len(reachable_portals) == 1:
             info.sole_entrance = reachable_portals[0]
+        if world.intensity[player] < 2 and world.doorShuffle[player] == 'basic' and dungeon == 'Desert Palace':
+            if len(inaccessible_portals) == 1 and inaccessible_portals[0] == 'Desert Back':
+                info.required_passage.clear()  # can't make a passage at this intensity level, something else must exit
         info_map[dungeon] = info
 
     for dungeon, info in info_map.items():
@@ -1104,9 +1115,9 @@ def assign_cross_keys(dungeon_builders, world, player):
     logger.debug('Cross Dungeon: Keys unable to assign in pool %s', remaining)
 
     # Last Step: Adjust Small Key Dungeon Pool
-    if not world.retro[player]:
-        for name, builder in dungeon_builders.items():
-            reassign_key_doors(builder, world, player)
+    for name, builder in dungeon_builders.items():
+        reassign_key_doors(builder, world, player)
+        if not world.retro[player]:
             log_key_logic(builder.name, world.key_logic[player][builder.name])
             actual_chest_keys = max(builder.key_doors_num - builder.key_drop_cnt, 0)
             dungeon = world.get_dungeon(name, player)
@@ -1580,28 +1591,6 @@ def find_key_door_candidates(region, checked, world, player):
     return candidates, checked_doors
 
 
-def kth_combination(k, l, r):
-    if r == 0:
-        return []
-    elif len(l) == r:
-        return l
-    else:
-        i = ncr(len(l)-1, r-1)
-        if k < i:
-            return l[0:1] + kth_combination(k, l[1:], r-1)
-        else:
-            return kth_combination(k-i, l[1:], r)
-
-
-def ncr(n, r):
-    if r == 0:
-        return 1
-    r = min(r, n-r)
-    numerator = reduce(op.mul, range(n, n-r, -1), 1)
-    denominator = reduce(op.mul, range(1, r+1), 1)
-    return numerator / denominator
-
-
 def reassign_key_doors(builder, world, player):
     logger = logging.getLogger('')
     logger.debug('Key doors for %s', builder.name)
@@ -1830,6 +1819,10 @@ def find_inaccessible_regions(world, player):
                 if connect.type is not RegionType.Dungeon or connect.name.endswith(' Portal'):
                     queue.append(connect)
     world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if valid_inaccessible_region(r)])
+    if world.mode[player] == 'inverted':
+        ledge = world.get_region('Hyrule Castle Ledge', 1)
+        if any(x for x in ledge.exits if x.connected_region.name == 'Agahnims Tower Portal'):
+            world.inaccessible_regions[player].append('Hyrule Castle Ledge')
     logger = logging.getLogger('')
     logger.debug('Inaccessible Regions:')
     for r in world.inaccessible_regions[player]:

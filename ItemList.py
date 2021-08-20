@@ -347,11 +347,11 @@ def generate_itempool(world, player):
     # rather than making all hearts/heart pieces progression items (which slows down generation considerably)
     # We mark one random heart container as an advancement item (or 4 heart pieces in expert mode)
     if world.difficulty[player] in ['normal', 'hard'] and not (world.custom and world.customitemarray[player]["heartcontainer"] == 0):
-        [item for item in items if item.name == 'Boss Heart Container'][0].advancement = True
+        next(item for item in items if item.name == 'Boss Heart Container').advancement = True
     elif world.difficulty[player] in ['expert'] and not (world.custom and world.customitemarray[player]["heartpiece"] < 4):
-        adv_heart_pieces = [item for item in items if item.name == 'Piece of Heart'][0:4]
-        for hp in adv_heart_pieces:
-            hp.advancement = True
+        adv_heart_pieces = (item for item in items if item.name == 'Piece of Heart')
+        for i in range(4):
+            next(adv_heart_pieces).advancement = True
 
     beeweights = {'0': {None: 100},
                   '1': {None: 75, 'trap': 25},

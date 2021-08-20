@@ -375,13 +375,6 @@ flexible_starts = {
     'Skull Woods': ['Skull Left Drop', 'Skull Pinball']
 }
 
-default_key_counts = {
-    'Hyrule Castle': 1, 'Eastern Palace': 0, 'Desert Palace': 1,
-    'Tower of Hera': 1, 'Agahnims Tower': 2, 'Palace of Darkness': 6,
-    'Swamp Palace': 1, 'Skull Woods': 3, 'Thieves Town': 1,
-    'Ice Palace': 2, 'Misery Mire': 3, 'Turtle Rock': 4, 'Ganons Tower': 4
-}
-
 dungeon_keys = {
     'Hyrule Castle': 'Small Key (Escape)',
     'Eastern Palace': 'Small Key (Eastern Palace)',
@@ -412,6 +405,19 @@ dungeon_bigs = {
     'Misery Mire': 'Big Key (Misery Mire)',
     'Turtle Rock': 'Big Key (Turtle Rock)',
     'Ganons Tower': 'Big Key (Ganons Tower)'
+}
+
+dungeon_prize = {
+    'Eastern Palace': 'Eastern Palace - Prize',
+    'Desert Palace': 'Desert Palace - Prize',
+    'Tower of Hera': 'Tower of Hera - Prize',
+    'Palace of Darkness': 'Palace of Darkness - Prize',
+    'Swamp Palace': 'Swamp Palace - Prize',
+    'Skull Woods': 'Skull Woods - Prize',
+    'Thieves Town': 'Thieves Town - Prize',
+    'Ice Palace': 'Ice Palace - Prize',
+    'Misery Mire': 'Misery Mire - Prize',
+    'Turtle Rock': 'Turtle Rock - Prize',
 }
 
 dungeon_hints = {

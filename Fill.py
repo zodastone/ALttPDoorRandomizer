@@ -1,4 +1,6 @@
 import RaceRandom as random
+import collections
+import itertools
 import logging
 
 from BaseClasses import CollectionState
@@ -211,7 +213,7 @@ def fill_restrictive(world, base_state, locations, itempool, keys_in_itempool = 
                             and valid_key_placement(item_to_place, location, itempool if (keys_in_itempool and keys_in_itempool[item_to_place.player]) else world.itempool, world):
                         spot_to_fill = location
                         break
-                    elif item_to_place.smallkey or item_to_place.bigkey:
+                    if item_to_place.smallkey or item_to_place.bigkey:
                         location.item = None
 
                 if spot_to_fill is None:
@@ -221,7 +223,10 @@ def fill_restrictive(world, base_state, locations, itempool, keys_in_itempool = 
                         if world.accessibility[item_to_place.player] != 'none':
                             logging.getLogger('').warning('Not all items placed. Game beatable anyway. (Could not place %s)' % item_to_place)
                         continue
-                    raise FillError('No more spots to place %s' % item_to_place)
+                    spot_to_fill = last_ditch_placement(item_to_place, locations, world, maximum_exploration_state,
+                                                        base_state, itempool, keys_in_itempool, single_player_placement)
+                    if spot_to_fill is None:
+                        raise FillError('No more spots to place %s' % item_to_place)
 
                 world.push_item(spot_to_fill, item_to_place, False)
                 track_outside_keys(item_to_place, spot_to_fill, world)
@@ -250,14 +255,86 @@ def valid_key_placement(item, location, itempool, world):
 def track_outside_keys(item, location, world):
     if not item.smallkey:
         return
-    item_dungeon = item.name.split('(')[1][:-1]
-    if item_dungeon == 'Escape':
-        item_dungeon = 'Hyrule Castle'
+    item_dungeon = item.dungeon
     if location.player == item.player:
         loc_dungeon = location.parent_region.dungeon
         if loc_dungeon and loc_dungeon.name == item_dungeon:
             return  # this is an inside key
     world.key_logic[item.player][item_dungeon].outside_keys += 1
+
+
+def last_ditch_placement(item_to_place, locations, world, state, base_state, itempool,
+                         keys_in_itempool=None, single_player_placement=False):
+    def location_preference(loc):
+        if not loc.item.advancement:
+            return 1
+        if loc.item.type and loc.item.type != 'Sword':
+            if loc.item.type in ['Map', 'Compass']:
+                return 2
+            else:
+                return 3
+        return 4
+
+    if item_to_place.type == 'Crystal':
+        possible_swaps = [x for x in state.locations_checked if x.item.type == 'Crystal']
+    else:
+        possible_swaps = [x for x in state.locations_checked
+                          if x.item.type not in ['Event', 'Crystal'] and not x.forced_item]
+    swap_locations = sorted(possible_swaps, key=location_preference)
+
+    for location in swap_locations:
+        old_item = location.item
+        new_pool = list(itempool) + [old_item]
+        new_spot = find_spot_for_item(item_to_place, [location], world, base_state, new_pool,
+                                      keys_in_itempool, single_player_placement)
+        if new_spot:
+            restore_item = new_spot.item
+            new_spot.item = item_to_place
+            swap_spot = find_spot_for_item(old_item, locations, world, base_state, itempool,
+                                           keys_in_itempool, single_player_placement)
+            if swap_spot:
+                logging.getLogger('').debug(f'Swapping {old_item} for {item_to_place}')
+                world.push_item(swap_spot, old_item, False)
+                swap_spot.event = True
+                locations.remove(swap_spot)
+                locations.append(new_spot)
+                return new_spot
+            else:
+                new_spot.item = restore_item
+        else:
+            location.item = old_item
+    return None
+
+
+def find_spot_for_item(item_to_place, locations, world, base_state, pool,
+                       keys_in_itempool=None, single_player_placement=False):
+    def sweep_from_pool():
+        new_state = base_state.copy()
+        for item in pool:
+            new_state.collect(item, True)
+        new_state.sweep_for_events()
+        return new_state
+    for location in locations:
+        maximum_exploration_state = sweep_from_pool()
+        perform_access_check = True
+        old_item = None
+        if world.accessibility[item_to_place.player] == 'none':
+            perform_access_check = not world.has_beaten_game(maximum_exploration_state, item_to_place.player) if single_player_placement else not world.has_beaten_game(maximum_exploration_state)
+
+        if item_to_place.smallkey or item_to_place.bigkey:  # a better test to see if a key can go there
+            old_item = location.item
+            location.item = item_to_place
+            test_state = maximum_exploration_state.copy()
+            test_state.stale[item_to_place.player] = True
+        else:
+            test_state = maximum_exploration_state
+        if (not single_player_placement or location.player == item_to_place.player) \
+             and location.can_fill(test_state, item_to_place, perform_access_check) \
+             and valid_key_placement(item_to_place, location, pool if (keys_in_itempool and keys_in_itempool[item_to_place.player]) else world.itempool, world):
+            return location
+        if item_to_place.smallkey or item_to_place.bigkey:
+            location.item = old_item
+    return None
 
 
 def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None):
@@ -420,9 +497,8 @@ def sell_keys(world, player):
 
 def balance_multiworld_progression(world):
     state = CollectionState(world)
-    checked_locations = []
-    unchecked_locations = world.get_locations().copy()
-    random.shuffle(unchecked_locations)
+    checked_locations = set()
+    unchecked_locations = set(world.get_locations())
 
     reachable_locations_count = {}
     for player in range(1, world.players + 1):
@@ -430,7 +506,7 @@ def balance_multiworld_progression(world):
 
     def get_sphere_locations(sphere_state, locations):
         sphere_state.sweep_for_events(key_only=True, locations=locations)
-        return [loc for loc in locations if sphere_state.can_reach(loc) and sphere_state.not_flooding_a_key(sphere_state.world, loc)]
+        return {loc for loc in locations if sphere_state.can_reach(loc) and sphere_state.not_flooding_a_key(sphere_state.world, loc)}
 
     while True:
         sphere_locations = get_sphere_locations(state, unchecked_locations)
@@ -441,38 +517,42 @@ def balance_multiworld_progression(world):
         if checked_locations:
             threshold = max(reachable_locations_count.values()) - 20
 
-            balancing_players = [player for player, reachables in reachable_locations_count.items() if reachables < threshold]
-            if balancing_players is not None and len(balancing_players) > 0:
+            balancing_players = {player for player, reachables in reachable_locations_count.items() if reachables < threshold}
+            if balancing_players:
                 balancing_state = state.copy()
                 balancing_unchecked_locations = unchecked_locations.copy()
                 balancing_reachables = reachable_locations_count.copy()
                 balancing_sphere = sphere_locations.copy()
-                candidate_items = []
+                candidate_items = collections.defaultdict(set)
                 while True:
                     for location in balancing_sphere:
                         if location.event and (world.keyshuffle[location.item.player] or not location.item.smallkey) and (world.bigkeyshuffle[location.item.player] or not location.item.bigkey):
                             balancing_state.collect(location.item, True, location)
-                            if location.item.player in balancing_players and not location.locked:
-                                candidate_items.append(location)
+                            player = location.item.player
+                            if player in balancing_players and not location.locked and location.player != player:
+                                candidate_items[player].add(location)
                     balancing_sphere = get_sphere_locations(balancing_state, balancing_unchecked_locations)
                     for location in balancing_sphere:
                         balancing_unchecked_locations.remove(location)
                         balancing_reachables[location.player] += 1
-                    if world.has_beaten_game(balancing_state) or all([reachables >= threshold for reachables in balancing_reachables.values()]):
+                    if world.has_beaten_game(balancing_state) or all(reachables >= threshold for reachables in balancing_reachables.values()):
                         break
                     elif not balancing_sphere:
                         raise RuntimeError('Not all required items reachable. Something went terribly wrong here.')
 
-                unlocked_locations = [l for l in unchecked_locations if l not in balancing_unchecked_locations]
+                unlocked_locations = collections.defaultdict(set)
+                for l in unchecked_locations:
+                    if l not in balancing_unchecked_locations:
+                        unlocked_locations[l.player].add(l)
                 items_to_replace = []
                 for player in balancing_players:
-                    locations_to_test = [l for l in unlocked_locations if l.player == player]
-                    # only replace items that end up in another player's world
-                    items_to_test = [l for l in candidate_items if l.item.player == player and l.player != player]
+                    locations_to_test = unlocked_locations[player]
+                    items_to_test = candidate_items[player]
                     while items_to_test:
                         testing = items_to_test.pop()
                         reducing_state = state.copy()
-                        for location in [*[l for l in items_to_replace if l.item.player == player], *items_to_test]:
+                        for location in itertools.chain((l for l in items_to_replace if l.item.player == player),
+                                                        items_to_test):
                             reducing_state.collect(location.item, True, location)
 
                         reducing_state.sweep_for_events(locations=locations_to_test)
@@ -486,33 +566,44 @@ def balance_multiworld_progression(world):
                                 items_to_replace.append(testing)
 
                 replaced_items = False
-                replacement_locations = [l for l in checked_locations if not l.event and not l.locked]
+                # sort then shuffle to maintain deterministic behaviour,
+                # while allowing use of set for better algorithm growth behaviour elsewhere
+                replacement_locations = sorted((l for l in checked_locations if not l.event and not l.locked),
+                                               key=lambda loc: (loc.name, loc.player))
+                random.shuffle(replacement_locations)
+                items_to_replace.sort(key=lambda item: (item.name, item.player))
+                random.shuffle(items_to_replace)
                 while replacement_locations and items_to_replace:
-                    new_location = replacement_locations.pop()
                     old_location = items_to_replace.pop()
+                    for new_location in replacement_locations:
+                        if (new_location.can_fill(state, old_location.item, False) and
+                           old_location.can_fill(state, new_location.item, False)):
+                            replacement_locations.remove(new_location)
+                            new_location.item, old_location.item = old_location.item, new_location.item
+                            if world.shopsanity[new_location.player]:
+                                check_shop_swap(new_location)
+                            if world.shopsanity[old_location.player]:
+                                check_shop_swap(old_location)
+                            new_location.event, old_location.event = True, False
+                            logging.debug(f"Progression balancing moved {new_location.item} to {new_location}, "
+                                          f"displacing {old_location.item} into {old_location}")
+                            state.collect(new_location.item, True, new_location)
+                            replaced_items = True
+                            break
+                    else:
+                        logging.warning(f"Could not Progression Balance {old_location.item}")
 
-                    while not new_location.can_fill(state, old_location.item, False) or (new_location.item and not old_location.can_fill(state, new_location.item, False)):
-                        replacement_locations.insert(0, new_location)
-                        new_location = replacement_locations.pop()
-
-                    new_location.item, old_location.item = old_location.item, new_location.item
-                    if world.shopsanity[new_location.player]:
-                        check_shop_swap(new_location)
-                    if world.shopsanity[old_location.player]:
-                        check_shop_swap(old_location)
-                    new_location.event, old_location.event = True, False
-                    state.collect(new_location.item, True, new_location)
-                    replaced_items = True
                 if replaced_items:
-                    for location in get_sphere_locations(state, [l for l in unlocked_locations if l.player in balancing_players]):
+                    unlocked = {fresh for player in balancing_players for fresh in unlocked_locations[player]}
+                    for location in get_sphere_locations(state, unlocked):
                         unchecked_locations.remove(location)
                         reachable_locations_count[location.player] += 1
-                        sphere_locations.append(location)
+                        sphere_locations.add(location)
 
         for location in sphere_locations:
             if location.event and (world.keyshuffle[location.item.player] or not location.item.smallkey) and (world.bigkeyshuffle[location.item.player] or not location.item.bigkey):
                 state.collect(location.item, True, location)
-        checked_locations.extend(sphere_locations)
+        checked_locations |= sphere_locations
 
         if world.has_beaten_game(state):
             break
@@ -651,7 +742,7 @@ def balance_money_progression(world):
                 if room not in rooms_visited[player] and world.get_region(room, player) in state.reachable_regions[player]:
                     wallet[player] += income
                     rooms_visited[player].add(room)
-        if checked_locations:
+        if checked_locations or len(unchecked_locations) == 0:
             if world.has_beaten_game(state):
                 done = True
                 continue
@@ -661,11 +752,11 @@ def balance_money_progression(world):
             solvent = set()
             insolvent = set()
             for player in range(1, world.players+1):
-                if wallet[player] >= sphere_costs[player] > 0:
+                if wallet[player] >= sphere_costs[player] >= 0:
                     solvent.add(player)
                 if sphere_costs[player] > 0 and sphere_costs[player] > wallet[player]:
                     insolvent.add(player)
-            if len(solvent) == 0:
+            if len([p for p in solvent if len(locked_by_money[p]) > 0]) == 0:
                 target_player = min(insolvent, key=lambda p: sphere_costs[p]-wallet[p])
                 difference = sphere_costs[target_player]-wallet[target_player]
                 logger.debug(f'Money balancing needed: Player {target_player} short {difference}')
@@ -705,7 +796,7 @@ def balance_money_progression(world):
             for player in solvent:
                 wallet[player] -= sphere_costs[player]
                 for location in locked_by_money[player]:
-                    if location == 'Kiki':
+                    if isinstance(location, str) and location == 'Kiki':
                         kiki_paid[player] = True
                     else:
                         state.collect(location.item, True, location)

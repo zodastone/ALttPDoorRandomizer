@@ -176,8 +176,8 @@ def place_bosses(world, player):
 
         if world.boss_shuffle[player] == "simple":  # vanilla bosses shuffled
             bosses = placeable_bosses + ['Armos Knights', 'Lanmolas', 'Moldorm']
-        else: # all bosses present, the three duplicates chosen at random
-            bosses = all_bosses + [random.choice(placeable_bosses) for _ in range(3)]
+        else:  # all bosses present, the three duplicates chosen at random
+            bosses = all_bosses + random.sample(placeable_bosses, 3)
 
         logging.getLogger('').debug('Bosses chosen %s', bosses)
 

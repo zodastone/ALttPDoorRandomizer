@@ -102,8 +102,7 @@ class LocalRom(object):
         self.buffer[address] = value
 
     def write_bytes(self, startaddress, values):
-        for i, value in enumerate(values):
-            self.write_byte(startaddress + i, value)
+        self.buffer[startaddress:startaddress + len(values)] = values
 
     def write_to_file(self, file):
         with open(file, 'wb') as outfile:
@@ -2796,7 +2795,7 @@ def write_pots_to_rom(rom, pot_contents):
             pots = [pot for pot in pot_contents[i] if pot.item != PotItem.Nothing]
             if len(pots) > 0:
                 write_int16(rom, pot_item_room_table_lookup + 2*i, n)
-                rom.write_bytes(n, itertools.chain(*((pot.x,pot.y,pot.item) for pot in pots)))
+                rom.write_bytes(n, list(itertools.chain.from_iterable(((pot.x, pot.y, pot.item) for pot in pots))))
                 n += 3*len(pots) + 2
                 rom.write_bytes(n - 2, [0xFF,0xFF])
             else:
