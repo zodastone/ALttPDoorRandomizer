@@ -15,6 +15,10 @@ CLI: ```--bombbag```
 
 # Bug Fixes and Notes.
 
+* 0.5.1.0
+	* Large logic refactor introducing a new method of key logic 
+	* Some performance optimization
+	* Some outstanding bug fixes (boss shuffle "full" picks three unique bosses to be duplicated, e.g.)
 * 0.5.0.3
 	* Fixed a bug in retro+vanilla and big key placement
 	* Fixed a problem with shops not registering in the Multiclient until you visit one
