@@ -1950,9 +1950,11 @@ def add_key_logic_rules(world, player):
             forbid_item(location, d_logic.small_key_name, player)
         for door in d_logic.bk_doors:
             add_rule(world.get_entrance(door.name, player), create_rule(d_logic.bk_name, player))
-        if len(d_logic.bk_doors) > 0 or len(d_logic.bk_chests) > 1:
-            for chest in d_logic.bk_chests:
-                add_rule(world.get_location(chest.name, player), create_rule(d_logic.bk_name, player))
+        for chest in d_logic.bk_chests:
+            big_chest = world.get_location(chest.name, player)
+            add_rule(big_chest, create_rule(d_logic.bk_name, player))
+            if len(d_logic.bk_doors) == 0 and len(d_logic.bk_chests) <= 1:
+                set_always_allow(big_chest, lambda state, item: item.name == d_logic.bk_name and item.player == player)
     if world.retro[player]:
         for d_name, layout in world.key_layout[player].items():
             for door in layout.flat_prop:
