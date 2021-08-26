@@ -438,8 +438,6 @@ class World(object):
                 return True
             state = starting_state.copy()
         else:
-            if self.has_beaten_game(self.state):
-                return True
             state = CollectionState(self)
 
         if self.has_beaten_game(state):

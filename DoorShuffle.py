@@ -1456,6 +1456,14 @@ def find_valid_combination(builder, start_regions, world, player, drop_keys=True
     random.shuffle(sample_list)
     proposal = kth_combination(sample_list[itr], builder.candidates, builder.key_doors_num)
 
+    # eliminate start region if portal marked as destination
+    excluded = {}
+    for region in start_regions:
+        portal = next((x for x in world.dungeon_portals[player] if x.door.entrance.parent_region == region), None)
+        if portal and portal.destination:
+            excluded[region] = None
+    start_regions = [x for x in start_regions if x not in excluded.keys()]
+
     key_layout = build_key_layout(builder, start_regions, proposal, world, player)
     while not validate_key_layout(key_layout, world, player):
         itr += 1

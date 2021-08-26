@@ -4,8 +4,9 @@ from collections import defaultdict, deque
 
 from BaseClasses import DoorType, dungeon_keys, KeyRuleType, RegionType
 from Regions import dungeon_events
-from Dungeons import dungeon_keys, dungeon_bigs, dungeon_prize
-from DungeonGenerator import ExplorationState, special_big_key_doors
+from Dungeons import dungeon_keys, dungeon_bigs, dungeon_table
+from DungeonGenerator import ExplorationState, special_big_key_doors, count_locations_exclude_big_chest, prize_or_event
+from DungeonGenerator import reserved_location, blind_boss_unavail
 
 
 class KeyLayout(object):
@@ -1387,7 +1388,7 @@ def validate_key_layout(key_layout, world, player):
         dungeon_entrance, portal_door = find_outside_connection(region)
         if (len(key_layout.start_regions) > 1 and dungeon_entrance and
            dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower', 'Pyramid Fairy']
-           and key_layout.key_logic.dungeon in dungeon_prize):
+           and dungeon_table[key_layout.key_logic.dungeon].prize):
             state.append_door_to_list(portal_door, state.prize_doors)
             state.prize_door_set[portal_door] = dungeon_entrance
             key_layout.prize_relevant = True
@@ -1550,7 +1551,7 @@ def create_key_counters(key_layout, world, player):
         dungeon_entrance, portal_door = find_outside_connection(region)
         if (len(key_layout.start_regions) > 1 and dungeon_entrance and
            dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower', 'Pyramid Fairy']
-           and key_layout.key_logic.dungeon in dungeon_prize):
+           and dungeon_table[key_layout.key_logic.dungeon].prize):
             state.append_door_to_list(portal_door, state.prize_doors)
             state.prize_door_set[portal_door] = dungeon_entrance
             key_layout.prize_relevant = True
@@ -1975,8 +1976,8 @@ def validate_key_placement(key_layout, world, player):
                      len(counter.key_only_locations) + keys_outside
         if key_layout.prize_relevant:
             found_prize = any(x for x in counter.important_locations if '- Prize' in x.name)
-            if not found_prize and key_layout.sector.name in dungeon_prize:
-                prize_loc = world.get_location(dungeon_prize[key_layout.sector.name], player)
+            if not found_prize and dungeon_table[key_layout.sector.name].prize:
+                prize_loc = world.get_location(dungeon_table[key_layout.sector.name].prize, player)
                 # todo: pyramid fairy only care about crystals 5 & 6
                 found_prize = 'Crystal' not in prize_loc.item.name
         else:
