@@ -604,6 +604,7 @@ def customize_shops(world, player):
                 upgrade.location = loc
     change_shop_items_to_rupees(world, player, shops_to_customize)
     balance_prices(world, player)
+    check_hints(world, player)
 
 
 def randomize_price(price):
@@ -705,6 +706,15 @@ def balance_prices(world, player):
     #
     #     new_price = min(500, max(0, new_price))  # cap prices between 0--twice base price
     #     loc.parent_region.shop.inventory[slot]['price'] = new_price
+
+
+def check_hints(world, player):
+    if world.shuffle[player] in ['simple', 'restricted', 'full', 'crossed', 'insanity']:
+        for shop, location_list in  shop_to_location_table.items():
+            if shop in ['Capacity Upgrade', 'Light World Death Mountain Shop', 'Potion Shop']:
+                continue  # near the queen, near potions, and near 7 chests are fine
+            for loc_name in location_list:  # other shops are indistinguishable in ER
+                world.get_location(loc_name, player).hint_text = f'for sale'
 
 
 repeatable_shop_items = ['Single Arrow', 'Arrows (10)', 'Bombs (3)', 'Bombs (10)', 'Red Potion', 'Small Heart',

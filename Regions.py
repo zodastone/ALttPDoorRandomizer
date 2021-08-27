@@ -1374,9 +1374,9 @@ location_table = {'Mushroom': (0x180013, 0x186338, False, 'in the woods'),
                   'Red Shield Shop - Left': (None, None, False, 'for sale as a curiosity'),
                   'Red Shield Shop - Middle': (None, None, False, 'for sale as a curiosity'),
                   'Red Shield Shop - Right': (None, None, False, 'for sale as a curiosity'),
-                  'Potion Shop - Left': (None, None, False, 'for sale near the witch'),
-                  'Potion Shop - Middle': (None, None, False, 'for sale near the witch'),
-                  'Potion Shop - Right': (None, None, False, 'for sale near the witch'),
+                  'Potion Shop - Left': (None, None, False, 'for sale near potions'),
+                  'Potion Shop - Middle': (None, None, False, 'for sale near potions'),
+                  'Potion Shop - Right': (None, None, False, 'for sale near potions'),
                   }
 
 lookup_id_to_name = {data[0]: name for name, data in location_table.items() if type(data[0]) == int}
