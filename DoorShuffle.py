@@ -1915,14 +1915,18 @@ def check_required_paths(paths, world, player):
         if dungeon_name in world.dungeon_layouts[player].keys():
             builder = world.dungeon_layouts[player][dungeon_name]
             if len(paths[dungeon_name]) > 0:
-                states_to_explore = defaultdict(list)
+                states_to_explore = {}
                 for path in paths[dungeon_name]:
                     if type(path) is tuple:
-                        states_to_explore[tuple([path[0]])] = path[1]
+                        states_to_explore[tuple([path[0]])] = (path[1], 'any')
                     else:
-                        states_to_explore[tuple(builder.path_entrances)].append(path)
+                        common_starts = tuple(builder.path_entrances)
+                        if common_starts not in states_to_explore:
+                            states_to_explore[common_starts] = ([], 'all')
+                        states_to_explore[common_starts][0].append(path)
                 cached_initial_state = None
-                for start_regs, dest_regs in states_to_explore.items():
+                for start_regs, info in states_to_explore.items():
+                    dest_regs, path_type = info
                     if type(dest_regs) is not list:
                         dest_regs = [dest_regs]
                     check_paths = convert_regions(dest_regs, world, player)
@@ -1939,11 +1943,17 @@ def check_required_paths(paths, world, player):
                             cached_initial_state = state
                     else:
                         state = cached_initial_state
-                    valid, bad_region = check_if_regions_visited(state, check_paths)
+                    if path_type == 'any':
+                        valid, bad_region = check_if_any_regions_visited(state, check_paths)
+                    else:
+                        valid, bad_region = check_if_all_regions_visited(state, check_paths)
                     if not valid:
                         if check_for_pinball_fix(state, bad_region, world, player):
                             explore_state(state, world, player)
-                            valid, bad_region = check_if_regions_visited(state, check_paths)
+                            if path_type == 'any':
+                                valid, bad_region = check_if_any_regions_visited(state, check_paths)
+                            else:
+                                valid, bad_region = check_if_all_regions_visited(state, check_paths)
                     if not valid:
                         raise Exception('%s cannot reach %s' % (dungeon_name, bad_region.name))
 
@@ -1983,7 +1993,7 @@ def explore_state_not_inaccessible(state, world, player):
             state.add_all_doors_check_unattached(connect_region, world, player)
 
 
-def check_if_regions_visited(state, check_paths):
+def check_if_any_regions_visited(state, check_paths):
     valid = False
     breaking_region = None
     for region_target in check_paths:
@@ -1993,6 +2003,13 @@ def check_if_regions_visited(state, check_paths):
         elif not breaking_region:
             breaking_region = region_target
     return valid, breaking_region
+
+
+def check_if_all_regions_visited(state, check_paths):
+    for region_target in check_paths:
+        if not state.visited_at_all(region_target):
+            return False, region_target
+    return True, None
 
 
 def check_for_pinball_fix(state, bad_region, world, player):
