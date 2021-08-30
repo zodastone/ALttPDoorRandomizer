@@ -582,6 +582,8 @@ dw $00bc, $00a2, $00a3, $00c2, $001a, $0049, $0014, $008c
 dw $009f, $0066, $005d, $00a8, $00a9, $00aa, $00b9, $0052
 ; HC West Hall, TR Dash Bridge, TR Hub, Pod Arena, GT Petting Zoo, Ice Spike Cross
 dw $0050, $00c5, $00c6, $0009, $0003, $002a, $007d, $005e
+; Sewer Drop, Mire Cross, GT Crystal Circles
+dw $0011, $00b2, $003d
 dw $ffff
 
 ; dungeon tables
