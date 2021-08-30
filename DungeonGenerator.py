@@ -109,7 +109,8 @@ def generate_dungeon_find_proposal(builder, entrance_region_names, split_dungeon
                 p_region = portal.door.entrance.connected_region
                 access_region = next(x.parent_region for x in p_region.entrances
                                      if x.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld])
-                if access_region.name in world.inaccessible_regions[player]:
+                if (access_region.name in world.inaccessible_regions[player] and
+                   region.name not in world.enabled_entrances[player]):
                     excluded[region] = None
     entrance_regions = [x for x in entrance_regions if x not in excluded.keys()]
     doors_to_connect = {}

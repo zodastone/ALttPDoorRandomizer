@@ -753,7 +753,7 @@ def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map,
 
 def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player):
     entrances_map, potentials, connections = connections_tuple
-    enabled_entrances = {}
+    enabled_entrances = world.enabled_entrances[player] = {}
     sector_queue = deque(dungeon_builders.values())
     last_key, loops = None, 0
     logging.getLogger('').info(world.fish.translate("cli", "cli", "generating.dungeon"))

@@ -77,6 +77,7 @@ class World(object):
         self._room_cache = {}
         self.dungeon_layouts = {}
         self.inaccessible_regions = {}
+        self.enabled_entrances = {}
         self.key_logic = {}
         self.pool_adjustment = {}
         self.key_layout = defaultdict(dict)
