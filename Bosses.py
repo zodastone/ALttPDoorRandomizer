@@ -181,11 +181,11 @@ def place_bosses(world, player):
 
         logging.getLogger('').debug('Bosses chosen %s', bosses)
 
-        random.shuffle(bosses)
         for [loc, level] in boss_locations:
             loc_text = loc + (' ('+level+')' if level else '')
-            boss = next((b for b in bosses if can_place_boss(world, player, b, loc, level)), None)
-            if not boss:
+            try:
+                boss = random.choice([b for b in bosses if can_place_boss(world, player, b, loc, level)])
+            except IndexError:
                 raise FillError('Could not place boss for location %s' % loc_text)
             bosses.remove(boss)
 
