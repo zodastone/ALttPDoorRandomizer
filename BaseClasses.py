@@ -142,6 +142,7 @@ class World(object):
             set_player_attr('force_fix', {'gt': False, 'sw': False, 'pod': False, 'tr': False})
 
             set_player_attr('exp_cache', defaultdict(dict))
+            set_player_attr('enabled_entrances', {})
 
     def get_name_string_for_object(self, obj):
         return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_names(obj.player)})'

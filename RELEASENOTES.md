@@ -15,6 +15,17 @@ CLI: ```--bombbag```
 
 # Bug Fixes and Notes.
 
+* 0.5.1.1
+	* Shop hints in ER are now more generic instead of using "near X" because they aren't near that anymore
+	* Added memory location for mutliworld scripts to read what item was just obtain (longer than one frame)
+	* Fix for bias in boss shuffle "full"
+	* Fix for certain lone big chests in keysanity (allowed you to get contents without big key)
+	* Fix for pinball checking
+	* Fix for multi-entrance dungeons
+	* 2 fixes for big key placement logic
+		* ensure big key is placed early if the validator assumes it)
+		* Open big key doors appropriately when generating rules and big key is forced somewhere
+	* Updated cutoff entrances for intensity 3
 * 0.5.1.0
 	* Large logic refactor introducing a new method of key logic 
 	* Some performance optimization

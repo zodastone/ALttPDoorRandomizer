@@ -282,6 +282,12 @@ def analyze_dungeon(key_layout, world, player):
         if not big_avail:
             if chest_keys == non_big_locs and chest_keys > 0 and available <= possible_smalls and not avail_bigs:
                 key_logic.bk_restricted.update(filter_big_chest(key_counter.free_locations))
+            # note to self: this is due to the enough_small_locations function in validate_key_layout_sub_loop
+            # I don't like this exception here or there
+            elif available <= possible_smalls and avail_bigs and non_big_locs > 0:
+                max_ctr = find_max_counter(key_layout)
+                bk_lockdown = [x for x in max_ctr.free_locations if x not in key_counter.free_locations]
+                key_logic.bk_restricted.update(filter_big_chest(bk_lockdown))
         # try to relax the rules here? - smallest requirement that doesn't force a softlock
         child_queue = deque()
         for child in key_counter.child_doors.keys():
@@ -1619,8 +1625,13 @@ def can_open_door_by_counter(door, counter: KeyCounter, layout, world, player):
         # ttl_small_key_only = len(counter.key_only_locations)
         return cnt_avail_small_locations_by_ctr(ttl_locations, counter, layout, world, player) > 0
     elif door.bigKey:
-        available_big_locations = cnt_avail_big_locations_by_ctr(ttl_locations, counter, layout, world, player)
-        return not counter.big_key_opened and available_big_locations > 0 and not layout.big_key_special
+        if counter.big_key_opened:
+            return False
+        if layout.big_key_special:
+            return any(x for x in counter.other_locations.keys() if x.forced_item and x.forced_item.bigkey)
+        else:
+            available_big_locations = cnt_avail_big_locations_by_ctr(ttl_locations, counter, layout, world, player)
+            return available_big_locations > 0
     else:
         return True
 
