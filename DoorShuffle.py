@@ -1582,7 +1582,7 @@ def find_key_door_candidates(region, checked, world, player):
                             if d2.type == DoorType.Normal:
                                 room_b = world.get_room(d2.roomIndex, player)
                                 pos_b, kind_b = room_b.doorList[d2.doorListPos]
-                                valid = kind in okay_normals and kind_b in okay_normals
+                                valid = kind in okay_normals and kind_b in okay_normals and valid_key_door_pair(d, d2)
                             else:
                                 valid = kind in okay_normals
                             if valid and 0 <= d2.doorListPos < 4:
@@ -1597,6 +1597,12 @@ def find_key_door_candidates(region, checked, world, player):
                 if d is not None:
                     checked_doors.append(d)
     return candidates, checked_doors
+
+
+def valid_key_door_pair(door1, door2):
+    if door1.roomIndex != door2.roomIndex:
+        return True
+    return len(door1.entrance.parent_region.exits) <= 1 or len(door2.entrance.parent_region.exits) <= 1
 
 
 def reassign_key_doors(builder, world, player):
