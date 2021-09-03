@@ -26,7 +26,7 @@ class KeyLayout(object):
         self.item_locations = set()
 
         self.found_doors = set()
-        self.prize_relevant = False
+        self.prize_relevant = None
         # bk special?
         # bk required? True if big chests or big doors exists
 
@@ -37,7 +37,7 @@ class KeyLayout(object):
         self.max_chests = calc_max_chests(builder, self, world, player)
         self.all_locations = set()
         self.item_locations = set()
-        self.prize_relevant = False
+        self.prize_relevant = None
 
 
 class KeyLogic(object):
@@ -284,7 +284,7 @@ def analyze_dungeon(key_layout, world, player):
                 key_logic.bk_restricted.update(filter_big_chest(key_counter.free_locations))
             # note to self: this is due to the enough_small_locations function in validate_key_layout_sub_loop
             # I don't like this exception here or there
-            elif available <= possible_smalls and avail_bigs and non_big_locs > 0:
+            elif available < possible_smalls and avail_bigs and non_big_locs > 0:
                 max_ctr = find_max_counter(key_layout)
                 bk_lockdown = [x for x in max_ctr.free_locations if x not in key_counter.free_locations]
                 key_logic.bk_restricted.update(filter_big_chest(bk_lockdown))
@@ -1380,6 +1380,15 @@ def forced_big_key_avail(locations):
     return None
 
 
+def prize_relevance(key_layout, dungeon_entrance):
+    if len(key_layout.start_regions) > 1 and dungeon_entrance and dungeon_table[key_layout.key_logic.dungeon].prize:
+        if dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower']:
+            return 'GT'
+        elif dungeon_entrance.name == 'Pyramid Fairy':
+            return 'BigBomb'
+    return None
+
+
 # Soft lock stuff
 def validate_key_layout(key_layout, world, player):
     # retro is all good - except for hyrule castle in standard mode
@@ -1391,12 +1400,11 @@ def validate_key_layout(key_layout, world, player):
     state.big_key_special = check_bk_special(key_layout.sector.regions, world, player)
     for region in key_layout.start_regions:
         dungeon_entrance, portal_door = find_outside_connection(region)
-        if (len(key_layout.start_regions) > 1 and dungeon_entrance and
-           dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower', 'Pyramid Fairy']
-           and dungeon_table[key_layout.key_logic.dungeon].prize):
+        prize_relevant_flag = prize_relevance(key_layout, dungeon_entrance)
+        if prize_relevant_flag:
             state.append_door_to_list(portal_door, state.prize_doors)
             state.prize_door_set[portal_door] = dungeon_entrance
-            key_layout.prize_relevant = True
+            key_layout.prize_relevant = prize_relevant_flag
         else:
             state.visit_region(region, key_checks=True)
             state.add_all_doors_check_keys(region, flat_proposal, world, player)
@@ -1554,12 +1562,11 @@ def create_key_counters(key_layout, world, player):
                 state.big_key_special = True
     for region in key_layout.start_regions:
         dungeon_entrance, portal_door = find_outside_connection(region)
-        if (len(key_layout.start_regions) > 1 and dungeon_entrance and
-           dungeon_entrance.name in ['Ganons Tower', 'Inverted Ganons Tower', 'Pyramid Fairy']
-           and dungeon_table[key_layout.key_logic.dungeon].prize):
+        prize_relevant_flag = prize_relevance(key_layout, dungeon_entrance)
+        if prize_relevant_flag:
             state.append_door_to_list(portal_door, state.prize_doors)
             state.prize_door_set[portal_door] = dungeon_entrance
-            key_layout.prize_relevant = True
+            key_layout.prize_relevant = prize_relevant_flag
         else:
             state.visit_region(region, key_checks=True)
             state.add_all_doors_check_keys(region, flat_proposal, world, player)
@@ -1988,8 +1995,10 @@ def validate_key_placement(key_layout, world, player):
             found_prize = any(x for x in counter.important_locations if '- Prize' in x.name)
             if not found_prize and dungeon_table[key_layout.sector.name].prize:
                 prize_loc = world.get_location(dungeon_table[key_layout.sector.name].prize, player)
-                # todo: pyramid fairy only care about crystals 5 & 6
-                found_prize = 'Crystal' not in prize_loc.item.name
+                if key_layout.prize_relevant == 'BigBomb':
+                    found_prize = prize_loc.item.name not in ['Crystal 5', 'Crystal 6']
+                elif key_layout.prize_relevant == 'GT':
+                    found_prize = 'Crystal' not in prize_loc.item.name or world.crystals_needed_for_gt[player] < 7
         else:
             found_prize = False
         can_progress = (not counter.big_key_opened and big_found and any(d.bigKey for d in counter.child_doors)) or \
