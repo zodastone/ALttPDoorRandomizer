@@ -32,7 +32,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '091671c7f555331ff2f411b304141c29'
+RANDOMIZERBASEHASH = 'ef6e3e1aa59838c01dbd5b1b2387e70c'
 
 
 class JsonRom(object):
@@ -671,7 +671,19 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         dr_flags |= DROptions.Debug
     if world.doorShuffle[player] == 'crossed' and world.logic[player] != 'nologic'\
        and world.mixed_travel[player] == 'prevent':
-        dr_flags |= DROptions.Rails
+        # PoD Falling Bridge or Hammjump
+        # 1FA607: db $2D, $79, $69 ; 0x0069: Vertical Rail ↕ | { 0B, 1E } | Size: 05
+        # 1FA60A: db $14, $99, $5D ; 0x005D: Large Horizontal Rail ↔ | { 05, 26 } | Size: 01
+        rom.write_bytes(0xfa607, [0x2d, 0x79, 0x69, 0x14, 0x99, 0x5d])
+        # PoD Arena
+        # 1FA573: db $D4, $B2, $22 ; 0x0022: Horizontal Rail ↔ | { 35, 2C } | Size: 02
+        # 1FA576: db $D4, $CE, $22 ; 0x0022: Horizontal Rail ↔ | { 35, 33 } | Size: 01
+        # 1FA579: db $D9, $AE, $69 ; 0x0069: Vertical Rail ↕ | { 36, 2B } | Size: 06
+        rom.write_bytes(0xfa573, [0xd4, 0xb2, 0x22, 0xd4, 0xce, 0x22, 0xd9, 0xae, 0x69])
+        # Mire BK Pond
+        # 1FB1FC: db $C8, $9D, $69 ; 0x0069: Vertical Rail ↕ | { 32, 27 } | Size: 01
+        # 1FB1FF: db $B4, $AC, $5D ; 0x005D: Large Horizontal Rail ↔ | { 2D, 2B } | Size: 00
+        rom.write_bytes(0xfb1fc, [0xc8, 0x9d, 0x69, 0xb4, 0xac, 0x5d])
     if world.standardize_palettes[player] == 'original':
         dr_flags |= DROptions.OriginalPalettes
     if world.experimental[player]:

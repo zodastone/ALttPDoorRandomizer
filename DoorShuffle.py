@@ -2041,7 +2041,7 @@ class DROptions(Flag):
     Town_Portal = 0x02  # If on, Players will start with mirror scroll
     Map_Info = 0x04
     Debug = 0x08
-    Rails = 0x10  # If on, draws rails
+    # Rails = 0x10  # Unused bit now
     OriginalPalettes = 0x20
     Open_PoD_Wall = 0x40  # If on, pre opens the PoD wall, no bow required
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
