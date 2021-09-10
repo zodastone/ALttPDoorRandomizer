@@ -58,10 +58,11 @@ class KeyLogic(object):
         self.outside_keys = 0
         self.dungeon = dungeon_name
         self.sm_doors = {}
+        self.prize_location = None
 
-    def check_placement(self, unplaced_keys, big_key_loc=None):
+    def check_placement(self, unplaced_keys, big_key_loc=None, prize_loc=None, cr_count=7):
         for rule in self.placement_rules:
-            if not rule.is_satisfiable(self.outside_keys, unplaced_keys, big_key_loc):
+            if not rule.is_satisfiable(self.outside_keys, unplaced_keys, big_key_loc, prize_loc, cr_count):
                 return False
             if big_key_loc:
                 for rule_a, rule_b in itertools.combinations(self.placement_rules, 2):
@@ -120,6 +121,7 @@ class PlacementRule(object):
         self.check_locations_wo_bk = None
         self.bk_relevant = True
         self.key_reduced = False
+        self.prize_relevance = None
 
     def contradicts(self, rule, unplaced_keys, big_key_loc):
         bk_blocked = big_key_loc in self.bk_conditional_set if self.bk_conditional_set else False
@@ -154,7 +156,14 @@ class PlacementRule(object):
                 left -= rule_needed
         return False
 
-    def is_satisfiable(self, outside_keys, unplaced_keys, big_key_loc):
+    def is_satisfiable(self, outside_keys, unplaced_keys, big_key_loc, prize_location, cr_count):
+        if self.prize_relevance and prize_location:
+            if self.prize_relevance == 'BigBomb':
+                 if prize_location.item.name not in ['Crystal 5', 'Crystal 6']:
+                     return True
+            elif self.prize_relevance == 'GT':
+                if 'Crystal' not in prize_location.item.name or cr_count < 7:
+                    return True
         bk_blocked = False
         if self.bk_conditional_set:
             for loc in self.bk_conditional_set:
@@ -258,6 +267,7 @@ def analyze_dungeon(key_layout, world, player):
     find_bk_locked_sections(key_layout, world, player)
     key_logic.bk_chests.update(find_big_chest_locations(key_layout.all_chest_locations))
     key_logic.bk_chests.update(find_big_key_locked_locations(key_layout.all_chest_locations))
+    key_logic.prize_location = dungeon_table[key_layout.sector.name].prize
     if world.retro[player] and world.mode[player] != 'standard':
         return
 
@@ -361,11 +371,16 @@ def create_exhaustive_placement_rules(key_layout, world, player):
                 rule.bk_conditional_set = blocked_loc
                 rule.needed_keys_wo_bk = min_keys
                 rule.check_locations_wo_bk = set(filter_big_chest(accessible_loc))
+                rule.prize_relevance = key_layout.prize_relevant if rule_prize_relevant(key_counter) else None
             if valid_rule:
                 key_logic.placement_rules.append(rule)
                 adjust_locations_rules(key_logic, rule, accessible_loc, key_layout, key_counter, max_ctr)
     refine_placement_rules(key_layout, max_ctr)
     refine_location_rules(key_layout)
+
+
+def rule_prize_relevant(key_counter):
+    return not key_counter.prize_doors_opened and not key_counter.prize_received
 
 
 def skip_key_counter_due_to_prize(key_layout, key_counter):
@@ -467,7 +482,7 @@ def refine_placement_rules(key_layout, max_ctr):
                 if rule.needed_keys_wo_bk == 0:
                     rules_to_remove.append(rule)
                 if len(rule.check_locations_wo_bk) < rule.needed_keys_wo_bk or rule.needed_keys_wo_bk > key_layout.max_chests:
-                    if len(rule.bk_conditional_set) > 0:
+                    if not rule.prize_relevance and len(rule.bk_conditional_set) > 0:
                         key_logic.bk_restricted.update(rule.bk_conditional_set)
                         rules_to_remove.append(rule)
                         changed = True  # impossible for bk to be here, I think
@@ -1432,7 +1447,8 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     found_forced_bk = state.found_forced_bk()
     smalls_done = not smalls_avail or not enough_small_locations(state, available_small_locations)
     bk_done = state.big_key_opened or num_bigs == 0 or (available_big_locations == 0 and not found_forced_bk)
-    if smalls_done and bk_done:
+    prize_done = not key_layout.prize_relevant or state.prize_doors_opened
+    if smalls_done and bk_done and prize_done:
         return False
     else:
         # todo: pretty sure you should OR these paths together, maybe when there's one location and it can
@@ -1468,6 +1484,7 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
             if not valid:
                 return False
         # todo: feel like you only open these if the boss is available???
+        # todo: or if a crystal isn't valid placement on this boss
         if not state.prize_doors_opened and key_layout.prize_relevant:
             state_copy = state.copy()
             open_a_door(next(iter(state_copy.prize_door_set)), state_copy, flat_proposal, world, player)

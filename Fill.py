@@ -245,7 +245,11 @@ def valid_key_placement(item, location, itempool, world):
             return True
         key_logic = world.key_logic[item.player][dungeon.name]
         unplaced_keys = len([x for x in itempool if x.name == key_logic.small_key_name and x.player == item.player])
-        return key_logic.check_placement(unplaced_keys, location if item.bigkey else None)
+        prize_loc = None
+        if key_logic.prize_location:
+            prize_loc = world.get_location(key_logic.prize_location, location.player)
+        cr_count = world.crystals_needed_for_gt[location.player]
+        return key_logic.check_placement(unplaced_keys, location if item.bigkey else None, prize_loc, cr_count)
     else:
         inside_dungeon_item = ((item.smallkey and not world.keyshuffle[item.player])
                                or (item.bigkey and not world.bigkeyshuffle[item.player]))
