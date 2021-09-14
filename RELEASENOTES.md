@@ -15,6 +15,14 @@ CLI: ```--bombbag```
 
 # Bug Fixes and Notes.
 
+* 0.5.1.2
+	* Allowed Blind's Cell to be shuffled anywhere if Blind is not the boss of Thieves Town
+	* Remove unique annotation from a FastEnum that was causing problems
+	* Updated prevent mixed_travel setting to prevent more mixed travel
+	* Prevent key door loops on the same supertile where you could have spent 2 keys on one logical door
+	* Promoted dynamic soft-lock prevention on "stonewalls" from experimental to be the primary prevention (Stonewalls are now never pre-opened)
+	* Fix to money balancing algorithm with small item_pool, thanks Catobat
+	* Many fixes and refinements to key logic and generation	
 * 0.5.1.1
 	* Shop hints in ER are now more generic instead of using "near X" because they aren't near that anymore
 	* Added memory location for mutliworld scripts to read what item was just obtain (longer than one frame)

@@ -1358,10 +1358,8 @@ def combine_layouts(recombinant_builders, dungeon_builders, entrances_map):
                 if recombine.master_sector is None:
                     recombine.master_sector = builder.master_sector
                     recombine.master_sector.name = recombine.name
-                    recombine.pre_open_stonewalls = builder.pre_open_stonewalls
                 else:
                     recombine.master_sector.regions.extend(builder.master_sector.regions)
-                    recombine.pre_open_stonewalls.update(builder.pre_open_stonewalls)
         recombine.layout_starts = list(entrances_map[recombine.name])
         dungeon_builders[recombine.name] = recombine
 
@@ -2043,8 +2041,8 @@ class DROptions(Flag):
     Debug = 0x08
     # Rails = 0x10  # Unused bit now
     OriginalPalettes = 0x20
-    Open_PoD_Wall = 0x40  # If on, pre opens the PoD wall, no bow required
-    Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
+    # Open_PoD_Wall = 0x40  # No longer pre-opening pod wall - unused
+    # Open_Desert_Wall = 0x80  # No longer pre-opening desert wall - unused
     Hide_Total = 0x100
     DarkWorld_Spawns = 0x200
 

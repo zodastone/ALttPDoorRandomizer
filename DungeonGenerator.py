@@ -56,21 +56,8 @@ def pre_validate(builder, entrance_region_names, split_dungeon, world, player):
 
 
 def generate_dungeon(builder, entrance_region_names, split_dungeon, world, player):
-    stonewalls = check_for_stonewalls(builder)
     sector = generate_dungeon_main(builder, entrance_region_names, split_dungeon, world, player)
-    for stonewall in stonewalls:
-        if not stonewall_valid(stonewall):
-            builder.pre_open_stonewalls.add(stonewall)
     return sector
-
-
-def check_for_stonewalls(builder):
-    stonewalls = set()
-    for sector in builder.sectors:
-        for door in sector.outstanding_doors:
-            if door.stonewall:
-                stonewalls.add(door)
-    return stonewalls
 
 
 def generate_dungeon_main(builder, entrance_region_names, split_dungeon, world, player):
@@ -610,35 +597,6 @@ def winnow_hangers(hangers, hooks):
                     removal_info.append((hanger, door))
     for hanger, door in removal_info:
         hangers[hanger].remove(door)
-
-
-def stonewall_valid(stonewall):
-    bad_door = stonewall.dest
-    if bad_door.blocked:
-        return True  # great we're done with this one
-    loop_region = stonewall.entrance.parent_region
-    start_regions = [bad_door.entrance.parent_region]
-    if bad_door.dependents:
-        for dep in bad_door.dependents:
-            start_regions.append(dep.entrance.parent_region)
-    queue = deque(start_regions)
-    visited = set(start_regions)
-    while len(queue) > 0:
-        region = queue.popleft()
-        if region == loop_region:
-            return False  # guaranteed loop
-        possible_entrances = list(region.entrances)
-        for entrance in possible_entrances:
-            parent = entrance.parent_region
-            if parent.type != RegionType.Dungeon:
-                return False  # you can get stuck from an entrance
-            else:
-                door = entrance.door
-                if (door is None or (door != stonewall and not door.blocked)) and parent not in visited:
-                    visited.add(parent)
-                    queue.append(parent)
-    # we didn't find anything bad
-    return True
 
 
 def create_graph_piece_from_state(door, o_state, b_state, proposed_map, exception):
@@ -1197,8 +1155,6 @@ class DungeonBuilder(object):
         self.master_sector = None
         self.path_entrances = None  # used for pathing/key doors, I think
         self.split_flag = False
-
-        self.pre_open_stonewalls = set()  # used by stonewall system
 
         self.candidates = None
         self.total_keys = None

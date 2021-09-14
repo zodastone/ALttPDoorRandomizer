@@ -32,7 +32,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'ef6e3e1aa59838c01dbd5b1b2387e70c'
+RANDOMIZERBASEHASH = '11f4f494e999a919aafd7d2624e67679'
 
 
 class JsonRom(object):
@@ -754,13 +754,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
         rom.write_bytes(paired_door.address_b(world, player), paired_door.rom_data_b(world, player))
     if world.doorShuffle[player] != 'vanilla':
-        if not world.experimental[player]:
-            for builder in world.dungeon_layouts[player].values():
-                for stonewall in builder.pre_open_stonewalls:
-                    if stonewall.name == 'Desert Wall Slide NW':
-                        dr_flags |= DROptions.Open_Desert_Wall
-                    elif stonewall.name == 'PoD Bow Statue Down Ladder':
-                        dr_flags |= DROptions.Open_PoD_Wall
         for name, pair in boss_indicator.items():
             dungeon_id, boss_door = pair
             opposite_door = world.get_door(boss_door, player).dest
