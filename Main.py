@@ -10,6 +10,7 @@ import time
 import zlib
 
 from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance, Settings
+from Bosses import place_bosses
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
 from OverworldGlitchRules import create_owg_connections
@@ -146,6 +147,7 @@ def main(args, seed=None, fish=None):
         create_rooms(world, player)
         create_dungeons(world, player)
         adjust_locations(world, player)
+        place_bosses(world, player)
 
     if any(world.potshuffle.values()):
         logger.info(world.fish.translate("cli", "cli", "shuffling.pots"))

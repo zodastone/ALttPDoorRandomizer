@@ -4,7 +4,6 @@ import math
 import RaceRandom as random
 
 from BaseClasses import Region, RegionType, Shop, ShopType, Location, CollectionState
-from Bosses import place_bosses
 from Dungeons import get_dungeon_item_pool
 from EntranceShuffle import connect_entrance
 from Regions import shop_to_location_table, retro_shops, shop_table_by_location
@@ -371,7 +370,6 @@ def generate_itempool(world, player):
     tr_medallion = ['Ether', 'Quake', 'Bombos'][random.randint(0, 2)]
     world.required_medallions[player] = (mm_medallion, tr_medallion)
 
-    place_bosses(world, player)
     set_up_shops(world, player)
 
     if world.retro[player]:

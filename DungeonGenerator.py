@@ -585,7 +585,8 @@ def determine_paths_for_dungeon(world, player, all_regions, name):
             paths.append(boss)
     if 'Thieves Boss' in all_r_names:
         paths.append('Thieves Boss')
-        paths.append(('Thieves Blind\'s Cell', 'Thieves Boss'))
+        if world.get_dungeon("Thieves Town", player).boss.enemizer_name == 'Blind':
+            paths.append(('Thieves Blind\'s Cell', 'Thieves Boss'))
     for drop_check in drop_path_checks:
         if drop_check in all_r_names:
             paths.append((drop_check, non_hole_portals))
@@ -1275,6 +1276,9 @@ def create_dungeon_builders(all_sectors, connections_tuple, world, player,
                 for r_name in ['Hyrule Dungeon Cellblock', 'Sanctuary']:  # need to deliver zelda
                     assign_sector(find_sector(r_name, candidate_sectors), current_dungeon,
                                   candidate_sectors, global_pole)
+            if key == 'Thieves Town' and world.get_dungeon("Thieves Town", player).boss.enemizer_name == 'Blind':
+                assign_sector(find_sector("Thieves Blind's Cell", candidate_sectors), current_dungeon,
+                              candidate_sectors, global_pole)
         entrances_map, potentials, connections = connections_tuple
         accessible_sectors, reverse_d_map = set(), {}
         for key in dungeon_entrances.keys():
@@ -3898,7 +3902,7 @@ dungeon_boss_sectors = {
     'Palace of Darkness': ['PoD Boss'],
     'Swamp Palace': ['Swamp Boss'],
     'Skull Woods': ['Skull Boss'],
-    'Thieves Town': ['Thieves Blind\'s Cell', 'Thieves Boss'],
+    'Thieves Town': ['Thieves Boss'],
     'Ice Palace': ['Ice Boss'],
     'Misery Mire': ['Mire Boss'],
     'Turtle Rock': ['TR Boss'],
