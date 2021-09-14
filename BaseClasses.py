@@ -2740,7 +2740,6 @@ class Settings(object):
         args.shufflepots[p] = True if settings[7] & 0x4 else False
 
 
-@unique
 class KeyRuleType(FastEnum):
     WorstCase = 0
     AllowSmall = 1
