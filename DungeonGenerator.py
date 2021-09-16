@@ -56,11 +56,6 @@ def pre_validate(builder, entrance_region_names, split_dungeon, world, player):
 
 
 def generate_dungeon(builder, entrance_region_names, split_dungeon, world, player):
-    sector = generate_dungeon_main(builder, entrance_region_names, split_dungeon, world, player)
-    return sector
-
-
-def generate_dungeon_main(builder, entrance_region_names, split_dungeon, world, player):
     if builder.valid_proposal:  # we made this earlier in gen, just use it
         proposed_map = builder.valid_proposal
     else:
@@ -99,6 +94,15 @@ def generate_dungeon_find_proposal(builder, entrance_region_names, split_dungeon
                 if (access_region.name in world.inaccessible_regions[player] and
                    region.name not in world.enabled_entrances[player]):
                     excluded[region] = None
+        elif len(region.entrances) == 1:  # for holes
+            access_region = next(x.parent_region for x in region.entrances
+                                 if x.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld]
+                                 or x.parent_region.name == 'Sewer Drop')
+            if access_region.name == 'Sewer Drop':
+                access_region = next(x.parent_region for x in access_region.entrances)
+            if (access_region.name in world.inaccessible_regions[player] and
+               region.name not in world.enabled_entrances[player]):
+                excluded[region] = None
     entrance_regions = [x for x in entrance_regions if x not in excluded.keys()]
     doors_to_connect = {}
     all_regions = set()

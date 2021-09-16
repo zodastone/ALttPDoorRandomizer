@@ -14,7 +14,7 @@ from RoomData import DoorKind, PairedDoor, reset_rooms
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths, drop_entrances
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from DungeonGenerator import dungeon_portals, dungeon_drops, GenerationException
-from KeyDoorShuffle import analyze_dungeon, build_key_layout, validate_key_layout
+from KeyDoorShuffle import analyze_dungeon, build_key_layout, validate_key_layout, determine_prize_lock
 from Utils import ncr, kth_combination
 
 
@@ -1463,6 +1463,7 @@ def find_valid_combination(builder, start_regions, world, player, drop_keys=True
     start_regions = [x for x in start_regions if x not in excluded.keys()]
 
     key_layout = build_key_layout(builder, start_regions, proposal, world, player)
+    determine_prize_lock(key_layout, world, player)
     while not validate_key_layout(key_layout, world, player):
         itr += 1
         stop_early = False

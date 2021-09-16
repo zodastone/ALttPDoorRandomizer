@@ -27,6 +27,7 @@ class KeyLayout(object):
 
         self.found_doors = set()
         self.prize_relevant = None
+        self.prize_can_lock = None  # if true, then you may need to beat the bo
         # bk special?
         # bk required? True if big chests or big doors exists
 
@@ -1447,7 +1448,10 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     found_forced_bk = state.found_forced_bk()
     smalls_done = not smalls_avail or not enough_small_locations(state, available_small_locations)
     bk_done = state.big_key_opened or num_bigs == 0 or (available_big_locations == 0 and not found_forced_bk)
-    prize_done = not key_layout.prize_relevant or state.prize_doors_opened
+    # prize door should not be opened if the boss is reachable - but not reached yet
+    allow_for_prize_lock = (key_layout.prize_can_lock and
+                            not any(x for x in state.found_locations if '- Prize' in x.name))
+    prize_done = not key_layout.prize_relevant or state.prize_doors_opened or allow_for_prize_lock
     if smalls_done and bk_done and prize_done:
         return False
     else:
@@ -1529,6 +1533,39 @@ def enough_small_locations(state, avail_small_loc):
         if door not in unique_d_set and door.dest not in unique_d_set:
             unique_d_set.add(door)
     return avail_small_loc >= len(unique_d_set)
+
+
+def determine_prize_lock(key_layout, world, player):
+    if ((world.retro[player] and (world.mode[player] != 'standard' or key_layout.sector.name != 'Hyrule Castle'))
+       or world.logic[player] == 'nologic'):
+        return  # done, doesn't matter what
+    flat_proposal = key_layout.flat_prop
+    state = ExplorationState(dungeon=key_layout.sector.name)
+    state.key_locations = key_layout.max_chests
+    state.big_key_special = check_bk_special(key_layout.sector.regions, world, player)
+    prize_lock_possible = False
+    for region in key_layout.start_regions:
+        dungeon_entrance, portal_door = find_outside_connection(region)
+        prize_relevant_flag = prize_relevance(key_layout, dungeon_entrance)
+        if prize_relevant_flag:
+            state.append_door_to_list(portal_door, state.prize_doors)
+            state.prize_door_set[portal_door] = dungeon_entrance
+            key_layout.prize_relevant = prize_relevant_flag
+            prize_lock_possible = True
+        else:
+            state.visit_region(region, key_checks=True)
+            state.add_all_doors_check_keys(region, flat_proposal, world, player)
+    if not prize_lock_possible:
+        return  # done, no prize entrances to worry about
+    expand_key_state(state, flat_proposal, world, player)
+    while len(state.small_doors) > 0 or len(state.big_doors) > 0:
+        if len(state.big_doors) > 0:
+            open_a_door(state.big_doors[0].door, state, flat_proposal, world, player)
+        elif len(state.small_doors) > 0:
+            open_a_door(state.small_doors[0].door, state, flat_proposal, world, player)
+        expand_key_state(state, flat_proposal, world, player)
+    if any(x for x in state.found_locations if '- Prize' in x.name):
+        key_layout.prize_can_lock = True
 
 
 def cnt_avail_small_locations(free_locations, key_only, state, world, player):
