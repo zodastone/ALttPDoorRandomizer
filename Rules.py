@@ -1954,7 +1954,7 @@ def add_key_logic_rules(world, player):
             big_chest = world.get_location(chest.name, player)
             add_rule(big_chest, create_rule(d_logic.bk_name, player))
             if len(d_logic.bk_doors) == 0 and len(d_logic.bk_chests) <= 1:
-                set_always_allow(big_chest, lambda state, item: item.name == d_logic.bk_name and item.player == player)
+                set_always_allow(big_chest, allow_big_key_in_big_chest(d_logic.bk_name, player))
     if world.retro[player]:
         for d_name, layout in world.key_layout[player].items():
             for door in layout.flat_prop:
@@ -1990,6 +1990,10 @@ def eval_small_key_door_main(state, door_name, dungeon, player):
 
 def eval_small_key_door(door_name, dungeon, player):
     return lambda state: eval_small_key_door_main(state, door_name, dungeon, player)
+
+
+def allow_big_key_in_big_chest(bk_name, player):
+    return lambda state, item: item.name == bk_name and item.player == player
 
 
 def retro_in_hc(spot):
