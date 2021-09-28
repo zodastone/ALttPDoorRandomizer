@@ -559,7 +559,7 @@ class CollectionState(object):
                             queue.append((new_entrance, new_crystal_state))
             # else those connections that are not accessible yet
             if self.is_small_door(connection):
-                door = connection.door
+                door = connection.door if connection.door.smallKey else connection.door.controller
                 dungeon_name = connection.parent_region.dungeon.name
                 key_logic = self.world.key_logic[player][dungeon_name]
                 if door.name not in self.reached_doors[player]:
@@ -573,7 +573,7 @@ class CollectionState(object):
                     checklist[connection.name] = (connection, crystal_state)
                 elif door.name not in self.opened_doors[player]:
                     opened_doors = self.opened_doors[player]
-                    door = connection.door
+                    door = connection.door if connection.door.smallKey else connection.door.controller
                     if door.name not in opened_doors:
                         self.door_counter[player][1][dungeon_name] += 1
                         opened_doors.add(door.name)
@@ -956,7 +956,12 @@ class CollectionState(object):
 
     @staticmethod
     def is_small_door(connection):
-        return connection and connection.door and connection.door.smallKey
+        return connection and connection.door and (connection.door.smallKey or
+                                                   CollectionState.is_controlled_by_small(connection))
+
+    @staticmethod
+    def is_controlled_by_small(connection):
+        return connection.door.controller and connection.door.controller.smallKey
 
     def is_door_open(self, door_name, player):
         return door_name in self.opened_doors[player]
@@ -1641,6 +1646,7 @@ class Door(object):
         self.bk_shuffle_req = False
         self.standard_restricted = False  # flag if portal is not allowed in HC in standard
         self.lw_restricted = False  # flag if portal is not allowed in DW
+        self.rupee_bow_restricted = False  # flag if portal is not allowed in HC in standard+rupee_bow
         # self.incognitoPos = -1
         # self.sectorLink = False
 

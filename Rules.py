@@ -1942,7 +1942,11 @@ def add_key_logic_rules(world, player):
     key_logic = world.key_logic[player]
     for d_name, d_logic in key_logic.items():
         for door_name, rule in d_logic.door_rules.items():
-            add_rule(world.get_entrance(door_name, player), eval_small_key_door(door_name, d_name, player))
+            door_entrance = world.get_entrance(door_name, player)
+            add_rule(door_entrance, eval_small_key_door(door_name, d_name, player))
+            if door_entrance.door.dependents:
+                for dep in door_entrance.door.dependents:
+                    add_rule(dep.entrance, eval_small_key_door(door_name, d_name, player))
         for location in d_logic.bk_restricted:
             if not location.forced_item:
                 forbid_item(location, d_logic.bk_name, player)

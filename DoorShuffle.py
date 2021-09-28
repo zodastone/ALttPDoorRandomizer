@@ -368,7 +368,8 @@ def choose_portals(world, player):
 
     if world.doorShuffle[player] in ['basic', 'crossed']:
         cross_flag = world.doorShuffle[player] == 'crossed'
-        bk_shuffle = world.bigkeyshuffle[player]
+        # key drops allow the big key in the right place in Desert Tiles 2
+        bk_shuffle = world.bigkeyshuffle[player] or world.keydropshuffle[player]
         std_flag = world.mode[player] == 'standard'
         # roast incognito doors
         world.get_room(0x60, player).delete(5)
@@ -415,6 +416,7 @@ def choose_portals(world, player):
         for dungeon, info in shuffled_info:
             outstanding_portals = list(dungeon_portals[dungeon])
             hc_flag = std_flag and dungeon == 'Hyrule Castle'
+            rupee_bow_flag = hc_flag and world.retro[player]  # rupee bow
             if hc_flag:
                 sanc = world.get_portal('Sanctuary', player)
                 sanc.destination = True
@@ -424,14 +426,14 @@ def choose_portals(world, player):
                 info.required_passage = {x: y for x, y in info.required_passage.items() if len(y) > 0}
             for target_region, possible_portals in info.required_passage.items():
                 candidates = find_portal_candidates(master_door_list, dungeon, need_passage=True, crossed=cross_flag,
-                                                    bk_shuffle=bk_shuffle)
+                                                    bk_shuffle=bk_shuffle, rupee_bow=rupee_bow_flag)
                 choice, portal = assign_portal(candidates, possible_portals, world, player)
                 portal.destination = True
                 clean_up_portal_assignment(portal_assignment, dungeon, portal, master_door_list, outstanding_portals)
             dead_end_choices = info.total - 1 - len(portal_assignment[dungeon])
             for i in range(0, dead_end_choices):
                 candidates = find_portal_candidates(master_door_list, dungeon, dead_end_allowed=True,
-                                                    crossed=cross_flag, bk_shuffle=bk_shuffle)
+                                                    crossed=cross_flag, bk_shuffle=bk_shuffle, rupee_bow=rupee_bow_flag)
                 possible_portals = outstanding_portals if not info.sole_entrance else [x for x in outstanding_portals if x != info.sole_entrance]
                 choice, portal = assign_portal(candidates, possible_portals, world, player)
                 if choice.deadEnd:
@@ -443,7 +445,7 @@ def choose_portals(world, player):
             the_rest = info.total - len(portal_assignment[dungeon])
             for i in range(0, the_rest):
                 candidates = find_portal_candidates(master_door_list, dungeon, crossed=cross_flag,
-                                                    bk_shuffle=bk_shuffle, standard=hc_flag)
+                                                    bk_shuffle=bk_shuffle, standard=hc_flag, rupee_bow=rupee_bow_flag)
                 choice, portal = assign_portal(candidates, outstanding_portals, world, player)
                 clean_up_portal_assignment(portal_assignment, dungeon, portal, master_door_list, outstanding_portals)
 
@@ -564,7 +566,7 @@ def disconnect_portal(portal, world, player):
 
 
 def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allowed=False, crossed=False,
-                           bk_shuffle=False, standard=False):
+                           bk_shuffle=False, standard=False, rupee_bow=False):
     ret = [x for x in door_list if bk_shuffle or not x.bk_shuffle_req]
     if crossed:
         ret = [x for x in ret if not x.dungeonLink or x.dungeonLink == dungeon or x.dungeonLink.startswith('link')]
@@ -576,6 +578,8 @@ def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allo
         ret = [x for x in ret if not x.deadEnd]
     if standard:
         ret = [x for x in ret if not x.standard_restricted]
+    if rupee_bow:
+        ret = [x for x in ret if not x.rupee_bow_restricted]
     return ret
 
 

@@ -171,7 +171,7 @@ class PlacementRule(object):
                 if loc.item and loc.item.bigkey:
                     bk_blocked = True
                     break
-        else:
+        elif len(self.check_locations_w_bk) > self.needed_keys_w_bk:
             def loc_has_bk(l):
                 return (big_key_loc is not None and big_key_loc == l) or (l.item and l.item.bigkey)
 
