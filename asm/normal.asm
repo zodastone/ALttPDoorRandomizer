@@ -73,8 +73,9 @@ TrapDoorFixer:
     rts
 
 Cleanup:
-    stz $047a
-	inc $11
+	lda.l DRFlags : and #$10 : beq +
+    	stz $047a
+	+ inc $11
 	lda $ef
 	rts
 

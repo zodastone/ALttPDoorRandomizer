@@ -17,6 +17,7 @@ CLI: ```--bombbag```
 
 * 0.5.1.3
 	* Certain lobbies forbidden in standard when rupee bow is enabled
+	* PoD EG disarmed when mirroring (except in nologic)
 	* Fixed issue with key logic
 * 0.5.1.2
 	* Allowed Blind's Cell to be shuffled anywhere if Blind is not the boss of Thieves Town

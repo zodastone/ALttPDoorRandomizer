@@ -47,6 +47,12 @@ MirrorCheckOverride:
     rtl
     + lda.l DRScroll : rtl
 
+EGFixOnMirror:
+	lda.l DRFlags : and #$10 : beq +
+		stz $047a
+	+ jsl Mirror_SaveRoomData
+	rtl
+
 BlockEraseFix:
     lda $7ef353 : and #$02 : beq +
         stz $05fc : stz $05fd

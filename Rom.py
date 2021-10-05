@@ -32,7 +32,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '11f4f494e999a919aafd7d2624e67679'
+RANDOMIZERBASEHASH = '1b937c39f026f9a687391488b7386542'
 
 
 class JsonRom(object):
@@ -688,6 +688,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         dr_flags |= DROptions.OriginalPalettes
     if world.experimental[player]:
         dr_flags |= DROptions.DarkWorld_Spawns
+    if world.logic[player] != 'nologic':
+        dr_flags |= DROptions.Fix_EG
 
 
     # fix hc big key problems (map and compass too)

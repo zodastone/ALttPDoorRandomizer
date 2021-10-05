@@ -125,6 +125,11 @@ org $07a955 ; <- Bank07.asm : around 6564 (JP is a bit different) (STZ $05FC : S
 jsl BlockEraseFix
 nop #2
 
+org $02A0A8
+Mirror_SaveRoomData:
+org $07A95B ; < bank_07.asm ; #_07A95B: JSL Mirror_SaveRoomData
+jsl EGFixOnMirror
+
 org $02b82a
 jsl FixShopCode
 

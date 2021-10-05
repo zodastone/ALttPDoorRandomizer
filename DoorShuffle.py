@@ -2044,7 +2044,7 @@ class DROptions(Flag):
     Town_Portal = 0x02  # If on, Players will start with mirror scroll
     Map_Info = 0x04
     Debug = 0x08
-    # Rails = 0x10  # Unused bit now
+    Fix_EG = 0x10  # used to be Rails = 0x10  # Unused bit now
     OriginalPalettes = 0x20
     # Open_PoD_Wall = 0x40  # No longer pre-opening pod wall - unused
     # Open_Desert_Wall = 0x80  # No longer pre-opening desert wall - unused
