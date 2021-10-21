@@ -15,6 +15,9 @@ CLI: ```--bombbag```
 
 # Bug Fixes and Notes.
 
+* 0.5.1.4
+	* Revert quadrant glitch fix for baserom
+	* Fix for inverted
 * 0.5.1.3
 	* Certain lobbies forbidden in standard when rupee bow is enabled
 	* PoD EG disarmed when mirroring (except in nologic)
