@@ -304,7 +304,11 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Mire Lobby Gap', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('Mire Post-Gap Gap', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('Mire Falling Bridge WN', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))  # this is due to the fact the the door opposite is blocked
-    set_rule(world.get_entrance('Mire 2 NE', player), lambda state: state.has_sword(player) or state.has('Fire Rod', player) or state.has('Ice Rod', player) or state.has('Hammer', player) or state.has('Cane of Somaria', player) or state.can_shoot_arrows(player))  # need to defeat wizzrobes, bombs don't work ...
+    set_rule(world.get_entrance('Mire 2 NE', player), lambda state: state.has_sword(player) or
+             (state.has('Fire Rod', player) and (state.can_use_bombs(player) or state.can_extend_magic(player, 9))) or  # 9 fr shots or 8 with some bombs
+             (state.has('Ice Rod', player) and state.can_use_bombs(player)) or  # freeze popo and throw, bomb to finish
+             state.has('Hammer', player) or state.has('Cane of Somaria', player) or state.can_shoot_arrows(player))  # need to defeat wizzrobes, bombs don't work ...
+            # byrna could work with sufficient magic
     set_rule(world.get_location('Misery Mire - Spike Chest', player), lambda state: (state.world.can_take_damage and state.has_hearts(player, 4)) or state.has('Cane of Byrna', player) or state.has('Cape', player))
     set_rule(world.get_entrance('Mire Left Bridge Hook Path', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Mire Tile Room NW', player), lambda state: state.has_fire_source(player))
