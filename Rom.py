@@ -1619,13 +1619,16 @@ def write_custom_shops(rom, world, player):
                 loc_item = ItemFactory(item['item'], player)
             if (not world.shopsanity[player] and shop.region.name == 'Capacity Upgrade'
                and world.difficulty[player] != 'normal'):
-                continue  # skip cap upgrades except in normal/shopsanity
-            item_id = loc_item.code
-            price = int16_as_bytes(item['price'])
-            replace = ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF
-            replace_price = int16_as_bytes(item['replacement_price'])
+                # really should be 5A instead of B0 -- surprise!!!
+                item_id, price, replace, replace_price, item_max = 0xB0, [0, 0], 0xFF, [0, 0], 1
+            else:
+                item_id = loc_item.code
+                price = int16_as_bytes(item['price'])
+                replace = ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF
+                replace_price = int16_as_bytes(item['replacement_price'])
+                item_max = item['max']
             item_player = 0 if item['player'] == player else item['player']
-            item_data = [shop_id,  item_id] + price + [item['max'], replace] + replace_price + [item_player]
+            item_data = [shop_id,  item_id] + price + [item_max, replace] + replace_price + [item_player]
             items_data.extend(item_data)
 
     rom.write_bytes(0x184800, shop_data)
