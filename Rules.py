@@ -1212,7 +1212,7 @@ def standard_rules(world, player):
                      'North Fairy Cave', 'North Fairy Cave Drop', 'Lost Woods Gamble', 'Snitch Lady (East)',
                      'Snitch Lady (West)', 'Tavern (Front)', 'Bush Covered House', 'Light World Bomb Hut',
                      'Kakariko Shop', 'Long Fairy Cave', 'Good Bee Cave', '20 Rupee Cave', 'Cave Shop (Lake Hylia)',
-                     'Waterfall of Wishing', 'Hyrule Castle Main Gate', '50 Rupee Cave',
+                     'Waterfall of Wishing', 'Hyrule Castle Main Gate', '50 Rupee Cave', 'Bonk Fairy (Light)',
                      'Fortune Teller (Light)', 'Lake Hylia Fairy', 'Light Hype Fairy', 'Desert Fairy',
                      'Lumberjack House', 'Lake Hylia Fortune Teller', 'Kakariko Gamble Game', 'Top of Pyramid']:
         add_rule(world.get_entrance(entrance, player), lambda state: state.has('Zelda Delivered', player))

@@ -215,6 +215,13 @@ def link_entrances(world, player):
         if bomb_shop in dw_entrances:
             dw_entrances.remove(bomb_shop)
 
+        # standard mode cannot have Bonk Fairy Light be a connector in case of starting boots
+        # or boots are in links house, etc.
+        removed = False
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in lw_entrances:
+            lw_entrances.remove('Bonk Fairy (Light)')
+            removed = True
+
         # place the old man cave's entrance somewhere in the light world
         random.shuffle(lw_entrances)
         old_man_entrance = lw_entrances.pop()
@@ -226,6 +233,8 @@ def link_entrances(world, player):
 
         # now scramble the rest
         connect_caves(world, lw_entrances, dw_entrances, caves, player)
+        if removed:
+            lw_entrances.append('Bonk Fairy (Light)')
 
         # scramble holes
         scramble_holes(world, player)
@@ -395,13 +404,22 @@ def link_entrances(world, player):
         if bomb_shop in dw_entrances:
             dw_entrances.remove(bomb_shop)
 
+        # standard mode cannot have Bonk Fairy Light be a connector in case of
+        # starting boots or boots are in links house, etc.
+        removed = False
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in lw_entrances:
+            lw_entrances.remove('Bonk Fairy (Light)')
+            removed = True
+
         # place the old man cave's entrance somewhere in the light world
         old_man_entrance = lw_entrances.pop()
         connect_two_way(world, old_man_entrance, 'Old Man Cave Exit (West)', player)
 
-
         # now scramble the rest
         connect_caves(world, lw_entrances, dw_entrances, caves, player)
+
+        if removed:
+            lw_entrances.append('Bonk Fairy (Light)')
 
         # scramble holes
         scramble_holes(world, player)
@@ -487,15 +505,23 @@ def link_entrances(world, player):
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         entrances.remove(bomb_shop)
 
+        # standard mode cannot have Bonk Fairy Light be a connector in case of
+        # starting boots or boots are in links house, etc.
+        removed = False
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in entrances:
+            entrances.remove('Bonk Fairy (Light)')
+            removed = True
 
         # place the old man cave's entrance somewhere
         random.shuffle(entrances)
         old_man_entrance = entrances.pop()
         connect_two_way(world, old_man_entrance, 'Old Man Cave Exit (West)', player)
 
-
         # now scramble the rest
         connect_caves(world, entrances, [], caves, player)
+
+        if removed:
+            entrances.append('Bonk Fairy (Light)')
 
         # scramble holes
         scramble_holes(world, player)
@@ -971,6 +997,13 @@ def link_entrances(world, player):
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         doors.remove(bomb_shop)
 
+        # standard mode cannot have Bonk Fairy Light be a connector in case of
+        # starting boots or boots are in links house, etc.
+        removed = False
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in doors:
+            doors.remove('Bonk Fairy (Light)')
+            removed = True
+
         # handle remaining caves
         for cave in caves:
             if isinstance(cave, str):
@@ -979,6 +1012,9 @@ def link_entrances(world, player):
             for exit in cave:
                 connect_exit(world, exit, exit_pool.pop(), player)
                 connect_entrance(world, doors.pop(), exit, player)
+
+        if removed:
+            doors.append('Bonk Fairy (Light)')
 
         # place remaining doors
         connect_doors(world, doors, door_targets, player)
