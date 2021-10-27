@@ -1454,6 +1454,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x180176, 0x0A if world.retro[player] else 0x00)  # wood arrow cost
     rom.write_byte(0x180178, 0x32 if world.retro[player] else 0x00)  # silver arrow cost
     rom.write_byte(0x301FC, 0xDA if world.retro[player] else 0xE1)  # rupees replace arrows under pots
+    if enemized:
+        rom.write_byte(0x1B152e, 0xDA if world.retro[player] else 0xE1)
     rom.write_byte(0x30052, 0xDB if world.retro[player] else 0xE2) # replace arrows in fish prize from bottle merchant
     rom.write_bytes(0xECB4E, [0xA9, 0x00, 0xEA, 0xEA] if world.retro[player] else [0xAF, 0x77, 0xF3, 0x7E])  # Thief steals rupees instead of arrows
     rom.write_bytes(0xF0D96, [0xA9, 0x00, 0xEA, 0xEA] if world.retro[player] else [0xAF, 0x77, 0xF3, 0x7E])  # Pikit steals rupees instead of arrows

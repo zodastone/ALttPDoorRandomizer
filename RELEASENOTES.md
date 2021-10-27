@@ -18,6 +18,7 @@ CLI: ```--bombbag```
 * 0.5.1.5
 	* Fix for hard pool capacity upgrades missing
 	* Bonk Fairy (Light) is no longer in logic for ER Standard and is forbidden to be a connector, so rain state isn't exitable
+	* Bug fix for retro + enemizer and arrows appearing under pots
 * 0.5.1.4
 	* Revert quadrant glitch fix for baserom
 	* Fix for inverted
