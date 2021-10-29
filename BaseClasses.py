@@ -2396,6 +2396,7 @@ class Spoiler(object):
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'shuffle': self.world.shuffle,
+                         'shufflelinks': self.world.shufflelinks,
                          'door_shuffle': self.world.doorShuffle,
                          'intensity': self.world.intensity,
                          'item_pool': self.world.difficulty,
@@ -2470,6 +2471,7 @@ class Spoiler(object):
                 outfile.write('Difficulty:                      %s\n' % self.metadata['item_pool'][player])
                 outfile.write('Item Functionality:              %s\n' % self.metadata['item_functionality'][player])
                 outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'][player])
+                outfile.write(f"Link's House Shuffled:           {'Yes' if self.metadata['shufflelinks'][player] else 'No'}\n")
                 outfile.write('Door Shuffle:                    %s\n' % self.metadata['door_shuffle'][player])
                 outfile.write('Intensity:                       %s\n' % self.metadata['intensity'][player])
                 addition = ' (Random)' if self.world.crystals_gt_orig[player] == 'random' else ''
@@ -2669,7 +2671,7 @@ access_mode = {"items": 0, "locations": 1, "none": 2}
 boss_mode = {"none": 0, "simple": 1, "full": 2, "random": 3, "chaos": 3}
 enemy_mode = {"none": 0, "shuffled": 1, "random": 2, "chaos": 2, "legacy": 3}
 
-# byte 7: HHHD DP?? (enemy_health, enemy_dmg, potshuffle, ?)
+# byte 7: HHHD DPBS (enemy_health, enemy_dmg, potshuffle, bomb logic, shuffle links)
 e_health = {"default": 0, "easy": 1, "normal": 2, "hard": 3, "expert": 4}
 e_dmg = {"default": 0, "shuffled": 1, "random": 2}
 
@@ -2700,7 +2702,8 @@ class Settings(object):
             | (0x20 if w.mapshuffle[p] else 0) | (0x10 if w.compassshuffle[p] else 0)
             | (boss_mode[w.boss_shuffle[p]] << 2) | (enemy_mode[w.enemy_shuffle[p]]),
 
-            (e_health[w.enemy_health[p]] << 5) | (e_dmg[w.enemy_damage[p]] << 3) | (0x4 if w.potshuffle[p] else 0)])
+            (e_health[w.enemy_health[p]] << 5) | (e_dmg[w.enemy_damage[p]] << 3) | (0x4 if w.potshuffle[p] else 0)
+            | (0x2 if w.bombbag[p] else 0) | (1 if w.shufflelinks[p] else 0)])
         return base64.b64encode(code, "+-".encode()).decode()
 
     @staticmethod
@@ -2744,6 +2747,8 @@ class Settings(object):
         args.enemy_health[p] = r(e_health)[(settings[7] & 0xE0) >> 5]
         args.enemy_damage[p] = r(e_dmg)[(settings[7] & 0x18) >> 3]
         args.shufflepots[p] = True if settings[7] & 0x4 else False
+        args.bombbag[p] = True if settings[7] & 0x2 else False
+        args.shufflelinks[p] = True if settings[7] & 0x1 else False
 
 
 class KeyRuleType(FastEnum):
