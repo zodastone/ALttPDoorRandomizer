@@ -99,7 +99,8 @@ def get_weights(path):
         raise Exception(f'Failed to read weights file: {e}')
 
 def roll_settings(weights):
-    def get_choice(option, root=weights):
+    def get_choice(option, root=None):
+        root = weights if root is None else root
         if option not in root:
             return None
         if type(root[option]) is not dict:
@@ -113,6 +114,16 @@ def roll_settings(weights):
         if choice is None and default is not None:
             return default
         return choice
+
+    while True:
+        subweights = weights.get('subweights', {})
+        if len(subweights) == 0:
+            break
+        chances = ({k: int(v['chance']) for (k, v) in subweights.items()})
+        subweight_name = random.choices(list(chances.keys()), weights=list(chances.values()))[0]
+        subweights = weights.get('subweights', {}).get(subweight_name, {}).get('weights', {})
+        subweights['subweights'] = subweights.get('subweights', {})
+        weights = {**weights, **subweights}
 
     ret = argparse.Namespace()
 
