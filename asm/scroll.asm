@@ -168,7 +168,11 @@ ScrollX: ;change the X offset variables
 
     pla : sta $00
     sep #$30
-    lda $04 : sta $22
+    lda $04 : ldx $046d : bne .straight
+        sta $22 : bra +
+    .straight
+        sta $046d ; set X position later
+    +
     lda $00 : sta $23 : sta $0609 : sta $060d
     lda $01 : sta $a9
     lda $0e : asl : ora $ac : sta $ac

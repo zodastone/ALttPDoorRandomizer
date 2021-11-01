@@ -76,6 +76,9 @@ nop : jsl OverridePaletteHeader
 org $02817e ; Bank02.asm : 414 (LDA $02811E, X)
 jsl FixAnimatedTiles
 
+org $0aef43 ; UnderworldMap_RecoverGFX
+jsl FixCloseDungeonMap
+
 org $028a06 ; Bank02.asm : 1941 Dungeon_ResetTorchBackgroundAndPlayer
 JSL FixWallmasterLamp
 

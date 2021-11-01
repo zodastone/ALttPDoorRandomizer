@@ -45,6 +45,16 @@ FixAnimatedTiles:
 	+ LDA $02802E, X ; what we wrote over
 	RTL
 
+FixCloseDungeonMap:
+    LDA.l DRMode : CMP #$02 : BNE .vanilla
+	LDA $040C : BMI .vanilla
+        LSR : TAX
+        LDA.l DungeonTilesets,x
+        RTL
+    .vanilla
+    LDA $7EC20E
+    RTL
+
 FixWallmasterLamp:
 ORA $0458
 STY $1C : STA $1D : RTL ; what we wrote over
