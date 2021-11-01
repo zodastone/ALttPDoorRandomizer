@@ -364,6 +364,7 @@ def copy_world(world):
     ret.player_names = copy.deepcopy(world.player_names)
     ret.remote_items = world.remote_items.copy()
     ret.required_medallions = world.required_medallions.copy()
+    ret.bottle_refills = world.bottle_refills.copy()
     ret.swamp_patch_required = world.swamp_patch_required.copy()
     ret.ganon_at_pyramid = world.ganon_at_pyramid.copy()
     ret.powder_patch_required = world.powder_patch_required.copy()

@@ -1066,12 +1066,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     ])
 
     # set Fountain bottle exchange items
-    if world.difficulty[player] in ['hard', 'expert']:
-        rom.write_byte(0x348FF, [0x16, 0x2B, 0x2C, 0x2D, 0x3C, 0x48][random.randint(0, 5)])
-        rom.write_byte(0x3493B, [0x16, 0x2B, 0x2C, 0x2D, 0x3C, 0x48][random.randint(0, 5)])
-    else:
-        rom.write_byte(0x348FF, [0x16, 0x2B, 0x2C, 0x2D, 0x3C, 0x3D, 0x48][random.randint(0, 6)])
-        rom.write_byte(0x3493B, [0x16, 0x2B, 0x2C, 0x2D, 0x3C, 0x3D, 0x48][random.randint(0, 6)])
+    rom.write_byte(0x348FF, ItemFactory(world.bottle_refills[player][0], player).code)
+    rom.write_byte(0x3493B, ItemFactory(world.bottle_refills[player][1], player).code)
 
     #enable Fat Fairy Chests
     rom.write_bytes(0x1FC16, [0xB1, 0xC6, 0xF9, 0xC9, 0xC6, 0xF9])
