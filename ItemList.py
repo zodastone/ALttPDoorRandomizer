@@ -370,6 +370,15 @@ def generate_itempool(world, player):
     tr_medallion = ['Ether', 'Quake', 'Bombos'][random.randint(0, 2)]
     world.required_medallions[player] = (mm_medallion, tr_medallion)
 
+    # shuffle bottle refills
+    if world.difficulty[player] in ['hard', 'expert']:
+        waterfall_bottle = hardbottles[random.randint(0, 5)]
+        pyramid_bottle = hardbottles[random.randint(0, 5)]
+    else:
+        waterfall_bottle = normalbottles[random.randint(0, 6)]
+        pyramid_bottle = normalbottles[random.randint(0, 6)]
+    world.bottle_refills[player] = (waterfall_bottle, pyramid_bottle)
+
     set_up_shops(world, player)
 
     if world.retro[player]:

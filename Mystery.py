@@ -99,7 +99,8 @@ def get_weights(path):
         raise Exception(f'Failed to read weights file: {e}')
 
 def roll_settings(weights):
-    def get_choice(option, root=weights):
+    def get_choice(option, root=None):
+        root = weights if root is None else root
         if option not in root:
             return None
         if type(root[option]) is not dict:
@@ -114,13 +115,24 @@ def roll_settings(weights):
             return default
         return choice
 
+    while True:
+        subweights = weights.get('subweights', {})
+        if len(subweights) == 0:
+            break
+        chances = ({k: int(v['chance']) for (k, v) in subweights.items()})
+        subweight_name = random.choices(list(chances.keys()), weights=list(chances.values()))[0]
+        subweights = weights.get('subweights', {}).get(subweight_name, {}).get('weights', {})
+        subweights['subweights'] = subweights.get('subweights', {})
+        weights = {**weights, **subweights}
+
     ret = argparse.Namespace()
 
     glitches_required = get_choice('glitches_required')
-    if glitches_required not in ['none', 'no_logic']:
-        print("Only NMG and No Logic supported")
-        glitches_required = 'none'
-    ret.logic = {'none': 'noglitches', 'no_logic': 'nologic'}[glitches_required]
+    if glitches_required is not None:
+        if glitches_required not in ['none', 'no_logic']:
+            print("Only NMG and No Logic supported")
+            glitches_required = 'none'
+        ret.logic = {'none': 'noglitches', 'no_logic': 'nologic'}[glitches_required]
 
     item_placement = get_choice('item_placement')
     # not supported in ER
@@ -152,26 +164,27 @@ def roll_settings(weights):
     ret.standardize_palettes = get_choice('standardize_palettes') if 'standardize_palettes' in weights else 'standardize'
 
     goal = get_choice('goals')
-    ret.goal = {'ganon': 'ganon',
-                'fast_ganon': 'crystals',
-                'dungeons': 'dungeons',
-                'pedestal': 'pedestal',
-                'triforce-hunt': 'triforcehunt'
-                }[goal]
+    if goal is not None:
+        ret.goal = {'ganon': 'ganon',
+                    'fast_ganon': 'crystals',
+                    'dungeons': 'dungeons',
+                    'pedestal': 'pedestal',
+                    'triforce-hunt': 'triforcehunt'
+                    }[goal]
     ret.openpyramid = goal == 'fast_ganon' if ret.shuffle in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
 
     ret.crystals_gt = get_choice('tower_open')
 
     ret.crystals_ganon = get_choice('ganon_open')
-    
-    if ret.goal == 'triforcehunt':
-        goal_min = get_choice_default('triforce_goal_min', default=20)
-        goal_max = get_choice_default('triforce_goal_max', default=20)
-        pool_min = get_choice_default('triforce_pool_min', default=30)
-        pool_max = get_choice_default('triforce_pool_max', default=30)
-        ret.triforce_goal = random.randint(int(goal_min), int(goal_max))
-        min_diff = get_choice_default('triforce_min_difference', default=10)
-        ret.triforce_pool = random.randint(max(int(pool_min), ret.triforce_goal + int(min_diff)), int(pool_max))
+
+    goal_min = get_choice_default('triforce_goal_min', default=20)
+    goal_max = get_choice_default('triforce_goal_max', default=20)
+    pool_min = get_choice_default('triforce_pool_min', default=30)
+    pool_max = get_choice_default('triforce_pool_max', default=30)
+    ret.triforce_goal = random.randint(int(goal_min), int(goal_max))
+    min_diff = get_choice_default('triforce_min_difference', default=10)
+    ret.triforce_pool = random.randint(max(int(pool_min), ret.triforce_goal + int(min_diff)), int(pool_max))
+
     ret.mode = get_choice('world_state')
     if ret.mode == 'retro':
         ret.mode = 'open'
@@ -182,11 +195,13 @@ def roll_settings(weights):
 
     ret.hints = get_choice('hints') == 'on'
 
-    ret.swords = {'randomized': 'random',
-                  'assured': 'assured',
-                  'vanilla': 'vanilla',
-                  'swordless': 'swordless'
-                  }[get_choice('weapons')]
+    swords = get_choice('weapons')
+    if swords is not None:
+        ret.swords = {'randomized': 'random',
+                    'assured': 'assured',
+                    'vanilla': 'vanilla',
+                    'swordless': 'swordless'
+                    }[swords]
 
     ret.difficulty = get_choice('item_pool')
 

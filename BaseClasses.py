@@ -97,6 +97,7 @@ class World(object):
             set_player_attr('player_names', [])
             set_player_attr('remote_items', False)
             set_player_attr('required_medallions', ['Ether', 'Quake'])
+            set_player_attr('bottle_refills', ['Bottle (Green Potion)', 'Bottle (Green Potion)'])
             set_player_attr('swamp_patch_required', False)
             set_player_attr('powder_patch_required', False)
             set_player_attr('ganon_at_pyramid', True)
@@ -2272,6 +2273,7 @@ class Spoiler(object):
         self.doorTypes = {}
         self.lobbies = {}
         self.medallions = {}
+        self.bottles = {}
         self.playthrough = {}
         self.unreachables = []
         self.startinventory = []
@@ -2314,6 +2316,15 @@ class Spoiler(object):
             for player in range(1, self.world.players + 1):
                 self.medallions[f'Misery Mire ({self.world.get_player_names(player)})'] = self.world.required_medallions[player][0]
                 self.medallions[f'Turtle Rock ({self.world.get_player_names(player)})'] = self.world.required_medallions[player][1]
+
+        self.bottles = OrderedDict()
+        if self.world.players == 1:
+            self.bottles['Waterfall Bottle'] = self.world.bottle_refills[1][0]
+            self.bottles['Pyramid Bottle'] = self.world.bottle_refills[1][1]
+        else:
+            for player in range(1, self.world.players + 1):
+                self.bottles[f'Waterfall Bottle ({self.world.get_player_names(player)})'] = self.world.bottle_refills[player][0]
+                self.bottles[f'Pyramid Bottle ({self.world.get_player_names(player)})'] = self.world.bottle_refills[player][1]
 
         self.startinventory = list(map(str, self.world.precollected_items))
 
@@ -2435,6 +2446,7 @@ class Spoiler(object):
         out.update(self.locations)
         out['Starting Inventory'] = self.startinventory
         out['Special'] = self.medallions
+        out['Bottles'] = self.bottles
         if self.hashes:
             out['Hashes'] = {f"{self.world.player_names[player][team]} (Team {team+1})": hash for (player, team), hash in self.hashes.items()}
         if self.shops:
@@ -2521,6 +2533,9 @@ class Spoiler(object):
             outfile.write('\n\nMedallions:\n')
             for dungeon, medallion in self.medallions.items():
                 outfile.write(f'\n{dungeon}: {medallion} Medallion')
+            outfile.write('\n\nBottle Refills:\n')
+            for fairy, bottle in self.bottles.items():
+                outfile.write(f'\n{fairy}: {bottle}')
             if self.startinventory:
                 outfile.write('\n\nStarting Inventory:\n\n')
                 outfile.write('\n'.join(self.startinventory))
