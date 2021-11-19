@@ -762,9 +762,12 @@ def balance_money_progression(world):
                 if sphere_costs[player] > 0 and sphere_costs[player] > wallet[player]:
                     insolvent.add(player)
             if len([p for p in solvent if len(locked_by_money[p]) > 0]) == 0:
-                target_player = min(insolvent, key=lambda p: sphere_costs[p]-wallet[p])
-                difference = sphere_costs[target_player]-wallet[target_player]
-                logger.debug(f'Money balancing needed: Player {target_player} short {difference}')
+                if len(insolvent) > 0:
+                    target_player = min(insolvent, key=lambda p: sphere_costs[p]-wallet[p])
+                    difference = sphere_costs[target_player]-wallet[target_player]
+                    logger.debug(f'Money balancing needed: Player {target_player} short {difference}')
+                else:
+                    difference = 0
                 while difference > 0:
                     swap_targets = [x for x in unchecked_locations if x not in sphere_locations and x.item.name.startswith('Rupees') and x.item.player == target_player]
                     if len(swap_targets) == 0:
