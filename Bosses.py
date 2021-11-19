@@ -32,7 +32,7 @@ def LanmolasDefeatRule(state, player):
         state.has('Fire Rod', player) or
         state.has('Ice Rod', player) or
         state.has('Cane of Somaria', player) or
-        state.has('Cane of Byrna', player) or
+        (state.has('Cane of Byrna', player) and state.can_use_bombs(player)) or
         state.can_shoot_arrows(player))
 
 def MoldormDefeatRule(state, player):
@@ -51,7 +51,7 @@ def ArrghusDefeatRule(state, player):
         return True
 
     return ((state.has('Fire Rod', player) and (state.can_shoot_arrows(player) or state.can_extend_magic(player, 12))) or #assuming mostly gitting two puff with one shot
-            (state.has('Ice Rod', player) and (state.can_shoot_arrows(player) or state.can_extend_magic(player, 16))))
+            (state.has('Ice Rod', player) and state.can_use_bombs(player) and (state.can_shoot_arrows(player) or state.can_extend_magic(player, 16))))
 
 
 def MothulaDefeatRule(state, player):
@@ -92,7 +92,7 @@ def KholdstareDefeatRule(state, player):
     )
 
 def VitreousDefeatRule(state, player):
-    return state.can_shoot_arrows(player) or state.has_blunt_weapon(player)
+    return (state.can_shoot_arrows(player) and state.can_use_bombs(player)) or state.has_blunt_weapon(player)
 
 def TrinexxDefeatRule(state, player):
     if not (state.has('Fire Rod', player) and state.has('Ice Rod', player)):
