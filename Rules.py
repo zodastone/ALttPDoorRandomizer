@@ -274,9 +274,11 @@ def global_rules(world, player):
     set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: state.has('Hammer', player))
     for entrance in ['Thieves Basement Block Path', 'Thieves Blocked Entry Path', 'Thieves Conveyor Block Path', 'Thieves Conveyor Bridge Block Path']:
         set_rule(world.get_entrance(entrance, player), lambda state: state.can_lift_rocks(player))
-    for location in ['Thieves\' Town - Blind\'s Cell', 'Thieves\' Town - Boss']:
-        forbid_item(world.get_location(location, player), 'Big Key (Thieves Town)', player)
-    forbid_item(world.get_location('Thieves\' Town - Blind\'s Cell', player), 'Big Key (Thieves Town)', player)
+
+    # I think these rules are unnecessary now - testing needed
+    # for location in ['Thieves\' Town - Blind\'s Cell', 'Thieves\' Town - Boss']:
+    #     forbid_item(world.get_location(location, player), 'Big Key (Thieves Town)', player)
+    # forbid_item(world.get_location('Thieves\' Town - Blind\'s Cell', player), 'Big Key (Thieves Town)', player)
     for location in ['Suspicious Maiden', 'Thieves\' Town - Blind\'s Cell']:
         set_rule(world.get_location(location, player), lambda state: state.has('Big Key (Thieves Town)', player))
     set_rule(world.get_location('Revealing Light', player), lambda state: state.has('Shining Light', player) and state.has('Maiden Rescued', player))
@@ -712,7 +714,8 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Broken Bridge (East)', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('East Death Mountain Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Fairy Ascension Rocks', player), lambda state: state.can_lift_heavy_rocks(player))
-    set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: state.has('Mirror', player))  # can erase block
+    # can erase block - overridden in noglitches
+    set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Death Mountain (Top)', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Turtle Rock Teleporter', player), lambda state: state.can_lift_heavy_rocks(player) and state.has('Hammer', player))
     set_rule(world.get_entrance('East Death Mountain (Top)', player), lambda state: state.has('Hammer', player))
@@ -849,7 +852,8 @@ def inverted_rules(world, player):
     set_rule(world.get_entrance('Broken Bridge (East)', player), lambda state: state.has('Hookshot', player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Dark Death Mountain Teleporter (East Bottom)', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Fairy Ascension Rocks', player), lambda state: state.can_lift_heavy_rocks(player) and state.has_Pearl(player))
-    set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: state.has('Mirror', player))  # can erase block
+    # can erase block - overridden in noglitches
+    set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Death Mountain (Top)', player), lambda state: state.has('Hammer', player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Dark Death Mountain Teleporter (East)', player), lambda state: state.can_lift_heavy_rocks(player) and state.has('Hammer', player) and state.has_Pearl(player))  # bunny cannot use hammer
     set_rule(world.get_entrance('East Death Mountain (Top)', player), lambda state: state.has('Hammer', player) and state.has_Pearl(player))  # bunny can not use hammer
