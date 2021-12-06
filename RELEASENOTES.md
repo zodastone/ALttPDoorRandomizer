@@ -15,6 +15,10 @@ CLI: ```--bombbag```
 
 # Bug Fixes and Notes.
 
+* 0.5.1.6
+	* Rules fixes for TT (Boss and Cell) can now have TT Big Key if not otherwise required (boss shuffle + crossed dungeon)
+	* BUg fix for money balancing
+	* Add some bomb assumptions for bosses in bombbag mode
 * 0.5.1.5
 	* Fix for hard pool capacity upgrades missing
 	* Bonk Fairy (Light) is no longer in logic for ER Standard and is forbidden to be a connector, so rain state isn't exitable
