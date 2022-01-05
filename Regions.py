@@ -957,6 +957,7 @@ def create_shops(world, player):
         if world.mode[player] == 'inverted' and region_name == 'Dark Lake Hylia Shop':
             locked = True
             inventory = [('Blue Potion', 160), ('Blue Shield', 50), ('Bombs (10)', 50)]
+            custom = True
         region = world.get_region(region_name, player)
         shop = Shop(region, room_id, type, shopkeeper, custom, locked, sram)
         region.shop = shop
