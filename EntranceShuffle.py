@@ -109,6 +109,7 @@ def link_entrances(world, player):
             links_house_doors = [i for i in LW_Single_Cave_Doors if i not in Isolated_LH_Doors_Open]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in bomb_shop_doors:
             bomb_shop_doors.remove(links_house)
         if links_house in blacksmith_doors:
@@ -173,6 +174,7 @@ def link_entrances(world, player):
             links_house_doors = [i for i in lw_entrances if i not in Isolated_LH_Doors_Open]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in lw_entrances:
             lw_entrances.remove(links_house)
 
@@ -337,6 +339,7 @@ def link_entrances(world, player):
             links_house_doors = [i for i in lw_entrances + lw_must_exits if i not in Isolated_LH_Doors_Open]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in lw_entrances:
             lw_entrances.remove(links_house)
         if links_house in lw_must_exits:
@@ -467,6 +470,7 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in links_house_doors if i not in exclusions]
             links_house = random.choice(list(links_house_doors))
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in entrances:
             entrances.remove(links_house)
         elif links_house in must_exits:
@@ -937,6 +941,7 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in links_house_doors if i not in exclusions]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         exit_pool.remove(links_house)
         doors.remove(links_house)
 
@@ -1301,6 +1306,7 @@ def link_inverted_entrances(world, player):
             links_house_doors = [i for i in DW_Single_Cave_Doors if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Inverted Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in bomb_shop_doors:
             bomb_shop_doors.remove(links_house)
         if links_house in blacksmith_doors:
@@ -1381,6 +1387,7 @@ def link_inverted_entrances(world, player):
             links_house_doors = [i for i in dw_entrances if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Inverted Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in dw_entrances:
             dw_entrances.remove(links_house)
 
@@ -1510,6 +1517,7 @@ def link_inverted_entrances(world, player):
             links_house_doors = [i for i in dw_entrances if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Inverted Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in dw_entrances:
             dw_entrances.remove(links_house)
 
@@ -1647,6 +1655,7 @@ def link_inverted_entrances(world, player):
             links_house_doors = [i for i in entrances + must_exits if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Inverted Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in entrances:
             entrances.remove(links_house)
         elif links_house in must_exits:
@@ -1780,6 +1789,7 @@ def link_inverted_entrances(world, player):
             links_house_doors = [i for i in doors if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Inverted Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         doors.remove(links_house)
         exit_pool.remove(links_house)
 
@@ -3329,7 +3339,6 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('EDDM Flute', 'The Sky'),
                                   ('Dark Grassy Lawn Flute', 'The Sky'),
                                   ('Hammer Peg Area Flute', 'The Sky'),
-                                  ('Chris Houlihan Room Exit', 'Pyramid Ledge'),
                                   ('Bush Covered Lawn Inner Bushes', 'Light World'),
                                   ('Bush Covered Lawn Outer Bushes', 'Bush Covered Lawn'),
                                   ('Bush Covered Lawn Mirror Spot', 'Dark Grassy Lawn'),

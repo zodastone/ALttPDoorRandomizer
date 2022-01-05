@@ -16,9 +16,12 @@ CLI: ```--bombbag```
 # Bug Fixes and Notes.
 
 * 0.5.1.7
+	* Baserom update
 	* Fix for Inverted Mode: Dark Lake Hylia shop defaults to selling a blue potion
 	* Fix for Ijwu's enemizer: Boss door in Thieves' Town no longer closes after the maiden hint if Blind is shuffled to Theives' Town in boss shuffle + crossed mode
 	* No logic now sets the AllowAccidentalMajorGlitches flag in the rom appropriately
+	* Houlihan room now exits wherever Link's House is shuffled to
+	* Rom fixes from Catobat and Codemann8. Thanks!
 * 0.5.1.6
 	* Rules fixes for TT (Boss and Cell) can now have TT Big Key if not otherwise required (boss shuffle + crossed dungeon)
 	* BUg fix for money balancing
