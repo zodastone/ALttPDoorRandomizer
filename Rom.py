@@ -28,9 +28,11 @@ from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_
 from Items import ItemFactory
 from EntranceShuffle import door_addresses, exit_ids
 
+from source.classes.SFX import randomize_sfx
+
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '988f1546b14d8f2e6ee30b9de44882da'
+RANDOMIZERBASEHASH = '5112ddd931bda3d9979097bc39a5e768'
 
 
 class JsonRom(object):
@@ -86,10 +88,12 @@ class LocalRom(object):
         self.name = name
         self.hash = hash
         self.orig_buffer = None
+        self.file = file
+        self.has_smc_header = False
         if not os.path.isfile(file):
             raise RuntimeError("Could not find valid local base rom for patching at expected path %s." % file)
         with open(file, 'rb') as stream:
-            self.buffer = read_rom(stream)
+            self.buffer, self.has_smc_header = read_rom(stream)
         if patch:
             self.patch_base_rom()
             self.orig_buffer = self.buffer.copy()
@@ -98,8 +102,7 @@ class LocalRom(object):
         self.buffer[address] = value
 
     def write_bytes(self, startaddress, values):
-        for i, value in enumerate(values):
-            self.write_byte(startaddress + i, value)
+        self.buffer[startaddress:startaddress + len(values)] = values
 
     def write_to_file(self, file):
         with open(file, 'wb') as outfile:
@@ -187,12 +190,21 @@ def write_int32s(rom, startaddress, values):
 def read_rom(stream):
     "Reads rom into bytearray and strips off any smc header"
     buffer = bytearray(stream.read())
+    has_smc_header = False
     if len(buffer)%0x400 == 0x200:
         buffer = buffer[0x200:]
-    return buffer
+        has_smc_header = True
+    return buffer, has_smc_header
 
-def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_on_hit):
-    baserom_path = os.path.abspath(baserom_path)
+def patch_enemizer(world, player, rom, local_rom, enemizercli, random_sprite_on_hit):
+    baserom_path = os.path.abspath(local_rom.file)
+    unheadered_path = None
+    if local_rom.has_smc_header:
+        headered_path = baserom_path
+        unheadered_path = baserom_path = os.path.abspath(output_path('unheadered_rom.sfc'))
+        with open(headered_path, 'rb') as headered:
+            with open(baserom_path, 'wb') as unheadered:
+                unheadered.write(headered.read()[0x200:])
     basepatch_path = os.path.abspath(local_path(os.path.join("data","base2current.json")))
     enemizer_basepatch_path = os.path.join(os.path.dirname(enemizercli), "enemizerBasePatch.json")
     randopatch_path = os.path.abspath(output_path('enemizer_randopatch.json'))
@@ -321,6 +333,7 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
         rom.write_bytes(0xEA081, [0x5c, 0x00, 0x80, 0xb7, 0xc9, 0x6, 0xf0, 0x24,
                                   0xad, 0x3, 0x4, 0x29, 0x20, 0xf0, 0x1d])
         rom.write_byte(0x200101, 0)  # Do not close boss room door on entry.
+        rom.write_byte(0x1B0101, 0)  # Do not close boss room door on entry. (for Ijwu's enemizer)
 
     if random_sprite_on_hit:
         _populate_sprite_table()
@@ -335,6 +348,12 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
                 rom.write_bytes(0x300000 + (i * 0x8000), sprite.sprite)
                 rom.write_bytes(0x307000 + (i * 0x8000), sprite.palette)
                 rom.write_bytes(0x307078 + (i * 0x8000), sprite.glove_palette)
+
+    if local_rom.has_smc_header:
+        try:
+            os.remove(unheadered_path)
+        except OSError:
+            pass
 
     try:
         os.remove(randopatch_path)
@@ -653,11 +672,25 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         dr_flags |= DROptions.Debug
     if world.doorShuffle[player] == 'crossed' and world.logic[player] != 'nologic'\
        and world.mixed_travel[player] == 'prevent':
-        dr_flags |= DROptions.Rails
+        # PoD Falling Bridge or Hammjump
+        # 1FA607: db $2D, $79, $69 ; 0x0069: Vertical Rail ↕ | { 0B, 1E } | Size: 05
+        # 1FA60A: db $14, $99, $5D ; 0x005D: Large Horizontal Rail ↔ | { 05, 26 } | Size: 01
+        rom.write_bytes(0xfa607, [0x2d, 0x79, 0x69, 0x14, 0x99, 0x5d])
+        # PoD Arena
+        # 1FA573: db $D4, $B2, $22 ; 0x0022: Horizontal Rail ↔ | { 35, 2C } | Size: 02
+        # 1FA576: db $D4, $CE, $22 ; 0x0022: Horizontal Rail ↔ | { 35, 33 } | Size: 01
+        # 1FA579: db $D9, $AE, $69 ; 0x0069: Vertical Rail ↕ | { 36, 2B } | Size: 06
+        rom.write_bytes(0xfa573, [0xd4, 0xb2, 0x22, 0xd4, 0xce, 0x22, 0xd9, 0xae, 0x69])
+        # Mire BK Pond
+        # 1FB1FC: db $C8, $9D, $69 ; 0x0069: Vertical Rail ↕ | { 32, 27 } | Size: 01
+        # 1FB1FF: db $B4, $AC, $5D ; 0x005D: Large Horizontal Rail ↔ | { 2D, 2B } | Size: 00
+        rom.write_bytes(0xfb1fc, [0xc8, 0x9d, 0x69, 0xb4, 0xac, 0x5d])
     if world.standardize_palettes[player] == 'original':
         dr_flags |= DROptions.OriginalPalettes
     if world.experimental[player]:
         dr_flags |= DROptions.DarkWorld_Spawns
+    if world.logic[player] != 'nologic':
+        dr_flags |= DROptions.Fix_EG
 
 
     # fix hc big key problems (map and compass too)
@@ -724,13 +757,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
         rom.write_bytes(paired_door.address_b(world, player), paired_door.rom_data_b(world, player))
     if world.doorShuffle[player] != 'vanilla':
-        if not world.experimental[player]:
-            for builder in world.dungeon_layouts[player].values():
-                for stonewall in builder.pre_open_stonewalls:
-                    if stonewall.name == 'Desert Wall Slide NW':
-                        dr_flags |= DROptions.Open_Desert_Wall
-                    elif stonewall.name == 'PoD Bow Statue Down Ladder':
-                        dr_flags |= DROptions.Open_PoD_Wall
         for name, pair in boss_indicator.items():
             dungeon_id, boss_door = pair
             opposite_door = world.get_door(boss_door, player).dest
@@ -1032,7 +1058,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x184000, [
         # original_item, limit, replacement_item, filler
         0x12, 0x01, 0x35, 0xFF, # lamp -> 5 rupees
-        0x51, 0x06, 0x52, 0xFF, # 6 +5 bomb upgrades -> +10 bomb upgrade
+        0x51, 0x00 if world.bombbag[player] else 0x06, 0x31 if world.bombbag[player] else 0x52, 0xFF, # 6 +5 bomb upgrades -> +10 bomb upgrade. If bombbag -> turns into Bombs (10)
         0x53, 0x06, 0x54, 0xFF, # 6 +5 arrow upgrades -> +10 arrow upgrade
         0x58, 0x01, 0x36 if world.retro[player] else 0x43, 0xFF, # silver arrows -> single arrow (red 20 in retro mode)
         0x3E, difficulty.boss_heart_container_limit, 0x47, 0xff, # boss heart -> green 20
@@ -1041,12 +1067,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     ])
 
     # set Fountain bottle exchange items
-    if world.difficulty[player] in ['hard', 'expert']:
-        rom.write_byte(0x348FF, [0x16, 0x2B, 0x2C, 0x2D, 0x3C, 0x48][random.randint(0, 5)])
-        rom.write_byte(0x3493B, [0x16, 0x2B, 0x2C, 0x2D, 0x3C, 0x48][random.randint(0, 5)])
-    else:
-        rom.write_byte(0x348FF, [0x16, 0x2B, 0x2C, 0x2D, 0x3C, 0x3D, 0x48][random.randint(0, 6)])
-        rom.write_byte(0x3493B, [0x16, 0x2B, 0x2C, 0x2D, 0x3C, 0x3D, 0x48][random.randint(0, 6)])
+    rom.write_byte(0x348FF, ItemFactory(world.bottle_refills[player][0], player).code)
+    rom.write_byte(0x3493B, ItemFactory(world.bottle_refills[player][1], player).code)
 
     #enable Fat Fairy Chests
     rom.write_bytes(0x1FC16, [0xB1, 0xC6, 0xF9, 0xC9, 0xC6, 0xF9])
@@ -1169,7 +1191,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     equip[0x36C] = 0x18
     equip[0x36D] = 0x18
     equip[0x379] = 0x68
-    starting_max_bombs = 10
+    if world.bombbag[player]:
+        starting_max_bombs = 0
+    else:
+        starting_max_bombs = 10
     starting_max_arrows = 30
 
     startingstate = CollectionState(world)
@@ -1426,6 +1451,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x180176, 0x0A if world.retro[player] else 0x00)  # wood arrow cost
     rom.write_byte(0x180178, 0x32 if world.retro[player] else 0x00)  # silver arrow cost
     rom.write_byte(0x301FC, 0xDA if world.retro[player] else 0xE1)  # rupees replace arrows under pots
+    if enemized:
+        rom.write_byte(0x1B152e, 0xDA if world.retro[player] else 0xE1)
     rom.write_byte(0x30052, 0xDB if world.retro[player] else 0xE2) # replace arrows in fish prize from bottle merchant
     rom.write_bytes(0xECB4E, [0xA9, 0x00, 0xEA, 0xEA] if world.retro[player] else [0xAF, 0x77, 0xF3, 0x7E])  # Thief steals rupees instead of arrows
     rom.write_bytes(0xF0D96, [0xA9, 0x00, 0xEA, 0xEA] if world.retro[player] else [0xAF, 0x77, 0xF3, 0x7E])  # Pikit steals rupees instead of arrows
@@ -1436,6 +1463,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x1800A3, 0x01)  # enable correct world setting behaviour after agahnim kills
     rom.write_byte(0x1800A4, 0x01 if world.logic[player] != 'nologic' else 0x00)  # enable POD EG fix
     rom.write_byte(0x180042, 0x01 if world.save_and_quit_from_boss else 0x00)  # Allow Save and Quit after boss kill
+    rom.write_byte(0x180358, 0x01 if world.logic[player] == 'nologic' else 0x00)
 
     # remove shield from uncle
     rom.write_bytes(0x6D253, [0x00, 0x00, 0xf6, 0xff, 0x00, 0x0E])
@@ -1461,7 +1489,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             rom.write_bytes(0x180188, [0, 0, 10])  # Zelda respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x18018B, [0, 0, 10])  # Mantle respawn refills (magic, bombs, arrows)
             bow_max, bow_small = 70, 10
-        elif uncle_location.item is not None and uncle_location.item.name in ['Bombs (10)']:
+        elif uncle_location.item is not None and uncle_location.item.name in ['Bomb Upgrade (+10)' if world.bombbag[player] else 'Bombs (10)']:
             rom.write_byte(0x18004E, 2)  # Escape Fill (bombs)
             rom.write_bytes(0x180185, [0, 50, 0])  # Uncle respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x180188, [0, 3, 0])  # Zelda respawn refills (magic, bombs, arrows)
@@ -1591,13 +1619,16 @@ def write_custom_shops(rom, world, player):
                 loc_item = ItemFactory(item['item'], player)
             if (not world.shopsanity[player] and shop.region.name == 'Capacity Upgrade'
                and world.difficulty[player] != 'normal'):
-                continue  # skip cap upgrades except in normal/shopsanity
-            item_id = loc_item.code
-            price = int16_as_bytes(item['price'])
-            replace = ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF
-            replace_price = int16_as_bytes(item['replacement_price'])
+                # really should be 5A instead of B0 -- surprise!!!
+                item_id, price, replace, replace_price, item_max = 0xB0, [0, 0], 0xFF, [0, 0], 1
+            else:
+                item_id = loc_item.code
+                price = int16_as_bytes(item['price'])
+                replace = ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF
+                replace_price = int16_as_bytes(item['replacement_price'])
+                item_max = item['max']
             item_player = 0 if item['player'] == player else item['player']
-            item_data = [shop_id,  item_id] + price + [item['max'], replace] + replace_price + [item_player]
+            item_data = [shop_id,  item_id] + price + [item_max, replace] + replace_price + [item_player]
             items_data.extend(item_data)
 
     rom.write_bytes(0x184800, shop_data)
@@ -1625,7 +1656,7 @@ def hud_format_text(text):
 
 
 def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite,
-                       ow_palettes, uw_palettes, reduce_flashing):
+                       ow_palettes, uw_palettes, reduce_flashing, shuffle_sfx):
 
     if not os.path.exists("data/sprites/official/001.link.1.zspr") and rom.orig_buffer:
         dump_zspr(rom.orig_buffer[0x80000:0x87000], rom.orig_buffer[0xdd308:0xdd380],
@@ -1727,6 +1758,9 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
         randomize_uw_palettes(rom)
     elif uw_palettes == 'blackout':
         blackout_uw_palettes(rom)
+
+    if shuffle_sfx:
+        randomize_sfx(rom)
 
     if isinstance(rom, LocalRom):
         rom.write_crc()
@@ -2275,6 +2309,12 @@ def set_inverted_mode(world, player, rom):
     write_int16(rom, snes_to_pc(0x02E8D5), 0x07C8)
     write_int16(rom, snes_to_pc(0x02E8F7), 0x01F8)
     rom.write_byte(snes_to_pc(0x08D40C), 0xD0)  # morph proof
+    rom.write_byte(snes_to_pc(0x1BC428), 0x00)  # remove diggable light world portals
+    rom.write_byte(snes_to_pc(0x1BC43A), 0x00)
+    rom.write_byte(snes_to_pc(0x1BC590), 0x00)
+    rom.write_byte(snes_to_pc(0x1BC5A1), 0x00)
+    rom.write_byte(snes_to_pc(0x1BC5B1), 0x00)
+    rom.write_byte(snes_to_pc(0x1BC5C7), 0x00)
     # the following bytes should only be written in vanilla
     # or they'll overwrite the randomizer's shuffles
     if world.shuffle[player] == 'vanilla':
@@ -2771,7 +2811,7 @@ def write_pots_to_rom(rom, pot_contents):
             pots = [pot for pot in pot_contents[i] if pot.item != PotItem.Nothing]
             if len(pots) > 0:
                 write_int16(rom, pot_item_room_table_lookup + 2*i, n)
-                rom.write_bytes(n, itertools.chain(*((pot.x,pot.y,pot.item) for pot in pots)))
+                rom.write_bytes(n, list(itertools.chain.from_iterable(((pot.x, pot.y, pot.item) for pot in pots))))
                 n += 3*len(pots) + 2
                 rom.write_bytes(n - 2, [0xFF,0xFF])
             else:

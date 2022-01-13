@@ -16,6 +16,9 @@
   pot_shuffle:
     on: 1
     off: 3
+  bombbag:
+    on: 1
+    off: 4
   entrance_shuffle:
     none: 15
     dungeonssimple: 3
@@ -132,3 +135,6 @@
       half: 0
       quarter: 1
       off: 0
+    shuffle_sfx:
+      on: 1
+      off: 1

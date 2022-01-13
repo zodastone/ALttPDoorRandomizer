@@ -35,11 +35,7 @@ rtl
 
 OnFileLoadOverride:
     jsl OnFileLoad ; what I wrote over
-    lda.l DRFlags : and #$80 : beq +  ;flag is off
-        lda $7ef086 : ora #$80 : sta $7ef086
-    + lda.l DRFlags : and #$40 : beq +  ;flag is off
-        lda $7ef036 : ora #$80 : sta $7ef036
-    + lda.l DRFlags : and #$02 : beq +
+    + lda.l DRFlags : and #$02 : beq + ; Mirror Scroll
         lda $7ef353 : bne +
             lda #$01 : sta $7ef353
 + rtl
@@ -50,6 +46,12 @@ MirrorCheckOverride:
     ++ lda $8A : and #$40 ; what I wrote over
     rtl
     + lda.l DRScroll : rtl
+
+EGFixOnMirror:
+	lda.l DRFlags : and #$10 : beq +
+		stz $047a
+	+ jsl Mirror_SaveRoomData
+	rtl
 
 BlockEraseFix:
     lda $7ef353 : and #$02 : beq +

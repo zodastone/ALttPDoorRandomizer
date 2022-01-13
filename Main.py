@@ -10,6 +10,7 @@ import time
 import zlib
 
 from BaseClasses import World, CollectionState, Item, Region, Location, Shop, Entrance, Settings
+from Bosses import place_bosses
 from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
 from OverworldGlitchRules import create_owg_connections
@@ -28,14 +29,24 @@ from Fill import sell_potions, sell_keys, balance_multiworld_progression, balanc
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.4.1-dev'
+__version__ = '1.0.0-dev'
+
+from source.classes.BabelFish import BabelFish
 
 
 class EnemizerError(RuntimeError):
     pass
 
 
+def check_python_version():
+    import sys
+    version = sys.version_info
+    if version.major < 3 or version.minor < 7:
+        logging.warning(BabelFish().translate("cli","cli","old.python.version"), sys.version)
+
+
 def main(args, seed=None, fish=None):
+    check_python_version()
     if args.outputpath:
         os.makedirs(args.outputpath, exist_ok=True)
         output_path.cached_path = args.outputpath
@@ -69,6 +80,7 @@ def main(args, seed=None, fish=None):
     world.compassshuffle = args.compassshuffle.copy()
     world.keyshuffle = args.keyshuffle.copy()
     world.bigkeyshuffle = args.bigkeyshuffle.copy()
+    world.bombbag = args.bombbag.copy()
     world.crystals_needed_for_ganon = {player: random.randint(0, 7) if args.crystals_ganon[player] == 'random' else int(args.crystals_ganon[player]) for player in range(1, world.players + 1)}
     world.crystals_needed_for_gt = {player: random.randint(0, 7) if args.crystals_gt[player] == 'random' else int(args.crystals_gt[player]) for player in range(1, world.players + 1)}
     world.crystals_ganon_orig = args.crystals_ganon.copy()
@@ -135,6 +147,7 @@ def main(args, seed=None, fish=None):
         create_rooms(world, player)
         create_dungeons(world, player)
         adjust_locations(world, player)
+        place_bosses(world, player)
 
     if any(world.potshuffle.values()):
         logger.info(world.fish.translate("cli", "cli", "shuffling.pots"))
@@ -233,7 +246,7 @@ def main(args, seed=None, fish=None):
         balance_multiworld_progression(world)
 
     # if we only check for beatable, we can do this sanity check first before creating the rom
-    if not world.can_beat_game():
+    if not world.can_beat_game(log_error=True):
         raise RuntimeError(world.fish.translate("cli","cli","cannot.beat.game"))
 
     for player in range(1, world.players+1):
@@ -258,11 +271,11 @@ def main(args, seed=None, fish=None):
                 rom = JsonRom() if args.jsonout or use_enemizer else LocalRom(args.rom)
 
                 if use_enemizer and (args.enemizercli or not args.jsonout):
-                    base_patch = LocalRom(args.rom)  # update base2current.json (side effect)
+                    local_rom = LocalRom(args.rom)  # update base2current.json (side effect)
                     if args.rom and not(os.path.isfile(args.rom)):
                         raise RuntimeError("Could not find valid base rom for enemizing at expected path %s." % args.rom)
                     if os.path.exists(args.enemizercli):
-                        patch_enemizer(world, player, rom, args.rom, args.enemizercli, sprite_random_on_hit)
+                        patch_enemizer(world, player, rom, local_rom, args.enemizercli, sprite_random_on_hit)
                         enemized = True
                         if not args.jsonout:
                             rom = LocalRom.fromJsonRom(rom, args.rom, 0x400000)
@@ -282,7 +295,8 @@ def main(args, seed=None, fish=None):
 
                 apply_rom_settings(rom, args.heartbeep[player], args.heartcolor[player], args.quickswap[player],
                                    args.fastmenu[player], args.disablemusic[player], args.sprite[player],
-                                   args.ow_palettes[player], args.uw_palettes[player], args.reduce_flashing[player])
+                                   args.ow_palettes[player], args.uw_palettes[player], args.reduce_flashing[player],
+                                   args.shuffle_sfx[player])
 
                 if args.jsonout:
                     jsonout[f'patch_t{team}_p{player}'] = rom.patches
@@ -350,6 +364,7 @@ def copy_world(world):
     ret.player_names = copy.deepcopy(world.player_names)
     ret.remote_items = world.remote_items.copy()
     ret.required_medallions = world.required_medallions.copy()
+    ret.bottle_refills = world.bottle_refills.copy()
     ret.swamp_patch_required = world.swamp_patch_required.copy()
     ret.ganon_at_pyramid = world.ganon_at_pyramid.copy()
     ret.powder_patch_required = world.powder_patch_required.copy()
@@ -372,6 +387,7 @@ def copy_world(world):
     ret.compassshuffle = world.compassshuffle.copy()
     ret.keyshuffle = world.keyshuffle.copy()
     ret.bigkeyshuffle = world.bigkeyshuffle.copy()
+    ret.bombbag = world.bombbag.copy()
     ret.crystals_needed_for_ganon = world.crystals_needed_for_ganon.copy()
     ret.crystals_needed_for_gt = world.crystals_needed_for_gt.copy()
     ret.crystals_ganon_orig = world.crystals_ganon_orig.copy()
@@ -388,6 +404,8 @@ def copy_world(world):
     ret.keydropshuffle = world.keydropshuffle.copy()
     ret.mixed_travel = world.mixed_travel.copy()
     ret.standardize_palettes = world.standardize_palettes.copy()
+
+    ret.exp_cache = world.exp_cache.copy()
 
     for player in range(1, world.players + 1):
         if world.mode[player] != 'inverted':
@@ -448,6 +466,7 @@ def copy_world(world):
         # these need to be modified properly by set_rules
         new_location.access_rule = lambda state: True
         new_location.item_rule = lambda state: True
+        new_location.forced_item = location.forced_item
 
     # copy remaining itempool. No item in itempool should have an assigned location
     for item in world.itempool:
@@ -525,11 +544,11 @@ def create_playthrough(world):
     while sphere_candidates:
         state.sweep_for_events(key_only=True)
 
-        sphere = []
+        sphere = set()
         # build up spheres of collection radius. Everything in each sphere is independent from each other in dependencies and only depends on lower spheres
         for location in sphere_candidates:
             if state.can_reach(location) and state.not_flooding_a_key(world, location):
-                sphere.append(location)
+                sphere.add(location)
 
         for location in sphere:
             sphere_candidates.remove(location)
@@ -550,21 +569,24 @@ def create_playthrough(world):
 
     # in the second phase, we cull each sphere such that the game is still beatable, reducing each range of influence to the bare minimum required inside it
     for num, sphere in reversed(list(enumerate(collection_spheres))):
-        to_delete = []
+        to_delete = set()
         for location in sphere:
             # we remove the item at location and check if game is still beatable
             logging.getLogger('').debug('Checking if %s (Player %d) is required to beat the game.', location.item.name, location.item.player)
             old_item = location.item
             location.item = None
+            # todo: this is not very efficient, but I'm not sure how else to do it for this backwards logic
+            # world.clear_exp_cache()
             if world.can_beat_game(state_cache[num]):
-                to_delete.append(location)
+                # logging.getLogger('').debug(f'{old_item.name} (Player {old_item.player}) is not required')
+                to_delete.add(location)
             else:
                 # still required, got to keep it around
+                # logging.getLogger('').debug(f'{old_item.name} (Player {old_item.player}) is required')
                 location.item = old_item
 
         # cull entries in spheres for spoiler walkthrough at end
-        for location in to_delete:
-            sphere.remove(location)
+        sphere -= to_delete
 
     # second phase, sphere 0
     for item in [i for i in world.precollected_items if i.advancement]:
@@ -580,7 +602,7 @@ def create_playthrough(world):
     # used to access it was deemed not required.) So we need to do one final sphere collection pass
     # to build up the correct spheres
 
-    required_locations = [item for sphere in collection_spheres for item in sphere]
+    required_locations = {item for sphere in collection_spheres for item in sphere}
     state = CollectionState(world)
     collection_spheres = []
     while required_locations:
@@ -596,7 +618,10 @@ def create_playthrough(world):
 
         logging.getLogger('').debug(world.fish.translate("cli","cli","building.final.spheres"), len(collection_spheres), len(sphere), len(required_locations))
         if not sphere:
-            raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.required"))
+            if world.has_beaten_game(state):
+                required_locations.clear()
+            else:
+                raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.required"))
 
     # store the required locations for statistical analysis
     old_world.required_locations = [(location.name, location.player) for sphere in collection_spheres for location in sphere]
@@ -617,7 +642,7 @@ def create_playthrough(world):
     old_world.spoiler.paths = dict()
     for player in range(1, world.players + 1):
         old_world.spoiler.paths.update({location.gen_name(): get_path(state, location.parent_region) for sphere in collection_spheres for location in sphere if location.player == player})
-        for _, path in dict(old_world.spoiler.paths).items():
+        for path in dict(old_world.spoiler.paths).values():
             if any(exit == 'Pyramid Fairy' for (_, exit) in path):
                 if world.mode[player] != 'inverted':
                     old_world.spoiler.paths[str(world.get_region('Big Bomb Shop', player))] = get_path(state, world.get_region('Big Bomb Shop', player))
@@ -625,6 +650,6 @@ def create_playthrough(world):
                     old_world.spoiler.paths[str(world.get_region('Inverted Big Bomb Shop', player))] = get_path(state, world.get_region('Inverted Big Bomb Shop', player))
 
     # we can finally output our playthrough
-    old_world.spoiler.playthrough = OrderedDict([("0", [str(item) for item in world.precollected_items if item.advancement])])
+    old_world.spoiler.playthrough = {"0": [str(item) for item in world.precollected_items if item.advancement]}
     for i, sphere in enumerate(collection_spheres):
         old_world.spoiler.playthrough[str(i + 1)] = {location.gen_name(): str(location.item) for location in sphere}

@@ -57,6 +57,7 @@ SETTINGSTOPROCESS = {
     "item": {
       "hints": "hints",
       "retro": "retro",
+      "bombbag": "bombbag",
       "shopsanity": "shopsanity",
       "pseudoboots": "pseudoboots",
       "worldstate": "mode",
@@ -107,7 +108,8 @@ SETTINGSTOPROCESS = {
       "menuspeed": "fastmenu",
       "owpalettes": "ow_palettes",
       "uwpalettes": "uw_palettes",
-      "reduce_flashing": "reduce_flashing"
+      "reduce_flashing": "reduce_flashing",
+      "shuffle_sfx": "shuffle_sfx",
     },
     "generation": {
       "createspoiler": "create_spoiler",

@@ -846,7 +846,7 @@ async def track_locations(ctx : Context, roomid, roomdata):
             new_locations.append(Regions.lookup_name_to_id[location])
 
     try:
-        if roomid in location_shop_ids:
+        if ctx.shop_mode or ctx.retro_mode:
             misc_data = await snes_read(ctx, SHOP_ADDR, SHOP_SRAM_LEN)
             for cnt, b in enumerate(misc_data):
                 my_check = Regions.shop_table_by_location_id[0x400000 + cnt]

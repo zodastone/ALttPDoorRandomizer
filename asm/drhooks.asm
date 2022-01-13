@@ -76,6 +76,9 @@ nop : jsl OverridePaletteHeader
 org $02817e ; Bank02.asm : 414 (LDA $02811E, X)
 jsl FixAnimatedTiles
 
+org $0aef43 ; UnderworldMap_RecoverGFX
+jsl FixCloseDungeonMap
+
 org $028a06 ; Bank02.asm : 1941 Dungeon_ResetTorchBackgroundAndPlayer
 JSL FixWallmasterLamp
 
@@ -124,6 +127,11 @@ nop : stz $0dd0, X : rts
 org $07a955 ; <- Bank07.asm : around 6564 (JP is a bit different) (STZ $05FC : STZ $05FD)
 jsl BlockEraseFix
 nop #2
+
+org $02A0A8
+Mirror_SaveRoomData:
+org $07A95B ; < bank_07.asm ; #_07A95B: JSL Mirror_SaveRoomData
+jsl EGFixOnMirror
 
 org $02b82a
 jsl FixShopCode
@@ -181,9 +189,9 @@ Main_ShowTextMessage:
 
 ; Conditionally disable UW music changes in Door Rando
 org $028ADB ; <- Bank02.asm:2088-2095 (LDX.b #$14 : LDA $A0 ...)
-JSL.l Underworld_DoorDown_Entry : CPX #$10
-db $B0, $21 ; BCS $028B04
-BRA + : NOP #6 : +
+JSL.l Underworld_DoorDown_Entry : CPX #$FF
+BEQ + : db $80, $1C ; BRA $028B04
+NOP #6 : +
 
 org $02C3F2 ; <- Bank02.asm:10521 Unused call
 Underworld_DoorDown_Call:

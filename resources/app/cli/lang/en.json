@@ -2,7 +2,7 @@
   "cli": {
     "yes": "Yes",
     "no": "No",
-    "app.title": "ALttP Door Randomizer Version %s - Seed: %s, Code: %s",
+    "app.title": "ALttP Door Randomizer Version %s : --seed %s --code %s",
     "version": "Version",
     "seed": "Seed",
     "player": "Player",
@@ -52,7 +52,8 @@
     "enemizer.nothing.applied": "No Enemizer options will be applied until this is resolved.",
     "building.collection.spheres": "Building up collection spheres",
     "building.calculating.spheres": "Calculated sphere %i, containing %i of %i progress items.",
-    "building.final.spheres": "Calculated final sphere %i, containing %i of %i progress items."
+    "building.final.spheres": "Calculated final sphere %i, containing %i of %i progress items.",
+    "old.python.version": "Door Rando may have issues with python versions earlier than 3.7.  Detected version: %s"
   },
   "help": {
     "lang": [ "App Language, if available, defaults to English" ],
@@ -263,6 +264,7 @@
       "and a few other little things make this more like Zelda-1. (default: %(default)s)"
     ],
     "pseudoboots": [ " Players starts with pseudo boots that allow dashing but no item checks (default: %(default)s"],
+    "bombbag": ["Start with 0 bomb capacity. Two capacity upgrades (+10) are added to the pool (default: %(default)s)" ],
     "startinventory": [ "Specifies a list of items that will be in your starting inventory (separated by commas). (default: %(default)s)" ],
     "usestartinventory": [ "Toggle usage of Starting Inventory." ],
     "custom": [ "Not supported." ],
@@ -295,6 +297,7 @@
       "sprite that will be extracted."
     ],
     "reduce_flashing": [ "Reduce some in-game flashing (default: %(default)s)" ],
+    "shuffle_sfx": [ "Shuffle sounds effects (default: %(default)s)" ],
     "create_rom": [ "Create an output rom file. (default: %(default)s)" ],
     "gui": [ "Launch the GUI. (default: %(default)s)" ],
     "jsonout": [

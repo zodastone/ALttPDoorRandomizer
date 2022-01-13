@@ -109,6 +109,7 @@ def link_entrances(world, player):
             links_house_doors = [i for i in LW_Single_Cave_Doors if i not in Isolated_LH_Doors_Open]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in bomb_shop_doors:
             bomb_shop_doors.remove(links_house)
         if links_house in blacksmith_doors:
@@ -173,6 +174,7 @@ def link_entrances(world, player):
             links_house_doors = [i for i in lw_entrances if i not in Isolated_LH_Doors_Open]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in lw_entrances:
             lw_entrances.remove(links_house)
 
@@ -215,6 +217,13 @@ def link_entrances(world, player):
         if bomb_shop in dw_entrances:
             dw_entrances.remove(bomb_shop)
 
+        # standard mode cannot have Bonk Fairy Light be a connector in case of starting boots
+        # or boots are in links house, etc.
+        removed = False
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in lw_entrances:
+            lw_entrances.remove('Bonk Fairy (Light)')
+            removed = True
+
         # place the old man cave's entrance somewhere in the light world
         random.shuffle(lw_entrances)
         old_man_entrance = lw_entrances.pop()
@@ -226,6 +235,8 @@ def link_entrances(world, player):
 
         # now scramble the rest
         connect_caves(world, lw_entrances, dw_entrances, caves, player)
+        if removed:
+            lw_entrances.append('Bonk Fairy (Light)')
 
         # scramble holes
         scramble_holes(world, player)
@@ -328,6 +339,7 @@ def link_entrances(world, player):
             links_house_doors = [i for i in lw_entrances + lw_must_exits if i not in Isolated_LH_Doors_Open]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in lw_entrances:
             lw_entrances.remove(links_house)
         if links_house in lw_must_exits:
@@ -395,13 +407,22 @@ def link_entrances(world, player):
         if bomb_shop in dw_entrances:
             dw_entrances.remove(bomb_shop)
 
+        # standard mode cannot have Bonk Fairy Light be a connector in case of
+        # starting boots or boots are in links house, etc.
+        removed = False
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in lw_entrances:
+            lw_entrances.remove('Bonk Fairy (Light)')
+            removed = True
+
         # place the old man cave's entrance somewhere in the light world
         old_man_entrance = lw_entrances.pop()
         connect_two_way(world, old_man_entrance, 'Old Man Cave Exit (West)', player)
 
-
         # now scramble the rest
         connect_caves(world, lw_entrances, dw_entrances, caves, player)
+
+        if removed:
+            lw_entrances.append('Bonk Fairy (Light)')
 
         # scramble holes
         scramble_holes(world, player)
@@ -449,6 +470,7 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in links_house_doors if i not in exclusions]
             links_house = random.choice(list(links_house_doors))
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in entrances:
             entrances.remove(links_house)
         elif links_house in must_exits:
@@ -487,15 +509,23 @@ def link_entrances(world, player):
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         entrances.remove(bomb_shop)
 
+        # standard mode cannot have Bonk Fairy Light be a connector in case of
+        # starting boots or boots are in links house, etc.
+        removed = False
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in entrances:
+            entrances.remove('Bonk Fairy (Light)')
+            removed = True
 
         # place the old man cave's entrance somewhere
         random.shuffle(entrances)
         old_man_entrance = entrances.pop()
         connect_two_way(world, old_man_entrance, 'Old Man Cave Exit (West)', player)
 
-
         # now scramble the rest
         connect_caves(world, entrances, [], caves, player)
+
+        if removed:
+            entrances.append('Bonk Fairy (Light)')
 
         # scramble holes
         scramble_holes(world, player)
@@ -911,6 +941,7 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in links_house_doors if i not in exclusions]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         exit_pool.remove(links_house)
         doors.remove(links_house)
 
@@ -971,6 +1002,13 @@ def link_entrances(world, player):
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         doors.remove(bomb_shop)
 
+        # standard mode cannot have Bonk Fairy Light be a connector in case of
+        # starting boots or boots are in links house, etc.
+        removed = False
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in doors:
+            doors.remove('Bonk Fairy (Light)')
+            removed = True
+
         # handle remaining caves
         for cave in caves:
             if isinstance(cave, str):
@@ -979,6 +1017,9 @@ def link_entrances(world, player):
             for exit in cave:
                 connect_exit(world, exit, exit_pool.pop(), player)
                 connect_entrance(world, doors.pop(), exit, player)
+
+        if removed:
+            doors.append('Bonk Fairy (Light)')
 
         # place remaining doors
         connect_doors(world, doors, door_targets, player)
@@ -1265,6 +1306,7 @@ def link_inverted_entrances(world, player):
             links_house_doors = [i for i in DW_Single_Cave_Doors if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Inverted Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in bomb_shop_doors:
             bomb_shop_doors.remove(links_house)
         if links_house in blacksmith_doors:
@@ -1345,6 +1387,7 @@ def link_inverted_entrances(world, player):
             links_house_doors = [i for i in dw_entrances if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Inverted Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in dw_entrances:
             dw_entrances.remove(links_house)
 
@@ -1474,6 +1517,7 @@ def link_inverted_entrances(world, player):
             links_house_doors = [i for i in dw_entrances if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Inverted Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in dw_entrances:
             dw_entrances.remove(links_house)
 
@@ -1611,6 +1655,7 @@ def link_inverted_entrances(world, player):
             links_house_doors = [i for i in entrances + must_exits if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Inverted Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         if links_house in entrances:
             entrances.remove(links_house)
         elif links_house in must_exits:
@@ -1744,6 +1789,7 @@ def link_inverted_entrances(world, player):
             links_house_doors = [i for i in doors if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Inverted Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)  # should match link's house
         doors.remove(links_house)
         exit_pool.remove(links_house)
 
@@ -2120,10 +2166,11 @@ def connect_doors(world, doors, targets, player):
     """This works inplace"""
     random.shuffle(doors)
     random.shuffle(targets)
-    while doors:
-        door = doors.pop()
-        target = targets.pop()
+    placing = min(len(doors), len(targets))
+    for door, target in zip(doors, targets):
         connect_entrance(world, door, target, player)
+    doors[:] = doors[placing:]
+    targets[:] = targets[placing:]
 
 
 def skull_woods_shuffle(world, player):
@@ -2373,7 +2420,7 @@ Cave_Exits_Base = [['Elder House Exit (East)', 'Elder House Exit (West)'],
               ['Death Mountain Return Cave Exit (West)', 'Death Mountain Return Cave Exit (East)'],
               ['Fairy Ascension Cave Exit (Bottom)', 'Fairy Ascension Cave Exit (Top)'],
               ['Bumper Cave Exit (Top)', 'Bumper Cave Exit (Bottom)'],
-              ['Hookshot Cave Exit (South)', 'Hookshot Cave Exit (North)']]
+              ['Hookshot Cave Back Exit', 'Hookshot Cave Front Exit']]
 
 Cave_Exits_Base += [('Superbunny Cave Exit (Bottom)', 'Superbunny Cave Exit (Top)'),
               ('Spiral Cave Exit (Top)', 'Spiral Cave Exit')]
@@ -3115,6 +3162,10 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Dark Death Mountain Drop (West)', 'Dark Death Mountain (West Bottom)'),
                          ('East Death Mountain (Top) Mirror Spot', 'East Death Mountain (Top)'),
                          ('Superbunny Cave Climb', 'Superbunny Cave (Top)'),
+                         ('Hookshot Cave Front to Middle', 'Hookshot Cave (Middle)'),
+                         ('Hookshot Cave Middle to Front', 'Hookshot Cave (Front)'),
+                         ('Hookshot Cave Middle to Back', 'Hookshot Cave (Back)'),
+                         ('Hookshot Cave Back to Middle', 'Hookshot Cave (Middle)'),
                          ('Turtle Rock Teleporter', 'Turtle Rock (Top)'),
                          ('Turtle Rock Drop', 'Dark Death Mountain (Top)'),
                          ('Floating Island Drop', 'Dark Death Mountain (Top)'),
@@ -3233,6 +3284,10 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('Turtle Rock Tail Drop', 'Turtle Rock (Top)'),
                                   ('Turtle Rock Drop', 'Dark Death Mountain'),
                                   ('Superbunny Cave Climb', 'Superbunny Cave (Top)'),
+                                  ('Hookshot Cave Front to Middle', 'Hookshot Cave (Middle)'),
+                                  ('Hookshot Cave Middle to Front', 'Hookshot Cave (Front)'),
+                                  ('Hookshot Cave Middle to Back', 'Hookshot Cave (Back)'),
+                                  ('Hookshot Cave Back to Middle', 'Hookshot Cave (Middle)'),
                                   ('Desert Ledge Drop', 'Light World'),
                                   ('Floating Island Drop', 'Dark Death Mountain'),
                                   ('Dark Lake Hylia Central Island Teleporter', 'Lake Hylia Central Island'),
@@ -3284,7 +3339,6 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('EDDM Flute', 'The Sky'),
                                   ('Dark Grassy Lawn Flute', 'The Sky'),
                                   ('Hammer Peg Area Flute', 'The Sky'),
-                                  ('Chris Houlihan Room Exit', 'Pyramid Ledge'),
                                   ('Bush Covered Lawn Inner Bushes', 'Light World'),
                                   ('Bush Covered Lawn Outer Bushes', 'Bush Covered Lawn'),
                                   ('Bush Covered Lawn Mirror Spot', 'Dark Grassy Lawn'),
@@ -3428,16 +3482,16 @@ default_connections = [('Links House', 'Links House'),
                        ('Dark Desert Hint', 'Dark Desert Hint'),
                        ('Dark Desert Fairy', 'Dark Desert Healer Fairy'),
                        ('Spike Cave', 'Spike Cave'),
-                       ('Hookshot Cave', 'Hookshot Cave'),
+                       ('Hookshot Cave', 'Hookshot Cave (Front)'),
                        ('Superbunny Cave (Top)', 'Superbunny Cave (Top)'),
                        ('Cave Shop (Dark Death Mountain)', 'Cave Shop (Dark Death Mountain)'),
                        ('Dark Death Mountain Fairy', 'Dark Death Mountain Healer Fairy'),
                        ('Superbunny Cave (Bottom)', 'Superbunny Cave (Bottom)'),
                        ('Superbunny Cave Exit (Top)', 'Dark Death Mountain (Top)'),
                        ('Superbunny Cave Exit (Bottom)', 'Dark Death Mountain (East Bottom)'),
-                       ('Hookshot Cave Exit (South)', 'Dark Death Mountain (Top)'),
-                       ('Hookshot Cave Exit (North)', 'Death Mountain Floating Island (Dark World)'),
-                       ('Hookshot Cave Back Entrance', 'Hookshot Cave'),
+                       ('Hookshot Cave Front Exit', 'Dark Death Mountain (Top)'),
+                       ('Hookshot Cave Back Exit', 'Death Mountain Floating Island (Dark World)'),
+                       ('Hookshot Cave Back Entrance', 'Hookshot Cave (Back)'),
                        ('Mimic Cave', 'Mimic Cave'),
 
                        ('Pyramid Hole', 'Pyramid'),
@@ -3562,13 +3616,13 @@ inverted_default_connections =  [('Waterfall of Wishing', 'Waterfall of Wishing'
                                  ('Dark Desert Hint', 'Dark Desert Hint'),
                                  ('Dark Desert Fairy', 'Dark Desert Healer Fairy'),
                                  ('Spike Cave', 'Spike Cave'),
-                                 ('Hookshot Cave', 'Hookshot Cave'),
+                                 ('Hookshot Cave', 'Hookshot Cave (Front)'),
                                  ('Superbunny Cave (Top)', 'Superbunny Cave (Top)'),
                                  ('Cave Shop (Dark Death Mountain)', 'Cave Shop (Dark Death Mountain)'),
                                  ('Superbunny Cave (Bottom)', 'Superbunny Cave (Bottom)'),
                                  ('Superbunny Cave Exit (Bottom)', 'Dark Death Mountain (East Bottom)'),
-                                 ('Hookshot Cave Exit (North)', 'Death Mountain Floating Island (Dark World)'),
-                                 ('Hookshot Cave Back Entrance', 'Hookshot Cave'),
+                                 ('Hookshot Cave Back Exit', 'Death Mountain Floating Island (Dark World)'),
+                                 ('Hookshot Cave Back Entrance', 'Hookshot Cave (Back)'),
                                  ('Mimic Cave', 'Mimic Cave'),
                                  ('Inverted Pyramid Hole', 'Pyramid'),
                                  ('Inverted Links House', 'Inverted Links House'),
@@ -3589,7 +3643,7 @@ inverted_default_connections =  [('Waterfall of Wishing', 'Waterfall of Wishing'
                                  ('Death Mountain Return Cave (East)', 'Death Mountain Return Cave'),
                                  ('Death Mountain Return Cave Exit (West)', 'Death Mountain'),
                                  ('Death Mountain Return Cave Exit (East)', 'Death Mountain'),
-                                 ('Hookshot Cave Exit (South)', 'Dark Death Mountain'),
+                                 ('Hookshot Cave Front Exit', 'Dark Death Mountain'),
                                  ('Superbunny Cave Exit (Top)', 'Dark Death Mountain'),
                                  ('Pyramid Exit', 'Light World'),
                                  ('Inverted Pyramid Entrance', 'Bottom of Pyramid')]
@@ -3937,8 +3991,8 @@ exit_ids = {'Links House Exit': (0x01, 0x00),
             'Bumper Cave Exit (Bottom)': (0x16, 0x17),
             'Superbunny Cave Exit (Top)': (0x14, 0x15),
             'Superbunny Cave Exit (Bottom)': (0x13, 0x14),
-            'Hookshot Cave Exit (South)': (0x3A, 0x3B),
-            'Hookshot Cave Exit (North)': (0x3B, 0x3C),
+            'Hookshot Cave Front Exit': (0x3A, 0x3B),
+            'Hookshot Cave Back Exit': (0x3B, 0x3C),
             'Ganons Tower Exit': (0x37, 0x38),
             'Inverted Ganons Tower Exit': (0x37, 0x38),
             'Pyramid Exit': (0x36, 0x37),

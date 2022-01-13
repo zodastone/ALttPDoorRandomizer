@@ -25,7 +25,7 @@ def adjust(args):
         args.sprite = None
 
     apply_rom_settings(rom, args.heartbeep, args.heartcolor, args.quickswap, args.fastmenu, args.disablemusic,
-                       args.sprite, args.ow_palettes, args.uw_palettes, args.reduce_flashing)
+                       args.sprite, args.ow_palettes, args.uw_palettes, args.reduce_flashing, args.shuffle_sfx)
 
     output_path.cached_path = args.outputpath
     rom.write_to_file(output_path('%s.sfc' % outfilebase))

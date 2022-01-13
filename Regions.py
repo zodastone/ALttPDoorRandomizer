@@ -190,8 +190,11 @@ def create_regions(world, player):
         create_cave_region(player, 'Superbunny Cave (Top)', 'a connector', ['Superbunny Cave - Top', 'Superbunny Cave - Bottom'], ['Superbunny Cave Exit (Top)']),
         create_cave_region(player, 'Superbunny Cave (Bottom)', 'a connector', None, ['Superbunny Cave Climb', 'Superbunny Cave Exit (Bottom)']),
         create_cave_region(player, 'Spike Cave', 'Spike Cave', ['Spike Cave']),
-        create_cave_region(player, 'Hookshot Cave', 'a connector', ['Hookshot Cave - Top Right', 'Hookshot Cave - Top Left', 'Hookshot Cave - Bottom Right', 'Hookshot Cave - Bottom Left'],
-                           ['Hookshot Cave Exit (South)', 'Hookshot Cave Exit (North)']),
+        create_cave_region(player, 'Hookshot Cave (Front)', 'a connector', ['Hookshot Cave - Top Right', 'Hookshot Cave - Top Left', 'Hookshot Cave - Bottom Right', 'Hookshot Cave - Bottom Left'],
+                           ['Hookshot Cave Front to Middle', 'Hookshot Cave Front Exit']),
+        create_cave_region(player, 'Hookshot Cave (Back)', 'a connector', None, ['Hookshot Cave Back to Middle', 'Hookshot Cave Back Exit']),
+        create_cave_region(player, 'Hookshot Cave (Middle)', 'a connector', None, ['Hookshot Cave Middle to Back', 'Hookshot Cave Middle to Front']),
+
         create_dw_region(player, 'Death Mountain Floating Island (Dark World)', None, ['Floating Island Drop', 'Hookshot Cave Back Entrance', 'Floating Island Mirror Spot']),
         create_lw_region(player, 'Death Mountain Floating Island (Light World)', ['Floating Island']),
         create_dw_region(player, 'Turtle Rock (Top)', None, ['Turtle Rock Drop']),
@@ -954,6 +957,7 @@ def create_shops(world, player):
         if world.mode[player] == 'inverted' and region_name == 'Dark Lake Hylia Shop':
             locked = True
             inventory = [('Blue Potion', 160), ('Blue Shield', 50), ('Bombs (10)', 50)]
+            custom = True
         region = world.get_region(region_name, player)
         shop = Shop(region, room_id, type, shopkeeper, custom, locked, sram)
         region.shop = shop
@@ -1371,9 +1375,9 @@ location_table = {'Mushroom': (0x180013, 0x186338, False, 'in the woods'),
                   'Red Shield Shop - Left': (None, None, False, 'for sale as a curiosity'),
                   'Red Shield Shop - Middle': (None, None, False, 'for sale as a curiosity'),
                   'Red Shield Shop - Right': (None, None, False, 'for sale as a curiosity'),
-                  'Potion Shop - Left': (None, None, False, 'for sale near the witch'),
-                  'Potion Shop - Middle': (None, None, False, 'for sale near the witch'),
-                  'Potion Shop - Right': (None, None, False, 'for sale near the witch'),
+                  'Potion Shop - Left': (None, None, False, 'for sale near potions'),
+                  'Potion Shop - Middle': (None, None, False, 'for sale near potions'),
+                  'Potion Shop - Right': (None, None, False, 'for sale near potions'),
                   }
 
 lookup_id_to_name = {data[0]: name for name, data in location_table.items() if type(data[0]) == int}

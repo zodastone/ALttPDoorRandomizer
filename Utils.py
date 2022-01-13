@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 import os
 import re
+import operator as op
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from collections import defaultdict
+from functools import reduce
 
 
 def int16_as_bytes(value):
@@ -114,6 +116,28 @@ def make_new_base2current(old_rom='Zelda no Densetsu - Kamigami no Triforce (Jap
     basemd5 = hashlib.md5()
     basemd5.update(new_rom_data)
     return "New Rom Hash: " + basemd5.hexdigest()
+
+
+def kth_combination(k, l, r):
+    if r == 0:
+        return []
+    elif len(l) == r:
+        return l
+    else:
+        i = ncr(len(l)-1, r-1)
+        if k < i:
+            return l[0:1] + kth_combination(k, l[1:], r-1)
+        else:
+            return kth_combination(k-i, l[1:], r)
+
+
+def ncr(n, r):
+    if r == 0:
+        return 1
+    r = min(r, n-r)
+    numerator = reduce(op.mul, range(n, n-r, -1), 1)
+    denominator = reduce(op.mul, range(1, r+1), 1)
+    return numerator / denominator
 
 
 entrance_offsets = {

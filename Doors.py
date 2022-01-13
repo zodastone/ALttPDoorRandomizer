@@ -1490,8 +1490,11 @@ def create_doors(world, player):
     world.get_door('GT Petting Zoo SE', player).dead_end()
     world.get_door('GT DMs Room SW', player).dead_end()
     world.get_door("GT Bob\'s Room SE", player).passage = False
-    world.get_door('Desert Tiles 2 SE', player).bk_shuffle_req = True  # key-drop note (todo)
-    world.get_door('Swamp Lobby S', player).standard_restricted = True  # key-drop note (todo)
+    world.get_door('Desert Tiles 2 SE', player).bk_shuffle_req = True  # key-drop note: allows this to be a portal
+    world.get_door('Swamp Lobby S', player).standard_restricted = True
+    world.get_door('PoD Mimics 2 SW', player).rupee_bow_restricted = True  # bow statue
+    # enemizer logic could get rid of the following restriction
+    world.get_door('PoD Pit Room S', player).rupee_bow_restricted = True  # so mimics 1 shouldn't be required
 
     # can't unlink from boss right now
     world.get_door('Hera Lobby S', player).dungeonLink = 'Tower of Hera'

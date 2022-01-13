@@ -1,22 +1,21 @@
 import RaceRandom as random
 from collections import defaultdict, deque
 import logging
-import operator as op
 import time
 from enum import unique, Flag
 from typing import DefaultDict, Dict, List
 
-from functools import reduce
-from BaseClasses import RegionType, Region, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo
+from BaseClasses import RegionType, Region, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo, dungeon_keys
 from Doors import reset_portals
 from Dungeons import dungeon_regions, region_starts, standard_starts, split_region_starts
-from Dungeons import dungeon_bigs, dungeon_keys, dungeon_hints
+from Dungeons import dungeon_bigs, dungeon_hints
 from Items import ItemFactory
 from RoomData import DoorKind, PairedDoor, reset_rooms
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths, drop_entrances
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from DungeonGenerator import dungeon_portals, dungeon_drops, GenerationException
-from KeyDoorShuffle import analyze_dungeon, validate_vanilla_key_logic, build_key_layout, validate_key_layout
+from KeyDoorShuffle import analyze_dungeon, build_key_layout, validate_key_layout, determine_prize_lock
+from Utils import ncr, kth_combination
 
 
 def link_doors(world, player):
@@ -102,6 +101,8 @@ def link_doors_main(world, player):
             connect_portal(portal, world, player)
     if not world.doorShuffle[player] == 'vanilla':
         fix_big_key_doors_with_ugly_smalls(world, player)
+    else:
+        unmark_ugly_smalls(world, player)
     if world.doorShuffle[player] == 'vanilla':
         for entrance, ext in open_edges:
             connect_two_way(world, entrance, ext, player)
@@ -214,8 +215,8 @@ def vanilla_key_logic(world, player):
         analyze_dungeon(key_layout, world, player)
         world.key_logic[player][builder.name] = key_layout.key_logic
         log_key_logic(builder.name, key_layout.key_logic)
-    if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player] and not world.keydropshuffle[player]:
-        validate_vanilla_key_logic(world, player)
+    # if world.shuffle[player] == 'vanilla' and world.accessibility[player] == 'items' and not world.retro[player] and not world.keydropshuffle[player]:
+    #     validate_vanilla_key_logic(world, player)
 
 
 # some useful functions
@@ -317,6 +318,13 @@ def connect_one_way(world, entrancename, exitname, player):
         y.dest = x
 
 
+def unmark_ugly_smalls(world, player):
+    for d in ['Eastern Hint Tile Blocked Path SE', 'Eastern Darkness S', 'Thieves Hallway SE', 'Mire Left Bridge S',
+              'TR Lava Escape SE', 'GT Hidden Spikes SE']:
+        door = world.get_door(d, player)
+        door.smallKey = False
+
+
 def fix_big_key_doors_with_ugly_smalls(world, player):
     remove_ugly_small_key_doors(world, player)
     unpair_big_key_doors(world, player)
@@ -360,7 +368,8 @@ def choose_portals(world, player):
 
     if world.doorShuffle[player] in ['basic', 'crossed']:
         cross_flag = world.doorShuffle[player] == 'crossed'
-        bk_shuffle = world.bigkeyshuffle[player]
+        # key drops allow the big key in the right place in Desert Tiles 2
+        bk_shuffle = world.bigkeyshuffle[player] or world.keydropshuffle[player]
         std_flag = world.mode[player] == 'standard'
         # roast incognito doors
         world.get_room(0x60, player).delete(5)
@@ -407,6 +416,7 @@ def choose_portals(world, player):
         for dungeon, info in shuffled_info:
             outstanding_portals = list(dungeon_portals[dungeon])
             hc_flag = std_flag and dungeon == 'Hyrule Castle'
+            rupee_bow_flag = hc_flag and world.retro[player]  # rupee bow
             if hc_flag:
                 sanc = world.get_portal('Sanctuary', player)
                 sanc.destination = True
@@ -416,14 +426,14 @@ def choose_portals(world, player):
                 info.required_passage = {x: y for x, y in info.required_passage.items() if len(y) > 0}
             for target_region, possible_portals in info.required_passage.items():
                 candidates = find_portal_candidates(master_door_list, dungeon, need_passage=True, crossed=cross_flag,
-                                                    bk_shuffle=bk_shuffle)
+                                                    bk_shuffle=bk_shuffle, rupee_bow=rupee_bow_flag)
                 choice, portal = assign_portal(candidates, possible_portals, world, player)
                 portal.destination = True
                 clean_up_portal_assignment(portal_assignment, dungeon, portal, master_door_list, outstanding_portals)
             dead_end_choices = info.total - 1 - len(portal_assignment[dungeon])
             for i in range(0, dead_end_choices):
                 candidates = find_portal_candidates(master_door_list, dungeon, dead_end_allowed=True,
-                                                    crossed=cross_flag, bk_shuffle=bk_shuffle)
+                                                    crossed=cross_flag, bk_shuffle=bk_shuffle, rupee_bow=rupee_bow_flag)
                 possible_portals = outstanding_portals if not info.sole_entrance else [x for x in outstanding_portals if x != info.sole_entrance]
                 choice, portal = assign_portal(candidates, possible_portals, world, player)
                 if choice.deadEnd:
@@ -435,7 +445,7 @@ def choose_portals(world, player):
             the_rest = info.total - len(portal_assignment[dungeon])
             for i in range(0, the_rest):
                 candidates = find_portal_candidates(master_door_list, dungeon, crossed=cross_flag,
-                                                    bk_shuffle=bk_shuffle, standard=hc_flag)
+                                                    bk_shuffle=bk_shuffle, standard=hc_flag, rupee_bow=rupee_bow_flag)
                 choice, portal = assign_portal(candidates, outstanding_portals, world, player)
                 clean_up_portal_assignment(portal_assignment, dungeon, portal, master_door_list, outstanding_portals)
 
@@ -503,6 +513,9 @@ def analyze_portals(world, player):
                 raise Exception('please inspect this case')
         if len(reachable_portals) == 1:
             info.sole_entrance = reachable_portals[0]
+        if world.intensity[player] < 2 and world.doorShuffle[player] == 'basic' and dungeon == 'Desert Palace':
+            if len(inaccessible_portals) == 1 and inaccessible_portals[0] == 'Desert Back':
+                info.required_passage.clear()  # can't make a passage at this intensity level, something else must exit
         info_map[dungeon] = info
 
     for dungeon, info in info_map.items():
@@ -553,7 +566,7 @@ def disconnect_portal(portal, world, player):
 
 
 def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allowed=False, crossed=False,
-                           bk_shuffle=False, standard=False):
+                           bk_shuffle=False, standard=False, rupee_bow=False):
     ret = [x for x in door_list if bk_shuffle or not x.bk_shuffle_req]
     if crossed:
         ret = [x for x in ret if not x.dungeonLink or x.dungeonLink == dungeon or x.dungeonLink.startswith('link')]
@@ -565,6 +578,8 @@ def find_portal_candidates(door_list, dungeon, need_passage=False, dead_end_allo
         ret = [x for x in ret if not x.deadEnd]
     if standard:
         ret = [x for x in ret if not x.standard_restricted]
+    if rupee_bow:
+        ret = [x for x in ret if not x.rupee_bow_restricted]
     return ret
 
 
@@ -742,7 +757,7 @@ def handle_split_dungeons(dungeon_builders, recombinant_builders, entrances_map,
 
 def main_dungeon_generation(dungeon_builders, recombinant_builders, connections_tuple, world, player):
     entrances_map, potentials, connections = connections_tuple
-    enabled_entrances = {}
+    enabled_entrances = world.enabled_entrances[player] = {}
     sector_queue = deque(dungeon_builders.values())
     last_key, loops = None, 0
     logging.getLogger('').info(world.fish.translate("cli", "cli", "generating.dungeon"))
@@ -1071,6 +1086,7 @@ def assign_cross_keys(dungeon_builders, world, player):
     # Step 3: Initial valid combination find - reduce flex if needed
     for name, builder in dungeon_builders.items():
         suggested = builder.key_doors_num - builder.key_drop_cnt
+        builder.total_keys = builder.key_doors_num
         find_valid_combination(builder, start_regions_map[name], world, player)
         actual_chest_keys = builder.key_doors_num - builder.key_drop_cnt
         if actual_chest_keys < suggested:
@@ -1087,6 +1103,7 @@ def assign_cross_keys(dungeon_builders, world, player):
         name = builder.name
         logger.debug('Cross Dungeon: Increasing key count by 1 for %s', name)
         builder.key_doors_num += 1
+        builder.total_keys = builder.key_doors_num
         result = find_valid_combination(builder, start_regions_map[name], world, player, drop_keys=False)
         if result:
             remaining -= 1
@@ -1102,9 +1119,9 @@ def assign_cross_keys(dungeon_builders, world, player):
     logger.debug('Cross Dungeon: Keys unable to assign in pool %s', remaining)
 
     # Last Step: Adjust Small Key Dungeon Pool
-    if not world.retro[player]:
-        for name, builder in dungeon_builders.items():
-            reassign_key_doors(builder, world, player)
+    for name, builder in dungeon_builders.items():
+        reassign_key_doors(builder, world, player)
+        if not world.retro[player]:
             log_key_logic(builder.name, world.key_logic[player][builder.name])
             actual_chest_keys = max(builder.key_doors_num - builder.key_drop_cnt, 0)
             dungeon = world.get_dungeon(name, player)
@@ -1345,10 +1362,8 @@ def combine_layouts(recombinant_builders, dungeon_builders, entrances_map):
                 if recombine.master_sector is None:
                     recombine.master_sector = builder.master_sector
                     recombine.master_sector.name = recombine.name
-                    recombine.pre_open_stonewalls = builder.pre_open_stonewalls
                 else:
                     recombine.master_sector.regions.extend(builder.master_sector.regions)
-                    recombine.pre_open_stonewalls.update(builder.pre_open_stonewalls)
         recombine.layout_starts = list(entrances_map[recombine.name])
         dungeon_builders[recombine.name] = recombine
 
@@ -1380,7 +1395,7 @@ def shuffle_key_doors(builder, world, player):
                                 skips.append(world.get_door(dp.door_a, player))
                                 break
                     num_key_doors += 1
-    builder.key_doors_num = num_key_doors
+    builder.key_doors_num = builder.total_keys = num_key_doors
     find_small_key_door_candidates(builder, start_regions, world, player)
     find_valid_combination(builder, start_regions, world, player)
     reassign_key_doors(builder, world, player)
@@ -1443,7 +1458,16 @@ def find_valid_combination(builder, start_regions, world, player, drop_keys=True
     random.shuffle(sample_list)
     proposal = kth_combination(sample_list[itr], builder.candidates, builder.key_doors_num)
 
+    # eliminate start region if portal marked as destination
+    excluded = {}
+    for region in start_regions:
+        portal = next((x for x in world.dungeon_portals[player] if x.door.entrance.parent_region == region), None)
+        if portal and portal.destination:
+            excluded[region] = None
+    start_regions = [x for x in start_regions if x not in excluded.keys()]
+
     key_layout = build_key_layout(builder, start_regions, proposal, world, player)
+    determine_prize_lock(key_layout, world, player)
     while not validate_key_layout(key_layout, world, player):
         itr += 1
         stop_early = False
@@ -1561,7 +1585,7 @@ def find_key_door_candidates(region, checked, world, player):
                             if d2.type == DoorType.Normal:
                                 room_b = world.get_room(d2.roomIndex, player)
                                 pos_b, kind_b = room_b.doorList[d2.doorListPos]
-                                valid = kind in okay_normals and kind_b in okay_normals
+                                valid = kind in okay_normals and kind_b in okay_normals and valid_key_door_pair(d, d2)
                             else:
                                 valid = kind in okay_normals
                             if valid and 0 <= d2.doorListPos < 4:
@@ -1578,26 +1602,10 @@ def find_key_door_candidates(region, checked, world, player):
     return candidates, checked_doors
 
 
-def kth_combination(k, l, r):
-    if r == 0:
-        return []
-    elif len(l) == r:
-        return l
-    else:
-        i = ncr(len(l)-1, r-1)
-        if k < i:
-            return l[0:1] + kth_combination(k, l[1:], r-1)
-        else:
-            return kth_combination(k-i, l[1:], r)
-
-
-def ncr(n, r):
-    if r == 0:
-        return 1
-    r = min(r, n-r)
-    numerator = reduce(op.mul, range(n, n-r, -1), 1)
-    denominator = reduce(op.mul, range(1, r+1), 1)
-    return numerator / denominator
+def valid_key_door_pair(door1, door2):
+    if door1.roomIndex != door2.roomIndex:
+        return True
+    return len(door1.entrance.parent_region.exits) <= 1 or len(door2.entrance.parent_region.exits) <= 1
 
 
 def reassign_key_doors(builder, world, player):
@@ -1828,6 +1836,10 @@ def find_inaccessible_regions(world, player):
                 if connect.type is not RegionType.Dungeon or connect.name.endswith(' Portal'):
                     queue.append(connect)
     world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if valid_inaccessible_region(r)])
+    if world.mode[player] == 'inverted':
+        ledge = world.get_region('Hyrule Castle Ledge', player)
+        if any(x for x in ledge.exits if x.connected_region.name == 'Agahnims Tower Portal'):
+            world.inaccessible_regions[player].append('Hyrule Castle Ledge')
     logger = logging.getLogger('')
     logger.debug('Inaccessible Regions:')
     for r in world.inaccessible_regions[player]:
@@ -1912,14 +1924,18 @@ def check_required_paths(paths, world, player):
         if dungeon_name in world.dungeon_layouts[player].keys():
             builder = world.dungeon_layouts[player][dungeon_name]
             if len(paths[dungeon_name]) > 0:
-                states_to_explore = defaultdict(list)
+                states_to_explore = {}
                 for path in paths[dungeon_name]:
                     if type(path) is tuple:
-                        states_to_explore[tuple([path[0]])] = path[1]
+                        states_to_explore[tuple([path[0]])] = (path[1], 'any')
                     else:
-                        states_to_explore[tuple(builder.path_entrances)].append(path)
+                        common_starts = tuple(builder.path_entrances)
+                        if common_starts not in states_to_explore:
+                            states_to_explore[common_starts] = ([], 'all')
+                        states_to_explore[common_starts][0].append(path)
                 cached_initial_state = None
-                for start_regs, dest_regs in states_to_explore.items():
+                for start_regs, info in states_to_explore.items():
+                    dest_regs, path_type = info
                     if type(dest_regs) is not list:
                         dest_regs = [dest_regs]
                     check_paths = convert_regions(dest_regs, world, player)
@@ -1936,11 +1952,17 @@ def check_required_paths(paths, world, player):
                             cached_initial_state = state
                     else:
                         state = cached_initial_state
-                    valid, bad_region = check_if_regions_visited(state, check_paths)
+                    if path_type == 'any':
+                        valid, bad_region = check_if_any_regions_visited(state, check_paths)
+                    else:
+                        valid, bad_region = check_if_all_regions_visited(state, check_paths)
                     if not valid:
                         if check_for_pinball_fix(state, bad_region, world, player):
                             explore_state(state, world, player)
-                            valid, bad_region = check_if_regions_visited(state, check_paths)
+                            if path_type == 'any':
+                                valid, bad_region = check_if_any_regions_visited(state, check_paths)
+                            else:
+                                valid, bad_region = check_if_all_regions_visited(state, check_paths)
                     if not valid:
                         raise Exception('%s cannot reach %s' % (dungeon_name, bad_region.name))
 
@@ -1980,7 +2002,7 @@ def explore_state_not_inaccessible(state, world, player):
             state.add_all_doors_check_unattached(connect_region, world, player)
 
 
-def check_if_regions_visited(state, check_paths):
+def check_if_any_regions_visited(state, check_paths):
     valid = False
     breaking_region = None
     for region_target in check_paths:
@@ -1990,6 +2012,13 @@ def check_if_regions_visited(state, check_paths):
         elif not breaking_region:
             breaking_region = region_target
     return valid, breaking_region
+
+
+def check_if_all_regions_visited(state, check_paths):
+    for region_target in check_paths:
+        if not state.visited_at_all(region_target):
+            return False, region_target
+    return True, None
 
 
 def check_for_pinball_fix(state, bad_region, world, player):
@@ -2015,10 +2044,10 @@ class DROptions(Flag):
     Town_Portal = 0x02  # If on, Players will start with mirror scroll
     Map_Info = 0x04
     Debug = 0x08
-    Rails = 0x10  # If on, draws rails
+    Fix_EG = 0x10  # used to be Rails = 0x10  # Unused bit now
     OriginalPalettes = 0x20
-    Open_PoD_Wall = 0x40  # If on, pre opens the PoD wall, no bow required
-    Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
+    # Open_PoD_Wall = 0x40  # No longer pre-opening pod wall - unused
+    # Open_Desert_Wall = 0x80  # No longer pre-opening desert wall - unused
     Hide_Total = 0x100
     DarkWorld_Spawns = 0x200
 

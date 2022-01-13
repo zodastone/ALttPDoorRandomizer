@@ -96,13 +96,14 @@ def parse_cli(argv, no_defaults=False):
             for name in ['logic', 'mode', 'swords', 'goal', 'difficulty', 'item_functionality',
                          'shuffle', 'door_shuffle', 'intensity', 'crystals_ganon', 'crystals_gt', 'openpyramid',
                          'mapshuffle', 'compassshuffle', 'keyshuffle', 'bigkeyshuffle', 'startinventory',
+                         'bombbag',
                          'triforce_pool_min', 'triforce_pool_max', 'triforce_goal_min', 'triforce_goal_max',
                          'triforce_min_difference', 'triforce_goal', 'triforce_pool', 'shufflelinks', 'pseudoboots',
                          'retro', 'accessibility', 'hints', 'beemizer', 'experimental', 'dungeon_counters',
                          'shufflebosses', 'shuffleenemies', 'enemy_health', 'enemy_damage', 'shufflepots',
                          'ow_palettes', 'uw_palettes', 'sprite', 'disablemusic', 'quickswap', 'fastmenu', 'heartcolor', 'heartbeep',
                          'remote_items', 'shopsanity', 'keydropshuffle', 'mixed_travel', 'standardize_palettes', 'code',
-                         'reduce_flashing']:
+                         'reduce_flashing', 'shuffle_sfx']:
                 value = getattr(defaults, name) if getattr(playerargs, name) is None else getattr(playerargs, name)
                 if player == 1:
                     setattr(ret, name, {1: value})
@@ -126,6 +127,7 @@ def parse_settings():
     settings = {
         "lang": "en",
         "retro": False,
+        "bombbag": False,
         "mode": "open",
         "logic": "noglitches",
         "goal": "ganon",
@@ -190,6 +192,7 @@ def parse_settings():
         "ow_palettes": "default",
         "uw_palettes": "default",
         "reduce_flashing": False,
+        "shuffle_sfx": False,
 
         # Spoiler     defaults to TRUE
         # Playthrough defaults to TRUE
