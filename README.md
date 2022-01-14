@@ -251,6 +251,10 @@ Set `--logic` to `owglitches` to make overworld glitches required in the logic.
 
 In certain ER shuffles, (not dungeonssimple or dungeonsfulls), you can now control whether Links House is shuffled or remains vanilla. Previously, inverted seeds had this behavior and would shuffle links house, but now if will only do so if this is specified. Now, also works for open modes, but links house is never shuffled in standard mode.
 
+## Bomb Logic (--bombbag)
+
+When enabling this option, you do not start with bomb capacity but rather you must find 1 of 2 bomb bags. (They are represented by the +10 capacity item.) Bomb capacity upgrades are otherwise unavailable.
+
 ## Reduce Flashing
 
 Accessibility option to reducing some flashing animations in the game.
@@ -258,6 +262,10 @@ Accessibility option to reducing some flashing animations in the game.
 ## Pseudo-boots
 
 Option to start with ability to dash, but not able to make any boots required logical checks or traversal.
+
+## SFX Shuffle (--shuffle_sfx)
+
+Shuffles a large portion of the sounds effects. Can be used with the adjuster.
 
 ## Experimental Features
 
@@ -325,6 +333,12 @@ Start with dash ability, but no way to use boots to accomplish checks
 
 Whether to shuffle links house in most ER modes.
 
+
+```
+--bombbag
+```
+Need to find the bombbag upgrade to used bombs
+
 ```
 --experimental
 ```
@@ -348,3 +362,12 @@ Whether to standardize dungeon palettes in crossed dungeon mode. (default: stand
 ```
 
 Reduces amount of flashing in some animations
+
+```
+--shuffle_sfx
+```
+
+Shuffles a bunch of the sounds effects
+
+
+
