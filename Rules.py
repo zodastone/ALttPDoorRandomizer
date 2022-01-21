@@ -568,7 +568,7 @@ def bomb_rules(world, player):
     bonkable_doors = ['Two Brothers House Exit (West)', 'Two Brothers House Exit (East)'] # Technically this is incorrectly defined, but functionally the same as what is intended.
     bombable_doors = ['Ice Rod Cave', 'Light World Bomb Hut', 'Light World Death Mountain Shop', 'Mini Moldorm Cave',
                       'Hookshot Cave Back to Middle', 'Hookshot Cave Front to Middle', 'Hookshot Cave Middle to Front','Hookshot Cave Middle to Back',
-                      'Dark Lake Hylia Ledge Fairy', 'Hype Cave', 'Brewery']
+                      'Dark Lake Hylia Ledge Fairy', 'Hype Cave', 'Brewery', 'Light Hype Fairy']
     for entrance in bonkable_doors:
         add_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player)) 
     for entrance in bombable_doors:
