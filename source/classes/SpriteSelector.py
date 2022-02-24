@@ -4,6 +4,7 @@ import json
 import os
 import random
 import shutil
+import ssl
 from urllib.parse import urlparse
 from urllib.request import urlopen
 import webbrowser
@@ -149,7 +150,7 @@ class SpriteSelector(object):
 
             try:
                 task.update_status("Downloading official sprites list")
-                with urlopen('https://alttpr.com/sprites') as response:
+                with urlopen('https://alttpr.com/sprites', context=ssl._create_unverified_context()) as response:
                     sprites_arr = json.loads(response.read().decode("utf-8"))
             except Exception as e:
                 resultmessage = "Error getting list of official sprites. Sprites not updated.\n\n%s: %s" % (type(e).__name__, e)
