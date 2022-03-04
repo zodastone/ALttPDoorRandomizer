@@ -29,7 +29,7 @@ from Fill import sell_potions, sell_keys, balance_multiworld_progression, balanc
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '1.0.0-dev'
+__version__ = '1.0.1-dev'
 
 from source.classes.BabelFish import BabelFish
 

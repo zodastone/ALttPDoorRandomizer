@@ -14,6 +14,7 @@ from RoomData import DoorKind, PairedDoor, reset_rooms
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths, drop_entrances
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from DungeonGenerator import dungeon_portals, dungeon_drops, GenerationException
+from DungeonGenerator import valid_region_to_explore as valid_region_to_explore_lim
 from KeyDoorShuffle import analyze_dungeon, build_key_layout, validate_key_layout, determine_prize_lock
 from Utils import ncr, kth_combination
 
@@ -1368,6 +1369,8 @@ def combine_layouts(recombinant_builders, dungeon_builders, entrances_map):
         dungeon_builders[recombine.name] = recombine
 
 
+# todo: this allows cross-dungeon exploring via HC Ledge or Inaccessible Regions
+# todo: @deprecated
 def valid_region_to_explore(region, world, player):
     return region and (region.type == RegionType.Dungeon
                        or region.name in world.inaccessible_regions[player]
@@ -1559,7 +1562,7 @@ okay_normals = [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable, DoorKind.
 
 
 def find_key_door_candidates(region, checked, world, player):
-    dungeon = region.dungeon
+    dungeon_name = region.dungeon.name
     candidates = []
     checked_doors = list(checked)
     queue = deque([(region, None, None)])
@@ -1569,14 +1572,16 @@ def find_key_door_candidates(region, checked, world, player):
             d = ext.door
             if d and d.controller:
                 d = d.controller
-            if d and not d.blocked and not d.entranceFlag and d.dest is not last_door and d.dest is not last_region and d not in checked_doors:
+            if d and not d.blocked and d.dest is not last_door and d.dest is not last_region and d not in checked_doors:
                 valid = False
-                if 0 <= d.doorListPos < 4 and d.type in [DoorType.Interior, DoorType.Normal, DoorType.SpiralStairs]:
+                if (0 <= d.doorListPos < 4 and d.type in [DoorType.Interior, DoorType.Normal, DoorType.SpiralStairs]
+                   and not d.entranceFlag):
                     room = world.get_room(d.roomIndex, player)
                     position, kind = room.doorList[d.doorListPos]
-
                     if d.type == DoorType.Interior:
                         valid = kind in [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable, DoorKind.Dashable]
+                        if valid and d.dest not in candidates:  # interior doors are not separable yet
+                            candidates.append(d.dest)
                     elif d.type == DoorType.SpiralStairs:
                         valid = kind in [DoorKind.StairKey, DoorKind.StairKey2, DoorKind.StairKeyLow]
                     elif d.type == DoorType.Normal:
@@ -1595,7 +1600,7 @@ def find_key_door_candidates(region, checked, world, player):
                 if valid and d not in candidates:
                     candidates.append(d)
                 connected = ext.connected_region
-                if connected and (connected.type != RegionType.Dungeon or connected.dungeon == dungeon):
+                if valid_region_to_explore_lim(connected, dungeon_name, world, player):
                     queue.append((ext.connected_region, d, current))
                 if d is not None:
                     checked_doors.append(d)

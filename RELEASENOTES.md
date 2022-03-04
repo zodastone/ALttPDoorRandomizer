@@ -15,6 +15,8 @@ CLI: ```--bombbag```
 
 # Bug Fixes and Notes.
 
+* 1.0.1
+	* Fixed a bug with key doors not detecting one side of an interior door
 * 0.5.1.7
 	* Baserom update
 	* Fix for Inverted Mode: Dark Lake Hylia shop defaults to selling a blue potion
