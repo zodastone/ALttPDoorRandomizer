@@ -59,8 +59,8 @@ Rename the spoiler log (required) to countdown_spoiler.txt and place it in the s
 * Progressive swords, gloves, shields, mail (not bomb/arrow capacity)
 * Y-items (not Bombs)
 * Others: Pearl, Flippers, Boots, Half Magic
-* Keys (if Keysanity enabled)
-* If Triforce Hunt is enabled, remaining triforce pieces are reported separately from important items.
+* Keys (if Keysanity enabled.  Remaining keys are reported separately from important items)
+* If Triforce Hunt is enabled, remaining triforce pieces are reported separately from important items
 
 # Supported Game Modes
 

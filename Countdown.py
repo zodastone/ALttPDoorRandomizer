@@ -653,6 +653,29 @@ countdown_items = {"North Light World": 0,
                    "Misery Mire": 0,
                    "Turtle Rock": 0,
                    "Ganon's Tower": 0}
+countdown_keys = {"North Light World": 0,
+                   "East Light World": 0,
+                   "South Light World": 0,
+                   "Kakariko Village": 0,
+                   "Death Mountain": 0,
+                   "North Dark World": 0,
+                   "East Dark World": 0,
+                   "South Dark World": 0,
+                   "Village of Outcasts": 0,
+                   "Dark Death Mountain": 0,
+                   "Hyrule Castle": 0,
+                   "Eastern Palace": 0,
+                   "Desert Palace": 0,
+                   "Tower of Hera": 0,
+                   "Castle Tower": 0,
+                   "Palace of Darkness": 0,
+                   "Swamp Palace": 0,
+                   "Skull Woods": 0,
+                   "Thieves' Town": 0,
+                   "Ice Palace": 0,
+                   "Misery Mire": 0,
+                   "Turtle Rock": 0,
+                   "Ganon's Tower": 0}
 countdown_triforces = {"North Light World": 0,
                    "East Light World": 0,
                    "South Light World": 0,
@@ -678,6 +701,7 @@ countdown_triforces = {"North Light World": 0,
                    "Ganon's Tower": 0}
 countdown_item_names = {'Progressive', 'Boomerang', 'Hookshot', 'Mushroom', 'Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Lamp', 'Hammer', 'Shovel', 'Ocarina', 'Bug Catching Net', 'Book of Mudora', 'Bottle', 'Cane of Somaria', 'Cane of Byrna', 'Cape', 'Magic Mirror', 'Magic Upgrade', 'Boots', 'Flippers', 'Moon Pearl'}
 countdown_item_locs = set()
+countdown_key_locs = set()
 countdown_triforce_locs = set()
 countdown_use_triforces = False
 countdown_use_keys = False
@@ -1172,7 +1196,7 @@ async def track_locations(ctx : Context, roomid, roomdata):
         ctx.retro_mode = flags[0] & 0x4
 
     def new_check(location):
-        global countdown_last_msg
+        global countdown_last_msg, countdown_use_keys, countdown_key_locs, countdown_keys
         ctx.locations_checked.add(location)
         ignored = filter_location(ctx, location)
         if ignored:
@@ -1187,18 +1211,27 @@ async def track_locations(ctx : Context, roomid, roomdata):
                         countdown_items[regionName] = countdown_items[regionName] - 1
                     itemsLeft = countdown_items[regionName]
                     outStr = regionName + ": " + str(itemsLeft)
-                    if countdown_use_triforces:
+                    if (countdown_use_triforces or countdown_use_keys):
                         if itemsLeft == 1:
-                            outStr = outStr + " Item, "
+                            outStr = outStr + " Item"
                         else:
-                            outStr = outStr + " Items, "
-                        if location in countdown_triforce_locs:
-                            countdown_triforces[regionName] = countdown_triforces[regionName] - 1
-                        triforcesLeft = countdown_triforces[regionName]
-                        if triforcesLeft == 1:
-                            outStr = outStr + str(triforcesLeft) + " Triforce"
-                        else:
-                            outStr = outStr + str(triforcesLeft) + " Triforces"
+                            outStr = outStr + " Items"
+                        if countdown_use_keys:
+                            if location in countdown_key_locs:
+                                countdown_keys[regionName] = countdown_keys[regionName] - 1
+                            keysLeft = countdown_keys[regionName]
+                            if keysLeft == 1:
+                                outStr = outStr + ", " + str(keysLeft) + " Key"
+                            else:
+                                outStr = outStr + ", " + str(keysLeft) + " Keys"
+                        if countdown_use_triforces:
+                            if location in countdown_triforce_locs:
+                                countdown_triforces[regionName] = countdown_triforces[regionName] - 1
+                            triforcesLeft = countdown_triforces[regionName]
+                            if triforcesLeft == 1:
+                                outStr = outStr + ", " + str(triforcesLeft) + " Triforce"
+                            else:
+                                outStr = outStr + ", " + str(triforcesLeft) + " Triforces"
                     if outStr != countdown_last_msg:
                         logging.info('  ' + outStr)
                         file1 = open("countdown_display.txt", "w")
@@ -1338,7 +1371,7 @@ async def game_watcher(ctx : Context):
         await track_locations(ctx, roomid, roomdata)
 
 def processSpoiler(ctx : Context):
-    global countdown_use_triforces, countdown_use_keys, countdown_region_table, countdown_triforce_locs, countdown_triforces, countdown_item_locs, countdown_items
+    global countdown_use_triforces, countdown_use_keys, countdown_region_table, countdown_triforce_locs, countdown_triforces, countdown_item_locs, countdown_items, countdown_key_locs, countdown_keys
     file1 = open('countdown_spoiler.txt', 'r')
     lines = file1.readlines()
     file1.close()
@@ -1387,8 +1420,8 @@ def processSpoiler(ctx : Context):
                         countdown_triforce_locs.add(locationName)
                         countdown_triforces[regionName] = countdown_triforces[regionName] + 1
                     elif countdown_use_keys and ('Key' in itemName) and (countdown_use_keydrops or (not(('Key Drop' in locationName) or ('Pot Key' in locationName)))):
-                        countdown_item_locs.add(locationName)
-                        countdown_items[regionName] = countdown_items[regionName] + 1
+                        countdown_key_locs.add(locationName)
+                        countdown_keys[regionName] = countdown_keys[regionName] + 1
                     else:
                         for val in countdown_item_names:
                             if val in itemName:
