@@ -699,6 +699,29 @@ countdown_triforces = {"North Light World": 0,
                    "Misery Mire": 0,
                    "Turtle Rock": 0,
                    "Ganon's Tower": 0}
+countdown_regions_visited = {"North Light World": False,
+                   "East Light World": False,
+                   "South Light World": False,
+                   "Kakariko Village": False,
+                   "Death Mountain": False,
+                   "North Dark World": False,
+                   "East Dark World": False,
+                   "South Dark World": False,
+                   "Village of Outcasts": False,
+                   "Dark Death Mountain": False,
+                   "Hyrule Castle": False,
+                   "Eastern Palace": False,
+                   "Desert Palace": False,
+                   "Tower of Hera": False,
+                   "Castle Tower": False,
+                   "Palace of Darkness": False,
+                   "Swamp Palace": False,
+                   "Skull Woods": False,
+                   "Thieves' Town": False,
+                   "Ice Palace": False,
+                   "Misery Mire": False,
+                   "Turtle Rock": False,
+                   "Ganon's Tower": False}
 countdown_item_names = {'Progressive', 'Boomerang', 'Hookshot', 'Mushroom', 'Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Lamp', 'Hammer', 'Shovel', 'Ocarina', 'Bug Catching Net', 'Book of Mudora', 'Bottle', 'Cane of Somaria', 'Cane of Byrna', 'Cape', 'Magic Mirror', 'Magic Upgrade', 'Boots', 'Flippers', 'Moon Pearl'}
 countdown_item_locs = set()
 countdown_key_locs = set()
@@ -1101,6 +1124,7 @@ async def connect(ctx: Context, address=None):
     ctx.server_task = asyncio.create_task(server_loop(ctx, address))
 
 async def console_loop(ctx : Context):
+    global countdown_regions_visited, countdown_items, countdown_keys, countdown_triforces, countdown_use_triforces, countdown_use_keys
     while not ctx.exit_event.is_set():
         input = await aioconsole.ainput()
 
@@ -1145,6 +1169,49 @@ async def console_loop(ctx : Context):
                              if type(v) is int and not filter_location(ctx, k)]:
                 if location not in ctx.locations_checked:
                     logging.info('Missing: ' + location)
+        if command[0] == '/countdown':
+            try:
+                logging.info('--------------------')
+                found_region = False
+                for region in filter(lambda k: countdown_regions_visited[k] == True, countdown_regions_visited):
+                    items_left = countdown_items[region]
+                    keys_left = countdown_keys[region]
+                    triforces_left = countdown_triforces[region]
+                    if (items_left > 0 or keys_left > 0 or triforces_left > 0):
+                        found_region = True
+                        thing_added = False
+                        outStr = region + ": "
+                        if items_left > 0:
+                            outStr = outStr + str(items_left)
+                            if (countdown_use_triforces or countdown_use_keys):
+                                if items_left == 1:
+                                    outStr = outStr + " Item"
+                                else:
+                                    outStr = outStr + " Items"
+                            thing_added = True
+                        if keys_left > 0:
+                            if thing_added:
+                                outStr = outStr + ", "
+                            if keys_left== 1:
+                                outStr = outStr + str(keys_left) + " Key"
+                            else:
+                                outStr = outStr + str(keys_left) + " Keys"
+                            thing_added = True
+                        if triforces_left > 0:
+                            if thing_added:
+                                outStr = outStr + ", "
+                            if triforces_left == 1:
+                                outStr = outStr + str(triforces_left) + " Triforce"
+                            else:
+                                outStr = outStr + str(triforces_left) + " Triforces"
+                            thing_added = True
+                        logging.info('  ' + outStr)
+                if not found_region:
+                    logging.info('  All visited regions clear.')
+                logging.info('--------------------')
+            except Exception as e:
+                print(e)
+                logging.warning(e)
         if command[0] == '/getitem' and len(command) > 1:
             item = input[9:]
             item_id = Items.item_table[item][3] if item in Items.item_table else None
@@ -1181,7 +1248,7 @@ def filter_location(ctx, location):
 
 
 async def track_locations(ctx : Context, roomid, roomdata):
-    global countdown_items, countdown_triforces, countdown_use_triforces, countdown_region_table, countdown_item_locs, countdown_triforce_locs
+    global countdown_items, countdown_triforces, countdown_use_triforces, countdown_region_table, countdown_item_locs, countdown_triforce_locs, countdown_regions_visited
     new_locations = []
 
     if ctx.total_locations is None:
@@ -1208,6 +1275,7 @@ async def track_locations(ctx : Context, roomid, roomdata):
                 new_locations.append(Regions.lookup_name_to_id[location])
                 regionName = countdown_region_table.get(location)
                 if regionName is not None:
+                    countdown_regions_visited[regionName] = True
                     if location in countdown_item_locs:
                         countdown_items[regionName] = countdown_items[regionName] - 1
                     itemsLeft = countdown_items[regionName]

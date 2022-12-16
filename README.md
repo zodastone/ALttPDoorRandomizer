@@ -29,17 +29,13 @@ This "should" work with most Entrance/Door Rando versions, provided the underlyi
 
 # Installation from source
 
-(Github Releases with packaged executable files not currently supported.)
+Note: Installation of dependencies can be skipped if you have already used another door rando fork, as the dependencies are the same. Github Releases with packaged executable files not currently supported.
+
+Prerequisites: [Python 3.6+](http://python.org/downloads), [pip](https://pip.pypa.io/en/stable/installation/)
 
 From the main Github page on the Countdown branch, click the green "Code" dropdown, then Download ZIP.
 
-See these instructions.
-
-https://github.com/aerinon/ALttPDoorRandomizer/blob/DoorDev/docs/BUILDING.md
-
-When installing platform specific dependencies, don't forget to run the appropriate command from the bottom of the page! Those will install missing pip dependencies.
-
-Running the MultiServer and MultiClient/Countdown/MultiClientCountdown for multiworld should run resources/ci/common/local_install.py for those dependencies as well.
+Navigate to resources/app/meta/manifests, open a command prompt and run ```pip install -r pip_requirements.txt```.
 
 To use the CLI, run ```DungeonRandomizer.py```.
 
@@ -80,6 +76,7 @@ Typical "Defeat Ganon" seeds, plus:
 
 * Non-progressive swords/gloves/shields/mail will always be considered unimportant
 * Location regions are not updated if entrance/door rando is applied
+* Using command ```/countdown``` will display discovered regions with important items still remaining
 
 # Region Definitions
 
