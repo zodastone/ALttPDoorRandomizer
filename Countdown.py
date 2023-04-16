@@ -630,6 +630,44 @@ countdown_region_table = {"Blind's Hideout - Top": "Kakariko Village",
                      "Red Shield Shop - Left": "North Dark World",
                      "Red Shield Shop - Middle": "North Dark World",
                      "Red Shield Shop - Right": "North Dark World"}
+alttpr_location_map = {"Pegasus Rocks": "Bonk Rock Cave",
+                     "Graveyard Ledge": "Graveyard Cave",
+                     "Mini Moldorm Cave - NPC": "Mini Moldorm Cave - Generous Guy",
+                     "Hyrule Castle - Zelda's Cell": "Hyrule Castle - Zelda's Chest",
+                     "Hammer Pegs": "Peg Cave",
+                     'Bumper Cave': "Bumper Cave Ledge",
+                     'Hype Cave - NPC': "Hype Cave - Generous Guy",
+                     "Ganon's Tower - Conveyor Cross Pot Key": "Ganons Tower - Conveyor Cross Pot Key",
+                     "Ganon's Tower - Bob's Torch": "Ganons Tower - Bob's Torch",
+                     "Ganon's Tower - Hope Room - Left": "Ganons Tower - Hope Room - Left",
+                     "Ganon's Tower - Hope Room - Right": "Ganons Tower - Hope Room - Right",
+                     "Ganon's Tower - Tile Room": "Ganons Tower - Tile Room",
+                     "Ganon's Tower - Compass Room - Top Left": "Ganons Tower - Compass Room - Top Left",
+                     "Ganon's Tower - Compass Room - Top Right": "Ganons Tower - Compass Room - Top Right",
+                     "Ganon's Tower - Compass Room - Bottom Left": "Ganons Tower - Compass Room - Bottom Left",
+                     "Ganon's Tower - Compass Room - Bottom Right": "Ganons Tower - Compass Room - Bottom Right",
+                     "Ganon's Tower - Conveyor Star Pits Pot Key": "Ganons Tower - Conveyor Star Pits Pot Key",
+                     "Ganon's Tower - DMs Room - Top Left": "Ganons Tower - DMs Room - Top Left",
+                     "Ganon's Tower - DMs Room - Top Right": "Ganons Tower - DMs Room - Top Right",
+                     "Ganon's Tower - DMs Room - Bottom Left": "Ganons Tower - DMs Room - Bottom Left",
+                     "Ganon's Tower - DMs Room - Bottom Right": "Ganons Tower - DMs Room - Bottom Right",
+                     "Ganon's Tower - Map Chest": "Ganons Tower - Map Chest",
+                     "Ganon's Tower - Double Switch Pot Key": "Ganons Tower - Double Switch Pot Key",
+                     "Ganon's Tower - Firesnake Room": "Ganons Tower - Firesnake Room",
+                     "Ganon's Tower - Randomizer Room - Top Left": "Ganons Tower - Randomizer Room - Top Left",
+                     "Ganon's Tower - Randomizer Room - Top Right": "Ganons Tower - Randomizer Room - Top Right",
+                     "Ganon's Tower - Randomizer Room - Bottom Left": "Ganons Tower - Randomizer Room - Bottom Left",
+                     "Ganon's Tower - Randomizer Room - Bottom Right": "Ganons Tower - Randomizer Room - Bottom Right",
+                     "Ganon's Tower - Bob's Chest": "Ganons Tower - Bob's Chest",
+                     "Ganon's Tower - Big Chest": "Ganons Tower - Big Chest",
+                     "Ganon's Tower - Big Key Room - Left": "Ganons Tower - Big Key Room - Left",
+                     "Ganon's Tower - Big Key Room - Right": "Ganons Tower - Big Key Room - Right",
+                     "Ganon's Tower - Big Key Chest": "Ganons Tower - Big Key Chest",
+                     "Ganon's Tower - Mini Helmasaur Room - Left": "Ganons Tower - Mini Helmasaur Room - Left",
+                     "Ganon's Tower - Mini Helmasaur Room - Right": "Ganons Tower - Mini Helmasaur Room - Right",
+                     "Ganon's Tower - Mini Helmasaur Key Drop": "Ganons Tower - Mini Helmasaur Key Drop",
+                     "Ganon's Tower - Pre-Moldorm Chest": "Ganons Tower - Pre-Moldorm Chest",
+                     "Ganon's Tower - Moldorm Chest": "Ganons Tower - Validation Chest"}
 countdown_items = {"North Light World": 0,
                    "East Light World": 0,
                    "South Light World": 0,
@@ -723,6 +761,7 @@ countdown_regions_visited = {"North Light World": False,
                    "Turtle Rock": False,
                    "Ganon's Tower": False}
 countdown_item_names = {'Progressive', 'Boomerang', 'Hookshot', 'Mushroom', 'Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Lamp', 'Hammer', 'Shovel', 'Ocarina', 'Bug Catching Net', 'Book of Mudora', 'Bottle', 'Cane of Somaria', 'Cane of Byrna', 'Cape', 'Magic Mirror', 'Magic Upgrade', 'Boots', 'Flippers', 'Moon Pearl'}
+alttpr_item_names = {'Progressive', 'Boomerang', 'Hookshot', 'Mushroom', 'Powder', 'FireRod', 'IceRod', 'Bombos', 'Ether', 'Quake', 'Lamp', 'Hammer', 'Shovel', 'Ocarina', 'BugCatchingNet', 'BookOfMudora', 'Bottle', 'CaneOfSomaria', 'CaneOfByrna', 'Cape', 'MagicMirror', 'HalfMagic', 'Boots', 'Flippers', 'MoonPearl'}
 countdown_item_locs = set()
 countdown_key_locs = set()
 countdown_triforce_locs = set()
@@ -730,6 +769,7 @@ countdown_use_triforces = False
 countdown_use_keys = False
 countdown_use_keydrops = False
 countdown_last_msg = "Blah"
+spoiler_log_processed = False
 
 SNES_DISCONNECTED = 0
 SNES_CONNECTING = 1
@@ -1439,10 +1479,15 @@ async def game_watcher(ctx : Context):
         await track_locations(ctx, roomid, roomdata)
 
 def processSpoiler(ctx : Context):
-    global countdown_use_triforces, countdown_use_keys, countdown_region_table, countdown_triforce_locs, countdown_triforces, countdown_item_locs, countdown_items, countdown_key_locs, countdown_keys
+    global countdown_use_triforces, countdown_use_keys, countdown_region_table, countdown_triforce_locs, countdown_triforces, countdown_item_locs, countdown_items, countdown_key_locs, countdown_keys, spoiler_log_processed
+    if spoiler_log_processed:
+        return
     file1 = open('countdown_spoiler.txt', 'r')
     lines = file1.readlines()
     file1.close()
+    if "{" in lines[0]:
+        processSpoilerALttPR()
+        return
     playerName = 'Blah'
     if ctx.slot is not None:
         playerName = ' (' + ctx.player_names[ctx.slot] + ')'
@@ -1497,6 +1542,40 @@ def processSpoiler(ctx : Context):
                                 countdown_items[regionName] = countdown_items[regionName] + 1
                                 break
     print("Finished parsing spoiler log.")
+    spoiler_log_processed = True
+
+def processSpoilerALttPR():
+    global countdown_use_triforces, countdown_use_keys, countdown_region_table, countdown_triforce_locs, countdown_triforces, countdown_item_locs, countdown_items, countdown_key_locs, countdown_keys, alttpr_location_map
+    file1 = open('countdown_spoiler.txt', 'r')
+    parsed_json = json.load(file1)
+    if parsed_json["meta"]["dungeon_items"] == "full":
+        countdown_use_keys = True
+    goal = parsed_json["meta"]["goal"]
+    if (goal == "triforce-hunt") or (goal == "ganonhunt"):
+        countdown_use_triforces = True
+    alttpr_region_names = ["Light World", "Hyrule Castle", "Eastern Palace", "Desert Palace", "Death Mountain", "Tower Of Hera", "Castle Tower", "Dark World", "Dark Palace", "Swamp Palace", "Skull Woods", "Thieves Town", "Ice Palace", "Misery Mire", "Turtle Rock", "Ganons Tower"]
+    for region_name in alttpr_region_names:
+        for key, value in parsed_json[region_name].items():
+            locationName = key.split(":")[0]
+            if locationName in alttpr_location_map:
+                locationName = alttpr_location_map[locationName]
+            itemName = value.split(":")[0]
+            regionName = countdown_region_table.get(locationName)
+            if regionName is not None:
+                if countdown_use_triforces and ('TriforcePiece' in itemName):
+                    countdown_triforce_locs.add(locationName)
+                    countdown_triforces[regionName] = countdown_triforces[regionName] + 1
+                elif countdown_use_keys and ('Key' in itemName):
+                    countdown_key_locs.add(locationName)
+                    countdown_keys[regionName] = countdown_keys[regionName] + 1
+                else:
+                    for val in alttpr_item_names:
+                        if val in itemName:
+                            countdown_item_locs.add(locationName)
+                            countdown_items[regionName] = countdown_items[regionName] + 1
+                            break
+    print("Finished parsing spoiler log.")
+    spoiler_log_processed = True
 
 async def main():
     parser = argparse.ArgumentParser()

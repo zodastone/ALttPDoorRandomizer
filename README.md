@@ -43,7 +43,7 @@ Alternatively, run ```Gui.py``` for a simple graphical user interface.
 
 # Running Countdown Instructions
 
-Generate a seed with the included generator.
+Generate a seed with the included generator, or via https://alttpr.com/
 
 Rename the spoiler log (required) to countdown_spoiler.txt and place it in the same directory as Countdown.py, MultiClientCountdown.py.  Then:
 
@@ -65,6 +65,7 @@ Typical "Defeat Ganon" seeds, plus:
 * Keysanity
 * Shopsanity
 * Single Player or Multiworld Games (use Countdown.py or MultiClientCountdown.py accordingly)
+Should be compatible with seeds generated with the included generator, other Door Rando forks, or via https://alttpr.com/
 
 # Unsupported Game Modes
 
