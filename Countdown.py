@@ -5,6 +5,9 @@ import colorama
 import json
 import logging
 import shlex
+import threading
+import tkinter as tk
+from tkinter import font
 import urllib.parse
 import websockets
 
@@ -760,6 +763,29 @@ countdown_regions_visited = {"North Light World": False,
                    "Misery Mire": False,
                    "Turtle Rock": False,
                    "Ganon's Tower": False}
+region_names = ["North Light World",
+                   "East Light World",
+                   "South Light World",
+                   "Kakariko Village",
+                   "Death Mountain",
+                   "North Dark World",
+                   "East Dark World",
+                   "South Dark World",
+                   "Village of Outcasts",
+                   "Dark Death Mountain",
+                   "Hyrule Castle",
+                   "Eastern Palace",
+                   "Desert Palace",
+                   "Tower of Hera",
+                   "Castle Tower",
+                   "Palace of Darkness",
+                   "Swamp Palace",
+                   "Skull Woods",
+                   "Thieves' Town",
+                   "Ice Palace",
+                   "Misery Mire",
+                   "Turtle Rock",
+                   "Ganon's Tower"]
 countdown_item_names = {'Progressive', 'Boomerang', 'Hookshot', 'Mushroom', 'Magic Powder', 'Fire Rod', 'Ice Rod', 'Bombos', 'Ether', 'Quake', 'Lamp', 'Hammer', 'Shovel', 'Ocarina', 'Bug Catching Net', 'Book of Mudora', 'Bottle', 'Cane of Somaria', 'Cane of Byrna', 'Cape', 'Magic Mirror', 'Magic Upgrade', 'Boots', 'Flippers', 'Moon Pearl'}
 alttpr_item_names = {'Progressive', 'Boomerang', 'Hookshot', 'Mushroom', 'Powder', 'FireRod', 'IceRod', 'Bombos', 'Ether', 'Quake', 'Lamp', 'Hammer', 'Shovel', 'Ocarina', 'BugCatchingNet', 'BookOfMudora', 'Bottle', 'CaneOfSomaria', 'CaneOfByrna', 'Cape', 'MagicMirror', 'HalfMagic', 'Boots', 'Flippers', 'MoonPearl'}
 countdown_item_locs = set()
@@ -770,6 +796,12 @@ countdown_use_keys = False
 countdown_use_keydrops = False
 countdown_last_msg = "Blah"
 spoiler_log_processed = False
+
+window_labels = []
+label_to_col = {}
+window_launched = False
+def_bg_color = None
+bold_region_index = -1
 
 SNES_DISCONNECTED = 0
 SNES_CONNECTING = 1
@@ -1303,7 +1335,7 @@ async def track_locations(ctx : Context, roomid, roomdata):
         ctx.retro_mode = flags[0] & 0x4
 
     def new_check(location):
-        global countdown_last_msg, countdown_use_keys, countdown_key_locs, countdown_keys
+        global countdown_last_msg, countdown_use_keys, countdown_key_locs, countdown_keys, window_labels, def_bg_color, bold_region_index
         ctx.locations_checked.add(location)
         ignored = filter_location(ctx, location)
         if ignored:
@@ -1314,10 +1346,19 @@ async def track_locations(ctx : Context, roomid, roomdata):
                 new_locations.append(Regions.lookup_name_to_id[location])
                 regionName = countdown_region_table.get(location)
                 if regionName is not None:
+                    stuffLeft = False
+                    regionIndex = region_names.index(regionName)
                     countdown_regions_visited[regionName] = True
                     if location in countdown_item_locs:
                         countdown_items[regionName] = countdown_items[regionName] - 1
                     itemsLeft = countdown_items[regionName]
+                    if regionIndex > -1:
+                        bgColor = def_bg_color
+                        if itemsLeft > 0:
+                            stuffLeft = True
+                            bgColor = "pink1"
+                        window_labels[1][regionIndex]['text'] = str(itemsLeft)
+                        window_labels[1][regionIndex]['bg'] = bgColor
                     outStr = regionName + ": " + str(itemsLeft)
                     if (countdown_use_triforces or countdown_use_keys):
                         if itemsLeft == 1:
@@ -1328,6 +1369,14 @@ async def track_locations(ctx : Context, roomid, roomdata):
                             if location in countdown_key_locs:
                                 countdown_keys[regionName] = countdown_keys[regionName] - 1
                             keysLeft = countdown_keys[regionName]
+                            if regionIndex > -1:
+                                bgColor = def_bg_color
+                                if keysLeft > 0:
+                                    stuffLeft = True
+                                    bgColor = "pink1"
+                                keyCol = label_to_col['keys']
+                                window_labels[keyCol][regionIndex]['text'] = str(keysLeft)
+                                window_labels[keyCol][regionIndex]['bg'] = bgColor
                             if keysLeft == 1:
                                 outStr = outStr + ", " + str(keysLeft) + " Key"
                             else:
@@ -1336,10 +1385,33 @@ async def track_locations(ctx : Context, roomid, roomdata):
                             if location in countdown_triforce_locs:
                                 countdown_triforces[regionName] = countdown_triforces[regionName] - 1
                             triforcesLeft = countdown_triforces[regionName]
+                            if regionIndex > -1:
+                                bgColor = def_bg_color
+                                if triforcesLeft > 0:
+                                    stuffLeft = True
+                                    bgColor = "pink1"
+                                triCol = label_to_col['tris']
+                                window_labels[triCol][regionIndex]['text'] = str(triforcesLeft)
+                                window_labels[triCol][regionIndex]['bg'] = bgColor
                             if triforcesLeft == 1:
                                 outStr = outStr + ", " + str(triforcesLeft) + " Triforce"
                             else:
                                 outStr = outStr + ", " + str(triforcesLeft) + " Triforces"
+                    if regionIndex > -1:
+                        if regionIndex != bold_region_index:
+                            if bold_region_index > -1:
+                                f = tk.font.Font(font=window_labels[0][bold_region_index]['font'])
+                                f['weight'] = 'normal'
+                                window_labels[0][bold_region_index]['font'] = f
+                            f = tk.font.Font(font=window_labels[0][regionIndex]['font'])
+                            f['weight'] = 'bold'
+                            window_labels[0][regionIndex]['font'] = f
+                        bold_region_index = regionIndex
+                        if stuffLeft:
+                            window_labels[0][regionIndex]['bg'] = "pink1"
+                        else:
+                            for i in range(len(window_labels)):
+                                window_labels[i][regionIndex]['bg'] = "green2"
                     if outStr != countdown_last_msg:
                         logging.info('  ' + outStr)
                         file1 = open("countdown_display.txt", "w")
@@ -1577,7 +1649,59 @@ def processSpoilerALttPR():
     print("Finished parsing spoiler log.")
     spoiler_log_processed = True
 
+class CountdownGui(threading.Thread):
+    def __init__(self):
+        self.root = None
+        threading.Thread.__init__(self)
+
+    def run(self):
+        global region_names, window_labels, label_to_col, def_bg_color
+        if not countdown_use_keys:
+            region_names.remove("Castle Tower")
+        window = tk.Tk()
+        window.title("Countdown")
+        window.minsize(250, 250)
+        def_bg_color = window.cget('bg')
+        self.root=window
+        region_labels = []
+        item_count_labels = []
+        extraCol = 2
+        label = tk.Label(text='Items')
+        label.grid(row=0, column=1, sticky="ew")
+        for i in range(len(region_names)):
+            label = tk.Label(text=region_names[i], bg="light goldenrod")
+            label.grid(row=i+1, column=0, sticky="ew")
+            region_labels.append(label)
+            label = tk.Label(text='?', bg="light goldenrod")
+            label.grid(row=i+1, column=1, sticky="ew")
+            item_count_labels.append(label)
+        window_labels.append(region_labels)
+        window_labels.append(item_count_labels)
+        if countdown_use_keys:
+            label = tk.Label(text='Keys')
+            label.grid(row=0, column=extraCol, sticky="ew")
+            key_count_labels = []
+            for i in range(len(region_names)):
+                label = tk.Label(text='?', bg="light goldenrod")
+                label.grid(row=i+1, column=extraCol, sticky="ew")
+                key_count_labels.append(label)
+            window_labels.append(key_count_labels)
+            label_to_col['keys'] = extraCol
+            extraCol = extraCol + 1
+        if countdown_use_triforces:
+            label = tk.Label(text='Tris')
+            label.grid(row=0, column=extraCol, sticky="ew")
+            triforce_count_labels = []
+            for i in range(len(region_names)):
+                label = tk.Label(text='?', bg="light goldenrod")
+                label.grid(row=i+1, column=extraCol, sticky="ew")
+                triforce_count_labels.append(label)
+            window_labels.append(triforce_count_labels)
+            label_to_col['tris'] = extraCol
+        self.root.mainloop()
+
 async def main():
+    global window_launched
     parser = argparse.ArgumentParser()
     parser.add_argument('--snes', default='localhost:8080', help='Address of the QUsb2snes server.')
     parser.add_argument('--connect', default=None, help='Address of the multiworld host.')
@@ -1593,6 +1717,10 @@ async def main():
 
     await snes_connect(ctx, ctx.snes_address)
     processSpoiler(ctx)
+    if not window_launched:
+        window_launched = True
+        app = CountdownGui()
+        app.start()
 
 #    if ctx.server_task is None:
 #        ctx.server_task = asyncio.create_task(server_loop(ctx))
